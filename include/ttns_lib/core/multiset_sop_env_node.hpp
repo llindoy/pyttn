@@ -5,6 +5,7 @@
 #include <linalg/linalg.hpp>
 
 #include "sop_env_node.hpp"
+#include "../ttn/tree/tree_node.hpp"
 
 
 namespace ttns

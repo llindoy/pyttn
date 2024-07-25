@@ -34,6 +34,12 @@ void init_sop_operator(py::module &m, const std::string& label)
         .def("assign", [](_sop& self, const _sop& o){self=o;})
         .def("__copy__",[](const _sop& o){return _sop(o);})
         .def("__deepcopy__", [](const _sop& o, py::dict){return _sop(o);}, py::arg("memo"))
+        .def_property
+            (
+                "Eshift", 
+                static_cast<const T& (_sop::*)() const>(&_sop::Eshift),
+                [](_sop& o, const T& i){o.Eshift() = i;}
+            )
         .def(
               "initialise", 
               [](_sop& o, SOP<T>& sop, const ttn_type& A, const system_modes& sys, bool compress, bool exploit_identity, bool use_sparse)

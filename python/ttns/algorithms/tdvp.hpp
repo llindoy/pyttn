@@ -38,12 +38,6 @@ void init_tdvp(py::module &m, const std::string& label)
         .def("initialise", &tdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("nstep")=1, py::arg("num_threads")=1)
         .def_property
             (
-                "Eshift", 
-                static_cast<const T& (tdvp::*)() const>(&tdvp::Eshift),
-                [](tdvp& o, const T& i){o.Eshift() = i;}
-            )
-        .def_property
-            (
                 "coefficient", 
                 static_cast<const T& (tdvp::*)() const>(&tdvp::coefficient),
                 [](tdvp& o, const T& i){o.coefficient() = i;}

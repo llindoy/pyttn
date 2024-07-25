@@ -1,8 +1,11 @@
 #ifndef TTNS_OBSERVABLE_NODE_HPP
 #define TTNS_OBSERVABLE_NODE_HPP
 
+#include <common/tmp_funcs.hpp>
 #include <common/exception_handling.hpp>
 #include <linalg/linalg.hpp>
+
+#include "../ttn/tree/tree_node.hpp"
 
 
 namespace ttns

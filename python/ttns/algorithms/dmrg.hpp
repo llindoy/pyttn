@@ -39,12 +39,6 @@ void init_dmrg(py::module &m, const std::string& label)
         .def("E", &dmrg::E)
         .def_property
             (
-                "Eshift", 
-                static_cast<const T& (dmrg::*)() const>(&dmrg::Eshift),
-                [](dmrg& o, const T& i){o.Eshift() = i;}
-            )
-        .def_property
-            (
                 "restarts", 
                 static_cast<const size_type& (dmrg::*)() const>(&dmrg::restarts),
                 [](dmrg& o, const size_type& i){o.restarts() = i;}
