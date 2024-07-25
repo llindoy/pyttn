@@ -1,0 +1,8 @@
+*.swo
+*.swp
+external
+build
+build*
+pyttn
+bin
+temp
