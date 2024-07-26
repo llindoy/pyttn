@@ -28,6 +28,8 @@ public:
     using typename base_type::vector_type;
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
+    using typename base_type::matview;
+    using typename base_type::resview;
 
 public:
     dense_matrix_operator()  : base_type() {}
@@ -61,6 +63,34 @@ public:
     {
         return std::make_shared<dense_matrix_operator>(m_operator);
     }
+
+    void apply(const resview& A, resview& HA) final
+    {
+        CALL_AND_HANDLE
+        (
+            HA = m_operator*A, 
+            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
+        );
+    }  
+
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final
+    {
+        CALL_AND_RETHROW(this->apply(A, HA));
+    }  
+
+    void apply(const matview& A, resview& HA) final
+    {
+        CALL_AND_HANDLE
+        (
+            HA = m_operator*A, 
+            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
+        );
+    }  
+
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final
+    {
+        CALL_AND_RETHROW(this->apply(A, HA));
+    }  
 
     void apply(const_matrix_ref A, matrix_ref HA) final
     {
@@ -152,6 +182,8 @@ public:
     using typename base_type::vector_type;
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
+    using typename base_type::matview;
+    using typename base_type::resview;
 
 public:
     adjoint_dense_matrix_operator()  : base_type() {}
@@ -186,6 +218,34 @@ public:
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<adjoint_dense_matrix_operator>(m_operator);}
 
+    void apply(const resview& A, resview& HA) final
+    {
+        CALL_AND_HANDLE
+        (
+            HA = adjoint(m_operator->m_operator)*A, 
+            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
+        );
+    }  
+
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final
+    {
+        CALL_AND_RETHROW(this->apply(A, HA));
+    }  
+
+    void apply(const matview& A, resview& HA) final
+    {
+        CALL_AND_HANDLE
+        (
+            HA = adjoint(m_operator->m_operator)*A, 
+            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
+        );
+    }  
+
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final
+    {
+        CALL_AND_RETHROW(this->apply(A, HA));
+    }  
+
     void apply(const_matrix_ref A, matrix_ref HA) final
     {
         CALL_AND_HANDLE
@@ -203,12 +263,12 @@ public:
     {
         CALL_AND_HANDLE
         (
-            m_working.resize(A.size(0)),
-            "Failed to apply adjoint dense matrix operator.  Failed to resize working buffer."
+            m_HA.resize(A.size(0)),
+            "Failed to apply adjoint dense matrix operator.  Failed to resize HA buffer."
         );
         CALL_AND_HANDLE
         (
-            HA = (adjoint(m_operator->m_operator)*A).bind_conjugate_workspace(m_working), 
+            HA = (adjoint(m_operator->m_operator)*A).bind_conjugate_workspace(m_HA), 
             "Failed to apply adjoint dense matrix operator.  Failed to compute matrix vector product."
         );
     }  
@@ -228,7 +288,7 @@ public:
     }
 protected:
     std::shared_ptr<dense_matrix_operator<T, backend>> m_operator;
-    vector_type m_working;
+    vector_type m_HA;
 
 #ifdef CEREAL_LIBRARY_FOUND
 public:
@@ -290,6 +350,8 @@ public:
     using typename base_type::vector_type;
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
+    using typename base_type::matview;
+    using typename base_type::resview;
 
 public:
     sparse_matrix_operator() : base_type() {}
@@ -312,6 +374,34 @@ public:
     void resize(size_type /*n*/){ASSERT(false, "This shouldn't be called.");}
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<sparse_matrix_operator>(m_operator);}
+
+    void apply(const resview& A, resview& HA) final
+    {
+        CALL_AND_HANDLE
+        (
+            HA = m_operator*A, 
+            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
+        );
+    }  
+
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final
+    {
+        CALL_AND_RETHROW(this->apply(A, HA));
+    }  
+
+    void apply(const matview& A, resview& HA) final
+    {
+        CALL_AND_HANDLE
+        (
+            HA = m_operator*A, 
+            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
+        );
+    }  
+
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final
+    {
+        CALL_AND_RETHROW(this->apply(A, HA));
+    }  
 
     void apply(const_matrix_ref A, matrix_ref HA) final
     {
@@ -402,6 +492,8 @@ public:
     using typename base_type::vector_type;
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
+    using typename base_type::matview;
+    using typename base_type::resview;
 
 protected:
     linalg::csr_matrix<T, backend> m_operator;
@@ -487,9 +579,57 @@ public:
 
     const linalg::csr_matrix<T, backend>& mat()const{return m_operator;}
 
+
+    void apply(const resview& A, resview& HA) final
+    {
+        CALL_AND_RETHROW(apply_internal(A, HA));
+    }
+    void apply(const resview& A, resview& HA, real_type /*t*/, real_type /*dt*/) final
+    {CALL_AND_RETHROW(this->apply(A, HA));}  
+
+    void apply(const matview& A, resview& HA) final
+    {
+        CALL_AND_RETHROW(apply_internal(A, HA));
+    }
+    void apply(const matview& A, resview& HA, real_type /*t*/, real_type /*dt*/) final
+    {CALL_AND_RETHROW(this->apply(A, HA));}  
+
     //now we need to apply the matrix matrix product using the cusparse routine.  The cusparse routine expects a column major order A matrix
     //but here we have a row major A matrix so it is necessary to appropriately transpose A and the result matrix. 
     void apply(const_matrix_ref A, matrix_ref HA) final
+    {
+        CALL_AND_RETHROW(apply_internal(A, HA));
+    }
+    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final
+    {CALL_AND_RETHROW(this->apply(A, HA));}  
+
+
+    //now we need to apply the matrix vector product using the cusparse routine.  
+    //The cusparse routine expects a column major order A matrix but here we have 
+    //a row major A matrix so it is necessary to appropriately transpose A and the result matrix. 
+    void apply(const_vector_ref A, vector_ref HA) final
+    {
+        ASSERT
+        (
+            backend::environment().is_initialised(), 
+            "Failed to apply sparse matrix operator.  The cuda backend has not been initialised."
+        );
+
+        ASSERT
+        (
+            m_sparse_init, 
+            "Failed to apply sparse matrix operator.  The sparse matrix descriptor has not been initialised."
+        );
+        ASSERT(false, "Sparse matrix vector product is currently not implemented.");
+    }
+
+    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final
+    {CALL_AND_RETHROW(this->apply(A, HA));}  
+    void update(real_type /*t*/, real_type /*dt*/) final{}  
+
+protected:
+    template <typename Atype, typename Rtype>
+    void apply_internal(const Atype& a, Rtype& HA)
     {
         ASSERT
         (
@@ -504,7 +644,7 @@ public:
 
         if(m_temp.shape() != A.shape())
         {
-            CALL_AND_HANDLE(m_temp.resize(A.shape(1), A.shape(0)), "Failed to resize working array.");
+            CALL_AND_HANDLE(m_temp.resize(A.shape(1), A.shape(0)), "Failed to resize HA array.");
             if(m_temp_init)
             {
                 CALL_AND_HANDLE
@@ -580,34 +720,8 @@ public:
             "Failed to destroy previously constructed cusparse descriptor."
         );
     }
-    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {CALL_AND_RETHROW(this->apply(A, HA));}  
 
 
-    //now we need to apply the matrix vector product using the cusparse routine.  
-    //The cusparse routine expects a column major order A matrix but here we have 
-    //a row major A matrix so it is necessary to appropriately transpose A and the result matrix. 
-    void apply(const_vector_ref A, vector_ref HA) final
-    {
-        ASSERT
-        (
-            backend::environment().is_initialised(), 
-            "Failed to apply sparse matrix operator.  The cuda backend has not been initialised."
-        );
-
-        ASSERT
-        (
-            m_sparse_init, 
-            "Failed to apply sparse matrix operator.  The sparse matrix descriptor has not been initialised."
-        );
-        ASSERT(false, "Sparse matrix vector product is currently not implemented.");
-    }
-
-    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {CALL_AND_RETHROW(this->apply(A, HA));}  
-    void update(real_type /*t*/, real_type /*dt*/) final{}  
-
-protected:
     void deallocate_dense_descriptor(cusparseDnMatDescr_t& desc)
     {
         CALL_AND_HANDLE(cusparse_safe_call(cusparseDestroyDnMat(desc)), "Failed to deallocate dense matrix descriptor.");
@@ -681,6 +795,8 @@ public:
     using typename base_type::vector_type;
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
+    using typename base_type::matview;
+    using typename base_type::resview;
 
 public:
     diagonal_matrix_operator() : base_type() {}
@@ -711,6 +827,34 @@ public:
     void resize(size_type /* n */){ASSERT(false, "This shouldn't be called.");}
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<diagonal_matrix_operator>(m_operator);}
+
+    void apply(const resview& A, resview& HA) final
+    {
+        CALL_AND_HANDLE
+        (
+            HA = m_operator*A, 
+            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
+        );
+    }  
+
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final
+    {
+        CALL_AND_RETHROW(this->apply(A, HA));
+    }  
+
+    void apply(const matview& A, resview& HA) final
+    {
+        CALL_AND_HANDLE
+        (
+            HA = m_operator*A, 
+            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
+        );
+    }  
+
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final
+    {
+        CALL_AND_RETHROW(this->apply(A, HA));
+    }  
 
     void apply(const_matrix_ref& A, matrix_ref HA) final
     {

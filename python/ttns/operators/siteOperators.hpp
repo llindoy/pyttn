@@ -7,6 +7,7 @@
 #include <ttns_lib/operators/site_operators/liouville_space_operator.hpp>
 #include <ttns_lib/operators/site_operators/dvr_operator.hpp>
 #include <ttns_lib/operators/site_operators/site_operator.hpp>
+#include <ttns_lib/operators/site_operators/purification_operator.hpp>
 #include "../../utils.hpp"
 
 #include <pybind11/operators.h>
@@ -33,6 +34,7 @@ void init_site_operators(py::module &m, const std::string& label)
     using anti_commmat = ops::dense_anti_commutator_operator<T, linalg::blas_backend>;
     using dvrop = ops::dvr_operator<T, linalg::blas_backend>;
     using dirprodop = ops::direct_product_operator<T, linalg::blas_backend>;
+    using purifop = ops::purification_operator<T, linalg::blas_backend>;
 
 
     using size_type = typename prim::size_type;
@@ -44,8 +46,8 @@ void init_site_operators(py::module &m, const std::string& label)
     using vector_ref = typename prim::vector_ref;
     using const_vector_ref = typename prim::const_vector_ref;
 
-
     using siteop = site_operator<T, linalg::blas_backend>;
+    using opdict = operator_dictionary<T, linalg::blas_backend>;
     //the base primitive operator type
     py::class_<siteop>(m, (std::string("site_operator_")+label).c_str())
         .def(py::init())
@@ -59,6 +61,30 @@ void init_site_operators(py::module &m, const std::string& label)
         .def(py::init<const anti_commmat&>())
         .def(py::init<const dvrop&>())
         .def(py::init<const dirprodop&>())
+        .def(py::init<const purifop&>())
+        .def(py::init<const ident&, size_t>())
+        .def(py::init<const dmat&, size_t>())
+        .def(py::init<const adjmat&, size_t>())
+        .def(py::init<const spmat&, size_t>())
+        .def(py::init<const diagmat&, size_t>())
+        .def(py::init<const commmat&, size_t>())
+        .def(py::init<const anti_commmat&, size_t>())
+        .def(py::init<const dvrop&, size_t>())
+        .def(py::init<const dirprodop&, size_t>())
+        .def(py::init<const purifop&, size_t>())
+        .def(py::init<const ident&, size_t, bool>())
+        .def(py::init<const dmat&, size_t, bool>())
+        .def(py::init<const adjmat&, size_t, bool>())
+        .def(py::init<const spmat&, size_t, bool>())
+        .def(py::init<const diagmat&, size_t, bool>())
+        .def(py::init<const dvrop&, size_t, bool>())
+        .def(py::init<const dirprodop&, size_t, bool>())
+
+        .def(py::init<sOP&, const system_modes&, bool, bool>(), py::arg(), py::arg(), py::arg("use_sparse")=true, py::arg("use_purification")=false)
+        .def(py::init<sOP&, const system_modes&, const opdict&, bool, bool>(), py::arg(), py::arg(), py::arg(), py::arg("use_sparse")=true, py::arg("use_purification")=false)
+
+        .def("initialise", static_cast<void (siteop::*)(sOP&, const system_modes&, bool, bool)>(&siteop::initialise), py::arg(), py::arg(), py::arg("use_sparse")=true, py::arg("use_purification")=false)
+        .def("initialise", static_cast<void (siteop::*)(sOP&, const system_modes&, const opdict&, bool, bool)>(&siteop::initialise), py::arg(), py::arg(), py::arg(), py::arg("use_sparse")=true, py::arg("use_purification")=false)
 
         .def("complex_dtype", [](const siteop&){return !std::is_same<T, real_type>::value;})
 
@@ -72,6 +98,7 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("assign", [](siteop& op, const anti_commmat& o){return op=o;})
         .def("assign", [](siteop& op, const dvrop& o){return op=o;})
         .def("assign", [](siteop& op, const dirprodop& o){return op=o;})
+        .def("assign", [](siteop& op, const purifop& o){return op=o;})
 
         .def("bind", [](siteop& op, const ident& o){return op.bind(o);})
         .def("bind", [](siteop& op, const dmat& o){return op.bind(o);})
@@ -82,6 +109,7 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("bind", [](siteop& op, const anti_commmat& o){return op.bind(o);})
         .def("bind", [](siteop& op, const dvrop& o){return op.bind(o);})
         .def("bind", [](siteop& op, const dirprodop& o){return op.bind(o);})
+        .def("bind", [](siteop& op, const purifop& o){return op=o;})
 
         .def("__copy__", [](const siteop& o){return siteop(o);})
         .def("__deepcopy__", [](const siteop& o, py::dict){return siteop(o);}, py::arg("memo"))
@@ -257,6 +285,19 @@ void init_site_operators(py::module &m, const std::string& label)
         )
         .def("complex_dtype", [](const dirprodop&){return !std::is_same<T, real_type>::value;});
 
+
+    //a operator form for operators needed to implement purifications
+    py::class_<purifop, prim>(m, (std::string("purification_")+label).c_str())
+        .def(py::init())
+        .def(py::init<const ident&>())
+        .def(py::init<const dmat&>())
+        .def(py::init<const adjmat&>())
+        .def(py::init<const spmat&>())
+        .def(py::init<const diagmat&>())
+        .def(py::init<const dvrop&>())
+        .def(py::init<const dirprodop&>())
+        .def("complex_dtype", [](const purifop&){return !std::is_same<T, real_type>::value;});
+        
 
     //a special operator form for a sequential product operator
     //using seqprodop = ops::sequential_product_operator<T, linalg::blas_backend>;

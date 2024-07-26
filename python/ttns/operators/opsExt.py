@@ -81,6 +81,7 @@ __site_op_dict__ = {
         "matrix": matrix, 
         "adjoint_matrix": adjoint_matrix, 
         "sparse_matrix": sparse_matrix, 
+        "diagonal_matrix": diagonal_matrix, 
         "commutator": commutator, 
         "anti_commutator": anti_commutator, 
         "dvr": dvr, 

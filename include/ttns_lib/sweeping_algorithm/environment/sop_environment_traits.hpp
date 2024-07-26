@@ -406,6 +406,8 @@ public:
         {   
             try
             {
+                t1.resize(v.shape(0), v.shape(1));
+                t2.resize(v.shape(0), v.shape(1));
                 const auto& cinf = hprim.contraction_info()[h.id()]();
                 CALL_AND_HANDLE(res = hprim.Eshift()*v, "Failed to apply shift contribution");
                 CALL_AND_RETHROW(site_action_leaf_helper::evaluate(v, h(), cinf, hprim.mode_operators(), t1, t2, res));
@@ -421,6 +423,8 @@ public:
         {   
             try
             {
+                t1.resize(v.shape(0), v.shape(1));
+                t2.resize(v.shape(0), v.shape(1));
                 const auto& cinf = hprim.contraction_info()[h.id()]();
                 CALL_AND_HANDLE(res = hprim.Eshift()*v, "Failed to apply shift contribution");
                 CALL_AND_RETHROW(site_action_leaf_helper::evaluate(v.as_matrix(), h(), cinf, hprim.mode_operators(), t1, t2, res));
@@ -450,9 +454,20 @@ public:
         template <typename vtype, typename mat_type, typename rtype>
         inline void operator()(const vtype& v, const node_type& h, const environment_type& hprim, mat_type& t1, mat_type& t2, mat_type& t3, rtype& res) const
         {   
-            ASSERT(node_inf != nullptr, "Cannot apply site action branch without first binding a node_type object to this.");
-            (*node_inf).as_matrix() = v;
-            CALL_AND_RETHROW(this->operator()(*node_inf, h, hprim, t1, t2, t3, res));
+            try
+            {
+                t1.resize(v.shape(0), v.shape(1));
+                t2.resize(v.shape(0), v.shape(1));
+                t3.resize(v.shape(0), v.shape(1));
+                ASSERT(node_inf != nullptr, "Cannot apply site action branch without first binding a node_type object to this.");
+                (*node_inf).as_matrix() = v;
+                CALL_AND_RETHROW(this->operator()(*node_inf, h, hprim, t1, t2, t3, res));
+            }
+            catch(const std::exception& ex)
+            {
+                std::cerr << ex.what() << std::endl;
+                RAISE_EXCEPTION("Failed to apply the branch coefficient evolution operator at a node.");
+            }
         }
 
         template <typename mat_type, typename rtype>
@@ -460,6 +475,9 @@ public:
         {   
             try
             {
+                t1.resize(v.shape(0), v.shape(1));
+                t2.resize(v.shape(0), v.shape(1));
+                t3.resize(v.shape(0), v.shape(1));
                 const auto& vmat = v.as_matrix();
                 const auto& cinf = hprim.contraction_info()[h.id()]();
                 CALL_AND_HANDLE(res = hprim.Eshift()*vmat, "Failed to apply shift contribution.");
@@ -544,6 +562,8 @@ public:
                     for(size_t ci = 0; ci < cinf[row].size(); ++ci)
                     {
                         size_t col = cinf[row][ci].col();
+                        t1.resize(v[col].shape(0), v[col].shape(1));
+                        t2.resize(v[col].shape(0), v[col].shape(1));
                         CALL_AND_RETHROW(site_action_leaf_helper::evaluate(v[col], h()[row][ci], cinf[row][ci], hprim.mode_operators(row, ci), t1, t2, res[row], row == col));
                     }
                 }
@@ -577,6 +597,10 @@ public:
                         size_t col = cinf[row][ci].col();
 
                         ms_sop_env_slice<T, backend> hslice(h, row, ci);
+                        
+                        t1.resize(v[col].shape(0), v[col].shape(1));
+                        t2.resize(v[col].shape(0), v[col].shape(1));
+                        t3.resize(v[col].shape(0), v[col].shape(1));
                         if(row == col)
                         {
                             CALL_AND_RETHROW(site_action_branch_helper::evaluate(v[col], hslice, cinf[row][ci], t1, t2, t3, res[row]));

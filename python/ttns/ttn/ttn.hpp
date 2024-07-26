@@ -90,10 +90,10 @@ void init_ttn(py::module &m, const std::string& label)
         //.def(py::init<const multiset_ttn_slice<real_type, linalg::blas_backend, false>&>())
         //.def(py::init<const multiset_ttn_slice<T, linalg::blas_backend, false>&>())
 
-        .def(py::init<const ntree<size_t>&>())
-        .def(py::init<const ntree<size_t>&, const ntree<size_t>&>())
-        .def(py::init<const std::string&>())
-        .def(py::init<const std::string&, const std::string&>())
+        .def(py::init<const ntree<size_t>&, bool>(), py::arg(), py::arg("purification") = false)
+        .def(py::init<const ntree<size_t>&, const ntree<size_t>&, bool>(), py::arg(), py::arg(), py::arg("purification") = false)
+        .def(py::init<const std::string&, bool>(), py::arg(), py::arg("purification") = false)
+        .def(py::init<const std::string&, const std::string, bool &>(), py::arg(), py::arg(), py::arg("purification") = false)
 
         //template <typename U, typename be, bool CONST>
         //ttn& operator=(multiset_ttn_slice<U, be, CONST> other)
@@ -104,19 +104,22 @@ void init_ttn(py::module &m, const std::string& label)
         .def("__copy__", [](const _ttn& o){return _ttn(o);})
         .def("__deepcopy__", [](const _ttn& o, py::dict){return _ttn(o);}, py::arg("memo"))
 
+        .def("bond_dimensions", &_ttn::bond_dimensions)
+        .def("bond_dimensions", [](const _ttn& o){typename _ttn::hrank_info res;  o.bond_dimensions(res);   return res;})
         .def("reset_orthogonality", &_ttn::reset_orthogonality)
         .def("reset_orthogonality_centre", &_ttn::reset_orthogonality_centre)
 
-        .def("resize", static_cast<void (_ttn::*)(const ntree<size_t, std::allocator<size_t>>&, size_t)>(&_ttn::resize), py::arg(), py::arg("nset")=1)
-        .def("resize", static_cast<void (_ttn::*)(const ntree<size_t, std::allocator<size_t>>&, const ntree<size_t, std::allocator<size_t>>&, size_t)>(&_ttn::resize), py::arg(), py::arg(), py::arg("nset")=1)
-        .def("resize", static_cast<void (_ttn::*)(const std::string&, size_t)>(&_ttn::resize), py::arg(), py::arg("nset")=1)
-        .def("resize", static_cast<void (_ttn::*)(const std::string&, const std::string&, size_t)>(&_ttn::resize), py::arg(), py::arg(), py::arg("nset")=1)
-
+        .def("resize", static_cast<void (_ttn::*)(const ntree<size_t, std::allocator<size_t>>&, size_t, bool)>(&_ttn::resize), py::arg(), py::arg("nset")=1, py::arg("purification") = false)
+        .def("resize", static_cast<void (_ttn::*)(const ntree<size_t, std::allocator<size_t>>&, const ntree<size_t, std::allocator<size_t>>&, size_t, bool)>(&_ttn::resize), py::arg(), py::arg(), py::arg("nset")=1, py::arg("purification") = false)
+        .def("resize", static_cast<void (_ttn::*)(const std::string&, size_t, bool)>(&_ttn::resize), py::arg(), py::arg("nset")=1, py::arg("purification") = false)
+        .def("resize", static_cast<void (_ttn::*)(const std::string&, const std::string&, size_t, bool)>(&_ttn::resize), py::arg(), py::arg(), py::arg("nset")=1, py::arg("purification") = false)
         .def("set_seed", &_ttn::template set_seed<int>)
 
 
         .def("set_state", &_ttn::template set_state<int>)
         .def("set_state", &_ttn::template set_state<size_t>)
+        .def("set_state_purification", &_ttn::template set_state<int>)
+        .def("set_state_purification", &_ttn::template set_state<size_t>)
 
         .def("set_product", &_ttn::template set_product<real_type, linalg::blas_backend>)
         .def("set_product", &_ttn::template set_product<T, linalg::blas_backend>)
@@ -130,7 +133,7 @@ void init_ttn(py::module &m, const std::string& label)
                                 self.set_product(_ps);
                             }
             )
-        .def("set_purification", &_ttn::set_purification)
+        .def("set_identity_purification", &_ttn::set_identity_purification)
         .def(
                 "sample_product_state", 
                 [](_ttn& o, const std::vector<std::vector<real_type>>& x)
@@ -159,6 +162,7 @@ void init_ttn(py::module &m, const std::string& label)
         .def("mode_dimensions", [](const _ttn& o){return o.mode_dimensions();})
         .def("dim", [](const _ttn& o, size_t i){return o.dim(i);})
         .def("nmodes", [](const _ttn& o){return o.nmodes();})
+        .def("is_purification", &_ttn::is_purification)
         .def("ntensors", [](const _ttn& o){return o.ntensors();})
         .def("nsites", [](const _ttn& o){return o.ntensors();})
         .def("nset", &_ttn::nset)

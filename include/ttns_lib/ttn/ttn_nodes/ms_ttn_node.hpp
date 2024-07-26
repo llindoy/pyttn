@@ -56,6 +56,7 @@ public:
     using real_type = typename tmp::get_real_type<T>::type;
     using node_type = tree_node<tree_base<value_type>>;
     using self_type = node_type;
+    using hrank_type = std::vector<size_type>;
 
     using bond_matrix_type = std::vector<matrix_type>;
     using node_helper = ttn_node_helper<multiset_node_data, T, backend>;
@@ -286,6 +287,11 @@ public:
         return ms;
     }
 
+    void get_hrank(std::vector<size_type>& res ) const
+    {
+        res.resize(m_data.size()); 
+        for(size_t i = 0; i < m_data.size(); ++i){res[i] = m_data[i].hrank();}
+    }
     size_type hrank(size_type i) const{return m_data[i].hrank();}
     size_type nmodes() const{return m_children.size();}
     size_type dimen(size_type i) const {return m_data[i].dimen();}

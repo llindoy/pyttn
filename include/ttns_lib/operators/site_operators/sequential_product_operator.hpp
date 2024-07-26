@@ -25,6 +25,8 @@ public:
     using typename base_type::vector_type;
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
+    using typename base_type::matview;
+    using typename base_type::resview;
 
 public:
     sequential_product_operator()  : base_type() {}
@@ -74,6 +76,32 @@ public:
     }  
     std::shared_ptr<base_type> clone() const{return std::make_shared<sequential_product_operator>(m_operators);}
 
+
+    void apply(const resview& A, resview& HA) final
+    {
+        ASSERT(m_operators.size() > 0, "Invalid operator object.");
+        __apply_internal(A, HA);
+    }  
+    void apply(const resview& A, resview& HA, real_type t, real_type dt) final 
+    {
+        ASSERT(m_operators.size() > 0, "Invalid operator object.");
+        this->update(t, dt);
+        __apply_internal(A, HA);
+    } 
+
+    void apply(const matview& A, resview& HA) final
+    {
+        ASSERT(m_operators.size() > 0, "Invalid operator object.");
+        __apply_internal(A, HA);
+    }  
+    void apply(const matview& A, resview& HA, real_type t, real_type dt) final 
+    {
+        ASSERT(m_operators.size() > 0, "Invalid operator object.");
+        this->update(t, dt);
+        __apply_internal(A, HA);
+    } 
+
+
     void apply(const_matrix_ref A, matrix_ref HA) final
     {
         ASSERT(m_operators.size() > 0, "Invalid operator object.");
@@ -118,13 +146,14 @@ protected:
     void __apply_internal(const T1& A, T2& HA)
     {
         m_temp.resize(A.size());
-        auto t = m_temp.reinterpret_shape(A.shape());
-        t = A;
+        resview t = m_temp.reinterpret_shape(A.shape(0), A.shape(1));
+        resview _HA = HA.reinterpret_shape(A.shape(0), A.shape(1));
         for(size_t i = 0; i < m_operators.size(); ++i)
         {
+            if(i == 0){t.set_buffer(A);}
+            else{t.set_buffer(_HA);}
             size_t ind = m_operators.size() - (i+1);
-            m_operators[ind]->apply(t, HA);
-            t = HA;
+            m_operators[ind]->apply(t, _HA);
         }
     }
 

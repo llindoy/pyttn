@@ -439,8 +439,10 @@ protected:
     typename std::enable_if<std::is_integral<Itype>::value, void>::type 
     setup_data_from_topology_node(const ntree_node<ntree<Itype, Atype>>& tree_iter, 
                                   const ntree_node<ntree<Itype, Atype>>& capacity_iter, 
-                                  size_type ndims)
+                                  size_type ndims, 
+                                  bool purification = false)                                  
     {
+
         this->m_mode_dims.resize(ndims);
         this->m_mode_capacity.resize(ndims);
 
@@ -467,6 +469,19 @@ protected:
             this->m_mode_capacity[index2] = capacity_child.value();
             ++index2;
         }
+
+        //if we are at a leaf node and are a purification square the local hildbert space
+        if(ndims == 1 && purification)
+        {
+            size_type mdim = this->m_mode_dims[0];
+            size2 *= mdim;
+            this->m_mode_dims[0] *= mdim;
+
+            size_t cdim = this->m_mode_capacity[0];
+            capacity2 *= cdim;
+            this->m_mode_capacity[0] *= cdim;
+        }
+
         this->m_max_hrank = capacity1;
         this->m_max_dimen = capacity2;
 
@@ -481,7 +496,7 @@ protected:
     typename std::enable_if<std::is_integral<Itype>::value, void>::type 
     setup_data_from_topology_node(const ntree_node<ntree<std::vector<Itype>, Atype>>& tree_iter, 
                                   const ntree_node<ntree<std::vector<Itype>, Atype>>& capacity_iter, 
-                                  size_type ndims, size_type ind)
+                                  size_type ndims, size_type ind, bool purification = false)
     {
         this->m_mode_dims.resize(ndims);
         this->m_mode_capacity.resize(ndims);
@@ -509,6 +524,19 @@ protected:
             this->m_mode_capacity[index2] = capacity_child.value()[ind];
             ++index2;
         }
+
+        //if we are at a leaf node and are a purification square the local hildbert space
+        if(ndims == 1 && purification)
+        {
+            size_type mdim = this->m_mode_dims[0];
+            size2 *= mdim;
+            this->m_mode_dims[0] *= mdim;
+
+            size_t cdim = this->m_mode_capacity[0];
+            capacity2 *= cdim;
+            this->m_mode_capacity[0] *= cdim;
+        }
+
         this->m_max_hrank = capacity1;
         this->m_max_dimen = capacity2;
 
@@ -743,6 +771,7 @@ public:
     using bond_matrix_type = matrix_type;
 
     using engine_type = orthogonality::decomposition_engine<T, backend, false>;
+    using hrank_type = size_type;
 
     friend class tree<value_type>;
     friend class tree_base<value_type>;
@@ -897,6 +926,7 @@ public:
     size_type maxcapacity() const{return m_data.capacity();}
     size_type maxhrank(bool use_capacity = false) const{return m_data.hrank(use_capacity);}
 
+    void get_hrank(size_type& res ) const{res = m_data.hrank();}
     size_type hrank() const{return m_data.hrank();}
     size_type nmodes() const{return m_data.nmodes();}
     size_type dimen() const {return m_data.dimen();}
@@ -950,9 +980,10 @@ public:
     setup_data_from_topology_node(const ntree_node<ntree<Itype, Atype>>& tree_iter, 
                                   const ntree_node<ntree<Itype, Atype>>& capacity_iter, 
                                   size_type ndims,
-                                  size_type /* nset */ = 1)
+                                  size_type /* nset */ = 1,
+                                  bool purification = false)
     {
-        CALL_AND_RETHROW(m_data.setup_data_from_topology_node(tree_iter, capacity_iter, ndims));
+        CALL_AND_RETHROW(m_data.setup_data_from_topology_node(tree_iter, capacity_iter, ndims, purification));
     }
 
 public:

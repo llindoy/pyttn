@@ -1,12 +1,10 @@
 import numpy as np
-from pyttn import *
-import pyttn
-M = pyttn.linalg.matrix(np.random.rand(2,2))
-from pyttn._pyttn import ntree, sop_operator_complex
-
-from memory_profiler import memory_usage
-
+import sys
 import time
+
+sys.path.append("../../")
+from pyttn import *
+
 
 
 N=4

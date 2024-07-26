@@ -153,7 +153,7 @@ public:
             single_set_container mode_operators;
             //set the single set primitive mode operators from the information provided
             using sop_op_type = sop_operator<T, backend>;
-            CALL_AND_RETHROW(sop_op_type::set_primitive_operators(mode_operators, sys, site_ops, use_sparse));
+            CALL_AND_RETHROW(sop_op_type::set_primitive_operators(mode_operators, sys, site_ops, use_sparse, A.is_purification()));
 
             //and set the element as required.
             m_mode_operators[i].push_back(mode_operators);
@@ -202,7 +202,7 @@ public:
 
             using sop_op_type = sop_operator<T, backend>;
             //set the single set primitive mode operators from the information provided
-            CALL_AND_RETHROW(sop_op_type::set_primitive_operators(mode_operators, sys, opdict, site_ops, use_sparse));
+            CALL_AND_RETHROW(sop_op_type::set_primitive_operators(mode_operators, sys, opdict, site_ops, use_sparse, A.is_purification()));
 
             //and set the element as required.
             m_mode_operators[i].push_back(mode_operators);

@@ -25,6 +25,8 @@ public:
     using typename base_type::vector_type;
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
+    using typename base_type::matview;
+    using typename base_type::resview;
 
 public:
     dvr_operator()  : base_type() {}
@@ -79,24 +81,20 @@ public:
     void update(real_type /*t*/, real_type /*dt*/) final{}  
     std::shared_ptr<base_type> clone() const{return std::make_shared<dvr_operator>(m_V, m_operators);}
 
+    void apply(const resview& A, resview& HA) final
+    {
+        CALL_AND_RETHROW(apply_internal(A, HA));
+    }  
+    void apply(const resview& A, resview& HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(this->apply(A, HA));}  
+    void apply(const matview& A, resview& HA) final
+    {
+        CALL_AND_RETHROW(apply_internal(A, HA));
+    }  
+    void apply(const matview& A, resview& HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(this->apply(A, HA));}  
+
     void apply(const_matrix_ref A, matrix_ref HA) final
     {
-        ASSERT(m_operators.size() > 0, "Invalid operator object.");
-
-        std::array<size_type, 3> mdims = {{1,1,A.size()}};
-        
-        HA = m_V*A;
-        for(size_type i = 0; i < m_operators.size(); ++i)
-        {
-            mdims[0] *= mdims[1];
-            mdims[1] = m_operators[i].shape(0);
-            mdims[2] /= mdims[1];
-
-            auto At = A.reinterpret_shape(mdims[0], mdims[1], mdims[2]);
-            auto HAt = HA.reinterpret_shape(mdims[0], mdims[1], mdims[2]);
-
-            CALL_AND_HANDLE(HAt += contract(m_operators[i], 1, At, 1), "Failed to compute kronecker product contraction.");      
-        }
+        CALL_AND_RETHROW(apply_internal(A, HA));
     }  
     void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(this->apply(A, HA));}  
     void apply(const_vector_ref A , vector_ref HA) final
@@ -131,6 +129,28 @@ public:
         }
         oss << "V: " << std::endl << m_V << std::endl;
         return oss.str();
+    }
+
+protected:
+    template <typename Atype, typename Rtype>
+    void apply_internal(const Atype& A, Rtype& HA)
+    {
+        ASSERT(m_operators.size() > 0, "Invalid operator object.");
+
+        std::array<size_type, 3> mdims = {{1,1,A.size()}};
+        
+        HA = m_V*A;
+        for(size_type i = 0; i < m_operators.size(); ++i)
+        {
+            mdims[0] *= mdims[1];
+            mdims[1] = m_operators[i].shape(0);
+            mdims[2] /= mdims[1];
+
+            auto At = A.reinterpret_shape(mdims[0], mdims[1], mdims[2]);
+            auto HAt = HA.reinterpret_shape(mdims[0], mdims[1], mdims[2]);
+
+            CALL_AND_HANDLE(HAt += contract(m_operators[i], 1, At, 1), "Failed to compute kronecker product contraction.");      
+        }
     }
 
 protected:

@@ -105,7 +105,7 @@ public:
         //update the node tensor.  To do this we solve the effective eigenproblem
         if(!A.is_leaf())
         {
-            env.ceb.set_buffer(&(A()));
+            env.ceb.set_pointer(&(A()));
 #ifdef PARALLELISE_FOR_LOOPS
             CALL_AND_HANDLE
             (
@@ -119,7 +119,7 @@ public:
                 "Failed to evolve the branch coefficient matrix."
             );
 #endif
-            env.ceb.unset_buffer();
+            env.ceb.unset_pointer();
         }
         else
         {

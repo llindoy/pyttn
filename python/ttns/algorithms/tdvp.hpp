@@ -28,7 +28,7 @@ void init_tdvp(py::module &m, const std::string& label)
     using size_type = typename tdvp::size_type;
     using real_type = typename linalg::get_real_type<T>::type;
     //wrapper for the sPOP type 
-    py::class_<tdvp>(m, label.c_str())
+    py::class_<tdvp>(m, (std::string("one_site_tdvp_")+label).c_str())
         .def(py::init<>())
         .def(py::init<const _ttn&, const _sop&, size_type, size_type, size_type>(),
                   py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("nstep")=1, py::arg("num_threads")=1)
@@ -68,6 +68,7 @@ void init_tdvp(py::module &m, const std::string& label)
             )
         .def("clear", &tdvp::clear)
         .def("step", &tdvp::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
+        .def("__call__", &tdvp::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
         .def("prepare_environment", &tdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false);
 }
 

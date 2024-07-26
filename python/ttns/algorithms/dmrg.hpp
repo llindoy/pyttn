@@ -28,7 +28,7 @@ void init_dmrg(py::module &m, const std::string& label)
     using size_type = typename dmrg::size_type;
     using real_type = typename linalg::get_real_type<T>::type;
     //wrapper for the sPOP type 
-    py::class_<dmrg>(m, label.c_str())
+    py::class_<dmrg>(m, (std::string("one_site_dmrg_")+label).c_str())
         .def(py::init<>())
         .def(py::init<const _ttn&, const _sop&, size_type, size_type>(),
                   py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("num_threads")=1)
@@ -57,6 +57,7 @@ void init_dmrg(py::module &m, const std::string& label)
             )
         .def("clear", &dmrg::clear)
         .def("step", &dmrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
+        .def("__call__", &dmrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
         .def("prepare_environment", &dmrg::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false);
     //utils::eigenvalue_target& mode(){return m_eigensolver.mode();}
     //const utils::eigenvalue_target& mode() const{return m_eigensolver.mode();}

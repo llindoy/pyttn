@@ -255,30 +255,30 @@ public:
     inline bool same_shape(const shape_type& _shape) const{return _shape == m_shape;}
 public:    
     template <typename Itype, typename ... Args>
-    inline typename std::enable_if<std::is_integral<Itype>::value, tensor_view<typename std::add_const<value_type>::type, sizeof...(Args)+1, backend_type>>::type reinterpret_shape(const Itype& i, Args&& ... args) const
+    inline typename std::enable_if<std::is_integral<Itype>::value, reinterpreted_tensor<typename std::add_const<value_type>::type, sizeof...(Args)+1, backend_type>>::type reinterpret_shape(const Itype& i, Args&& ... args) const
     {
-        using reinterpreted_type = tensor_view<typename std::add_const<value_type>::type, sizeof...(Args)+1, backend_type>;
+        using reinterpreted_type = reinterpreted_tensor<typename std::add_const<value_type>::type, sizeof...(Args)+1, backend_type>;
         CALL_AND_HANDLE(return reinterpreted_type(size(), true, m_buffer, i, std::forward<Args>(args)...), "Failed to reinterpret the shape of the tensor_view object.");
     }
 
     template <typename Itype, typename ... Args>
-    inline typename std::enable_if<std::is_integral<Itype>::value, tensor_view<value_type, sizeof...(Args)+1, backend_type>>::type reinterpret_shape(const Itype& i, Args&& ... args)
+    inline typename std::enable_if<std::is_integral<Itype>::value, reinterpreted_tensor<value_type, sizeof...(Args)+1, backend_type>>::type reinterpret_shape(const Itype& i, Args&& ... args)
     {
-        using reinterpreted_type = tensor_view<value_type, sizeof...(Args)+1, backend_type>;
+        using reinterpreted_type = reinterpreted_tensor<value_type, sizeof...(Args)+1, backend_type>;
         CALL_AND_HANDLE(return reinterpreted_type(size(), true, m_buffer, i, std::forward<Args>(args)...), "Failed to reinterpret the shape of the tensor_view object.");
     }
 
     template <size_t vD>
-    inline tensor_view<typename std::add_const<value_type>::type, vD, backend_type> reinterpret_shape(const std::array<size_type, vD>& _size) const
+    inline reinterpreted_tensor<typename std::add_const<value_type>::type, vD, backend_type> reinterpret_shape(const std::array<size_type, vD>& _size) const
     {
-        using reinterpreted_type = tensor_view<typename std::add_const<value_type>::type, vD, backend_type>;
+        using reinterpreted_type = reinterpreted_tensor<typename std::add_const<value_type>::type, vD, backend_type>;
         CALL_AND_HANDLE(return reinterpreted_type(size(), true, m_buffer, _size), "Failed to reinterpret the shape of the tensor_view object.");
     }
 
     template <size_t vD>
-    inline tensor_view<value_type, vD, backend_type> reinterpret_shape(const std::array<size_type, vD>& _size)
+    inline reinterpreted_tensor<value_type, vD, backend_type> reinterpret_shape(const std::array<size_type, vD>& _size)
     {
-        using reinterpreted_type = tensor_view<value_type, vD, backend_type>;
+        using reinterpreted_type =reinterpreted_tensor<value_type, vD, backend_type>;
         CALL_AND_HANDLE(return reinterpreted_type(size(), true, m_buffer, _size), "Failed to reinterpret the shape of the tensor_view object.");
     }
 public:
@@ -295,7 +295,7 @@ private:
 public:
     //Inplace scalar multiplication/division functions
     template <typename Vt> inline value_update_type<Vt, self_type> operator*=(const Vt& v){CALL_AND_HANDLE(backend_type::scal(size(), value_type(v), m_buffer, 1), "Failed to perform operator*= on tensor view object.  scal call failed.");      return *this;}
-    template <typename Vt> inline value_update_type<Vt, self_type> operator/=(const Vt& v){CALL_AND_HANDLE(backend_type::scal(size(), value_type(1.0/v), m_buffer, 1), "Failed to perform operator/= on reintepreted object.  scal call failed.");  return *this;}
+    template <typename Vt> inline value_update_type<Vt, self_type> operator/=(const Vt& v){CALL_AND_HANDLE(backend_type::scal(size(), value_type(1.0/v), m_buffer, 1), "Failed to perform operator/= on reinterpreted object.  scal call failed.");  return *this;}
 
     inline pointer buffer(){return m_buffer;}
     inline const_pointer buffer()const{return m_buffer;}

@@ -16,11 +16,13 @@ namespace ttns
 namespace ops
 {
 
-template <typename T, typename backend = linalg::blas_backend> 
+template <template <typename, typename> class op, typename T, typename backend = linalg::blas_backend> 
 class purification_operator : public primitive<T, backend>
 {
 public:
     using base_type = primitive<T, backend>;
+    using mat_type = op<T, backend>;
+
     //use the parent class type aliases
     using typename base_type::matrix_type;
     using typename base_type::size_type;
@@ -31,25 +33,20 @@ public:
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
     using typename base_type::matview;
-    using typename base_type::resview;
 
 public:
     purification_operator()  : base_type() {}
-
-    purification_operator(std::shared_ptr<base_type> op) try : base_type(), m_operator(op->clone())
+    template <typename ... Args>
+    purification_operator(Args&& ... args) try : base_type(), m_operator(std::forward<Args>(args)...)
     {
-        base_type::m_size = op->size()*op->size();
+        ASSERT(m_operator.shape(0) == m_operator.shape(1), "The operator to be bound must be a square matrix.");
+        base_type::m_size = m_operator.shape(0)*m_operator.shape(0);
     }
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
         RAISE_EXCEPTION("Failed to construct commutator operator object.");
     }
-
-    template <typename OpType, typename = typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, void>::type>
-    purification_operator(const OpType& op) try : purification_operator(std::make_shared<OpType>(op)) {}
-    catch(const std::exception& ex){std::cerr << ex.what() << std::endl;    RAISE_EXCEPTION("Failed to construct purification operator.");}
-
     purification_operator(const purification_operator& o) = default;
     purification_operator(purification_operator&& o) = default;
 
@@ -61,41 +58,34 @@ public:
     std::shared_ptr<base_type> clone() const{return std::make_shared<purification_operator>(m_operator);}
 
 
-    void apply(const resview& A, resview& HA)
+    void apply(const matview& A, matrix_ref HA)
     {
-        RAISE_EXCEPTION("Cannot have nested purifications.");
+        CALL_AND_RETHROW(apply_internal(A, HA);
     }  
-    void apply(const resview& A, resview& HA, real_type t, real_type dt){this->update(t, dt); CALL_AND_RETHROW(this->apply(A, HA));}  
-    void apply(const matview& A, resview& HA)
-    {
-        RAISE_EXCEPTION("Cannot have nested purifications.");
-    }  
-    void apply(const matview& A, resview& HA, real_type t, real_type dt){this->update(t, dt); CALL_AND_RETHROW(this->apply(A, HA));}  
+    void apply(const matview& A, matrix_ref HA, real_type /*t*/, real_type /*dt*/){CALL_AND_RETHROW(this->apply(A, HA));}  
 
     void apply(const_matrix_ref A, matrix_ref HA)
     {
-        HA.resize(A.shape(0), A.shape(1));
-        CALL_AND_RETHROW(apply_internal(A, HA));
+        CALL_AND_RETHROW(apply_internal(A, HA);
     }  
-    void apply(const_matrix_ref A, matrix_ref HA, real_type t, real_type dt){this->update(t, dt); CALL_AND_RETHROW(this->apply(A, HA));}  
+    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/){CALL_AND_RETHROW(this->apply(A, HA));}  
     void apply(const_vector_ref A, vector_ref HA)
     {
         try
         {
-            HA.resize(A.shape());
             //reinterpret the arrays as rank 3 tensors 
-            auto HAt = HA.reinterpret_shape(m_operator->size(), m_operator->size());
-            auto At = A.reinterpret_shape(m_operator->size(), m_operator->size());
-            CALL_AND_HANDLE(m_operator->apply(At, HAt), "Failed to apply Hamiltonian on the left.");
+            auto HAt = HA.reinterpret_shape(m_operator.shape(0), m_operator.shape(1));
+            auto At = A.reinterpret_shape(m_operator.shape(0), m_operator.shape(1));
+            CALL_AND_HANDLE(HAt  = m_operator*At, "Failed to apply Hamiltonian on the left.");
         }
         catch(const std::exception& ex)
         {
             std::cerr << ex.what() << std::endl;
-            RAISE_EXCEPTION("Failed to evaluate purification operator.");
+            RAISE_EXCEPTION("Failed to evaluate dense commutator operator.");
         }
     }  
-    void apply(const_vector_ref A, vector_ref HA, real_type t, real_type dt){this->update(t, dt); CALL_AND_RETHROW(this->apply(A, HA));}  
-    void update(real_type t, real_type dt) final{m_operator->update(t, dt);}  
+    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/){CALL_AND_RETHROW(this->apply(A, HA));}  
+    void update(real_type /*t*/, real_type /*dt*/) final{}  
 
     const matrix_type& mat()const{return m_operator;}
 
@@ -104,7 +94,7 @@ public:
         std::stringstream oss;
         oss << "purification operator: " << std::endl;
         oss << "H: " << std::endl;
-        oss << m_operator->to_string() << std::endl;
+        oss << m_operator << std::endl;
         return oss.str();
     }
 protected:
@@ -114,19 +104,19 @@ protected:
         try
         {
             //reinterpret the arrays as rank 3 tensors 
-            auto HAt = HA.reinterpret_shape(m_operator->size(), (HA.shape(0)*HA.shape(1))/m_operator->size());
-            auto At = A.reinterpret_shape(m_operator->size(), (HA.shape(0)*HA.shape(1))/m_operator->size());
-            CALL_AND_HANDLE(m_operator->apply(At, HAt), "Failed to apply Hamiltonian on the left.");
+            auto HAt = HA.reinterpret_shape(m_operator.shape(0), m_operator.shape(1)*HA.shape(1));
+            auto At = A.reinterpret_shape(m_operator.shape(0), m_operator.shape(1)*HA.shape(1));
+            CALL_AND_HANDLE(HAt  = m_operator*At, "Failed to apply Hamiltonian on the left.");
         }
         catch(const std::exception& ex)
         {
             std::cerr << ex.what() << std::endl;
-            RAISE_EXCEPTION("Failed to evaluate purification operator.");
+            RAISE_EXCEPTION("Failed to evaluate dense commutator operator.");
         }
     }
 
 protected:
-    std::shared_ptr<base_type> m_operator;
+    mat_type m_operator;
 
 #ifdef CEREAL_LIBRARY_FOUND
 public:
@@ -134,23 +124,35 @@ public:
     void save(archive& ar) const
     {
         CALL_AND_HANDLE(ar(cereal::base_class<primitive<T, backend> >(this)), "Failed to serialise commutator operator object.  Error when serialising the base object.");
-        CALL_AND_HANDLE(ar(cereal::make_nvp("op", m_operator)), "Failed to serialise commutator operator object.  Error when serialising the matrix.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("matrix", m_operator)), "Failed to serialise commutator operator object.  Error when serialising the matrix.");
     }
 
     template <typename archive>
     void load(archive& ar)
     {
         CALL_AND_HANDLE(ar(cereal::base_class<primitive<T, backend> >(this)), "Failed to serialise commutator operator object.  Error when serialising the base object.");
-        CALL_AND_HANDLE(ar(cereal::make_nvp("op", m_operator)), "Failed to serialise commutator operator object.  Error when serialising the matrix.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("matrix", m_operator)), "Failed to serialise commutator operator object.  Error when serialising the matrix.");
     }
 #endif
 };
+
+
+template <typename T, typename backend = linalg::blas_backend> 
+using dense_purification_operator = purification_operator<linalg::matrix, T, backend>;
+
+template <typename T, typename backend = linalg::blas_backend> 
+using sparse_purification_operator = purification_operator<linalg::csr_matrix, T, backend>;
+
+template <typename T, typename backend = linalg::blas_backend> 
+using diagonal_purification_operator = purification_operator<linalg::diagonal_matrix, T, backend>;
 
 }   //namespace ttns
 }   //namespace ops
 
 #ifdef CEREAL_LIBRARY_FOUND
-TTNS_REGISTER_SERIALIZATION(ttns::ops::purification_operator, ttns::ops::primitive)
+TTNS_REGISTER_SERIALIZATION(ttns::ops::dense_purification_operator, ttns::ops::primitive)
+TTNS_REGISTER_SERIALIZATION(ttns::ops::sparse_purification_operator, ttns::ops::primitive)
+TTNS_REGISTER_SERIALIZATION(ttns::ops::diagonal_purification_operator, ttns::ops::primitive)
 #endif
 
 

@@ -118,6 +118,7 @@ protected:
                 CALL_AND_HANDLE(hspf.spf_id() = adjoint(b)*a, "Failed to compute the id matrix term.");
             }
 
+            std::cout << "eval leaf sizes: " << B.size(1) << " " << A.size(1) << std::endl;
             //#pragma omp parallel for default(shared) schedule(dynamic, 1)
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
             {
@@ -157,6 +158,8 @@ protected:
             RAISE_EXCEPTION("Failed to evaluate single particle operator at a leaf node.");
         }
     }
+
+    static inline void resize_buffer(const hnode& A, triad& HA, 
 
     template <typename spfnode>
     static inline void evaluate_leaf(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, triad& HA, spfnode& hspf, bool compute_identity = false)

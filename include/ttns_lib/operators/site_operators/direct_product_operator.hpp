@@ -25,6 +25,8 @@ public:
     using typename base_type::vector_type;
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
+    using typename base_type::matview;
+    using typename base_type::resview;
 
 public:
     direct_product_operator()  : base_type() {}
@@ -83,13 +85,22 @@ public:
 
     void update(real_type /*t*/, real_type /*dt*/) final{}  
     std::shared_ptr<base_type> clone() const{return std::make_shared<direct_product_operator>(m_operators);}
+
+    void apply(const resview& A, resview& HA) final
+    {
+        CALL_AND_RETHROW(apply_internal(A, HA));
+    }
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(this->apply(A, HA));}
+
+    void apply(const matview& A, resview& HA) final
+    {
+        CALL_AND_RETHROW(apply_internal(A, HA));
+    }
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(this->apply(A, HA));}
+
     void apply(const_matrix_ref A, matrix_ref HA) final
     {
-        CALL_AND_HANDLE(m_temp.resize(A.size()), "Failed to resize temporary array object.");
-        ASSERT(m_operators.size() > 0, "Invliad operator object.");
-        
-        bool HA_set = __apply_internal(A, HA);
-        if(!HA_set){CALL_AND_HANDLE(HA = m_temp.reinterpret_shape(HA.shape(0), HA.shape(1)), "Failed to copy temp array.");}
+        CALL_AND_RETHROW(apply_internal(A, HA));
     }  
     void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(this->apply(A, HA));}  
     void apply(const_vector_ref A , vector_ref HA) final
@@ -110,6 +121,17 @@ public:
             oss << m_operators[i] << std::endl;
         }
         return oss.str();
+    }
+
+protected:
+    template <typename Atype, typename Rtype>
+    void apply_internal(const Atype& A, Rtype& HA)
+    {
+        CALL_AND_HANDLE(m_temp.resize(A.size()), "Failed to resize temporary array object.");
+        ASSERT(m_operators.size() > 0, "Invliad operator object.");
+        
+        bool HA_set = __apply_internal(A, HA);
+        if(!HA_set){CALL_AND_HANDLE(HA = m_temp.reinterpret_shape(HA.shape(0), HA.shape(1)), "Failed to copy temp array.");}
     }
 
 protected:

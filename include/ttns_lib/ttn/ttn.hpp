@@ -104,7 +104,7 @@ public:
 
 
     template <typename INTEGER, typename Alloc>
-    ttn(const ntree<INTEGER, Alloc>& topology) try : base_type(topology, 1) {}
+    ttn(const ntree<INTEGER, Alloc>& topology, bool purification = false) try : base_type(topology, 1, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
@@ -112,21 +112,21 @@ public:
     }
 
     template <typename INTEGER, typename Alloc>
-    ttn(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity)try : base_type(topology, capacity, 1) {}
+    ttn(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, bool purification = false)try : base_type(topology, capacity, 1, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
         RAISE_EXCEPTION("Failed to construct TTN object.");
     }
 
-    ttn(const std::string& _topology) try : base_type(_topology, 1) {}
+    ttn(const std::string& _topology, bool purification = false) try : base_type(_topology, 1, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
         RAISE_EXCEPTION("Failed to construct TTN object.");
     }
 
-    ttn(const std::string& _topology, const std::string& _capacity) try : base_type(_topology, _capacity, 1) {}
+    ttn(const std::string& _topology, const std::string& _capacity, bool purification = false) try : base_type(_topology, _capacity, 1, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
@@ -221,7 +221,10 @@ public:
 
 public:
     template <typename int_type> 
-    void set_state(const std::vector<int_type>& si){CALL_AND_RETHROW(this->_set_state(si, 0));}
+    void set_state(const std::vector<int_type>& si){CALL_AND_RETHROW(this->_set_state(si, 0, false));}
+
+    template <typename int_type> 
+    void set_state_purification(const std::vector<int_type>& si){CALL_AND_RETHROW(this->_set_state(si, 0, true));}
 
     template <typename U, typename be> 
     void set_product(const std::vector<linalg::vector<U, be> >& ps){CALL_AND_RETHROW(this->_set_product(ps));}
@@ -229,7 +232,10 @@ public:
     template <typename Rvec> 
     void sample_product_state(std::vector<size_t>& state, const std::vector<Rvec>& relval){CALL_AND_RETHROW(this->_sample_product_state(state, relval));}
 
-    void set_purification(){CALL_AND_RETHROW(this->_set_purification());}
+    void set_identity_purification()
+    {
+        CALL_AND_RETHROW(this->_set_purification());
+    }
 public:
     
     real_type bond_entropy(size_t /* bond_index */)

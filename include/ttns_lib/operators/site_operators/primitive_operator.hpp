@@ -32,6 +32,8 @@ public:
     using vector_ref = vector_type&;
     using const_vector_ref = const vector_type&;
     using real_type = typename tmp::get_real_type<T>::type;
+    using matview = linalg::reinterpreted_tensor<const T, 2, backend>;
+    using resview = linalg::reinterpreted_tensor<T, 2, backend>;
 
 protected:
     size_type m_size;
@@ -49,10 +51,14 @@ public:
     primitive& operator=(primitive&& o) = default;
 
 
-    virtual void apply(const_matrix_ref A, matrix_ref working) = 0;
-    virtual void apply(const_matrix_ref A, matrix_ref working, real_type t, real_type dt) = 0;
-    virtual void apply(const_vector_ref A, vector_ref working) = 0;
-    virtual void apply(const_vector_ref A, vector_ref working, real_type t, real_type dt) = 0;
+    virtual void apply(const resview& A, resview& HA) = 0;
+    virtual void apply(const resview& A, resview& HA, real_type t, real_type dt) = 0;
+    virtual void apply(const matview& A, resview& HA) = 0;
+    virtual void apply(const matview& A, resview& HA, real_type t, real_type dt) = 0;
+    virtual void apply(const_matrix_ref A, matrix_ref HA) = 0;
+    virtual void apply(const_matrix_ref A, matrix_ref HA, real_type t, real_type dt) = 0;
+    virtual void apply(const_vector_ref A, vector_ref HA) = 0;
+    virtual void apply(const_vector_ref A, vector_ref HA, real_type t, real_type dt) = 0;
 
     //function for allowing you to update time-dependent Hamiltonians
     virtual void update(real_type t, real_type dt) = 0;     
@@ -118,6 +124,8 @@ public:
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
     using typename base_type::real_type;
+    using typename base_type::matview;
+    using typename base_type::resview;
 
 public:
     identity() : base_type() {}
@@ -125,10 +133,15 @@ public:
     identity(const identity& o) = default;
     identity(identity&& o) = default;
     ~identity() {}
-    void apply(const_matrix_ref A, matrix_ref working) final {working = A;}
-    void apply(const_matrix_ref A, matrix_ref working, real_type /*t*/, real_type /*dt*/) final {working = A;}
-    void apply(const_vector_ref A, vector_ref working) final {working = A;}
-    void apply(const_vector_ref A, vector_ref working, real_type /*t*/, real_type /*dt*/) final {working = A;}
+
+    void apply(const resview& A, resview& HA) final {HA = A;}
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final {HA = A;}
+    void apply(const matview& A, resview& HA) final {HA = A;}
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final {HA = A;}
+    void apply(const_matrix_ref A, matrix_ref HA) final {HA = A;}
+    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final {HA = A;}
+    void apply(const_vector_ref A, vector_ref HA) final {HA = A;}
+    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final {HA = A;}
     void update(real_type /* t */, real_type /* dt */) final{};    
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<identity>(base_type::m_size);}

@@ -202,6 +202,7 @@ public:
 
     void set_purification()
     {
+        ASSERT(this->is_purification(), "Set state requires a purification state.");
         this->zero();
         size_type ns = static_cast<size_type>(std::sqrt(this->nset()));
         ASSERT(ns*ns == this->nset(), "Cannot set purification state.  The set dimension is not a perfect square and therefore cannot represent composite system, ancilla states.");

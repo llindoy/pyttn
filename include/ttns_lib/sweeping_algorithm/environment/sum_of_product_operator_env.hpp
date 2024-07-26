@@ -112,7 +112,7 @@ public:
 
     inline void update_env_up(const environment_type& op, const hnode& _a1, node_type& _h)
     {
-        CALL_AND_HANDLE(spo_core::evaluate(op, op.contraction_info()[_h.id()], _a1, _h, m_buf.HA, m_buf.temp), "Failed to evaluate the mean field operator.");
+        CALL_AND_HANDLE(spo_core::evaluate(op, op.contraction_info()[_h.id()], _a1, _h, m_buf.HA, m_buf.temp), "Failed to evaluate the single particle operator.");
     }
 
     const buffer_type& buffer() const{return m_buf;}

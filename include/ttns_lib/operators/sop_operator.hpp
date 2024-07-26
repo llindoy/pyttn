@@ -198,7 +198,7 @@ public:
         site_ops_type site_ops;
         setup_indexing_tree(sop, A, compress, exploit_identity, site_ops);
 
-        CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, site_ops, use_sparse));
+        CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, site_ops, use_sparse, A.is_purification()));
         m_Eshift = sop.Eshift();
 
         site_ops.clear();
@@ -216,7 +216,7 @@ public:
         site_ops_type site_ops;
         setup_indexing_tree(sop, A, compress, exploit_identity, site_ops);
 
-        CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, opdict, site_ops, use_sparse));
+        CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, opdict, site_ops, use_sparse, A.is_purification()));
         m_Eshift = sop.Eshift();
 
         site_ops.clear();
@@ -329,7 +329,7 @@ protected:
     }
 
 public:
-    static void set_primitive_operators(container_type& mode_operators, const system_modes& sys, site_ops_type& site_ops, bool use_sparse = true)
+    static void set_primitive_operators(container_type& mode_operators, const system_modes& sys, site_ops_type& site_ops, bool use_sparse = true, bool use_purification = false)
     {
         //now go though and set up the system operator solely using the default dictionaries
         mode_operators.resize(sys.nmodes());
@@ -350,7 +350,7 @@ public:
                 if(t.size() == 1)
                 {
                     std::string label = t.ops().front().op();
-                    CALL_AND_HANDLE(mode_operators[nu].push_back(site_operator<T, backend>(operator_from_default_dictionaries<T, backend>::query(label, basis, sys[nu].type(), use_sparse), nu)), "Failed to insert new element in mode operator.");
+                    CALL_AND_HANDLE(mode_operators[nu].push_back(site_operator<T, backend>(operator_from_default_dictionaries<T, backend>::query(label, basis, sys[nu].type(), use_sparse), nu, use_purification)), "Failed to insert new element in mode operator.");
                 }
                 else
                 {
@@ -360,13 +360,13 @@ public:
                         std::string label = op.op();
                         CALL_AND_HANDLE(ops.push_back(operator_from_default_dictionaries<T, backend>::query(label, basis, sys[nu].type(), use_sparse)), "Failed to insert new element in mode operator.");
                     }
-                    mode_operators[nu].push_back(site_operator<T, backend>(ops::sequential_product_operator<T, backend>{ops}, nu));
+                    mode_operators[nu].push_back(site_operator<T, backend>(ops::sequential_product_operator<T, backend>{ops}, nu, use_purification));
                 }
             }
         }
     }
 
-    static void set_primitive_operators(container_type& mode_operators, const system_modes& sys, const operator_dictionary<T, backend>& opdict, site_ops_type& site_ops, bool use_sparse = true)
+    static void set_primitive_operators(container_type& mode_operators, const system_modes& sys, const operator_dictionary<T, backend>& opdict, site_ops_type& site_ops, bool use_sparse = true, bool use_purification = false)
     {
         //now go though and set up the system operator solely using the default dictionaries
         mode_operators.resize(sys.nmodes());
@@ -395,11 +395,11 @@ public:
                     if(op != nullptr)
                     {
                         ASSERT(op->size() == hilbert_space_dimension, "Failed to construct sop_operator.  Mode operator from operator dictionary has incorrect size.");
-                        mode_operators[nu].push_back(site_operator<T, backend>(op, nu));
+                        mode_operators[nu].push_back(site_operator<T, backend>(op, nu, use_purification));
                     }
                     else
                     {
-                        CALL_AND_HANDLE(mode_operators[nu].push_back(site_operator<T, backend>(operator_from_default_dictionaries<T, backend>::query(label, basis, sys[nu].type(), use_sparse), nu)), "Failed to insert new element in mode operator.");
+                        CALL_AND_HANDLE(mode_operators[nu].push_back(site_operator<T, backend>(operator_from_default_dictionaries<T, backend>::query(label, basis, sys[nu].type(), use_sparse), nu, use_purification)), "Failed to insert new element in mode operator.");
                     }
                 }
                 else
@@ -420,7 +420,7 @@ public:
                             CALL_AND_HANDLE(ops.push_back(operator_from_default_dictionaries<T, backend>::query(label, basis, sys[nu].type(), use_sparse)), "Failed to insert new element in mode operator.");
                         }
                     }
-                    mode_operators[nu].push_back(site_operator<T, backend>(ops::sequential_product_operator<T, backend>{ops}, nu));
+                    mode_operators[nu].push_back(site_operator<T, backend>(ops::sequential_product_operator<T, backend>{ops}, nu, use_purification));
                 }
             }
         }

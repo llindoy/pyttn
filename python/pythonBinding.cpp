@@ -37,6 +37,9 @@
 
 #include "ttns/sop/models/models.hpp"
 
+#include "ttns/algorithms/dmrg.hpp"
+#include "ttns/algorithms/tdvp.hpp"
+
 //using namespace ttns;
 namespace py = pybind11;
 
@@ -80,6 +83,12 @@ PYBIND11_MODULE(_pyttn, m)
     initialise_site_operators(m_ops);
     initialise_sop_operator(m);
 
+
+    //
+    //Wrap the core algorithms for operating on ttns
+    //
+    initialise_dmrg(m);
+    initialise_tdvp(m);
 }
 
 

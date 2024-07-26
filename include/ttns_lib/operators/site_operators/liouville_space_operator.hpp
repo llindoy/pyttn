@@ -32,6 +32,8 @@ public:
     using typename base_type::vector_type;
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
+    using typename base_type::matview;
+    using typename base_type::resview;
 
 public:
     dense_commutator_operator()  : base_type() {}
@@ -55,6 +57,43 @@ public:
     bool is_resizable() const final{return false;}
     void resize(size_type /* n */){ASSERT(false, "This shouldn't be called.");}
     std::shared_ptr<base_type> clone() const{return std::make_shared<dense_commutator_operator>(m_operator);}
+
+    void apply(const resview& A, resview& HA)
+    {
+        try
+        {
+            //reinterpret the arrays as rank 3 tensors 
+            auto HAt = HA.reinterpret_shape(m_operator.shape(0), m_operator.shape(1), HA.shape(1));
+            auto At = A.reinterpret_shape(m_operator.shape(0), m_operator.shape(1), HA.shape(1));
+            CALL_AND_HANDLE(HAt  = contract(m_operator, 1, At, 0), "Failed to apply Hamiltonian on the left.");
+            CALL_AND_HANDLE(HAt -= contract(At, 1, m_operator, 0), "Failed to apply Hamiltonian on the right.");
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to evaluate dense commutator operator.");
+        }
+    }  
+    void apply(const resview& A, resview& HA, real_type /*t*/, real_type /*dt*/){CALL_AND_RETHROW(this->apply(A, HA));}  
+
+    void apply(const matview& A, resview& HA)
+    {
+        try
+        {
+            //reinterpret the arrays as rank 3 tensors 
+            auto HAt = HA.reinterpret_shape(m_operator.shape(0), m_operator.shape(1), HA.shape(1));
+            auto At = A.reinterpret_shape(m_operator.shape(0), m_operator.shape(1), HA.shape(1));
+            CALL_AND_HANDLE(HAt  = contract(m_operator, 1, At, 0), "Failed to apply Hamiltonian on the left.");
+            CALL_AND_HANDLE(HAt -= contract(At, 1, m_operator, 0), "Failed to apply Hamiltonian on the right.");
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to evaluate dense commutator operator.");
+        }
+    }  
+    void apply(const matview& A, resview& HA, real_type /*t*/, real_type /*dt*/){CALL_AND_RETHROW(this->apply(A, HA));}  
+
     void apply(const_matrix_ref A, matrix_ref HA)
     {
         try
@@ -138,6 +177,8 @@ public:
     using typename base_type::vector_type;
     using typename base_type::vector_ref;
     using typename base_type::const_vector_ref;
+    using typename base_type::matview;
+    using typename base_type::resview;
 
 public:
     dense_anti_commutator_operator()  : base_type() {}
@@ -161,6 +202,44 @@ public:
     bool is_resizable() const final{return false;}
     void resize(size_type /* n */){ASSERT(false, "This shouldn't be called.");}
     std::shared_ptr<base_type> clone() const{return std::make_shared<dense_anti_commutator_operator>(m_operator);}
+
+
+    void apply(const resview& A, resview& HA)
+    {
+        try
+        {
+            //reinterpret the arrays as rank 3 tensors 
+            auto HAt = HA.reinterpret_shape(m_operator.shape(0), m_operator.shape(1), HA.shape(1));
+            auto At = A.reinterpret_shape(m_operator.shape(0), m_operator.shape(1), HA.shape(1));
+            CALL_AND_HANDLE(HAt  = contract(m_operator, 1, At, 0), "Failed to apply Hamiltonian on the left.");
+            CALL_AND_HANDLE(HAt += contract(At, 1, m_operator, 0), "Failed to apply Hamiltonian on the right.");
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to evaluate dense commutator operator.");
+        }
+    }  
+    void apply(const resview& A, resview& HA, real_type /*t*/, real_type /*dt*/){CALL_AND_RETHROW(this->apply(A, HA));}  
+
+    void apply(const matview& A, resview& HA)
+    {
+        try
+        {
+            //reinterpret the arrays as rank 3 tensors 
+            auto HAt = HA.reinterpret_shape(m_operator.shape(0), m_operator.shape(1), HA.shape(1));
+            auto At = A.reinterpret_shape(m_operator.shape(0), m_operator.shape(1), HA.shape(1));
+            CALL_AND_HANDLE(HAt  = contract(m_operator, 1, At, 0), "Failed to apply Hamiltonian on the left.");
+            CALL_AND_HANDLE(HAt += contract(At, 1, m_operator, 0), "Failed to apply Hamiltonian on the right.");
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to evaluate dense commutator operator.");
+        }
+    }  
+    void apply(const matview& A, resview& HA, real_type /*t*/, real_type /*dt*/){CALL_AND_RETHROW(this->apply(A, HA));}  
+
     void apply(const_matrix_ref A, matrix_ref HA)
     {
         try

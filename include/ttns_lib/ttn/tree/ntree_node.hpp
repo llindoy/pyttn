@@ -398,6 +398,67 @@ public:
         return ind;
     }
 
+    size_type insert_front(const node_type& src)
+    {
+        ASSERT(m_tree != nullptr, "Failed to add child to node.  The node is not associated with a tree.");
+        ASSERT(src.m_tree != m_tree, "Failed to add child to node.  The operation would introduce a cycle.");
+
+        node_type* q = static_cast<node_type*>(this);
+        node_type* p = src.copy_to_tree(*m_tree);
+        p->m_parent = this;
+        p->m_level = this->m_level + 1;
+
+        size_type additional_leaves = p->m_nleaves;
+        if(m_children.size() == 0){--additional_leaves;}
+
+        m_size += p->m_size;
+        m_nleaves += additional_leaves;
+        while(!q->is_root())
+        {
+            q = q->m_parent;
+            q->m_size += p->m_size;
+            q->m_nleaves += additional_leaves;
+        }
+        q = nullptr;
+
+        size_type ind = m_children.size();
+        m_children.insert(m_children.begin(), p);
+        return ind;
+    }  
+
+    size_type insert_front(const value_type& src = value_type())
+    {
+        ASSERT(m_tree != nullptr, "Failed to add child to node.  The node is not associated with a tree.");
+
+        node_type* q = static_cast<node_type*>(this);
+
+        node_type* p = m_tree->create_node();
+        p->m_tree = m_tree;
+        p->m_parent = this;
+        p->m_data = src;
+        p->m_size = 1;
+        p->m_nleaves = 1;
+        p->m_level = this->m_level + 1;
+        size_type additional_leaves = p->m_nleaves;
+        if(m_children.size() == 0){--additional_leaves;}
+
+        m_size += p->m_size;
+        m_nleaves += additional_leaves;
+        while(!q->is_root())
+        {
+            q = q->m_parent;
+            q->m_size += p->m_size;
+            q->m_nleaves += additional_leaves;
+        }
+
+        size_type ind = m_children.size();
+        m_children.insert(m_children.begin(), p);
+        p = nullptr;
+        q = nullptr;
+        return ind;
+    }
+
+
 protected:
     void remove_child(child_iterator it)
     {
