@@ -315,6 +315,7 @@ namespace ttns
 template <typename T> class sNBO;
 template <typename T> std::ostream& operator<<(std::ostream& os, const sNBO<T>& op);
 
+//TODO: Allow for mapping of sNBO operator to a vector of site_operators.
 template <typename T> 
 class sNBO
 {

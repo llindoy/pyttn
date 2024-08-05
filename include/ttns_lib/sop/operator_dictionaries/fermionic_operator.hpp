@@ -18,7 +18,7 @@ public:
     creation() {}
     virtual bool is_sparse() const{return true;}
     virtual bool changes_parity() const{return true;}
-    virtual bool jw_sign_change() const{return true;}
+    virtual bool jw_sign_change() const{return false;}
 
     virtual void as_diagonal(const std::shared_ptr<utils::occupation_number_basis>& /* op */, size_t /* index */, linalg::diagonal_matrix<T>& /* mat */) const
     {
@@ -98,7 +98,7 @@ class annihilation : public single_site_operator<T>
 public:
     annihilation() {}
     virtual bool changes_parity() const{return true;}
-    virtual bool jw_sign_change() const{return false;}
+    virtual bool jw_sign_change() const{return true;}
 
     virtual bool is_sparse() const{return true;}
 

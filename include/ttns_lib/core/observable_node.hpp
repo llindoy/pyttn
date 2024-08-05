@@ -55,6 +55,8 @@ public:
 
     void resize_matrices(size_type n, size_type m)
     {
+        m_dim1 = n;
+        m_dim2 = m;
         for(size_type i=0; i < m_data.size(); ++i)
         {
             CALL_AND_HANDLE(m_data[i].resize(n, m), "Failed to setup matrices for observable node.");
@@ -67,27 +69,28 @@ public:
 
     void reallocate_matrices(size_type capacity)
     {
-        for(size_type i=0; i < m_data.size(); ++i)
+        if(capacity > m_capacity)
         {
-            CALL_AND_HANDLE(m_data[i].reallocate(capacity), "Failed to setup matrices for observable node.");
-        }
-        if(m_has_identity)
-        {
-            CALL_AND_HANDLE(m_id.reallocate(capacity), "Failed to reserve identtiy buffer.");
+            m_capacity = capacity;
+            for(size_type i=0; i < m_data.size(); ++i)
+            {
+                CALL_AND_HANDLE(m_data[i].reallocate(capacity), "Failed to setup matrices for observable node.");
+            }
+            if(m_has_identity)
+            {
+                CALL_AND_HANDLE(m_id.reallocate(capacity), "Failed to reserve identtiy buffer.");
+            }
         }
     }
 
     void store_identity()
     {   
         m_has_identity = true;
-        if(m_data.size() > 0)
+        if(m_id.capacity() < m_capacity)
         {
-            if(m_id.capacity() < m_data[0].capacity())
-            {
-                m_id.reallocate(m_data[0].capacity());
-            }
-            m_id.resize(m_data[0].size(0), m_data[0].size(1));
+            m_id.reallocate(m_capacity);
         }
+        m_id.resize(m_dim1, m_dim2);
     }
 
     void clear() 
@@ -97,6 +100,9 @@ public:
             for(size_type i = 0; i < m_data.size(); ++i){m_data[i].clear();}
             m_data.clear();
             m_id.clear();
+            m_capacity = 0;
+            m_dim1 = 0;
+            m_dim2 = 0;
         }
         catch(const std::exception& ex)
         {
@@ -105,8 +111,8 @@ public:
         }
     }
 
-    size_t matrix_capacity() const {return m_data[0].capacity();}
-    std::array<size_t, 2> matrix_size() const{std::array<size_t, 2> ret; ret[0] = m_data[0].size(0); ret[1] = m_data[0].size(1); return ret;}
+    size_t matrix_capacity() const {return m_capacity;}
+    std::array<size_t, 2> matrix_size() const{std::array<size_t, 2> ret; ret[0] = m_dim1; ret[1] = m_dim2; return ret;}
 
     size_type size() const{return m_data.size();}
 
@@ -133,6 +139,9 @@ public:
         CALL_AND_HANDLE(ar(cereal::make_nvp("data", m_data)), "Failed to serialise observable node object.  Error when serialising the terms.");
         CALL_AND_HANDLE(ar(cereal::make_nvp("id", m_id)), "Failed to serialise observable node object.  Error when serialising the terms.");
         CALL_AND_HANDLE(ar(cereal::make_nvp("has_id", m_has_identity)), "Failed to serialise observable node object.  Error when serialising the terms.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("capacity", m_capacity)), "Failed to serialise observable node object.  Error when serialising the terms.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("dim1", m_dim1)), "Failed to serialise observable node object.  Error when serialising the terms.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("dim2", m_dim2)), "Failed to serialise observable node object.  Error when serialising the terms.");
     }
 #endif
 
@@ -140,6 +149,9 @@ protected:
     std::vector<linalg::matrix<T, B>> m_data;
     linalg::matrix<T, B> m_id;
     bool m_has_identity = false;
+    size_type m_capacity = 0; 
+    size_type m_dim1 = 0;
+    size_type m_dim2 = 0;
 };
 
 namespace node_data_traits

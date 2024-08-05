@@ -608,7 +608,9 @@ public:
      */
     static void decompose_down(node_type& A, orthogonality_type& orth, size_type mode, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false)
     {
-        //#pragma omp parallel for default(shared)
+#ifdef USE_OPENMP
+        #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if(orth.parallelise())
+#endif
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
@@ -621,7 +623,9 @@ public:
 
     static void decompose_up(node_type& A, orthogonality_type& orth, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false)
     {
-        //#pragma omp parallel for num_threads(orth.nthreads()) default(shared)
+#ifdef USE_OPENMP
+        #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if(orth.parallelise())
+#endif
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
@@ -637,7 +641,9 @@ public:
      */
     static void apply_to_node(node_type& A, orthogonality_type& orth)
     {       
-        //#pragma omp parallel for num_threads(orth.nthreads()) default(shared)
+#ifdef USE_OPENMP
+        #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if(orth.parallelise())
+#endif
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
@@ -656,7 +662,9 @@ public:
     {
         ASSERT(orth.most_recent_node() == A.id(), "Cannot apply bond matrix to parent.  The most recently decomposed node is not this node.");
         //apply the action of the current bond matrix to the node.  Here this applies the matrix along the bond pointing down into the node
-        //#pragma omp parallel for num_threads(orth.nthreads()) default(shared)
+#ifdef USE_OPENMP
+        #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if(orth.parallelise())
+#endif
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
@@ -670,7 +678,9 @@ public:
     static void apply_bond_matrix_from_parent(node_type& A, orthogonality_type& orth)
     {
         ASSERT(orth.most_recent_node() == A.parent().id(), "Cannot apply bond matrix from parent.  The most recently decomposed node is not the parent of this node.");
-        //#pragma omp parallel for num_threads(orth.nthreads()) default(shared)
+#ifdef USE_OPENMP
+        #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if(orth.parallelise())
+#endif
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
@@ -684,7 +694,9 @@ public:
     {
         ASSERT(orth.most_recent_node() == A.id(), "Cannot apply bond matrix to child.  The most recently decomposed node is not this node.");
         //apply the action of the current bond matrix to the node.  Here this applies the matrix along the bond pointing down into the node
-        //#pragma omp parallel for num_threads(orth.nthreads()) default(shared)
+#ifdef USE_OPENMP
+        #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if(orth.parallelise())
+#endif
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
@@ -698,7 +710,9 @@ public:
     {
         ASSERT(orth.most_recent_node() == A[mode].id(), "Cannot apply bond matrix from child.  The most recently decomposed node is not the expected child of this node.");
         //apply the action of the current bond matrix to the node.  Here this applies the matrix along the bond pointing down into the node
-        //#pragma omp parallel for num_threads(orth.nthreads()) default(shared)
+#ifdef USE_OPENMP
+        #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if(orth.parallelise())
+#endif
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
@@ -713,7 +727,9 @@ public:
      */
     static void shift_orthogonality_down(node_type& A, orthogonality_type& orth, size_type mode, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false)
     {
-        //#pragma omp parallel for num_threads(orth.nthreads()) default(shared) schedule(dynamic)
+#ifdef USE_OPENMP
+        #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if(orth.parallelise())
+#endif
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
@@ -732,7 +748,9 @@ public:
 
     static void shift_orthogonality_up(node_type& A, orthogonality_type& orth, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false)
     {
-        ////#pragma omp parallel for num_threads(orth.nthreads()) default(shared) schedule(dynamic)
+#ifdef USE_OPENMP
+        #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if(orth.parallelise())
+#endif
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
@@ -885,6 +903,7 @@ public:
         const matrix_type& U(size_type ) const{return m_U;}
         
         size_type nthreads() const{return 1;}
+        bool parallelise() const{return false;}
     protected:
         engine_type m_ortho_engine;
         matrix_type m_U;
@@ -924,6 +943,7 @@ public:
 
     size_type maxsize() const{return m_data.size();}
     size_type maxcapacity() const{return m_data.capacity();}
+    size_type buffer_maxcapacity() const{return m_data.capacity();}
     size_type maxhrank(bool use_capacity = false) const{return m_data.hrank(use_capacity);}
 
     void get_hrank(size_type& res ) const{res = m_data.hrank();}
@@ -935,6 +955,10 @@ public:
     size_type max_dim(size_type n) const{return m_data.max_dim(n);}
     const std::vector<size_type>& dims() const{return m_data.dims();}
     size_type nbonds() const{return this->size() + (this->is_root() ? 0 : 1);}
+    size_t buffer_size() const
+    {
+        return m_data.size();
+    }
 
     const ttn_node_data<T, backend>& operator()(size_type i1) const {ASSERT(i1 == 0, "Index out of bounds."); return m_data;}
     ttn_node_data<T, backend>& operator()(size_type i1) {ASSERT(i1 == 0, "Index out of bounds."); return m_data;}

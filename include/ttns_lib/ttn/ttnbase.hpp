@@ -2,6 +2,9 @@
 #define TTNS_TTN_BASE_HPP
 
 #include <random>
+#include <map>
+#include <vector>
+
 #include <common/tmp_funcs.hpp>
 #include <common/exception_handling.hpp>
 
@@ -140,6 +143,22 @@ public:
     }
 
 protected:
+    template <typename U, typename BU>
+    static void assign_node(ttn_node_data<T, backend>& r, const ttn_node_data<U, BU>& i)
+    {
+        r = i;
+    }
+
+    template <typename U, typename BU>
+    static void assign_node(std::vector<ttn_node_data<T, backend>>& r, const std::vector<ttn_node_data<U, BU>>& i)
+    {
+        ASSERT(r.size() >= i.size(), "input does not fit into output.");
+        for(size_t ind = 0; ind < i.size(); ++ind)
+        {
+            r[ind] = i[ind];
+        }
+    }
+
     template <typename U, typename be>
     void _assign_ttn(const ttn_base<node_class, U, be>& other)
     {
@@ -155,7 +174,7 @@ protected:
 
             for(auto z : common::zip(m_nodes, other))
             {
-                CALL_AND_HANDLE(std::get<0>(z)() = std::get<1>(z)(), "Failed when assigning slice index.");
+                CALL_AND_HANDLE(assign_node(std::get<0>(z)(), std::get<1>(z)()), "Failed when assigning slice index."); 
             }
             if(!all_fit){reset_orthogonality();}
 
@@ -459,6 +478,7 @@ public:
         ASSERT(m_euler_tour_initialised, "Failed to access euler tour it has not been initialised.");
         return m_euler_tour;
     }
+    bool euler_tour_initialised() const{return m_euler_tour_initialised;}
 
     const std::vector<size_type>& mode_dimensions() const{return m_dim_sizes;}
     const std::vector<size_type>& mode_dimensions_lhd() const{return m_dim_sizes_lhd;}

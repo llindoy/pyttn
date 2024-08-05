@@ -108,6 +108,8 @@ protected:
     {
         try
         {
+            size_type ti = omp_get_thread_num();
+            CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
             CALL_AND_HANDLE(hspf.resize_matrices(B.size(1), A.size(1)), "Failed to resize the single-particle Hamiltonian operator matrices.");
             const auto& a = A.as_matrix();  
             const auto& b = B.as_matrix();  
@@ -118,31 +120,17 @@ protected:
                 CALL_AND_HANDLE(hspf.spf_id() = adjoint(b)*a, "Failed to compute the id matrix term.");
             }
 
-            std::cout << "eval leaf sizes: " << B.size(1) << " " << A.size(1) << std::endl;
             //#pragma omp parallel for default(shared) schedule(dynamic, 1)
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
             {
                 if(!cinf[ind].is_identity_spf())
                 {
-                    //if there is only one spf term, then are handling either a common spf term or a 
-                    //standard term and we just go ahead and evaluate the spf term
-                    if(cinf[ind].nspf_terms() == 1)
+                    hspf.spf(ind).fill_zeros();
+                    for(size_type i = 0; i < cinf[ind].nspf_terms(); ++i)
                     {
-                        size_type ti = omp_get_thread_num();
-                        auto& indices = cinf[ind].spf_indexing()[0][0];
+                        auto& indices = cinf[ind].spf_indexing()[i][0];
                         CALL_AND_HANDLE(h[indices[0]][indices[1]].apply(a, HA[ti]), "Failed to apply leaf operator.");
-                        CALL_AND_HANDLE(hspf.spf(ind) = cinf[ind].spf_coeff(0)*adjoint(b)*HA[ti], "Failed to apply matrix product to obtain result.");
-                    }
-                    else
-                    {
-                        hspf.spf(ind).fill_zeros();
-                        size_type ti = omp_get_thread_num();
-                        for(size_type i = 0; i < cinf[ind].nspf_terms(); ++i)
-                        {
-                            auto& indices = cinf[ind].spf_indexing()[i][0];
-                            CALL_AND_HANDLE(h[indices[0]][indices[1]].apply(a, HA[ti]), "Failed to apply leaf operator.");
-                            CALL_AND_HANDLE(hspf.spf(ind) += cinf[ind].spf_coeff(i)*adjoint(b)*HA[ti], "Failed to apply matrix product to obtain result.");
-                        }
+                        CALL_AND_HANDLE(hspf.spf(ind) += cinf[ind].spf_coeff(i)*adjoint(b)*HA[ti], "Failed to apply matrix product to obtain result.");
                     }
                 }
             }
@@ -159,7 +147,7 @@ protected:
         }
     }
 
-    static inline void resize_buffer(const hnode& A, triad& HA, 
+    //static inline void resize_buffer(const hnode& A, triad& HA, 
 
     template <typename spfnode>
     static inline void evaluate_leaf(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, triad& HA, spfnode& hspf, bool compute_identity = false)
@@ -195,6 +183,10 @@ protected:
     {
         try
         {
+            size_type ti = omp_get_thread_num();
+            CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
+            CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
+
             CALL_AND_HANDLE(hspf().resize_matrices(A.size(1), A.size(1)), "Failed to resize the single-particle Hamiltonian operator matrices.");
             const auto& a = A.as_matrix();  
             //#pragma omp parallel for default(shared) schedule(dynamic, 1)
@@ -202,21 +194,11 @@ protected:
             {
                 if(!cinf[ind].is_identity_spf())
                 {
-                    if(cinf[ind].nspf_terms() == 1)
+                    hspf().spf(ind).fill_zeros();
+                    for(size_type i = 0; i < cinf[ind].nspf_terms(); ++i)
                     {
-                        size_type ti = omp_get_thread_num();
-                        CALL_AND_HANDLE(kron_prod(hspf, cinf, ind, 0, A, temp[ti], HA[ti]), "Failed to apply kronecker product operator.");
-                        CALL_AND_HANDLE(hspf().spf(ind) = cinf[ind].spf_coeff(0)*adjoint(a)*HA[ti], "Failed to apply matrix product to obtain result.");
-                    }
-                    else
-                    {
-                        hspf().spf(ind).fill_zeros();
-                        size_type ti = omp_get_thread_num();
-                        for(size_type i = 0; i < cinf[ind].nspf_terms(); ++i)
-                        {
-                            CALL_AND_HANDLE(kron_prod(hspf, cinf, ind, i, A, temp[ti], HA[ti]), "Failed to apply kronecker product operator.");
-                            CALL_AND_HANDLE(hspf().spf(ind) += cinf[ind].spf_coeff(i)*adjoint(a)*HA[ti], "Failed to apply matrix product to obtain result.");
-                        }
+                        CALL_AND_HANDLE(kron_prod(hspf, cinf, ind, i, A, temp[ti], HA[ti]), "Failed to apply kronecker product operator.");
+                        CALL_AND_HANDLE(hspf().spf(ind) += cinf[ind].spf_coeff(i)*adjoint(a)*HA[ti], "Failed to apply matrix product to obtain result.");
                     }
                 }
             }
@@ -238,6 +220,10 @@ protected:
     {
         try
         {
+            size_type ti = omp_get_thread_num();
+            CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
+            CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
+
             const auto& b = B.as_matrix();  
             CALL_AND_HANDLE(kpo::kpo_id(hspf, A, temp[0], HA[0]), "Failed to apply kronecker product operator.");
             CALL_AND_HANDLE(hspf().spf_id() = adjoint(b)*HA[0], "Failed to compute the id matrix term.");
@@ -248,21 +234,11 @@ protected:
             {
                 if(!cinf[ind].is_identity_spf())
                 {
-                    if(cinf[ind].nspf_terms() == 1)
+                    hspf().spf(ind).fill_zeros();
+                    for(size_type i = 0; i < cinf[ind].nspf_terms(); ++i)
                     {
-                        size_type ti = omp_get_thread_num();
-                        CALL_AND_HANDLE(kron_prod(hspf, cinf, ind, 0, B, A, temp[ti], HA[ti]), "Failed to apply kronecker product operator.");
-                        CALL_AND_HANDLE(hspf().spf(ind) = cinf[ind].spf_coeff(0)*adjoint(b)*HA[ti], "Failed to apply matrix product to obtain result.");
-                    }
-                    else
-                    {
-                        hspf().spf(ind).fill_zeros();
-                        size_type ti = omp_get_thread_num();
-                        for(size_type i = 0; i < cinf[ind].nspf_terms(); ++i)
-                        {
-                            CALL_AND_HANDLE(kron_prod(hspf, cinf, ind, i, B, A, temp[ti], HA[ti]), "Failed to apply kronecker product operator.");
-                            CALL_AND_HANDLE(hspf().spf(ind) += cinf[ind].spf_coeff(i)*adjoint(b)*HA[ti], "Failed to apply matrix product to obtain result.");
-                        }
+                        CALL_AND_HANDLE(kron_prod(hspf, cinf, ind, i, B, A, temp[ti], HA[ti]), "Failed to apply kronecker product operator.");
+                        CALL_AND_HANDLE(hspf().spf(ind) += cinf[ind].spf_coeff(i)*adjoint(b)*HA[ti], "Failed to apply matrix product to obtain result.");
                     }
                 }
             }

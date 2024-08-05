@@ -6,15 +6,15 @@ sys.path.append("../../")
 from pyttn import *
 
 def sbm_discretise(N, alpha, wc):
-    w = -wc * np.log(1.-np.arange(N)/(N+1.0))
-    g = np.sqrt(4*alpha*w)
+    w = -wc * np.log(1.-(np.arange(N)+1)/(N+1.0))
+    g = np.sqrt(2*alpha*w*wc/(N+1.0))
     return g, w
 
 
 def spin_boson_test(Nb, alpha, wc, eps, delta, chi, nbose, dt, nstep = 1, degree = 2, compress = True):
     g, w = sbm_discretise(Nb, alpha, wc)
 
-    sbg = spin_boson(eps, delta, w, g, geom="star")
+    sbg = spin_boson(2*eps, 2*delta, w, g, geom="star")
     sbg.mode_dims = [nbose for i in range(Nb)]
     H = sbg.hamiltonian()
     sysinf = sbg.system_info()

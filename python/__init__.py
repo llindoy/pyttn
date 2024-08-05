@@ -1,3 +1,3 @@
-from . import linalg as linalg
 from .ttns import *
-from . import _pyttn as core
+from .linalg import *
+from .utils  import *

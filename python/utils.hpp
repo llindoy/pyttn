@@ -16,7 +16,7 @@ namespace py=pybind11;
 namespace linalg
 {
 template<typename T, size_t D>
-void convert_pybuffer_to_tensor(py::buffer& b, linalg::tensor<T, D>& t)
+void convert_pybuffer_to_tensor(const py::buffer& b, linalg::tensor<T, D>& t)
 {
     py::buffer_info info = b.request();
     if(info.format != py::format_descriptor<T>::format())
@@ -43,7 +43,7 @@ void convert_pybuffer_to_tensor(py::buffer& b, linalg::tensor<T, D>& t)
 }
 
 template<typename T, size_t D>
-void copy_pybuffer_to_tensor(py::buffer& b, linalg::tensor<T, D>& t)
+void copy_pybuffer_to_tensor(const py::buffer& b, linalg::tensor<T, D>& t)
 {
     py::buffer_info info = b.request();
 
@@ -67,7 +67,7 @@ void copy_pybuffer_to_tensor(py::buffer& b, linalg::tensor<T, D>& t)
 
 
 template<typename T>
-void convert_pybuffer_to_diagonal_matrix(py::buffer& b, diagonal_matrix<T>& t)
+void convert_pybuffer_to_diagonal_matrix(const py::buffer& b, diagonal_matrix<T>& t)
 {
     py::buffer_info info = b.request();
     if(info.ndim != 1)
@@ -78,7 +78,7 @@ void convert_pybuffer_to_diagonal_matrix(py::buffer& b, diagonal_matrix<T>& t)
     t.set_buffer(static_cast<T*>(info.ptr), info.shape[0]);
 }
 template<typename T>
-void copy_pybuffer_to_diagonal_matrix(py::buffer& b, diagonal_matrix<T>& t)
+void copy_pybuffer_to_diagonal_matrix(const py::buffer& b, diagonal_matrix<T>& t)
 {
     py::buffer_info info = b.request();
 

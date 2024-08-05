@@ -319,6 +319,7 @@ template <typename T> class SOP;
 template <typename T> std::ostream& operator<<(std::ostream& os, const SOP<T>& op);
 
 //the string sum of product operator class used for storing the representation of the Hamiltonian of interest.
+//TODO: Ensure correctness of the Jordan-Wigner Mapping code
 template <typename T> 
 class SOP
 {
@@ -354,6 +355,29 @@ public:
         m_allow_insertion = true;
     }
 
+
+    template <typename U>
+    SOP<T>& operator*=(const U& a)
+    {
+        this->Eshift() *= a;
+        for(auto& t : m_terms)
+        {
+            t.second *= a;
+        }
+        return *this;
+    }
+
+    template <typename U>
+    SOP<T>& operator/=(const U& a)
+    {
+        this->Eshift() /= a;
+        for(auto& t : m_terms)
+        {
+            t.second /= a;
+        }
+        return *this;
+    }
+
     template <typename U>
     SOP<T>& operator+=(const sSOP<U>& a)
     {
@@ -380,6 +404,13 @@ public:
     SOP<T>& operator+=(const sNBO<U>& a)
     {
         insert(a);
+        return *this;
+    }
+
+    template <typename U>
+    typename std::enable_if<linalg::is_number<U>::value, SOP<T>&>::type operator+=(const U& a)
+    {
+        this->Eshift() += a;
         return *this;
     }
 
@@ -411,6 +442,13 @@ public:
         return *this;
     }
     
+    template <typename U>
+    typename std::enable_if<linalg::is_number<U>::value, SOP<T>&>::type operator-=(const U& a)
+    {
+        this->Eshift() -= a;
+        return *this;
+    }
+
     void set_operator_dictionary(const SOP& o)
     {
         m_opdict = o.m_opdict;
@@ -580,24 +618,22 @@ public:
         size_t nmodes = sys_info.nmodes();
         ASSERT(nmodes == this->nmodes(), "Failed to simplify sum of product operator object operator sys_info object does not have the correct size.");
         std::vector<bool> is_fermion_mode(nmodes);      std::fill(is_fermion_mode.begin(), is_fermion_mode.end(), false);
-        this->set_is_fermionic_mode(is_fermion_mode);
-
         for(size_t i = 0; i < nmodes; ++i)
         {
-            ASSERT(is_fermion_mode[i] == sys_info[i].fermionic(), "The system information and SOP information about which modes are fermionic are inconsistent.");
+            is_fermion_mode[i] = sys_info[i].fermionic();
         }
         this->jordan_wigner(is_fermion_mode, tol);
         return *this;
     }
 
-    SOP& jordan_wigner(double tol = 1e-15)
-    {
-        size_t nmodes = this->nmodes();
-        std::vector<bool> is_fermion_mode(nmodes);      std::fill(is_fermion_mode.begin(), is_fermion_mode.end(), false);
-        this->set_is_fermionic_mode(is_fermion_mode);
-        this->jordan_wigner(is_fermion_mode, tol);
-        return *this;
-    }
+    //SOP& jordan_wigner(double tol = 1e-15)
+    //{
+    //    size_t nmodes = this->nmodes();
+    //    std::vector<bool> is_fermion_mode(nmodes);      std::fill(is_fermion_mode.begin(), is_fermion_mode.end(), false);
+    //    this->set_is_fermionic_mode(is_fermion_mode);
+    //    this->jordan_wigner(is_fermion_mode, tol);
+    //    return *this;
+    //}
 };
 
 
@@ -605,6 +641,7 @@ template <typename T>
 std::ostream& operator<<(std::ostream& os, const ttns::SOP<T>& op)
 {
     if(!op.label().empty()){os << op.label() << ": " << std::endl;}
+    os << op.Eshift() << std::endl;
     const auto separator = "";    const auto* sep = "";
     const auto plus = "+";
     for(const auto& t : op)
@@ -625,6 +662,23 @@ ttns::SOP<T> operator+(const ttns::SOP<T>& a, const ttns::SOP<T>& b)
     for(auto& t : b){ret.insert(t.second, t.first);}
     return  ret;
 }*/
+
+
+template <typename T, typename U>
+typename std::enable_if<linalg::is_number<T>::value, ttns::SOP<decltype(T()*U())>>::type operator+(const T& a, const ttns::SOP<U>& b)
+{
+    ttns::SOP<decltype(T()*U())> ret(b);
+    ret.Eshift() += a;
+    return  ret;
+}
+
+template <typename T, typename U>
+typename std::enable_if<linalg::is_number<T>::value, ttns::SOP<decltype(T()*U())>>::type operator+(const ttns::SOP<U>& b, const T& a)
+{
+    ttns::SOP<decltype(T()*U())> ret(b);
+    ret.Eshift() += a;
+    return  ret;
+}
 
 template <typename T, typename U>
 ttns::SOP<decltype(T()*U())> operator+(const ttns::sSOP<T>& a, const ttns::SOP<U>& b)
@@ -709,6 +763,24 @@ ttns::SOP<T> operator-(const ttns::SOP<T>& a, const ttns::SOP<T>& b)
     }
     return ret;
 }*/
+
+
+template <typename T, typename U>
+typename std::enable_if<linalg::is_number<T>::value, ttns::SOP<decltype(T()*U())>>::type operator-(const T& a, const ttns::SOP<U>& b)
+{
+    ttns::SOP<decltype(T()*U())> ret(b);
+    ret *= T(-1.0);
+    ret.Eshift() += a;
+    return  ret;
+}
+
+template <typename T, typename U>
+typename std::enable_if<linalg::is_number<T>::value, ttns::SOP<decltype(T()*U())>>::type operator-(const ttns::SOP<U>& b, const T& a)
+{
+    ttns::SOP<decltype(T()*U())> ret(b);
+    ret.Eshift() -= a;
+    return  ret;
+}
 
 template <typename T, typename U>
 ttns::SOP<decltype(T()*U())> operator-(const ttns::sSOP<T>& a, const ttns::SOP<U>& b)

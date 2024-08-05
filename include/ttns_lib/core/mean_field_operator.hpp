@@ -64,21 +64,22 @@ public:
 
 public:
     template <typename opnode>
-    static inline void evaluate(const cinfnode& hinf, const hnode& A, triad& HA, triad& temp, triad& temp2, opnode& h)
+    static inline void evaluate(const cinfnode& hinf, const hnode& A, triad& HA, triad& temp, opnode& h)
     {
         if(!h.is_root())
         {
             size_type mode = h.child_id();
             const auto& hinf_p = hinf.parent();
-            CALL_AND_RETHROW(_evaluate_term(hinf(), hinf_p(), mode, 0, A(), HA, temp, temp2, h));
+            CALL_AND_RETHROW(_evaluate_term(hinf(), hinf_p(), mode, 0, A(), HA, temp, h));
         }
     }
 
     template <typename opnode>
-    static inline void evaluate(const ms_cinfnode& hinf, const ms_hnode& A, triad& HA, triad& temp, triad& temp2, opnode& h)
+    static inline void evaluate(const ms_cinfnode& hinf, const ms_hnode& A, triad& HA, triad& temp, opnode& h)
     {
         if(!h.is_root())
         {
+            //std::cerr << "node index: " << h.id() << " " << (h.is_leaf() ? "leaf" : "not leaf") << " " << (h.parent().is_root() ? "parent root" : "not root") << std::endl;
             size_type mode = h.child_id();
             const auto& hinf_p = hinf.parent();
 
@@ -87,9 +88,17 @@ public:
                 for(size_t ci = 0; ci < hinf()[row].size(); ++ci)
                 {
                     size_t col = hinf()[row][ci].col();
+                    //std::cerr << "row col" << row << " " << col << std::endl;
                     ms_sop_env_slice<T, backend> hslice(h, row, ci);
                     size_type ti = omp_get_thread_num();
-                    evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, ti, A(row), A(col), HA, temp, temp2, hslice);
+                    if(row == col)
+                    {
+                        _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, ti, A(row), HA, temp, hslice);
+                    }
+                    else
+                    {
+                        _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, ti, A(row), A(col), HA, temp, hslice);
+                    }
                 }
             }
         }
@@ -98,16 +107,12 @@ public:
 
 protected:
     template <typename opnode>
-    static inline void _evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, size_type ti, const hdata& A, triad& HA, triad& temp, triad& temp2, opnode& h)
+    static inline void _evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, size_type ti, const hdata& A, triad& HA, triad& temp, opnode& h)
     {
         try
         {
-            HA[ti].resize(A.size(0), A.size(1));
-            temp[ti].resize(A.size(0), A.size(1));
-            temp2[ti].resize(A.size(0), A.size(1));
-
-            //resize the matrices in the event that the tensor objects have changed size
-            //CALL_AND_HANDLE(h.resize_matrices(A.size(1), A.size(1)), "Failed to resize the single-particle Hamiltonian operator matrices.");
+            CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+            CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
 
             const auto& h_p = h.parent();
 
@@ -117,19 +122,21 @@ protected:
                 //if the mean field operator is the identity then we don't need to do anything.
                 if(!hinf[ind].is_identity_mf())
                 {
-                    if(hinf[ind].nmf_terms() == 1)
+                    h().mf(ind).fill_zeros();
+                    for(size_type it = 0; it < hinf[ind].nmf_terms(); ++it)
                     {
-                        size_type pi = hinf[ind].mf_indexing()[0].parent_index();
+                        size_type pi = hinf[ind].mf_indexing()[it].parent_index();
 
                         if(!hinf_p[pi].is_identity_mf())
                         {
-                            CALL_AND_HANDLE(kron_prod(h, hinf, ind, 0, A, HA[ti], temp[ti]), "Failed to evaluate action of kronecker product operator.");
+                            CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, A, HA[ti], temp[ti]), "Failed to evaluate action of kronecker product operator.");
                             CALL_AND_HANDLE(HA[ti] = temp[ti]*trans(h_p().mf(pi)), "Failed to apply action of parent mean field operator.");
                         }
                         else
                         {
-                            CALL_AND_HANDLE(kron_prod(h, hinf, ind, 0, A, temp[ti], HA[ti]), "Failed to evaluate action of kronecker product operator.");
+                            CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, A, temp[ti], HA[ti]), "Failed to evaluate action of kronecker product operator.");
                         }
+
                         CALL_AND_HANDLE(temp[ti] = conj(A.as_matrix()), "Failed to compute conjugate of the A matrix.");
 
                         try
@@ -138,47 +145,13 @@ protected:
                             auto _HA = HA[ti].reinterpret_shape(_A.shape(0), _A.shape(1), _A.shape(2));
                             auto _temp = temp[ti].reinterpret_shape(_A.shape(0), _A.shape(1), _A.shape(2));
 
-                            CALL_AND_HANDLE(h().mf(ind) = (contract(_temp, 0, 2, _HA, 0, 2).bind_workspace(temp2[ti])), "Failed when evaluating the final contraction.");
+                            CALL_AND_HANDLE(h().mf(ind) += hinf[ind].mf_coeff(it)*(contract(_temp, 0, 2, _HA, 0, 2)), "Failed when evaluating the final contraction.");
                         }                                         
                         catch(const std::exception& ex)
                         {
                             std::cerr << ex.what() << std::endl;
                             RAISE_EXCEPTION("Failed to form temporary reinterpreted tensors and perform contraction over the outer indices to form the mean field Hamiltonian.");
-                        }   
-                    }
-                    else
-                    {
-                        h().mf(ind).fill_zeros();
-                        for(size_type it = 0; it < hinf[ind].nmf_terms(); ++it)
-                        {
-                            size_type pi = hinf[ind].mf_indexing()[it].parent_index();
-
-                            if(!hinf_p[pi].is_identity_mf())
-                            {
-                                CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, A, HA[ti], temp[ti]), "Failed to evaluate action of kronecker product operator.");
-                                CALL_AND_HANDLE(HA[ti] = hinf[ind].mf_coeff(it)*temp[ti]*trans(h_p().mf(pi)), "Failed to apply action of parent mean field operator.");
-                            }
-                            else
-                            {
-                                CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, A, temp[ti], HA[ti]), "Failed to evaluate action of kronecker product operator.");
-                            }
-
-                            CALL_AND_HANDLE(temp[ti] = conj(A.as_matrix()), "Failed to compute conjugate of the A matrix.");
-
-                            try
-                            {
-                                auto _A = A.as_rank_3(mode);
-                                auto _HA = HA[ti].reinterpret_shape(_A.shape(0), _A.shape(1), _A.shape(2));
-                                auto _temp = temp[ti].reinterpret_shape(_A.shape(0), _A.shape(1), _A.shape(2));
-
-                                CALL_AND_HANDLE(h().mf(ind) += hinf[ind].mf_coeff(it)*(contract(_temp, 0, 2, _HA, 0, 2).bind_workspace(temp2[ti])), "Failed when evaluating the final contraction.");
-                            }                                         
-                            catch(const std::exception& ex)
-                            {
-                                std::cerr << ex.what() << std::endl;
-                                RAISE_EXCEPTION("Failed to form temporary reinterpreted tensors and perform contraction over the outer indices to form the mean field Hamiltonian.");
-                            }                       
-                        }
+                        }                       
                     }
                 }
             }
@@ -192,18 +165,19 @@ protected:
 
     //THE OFF DIAGONAL TERMS CURRENTLY SEEM TO BE INCORRECT. It seems that the values are correct but the sign is wrong.
     template <typename opnode>
-    static inline void _evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, size_type ti, const hdata& B, const hdata& A, triad& HA, triad& temp, triad& temp2, opnode& h)
+    static inline void _evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, size_type ti, const hdata& B, const hdata& A, triad& HA, triad& temp, opnode& h)
     {
+        if(&A == &B){CALL_AND_RETHROW(return _evaluate_term(hinf, hinf_p, mode, ti, A, HA, temp, h));}
         try
         {
-            HA[ti].resize(A.size(0), A.size(1));
-            temp[ti].resize(B.size(0), A.size(1));
-            temp2[ti].resize(B.size(0), B.size(1));
+            CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+            CALL_AND_HANDLE(temp[ti].resize(B.size(0), A.size(1)), "failed to resize working buffers.");
 
             const auto& h_p = h.parent();
             {
-                const auto& b = B.as_matrix();  
-                CALL_AND_HANDLE(kpo_id(h, A, mode, HA[ti], temp[ti]), "Failed to apply kronecker product operator.");
+                //std::cerr << "evaluating id pre" << std::endl;
+                CALL_AND_HANDLE(kpo::kpo_id(h_p, A, mode, HA[ti], temp[ti]), "Failed to apply kronecker product operator.");
+                //std::cerr << "evaluating id post" << std::endl;
                 CALL_AND_HANDLE(HA[ti] = temp[ti]*trans(h_p().mf_id()), "Failed to apply action of parent mean field operator.");
                 CALL_AND_HANDLE(temp[ti] = conj(B.as_matrix()), "Failed to compute conjugate of the A matrix.");
 
@@ -214,7 +188,7 @@ protected:
                     auto _HA = HA[ti].reinterpret_shape(_B.shape(0), _A.shape(1), _B.shape(2));
                     auto _temp = temp[ti].reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
   
-                    CALL_AND_HANDLE(h().mf_id() = (contract(_temp, 0, 2, _HA, 0, 2).bind_workspace(temp2[ti])), "Failed when evaluating the final contraction.");
+                    CALL_AND_HANDLE(h().mf_id() = (contract(_temp, 0, 2, _HA, 0, 2)), "Failed when evaluating the final contraction.");
                 }                                         
                 catch(const std::exception& ex)
                 {
@@ -229,70 +203,53 @@ protected:
                 //if the mean field operator is the identity then we don't need to do anything.
                 if(!hinf[ind].is_identity_mf())
                 {
-                    if(hinf[ind].nmf_terms() == 1)
+                    h().mf(ind).fill_zeros();
+                    for(size_type it = 0; it < hinf[ind].nmf_terms(); ++it)
                     {
-                        size_type pi = hinf[ind].mf_indexing()[0].parent_index();
-
+                        size_type pi = hinf[ind].mf_indexing()[it].parent_index();
+                        
+                        if(hinf[ind].mf_indexing()[it].sibling_indices().size() == 0)
+                        {
+                            //std::cerr << "idop before" << std::endl;
+                            CALL_AND_HANDLE(kpo::kpo_id(h_p, A, mode, HA[ti], temp[ti]), "Failed to apply kronecker product operator.");
+                            //std::cerr << "idop" << std::endl;
+                        }
+                        else
+                        {
+                            //std::cerr << "standard before" << mode << std::endl;
+                            CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, B, A, mode, HA[ti], temp[ti]), "Failed to evaluate action of kronecker product operator.");
+                            //std::cerr << "standard" << mode << std::endl;
+                        }
                         if(!hinf_p[pi].is_identity_mf())
                         {
-                            CALL_AND_HANDLE(kron_prod(hinf, h, ind, 0, B, A, mode, HA[ti], temp[ti]), "Failed to evaluate action of kronecker product operator.");
                             CALL_AND_HANDLE(HA[ti] = temp[ti]*trans(h_p().mf(pi)), "Failed to apply action of parent mean field operator.");
                         }
                         else
                         {
-                            CALL_AND_HANDLE(kron_prod(hinf, h, ind, 0, B, A, mode, temp[ti], HA[ti]), "Failed to evaluate action of kronecker product operator.");
+                            CALL_AND_HANDLE(HA[ti] = temp[ti]*trans(h_p().mf_id()), "Failed to apply action of parent mean field operator.");
                         }
+
                         CALL_AND_HANDLE(temp[ti] = conj(B.as_matrix()), "Failed to compute conjugate of the A matrix.");
 
                         try
                         {
                             auto _A = A.as_rank_3(mode);
                             auto _B = B.as_rank_3(mode);
+
+                            //std::cerr << "A" << _A.size(0) << " " << _A.size(1) <<  " " << _A.size(2) << std::endl;
+                            //std::cerr << "B" << _B.size(0) << " " << _B.size(1) <<  " " << _B.size(2) << std::endl;
+                            //std::cerr << "HA" << HA[ti].size(0) << " " << HA[ti].size(1) << std::endl;
+                            //std::cerr << "temp" << temp[ti].size(0) << " " << temp[ti].size(1) << std::endl;
                             auto _HA = HA[ti].reinterpret_shape(_B.shape(0), _A.shape(1), _B.shape(2));
                             auto _temp = temp[ti].reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
 
-                            CALL_AND_HANDLE(h().mf(ind) = (contract(_temp, 0, 2, _HA, 0, 2).bind_workspace(temp2[ti])), "Failed when evaluating the final contraction.");
+                            CALL_AND_HANDLE(h().mf(ind) += hinf[ind].mf_coeff(it)*(contract(_temp, 0, 2, _HA, 0, 2)), "Failed when evaluating the final contraction.");
                         }                                         
                         catch(const std::exception& ex)
                         {
                             std::cerr << ex.what() << std::endl;
                             RAISE_EXCEPTION("Failed to form temporary reinterpreted tensors and perform contraction over the outer indices to form the mean field Hamiltonian.");
-                        }   
-                    }
-                    else
-                    {
-                        h().mf(ind).fill_zeros();
-                        for(size_type it = 0; it < hinf[ind].nmf_terms(); ++it)
-                        {
-                            size_type pi = hinf[ind].mf_indexing()[it].parent_index();
-
-                            if(!hinf_p[pi].is_identity_mf())
-                            {
-                                CALL_AND_HANDLE(kron_prod(hinf, h, ind, it, B, A, mode, HA[ti], temp[ti]), "Failed to evaluate action of kronecker product operator.");
-                                CALL_AND_HANDLE(HA[ti] = hinf[ind].mf_coeff(it)*temp[ti]*trans(h_p().mf(pi)), "Failed to apply action of parent mean field operator.");
-                            }
-                            else
-                            {
-                                CALL_AND_HANDLE(kron_prod(hinf, h, ind, it, B, A, mode, temp[ti], HA[ti]), "Failed to evaluate action of kronecker product operator.");
-                            }
-
-                            CALL_AND_HANDLE(temp[ti] = conj(B.as_matrix()), "Failed to compute conjugate of the A matrix.");
-
-                            try
-                            {
-                                auto _A = A.as_rank_3(mode);
-                                auto _B = B.as_rank_3(mode);
-                                auto _HA = HA[ti].reinterpret_shape(_B.shape(0), _A.shape(1), _B.shape(2));
-                                auto _temp = temp[ti].reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
-
-                                CALL_AND_HANDLE(h().mf(ind) += hinf[ind].mf_coeff(it)*(contract(_temp, 0, 2, _HA, 0, 2).bind_workspace(temp2[ti])), "Failed when evaluating the final contraction.");
-                            }                                         
-                            catch(const std::exception& ex)
-                            {
-                                std::cerr << ex.what() << std::endl;
-                                RAISE_EXCEPTION("Failed to form temporary reinterpreted tensors and perform contraction over the outer indices to form the mean field Hamiltonian.");
-                            }                       
-                        }
+                        }                       
                     }
                 }
             }
@@ -305,15 +262,15 @@ protected:
     }
 
     template <typename opnode>
-    static inline void evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, size_type ti, const hdata& B, const hdata& A, triad& HA, triad& temp, triad& temp2, opnode& h)
+    static inline void evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, size_type ti, const hdata& B, const hdata& A, triad& HA, triad& temp, opnode& h)
     {
         if(&A == &B)
         {
-            CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, ti, A, HA, temp, temp2, h));
+            CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, ti, A, HA, temp, h));
         }
         else
         {
-            CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, ti, A, HA, temp, temp2, h));
+            CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, ti, B, A, HA, temp, h));
         }
     }
 public:     
@@ -328,7 +285,14 @@ public:
     static void kron_prod(const spfnode& op, const cinftype& cinf, size_type ind, size_type ri, const hdata& B, const hdata& A, size_type mode, mat& temp, mat& res)
     {
         ASSERT(op().has_identity(), "Cannot apply rectangular hamiltonian without having identity matrices bound");
-        CALL_AND_RETHROW(kpo::kron_prod([&op](size_t nu, size_t cri){return op.parent()[nu]().spf(cri);}, [&op](size_t nu){return op.parent()[nu]().spf_id();}, cinf[ind].mf_indexing()[ri].sibling_indices(), B, A, mode, temp, res));
+        ASSERT(cinf[ind].mf_indexing()[ri].sibling_indices().size() != 0, "Cannot apply kron prod if all spf matrices are identity.");
+        CALL_AND_RETHROW
+        (
+            kpo::kron_prod(
+              [&op](size_t nu, size_t cri){return op.parent()[nu]().spf(cri);}, 
+              [&op](size_t nu){return op.parent()[nu]().spf_id();}, 
+              cinf[ind].mf_indexing()[ri].sibling_indices(), B, A, mode, temp, res)
+            );
     }
 
 };  //class mean field operator engine

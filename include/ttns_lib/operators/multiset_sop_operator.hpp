@@ -78,7 +78,7 @@ public:
 
     using mode_terms_type = std::vector<element_type>;
 
-    using ttn_type = ttn<T, backend>;
+    using ttn_type = ms_ttn<T, backend>;
 
     using single_set_container = std::vector<mode_terms_type>;
 
@@ -91,6 +91,7 @@ public:
 
     using site_ops_type = typename autoSOP<T>::site_ops_type;
 protected:
+    std::vector<std::vector<T>> m_Eshift;
     tree_type m_contraction_info;
     container_type m_mode_operators;
     std::vector<size_type> m_mode_dimension;
@@ -133,6 +134,7 @@ public:
 
         //resize the mode operators object
         m_mode_operators.resize(m_nset);
+        m_Eshift.resize(m_nset);
         m_indices.resize(m_nset);
 
         //iterate over each of the sop objects in the multiset sop class
@@ -157,6 +159,7 @@ public:
 
             //and set the element as required.
             m_mode_operators[i].push_back(mode_operators);
+            m_Eshift[i].push_back(_sop.Eshift());
 
             mode_operators.clear();
             mode_operators.shrink_to_fit();
@@ -185,6 +188,7 @@ public:
 
         //resize the mode operators object
         m_mode_operators.resize(m_nset);
+        m_Eshift.resize(m_nset);
 
         //iterate over each of the sop objects in the multiset sop class
         for(auto& data : sop)
@@ -206,6 +210,7 @@ public:
 
             //and set the element as required.
             m_mode_operators[i].push_back(mode_operators);
+            m_Eshift[i].push_back(_sop.Eshift());
 
             mode_operators.clear();
             mode_operators.shrink_to_fit();
@@ -228,6 +233,20 @@ public:
     container_type& mode_operators(){return m_mode_operators;}
     const container_type& mode_operators() const{return m_mode_operators;}
 
+    template <typename RT>
+    void update(size_type nu, RT t, RT dt)
+    {
+        for(auto& m1 : m_mode_operators)
+        {
+            for(auto& m2 : m1)
+            {
+                for(size_t term = 0; term < m2[nu].size(); ++term)
+                {
+                    m2[nu][term].update(t, dt);
+                }
+            }
+        }
+    }
 
     const single_set_container& mode_operators(size_t i, size_t j) const
     {
@@ -236,6 +255,12 @@ public:
         return m_mode_operators[i][j];
     }
 
+    const T& Eshift(size_t i, size_t j) const
+    {
+        ASSERT(i < m_nset, "Index out of bounds.");
+        ASSERT(j < m_indices[i].size(), "Index out of bounds.");
+        return m_Eshift[i][j];
+    }
     size_t nrow(size_t i) const
     {
         ASSERT(i < m_nset, "Index out of bounds.");

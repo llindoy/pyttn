@@ -768,6 +768,7 @@ protected:
                     for(size_t j = 0; j < sop.nrow(iset); ++j)
                     {
                         size_t nt = get_nterms(h(), iset, j);
+                        if(nt == 0){nt = 1;}
                         if(nt > nterms){nterms = nt;}
 
                         size_t jset = sop.column_index(iset, j);

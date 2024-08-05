@@ -77,7 +77,7 @@ public:
     }
 
     template <typename INTEGER, typename Alloc>
-    ms_ttn(const ntree<INTEGER, Alloc>& topology, size_type nset) try : base_type(topology, nset) {}
+    ms_ttn(const ntree<INTEGER, Alloc>& topology, size_type nset, bool purification = false) try : base_type(topology, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
@@ -85,21 +85,21 @@ public:
     }
 
     template <typename INTEGER, typename Alloc>
-    ms_ttn(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, size_type nset)try : base_type(topology, capacity, nset) {}
+    ms_ttn(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, size_type nset, bool purification = false)try : base_type(topology, capacity, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
         RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
     }
 
-    ms_ttn(const std::string& _topology, size_type nset) try : base_type(_topology, nset) {}
+    ms_ttn(const std::string& _topology, size_type nset, bool purification = false) try : base_type(_topology, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
         RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
     }
 
-    ms_ttn(const std::string& _topology, const std::string& _capacity, size_type nset) try : base_type(_topology, _capacity, nset) {}
+    ms_ttn(const std::string& _topology, const std::string& _capacity, size_type nset, bool purification = false) try : base_type(_topology, _capacity, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
@@ -109,7 +109,7 @@ public:
 public:
     ms_ttn& operator=(const ms_ttn& other) = default;
     template <typename U, typename be>
-    ms_ttn& operator=(const ms_ttn<U, be>& other){CALL_AND_RETHROW(return this->base_type::operator=(other));}
+    ms_ttn& operator=(const ms_ttn<U, be>& other){CALL_AND_RETHROW(return base_type::operator=(other));}
 
     template <typename U, typename be>
     ms_ttn& assign_set(size_type set, const ttn<U, be>& other)
@@ -125,13 +125,13 @@ public:
 
 public:
     template <typename int_type> 
-    void set_state(size_type sind, const std::vector<int_type>& si){CALL_AND_RETHROW(_set_state(si, sind));}
+    void set_state(size_type sind, const std::vector<int_type>& si){CALL_AND_RETHROW(this->_set_state(si, sind));}
 
     template <typename U, typename be> 
-    void set_product(size_type sind, const std::vector<linalg::vector<U, be> >& ps){CALL_AND_RETHROW(_set_product(ps, sind));}
+    void set_product(size_type sind, const std::vector<linalg::vector<U, be> >& ps){CALL_AND_RETHROW(this->_set_product(ps, sind));}
 
     template <typename Rvec> 
-    void sample_product_state(size_type sind, std::vector<size_t>& state, const std::vector<Rvec>& relval){CALL_AND_RETHROW(_sample_product_state(state, relval, sind));}
+    void sample_product_state(size_type sind, std::vector<size_t>& state, const std::vector<Rvec>& relval){CALL_AND_RETHROW(this->_sample_product_state(state, relval, sind));}
 
     template <typename U, typename int_type> 
     void set_state(const std::vector<U>& coeff, const std::vector<std::vector<int_type>>& si)
@@ -144,7 +144,7 @@ public:
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
-                ASSERT(si[set_index][i] < m_dim_sizes[i], "Cannot set state, state index out of bounds.");
+                ASSERT(static_cast<size_type>(si[set_index][i]) < m_dim_sizes[i], "Cannot set state, state index out of bounds.");
             }
         }
         
@@ -242,9 +242,9 @@ public:
     size_type nthreads() const{return m_orthog.nthreads();}
     size_type& nthreads() {return m_orthog.nthreads();}
 
-/*  
     real_type bond_entropy(size_t bond_index)
     {
+/*  
         try
         {
             if(!m_orthog.is_initialised()){m_orthog.init(*this, m_maxsize, m_maxcapacity);}
@@ -287,10 +287,12 @@ public:
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to shift orthogonality centre.");
         }
+        */
     }
 
     real_type compute_maximum_bond_entropy()
     {
+/*  
         try
         {
             //first we ensure that the ttn is orthogonalised to the root node
@@ -344,8 +346,8 @@ public:
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to truncate ttn object.");
         }
-    }
 */
+    }
  
   #ifdef CEREAL_LIBRARY_FOUND
 public:
@@ -361,6 +363,59 @@ public:
         CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn object.  Error when serialising the base object.");
     }
 #endif
+
+public:
+    template <typename bType> 
+    static void flatten(const std::vector<bType>& buf, linalg::vector<T, backend>& res)
+    {
+        size_t size = 0; 
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            size += buf[i].size();
+        }
+        res.resize(size);
+        size_t iskip = 0;
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            backend::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
+            iskip += buf[i].size();
+        }
+    }
+
+    template <typename bType> 
+    static void flatten(const std::vector<bType>& buf, linalg::reinterpreted_tensor<T, 1, backend>& res)
+    {
+        size_t size = 0; 
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            size += buf[i].size();
+        }
+        ASSERT(res.size() == size, "Cannot flatten array invalid size.");
+        size_t iskip = 0;
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            backend::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
+            iskip += buf[i].size();
+        }
+    }
+
+    template <typename ftype, typename bType> 
+    static void unpack(const ftype& res, std::vector<bType>& buf)
+    {
+        size_t size = 0; 
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            size += buf[i].size();
+        }
+        ASSERT(res.size() == size, "Failed to unpack flattened array into multiset type.  Incompatibles sizes.");
+
+        size_t iskip = 0;
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            backend::copy(res.buffer()+iskip, buf[i].size(), buf[i].buffer());
+            iskip += buf[i].size();
+        }
+    }
 };
 
 template <typename T, typename backend> 

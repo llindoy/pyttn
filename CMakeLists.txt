@@ -18,7 +18,7 @@ get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTO
 
 #compiler flags
 option(USE_CUDA "Compile with cuda" OFF)
-option(USE_OPENMP "Compile with openmp" OFF)
+option(USE_OPENMP "Compile with openmp" ON)
 option(USE_GEMM3M "Compile with openmp" OFF)
 option(BUILD_TESTS "Build Tests" OFF)
 option(BUILD_PYTHON_BINDINGS "Build Python Bindings" OFF)

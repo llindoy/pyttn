@@ -284,7 +284,7 @@ public:
 public:
     template <typename U> 
     inline typename std::enable_if<std::is_convertible<U, value_type>::value, self_type&>::type fill_value(const U& u){CALL_AND_HANDLE(fill_impl(u), "Failed to fill buffer with value.  Error when calling fill impl.");   return *this;}
-    template <typename U> 
+
     inline self_type& fill_zeros(){CALL_AND_HANDLE(fill_impl(value_type(0.0)), "Failed to fill buffer to zero.");   return *this;}  
     inline self_type& fill_ones(){CALL_AND_HANDLE(fill_impl(value_type(1.0)), "Failed to fill buffer to one.");   return *this;}
 

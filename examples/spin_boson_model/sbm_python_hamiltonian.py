@@ -6,20 +6,16 @@ import sys
 sys.path.append("../../")
 from pyttn import *
 
-
-def sbm_discretise(N, alpha, wc):
-    w = -wc * np.log(1.-np.arange(N)/(N+1.0))
-    g = np.sqrt(4*alpha*w)
-    return g, w
+from sbm_core import sbm_discretise
 
 
 def spin_boson_test(Nb, alpha, wc, eps, delta, chi, nbose, dt, nstep = 1, degree = 2, yrange=[0, 0.5]):
     g, w = sbm_discretise(Nb, alpha, wc)
 
     H = SOP(Nb+1)
-    H += eps*sOP("sz", 0) + delta*sOP("sx", 0)
+    H += 2.0*eps*sOP("sz", 0) + 2.0*delta*sOP("sx", 0)
     for i in range(Nb):
-        H += g[i]*sOP("sz", 0)*sOP("q", i+1)
+        H += np.sqrt(2.0)*g[i]*sOP("sz", 0)*sOP("q", i+1)
         H += w[i]*sOP("n", i+1)
 
     sysinf = system_modes(Nb+1)
@@ -73,10 +69,10 @@ def spin_boson_test(Nb, alpha, wc, eps, delta, chi, nbose, dt, nstep = 1, degree
         print((i+1)*dt, res[i+1], t2-t1)
         if(plt.fignum_exists(num)):
             plt.gcf().canvas.draw()
-            line.remove()
-            del line
-            line = ax.plot(np.arange(nstep+1)*dt, res)[0]
-            plt.pause(0.1)
+            line.set_data(np.arange(nstep+1)*dt, res)
+            plt.pause(0.01)
 
+    plt.ioff()
+    plt.show()
 
-spin_boson_test(64, 4.0, 25, 0.0, 2.0, 20, 10, 0.001, nstep = 100, yrange=[0.4996, 0.5])
+spin_boson_test(64, 2.0, 25, 0.0, 1.0, 20, 10, 0.0025, nstep = 400, yrange=[0.4965, 0.5])

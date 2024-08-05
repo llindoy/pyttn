@@ -17,7 +17,9 @@
 namespace ttns
 {
 
-//TODO: Need to fix the accumulation coefficients array for the hierarchical sop class.
+//TODO: Need to fix accumulation coefficients when working with specific hamiltonian types
+//      Need to debug this code carefully something is going very wrong - but it works when
+//      all accumulation coefficients are set to 1.
 template <typename T>
 class autoSOP
 {
@@ -727,7 +729,6 @@ protected:
                         if(std::find(_V.begin(), _V.end(), _v) == _V.end())
                         {
                             composite_rs.insert(_r);
-                            
 
                             std::pair<size_t, size_t> m_inds({spfr[_r], mfr[_r]});
                             ASSERT(mf[mfr[_r]].nterms() == 1, "Something went wrong when optimising the MF terms.  A composite MF was encountered when simple MFs were expected.");
@@ -773,8 +774,6 @@ protected:
                     {                
                         const auto& ve = g.V_edges(v);
                         const auto& vd = g.V_edges_data(v);
-
-
 
                         //get the r indices included in this sum
                         utils::term_indexing_array<size_t> temp_rs(nterms);
@@ -1195,7 +1194,9 @@ public:
     {
         if(sop.nterms() > 0)
         {
-            if(compress)
+            
+            //we only compress the term if it has at least two terms
+            if(compress && sop.nterms() > 1)
             {
                 autoSOP<T>::compressed(sop, A, bp, site_ops);
             }
@@ -1204,6 +1205,13 @@ public:
                 autoSOP<T>::primitive(sop, A, bp, site_ops);
             }
             return true;
+        }
+        else
+        {
+            ASSERT(sop.nmodes() == A.nleaves(), "Failed to compute trivial tree bipartitioning of the SOP.  SOP and Tree do not have the same dimension.");
+            bp.clear();
+            bp.construct_topology(A);
+            site_ops.resize(sop.nmodes());
         }
         return false;
     }

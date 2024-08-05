@@ -327,6 +327,7 @@ protected:
         try
         {
             auto& v = m_mode_operators[nu][op];
+            std::cerr << "inserting at mode: " << nu << " term: " << r << " label:" << op.label(m_op_dict[nu]) << std::endl;
             v.reserve(m_nterms);
             v.insert(r);
         }

@@ -142,7 +142,6 @@ public:
         try
         {
             ASSERT(m_krylov_dim != 0, "Failed to compute the partial krylov subspace. Cannot construct a krylov subspace with dim of 0.");
-            if(istart > iend){std::cerr << istart << " " << iend << std::endl;}
             ASSERT(istart <= iend, "Failed to compute the partial krylov subspace.  The starting index must be smaller than the final index.");
             ASSERT(iend <= m_krylov_dim, "Failed to compute the partial krylov subspace.  The final index is larger than the maximum krylov subspace dimension.");
 

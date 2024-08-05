@@ -173,6 +173,8 @@ public:
         size_type nthreads() const{return m_nthreads;}
         size_type& nthreads() {m_initialised = false; return m_nthreads;}
 
+        bool parallelise() const{return m_nthreads>1;}
+
         size_type most_recent_node() const{return m_most_recent_node;}
         size_type& most_recent_node(){return m_most_recent_node;}
 
@@ -310,6 +312,26 @@ public:
     const std::vector<size_type>& dims(size_type i) const{return m_data[i].dims();}
     size_type nbonds() const{return this->size() + (this->is_root() ? 0 : 1);}
 
+    size_type buffer_maxcapacity() const
+    {
+        size_t bs = 0;
+        for(size_t i = 0; i < nset(); ++i)
+        {
+            bs += m_data[i].capacity();
+        }
+        return bs;
+    }
+
+    size_t buffer_size() const
+    {
+        size_t bs = 0;
+        for(size_t i = 0; i < nset(); ++i)
+        {
+            bs += m_data[i].size();
+        }
+        return bs;
+    }
+
     const value_type& operator()() const {return m_data;}
     value_type& operator()() {return m_data;}
 
@@ -381,12 +403,13 @@ public:
     setup_data_from_topology_node(const ntree_node<ntree<Itype, Atype>>& tree_iter, 
                                   const ntree_node<ntree<Itype, Atype>>& capacity_iter, 
                                   size_type ndims,
-                                  size_type nset = 1)
+                                  size_type nset = 1,
+                                  bool purification = false)
     {
         m_data.resize(nset);
         for(size_type i = 0; i < nset; ++i)
         {
-            m_data[i].setup_data_from_topology_node(tree_iter, capacity_iter, ndims);
+            m_data[i].setup_data_from_topology_node(tree_iter, capacity_iter, ndims, purification);
         }
     }
 
@@ -395,13 +418,14 @@ public:
     setup_data_from_topology_node(const ntree_node<ntree<std::vector<Itype>, Atype>>& tree_iter, 
                                   const ntree_node<ntree<std::vector<Itype>, Atype>>& capacity_iter, 
                                   size_type ndims,
-                                  size_type nset = 1)
+                                  size_type nset = 1,
+                                  bool purification = false)
     {
         ASSERT(tree_iter.value().size() == nset, "Cannot setup data from topology node the nset variable has not been set correctly.");
         m_data.resize(nset);
         for(size_type i = 0; i < nset; ++i)
         {
-            m_data[i].setup_data_from_topology_node(tree_iter, capacity_iter, ndims, i);
+            m_data[i].setup_data_from_topology_node(tree_iter, capacity_iter, ndims, i, purification);
         }
     }
 

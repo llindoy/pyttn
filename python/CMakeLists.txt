@@ -9,11 +9,12 @@ option(USE_OPENMP "Compile with openmp" OFF)
 option(USE_GEMM3M "Compile with openmp" OFF)
 
 set(PYTHON_BINDINGS_SRC pythonBinding.cpp 
+          utils/orthopol.cpp
           linalg/sparseMatrix.cpp linalg/tensor.cpp 
           ttns/observables/matrix_element.cpp 
           ttns/operators/siteOperators.cpp ttns/operators/sop_operator.cpp
           ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp ttns/sop/models/models.cpp
-          ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp
+          ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp ttns/ttn/ms_ttn.cpp
           ttns/algorithms/tdvp.cpp ttns/algorithms/dmrg.cpp
           )
 

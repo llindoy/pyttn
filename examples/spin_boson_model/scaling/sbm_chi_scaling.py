@@ -2,7 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import sys
-sys.path.append("../../")
+sys.path.append("../../../")
+sys.path.append("../")
 
 from pyttn import *
 from sbm_core import *
@@ -16,7 +17,7 @@ def bath_size_scaling_binary_ternary():
 
     for chi in chis:
         print(chi)
-        m, std = spin_boson_test(nb, 4.0, 25, 0.0, 2.0, chi, nbose, 0.001, nstep=1, compress = True)
+        m, std = spin_boson_test(nb, 2.0, 25, 0.0, 1.0, chi, nbose, 0.001, nstep=1, compress = True)
         timings_binary.append(m)
         stdevs_binary.append(std)
 
@@ -28,7 +29,8 @@ def bath_size_scaling_binary_ternary():
     stdevs_3 = []
     for chi in chis:
         print(chi)
-        m, std = spin_boson_test(nb, 4.0, 25, 0.0, 2.0, chi, nbose, 0.001, nstep=1, degree = 3, compress = True)
+
+        m, std = spin_boson_test(nb, 2.0, 25, 0.0, 1.0, chi, nbose, 0.001, nstep=1, degree = 3, compress = True)
         timings_3.append(m)
         stdevs_3.append(std)
 

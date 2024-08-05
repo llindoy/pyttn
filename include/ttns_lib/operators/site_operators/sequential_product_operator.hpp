@@ -104,11 +104,13 @@ public:
 
     void apply(const_matrix_ref A, matrix_ref HA) final
     {
+        HA.resize(A.shape(0), A.shape(1));
         ASSERT(m_operators.size() > 0, "Invalid operator object.");
         __apply_internal(A, HA);
     }  
     void apply(const_matrix_ref A, matrix_ref HA, real_type t, real_type dt) final
     {
+        HA.resize(A.shape(0), A.shape(1));
         ASSERT(m_operators.size() > 0, "Invalid operator object.");
         this->update(t, dt);
         __apply_internal(A, HA);
@@ -145,15 +147,23 @@ protected:
     template <typename T1, typename T2>
     void __apply_internal(const T1& A, T2& HA)
     {
-        m_temp.resize(A.size());
-        resview t = m_temp.reinterpret_shape(A.shape(0), A.shape(1));
-        resview _HA = HA.reinterpret_shape(A.shape(0), A.shape(1));
-        for(size_t i = 0; i < m_operators.size(); ++i)
+        try
         {
-            if(i == 0){t.set_buffer(A);}
-            else{t.set_buffer(_HA);}
-            size_t ind = m_operators.size() - (i+1);
-            m_operators[ind]->apply(t, _HA);
+            m_temp.resize(A.size());
+            resview t = m_temp.reinterpret_shape(A.shape(0), A.shape(1));
+            resview _HA = HA.reinterpret_shape(A.shape(0), A.shape(1));
+            for(size_t i = 0; i < m_operators.size(); ++i)
+            {
+                if(i == 0){t.set_buffer(A);}
+                else{t.set_buffer(_HA);}
+                size_t ind = m_operators.size() - (i+1);
+                m_operators[ind]->apply(t, _HA);
+            }
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to apply sequential product operator.");
         }
     }
 

@@ -73,21 +73,28 @@ set(COMPILER_SET TRUE INTERNAL BOOL "")
 
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-add_executable(tree_test operator_optimisation.cpp)
+add_executable(siam_test siam.cpp)
 add_executable(pyrazine_test pyrazine_operator.cpp)
-add_executable(spin_boson_test spin_boson.cpp)
+add_executable(spin_boson spin_boson.cpp)
+add_executable(spin_boson_multiset spin_boson_multiset.cpp)
 
 
-target_include_directories(tree_test PRIVATE ${TTNS_INCLUDE_DIRECTORIES})
-target_link_libraries(tree_test PRIVATE ${LINALG_LIBS} ${LIBS}) 
+target_include_directories(siam_test PRIVATE ${TTNS_INCLUDE_DIRECTORIES})
+target_link_libraries(siam_test PRIVATE ${LINALG_LIBS} ${LIBS}) 
 
-install(TARGETS tree_test
+install(TARGETS siam_test
         DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 
-target_include_directories(spin_boson_test PRIVATE ${TTNS_INCLUDE_DIRECTORIES})
-target_link_libraries(spin_boson_test PRIVATE ${LINALG_LIBS} ${LIBS}) 
+target_include_directories(spin_boson PRIVATE ${TTNS_INCLUDE_DIRECTORIES})
+target_link_libraries(spin_boson PRIVATE ${LINALG_LIBS} ${LIBS}) 
 
-install(TARGETS spin_boson_test
+install(TARGETS spin_boson
+  DESTINATION ${CMAKE_SOURCE_DIR}/bin)
+
+target_include_directories(spin_boson_multiset PRIVATE ${TTNS_INCLUDE_DIRECTORIES})
+target_link_libraries(spin_boson_multiset PRIVATE ${LINALG_LIBS} ${LIBS}) 
+
+install(TARGETS spin_boson_multiset
   DESTINATION ${CMAKE_SOURCE_DIR}/bin)
 
 target_include_directories(pyrazine_test PRIVATE ${TTNS_INCLUDE_DIRECTORIES})

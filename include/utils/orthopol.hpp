@@ -167,7 +167,7 @@ public:
     }
 
 
-    void compute_nodes_and_weights(size_t npoints, T normalisation = 1)
+    void compute_nodes_and_weights(size_t npoints, T normalisation = 1.0)
     {
         ASSERT(npoints <= m_max_order, "Failed to compute quadrature nodes and weights. ");
         if(m_p0 == T(0)){m_p0 = normalisation;}
@@ -482,13 +482,11 @@ void nonclassical_polynomial(orthopol<T>& orth, const orthopol<T>& orthref, size
         ASSERT(std::abs(xmin) != std::numeric_limits<T>::infinity() && std::abs(xmax) != std::numeric_limits<T>::infinity(), "The modified Chebyshev method is not suitable for infinite ranges.");
         quad::gauss::legendre<T> gauss_leg(quadrature_order);
 
-        std::cerr << std::setprecision(16);
         //compute the first 2N modified moments of the weight function F using the monic polynomials stored in orthref
         linalg::vector<T> modified_moments(2*nmax);
         for(size_t i = 0; i < 2*nmax; ++i)
         {
             modified_moments[i] = quad::adaptive_integrate([&](T x){return orthref.monic(x, i)*f(x)*scale_factor;}, gauss_leg, xmin, xmax, false, tol, true, rel_tol, 0.0, max_order, false);
-            std::cerr << i << " " << modified_moments[i] << "\r";
         }
         CALL_AND_HANDLE(nonclassical_polynomial(orth, orthref, modified_moments, scale_factor), "An issues occured when applying modified Chebyshev algorithm.  This is likely a result of a poor choice of the monic polynomials, resulting in inaccurate evaluation of moments.");
         orth.set_domain(xmin, xmax);
@@ -515,13 +513,11 @@ void nonclassical_polynomial(orthopol<T>& orth, const orthopol<T>& orthref, T xm
         quad::gauss::legendre<T> gauss_leg(quadrature_order);
         ASSERT(std::abs(xmin) != std::numeric_limits<T>::infinity() && std::abs(xmax) != std::numeric_limits<T>::infinity(), "The modified Chebyshev method is not suitable for infinite ranges.");
 
-        std::cerr << std::setprecision(16);
         //compute the first 2N modified moments of the weight function F using the monic polynomials stored in orthref
         linalg::vector<T> modified_moments(2*nmax);
         for(size_t i = 0; i < 2*nmax; ++i)
         {
             modified_moments[i] = quad::adaptive_integrate([&](T x){return orthref.monic(x, i)*f(x)*scale_factor;}, gauss_leg, xmin, xmax, false, tol, true, rel_tol, 0.0, max_order, false);
-            std::cerr << i << " " << modified_moments[i] << "\r";
         }
         CALL_AND_HANDLE(nonclassical_polynomial(orth, orthref, modified_moments, scale_factor), "An issues occured when applying modified Chebyshev algorithm.  This is likely a result of a poor choice of the monic polynomials, resulting in inaccurate evaluation of moments.");
         orth.set_domain(xmin, xmax);

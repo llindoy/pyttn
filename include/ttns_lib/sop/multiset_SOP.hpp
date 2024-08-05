@@ -102,7 +102,7 @@ public:
         iter->second.insert(std::forward<Args>(args)...);
     }
 
-    void insert(size_t i, size_t j, const SOP<T>& sop)
+    void set(size_t i, size_t j, const SOP<T>& sop)
     {
         ASSERT(i < m_nset && j < m_nset, "Failed to access sop.  Index out of bounds.");
         std::pair<size_t, size_t> key = std::make_pair(i, j);
@@ -112,7 +112,7 @@ public:
         {
             iter = m_terms.insert({key, SOP<T>(m_nmodes)}).first;
         }
-        iter->second += sop;
+        iter->second = sop;
     }
 
 protected:
@@ -134,18 +134,9 @@ public:
 
     multiset_SOP& jordan_wigner(const system_modes& sys_info, double tol = 1e-15)
     {
-        for(const auto& it : m_terms)
+        for(auto& it : m_terms)
         {
             it.second.jordan_wigner(sys_info, tol);
-        }
-        return *this;
-    }
-
-    multiset_SOP& jordan_wigner(double tol = 1e-15)
-    {
-        for(const auto& it : m_terms)
-        {
-            it.second.jordan_wigner(tol);
         }
         return *this;
     }

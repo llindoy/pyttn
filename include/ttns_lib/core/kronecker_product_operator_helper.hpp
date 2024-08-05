@@ -293,6 +293,39 @@ public:
         }
     }
 
+    template <typename A1, typename R1, typename t1>
+    static void kron_prod_rect_skip(A1& _A, R1& res, t1& temp, size_type Mshape, size_type Rshape, bool& first_call, bool& res_set)
+    {
+        if(first_call)
+        {     
+            CALL_AND_HANDLE(res.resize(Mshape*Rshape, _A.shape(2)), "Failed to resize temporary working buffer.");
+            auto _res = res.reinterpret_shape(Mshape, Rshape, _A.shape(2));
+            CALL_AND_HANDLE(_res  = _A, "Failed to compute kronecker product contraction.");      
+            res_set = true; first_call = false;
+        }
+        else
+        {
+            if(res_set)
+            {   
+                CALL_AND_HANDLE(temp.resize(Mshape*Rshape, _A.shape(2)), "Failed to resize temporary working buffer.");
+                auto _res = res.reinterpret_shape(Mshape, _A.shape(1), _A.shape(2));
+                auto _temp = temp.reinterpret_shape(Mshape, Rshape, _A.shape(2));
+
+                CALL_AND_HANDLE(_temp = _res, "Failed to compute kronecker product contraction.");    
+                res_set = false;
+            }
+            else
+            {               
+                CALL_AND_HANDLE(res.resize(Mshape*Rshape, _A.shape(2)), "Failed to resize temporary working buffer.");
+                auto _res = res.reinterpret_shape(Mshape, Rshape, _A.shape(2));
+                auto _temp = temp.reinterpret_shape(Mshape, _A.shape(1), _A.shape(2));
+                
+                CALL_AND_HANDLE(_res  = _temp, "Failed to compute kronecker product contraction.");   
+                res_set = true;
+            }
+        }
+    }
+
 public:
     template <typename spfnode>
     static void kpo_id(const spfnode& op, const hdata& A, mat& temp, mat& res)
@@ -352,6 +385,7 @@ public:
                 {
                     if(first_call){Mshape = _A.shape(0); Rshape = _A.shape(1);}
                     else{Mshape *= Rshape;   Rshape = _A.shape(1);}
+                    kron_prod_rect_skip(_A, res, temp, Mshape, Rshape, first_call, res_set);
                 }
             }
             finalise(A.as_matrix(), res, temp, first_call, res_set, false);
@@ -391,10 +425,7 @@ public:
                 if(_nu == nu)
                 {
                     kron_prod_rect_internal(op(nu, cri), _A, res, temp, Mshape, Rshape, first_call, res_set);
-                    if(ni+1<spinds.size())
-                    {
-                        ++ni;
-                    }
+                    if(ni+1<spinds.size()){++ni;}
                 }
                 else
                 {
@@ -432,7 +463,7 @@ public:
 
                 auto _A = A.as_rank_3(_nu);
 
-                if(nu != nuskip)
+                if(_nu != nuskip)
                 {
                     if(first_call){Mshape = _A.shape(0); Rshape = m;}
                     else{Mshape *= Rshape;   Rshape = m;}
@@ -440,10 +471,7 @@ public:
                     if(_nu == nu)
                     {
                         kron_prod_rect_internal(op(nu, cri), _A, res, temp, Mshape, Rshape, first_call, res_set);
-                        if(ni+1<spinds.size())
-                        {
-                            ++ni;
-                        }
+                        if(ni+1<spinds.size()){++ni;}
                     }
                     else
                     {
@@ -454,6 +482,7 @@ public:
                 {
                     if(first_call){Mshape = _A.shape(0); Rshape = _A.shape(1);}
                     else{Mshape *= Rshape;   Rshape = _A.shape(1);}
+                    kron_prod_rect_skip(_A, res, temp, Mshape, Rshape, first_call, res_set);
                 }
             }
             finalise(A.as_matrix(), res, temp, first_call, res_set, false);

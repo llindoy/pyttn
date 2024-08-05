@@ -20,11 +20,14 @@
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 
+#include "utils/orthopol.hpp"
+
 #include "linalg/tensor.hpp"
 #include "linalg/sparseMatrix.hpp"
 
 #include "ttns/ttn/ntree.hpp"
 #include "ttns/ttn/ttn.hpp"
+#include "ttns/ttn/ms_ttn.hpp"
 #include "ttns/operators/siteOperators.hpp"
 #include "ttns/operators/sop_operator.hpp"
 
@@ -53,12 +56,18 @@ PYBIND11_MODULE(_pyttn, m)
 {
     m.doc()="TTNS library.";
     auto m_linalg = m.def_submodule("linalg", "Linear algebra submodule for TTNS library.");
+    auto m_orthopol = m.def_submodule("orthopol", "Orthogonal polynomials submodule for TTNS library.");
 
     //
     //Wrap the required linear algebra types to enable python based instantiation of operators.
     //
     initialise_tensors(m_linalg);
     initialise_sparse_matrices(m_linalg);
+
+    //
+    //Wrap the required utils functions
+    //
+    initialise_orthopol(m_orthopol);
     
     //
     //Wrap the sOP functionality
@@ -74,12 +83,13 @@ PYBIND11_MODULE(_pyttn, m)
     //
     initialise_ntree(m);
     initialise_ttn(m);
+    initialise_msttn(m);
 
     initialise_matrix_element(m);
     //
     //Wrap operator classes
     //
-    auto m_ops = m.def_submodule("ops", "Linear algebra submodule for TTNS library.");
+    auto m_ops = m.def_submodule("ops", "Operator submodule for TTNS library.");
     initialise_site_operators(m_ops);
     initialise_sop_operator(m);
 

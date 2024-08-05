@@ -2,6 +2,7 @@
 #define PYTHON_BINDING_DMRG_HPP
 
 #include <ttns_lib/ttn/ttn.hpp>
+#include <ttns_lib/ttn/ms_ttn.hpp>
 #include <ttns_lib/sweeping_algorithm/dmrg.hpp>
 
 #include <pybind11/operators.h>
@@ -15,20 +16,21 @@
 
 namespace py=pybind11;
 
-template <typename T>
-void init_dmrg(py::module &m, const std::string& label)
+
+template <typename T, template <typename, typename> class ttn_class>
+void init_dmrg_core(py::module& m, const std::string& label)
 {
     using namespace ttns;
     using backend = linalg::blas_backend;
 
-    using dmrg = one_site_dmrg<T, backend>;
-    using _ttn = ttn<T, backend>;
-    using _sop = sop_operator<T, backend>;
+    using dmrg = _one_site_dmrg<T, backend, ttn_class>;
+    using _ttn = ttn_class<T, backend>;
+    using _sop = typename dmrg::env_type;
 
     using size_type = typename dmrg::size_type;
     using real_type = typename linalg::get_real_type<T>::type;
     //wrapper for the sPOP type 
-    py::class_<dmrg>(m, (std::string("one_site_dmrg_")+label).c_str())
+    py::class_<dmrg>(m, label.c_str())
         .def(py::init<>())
         .def(py::init<const _ttn&, const _sop&, size_type, size_type>(),
                   py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("num_threads")=1)
@@ -61,6 +63,14 @@ void init_dmrg(py::module &m, const std::string& label)
         .def("prepare_environment", &dmrg::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false);
     //utils::eigenvalue_target& mode(){return m_eigensolver.mode();}
     //const utils::eigenvalue_target& mode() const{return m_eigensolver.mode();}
+}
+
+
+template <typename T>
+void init_dmrg(py::module &m, const std::string& label)
+{
+    init_dmrg_core<T, ttns::ttn>(m, (std::string("one_site_dmrg_")+label));
+    init_dmrg_core<T, ttns::ms_ttn>(m, (std::string("multiset_one_site_dmrg_")+label));
 }
 
 void initialise_dmrg(py::module& m);

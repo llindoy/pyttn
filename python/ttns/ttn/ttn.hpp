@@ -2,6 +2,8 @@
 #define PYTHON_BINDING_TTN_HPP
 
 #include <ttns_lib/ttn/ttn.hpp>
+#include <ttns_lib/ttn/multiset_ttn_slice.hpp>
+#include <ttns_lib/operators/site_operators/site_operator.hpp>
 #include "../../utils.hpp"
 
 #include <pybind11/operators.h>
@@ -85,22 +87,24 @@ void init_ttn(py::module &m, const std::string& label)
         .def(py::init<const _ttn&>())
         .def(py::init<const ttn<real_type, linalg::blas_backend>&>())
 
-        //.def(py::init<const multiset_ttn_slice<real_type, linalg::blas_backend, true>&>())
-        //.def(py::init<const multiset_ttn_slice<T, linalg::blas_backend, true>&>())
-        //.def(py::init<const multiset_ttn_slice<real_type, linalg::blas_backend, false>&>())
-        //.def(py::init<const multiset_ttn_slice<T, linalg::blas_backend, false>&>())
+        .def(py::init<const multiset_ttn_slice<real_type, linalg::blas_backend, true>&>())
+        .def(py::init<const multiset_ttn_slice<T, linalg::blas_backend, true>&>())
+        .def(py::init<const multiset_ttn_slice<real_type, linalg::blas_backend, false>&>())
+        .def(py::init<const multiset_ttn_slice<T, linalg::blas_backend, false>&>())
 
         .def(py::init<const ntree<size_t>&, bool>(), py::arg(), py::arg("purification") = false)
         .def(py::init<const ntree<size_t>&, const ntree<size_t>&, bool>(), py::arg(), py::arg(), py::arg("purification") = false)
         .def(py::init<const std::string&, bool>(), py::arg(), py::arg("purification") = false)
         .def(py::init<const std::string&, const std::string, bool &>(), py::arg(), py::arg(), py::arg("purification") = false)
 
-        //template <typename U, typename be, bool CONST>
-        //ttn& operator=(multiset_ttn_slice<U, be, CONST> other)
-
         .def("complex_dtype", [](const _ttn&){return !std::is_same<T, real_type>::value;})
-        .def("assign", &_ttn::template operator=<T, linalg::blas_backend>)
-        .def("assign", &_ttn::template operator=<real_type, linalg::blas_backend> )
+
+        .def("assign", &_ttn::template operator=<T, linalg::blas_backend, true>)
+        .def("assign", &_ttn::template operator=<T, linalg::blas_backend, false>)
+        .def("assign", &_ttn::template operator=<real_type, linalg::blas_backend, true>)
+        .def("assign", &_ttn::template operator=<real_type, linalg::blas_backend, false>)
+        .def("assign", [](_ttn& o, const _ttn& i){o=i;})
+        .def("assign", [](_ttn& o, const ttn<real_type, linalg::blas_backend>& i){o=i;})
         .def("__copy__", [](const _ttn& o){return _ttn(o);})
         .def("__deepcopy__", [](const _ttn& o, py::dict){return _ttn(o);}, py::arg("memo"))
 

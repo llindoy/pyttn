@@ -61,12 +61,12 @@ public:
     std::shared_ptr<base_type> clone() const{return std::make_shared<purification_operator>(m_operator);}
 
 
-    void apply(const resview& A, resview& HA)
+    void apply(const resview& /* A */, resview& /* HA */)
     {
         RAISE_EXCEPTION("Cannot have nested purifications.");
     }  
     void apply(const resview& A, resview& HA, real_type t, real_type dt){this->update(t, dt); CALL_AND_RETHROW(this->apply(A, HA));}  
-    void apply(const matview& A, resview& HA)
+    void apply(const matview& /* A */, resview& /* HA */)
     {
         RAISE_EXCEPTION("Cannot have nested purifications.");
     }  

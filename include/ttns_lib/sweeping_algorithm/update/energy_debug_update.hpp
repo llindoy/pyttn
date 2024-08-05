@@ -4,6 +4,7 @@
 #include <common/omp.hpp>
 #include "simple_update_parameter_list.hpp"
 #include "../sweeping_forward_decl.hpp"
+#include "update_buffer.hpp"
 
 namespace ttns
 {
@@ -41,6 +42,7 @@ public:
     
     void initialise(const ttn_type&){}
 
+
     void initialise(const ttn_type&, const parameter_list& ){}
     void initialise(const ttn_type&, parameter_list&& ){}
 
@@ -50,42 +52,49 @@ public:
 
     size_type update_site_tensor(hnode& A, const environment_type& env, env_node_type& h, env_type& op)
     {                    
-          linalg::matrix<T, backend> res(A().as_matrix());
-          if(!A.is_leaf())
-          {
-              env.ceb.set_pointer(&(A()));
-              CALL_AND_HANDLE
-              (
-                  env.ceb(A().as_matrix(), h, op, env.buffer().HA[0], env.buffer().temp[0], env.buffer().temp2[0], res),
-                  "Failed to evolve the branch coefficient matrix."
-              );
-              env.ceb.unset_pointer();
-              auto t1 = res.reinterpret_shape(A().as_matrix().size());
-              auto a1 = A().as_matrix().reinterpret_shape(A().as_matrix().size());
-              std::cerr << "branch: " << A.id() << " " << linalg::dot_product(t1, linalg::conj(a1)) << std::endl;
-          }
-          else
-          {
-              CALL_AND_HANDLE
-              (
-                  env.cel(A().as_matrix(), h, op, env.buffer().HA[0], env.buffer().temp[0], res),
-                  "Failed to evolve the leaf coefficient matrix."
-              );
-              auto t1 = res.reinterpret_shape(A().as_matrix().size());
-              auto a1 = A().as_matrix().reinterpret_shape(A().as_matrix().size());
-              std::cerr << "leaf: " << A.id() << " " << linalg::dot_product(t1, linalg::conj(a1)) << std::endl;
-          }        
+        m_res.resize(A().shape(0), A().shape(1));
+        if(!A.is_leaf())
+        {
+            CALL_AND_HANDLE
+            (
+                env.ceb(A(), h, op, env.buffer().HA, env.buffer().temp, env.buffer().temp2, m_res),
+                "Failed to evolve the branch coefficient matrix."
+            );
+            auto t1 = m_res.reinterpret_shape(A().as_matrix().size());
+            auto a1 = A().as_matrix().reinterpret_shape(A().as_matrix().size());
+            std::cerr << "branch: " << A.id() << " " << linalg::dot_product(t1, linalg::conj(a1)) << std::endl;
+        }
+        else
+        {
+            CALL_AND_HANDLE
+            (
+                env.cel(A().as_matrix(), h, op, env.buffer().HA, env.buffer().temp, m_res),
+                "Failed to evolve the leaf coefficient matrix."
+            );
+            auto t1 = m_res.reinterpret_shape(A().as_matrix().size());
+            auto a1 = A().as_matrix().reinterpret_shape(A().as_matrix().size());
+            std::cerr << "leaf: " << A.id() << " " << linalg::dot_product(t1, linalg::conj(a1)) << std::endl;
+        }        
         return 0;
     }
     void update_bond_tensor(bond_matrix_type& r, const environment_type& env, env_node_type& h, env_type& op)
     {
-        linalg::matrix<T, backend> res(r);
-        CALL_AND_HANDLE(env.fha(r, h, op, env.buffer().HA[0], res), "Failed to compute action of hamiltonian on node");
-        auto t1 = res.reinterpret_shape(r.size());
+        m_res = r;
+        CALL_AND_HANDLE(env.fha(r, h, op, env.buffer().HA, m_res), "Failed to compute action of hamiltonian on node");
+        auto t1 = m_res.reinterpret_shape(r.size());
         auto a1 = r.reinterpret_shape(r.size());
         std::cerr << "bond dim: " << linalg::dot_product(t1, linalg::conj(a1)) << std::endl;
     }
+
+protected: 
+    linalg::matrix<T, backend> m_res;
 };  //class energy_debug_engine
+
+
+
+
+
+
 
 template <typename T, typename backend>
 class energy_debug_engine<T, backend, ms_ttn, sop_environment>
@@ -117,68 +126,79 @@ public:
     energy_debug_engine& operator=(const energy_debug_engine& o) = default;
     energy_debug_engine& operator=(energy_debug_engine&& o) = default;
     
-    void initialise(const ttn_type&){}
+    void initialise(const ttn_type& A)
+    {
+        CALL_AND_RETHROW(mbuf.initialise(A));
+    }
 
     void initialise(const ttn_type&, const parameter_list& ){}
     void initialise(const ttn_type&, parameter_list&& ){}
 
-    void clear(){}
+    void clear()
+    {
+        mbuf.clear();
+    }
 
     void advance_half_step(){}
 
     size_type update_site_tensor(hnode& A, const environment_type& env, env_node_type& h, env_type& op)
     {                    
-          std::vector<linalg::matrix<T, backend>> res(A.nset());
-          for(size_t i = 0; i < res.size(); ++i){res[i] = A()[i].as_matrix()*0.0;}
-          if(!A.is_leaf())
-          {
-              CALL_AND_HANDLE
-              (
-                  env.ceb(A(), h, op, env.buffer().HA[0], env.buffer().temp[0], env.buffer().temp2[0], res),
-                  "Failed to evolve the branch coefficient matrix."
-              );
-              T val(0.0);
-              for(size_t i = 0; i < A.nset(); ++i)
-              {
-                  auto t1 = res[i].reinterpret_shape(A()[i].size());
-                  auto a1 = A()[i].as_matrix().reinterpret_shape(A()[i].size());
-                  val += linalg::dot_product(t1, linalg::conj(a1));
-              }
-              std::cerr << "branch: " << A.id() << " " << val << std::endl;
-          }
-          else
-          {
-              CALL_AND_HANDLE
-              (
-                  env.cel(A(), h, op, env.buffer().HA[0], env.buffer().temp[0], res),
-                  "Failed to evolve the leaf coefficient matrix."
-              );
-              T val(0.0);
-              for(size_t i = 0; i < A.nset(); ++i)
-              {
-                  auto t1 = res[i].reinterpret_shape(A()[i].size());
-                  auto a1 = A()[i].as_matrix().reinterpret_shape(A()[i].size());
-                  val += linalg::dot_product(t1, linalg::conj(a1));
-              }
-              std::cerr << "leaf: " << A.id() << " " << val << std::endl;
-          }        
+        mbuf.setup(A());
+
+        if(!A.is_leaf())
+        {
+            env.ceb.set_pointer(&(A()));
+            CALL_AND_HANDLE
+            (
+                env.ceb(mbuf.A(), h, op, env.buffer().HA, env.buffer().temp, env.buffer().temp2, mbuf.res(), mbuf.resbuf()),
+                "Failed to evolve the branch coefficient matrix."
+            );
+            env.ceb.unset_pointer();
+        }
+        else
+        {
+            env.cel.set_pointer(&(A()));
+            CALL_AND_HANDLE
+            (
+                env.cel(mbuf.A(), h, op, env.buffer().HA, env.buffer().temp, mbuf.res(), mbuf.resbuf()),
+                "Failed to evolve the leaf coefficient matrix."
+            );
+            env.cel.unset_pointer();
+        }        
+
+        mbuf.unpack_results();
+        T val(0.0);
+        for(size_t i = 0; i < A.nset(); ++i)
+        {
+            auto t1 = mbuf.res()[i].reinterpret_shape(A()[i].size());
+            auto a1 = A()[i].as_matrix().reinterpret_shape(A()[i].size());
+            val += linalg::dot_product(linalg::conj(a1), t1);
+        }
+        std::cout << "site: " << A.id() << " " << val << std::endl;
         return 0;
     }
 
     void update_bond_tensor(bond_matrix_type& r, const environment_type& env, env_node_type& h, env_type& op)
     {
-        std::vector<linalg::matrix<T, backend>> res(r.size());
-        for(size_t i = 0; i < r.size(); ++i){res[i] = r[i]*0.0;}
-        CALL_AND_HANDLE(env.fha(r, h, op, env.buffer().HA[0], res), "Failed to compute action of hamiltonian on node");
+        mbuf.setup(r);
+
+        env.fha.set_pointer(&(r));
+        CALL_AND_HANDLE(env.fha(mbuf.A(), h, op, env.buffer().HA, mbuf.res(), mbuf.resbuf()), "Failed to compute action of hamiltonian on node");
+        env.fha.unset_pointer();
+
+        mbuf.unpack_results();
+
         T val(0.0);
         for(size_t i = 0; i < r.size(); ++i)
         {
-            auto t1 = res[i].reinterpret_shape(r[i].size());
+            auto t1 = mbuf.res()[i].reinterpret_shape(r[i].size());
             auto a1 = r[i].reinterpret_shape(r[i].size());
-            val += linalg::dot_product(t1, linalg::conj(a1));
+            val += linalg::dot_product(linalg::conj(a1), t1);
         }
         std::cout << "bond dim: " << val << std::endl;
     }
+public:
+    multiset_update_buffer<T, backend> mbuf;
 };  //class energy_debug_engine
 
 

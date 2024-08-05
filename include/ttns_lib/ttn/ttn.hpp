@@ -11,6 +11,7 @@
 #include "../operators/site_operators/site_operator.hpp"
 
 #include "ttnbase.hpp"
+#include "ms_ttn.hpp"
 
 namespace ttns
 {
@@ -88,11 +89,11 @@ public:
 
         this->m_orthog.clear();
 
-        this->m_orthogonality_centre = other.obj().m_orthogonality_centre;
-        this->m_has_orthogonality_centre = other.obj().m_has_orthogonality_centre;
+        this->m_orthogonality_centre = other.obj().orthogonality_centre();
+        this->m_has_orthogonality_centre = other.obj().has_orthogonality_centre();
 
-        this->m_euler_tour = other.obj().m_euler_tour;
-        this->m_euler_tour_initialised = other.obj().m_euler_tour_initialised;
+        this->m_euler_tour = other.obj().euler_tour();
+        this->m_euler_tour_initialised = other.obj().euler_tour_initialised();
     }
 
 
@@ -159,8 +160,8 @@ public:
             }
             if(!all_fit){this->m_orthog.clear();}
 
-            this->m_orthogonality_centre = other.obj().m_orthogonality_centre;
-            this->m_has_orthogonality_centre = other.obj().m_has_orthogonality_centre;
+            this->m_orthogonality_centre = other.obj().orthogonality_centre();
+            this->m_has_orthogonality_centre = other.obj().has_orthogonality_centre();
         }
         else
         {
@@ -177,11 +178,11 @@ public:
 
             this->m_orthog.clear();
 
-            this->m_orthogonality_centre = other.obj().m_orthogonality_centre;
-            this->m_has_orthogonality_centre = other.obj().m_has_orthogonality_centre;
+            this->m_orthogonality_centre = other.obj().orthogonality_centre();
+            this->m_has_orthogonality_centre = other.obj().has_orthogonality_centre();
 
-            this->m_euler_tour = other.obj().m_euler_tour;
-            this->m_euler_tour_initialised = other.obj().m_euler_tour_initialised;
+            this->m_euler_tour = other.obj().euler_tour();
+            this->m_euler_tour_initialised = other.obj().euler_tour_initialised();
         }
         return *this;
     }
@@ -746,6 +747,8 @@ public:
             measure_without_collapse(i, res[i]);
         }
     }
+
+
 };
 
 template <typename T, typename backend, typename real_type = typename linalg::get_real_type<T>::type>

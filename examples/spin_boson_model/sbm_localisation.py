@@ -6,16 +6,10 @@ import sys
 sys.path.append("../../")
 from pyttn import *
 
-
-def sbm_discretise(N, alpha, wc):
-    w = -wc * np.log(1.-np.arange(N)/(N+1.0))
-    g = np.sqrt(4*alpha*w)
-    return g, w
-
+from sbm_core import sbm_discretise
 
 def spin_boson_test(Nb, alpha, wc, eps, delta, chi, nbose, dt, nstep = 1, degree = 2, yrange=[0, 0.5]):
     g, w = sbm_discretise(Nb, alpha, wc)
-
 
     sbg = spin_boson(eps, delta, w, g, geom="star")
     sbg.mode_dims = [nbose for i in range(Nb)]
@@ -72,10 +66,11 @@ def spin_boson_test(Nb, alpha, wc, eps, delta, chi, nbose, dt, nstep = 1, degree
         print((i+1)*dt, res[i+1], t2-t1)
         if(plt.fignum_exists(num)):
             plt.gcf().canvas.draw()
-            line.remove()
-            del line
-            line = ax.plot(np.arange(nstep+1)*dt, res)[0]
-            plt.pause(0.1)
+            line.set_data(np.arange(nstep+1)*dt, res)
+            plt.pause(0.01)
 
+    plt.ioff()
+    plt.show()
 
-spin_boson_test(8, 4.0, 25, 0.0, 2.0, 20, 10, 0.001, degree = 1, nstep = 100, yrange=[0.4996, 0.5])
+alphas = [0.1, 0.3, 0.5, 0.7, 1.0, 1.2, 1.5]
+spin_boson_test(256, alphas[1], 5, 0.0, 1.0, 8, 10, 0.01, degree = 2, nstep = 3000, yrange=[-0.5, 0.5])
