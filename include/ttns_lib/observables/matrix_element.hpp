@@ -128,6 +128,56 @@ public:
     }
 
 
+protected:
+    template <typename state_type>
+    void compute_norm_internal(const state_type& psi, bool use_sparsity, size_t set_index, size_t r = 0)
+    {
+        try
+        {
+            using common::zip;   using common::rzip;
+            CALL_AND_RETHROW(resize_to_fit(psi, psi));
+
+            if(use_sparsity && psi.has_orthogonality_centre())
+            {
+                //if we have an orthognality centre and have elected to use sparsity then we construct the indexing objec starting at the orthognality centre
+                ancestor_index inds;
+                psi.ancestor_indexing(psi.orthogonality_centre(), inds);
+
+                //first iterate through the nodes we plan on traversing and flag that the nodes are identity
+                for(const auto& pair : reverse(inds))
+                {
+                    size_type ind = std::get<0>(pair);
+                    if(!psi[ind].is_leaf()){for(auto& c : m_is_identity[ind]){c() = true;}}
+                    m_is_identity[ind]() = false;
+                }
+
+                for(const auto& pair : inds)
+                {
+                    size_type ind = std::get<0>(pair);
+                    const auto& p = psi[ind]; auto& mel = m_matel[ind]; auto& is_id = m_is_identity[ind];       
+                    update_expectation_value(p, set_index, mel, r, is_id, m_buf);
+                }
+            }
+            else
+            {
+                for(auto z : rzip(psi, m_matel, m_is_identity))
+                {
+                    const auto& p = std::get<0>(z); auto& mel = std::get<1>(z); auto& is_id = std::get<2>(z); 
+                    update_expectation_value(p, set_index, mel, r, is_id, m_buf);
+                }
+            }
+        }
+        catch(const common::invalid_value& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_NUMERIC("computing inner product of hierarchical tucker tensor with itself.");
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to compute inner product of hierarchical tucker tensor with itself.");
+        }
+    }
 public:
     template <typename state_type>
     real_type operator()(const state_type& psi){ CALL_AND_RETHROW(return this->operator()(psi, true));}
@@ -433,37 +483,98 @@ public:
     }
 
 protected:
-    inline T accum_root(const sttn_node_data<T>& hr)
+    inline T accum_root(const sttn_node_data<T>& hr, T Eshift = T(0), bool use_identity = false)
     {
         T retval = T(0.0)*0.0;
+        if(!use_identity)
+        {
+            retval = Eshift;
+        }
         for(size_t j = 0; j < hr.nterms(); ++j)
         {
             CALL_AND_HANDLE(retval += hr[j].coeff()*gather_result(m_matel[0]()[j]), "Failed to return result.");
+            if(use_identity && std::abs(Eshift) > 1e-14)
+            {
+                CALL_AND_HANDLE(retval += Eshift*gather_result(m_matel[0]().id()), "Failed to return result.");
+            }
         }
         return retval;
     }
 
-    inline T accum_root(const sttn_node_data<T>& hr, size_t i, size_t c)
+    inline T accum_root(const sttn_node_data<T>& hr, size_t i, size_t c, T Eshift = T(0), bool use_identity = false)
     {
         ASSERT(i == 0 && c == 0, "Index out of bounds.");
-        return accum_root(hr);
+        return accum_root(hr, Eshift, use_identity = false);
     }
 
-    inline T accum_root(const multiset_sttn_node_data<T>& hr, size_t i, size_t c)
+    inline T accum_root(const multiset_sttn_node_data<T>& hr, size_t i, size_t c, T Eshift = T(0), bool use_identity = false)
     {
-        return accum_root(hr[i][c]);
+        return accum_root(hr[i][c], Eshift, use_identity = false);
     }
 
 public:
     template <typename state_type>
     inline T operator()(typename ttn_sop_type<state_type>::sop_type& sop, const state_type& psi)
     {
-        CALL_AND_RETHROW(return this->operator()(sop, psi, psi));
+        try
+        {
+            using spo = single_particle_operator_engine<T, backend>;
+            using common::zip;   using common::rzip;
+            ASSERT(has_same_structure(psi, sop.contraction_info()), "The input hiearchical tucker tensors do not both have the same topology as the matrix_element object.");
+            ASSERT(psi.nset() == sop.nset(), "Cannot compute matrix element between tensor networks with different set sizes.");
+            CALL_AND_RETHROW(resize_to_fit(psi, psi, sop));
+
+            bool compute_identity = !(psi.is_orthogonalised());
+            T retval = T(0.0)*0.0;
+            //to do modify this code to handle multiset sops
+            for(size_type set_index = 0; set_index <psi.nset(); ++set_index)
+            {
+                for(size_t nr = 0; nr < sop.nrow(set_index); ++nr)
+                {
+                    bool use_identity = false;
+                    T Eshift = sop.Eshift_val(set_index, nr);
+                    size_t col = sop.column_index(set_index, nr);
+                    if(col == set_index && sop.is_scalar(set_index, nr) && std::abs(Eshift) > 1e-14)
+                    {
+                        CALL_AND_HANDLE(this->compute_norm_internal(psi, true, set_index, 0), "Failed to compute norm of diagonal term.");
+                        T val(0);
+                        CALL_AND_HANDLE(val += real(gather_result(m_matel[0]()[0])), "Failed to return result.");
+                        retval += Eshift*val;
+                    }
+                    else
+                    {
+                        for(auto z : rzip(psi, m_matel, sop.contraction_info()))
+                        {
+                            const auto& p = std::get<0>(z); auto& mel = std::get<1>(z);  const auto& h = std::get<2>(z);
+                            CALL_AND_RETHROW(m_buf.resize(p(set_index).shape(0), p(set_index).shape(1)));
+
+                            CALL_AND_HANDLE(spo::evaluate(sop, h, p, p, set_index, nr, mel, m_buf.HA, m_buf.temp, compute_identity), "Failed to compute expectation value.");
+                        }
+                        const auto& hr = sop.contraction_info().root()();
+                        CALL_AND_HANDLE(retval += accum_root(hr, set_index, nr, Eshift, use_identity), "Failed to return result.");
+                    }
+
+                }
+            }
+            return retval;
+        }
+        catch(const common::invalid_value& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_NUMERIC("computing inner product of two hierarchical tucker tensors.");
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to compute inner product of two hierarchical tucker tensors.");
+        }
     }
 
+    //TODO: optimise the evaluation of multiset sops where there are no non-trivial terms in the index
     template <typename state_type>
     inline T operator()(typename ttn_sop_type<state_type>::sop_type& sop, const state_type& bra, const state_type& ket)
     {
+        if(&bra == &ket){CALL_AND_RETHROW(return this->operator()(sop, ket););}
         try
         {
             using spo = single_particle_operator_engine<T, backend>;
@@ -487,7 +598,8 @@ public:
                     }
 
                     const auto& hr = sop.contraction_info().root()();
-                    CALL_AND_HANDLE(retval += accum_root(hr, set_index, nr), "Failed to return result.");
+                    T Eshift = sop.Eshift_val(set_index, nr);
+                    CALL_AND_HANDLE(retval += accum_root(hr, set_index, nr, Eshift, true), "Failed to return result.");
                 }
             }
             return retval;

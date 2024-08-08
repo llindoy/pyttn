@@ -112,4 +112,4 @@ def holstein(N, J, gh, wh, chi, nbose, gp=0, wp=0, dt = 0.01, nstep = 100, geom=
     plt.ioff()
     plt.show()
 
-holstein(32, 1, 0.1, 1, 24, 24, dt = 0.05, degree=2, nstep = 1000, gp=0.0, wp = 0.0)
+holstein(32, 1, 2, 1, 4, 24, dt = 0.05, degree=2, nstep = 1000, gp=0.0, wp = 0.0)

@@ -78,8 +78,8 @@ int main(int argc, char* argv[])
             {
                 if(beta < 0)
                 {
-                    w[i] = -wc*std::log(1.0-(i+1)/(N+1.));
-                    g[i] = std::sqrt(2*alpha*wc*wc*std::pow(w[i]/wc, s)/(N+1.0));
+                    w[i] = -wc*std::log(1.0-(i+1.0)/(N+1.));
+                    g[i] = std::sqrt(2*alpha*wc*w[i]/(N+1.0));
                 }
                 else
                 {
@@ -92,8 +92,6 @@ int main(int argc, char* argv[])
                 }
             }
 
-
-          
             real_type eps = 0.0;
             real_type delta = 1.0;
 
@@ -104,8 +102,6 @@ int main(int argc, char* argv[])
                 sysinf[i] = boson_mode(mdim);
             }
 
-
-
             multiset_SOP<complex_type> msSOP(2, Nb);
             msSOP(0, 0) = SOP<complex_type>(Nb);
             msSOP(0, 1) = SOP<complex_type>(Nb);
@@ -114,20 +110,19 @@ int main(int argc, char* argv[])
 
             //set up the system terms
             msSOP(0, 0) += eps;
-            msSOP(0, 1) += delta;
-            msSOP(1, 0) += delta;
+            msSOP(0, 1) += ttns::literal::coeff<complex_type>([delta](real_type t){return (std::fmod(t , 0.2)< 0.1 ? 0.0 : delta);});
+            msSOP(1, 0) += ttns::literal::coeff<complex_type>([delta](real_type t){return (std::fmod(t , 0.2)< 0.1 ? 0.0 : delta);});
             msSOP(1, 1) -= eps;
 
             //now add on the system bath and bath terms
             for(size_t i =0; i < Nb; ++i)
             {
-                msSOP(0,0) += 0.5*(std::sqrt(2.0)*g[i]) * sOP("q", i);   
+                complex_type gi = g[i];
+                msSOP(0,0) += ttns::literal::coeff<complex_type>([gi](real_type t){return (std::fmod(t , 0.2)< 0.1 ? 0.0 : 0.5*std::sqrt(2.0)*gi);}) * sOP("q", i);   
                 msSOP(0,0) += w[i]*sOP("n", i);
-                msSOP(1,1) -= 0.5*(std::sqrt(2.0)*g[i]) * sOP("q", i);   
+                msSOP(1,1) -= ttns::literal::coeff<complex_type>([gi](real_type t){return (std::fmod(t , 0.2)< 0.1 ? 0.0 : 0.5*std::sqrt(2.0)*gi);}) * sOP("q", i);   
                 msSOP(1,1) += w[i]*sOP("n", i);
             }
-
-            std::cerr << msSOP << std::endl;
 
             std::vector<size_t> dims(Nb);
             for(size_t i = 0; i < Nb; ++i)
@@ -142,7 +137,7 @@ int main(int argc, char* argv[])
 
             std::vector<complex_type> coeff(2);
             coeff[0] = 1.0;
-            coeff[1] = 0.0;//complex_type(0, -0.5);
+            coeff[1] = 0.0;
             std::vector<std::vector<size_t>> msState(2);    msState[0] = zeros; msState[1]=zeros;
 
 

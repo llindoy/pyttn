@@ -165,7 +165,9 @@ public:
         try
         {
             A.setup_orthogonality();
-            if(!A.is_orthogonalised() || update_environment || !m_env_set)
+
+            //if we have a purely time-independent Hamiltonian then we will want to make sure all the buffers are correctly set for the sweeping algorithm
+            if( (!A.is_orthogonalised() || update_environment || !m_env_set))
             {
                 CALL_AND_HANDLE(prepare_environment(A, op), "Failed to setup environment for evolution");
             }
@@ -296,12 +298,28 @@ protected:
 
         bool subspace_expanded_f = false;
 
+
+        //if the operator is time dependent then we need to advance it to the current time point and update the single particle function operators.  
+        //For updating schemes that do not have an explicit time dependence this 
+        if(op.is_time_dependent())
+        {
+            update_type::advance_hamiltonian(A, m_env, m_ham, op);
+        }
+
         CALL_AND_HANDLE
         (   
             subspace_expanded_f = forward_loop_step(A, op, std::forward<NodeFunc>(nf), std::forward<RFunc>(rf), std::forward<SubspaceFuncDown>(sfd), std::forward<EnvFuncDown>(evd), std::forward<EnvFuncUp>(evu)), 
             "Failed to perform a step of the tdvp_engine object.  Exception raised when performing the forward loop half step."
         );
         CALL_AND_HANDLE(static_cast<update_type*>(this)->advance_half_step(), "Failed to advance the implementation specific objects.");
+
+
+        //if the operator is time dependent then we need to advance it to the current time point and update the single particle function operators
+        if(op.is_time_dependent())
+        {
+            update_type::advance_hamiltonian(A, m_env, m_ham, op);
+        }
+
         //if the forward step failed due to a numerical issue we return that it failed.
         bool subspace_expanded_b = false;
         CALL_AND_HANDLE

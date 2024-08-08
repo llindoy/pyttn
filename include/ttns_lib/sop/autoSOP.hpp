@@ -10,6 +10,7 @@
 #include "sop_tree.hpp"
 #include "compressedSOP.hpp"
 #include "../ttn/ttn.hpp"
+#include "coeff_type.hpp"
 
 //#define TIMING 0
 #include <common/timing_macro.hpp>
@@ -230,7 +231,7 @@ protected:
         INIT_TIMER;
         for(auto& n : reverse(bp))
         {
-            //if we are at a leaf node then all we need to do is copy the primitive spf object info into this node
+            //if we are at a leaf node then all we need to do is copy the literal spf object info into this node
             if(n.is_leaf())
             {
                 update_spf_leaf(csop, n);
@@ -413,7 +414,7 @@ protected:
 
 protected:
     template <typename Bgraph, typename node_type>
-    static void optimise_spf_graph(const std::list<Bgraph>& sbpg, const std::map<std::pair<size_t, size_t>, std::vector<size_t>>& repeated_edges, const std::vector<T>& cr, node_type& n)
+    static void optimise_spf_graph(const std::list<Bgraph>& sbpg, const std::map<std::pair<size_t, size_t>, std::vector<size_t>>& repeated_edges, const std::vector<literal::coeff<T>>& cr, node_type& n)
     {
         auto& spf = n().spf();
         size_t nterms = cr.size();
@@ -446,7 +447,7 @@ protected:
                 utils::term_indexing_array<size_t> composite_rs(nterms);
 
                 auto_sop::opinfo oinf;
-                std::vector<T> accum_coeff;
+                std::vector<literal::coeff<T>> accum_coeff;
                 bool all_identity = true;
 
                 for(auto z : common::zip(ve, vd))
@@ -475,7 +476,7 @@ protected:
                             {
                                 accum_coeff.push_back(cr[_r]);
                             }
-                            else{accum_coeff.push_back(1.0);}
+                            else{accum_coeff.push_back(literal::coeff<T>(T(1.0)));}
                             for(size_t rsi = 0; rsi < it->second.size(); ++rsi)
                             {
                                 composite_rs.insert(it->second[rsi]);
@@ -548,7 +549,7 @@ protected:
                         "Assertion failed these nodes should not have had any r indices bound."
                     );
 
-                    std::vector<T> accum_coeff(1);  accum_coeff[0] = T(1.0);
+                    std::vector<literal::coeff<T>> accum_coeff(1);  accum_coeff[0] = T(1.0);
                     new_spf.push_back(auto_sop::operator_data<T>(g.U(u), connected_rs, accum_coeff));
 
                     //now get the complement of the connected_rs
@@ -570,7 +571,7 @@ protected:
     }
 
 protected:
-    static void optimise_spf_operators(tree<auto_sop::node_op_info<T>>& bp, const std::vector<T>& cr)
+    static void optimise_spf_operators(tree<auto_sop::node_op_info<T>>& bp, const std::vector<literal::coeff<T>>& cr)
     {
         sweeping::traversal_path euler_tour;
         sweeping::traversal_path::initialise_euler_tour(bp, euler_tour);
@@ -642,7 +643,7 @@ protected:
 
 protected:
     template <typename Bgraph, typename node_type>
-    static void optimise_mf_graph(const std::list<Bgraph>& sbpg, const std::map<std::pair<size_t, size_t>, std::vector<size_t>>& repeated_edges, const std::vector<T>& cr, size_t ncomposite_spf, node_type& n, bool reorder_mf = false)
+    static void optimise_mf_graph(const std::list<Bgraph>& sbpg, const std::map<std::pair<size_t, size_t>, std::vector<size_t>>& repeated_edges, const std::vector<literal::coeff<T>>& cr, size_t ncomposite_spf, node_type& n, bool reorder_mf = false)
     {
         auto& spf = n().spf();
         auto& mf = n().mf();
@@ -674,7 +675,7 @@ protected:
 
                 if(rintersect.size() > 0 )
                 {
-                    std::vector<T> accum_coeff(1);  accum_coeff[0] = T(1.0);
+                    std::vector<literal::coeff<T>> accum_coeff(1);  accum_coeff[0] = T(1.0);
                     new_mf.push_back(auto_sop::operator_data<T>(mfi.m_opdef, rintersect, accum_coeff));
                     mf_bound = true;
 
@@ -715,7 +716,7 @@ protected:
                     const auto& vd = g.U_edges_data(u);
 
                     auto_sop::opinfo oinf;
-                    std::vector<T> accum_coeff;
+                    std::vector<literal::coeff<T>> accum_coeff;
                     bool all_identity = true;
 
                     //get the r indices included in this sum
@@ -739,7 +740,7 @@ protected:
                             if(auto it = repeated_edges.find(m_inds); it != repeated_edges.end())
                             {
                                 if(it->second.size() == 0){accum_coeff.push_back(cr[_r]);}
-                                else{accum_coeff.push_back(1.0);}
+                                else{accum_coeff.push_back(literal::coeff<T>(T(1.0)));}
 
                                 for(size_t rsi = 0; rsi < it->second.size(); ++rsi)
                                 {
@@ -819,7 +820,7 @@ protected:
                             ASSERT(rrem.size() == temp_rs.size(), "The remaining bound term does not account for the residual terms.");
                         }
 
-                        std::vector<T> accum_coeff(1);  accum_coeff[0] = T(1.0);
+                        std::vector<literal::coeff<T>> accum_coeff(1);  accum_coeff[0] = T(1.0);
                         new_mf.push_back(auto_sop::operator_data<T>(g.V(v), connected_rs, accum_coeff));
 
                         //now get the complement of the connected_rs
@@ -875,7 +876,7 @@ protected:
         }
     }
 
-    static void optimise_mf_operators(tree<auto_sop::node_op_info<T>>& bp, const std::vector<T>& cr)
+    static void optimise_mf_operators(tree<auto_sop::node_op_info<T>>& bp, const std::vector<literal::coeff<T>>& cr)
     {
         INIT_TIMER;
         size_t nterms = cr.size();
@@ -919,7 +920,7 @@ protected:
         }
     }
 
-    static void set_coeffs(const std::vector<T>& cr, tree<auto_sop::node_op_info<T>>& bp)
+    static void set_coeffs(const std::vector<literal::coeff<T>>& cr, tree<auto_sop::node_op_info<T>>& bp)
     {
         //setup the accumulation coefficients for the spf objects.  This is done by iterating over all nodes in the tree in 
         //reverse order which ensures we update information about the child of a node before we attempt to update the node
@@ -966,7 +967,7 @@ protected:
 
 protected:
     template <typename node_type>
-    static inline void update_spf_leaf_primitive(const compressedSOP<T>& csop, node_type& n)
+    static inline void update_spf_leaf_literal(const compressedSOP<T>& csop, node_type& n)
     {
         ASSERT(n.is_leaf(), "Failed to process spf data.  Node is not a leaf.")
         n().spf().clear();
@@ -996,7 +997,7 @@ protected:
 
 
     template <typename node_type>
-    static inline void update_spf_primitive(node_type& n, size_t nterms)
+    static inline void update_spf_literal(node_type& n, size_t nterms)
     {
         ASSERT(!n.is_leaf(), "Failed to process spf data.  Node is a leaf.")
         auto& spf = n().spf();
@@ -1022,21 +1023,21 @@ protected:
 
     //setup the spf operator information. This function switches between union and array based implementations depending on the number of terms 
     //that will be treated in each term.  Doing so can dramatically increase the efficiency of the code.
-    static inline void setup_spf_primitive(const compressedSOP<T>& csop, tree<auto_sop::node_op_info<T>>& bp)
+    static inline void setup_spf_literal(const compressedSOP<T>& csop, tree<auto_sop::node_op_info<T>>& bp)
     {
         INIT_TIMER;
         const auto& cr = csop.coeff();
         for(auto& n : reverse(bp))
         {
-            //if we are at a leaf node then all we need to do is copy the primitive spf object info into this node
+            //if we are at a leaf node then all we need to do is copy the literal spf object info into this node
             if(n.is_leaf())
             {
-                update_spf_leaf_primitive(csop, n);
+                update_spf_leaf_literal(csop, n);
             }
             //if we aren't at a leaf node then we iterate through all of the children of this node and construct the composite operators that are the spf operators here
             else
             {
-                update_spf_primitive(n, csop.nterms());
+                update_spf_literal(n, csop.nterms());
             }
             auto& rcoeff = n().coeff();
             rcoeff.clear();
@@ -1049,7 +1050,7 @@ protected:
     }
 
     template <typename node_type>
-    static void setup_root_node_primitive(node_type& n, size_t nterms)
+    static void setup_root_node_literal(node_type& n, size_t nterms)
     {
         ASSERT(n.is_root(), "node is not root.  Cannot set it to be a root.");
         n().mf().clear();
@@ -1064,7 +1065,7 @@ protected:
 
 
     template <typename node_type>
-    static void update_mf_primitive(node_type& n, size_t nterms)
+    static void update_mf_literal(node_type& n, size_t nterms)
     {
         auto& mf = n().mf();
         mf.clear();
@@ -1098,7 +1099,7 @@ protected:
         }
     }
 
-    static inline void setup_mf_primitive(tree<auto_sop::node_op_info<T>>& bp, size_t nterms)
+    static inline void setup_mf_literal(tree<auto_sop::node_op_info<T>>& bp, size_t nterms)
     {
         INIT_TIMER;
         for(auto& n : bp)
@@ -1106,12 +1107,12 @@ protected:
             //If we are at the root node the mf operator is trivial
             if(n.is_root())
             {
-                setup_root_node_primitive(n, nterms);
+                setup_root_node_literal(n, nterms);
             }
             //if this isn't the root node then we need to actually work out the mf indexing objects.  
             else
             {
-                update_mf_primitive(n, nterms);
+                update_mf_literal(n, nterms);
             }
         }   
     }
@@ -1140,7 +1141,7 @@ public:
 
         START_TIMER;
         setup_spf(csop, bp);
-        STOP_TIMER("primitive spf");
+        STOP_TIMER("literal spf");
 
         //now extract the site operator types and clear the csop object as we no longer need it from this point
         site_ops = csop.site_operators();
@@ -1161,7 +1162,7 @@ public:
     }
 
     template <typename ttn_type>
-    static void primitive(const SOP<T>& sop, const ttn_type& A, tree<auto_sop::node_op_info<T>>& bp, site_ops_type& site_ops)
+    static void literal(const SOP<T>& sop, const ttn_type& A, tree<auto_sop::node_op_info<T>>& bp, site_ops_type& site_ops)
     {
         //first ensure that the SOP object has the same dimensionality as the bp object.
         ASSERT(sop.nmodes() == A.nleaves(), "Failed to compute trivial tree bipartitioning of the SOP.  SOP and Tree do not have the same dimension.");
@@ -1179,12 +1180,12 @@ public:
         STOP_TIMER("Compressed SOP");
 
         START_TIMER;
-        setup_spf_primitive(csop, bp);
-        STOP_TIMER("primitive spf");
+        setup_spf_literal(csop, bp);
+        STOP_TIMER("literal spf");
 
         START_TIMER;
-        setup_mf_primitive(bp, nterms);
-        STOP_TIMER("primitive mf");
+        setup_mf_literal(bp, nterms);
+        STOP_TIMER("literal mf");
     }
 
 
@@ -1202,7 +1203,7 @@ public:
             }
             else
             {
-                autoSOP<T>::primitive(sop, A, bp, site_ops);
+                autoSOP<T>::literal(sop, A, bp, site_ops);
             }
             return true;
         }

@@ -13,6 +13,7 @@
 #include <chrono>
 
 
+#include "coeff_type.hpp"
 #include "SOP.hpp"
 
 #ifdef CEREAL_LIBRARY_FOUND
@@ -422,9 +423,9 @@ public:
         return m_mode_operators[nu];
     }
 
-    const std::vector<T>& coeff() const{return m_coeff;}
-    const T& coeff(size_t r)const{return m_coeff[r];}
-    T& coeff(size_t r){return m_coeff[r];}
+    const std::vector<literal::coeff<T>>& coeff() const{return m_coeff;}
+    const literal::coeff<T>& coeff(size_t r)const{return m_coeff[r];}
+    literal::coeff<T>& coeff(size_t r){return m_coeff[r];}
 
     size_t nterms() const{return m_nterms;}
     size_t nterms(size_t nu) const{return m_mode_operators[nu].size();}
@@ -533,7 +534,7 @@ protected:
     dict_container m_op_dict;
 
     size_t m_nterms;
-    std::vector<T> m_coeff;
+    std::vector<literal::coeff<T>> m_coeff;
     std::string m_label;
     std::vector<size_t> m_identity_index;
 };  //class compressedSOP

@@ -24,6 +24,68 @@ public:
     using node_type = typename tree_type::node_type;
     using size_type = typename tree_type::size_type;
     using leaf_index = std::vector<std::vector<size_type>>;
+
+
+protected:
+    static size_type get_nlevels_for_tree(size_type nchild, size_type nbranch)
+    {
+        return 1;
+    }
+
+public:
+    /*  
+    class linear
+    {
+    public:
+        linear() : m_nlevels(1), m_ntop(1); m_nbottom(1){}
+        linear(size_type top, size_type bottom, size_type nl) : m_nlevels(nl), m_ntop(top), m_nbottom(bottom) {}
+        linear(size_type top, size_type bottom, size_type nchild, size_type nbranch) : m_ntop(top), m_nbottom(bottom)
+        {   
+            set_nlevels_for_tree(nchild, nbranch);
+        }
+
+        void set_nlevels_for_tree(size_type nchild, size_type nbranch)
+        {
+            m_nlevels = get_nlevels_for_tree(nchild, nbranch);
+        }
+
+        size_type operator()(size_t l) const
+        {
+              
+        }
+
+    protected:
+        size_type m_nlevels;
+        size_type m_ntop;
+        size_type m_nbottom;
+    };
+
+    class logarithmic
+    {
+    public:
+        logarithmic() : m_nlevels(1), m_ntop(1); m_nbottom(1){}
+        logarithmic(size_type top, size_type bottom, size_type nl) : m_nlevels(nl), m_ntop(top), m_nbottom(bottom) {}
+        logarithmic(size_type top, size_type bottom, size_type nchild, size_type nbranch) : m_ntop(top), m_nbottom(bottom)
+        {   
+            set_nlevels_for_tree(nchild, nbranch);
+        }
+
+        void set_nlevels_for_tree(size_type nchild, size_type nbranch)
+        {
+            m_nlevels = get_nlevels_for_tree(nchild, nbranch);
+        }
+
+        size_type operator()(size_t l) const
+        {
+              
+        }
+
+    protected:
+        size_type m_nlevels;
+        size_type m_ntop;
+        size_type m_nbottom;
+    };*/
+
 public:
     /*
      *  Functions for constructing balanced N-ary trees with values specified either by a function of the level or as a constant value.
@@ -374,6 +436,17 @@ public:
         }
     }
 
+    template <typename ... Args>
+    static void mlmctdh_tree(Args&& ... args)
+    {
+        CALL_AND_RETHROW(htucker_tree(std::forward<Args>(args)...));
+    }
+
+    template <typename ... Args>
+    static void mlmctdh_subtree(Args&& ... args)
+    {
+        CALL_AND_RETHROW(htucker_subtree(std::forward<Args>(args)...));
+    }
 
     //TODO: something is currently going wrong when using mps subtrees.  Need to fix this shortly
     template <typename Func>

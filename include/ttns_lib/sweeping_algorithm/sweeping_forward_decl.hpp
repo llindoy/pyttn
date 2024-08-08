@@ -56,8 +56,8 @@ public:
 
     inline void update_env_down(const environment_type&, const hnode&, node_type&){}
     inline void update_env_down(const environment_type&, const hnode&, node_type&, node_type&){}
-    inline void update_env_up(const environment_type&, const hnode&, node_type&){}
-    inline void update_env_up(const environment_type&, const hnode&, node_type&, node_type&){}
+    inline void update_env_up(const environment_type&, const hnode&, node_type&, bool = false){}
+    inline void update_env_up(const environment_type&, const hnode&, node_type&, node_type&, bool = false){}
 
     const size_type& num_buffers() const{return m_num_buffers;}
     size_type& num_buffers(){return m_num_buffers;}
@@ -164,6 +164,7 @@ public:
     T E() const{return T(0);}
     size_type update_site_tensor(hnode& /* A */, const environment_type& /* env */, env_node_type& /* h */, const env_type& /* op */){return 0;}
     void update_bond_tensor(bond_matrix_type& /* r */, const environment_type& /* env */, env_node_type& /* h */, const env_type& /* op */){}
+    void advance_hamiltonian(ttn_type&, environment_type&, env_container_type& , env_type& ){}
     void advance_half_step(){}
 
 };

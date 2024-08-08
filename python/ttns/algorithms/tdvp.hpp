@@ -68,6 +68,12 @@ void init_tdvp_core(py::module& m, const std::string& label)
                 static_cast<const size_type& (tdvp::*)() const>(&tdvp::krylov_steps),
                 [](tdvp& o, const size_type& i){o.krylov_steps() = i;}
             )
+        .def_property
+            (
+                "use_time_dependent_hamiltonian",
+                static_cast<const bool& (tdvp::*)() const>(&tdvp::use_time_dependent_hamiltonian),
+                [](tdvp& o, const bool& i){o.use_time_dependent_hamiltonian() = i;}
+            )
         .def("clear", &tdvp::clear)
         .def("step", &tdvp::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
         .def("__call__", &tdvp::operator(), py::arg(), py::arg(), py::arg("update_env") = false)

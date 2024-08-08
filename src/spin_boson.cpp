@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
         if(argc < 9)
         {
-            std::cerr << argv[0] << "<N> <alpha> <wc> <s> <beta> <nchi> <nbranch> <nbose>" << std::endl;
+            std::cerr << argv[0] << "<N> <alpha> <wc> <s> <beta> <nchi> <nbranch> <nbose> <eps>" << std::endl;
             return 1;
         }
 
@@ -62,6 +62,7 @@ int main(int argc, char* argv[])
         size_t nchi = std::atoi(argv[6]);
         size_t nbranch = std::atoi(argv[7]);
         size_t mdim = std::atoi(argv[8]);
+        real_type eps = std::atof(argv[9]);
         INIT_TIMER;
 
         {
@@ -91,7 +92,6 @@ int main(int argc, char* argv[])
                 }
             }
 
-            real_type eps = 0.0;
             real_type delta = 2.0;
             spin_boson_star<complex_type> sbm(eps, delta, w, g);
 
@@ -103,7 +103,16 @@ int main(int argc, char* argv[])
 
             SOP<complex_type> sop(1+Nb);
             system_modes sysinf;
-            sbm.hamiltonian(sop);
+
+            sop += ttns::literal::coeff<complex_type>([eps](real_type t){return eps*std::cos(10*t);})*sOP("sz", 0) + ttns::literal::coeff<complex_type>([delta](real_type t){return (std::fmod(t , 0.2)< 0.1 ? 0.0 : delta);})*sOP("sx", 0);
+            for(size_t i = 0; i < Nb; ++i)
+            {
+                complex_type gi = g[i];
+                sop +=  ttns::literal::coeff<complex_type>([gi](real_type t){return (std::fmod(t , 0.2)< 0.1 ? 0.0 : std::sqrt(2.0)*gi);})*(sOP("sz", 0)*sOP("q", i+1));
+                sop += w[i]*sOP("n", i+1);
+            }
+
+            //sbm.hamiltonian(sop);
             sbm.system_info(sysinf);
 
             std::vector<size_t> dims(Nb+1);
@@ -133,10 +142,11 @@ int main(int argc, char* argv[])
             matrix_element<complex_type> mel;//(A, sop_op);
             mel.resize(A, sop_op);
 
-            one_site_tdvp<complex_type, backend_type> sweep(A, sop_op, 16, );
+            one_site_tdvp<complex_type, backend_type> sweep(A, sop_op, 16);
             sweep.dt() = 0.0025;
             sweep.coefficient() = complex_type(0, 1);
             sweep.krylov_steps() = 1;
+            sweep.use_time_dependent_hamiltonian() = true;
             CALL_AND_HANDLE(sweep.prepare_environment(A, sop_op), "Failed to prepare the hamiltonian buffer for evolution.");
 
             std::cout << std::setprecision(16);

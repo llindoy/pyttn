@@ -7,7 +7,7 @@
 #include <tuple>
 #include <type_traits>
 
-#include <linalg/utils/linalg_utils.hpp>
+#include <linalg/linalg.hpp>
 
 namespace common
 {

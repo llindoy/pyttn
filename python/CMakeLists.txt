@@ -9,7 +9,7 @@ option(USE_OPENMP "Compile with openmp" OFF)
 option(USE_GEMM3M "Compile with openmp" OFF)
 
 set(PYTHON_BINDINGS_SRC pythonBinding.cpp 
-          utils/orthopol.cpp
+          utils/orthopol.cpp utils/discretisation.cpp
           linalg/sparseMatrix.cpp linalg/tensor.cpp 
           ttns/observables/matrix_element.cpp 
           ttns/operators/siteOperators.cpp ttns/operators/sop_operator.cpp

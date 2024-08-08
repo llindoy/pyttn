@@ -7,6 +7,7 @@
 
 #include <utils/io/input_wrapper.hpp>
 #include <common/zip.hpp>
+#include "coeff_type.hpp"
 
 namespace ttns
 {
@@ -304,10 +305,7 @@ inline ttns::sPOP operator*(const ttns::sPOP& a, const ttns::sPOP& b)
 }
 
 
-
-
-
-
+#include "coeff_type.hpp"
 
 namespace ttns
 {
@@ -324,6 +322,7 @@ public:
     using const_iterator = typename sPOP::const_iterator;
     using reverse_iterator = typename sPOP::reverse_iterator;
     using const_reverse_iterator = typename sPOP::const_reverse_iterator;
+    using function_type = typename literal::coeff<T>::function_type;
 public:
     sNBO(){}
 
@@ -337,6 +336,15 @@ public:
 
     sNBO(const T& coeff, const sPOP& p) : m_coeff(coeff), m_ops(p) {}
     sNBO(const T& coeff, sPOP&& p) : m_coeff(coeff), m_ops(std::forward<sPOP>(p)) {}
+
+    sNBO(const literal::coeff<T>& coeff, const sPOP& p) : m_coeff(coeff), m_ops(p) {}
+    sNBO(const literal::coeff<T>& coeff, sPOP&& p) : m_coeff(coeff), m_ops(std::forward<sPOP>(p)) {}
+
+    sNBO(const function_type& coeff, const sPOP& p) : m_coeff(coeff), m_ops(p) {}
+    sNBO(const function_type& coeff, sPOP&& p) : m_coeff(coeff), m_ops(std::forward<sPOP>(p)) {}
+
+    sNBO(function_type&& coeff, const sPOP& p) : m_coeff(std::move(coeff)), m_ops(p) {}
+    sNBO(function_type&& coeff, sPOP&& p) : m_coeff(std::move(coeff)), m_ops(std::forward<sPOP>(p)) {}
 
     template <typename ... Args>
     sNBO(const T& coeff, const sOP& p, Args&&... args) : m_coeff(coeff), m_ops(p, std::forward<Args>(args)...) {}
@@ -360,8 +368,8 @@ public:
         return *this;
     }
 
-    const T& coeff() const{return m_coeff;}
-    T& coeff(){return m_coeff;}
+    const literal::coeff<T>& coeff() const{return m_coeff;}
+    literal::coeff<T>& coeff(){return m_coeff;}
 
     const std::list<sOP>& ops() const{return m_ops.ops();}
     std::list<sOP>& ops(){return m_ops.ops();}
@@ -430,7 +438,7 @@ public:
     const_reverse_iterator rend() const {  return const_reverse_iterator(m_ops.rend());  }
 
 protected:
-    T m_coeff;
+    literal::coeff<T> m_coeff;
     sPOP m_ops;
 };
 
@@ -443,7 +451,7 @@ std::ostream& operator<<(std::ostream& os, const ttns::sNBO<T>& op)
 
 }   //namespace ttns
 
-template <typename T>
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
 ttns::sNBO<T> operator*(const T& a, const ttns::sOP& b)
 {
     ttns::sNBO<T> ret(a, {b});
@@ -451,7 +459,7 @@ ttns::sNBO<T> operator*(const T& a, const ttns::sOP& b)
 }
 
 
-template <typename T>
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
 ttns::sNBO<T> operator*(const ttns::sOP& a, const T& b)
 {
     ttns::sNBO<T> ret(b, {a});
@@ -459,7 +467,7 @@ ttns::sNBO<T> operator*(const ttns::sOP& a, const T& b)
 }
 
 
-template <typename T>
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
 ttns::sNBO<T> operator*(const T& a, const ttns::sPOP& b)
 {
     ttns::sNBO<T> ret(a, b);
@@ -467,12 +475,44 @@ ttns::sNBO<T> operator*(const T& a, const ttns::sPOP& b)
 }
 
 
-template <typename T>
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
 ttns::sNBO<T> operator*(const ttns::sPOP& a, const T& b)
 {
     ttns::sNBO<T> ret(b, a);
     return ret;
 }
+
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
+ttns::sNBO<T> operator*(const ttns::literal::coeff<T>& a, const ttns::sOP& b)
+{
+    ttns::sNBO<T> ret(a, {b});
+    return ret;
+}
+
+
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
+ttns::sNBO<T> operator*(const ttns::sOP& a, const ttns::literal::coeff<T>& b)
+{
+    ttns::sNBO<T> ret(b, {a});
+    return ret;
+}
+
+
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
+ttns::sNBO<T> operator*(const ttns::literal::coeff<T>& a, const ttns::sPOP& b)
+{
+    ttns::sNBO<T> ret(a, b);
+    return ret;
+}
+
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
+ttns::sNBO<T> operator*(const ttns::sPOP& a, const ttns::literal::coeff<T>& b)
+{
+    ttns::sNBO<T> ret(b, a);
+    return ret;
+}
+
+
 
 
 template <typename T, typename U>
@@ -646,7 +686,7 @@ public:
     {
         for(auto& t : a.terms())
         {
-            m_terms.push_back({-t.coeff(), t.pop()});
+            m_terms.push_back({T(-1.0)*t.coeff(), t.pop()});
         }
         return *this;
     }
@@ -666,7 +706,7 @@ public:
     template <typename U>
     sSOP<T>& operator-=(const sNBO<U>& a)
     {
-        m_terms.push_back({-a.coeff(), a.pop()});
+        m_terms.push_back({T(-1.0)*a.coeff(), a.pop()});
         return *this;
     }
 
@@ -752,7 +792,7 @@ std::ostream& operator<<(std::ostream& os, const ttns::sSOP<T>& op)
     const auto plus = "+";
     for(const auto& t : op)
     {
-        sep = std::real(t.coeff()) >= 0 ? plus : separator;
+        sep = t.coeff().is_positive() ? plus : separator;
         os << sep << t << std::endl;
     }
     return os;
@@ -920,7 +960,7 @@ ttns::sSOP<decltype(T()*U())> operator-(const ttns::sSOP<T>& a, const ttns::sSOP
 
     for(auto& t : b.terms())
     {
-        ret.terms().push_back({-t.coeff(), t.pop()});
+        ret.terms().push_back({T(-1.0)*t.coeff(), t.pop()});
     }
     return  ret;
 }
@@ -933,7 +973,7 @@ ttns::sSOP<decltype(T()*U())> operator-(const ttns::sNBO<T>& a, const ttns::sSOP
     ret.terms().push_back(a);
     for(auto& t : b.terms())
     {
-        ret.terms().push_back({-t.coeff(), t.pop()});
+        ret.terms().push_back({T(-1.0)*t.coeff(), t.pop()});
     }
     return  ret;
 }
@@ -942,7 +982,7 @@ template <typename T, typename U>
 ttns::sSOP<decltype(T()*U())> operator-(const ttns::sSOP<T>& a, const ttns::sNBO<U>& b)
 {
     ttns::sSOP<decltype(T()*U())> ret(a);
-    ret.terms().push_back({-b.coeff(), b.pop()});
+    ret.terms().push_back({T(-1.0)*b.coeff(), b.pop()});
     return  ret;
 }
 
@@ -955,7 +995,7 @@ ttns::sSOP<T> operator-(const ttns::sPOP& a, const ttns::sSOP<T>& b)
     ret.terms().push_back({T(1.0), a});
     for(auto& t : b.terms())
     {
-        ret.terms().push_back({-t.coeff(), t.pop()});
+        ret.terms().push_back({T(-1.0)*t.coeff(), t.pop()});
     }
     return  ret;
 }
@@ -975,7 +1015,7 @@ ttns::sSOP<T> operator-(const ttns::sOP& a, const ttns::sSOP<T>& b)
     ret.terms().push_back({1.0, a});
     for(auto& t : b.terms())
     {
-        ret.terms().push_back({-t.coeff(), t.pop()});
+        ret.terms().push_back({T(-1.0)*t.coeff(), t.pop()});
     }
     return  ret;
 }

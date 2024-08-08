@@ -21,6 +21,7 @@
 #include <pybind11/functional.h>
 
 #include "utils/orthopol.hpp"
+#include "utils/discretisation.hpp"
 
 #include "linalg/tensor.hpp"
 #include "linalg/sparseMatrix.hpp"
@@ -56,7 +57,7 @@ PYBIND11_MODULE(_pyttn, m)
 {
     m.doc()="TTNS library.";
     auto m_linalg = m.def_submodule("linalg", "Linear algebra submodule for TTNS library.");
-    auto m_orthopol = m.def_submodule("orthopol", "Orthogonal polynomials submodule for TTNS library.");
+    auto m_orthopol = m.def_submodule("utils", "Orthogonal polynomials submodule for TTNS library.");
 
     //
     //Wrap the required linear algebra types to enable python based instantiation of operators.
@@ -68,6 +69,7 @@ PYBIND11_MODULE(_pyttn, m)
     //Wrap the required utils functions
     //
     initialise_orthopol(m_orthopol);
+    initialise_discretisation(m_orthopol);
     
     //
     //Wrap the sOP functionality

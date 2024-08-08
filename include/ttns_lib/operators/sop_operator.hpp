@@ -2,6 +2,7 @@
 #define TTNS_SOP_OPERATOR_CONTAINER_HPP
 
 #include <linalg/linalg.hpp>
+#include <common/zip.hpp>
 
 #include <memory>
 #include <list>
@@ -14,6 +15,7 @@
 #include "../sop/system_information.hpp"
 #include "../sop/SOP.hpp"
 #include "../sop/autoSOP.hpp"
+#include "../sop/coeff_type.hpp"
 #include "../sop/operator_dictionaries/operator_dictionary.hpp"
 #include "site_operators/sequential_product_operator.hpp"
 
@@ -63,6 +65,14 @@ public:
         {
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to clear operator node object.");
+        }
+    }
+
+    void update_coefficients(real_type t, bool force_update = false)
+    {
+        for(size_t i = 0; i < m_terms.size(); ++i)
+        {
+            m_terms[i].update_coefficients(t, force_update);
         }
     }
 
@@ -144,6 +154,7 @@ class sop_operator
 {
 public:
     using size_type = typename backend::size_type;
+    using real_type = typename tmp::get_real_type<T>::type; 
 
     using op_type = ops::primitive<T, backend>;
     using element_type = site_operator<T, backend>;
@@ -168,17 +179,20 @@ protected:
     tree_type m_contraction_info;
     container_type m_mode_operators;
     std::vector<size_type> m_mode_dimension;
-    T m_Eshift ;
+    literal::coeff<T> _m_Eshift ;
+    T m_Eshift;
+    bool m_time_dependent_operators = false;
+    bool m_time_dependent_coefficients = false;
 
 public:
-    sop_operator() : m_Eshift(T(0.0)){}
+    sop_operator() : _m_Eshift(T(0.0)), m_Eshift(T(0.0)){}
     sop_operator(const sop_operator& o) = default;
     sop_operator(sop_operator&& o) = default;
-    sop_operator(SOP<T>& sop, const ttn_type& A, const system_modes& sys, bool compress = true, bool exploit_identity = true, bool use_sparse = true) : m_Eshift(T(0.0))
+    sop_operator(SOP<T>& sop, const ttn_type& A, const system_modes& sys, bool compress = true, bool exploit_identity = true, bool use_sparse = true) :  _m_Eshift(T(0.0)), m_Eshift(T(0.0))
     {
         CALL_AND_HANDLE(initialise(sop, A, sys, compress, exploit_identity, use_sparse), "Failed to construct sop operator.");
     }
-    sop_operator(SOP<T>& sop, const ttn_type& A, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool compress = true, bool exploit_identity = true, bool use_sparse = true) : m_Eshift(T(0.0))
+    sop_operator(SOP<T>& sop, const ttn_type& A, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool compress = true, bool exploit_identity = true, bool use_sparse = true) :  _m_Eshift(T(0.0)), m_Eshift(T(0.0))
     {
         CALL_AND_HANDLE(initialise(sop, A, sys, opdict, compress, exploit_identity, use_sparse), "Failed to construct sop operator.");
     }
@@ -199,7 +213,9 @@ public:
         setup_indexing_tree(sop, A, compress, exploit_identity, site_ops);
 
         CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, site_ops, use_sparse, A.is_purification()));
-        m_Eshift = sop.Eshift();
+        setup_time_dependence();
+        _m_Eshift = sop.Eshift();
+        update_coefficients(real_type(0.0), true);
 
         site_ops.clear();
         site_ops.shrink_to_fit();
@@ -217,7 +233,9 @@ public:
         setup_indexing_tree(sop, A, compress, exploit_identity, site_ops);
 
         CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, opdict, site_ops, use_sparse, A.is_purification()));
-        m_Eshift = sop.Eshift();
+        setup_time_dependence();
+        _m_Eshift = sop.Eshift();
+        update_coefficients(real_type(0.0), true);
 
         site_ops.clear();
         site_ops.shrink_to_fit();
@@ -228,9 +246,21 @@ public:
         m_contraction_info.clear();
         m_mode_operators.clear();
         m_mode_dimension.clear();       
+        _m_Eshift.clear();
     }
 
     const tree_type& contraction_info() const{return m_contraction_info;}
+
+    bool is_scalar(size_t i, size_t c) const
+    {
+        ASSERT(i == 0 && c == 0, "Index out of bounds.");
+        return m_contraction_info.root()().nterms() == 0;
+    }
+
+    bool is_scalar() const
+    {
+        return m_contraction_info.root()().nterms() == 0;
+    }
 
     size_t nrow(size_t i) const
     {
@@ -242,8 +272,6 @@ public:
         ASSERT(i == 0 && j == 0, "Index out of bounds.");
         return 0;
     }
-
-
 
     const mode_terms_type& operators(size_type nu) const
     {
@@ -292,8 +320,98 @@ public:
 
 public:
     size_type nset() const{return 1;}
+    bool is_time_dependent() const{return m_time_dependent_coefficients || m_time_dependent_operators;}
+    bool has_time_dependent_coefficients() const{return m_time_dependent_coefficients;}
+    bool has_time_dependent_operators() const{return m_time_dependent_operators;}
 
 protected:
+    void setup_time_dependence()
+    {
+        //iterate through the coefficient tree and set the node to be time dependent if either its coefficients are time dependent
+        //or it is a parent of a time dependent node
+        for(auto it = m_contraction_info.rbegin(); it != m_contraction_info.rend(); ++it)
+        {
+            auto& n = *it;
+            auto& cinf = n();
+            if(n.is_leaf())
+            {
+                for(size_type ind = 0; ind < cinf.nterms(); ++ind)
+                {
+                    bool time_dependent = false;
+                    for(size_type i = 0; i < cinf[ind].nspf_terms(); ++i)
+                    {
+                        if(cinf[ind].time_dependent_spf_coeff(i))
+                        {
+                            time_dependent = true;
+                            m_time_dependent_operators = true;
+                            m_time_dependent_coefficients = true;
+                        }
+                    }
+
+                    if(cinf[ind].time_dependent_coeff()){m_time_dependent_coefficients = true;}
+                    if(!m_time_dependent_coefficients)
+                    {
+                        for(size_type i = 0; i < cinf[ind].nmf_terms(); ++i)
+                        {
+                            if(cinf[ind].time_dependent_mf_coeff(i))
+                            {
+                                m_time_dependent_coefficients = true;
+                            }
+                        }
+                    }
+
+                    cinf[ind].set_is_time_dependent(time_dependent);
+                }
+            }
+            else
+            {
+                for(size_type ind = 0; ind < cinf.nterms(); ++ind)
+                {
+                    bool time_dependent = false;
+                    for(size_type i = 0; i < cinf[ind].nspf_terms(); ++i)
+                    {
+                        //check its accumulation coefficients
+                        if(cinf[ind].time_dependent_spf_coeff(i))
+                        {
+                            time_dependent = true;
+                            m_time_dependent_operators = true;
+                            m_time_dependent_coefficients = true;
+                        }
+
+                        //check the children spfs
+                        const auto& spinds = cinf[ind].spf_indexing()[i];
+                        for(size_type ni=0; ni<spinds.size(); ++ni)
+                        {
+                            size_type nu = spinds[ni][0];
+                            size_type cri = spinds[ni][1];
+                            if(n[nu]()[cri].is_time_dependent())
+                            {
+                                time_dependent = true;
+                                m_time_dependent_operators = true;
+                                m_time_dependent_coefficients = true;
+                            }
+                        }
+                    }
+
+                    if(cinf[ind].time_dependent_coeff()){m_time_dependent_coefficients = true;}
+                    if(!m_time_dependent_coefficients)
+                    {
+                        for(size_type i = 0; i < cinf[ind].nmf_terms(); ++i)
+                        {
+                            if(cinf[ind].time_dependent_mf_coeff(i))
+                            {
+                                m_time_dependent_coefficients = true;
+                            }
+                        }
+                    }
+                    cinf[ind].set_is_time_dependent(time_dependent);
+                }
+            }
+        }
+        if(_m_Eshift.is_time_dependent()){m_time_dependent_coefficients = true;}
+    }
+
+
     void setup_indexing_tree(SOP<T>& sop, const ttn_type& A, bool compress, bool exploit_identity, site_ops_type& site_ops)
     {
         tree<auto_sop::node_op_info<T>> bp;
@@ -425,8 +543,36 @@ public:
             }
         }
     }
+    const T& Eshift_val(size_t i, size_t j) const
+    {
+        ASSERT(i == 0 && j == 0, "Index out of bounds.");
+        return m_Eshift;
+    }
+
+    const T& Eshift(size_t i, size_t j) const
+    {
+        ASSERT(i == 0 && j == 0, "Index out of bounds.");
+        return m_Eshift;
+    }
     const T& Eshift() const{return m_Eshift;}
-    T& Eshift() {return m_Eshift;}
+    literal::coeff<T>& Eshift() {return _m_Eshift;}
+
+    void update_coefficients(real_type t, bool force_update = false)
+    {
+        //we don't need the rest of the operator to be time dependent to update the Eshift term.
+        if(m_time_dependent_coefficients || force_update)
+        {
+            if(_m_Eshift.is_time_dependent() )
+            {
+                m_Eshift = _m_Eshift(t);
+            }
+
+            for(auto& n : m_contraction_info)
+            {
+                n().update_coefficients(t, force_update);
+            }
+        }
+    }
 
 #ifdef CEREAL_LIBRARY_FOUND
 public:
@@ -437,6 +583,9 @@ public:
         CALL_AND_HANDLE(ar(cereal::make_nvp("operators", m_mode_operators)), "Failed to serialise sum of product operator.  Failed to serialise array of product operators.");
         CALL_AND_HANDLE(ar(cereal::make_nvp("mode_dimension", m_mode_dimension)), "Failed to serialise sum of product operator.  Failed to serialise the number of modes.");
         CALL_AND_HANDLE(ar(cereal::make_nvp("Eshift", m_Eshift)), "Failed to serialise operator node object.  Error when serialising Eshift.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("Eshift_int", _m_Eshift)), "Failed to serialise operator node object.  Error when serialising Eshift.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("time_dependent_coeffs", m_time_dependent_coefficients)), "Failed to serialise operator node object.  Error when serialising time dependence.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("time_dependent_operators", m_time_dependent_operators)), "Failed to serialise operator node object.  Error when serialising time dependence.");
     }
 #endif
 };  //class sop_operator

@@ -126,6 +126,7 @@ public:
     }
 
     void update_bond_tensor(bond_matrix_type& /* r */, const environment_type& /* env */, env_node_type& /* h */, env_type& /* op */){}
+    void advance_hamiltonian(ttn_type&, environment_type&, env_container_type& , env_type& ){}
 
 protected:
     //the krylov subspace engine
@@ -262,6 +263,7 @@ public:
 
     void update_bond_tensor(bond_matrix_type& /* r */, const environment_type& /* env */, env_node_type& /* h */, env_type& /* op */){}
 
+    void advance_hamiltonian(ttn_type&, environment_type&, env_container_type& , env_type& ){}
 protected:
     //the krylov subspace engine
     eigensolver_type m_eigensolver;

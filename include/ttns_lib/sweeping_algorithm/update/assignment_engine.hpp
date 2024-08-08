@@ -75,6 +75,7 @@ public:
 
     void update_bond_tensor(bond_matrix_type& /* r */, const environment_type& /* env */, env_node_type& /* h */, env_type& /* op */){}
 
+    void advance_hamiltonian(ttn_type&, const environment_type&, env_container_type& , env_type& ){}
 protected:
 };  //class assignment_engine
 

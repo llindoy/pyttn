@@ -14,7 +14,7 @@ def sbm_discretise(N, alpha, wc):
 def spin_boson_test(Nb, alpha, wc, eps, delta, chi, nbose, dt, nstep = 1, degree = 2, compress = True):
     g, w = sbm_discretise(Nb, alpha, wc)
 
-    sbg = spin_boson(2*eps, 2*delta, w, g, geom="star")
+    sbg = models.spin_boson(2*eps, 2*delta, w, g, geom="star")
     sbg.mode_dims = [nbose for i in range(Nb)]
     H = sbg.hamiltonian()
     sysinf = sbg.system_info()

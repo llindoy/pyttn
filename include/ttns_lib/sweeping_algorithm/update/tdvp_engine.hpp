@@ -32,6 +32,7 @@ public:
     using expmv_type = utils::expmv<T, backend, false>;
 
     using parameter_list = simple_update_parameter_list;
+
 public:
     tdvp_engine() : m_dt(0), m_t(0), m_coeff(1) {}
     tdvp_engine(const ttn_type& A, size_type krylov_dim = 12, size_type ndt = 1) : m_dt(0), m_t(0), m_coeff(1)
@@ -98,6 +99,9 @@ public:
     const expmv_type& expmv() const{return m_expmv;}
     expmv_type& expmv(){return m_expmv;}
 
+    const bool& use_time_dependent_hamiltonian() const{return m_use_time_dependent_hamiltonian;}
+    bool& use_time_dependent_hamiltonian(){return m_use_time_dependent_hamiltonian;}
+
     size_type update_site_tensor(hnode& A, const environment_type& env, env_node_type& h, env_type& op)
     {                    
         try
@@ -154,6 +158,21 @@ public:
         }
     }
 
+    void advance_hamiltonian(ttn_type& A, environment_type& env, env_container_type& h, env_type& op)
+    {
+        if(m_use_time_dependent_hamiltonian)
+        {
+            op.update_coefficients(m_t+(m_dt/4.0));
+            if(op.has_time_dependent_operators())
+            {
+                for(auto z : common::rzip(A, h))
+                {
+                    const auto& a = std::get<0>(z); auto& hspf = std::get<1>(z);
+                    CALL_AND_HANDLE(env.update_env_up(op, a, hspf, true), "Failed to update the environment tensor.");
+                }
+            }
+        }
+    }
 protected:
     //the krylov subspace engine
     expmv_type m_expmv;
@@ -161,6 +180,8 @@ protected:
     real_type m_dt;
     real_type m_t;
     T m_coeff;
+
+    bool m_use_time_dependent_hamiltonian = false;
     
 };  //class tdvp_engine
 
@@ -257,6 +278,9 @@ public:
     const expmv_type& expmv() const{return m_expmv;}
     expmv_type& expmv(){return m_expmv;}
 
+    const bool& use_time_dependent_hamiltonian() const{return m_use_time_dependent_hamiltonian;}
+    bool& use_time_dependent_hamiltonian(){return m_use_time_dependent_hamiltonian;}
+
     size_type update_site_tensor(hnode& A, const environment_type& env, env_node_type& h, env_type& op)
     {                    
         try
@@ -324,6 +348,22 @@ public:
         }
     }
 
+    void advance_hamiltonian(ttn_type& A, environment_type& env, env_container_type& h, env_type& op)
+    {
+        if(m_use_time_dependent_hamiltonian)
+        {
+            op.update_coefficients(m_t+(m_dt/4.0));
+
+            if(op.has_time_dependent_operators())
+            {
+                for(auto z : common::rzip(A, h))
+                {
+                    const auto& a = std::get<0>(z); auto& hspf = std::get<1>(z);
+                    CALL_AND_HANDLE(env.update_env_up(op, a, hspf, true), "Failed to update the environment tensor.");
+                }
+            }
+        }
+    }
 protected:
     //the krylov subspace engine
     expmv_type m_expmv;
@@ -331,6 +371,8 @@ protected:
     real_type m_dt;
     real_type m_t;
     T m_coeff;
+
+    bool m_use_time_dependent_hamiltonian = false;
     
     multiset_update_buffer<T, backend> mbuf;
 };  //class tdvp_engine

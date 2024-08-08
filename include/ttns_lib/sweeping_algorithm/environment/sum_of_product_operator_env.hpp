@@ -112,9 +112,9 @@ public:
         CALL_AND_HANDLE(mfo_core::evaluate(op.contraction_info()[_h.id()], _a1, m_buf.HA, m_buf.temp, _h), "Failed to evaluate the mean field operator.");
     }
 
-    inline void update_env_up(const environment_type& op, const hnode& _a1, node_type& _h)
+    inline void update_env_up(const environment_type& op, const hnode& _a1, node_type& _h, bool only_update_time_dependent = false)
     {
-        CALL_AND_HANDLE(spo_core::evaluate(op, op.contraction_info()[_h.id()], _a1, _h, m_buf.HA, m_buf.temp), "Failed to evaluate the single particle operator.");
+        CALL_AND_HANDLE(spo_core::evaluate(op, op.contraction_info()[_h.id()], _a1, _h, m_buf.HA, m_buf.temp, false, only_update_time_dependent), "Failed to evaluate the single particle operator.");
     }
 
     const buffer_type& buffer() const{return m_buf;}

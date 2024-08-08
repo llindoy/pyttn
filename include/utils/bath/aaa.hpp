@@ -7,7 +7,7 @@
 #include <linalg/decompositions/generalised_eigensolvers/generalised_eigensolver.hpp>
 #include <linalg/decompositions/singular_value_decomposition/singular_value_decomposition.hpp>
 
-#include "quadrature/adaptive_integrate.hpp"
+#include "../quadrature/adaptive_integrate.hpp"
 
 namespace utils
 {

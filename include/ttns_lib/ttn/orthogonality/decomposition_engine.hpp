@@ -17,6 +17,7 @@ enum truncation_mode
 };
 
 
+//TODO: Need to fix the code so that it can handle weird the case of (1(7(7))(1(X))). 
 template <typename T, typename backend=blas_backend, bool use_divide_and_conquer = true>
 class decomposition_engine
 {
@@ -185,7 +186,7 @@ public:
             }
 
           
-            if(A.shape(1) > 1)
+            if(A.shape(1) > 1 && A.shape(0) > 1)
             {
                 if(bond_dimension < 2){bond_dimension = 2;}
             }
@@ -295,7 +296,6 @@ protected:
         try
         {
             backend::copy_matrix_subblock( bond_dimension, V.shape(1), V.buffer(), V.shape(0), m_temp2.buffer(), V.shape(1));
-            
         }
         catch(const std::exception& ex)
         {
@@ -319,6 +319,7 @@ public:
             }
             else
             {
+                std::cerr << "here" << std::endl;
                 ASSERT(V.size() <= m_temp.capacity(), "The temporary matrix does not have sufficient capacity.");
                 CALL_AND_HANDLE(m_temp = trans(V), "Failed to evaluate transpose of V matrix into temporary buffer.");
                 CALL_AND_HANDLE(V = m_temp, "Failed to store transposed V matrix.");

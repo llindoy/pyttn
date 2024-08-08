@@ -1,6 +1,7 @@
 #ifndef PYTHON_BINDING_STRING_SOP_HPP
 #define PYTHON_BINDING_STRING_SOP_HPP
 
+#include <ttns_lib/sop/coeff_type.hpp>
 #include <ttns_lib/sop/sSOP.hpp>
 
 #include <pybind11/operators.h>
@@ -19,6 +20,7 @@ void init_sSOP(py::module& m)
 {
     using complex_type = linalg::complex<real_type>;
     using namespace ttns;
+    using namespace literal;
     //wrapper for the sOP type 
     py::class_<sOP>(m, "sOP")
         .def(py::init())
@@ -47,6 +49,13 @@ void init_sSOP(py::module& m)
         .def("__mul__", [](const sOP& a, real_type b){return a*b;})
         .def("__mul__", [](const sOP& a, const complex_type& b){return a*b;})
         .def("__rmul__", [](const sOP& b, real_type a){return a*b;})
+        .def("__rmul__", [](const sOP& b, const complex_type a){return a*b;})
+
+        .def("__mul__", [](const sOP& a, const coeff<real_type>& b){return a*b;})
+        .def("__mul__", [](const sOP& a, const coeff<complex_type>& b){return a*b;})
+        .def("__rmul__", [](const sOP& b, const coeff<real_type>& a){return a*b;})
+        .def("__rmul__", [](const sOP& b, const coeff<complex_type>& a){return a*b;})
+
         .def("__rmul__", [](const sOP& b, const complex_type& a){return a*b;})
         .def("__add__", [](sOP& a, const sOP& b){return a+b;})
         .def("__sub__", [](sOP& a, const sOP& b){return a-b;});
@@ -88,9 +97,13 @@ void init_sSOP(py::module& m)
         .def("__mul__", [](const sPOP& a, const sPOP& b){return a*b;})
         .def("__mul__", [](const sPOP& a, real_type b){return a*b;})
         .def("__mul__", [](const sPOP& a, const complex_type& b){return a*b;})
+        .def("__mul__", [](const sPOP& a, const coeff<real_type>& b){return a*b;})
+        .def("__mul__", [](const sPOP& a, const coeff<complex_type>& b){return a*b;})
         .def("__rmul__", [](const sPOP& b, const sOP& a){return a*b;})
         .def("__rmul__", [](const sPOP& b, real_type a){return a*b;})
         .def("__rmul__", [](const sPOP& b, const complex_type& a){return a*b;})
+        .def("__rmul__", [](const sPOP& b, const coeff<real_type>& a){return a*b;})
+        .def("__rmul__", [](const sPOP& b, const coeff<complex_type>& a){return a*b;})
 
         .def("__add__", [](sPOP& a, const sOP& b){return a+b;})
         .def("__add__", [](sPOP& a, const sPOP& b){return a+b;})
@@ -101,6 +114,123 @@ void init_sSOP(py::module& m)
         .def("__rsub__", [](sPOP& b, const sOP& a){return a-b;});
 
     {
+        using coef = coeff<real_type>;
+        //using complex_func_type = std::function<complex_type(real_type)>;
+        using func_type = std::function<real_type(real_type)>;
+        py::class_<coef>(m, "coeff_real")
+            .def(py::init())
+            .def(py::init<const real_type&>())
+            .def(py::init<const func_type&>())
+            .def(py::init<const coef&>())
+            .def("assign", [](coef& self, const coef& o){self=o;})
+            .def("assign", [](coef& self, const real_type& o){self=o;})
+            .def("assign", [](coef& self, const func_type& o){self=o;})
+            .def("__copy__",[](const coef& o){return coef(o);})
+            .def("__deepcopy__", [](const coef& o, py::dict){return coef(o);}, py::arg("memo"))
+            .def("clear", &coef::clear)
+            .def("is_zero", &coef::is_zero, py::arg("tol")=real_type(1e-14))
+            .def("is_positive", &coef::is_positive)
+            .def("is_time_dependent", &coef::is_time_dependent)
+            .def("__call__", &coef::operator())
+
+            .def("__str__", [](const coef& o){std::ostringstream oss; oss << o; return oss.str();})
+            .def("__iadd__", [](coef& a, const real_type& b){return a+=b;})
+            .def("__isub__", [](coef& a, const real_type& b){return a-=b;})
+            .def("__imul__", [](coef& a, const real_type& b){return a*=b;})
+            .def("__idiv__", [](coef& a, const real_type& b){return a/=b;})
+
+            .def("__iadd__", [](coef& a, const coef& b){return a+=b;})
+            .def("__isub__", [](coef& a, const coef& b){return a-=b;})
+            .def("__imul__", [](coef& a, const coef& b){return a*=b;})
+
+            //.def("__add__", [](coef& a, const func_type& b){return a+b;})
+            //.def("__radd__", [](coef& b, const func_type& a){return a+b;})
+            //.def("__sub__", [](coef& a, const func_type& b){return a-b;})
+            //.def("__rsub__", [](coef& b, const func_type& a){return a-b;})
+
+            //.def("__add__", [](coef& a, const complex_func_type& b){return a+b;})
+            //.def("__radd__", [](coef& b, const complex_func_type& a){return a+b;})
+            //.def("__sub__", [](coef& a, const complex_func_type& b){return a-b;})
+            //.def("__rsub__", [](coef& b, const complex_func_type& a){return a-b;})
+
+            .def("__add__", [](coef& a, const coef& b){return a+b;})
+            .def("__sub__", [](coef& a, const coef& b){return a-b;})
+            .def("__mul__", [](coef& a, const coef& b){return a*b;})
+            .def("__add__", [](coef& a, const coeff<complex_type>& b){return a+b;})
+            .def("__sub__", [](coef& a, const coeff<complex_type>& b){return a-b;})
+            .def("__mul__", [](coef& a, const coeff<complex_type>& b){return a*b;})
+            .def("__mul__", [](coef& a, const sOP& b){return a*b;})
+            .def("__mul__", [](coef& a, const sPOP& b){return a*b;});
+    }
+      
+    {
+        using coef = coeff<complex_type>;
+        using func_type = std::function<complex_type(real_type)>;
+        using real_func_type = std::function<real_type(real_type)>;
+        py::class_<coef>(m, "coeff_complex")
+            .def(py::init())
+            .def(py::init<const real_type&>())
+            .def(py::init<const complex_type&>())
+            .def(py::init<const func_type&>())
+            .def(py::init<const real_func_type&>())
+            .def(py::init<const coef&>())
+            .def(py::init<const coeff<real_type>&>())
+            .def("assign", [](coef& self, const coef& o){self=o;})
+            .def("assign", [](coef& self, const coeff<real_type>& o){self=o;})
+            .def("assign", [](coef& self, const real_type& o){self=o;})
+            .def("assign", [](coef& self, const complex_type& o){self=o;})
+            .def("assign", [](coef& self, const func_type& o){self=o;})
+            .def("assign", [](coef& self, const real_func_type& o){self=coeff<real_type>(o);})
+            .def("__copy__",[](const coef& o){return coef(o);})
+            .def("__deepcopy__", [](const coef& o, py::dict){return coef(o);}, py::arg("memo"))
+            .def("clear", &coef::clear)
+            .def("is_zero", &coef::is_zero, py::arg("tol")=real_type(1e-14))
+            .def("is_positive", &coef::is_positive)
+            .def("is_time_dependent", &coef::is_time_dependent)
+            .def("__call__", &coef::operator())
+
+            .def("__str__", [](const coef& o){std::ostringstream oss; oss << o; return oss.str();})
+            .def("__iadd__", [](coef& a, const real_type& b){return a+=b;})
+            .def("__isub__", [](coef& a, const real_type& b){return a-=b;})
+            .def("__imul__", [](coef& a, const real_type& b){return a*=b;})
+            .def("__idiv__", [](coef& a, const real_type& b){return a/=b;})
+
+            .def("__iadd__", [](coef& a, const complex_type& b){return a+=b;})
+            .def("__isub__", [](coef& a, const complex_type& b){return a-=b;})
+            .def("__imul__", [](coef& a, const complex_type& b){return a*=b;})
+            .def("__idiv__", [](coef& a, const complex_type& b){return a/=b;})
+
+            .def("__iadd__", [](coef& a, const coef& b){return a+=b;})
+            .def("__isub__", [](coef& a, const coef& b){return a-=b;})
+            .def("__imul__", [](coef& a, const coef& b){return a*=b;})
+
+            //.def("__iadd__", [](coef& a, const real_func_type& b){return a+=b;})
+            //.def("__isub__", [](coef& a, const real_func_type& b){return a-=b;})
+            .def("__iadd__", [](coef& a, const coeff<real_type>& b){return a+=b;})
+            .def("__isub__", [](coef& a, const coeff<real_type>& b){return a-=b;})
+            .def("__imul__", [](coef& a, const coeff<real_type>& b){return a*=b;})
+
+            //.def("__add__", [](coef& a, const func_type& b){return a+b;})
+            //.def("__radd__", [](coef& b, const func_type& a){return a+b;})
+            //.def("__sub__", [](coef& a, const func_type& b){return a-b;})
+            //.def("__rsub__", [](coef& b, const func_type& a){return a-b;})
+
+            //.def("__add__", [](coef& a, const real_func_type& b){return a+b;})
+            //.def("__radd__", [](coef& b, const real_func_type& a){return a+b;})
+            //.def("__sub__", [](coef& a, const real_func_type& b){return a-b;})
+            //.def("__rsub__", [](coef& b, const real_func_type& a){return a-b;})
+
+            .def("__add__", [](coef& a, const coef& b){return a+b;})
+            .def("__sub__", [](coef& a, const coef& b){return a-b;})
+            .def("__mul__", [](coef& a, const coef& b){return a*b;})
+            .def("__add__", [](coef& a, const coeff<real_type>& b){return a+b;})
+            .def("__sub__", [](coef& a, const coeff<real_type>& b){return a-b;})
+            .def("__mul__", [](coef& a, const coeff<real_type>& b){return a*b;})
+            .def("__mul__", [](coef& a, const sOP& b){return a*b;})
+            .def("__mul__", [](coef& a, const sPOP& b){return a*b;});
+    }
+
+    {
         using NBO = sNBO<real_type>;
         //wrapper for the sPOP type 
         py::class_<NBO>(m, "sNBO_real")
@@ -109,6 +239,8 @@ void init_sSOP(py::module& m)
             .def(py::init<const sPOP&>())
             .def(py::init<const real_type&, const sPOP&>())
             .def(py::init<const real_type&, const sOP&>())
+            .def(py::init<const coeff<real_type>&, const sPOP&>())
+            .def(py::init<const coeff<real_type>&, const sOP&>())
             .def(py::init<const NBO&>())
             .def("assign", [](NBO& self, const NBO& o){self=o;})
             .def("__copy__",[](const NBO& o){return NBO(o);})
@@ -125,8 +257,8 @@ void init_sSOP(py::module& m)
             .def_property
                 (
                     "coeff", 
-                    static_cast<const real_type& (NBO::*)() const>(&NBO::coeff),
-                    [](NBO& o, const real_type& i){o.coeff() = i;}
+                    static_cast<const coeff<real_type>& (NBO::*)() const>(&NBO::coeff),
+                    [](NBO& o, const coeff<real_type>& i){o.coeff() = i;}
                 )
             .def_property
                 (
@@ -149,6 +281,8 @@ void init_sSOP(py::module& m)
 
             .def("__mul__", [](const NBO& a, const real_type& b){return a*b;})
             .def("__mul__", [](const NBO& a, const complex_type& b){return a*b;})
+            //.def("__mul__", [](const NBO& a, const coeff<real_type>& b){return a*b;})
+            //.def("__mul__", [](const NBO& a, const coeff<complex_type>& b){return a*b;})
             .def("__mul__", [](const NBO& a, const sOP& b){return a*b;})
             .def("__mul__", [](const NBO& a, const sPOP& b){return a*b;})
             .def("__mul__", [](const NBO& a, const NBO& b){return a*b;})
@@ -178,6 +312,8 @@ void init_sSOP(py::module& m)
             .def(py::init<const sPOP&>())
             .def(py::init<const complex_type&, const sPOP&>())
             .def(py::init<const complex_type&, const sOP&>())
+            .def(py::init<const coeff<complex_type>&, const sPOP&>())
+            .def(py::init<const coeff<complex_type>&, const sOP&>())
             .def(py::init<const NBO&>())
             .def(py::init<const sNBO<real_type>&>())
             .def("assign", [](NBO& self, const NBO& o){self=o;})
@@ -196,8 +332,8 @@ void init_sSOP(py::module& m)
             .def_property
                 (
                     "coeff", 
-                    static_cast<const complex_type& (NBO::*)() const>(&NBO::coeff),
-                    [](NBO& o, const complex_type& i){o.coeff() = i;}
+                    static_cast<const coeff<complex_type>& (NBO::*)() const>(&NBO::coeff),
+                    [](NBO& o, const coeff<complex_type>& i){o.coeff() = i;}
                 )
             .def_property
                 (
@@ -221,6 +357,8 @@ void init_sSOP(py::module& m)
             .def("__mul__", [](const NBO& a, const real_type& b){return a*b;})
             .def("__mul__", [](const NBO& a, const complex_type& b){return a*b;})
             .def("__mul__", [](const NBO& a, const complex_type& b){return a*b;})
+            //.def("__mul__", [](const NBO& a, const coeff<real_type>& b){return a*b;})
+            //.def("__mul__", [](const NBO& a, const coeff<complex_type>& b){return a*b;})
             .def("__mul__", [](const NBO& a, const sOP& b){return a*b;})
             .def("__mul__", [](const NBO& a, const sPOP& b){return a*b;})
             .def("__mul__", [](const NBO& a, const NBO& b){return a*b;})

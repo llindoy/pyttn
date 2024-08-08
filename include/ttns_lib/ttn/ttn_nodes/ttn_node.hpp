@@ -608,6 +608,7 @@ public:
      */
     static void decompose_down(node_type& A, orthogonality_type& orth, size_type mode, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false)
     {
+        orth.resize_data(A);
 #ifdef USE_OPENMP
         #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if(orth.parallelise())
 #endif
@@ -623,6 +624,7 @@ public:
 
     static void decompose_up(node_type& A, orthogonality_type& orth, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false)
     {
+        orth.resize_data(A);
 #ifdef USE_OPENMP
         #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if(orth.parallelise())
 #endif

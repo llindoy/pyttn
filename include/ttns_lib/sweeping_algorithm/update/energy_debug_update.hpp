@@ -86,6 +86,7 @@ public:
         std::cerr << "bond dim: " << linalg::dot_product(t1, linalg::conj(a1)) << std::endl;
     }
 
+    void advance_hamiltonian(ttn_type&, environment_type&, env_container_type& , env_type& ){}
 protected: 
     linalg::matrix<T, backend> m_res;
 };  //class energy_debug_engine
@@ -117,6 +118,7 @@ public:
     using buffer_type = typename environment_type::buffer_type;
 
     using parameter_list = simple_update_parameter_list;
+
 public:
     energy_debug_engine() {}
     energy_debug_engine(const ttn_type&){}
@@ -197,6 +199,8 @@ public:
         }
         std::cout << "bond dim: " << val << std::endl;
     }
+
+    void advance_hamiltonian(ttn_type&, environment_type&, env_container_type& , env_type& ){}
 public:
     multiset_update_buffer<T, backend> mbuf;
 };  //class energy_debug_engine

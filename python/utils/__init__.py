@@ -1,1 +1,1 @@
-from pyttn._pyttn.orthopol import *
+from pyttn._pyttn.utils import *

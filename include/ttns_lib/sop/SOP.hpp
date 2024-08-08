@@ -1,6 +1,7 @@
 #ifndef TTNS_OPERATOR_GEN_LIB_SOP_HPP
 #define TTNS_OPERATOR_GEN_LIB_SOP_HPP
 
+#include "coeff_type.hpp"
 #include "sSOP.hpp"
 #include "system_information.hpp"
 #include "operator_dictionaries/default_operator_dictionaries.hpp"
@@ -325,14 +326,15 @@ class SOP
 {
 public:
     using operator_dictionary_type = std::vector<std::vector<std::string>>;
-    using container_type = std::unordered_map<prodOP, T>;
+    using container_type = std::unordered_map<prodOP, literal::coeff<T>>;
     using iterator = typename container_type::iterator;
     using const_iterator = typename container_type::const_iterator;
+    using function_type = typename literal::coeff<T>::function_type;
 
 protected:
     iterator last_insert;
     bool m_has_hint = false;
-    T m_Eshift = T(0);
+    literal::coeff<T> m_Eshift = literal::coeff<T>(T(0));
 
 public:
     SOP(){}
@@ -414,12 +416,18 @@ public:
         return *this;
     }
 
+    SOP<T>& operator+=(const literal::coeff<T>& a)
+    {
+        this->Eshift() += a;
+        return *this;
+    }
+
     template <typename U>
     SOP<T>& operator-=(const sSOP<U>& a)
     {
         for(const auto& t : a)
         {
-            insert({-t.coeff(), t.pop()});
+            insert({T(-1.0)*t.coeff(), t.pop()});
         }
         return *this;
     }
@@ -438,12 +446,18 @@ public:
 
     SOP<T>& operator-=(const sNBO<T>& a)
     {
-        insert(-a.coeff(), a.pop());
+        insert(T(-1.0)*a.coeff(), a.pop());
         return *this;
     }
     
     template <typename U>
     typename std::enable_if<linalg::is_number<U>::value, SOP<T>&>::type operator-=(const U& a)
+    {
+        this->Eshift() -= a;
+        return *this;
+    }
+
+    SOP<T>& operator-=(const literal::coeff<T>& a)
     {
         this->Eshift() -= a;
         return *this;
@@ -464,10 +478,11 @@ public:
     const std::string& label() const{return m_label;}
     std::string& label(){return m_label;}
 
-    const T& Eshift() const{return m_Eshift;}
-    T& Eshift(){return m_Eshift;}
+    const literal::coeff<T>& Eshift() const{return m_Eshift;}
+    literal::coeff<T>& Eshift(){return m_Eshift;}
 
-    void insert(const T& ac, const sPOP& a)
+    template <typename U>
+    void insert(const U& ac, const sPOP& a)
     {
         ASSERT(m_allow_insertion, "Additional terms cannot be added to Hamiltonian following jordan-wigner mapping.");\
         prodOP temp(a.size());
@@ -494,7 +509,7 @@ public:
             temp[counter] = std::make_tuple(ind, m.mode(), m.fermionic());
             ++counter;
         }
-        T v = ac;
+        U v = ac;
         if(!contains_fermionic)
         {
             temp.order_modes();
@@ -502,13 +517,14 @@ public:
         else
         {
             bool flip_sign = temp.fermion_order_modes(m_opdict);
-            if(flip_sign){v = -ac;}
+            if(flip_sign){v = U(-1.0)*ac;}
         }
         m_terms[temp] += v;
     }
 
     void insert(const sNBO<T>& a){insert(a.coeff(), a.pop());}
-    void insert(const T& v, const prodOP& a)
+    template <typename U>
+    void insert(const U& v, const prodOP& a)
     {
         ASSERT(m_allow_insertion, "Additional terms cannot be added to Hamiltonian following jordan-wigner mapping.");\
         bool contains_fermionic = false;
@@ -518,11 +534,11 @@ public:
         }
 
         prodOP b = a;
-        T v2 = v;
+        U v2 = v;
         if(contains_fermionic)
         {
             bool flip_sign = b.fermion_order_modes(m_opdict);
-            if(flip_sign){v2 = -v;}
+            if(flip_sign){v2 = U(-1.0)*v;}
         }
         else
         {
@@ -597,7 +613,7 @@ protected:
             for(auto& a : m_terms)
             {
                 bool flip_sign = a.first.jordan_wigner(m_opdict, is_fermion_mode);
-                if(flip_sign){a.second = -a.second;}
+                if(flip_sign){a.second *= T(-1.);}
 
             }
         }
@@ -608,7 +624,7 @@ public:
     {
         for(auto it = m_terms.begin(); it != m_terms.end(); )
         {
-            if(std::abs(it->second ) < tol){it = m_terms.erase(it);}
+            if(it->second.is_zero(tol)){it = m_terms.erase(it);}
             else{it++;}
         }
     }
@@ -646,7 +662,7 @@ std::ostream& operator<<(std::ostream& os, const ttns::SOP<T>& op)
     const auto plus = "+";
     for(const auto& t : op)
     {
-        sep = std::real(t.second) >= 0 ? plus : separator;
+        sep = t.second.is_positive() ? plus : separator;
         os << sep << t.second << " ";   t.first.label(os, op.m_opdict) << std::endl;
     }
     return os;
@@ -788,7 +804,7 @@ ttns::SOP<decltype(T()*U())> operator-(const ttns::sSOP<T>& a, const ttns::SOP<U
     ttns::SOP<decltype(T()*U())> ret(b);
     for(const auto& _a : a)
     {
-        ret.insert(-_a.coeff(), _a.pop());
+        ret.insert(-1.0*_a.coeff(), _a.pop());
     }
     return  ret;
 }
@@ -799,7 +815,7 @@ ttns::SOP<decltype(T()*U())> operator-(const ttns::SOP<T>& b, const ttns::sSOP<U
     ttns::SOP<T> ret(b);
     for(const auto& _a : a)
     {
-        ret.insert(-_a.coeff(), _a.pop());
+        ret.insert(-1.0*_a.coeff(), _a.pop());
     }
     return  ret;
 }
@@ -808,7 +824,7 @@ template <typename T, typename U>
 ttns::SOP<decltype(T()*U())> operator-(const ttns::sNBO<T>& a, const ttns::SOP<U>& b)
 {
     ttns::SOP<decltype(T()*U())> ret(b);
-    ret.insert(-a.coeff(), a.pop());
+    ret.insert(-1.0*a.coeff(), a.pop());
     return  ret;
 }
 
@@ -816,7 +832,7 @@ template <typename T, typename U>
 ttns::SOP<decltype(T()*U())> operator-(const ttns::SOP<T>& b, const ttns::sNBO<U>& a)
 {
     ttns::SOP<T> ret(b);
-    ret.insert(-a.coeff(), a.pop());
+    ret.insert(-1.0*a.coeff(), a.pop());
     return  ret;
 }
 

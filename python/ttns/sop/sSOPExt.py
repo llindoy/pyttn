@@ -1,6 +1,15 @@
 from pyttn._pyttn import fermion_operator
-from pyttn._pyttn import sNBO_real, sNBO_complex, sSOP_real, sSOP_complex
+from pyttn._pyttn import sNBO_real, sNBO_complex, sSOP_real, sSOP_complex, coeff_real, coeff_complex
 import numpy as np
+
+def coeff(*args, dtype = np.complex128):
+    if(dtype == np.complex128):
+        return coeff_complex(*args)
+    elif(dtype == np.float64):
+        return coeff_real(*args)
+    else:
+        raise RuntimeError("Invalid dtype for sNBO")
+
 
 def sNBO(*args, dtype = np.complex128):
     if(dtype == np.complex128):

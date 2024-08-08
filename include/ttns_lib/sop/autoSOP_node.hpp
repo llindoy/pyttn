@@ -109,7 +109,7 @@ public:
     operator_data(){}
     operator_data(const opinfo& op) : m_opdef(op){}
     operator_data(const opinfo& op, const utils::term_indexing_array<size_t>& ind) : m_opdef(op), m_inds(ind){}
-    operator_data(const opinfo& op, const utils::term_indexing_array<size_t>& ind, const std::vector<T>& coeff) : m_opdef(op), m_inds(ind), m_accum_coeff(coeff){}
+    operator_data(const opinfo& op, const utils::term_indexing_array<size_t>& ind, const std::vector<literal::coeff<T>>& coeff) : m_opdef(op), m_inds(ind), m_accum_coeff(coeff){}
     operator_data(const operator_data& o) = default;
     operator_data(operator_data&& o) = default;
 
@@ -120,8 +120,8 @@ public:
     
     const opinfo& operator_definition() const{return m_opdef;}
     const utils::term_indexing_array<size_t>& indices() const{return m_inds;}
-    const std::vector<T>& accumulation_coefficients() const{return m_accum_coeff;}
-    void set_accumulation_coefficients(const std::vector<T>& coeffs) const{m_accum_coeff = coeffs;}
+    const std::vector<literal::coeff<T>>& accumulation_coefficients() const{return m_accum_coeff;}
+    void set_accumulation_coefficients(const std::vector<literal::coeff<T>>& coeffs) const{m_accum_coeff = coeffs;}
     const bool& is_identity() const{return m_opdef.m_is_identity;}
     bool& is_identity() {return m_opdef.m_is_identity;}
 
@@ -157,7 +157,7 @@ public:
 protected:
     opinfo& operator_definition(){return m_opdef;}
     utils::term_indexing_array<size_t>& indices(){return m_inds;}
-    std::vector<T>& accumulation_coefficients(){return m_accum_coeff;}
+    std::vector<literal::coeff<T>>& accumulation_coefficients(){return m_accum_coeff;}
 
 protected:
     opinfo m_opdef;
@@ -166,7 +166,7 @@ protected:
     //the coefficients used when accumulating the terms together to form a composite operator.  
     //If the m_opdef only contains a single element then this is simply set to vector of length 1
     //containing static_cast<T>(1.0), as we never need to accumulate this term
-    std::vector<T> m_accum_coeff;
+    std::vector<literal::coeff<T>> m_accum_coeff;
 
     friend class node_op_info<T>;
     friend class autoSOP<T>;
@@ -186,11 +186,11 @@ public:
 
     const std::vector<operator_data<T>>& spf() const{return m_spf;}
     const std::vector<operator_data<T>>& mf() const{return m_mf;}
-    const std::vector<T>& coeff() const{return m_coeff;}
+    const std::vector<literal::coeff<T>>& coeff() const{return m_coeff;}
 
     std::vector<operator_data<T>>& spf(){return m_spf;}
     std::vector<operator_data<T>>& mf(){return m_mf;}
-    std::vector<T>& coeff(){return m_coeff;}
+    std::vector<literal::coeff<T>>& coeff(){return m_coeff;}
 
     size_t nterms() const{return m_spf.size();}
 
@@ -230,7 +230,7 @@ public:
 protected:
     std::vector<operator_data<T>> m_spf;
     std::vector<operator_data<T>> m_mf;
-    std::vector<T> m_coeff;
+    std::vector<literal::coeff<T>> m_coeff;
 
     friend class autoSOP<T>;
 
