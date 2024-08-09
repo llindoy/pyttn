@@ -2,17 +2,40 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import sys
+import scipy
 sys.path.append("../../")
 from pyttn import *
+from pyttn.utils import density_discretisation, orthopol_discretisation
 
-def sbm_discretise(N, alpha, wc):
-    w = -wc * np.log(1.-(np.arange(N)+1)/(N+1.0))
-    g = np.sqrt(2*alpha*w*wc/(N+1.0))
-    return g, w
+from numba import jit
 
+def discretise_bath(Nb, alpha, wc, s, beta = None, Nw = 10, moment_scaling=2, atol=0, rtol=1e-10):
+    @jit(nopython=True)
+    def J(w):
+        return np.abs(np.pi/2*alpha*wc*np.power(w/wc, s)*np.exp(-np.abs(w/wc)))*np.where(w > 0, 1.0, -1.0)
 
-def spin_boson_test(Nb, alpha, wc, eps, delta, chi, nbose, dt, nstep = 1, degree = 2, compress = True):
-    g, w = sbm_discretise(Nb, alpha, wc)
+    @jit(nopython=True)
+    def S(w):
+        if beta == None:
+            return J(w)*np.where(w > 0, 1.0, 0.0)
+        else:
+            return J(w)*0.5*(1.0+1.0/np.tanh(beta*w/2.0))
+
+    wmax = Nw*wc
+    wmin = 0
+    if beta != None:
+        wmin = -wmax/(beta*wc+1)
+    g, w = orthopol_discretisation.discretise( lambda x : S(x), wmin, wmax, Nb, moment_scaling=moment_scaling, atol=atol, rtol=rtol)
+
+    renorm = np.exp(-2.0/np.pi*scipy.integrate.quad(lambda x : J(x)/(x*x), wmax, np.inf)[0])
+
+    return np.array(g), np.array(w), renorm
+
+def spin_boson_test(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep = 1, degree = 2, compress = True):
+    g, w = discretise_bath(Nb, alpha, wc, s, beta=beta)
+    plt.plot(w, g*g)
+    plt.show()
+
 
     sbg = models.spin_boson(2*eps, 2*delta, w, g, geom="star")
     sbg.mode_dims = [nbose for i in range(Nb)]

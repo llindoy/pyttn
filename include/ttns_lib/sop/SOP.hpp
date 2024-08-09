@@ -298,7 +298,7 @@ inline bool operator==(const prodOP& A, const prodOP& B)
 
 inline bool operator!=(const prodOP& A, const prodOP& B){return !(A == B);}
 
-};
+}
 
 
 template <>

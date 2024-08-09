@@ -84,7 +84,7 @@ static inline sOP fermion_operator(const std::string& op, size_t mode)
     utils::io::remove_whitespace_and_to_lower(label);
 
     return sOP(op, mode, true);
-};
+}
 
 inline bool operator<(const sOP& A, const sOP& B)
 {   

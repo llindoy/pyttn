@@ -28,7 +28,7 @@ std::ostream& operator<<(std::ostream& os, const multiset_node_data<T, backend>&
     return os;
 }
 
-};
+}
 
 #include "node_traits/ttn_node_traits.hpp"
 #include "node_traits/ms_ttn_node_traits.hpp"

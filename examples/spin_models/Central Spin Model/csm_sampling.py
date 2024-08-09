@@ -113,7 +113,7 @@ if __name__ == "__main__":
     parser.add_argument('--chi', type=int, default=16)
     parser.add_argument('--nsamples', type=int, default=512)
     parser.add_argument('--type', type = str, default='uniform')
-    parser.add_argument('--fname', type=str, default='csm.h5'
+    parser.add_argument('--fname', type=str, default='csm.h5')
     args = parser.parse_args()
 
     N = args.N
