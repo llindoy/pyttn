@@ -19,7 +19,7 @@ namespace ttns
 template <typename T, typename backend>
 using ttn_node = typename tree<ttn_node_data<T, backend> >::node_type;
 
-template <typename T, typename backend = blas_backend>
+template <typename T, typename backend = linalg::blas_backend>
 class ttn : public ttn_base<ttn_node_data, T, backend> 
 {
 public:

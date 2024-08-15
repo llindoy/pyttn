@@ -146,11 +146,13 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
         sysinf[i+1] = boson_mode(mode_dims[i])
 
 
-    #and add the node that forms the root of the bath
-    topo = ntree("(1(2(2))(2))")
     degree = 2
     #and add the node that forms the root of the bath
-    ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi)
+    topo = ntree("(1(2(2))(2))")
+    if(degree > 1):
+        ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi)
+    else:
+        ntreeBuilder.mps_subtree(topo()[1], sbg.mode_dims, degree, chi)
     ntreeBuilder.sanitise(topo)
 
     A = ttn(topo, dtype=np.complex128)

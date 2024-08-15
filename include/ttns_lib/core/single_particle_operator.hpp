@@ -316,13 +316,6 @@ public:
         CALL_AND_RETHROW(kpo::kron_prod([&op](size_t nu, size_t cri){return op[nu]().spf(cri);}, cinf[ind].spf_indexing()[ri], A, temp, res));
     }
 
-    //kronecker product operators for the operator ype
-    //template <typename spfnode, typename Atype, typename dimstype>
-    //static void kron_prod(const spfnode& op, const cinftype& cinf, size_type ind, size_type ri, size_type hrank, const dimstype& dims, const Atype& A, mat& temp, mat& res)
-    //{
-    //    CALL_AND_RETHROW(kpo::kron_prod([&op](size_t nu, size_t cri){return op[nu]().spf(cri);}, cinf[ind].spf_indexing()[ri], hrank, dims, A, temp, res));
-    //}
-
     //kronecker product operators for the operator type
     template <typename spfnode>
     static void kron_prod(const spfnode& op, const cinftype& cinf, size_type ind, size_type ri, const hdata& B, const hdata& A, mat& temp, mat& res)

@@ -5,7 +5,8 @@ import h5py
 import scipy
 import copy
 
-sys.path.append("../../")
+sys.path.append("../../../")
+sys.path.append("..")
 from pyttn import *
 
 from pyttn.utils import orthopol_discretisation
@@ -64,10 +65,8 @@ def setup_star_hamiltonian(eps, delta, g, w, Nb):
 
 import matplotlib.pyplot as plt
 
-
-def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, Ncut = 20, nstep = 1, Nw = 10, nsamples = 100, seed = 0, ofname='sbm.h5'):
+def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep = 1, Nw = 7.5, ofname='sbm.h5', adaptive=False, spawning_threshold=1e-5, unoccupied_threshold=1e-4):
     g, w, renorm = discretise_bath(Nb, alpha, wc, s, beta=None, Nw=Nw)
-
     H = None
 
     H, l = setup_star_hamiltonian(eps, delta*renorm, 2*g, w, Nb)
@@ -80,14 +79,27 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, Ncut = 
         sysinf[i+1] = boson_mode(mode_dims[i])
 
 
+    degree = 2
+
+    chi0 = chi
+    if adaptive:
+        chi0 = 2
     #and add the node that forms the root of the bath
     topo = ntree("(1(2(2))(2))")
-    degree = 2
-    #and add the node that forms the root of the bath
-    ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi)
+    if(degree > 1):
+        ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi0)
+    else:
+        ntreeBuilder.mps_subtree(topo()[1], sbg.mode_dims, degree, chi0)
     ntreeBuilder.sanitise(topo)
 
-    A = ttn(topo, dtype=np.complex128)
+    capacity = ntree("(1(2(2))(2))")
+    if(degree > 1):
+        ntreeBuilder.mlmctdh_subtree(capacity()[1], mode_dims, degree, chi)
+    else:
+        ntreeBuilder.mps_subtree(capacity()[1], sbg.mode_dims, degree, chi)
+    ntreeBuilder.sanitise(capacity)
+
+    A = ttn(topo, capacity, dtype=np.complex128)
     A.set_state([0 for i in range(Nb+1)])
 
     h = sop_operator(H, A, sysinf)
@@ -99,14 +111,22 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, Ncut = 
         sysinf
     )
 
-    sweep = tdvp(A, h, krylov_dim = 12)
+    sweep = None
+    if not adaptive:
+        sweep = tdvp(A, h, krylov_dim = 12)
+    else:
+        sweep = tdvp(A, h, krylov_dim = 12, expansion='subspace')
+        sweep.spawning_threshold = spawning_threshold
+        sweep.unoccupied_threshold=unoccupied_threshold
+        sweep.minimum_unoccupied=1
+        sweep.eval_but_dont_apply=True
+
     sweep.dt = dt
     sweep.coefficient = -1.0j
+    sweep.prepare_environment(A, h)
 
     res = np.zeros(nstep+1)
-
-
-
+    runtime = np.zeros(nstep+1)
 
     res[0] = np.real(mel(op, A, A))
     for i in range(nstep):
@@ -114,6 +134,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, Ncut = 
         sweep.step(A, h, dt)
         t2 = time.time()
         res[i+1] = np.real(mel(op, A, A))
+        runtime[i+1] = runtime[i]+(t2-t1)
 
         print((i+1)*dt, t2-t1, res[i+1], mel(A))
         sys.stdout.flush()
@@ -122,28 +143,32 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, Ncut = 
             h5 = h5py.File(ofname, 'w')
             h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
             h5.create_dataset('Sz', data=res)
+            h5.create_dataset('runtime', data=runtime)
             h5.close()
 
     h5 = h5py.File(ofname, 'w')
     h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
     h5.create_dataset('Sz', data=res)
+    h5.create_dataset('runtime', data=runtime)
     h5.close()
 
 import argparse
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Dynamics of the zero temperature spin boson model with')
-    parser.add_argument('alpha', type = float)
+    parser.add_argument('--alpha', type = float, default=1)
     parser.add_argument('--wc', type = float, default=5)
     parser.add_argument('--s', type = float, default=1)
     parser.add_argument('--delta', type = float, default=0)
     parser.add_argument('--eps', type = float, default=1)
     parser.add_argument('--chi', type=int, default=16)
-    parser.add_argument('--beta', type=float, default=5)
     parser.add_argument('--nbose', type=int, default=20)
     parser.add_argument('--dt', type=float, default=0.005)
-    parser.add_argument('--fname', type=str, default='sbm.h5')
+    parser.add_argument('--spawningthreshold', type = float, default=1e-5)
+    parser.add_argument('--unoccupiedthreshold', type = float, default=1e-4)
     args = parser.parse_args()
 
-    nstep = int(10.0/args.dt)+1
-    sbm_dynamics(140, args.alpha, args.wc, args.s, args.delta, args.eps, args.chi, args.nbose, args.dt, nstep = nstep, ofname = args.fname, beta=args.beta)
+    nstep = int(5.0/args.dt)+1
+    ofname = 'sbm_subspace_expansion_'+str(args.chi)+"_"+str(args.spawningthreshold)+"_"+str(args.unoccupiedthreshold)+'.h5'
+    sbm_dynamics(128, args.alpha, args.wc, args.s, args.delta, args.eps, args.chi, args.nbose, args.dt, nstep = nstep, spawning_threshold=args.spawningthreshold, unoccupied_threshold=args.unoccupiedthreshold, ofname = ofname, adaptive=True)
+    #sbm_dynamics(128, args.alpha, args.wc, args.s, args.delta, args.eps, args.chi, args.nbose, args.dt, nstep = nstep, ofname = 'sbm_single_site.h5')

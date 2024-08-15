@@ -15,7 +15,7 @@ namespace ttns
 template <typename T, typename backend>
 using ms_ttn_node = typename tree<multiset_node_data<T, backend> >::node_type;
 
-template <typename T, typename backend = blas_backend>
+template <typename T, typename backend = linalg::blas_backend>
 class ms_ttn : public ttn_base<multiset_node_data, T, backend> 
 {
 public:

@@ -16,6 +16,7 @@ class root_to_leaf_decomposition_engine
     using hdata = ttn_node_data<T, backend>;
     using mat = linalg::matrix<T, backend>;
     using real_type = typename tmp::get_real_type<T>::type;
+    using dmat = linalg::diagonal_matrix<real_type, backend>;
     using size_type = typename backend::size_type;
 
 public:
@@ -219,6 +220,66 @@ public:
             eng(umat);
         }
         , "Failed when evaluating the decomposition of the resultant matricisation.");
+    }
+
+    template <typename engine>
+    static inline size_type evaluate(engine& eng, const hdata& A, mat& U, mat& R, dmat& S, mat& tm, size_type mode, real_type tol = real_type(0), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation, bool save_svd = false)
+    {
+        ASSERT(mode < A.nmodes(), "Failed to perform the root to leaf decomposition.  The node to be decomposed does not have the requested mode.");
+
+        size_type d1 = (A.hrank()*A.dimen())/A.dim(mode);     size_type d2 = A.dim(mode);
+
+        ASSERT(A.size() <= U.capacity(), "The U matrix is not the same size as the input matrix."); 
+        ASSERT(A.size() <= tm.capacity(), "The U matrix is not the same size as the input matrix."); 
+        ASSERT(d2*d2 <= R.capacity(), "The R matrix is not large enough to store the result of the decomposition.");
+
+        CALL_AND_HANDLE(U.resize(A.size(0), A.size(1)), "Failed when resizing the U matrix so that it has the correct shape.");
+        CALL_AND_HANDLE(tm.resize(d1, d2), "Failed when resizing the U matrix so that it has the correct shape.");
+        CALL_AND_HANDLE(R.resize(d2, d2), "Failed when resizing the R matrix so that it has the correct shape.");
+
+        //indices useful for reordering the A tensor
+        size_type id1 = 1;                  size_type id2 = A.hrank()*A.dimen();
+        for(size_type i=0; i<=mode; ++i){id1 *= A.dim(i);}
+        id2 /= id1;
+
+        size_type bond_dimension = 0;
+        //First we create a reordering of the matrix such that we have the index of interest as the fastest index of the matrix.
+        CALL_AND_HANDLE(
+        {
+            //first we reinterpret 
+            auto atens = A.as_matrix().reinterpret_shape(id1, id2);
+            auto utens = U.reinterpret_shape(id2, id1);
+
+            //now we permute the dimensions of this reinterpreted shape rank 3 tensor so that the middle dimension becomes the last dimension.
+            utens = trans(atens);
+        }
+        , "Failed to unpack the matricisation back into the full rank tensor.");
+
+        //now we reinterpret the reordered tensors as the correctly sized matrix and perform the singular values decomposition
+        CALL_AND_HANDLE(
+        {
+            auto umat = U.reinterpret_shape(d1, d2);
+            bond_dimension = eng(umat, tm, R, S, tol, nchi, rel_truncate, trunc_mode, save_svd);
+        }
+        , "Failed when evaluating the decomposition of the resultant matricisation.");
+
+
+        size_type id1p = (R.shape(0)*id1/R.shape(1));
+        U.resize(R.shape(0)*A.shape(0)/R.shape(1), A.size(1));
+        //now it is necessary to undo the permutation done before so that we can store the transformed U tensor
+        CALL_AND_HANDLE(
+        {
+            auto utens = U.reinterpret_shape(id1p, id2);
+            auto ttens = tm.reinterpret_shape(id2, id1p);
+
+            utens = trans(ttens);
+        }
+        ,"Failed when repacking the matricisation.");
+        
+        //Finally we need to transpose the R matrix as we want its transpose for the remainder of the code.
+        CALL_AND_HANDLE(eng.transposeV(R), "Failed to compute the inplace transpose of the R matrix.");
+        
+        return bond_dimension;
     }
 
     static inline void apply_to_node(hdata& a, const mat& u)

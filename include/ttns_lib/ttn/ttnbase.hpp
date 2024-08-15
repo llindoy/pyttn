@@ -34,16 +34,16 @@ struct level_pair_comp
     }
 };
 
-template <template <typename, typename> class node_class, typename T, typename backend = blas_backend>
+template <template <typename, typename> class node_class, typename T, typename backend = linalg::blas_backend>
 class ttn_base : public tree<node_class<T, backend> > 
 {
 public:
-    static_assert(is_number<T>::value, "The first template argument to the ttn object must be a valid number type.");
-    static_assert(is_valid_backend<backend>::value, "The second template argument to the ttn object must be a valid backend.");
+    static_assert(linalg::is_number<T>::value, "The first template argument to the ttn object must be a valid number type.");
+    static_assert(linalg::is_valid_backend<backend>::value, "The second template argument to the ttn object must be a valid backend.");
 
     using real_type = typename linalg::get_real_type<T>::type;
 
-    using matrix_type = matrix<T, backend>;
+    using matrix_type = linalg::matrix<T, backend>;
     using base_type = tree<node_class<T, backend> >;
 
     using reference = typename base_type::reference;
@@ -59,6 +59,7 @@ public:
 
     using node_type = typename base_type::node_type;
     using bond_matrix_type = typename node_type::bond_matrix_type;
+    using population_matrix_type = typename node_type::population_matrix_type;
     using orthogonality_type = typename node_type::orthogonality_type;
     using value_type = typename node_type::value_type;
 
@@ -442,8 +443,10 @@ protected:
 
 public:
     const bond_matrix_type& active_bond_matrix() const{return m_orthog.bond_matrix();}
-    bond_matrix_type& active_bond_matrix(){return m_orthog.bond_matrix();}
+    bond_matrix_type& active_bond_matrix() {return m_orthog.bond_matrix();}
 
+    const population_matrix_type& active_population_matrix() const{return m_orthog.population_matrix();}
+    population_matrix_type& active_population_matrix() {return m_orthog.population_matrix();}
 public:
 
     void clear()
@@ -749,7 +752,7 @@ public:
 public:
     //scalar inplace multiplication and division
     template <typename U>
-    typename std::enable_if<is_number<U>::value, ttn_base&>::type operator*=(const U& u)
+    typename std::enable_if<linalg::is_number<U>::value, ttn_base&>::type operator*=(const U& u)
     {
         if(this->has_orthogonality_centre())
         {
@@ -763,7 +766,7 @@ public:
     }
 
     template <typename U>
-    typename std::enable_if<is_number<U>::value, ttn_base&>::type operator/=(const U& u)
+    typename std::enable_if<linalg::is_number<U>::value, ttn_base&>::type operator/=(const U& u)
     {
         if(this->has_orthogonality_centre())
         {

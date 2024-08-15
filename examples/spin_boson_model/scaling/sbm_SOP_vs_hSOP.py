@@ -17,21 +17,28 @@ def bath_size_scaling_SOP_vs_hSOP():
 
     timings_SOP = []
     stdevs_SOP = []
+    step = 20
     for nb in Nbs:
         print(nb)
-        m, std = spin_boson_test(nb, 2.0, 25, 0.0, 1.0, chi, nbose, 0.001, nstep=1, compress = True)
+        m, std = spin_boson_test(nb, 1.0, 5, 1.0, 0.0, 1.0, chi, nbose, 0.01, nstep=nstep, compress = True)
         timings_hSOP.append(m)
-        stdevs_hSOP.append(std)
+        stdevs_hSOP.append(std/np.sqrt(nstep))
+    h5 = h5py.File("bath_size_scaling_hSOP.h5", 'w')
+    h5.create_dataset('Nbs', data=np.array(Nbose))
+    h5.create_dataset('mean', data=np.array(timings_hSOP))
+    h5.create_dataset('stderr', data=np.array(stdevs_hSOP))
+    h5.close()
 
     for nb in Nbs:
-        m, std = spin_boson_test(nb, 2.0, 25, 0.0, 1.0, chi, nbose, 0.001, nstep=1, compress = False)
+        m, std = spin_boson_test(nb, 1.0, 5, 1.0, 0.0, 1.0, chi, nbose, 0.01, nstep=nstep, compress = False)
         timings_SOP.append(m)
-        stdevs_SOP.append(std)
+        stdevs_SOP.append(std/np.sqrt(nstep))
         print(nb, timings_hSOP[-1], stdevs_hSOP[-1], timings_SOP[-1], stdevs_SOP[-1])
 
-    plt.figure(1)
-    plt.loglog(Nbs, timings_hSOP)
-    plt.loglog(Nbs, timings_SOP)
-    plt.show()
+    h5 = h5py.File("bath_size_scaling_SOP.h5", 'w')
+    h5.create_dataset('Nbs', data=np.array(Nbose))
+    h5.create_dataset('mean', data=np.array(timings_SOP))
+    h5.create_dataset('stderr', data=np.array(stdevs_SOP))
+    h5.close()
 
 bath_size_scaling_SOP_vs_hSOP()

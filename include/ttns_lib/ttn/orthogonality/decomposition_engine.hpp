@@ -18,16 +18,16 @@ enum truncation_mode
 
 
 //TODO: Need to fix the code so that it can handle weird the case of (1(7(7))(1(X))). 
-template <typename T, typename backend=blas_backend, bool use_divide_and_conquer = true>
+template <typename T, typename backend=linalg::blas_backend, bool use_divide_and_conquer = true>
 class decomposition_engine
 {
 public:
     using real_type = typename tmp::get_real_type<T>::type;
     using size_type = typename backend::size_type;
-    using matrix_type = matrix<T, backend>;
-    using dmat_type = diagonal_matrix<real_type, backend>;
-    using dmat_host_type = diagonal_matrix<real_type>;
-    using svd_engine = singular_value_decomposition<matrix_type, use_divide_and_conquer>;
+    using matrix_type = linalg::matrix<T, backend>;
+    using dmat_type = linalg::diagonal_matrix<real_type, backend>;
+    using dmat_host_type = linalg::diagonal_matrix<real_type>;
+    using svd_engine = linalg::singular_value_decomposition<matrix_type, use_divide_and_conquer>;
 public:
     decomposition_engine() {}
     decomposition_engine(const decomposition_engine& o) = default;
@@ -197,7 +197,7 @@ public:
                 //a rectangular matrix and so now we resize and zero pad the U and S matrices to make sure everything is correct.
                 if(A.shape(0) < A.shape(1))
                 {       
-                    CALL_AND_HANDLE(pad_buffer(A, U, A.shape(1)), "Failed to pad buffer");
+                    CALL_AND_HANDLE(pad_buffer(A, U, m_s, A.shape(1)), "Failed to pad buffer");
                 }
                 CALL_AND_HANDLE(V = m_s*m_temp, "Failed to assign rb matrix.");
             }
@@ -211,7 +211,7 @@ public:
                 if(A.shape(0) < A.shape(1))
                 {       
                     //if the shape is less than bond dimension then we pad up to bond-dimension in size - we don't do the full padding
-                    CALL_AND_HANDLE(pad_buffer(A, U, A.shape(1)), "Failed to pad buffer");
+                    CALL_AND_HANDLE(pad_buffer(A, U, m_s, A.shape(1)), "Failed to pad buffer");
                 }
                 CALL_AND_HANDLE(truncateU(U, bond_dimension), "Failed to truncate U matrix.");
                 CALL_AND_HANDLE(truncateV(m_temp, bond_dimension), "Failed to truncate U matrix.");
@@ -236,9 +236,127 @@ public:
         }
     }
 
+
+    template <typename Atype, typename Utype, typename Vtype, typename Stype>
+    size_type operator()(const Atype& A, Utype& U, Vtype& V, Stype& S, real_type tol = real_type(0), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation, bool save_shost = false)
+    {
+        try
+        {
+            //check that the temporary arrays have the correct capacity
+            ASSERT(V.size() <= m_temp.capacity(), "The temporary matrix does not have sufficient capacity.");
+            ASSERT(A.shape(1) <= m_s.capacity(), "The matrix of singular values does not have sufficient capacity.");
+
+            CALL_AND_HANDLE(S.resize(A.shape(1), A.shape(1)), "Failed to resize S matrix.");
+            CALL_AND_HANDLE(m_temp.resize(V.shape()), "Failed to resize temporary V matrix to ensure it has the correct shape.");
+            CALL_AND_HANDLE(m_svd(A, S, U, m_temp, A.shape(0) < A.shape(1)), "Failed when evaluating the decomposition.")
+
+            //determine the bond dimension to retain given the user specified tol and nchi arrays
+            size_type bond_dimension = S.size();
+            if(nchi > 0)
+            {
+                bond_dimension = std::min(nchi, bond_dimension);
+            }
+            real_type snorm = 0.0;
+            if(tol > real_type(0))
+            {   
+                CALL_AND_HANDLE(m_shost = S, "Failed to copy singular values to host.");
+                size_type nb = 0;
+
+                if(rel_truncate)
+                {
+                    for(size_type i = 0; i < bond_dimension; ++i)
+                    {
+                        snorm += m_shost(i, i)*m_shost(i, i);
+                    }
+                    snorm = std::sqrt(snorm);
+                }
+                else{snorm = 1.0;}
+
+                if(trunc_mode == truncation_mode::singular_values_truncation)
+                {
+                    for(size_type i = 0; i < bond_dimension; ++i)
+                    {
+                        if(std::abs(m_shost(i, i)) > tol*snorm){++nb;}
+                    }
+                }
+                else if(trunc_mode == truncation_mode::weight_truncation)
+                {
+                    real_type discarded_weight = 0;
+                    nb = bond_dimension;
+                    for(size_type i = 0; i < bond_dimension; ++i)
+                    {
+                        size_type ind = bond_dimension-(i+1);
+                        discarded_weight += m_shost(ind, ind)*m_shost(ind, ind);
+                        if(discarded_weight > tol*snorm)
+                        {
+                            nb = ind+1;
+                            break;
+                        }
+                    }
+                }
+        
+                nb = std::max(size_type(1), nb);
+                bond_dimension = std::min(nb, bond_dimension);
+            }
+            else if(save_shost)
+            {
+                CALL_AND_HANDLE(m_shost = S, "Failed to copy singular values to host.");
+            }
+
+          
+            if(A.shape(1) > 1 && A.shape(0) > 1)
+            {
+                if(bond_dimension < 2){bond_dimension = 2;}
+            }
+
+            if(S.size(0) == bond_dimension && S.size(1) == bond_dimension)  
+            {
+                //if A.shape(0) < A.shape(1) then the resultant U matrix is the square matrix.  For our implementation this matrix must be 
+                //a rectangular matrix and so now we resize and zero pad the U and S matrices to make sure everything is correct.
+                if(A.shape(0) < A.shape(1))
+                {       
+                    CALL_AND_HANDLE(pad_buffer(A, U, S, A.shape(1)), "Failed to pad buffer");
+                }
+                CALL_AND_HANDLE(V = S*m_temp, "Failed to assign rb matrix.");
+            }
+            ////now handle the case where we need to perform truncation
+            ////first truncate s and temp so that the matrix multiplication can be performed as required
+            else
+            {
+                //if A.shape(0) < A.shape(1) then the resultant U matrix is the square matrix.  For our implementation this matrix must be 
+                //a rectangular matrix and so now we resize and zero pad the U and S matrices to make sure everything is correct.  If we are truncating then
+                //in the case where we are truncating we only pad up to bond_dimension
+                if(A.shape(0) < A.shape(1))
+                {       
+                    //if the shape is less than bond dimension then we pad up to bond-dimension in size - we don't do the full padding
+                    CALL_AND_HANDLE(pad_buffer(A, U, S, A.shape(1)), "Failed to pad buffer");
+                }
+                CALL_AND_HANDLE(truncateU(U, bond_dimension), "Failed to truncate U matrix.");
+                CALL_AND_HANDLE(truncateV(m_temp, bond_dimension), "Failed to truncate U matrix.");
+
+                CALL_AND_HANDLE(V.resize(bond_dimension, V.size(1)), "Failed to resize V array.");
+                S.resize(bond_dimension, bond_dimension);
+
+                CALL_AND_HANDLE(V = S*m_temp, "Failed to compute V");
+            }
+
+            return bond_dimension;
+        }
+        catch(const common::invalid_value& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_NUMERIC("applying the decomposition engine.");
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to apply the decomposition engine.");
+        }
+    }
+
 protected:
-    template <typename Atype, typename Utype>
-    void pad_buffer(const Atype& A, Utype& U, size_type bond_dimension)
+    template <typename Atype, typename Utype, typename Stype>
+    void pad_buffer(const Atype& A, Utype& U, Stype& S, size_type bond_dimension)
     {
         ASSERT(A.size() <= m_temp2.capacity(), "The second temporary matrix does not have sufficient capacity.");
         CALL_AND_HANDLE(m_temp2.resize(A.shape(0), bond_dimension), "Failed to resize the second temporary matrix so that it has the correct shape.");
@@ -259,11 +377,11 @@ protected:
         CALL_AND_HANDLE(U = m_temp2, "Failed to assign the U matrix.");
         
         
-        CALL_AND_HANDLE(m_s.resize(bond_dimension, bond_dimension), "Failed to resize the S matrix.");
+        CALL_AND_HANDLE(S.resize(bond_dimension, bond_dimension), "Failed to resize the S matrix.");
 
         try
         {
-            memfill::fill(m_s.buffer()+A.shape(0), bond_dimension-A.shape(0), real_type(0.0));
+            memfill::fill(S.buffer()+A.shape(0), bond_dimension-A.shape(0), real_type(0.0));
         }
         catch(const std::exception& ex)
         {

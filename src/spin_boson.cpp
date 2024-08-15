@@ -22,6 +22,7 @@
 #include <ttns_lib/operators/multiset_sop_operator.hpp>
 #include <ttns_lib/sweeping_algorithm/tdvp.hpp>
 #include <ttns_lib/sweeping_algorithm/dmrg.hpp>
+#include <ttns_lib/sweeping_algorithm/subspace_expansion/variance_subspace_expansion_engine.hpp>
 
 #include <ttns_lib/sop/models/spin_boson.hpp>
 
@@ -48,9 +49,9 @@ int main(int argc, char* argv[])
         using namespace utils;
         backend_type::initialise();
 
-        if(argc < 9)
+        if(argc < 12)
         {
-            std::cerr << argv[0] << "<N> <alpha> <wc> <s> <beta> <nchi> <nbranch> <nbose> <eps>" << std::endl;
+            std::cerr << argv[0] << " <N> <alpha> <wc> <s> <beta> <nchi> <nbranch> <nbose> <eps> <weight trunc> <svd trunc>" << std::endl;
             return 1;
         }
 
@@ -63,6 +64,8 @@ int main(int argc, char* argv[])
         size_t nbranch = std::atoi(argv[7]);
         size_t mdim = std::atoi(argv[8]);
         real_type eps = std::atof(argv[9]);
+        real_type unocc_trunc = std::atof(argv[10]);
+        real_type svd_trunc = std::atof(argv[11]);
         INIT_TIMER;
 
         {
@@ -104,11 +107,11 @@ int main(int argc, char* argv[])
             SOP<complex_type> sop(1+Nb);
             system_modes sysinf;
 
-            sop += ttns::literal::coeff<complex_type>([eps](real_type t){return eps*std::cos(10*t);})*sOP("sz", 0) + ttns::literal::coeff<complex_type>([delta](real_type t){return (std::fmod(t , 0.2)< 0.1 ? 0.0 : delta);})*sOP("sx", 0);
+            sop += eps*sOP("sz", 0) + delta*sOP("sx", 0);
             for(size_t i = 0; i < Nb; ++i)
             {
                 complex_type gi = g[i];
-                sop +=  ttns::literal::coeff<complex_type>([gi](real_type t){return (std::fmod(t , 0.2)< 0.1 ? 0.0 : std::sqrt(2.0)*gi);})*(sOP("sz", 0)*sOP("q", i+1));
+                sop +=  std::sqrt(2.0)*gi*(sOP("sz", 0)*sOP("q", i+1));
                 sop += w[i]*sOP("n", i+1);
             }
 
@@ -128,10 +131,17 @@ int main(int argc, char* argv[])
             ntree_builder<size_t>::htucker_subtree(topology()[1], sbm.mode_dims(), nbranch, nchi);
             ntree_builder<size_t>::sanitise_tree(topology, false);
 
+            ntree<size_t> capacity;
+            capacity.insert(1);
+            capacity().insert(2); capacity()[0].insert(2);
+            capacity().insert(2);
+            ntree_builder<size_t>::htucker_subtree(capacity()[1], sbm.mode_dims(), nbranch, mdim);
+            ntree_builder<size_t>::sanitise_tree(capacity, false);
+
             std::cout << topology << std::endl;
             std::vector<size_t> zeros(Nb+1);   std::fill(zeros.begin(), zeros.end(), 0);
 
-            ttn<complex_type, backend_type> A(topology);      A.set_state(zeros);
+            ttn<complex_type, backend_type> A(topology, capacity);      A.set_state(zeros);
 
             sop_operator<complex_type, backend_type> sop_op(sop, A, sysinf);
 
@@ -142,22 +152,34 @@ int main(int argc, char* argv[])
             matrix_element<complex_type> mel;//(A, sop_op);
             mel.resize(A, sop_op);
 
-            one_site_tdvp<complex_type, backend_type> sweep(A, sop_op, 16);
+            //sweeping_algorithm<complex_type, backend_type, ttn, tdvp_engine, sop_environment, variance_subspace_expansion> sweep(A, sop_op, {16}, {}, {4, 2});
+            adaptive_one_site_tdvp<complex_type, backend_type> sweep(A, sop_op, 16, 1, 4, 2);
+            //one_site_tdvp<complex_type, backend_type> sweep(A, sop_op, 16);
             sweep.dt() = 0.0025;
             sweep.coefficient() = complex_type(0, 1);
             sweep.krylov_steps() = 1;
+            sweep.minimum_unoccupied() = 1;
+            sweep.unoccupied_threshold() = unocc_trunc;
+            sweep.spawning_threshold() = svd_trunc;
+            sweep.truncation_mode() = orthogonality::truncation_mode::weight_truncation;
             sweep.use_time_dependent_hamiltonian() = true;
             CALL_AND_HANDLE(sweep.prepare_environment(A, sop_op), "Failed to prepare the hamiltonian buffer for evolution.");
 
             std::cout << std::setprecision(16);
             std::cout << 0 << " " << std::real(mel(op, A)) << std::endl;
+            size_t counter = 4;
             for(size_t i = 0; i < 1000; ++i)
             {
+                sweep.maximum_bond_dimension() = counter;
                 auto t1 = std::chrono::high_resolution_clock::now();
                 sweep(A, sop_op);
                 auto t2 = std::chrono::high_resolution_clock::now();
                 auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2-t1);
-                std::cout << (i+1)*sweep.dt() << " " << std::real(mel(op, A)) << " " << duration.count() << std::endl;
+                std::cout << (i+1)*sweep.dt() << " " << std::real(mel(op, A)) << " " << A.maximum_bond_dimension() << " " << duration.count() << std::endl;
+                if(i%100 == 0)
+                {
+                    counter += 1;
+                }
             }
             return 0;
         }

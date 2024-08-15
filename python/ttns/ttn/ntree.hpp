@@ -263,6 +263,10 @@ void init_ntree_builder(py::module &m)
                    )
         .def_static(
                         "mps_subtree", 
+                        static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, size_t&&, size_t&&)>(ntree_builder<T>::mps_subtree)
+                   )
+        .def_static(
+                        "mps_subtree", 
                         static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, const std::function<size_t(size_t)>&)>(ntree_builder<T>::mps_subtree)
                    )
         .def_static(

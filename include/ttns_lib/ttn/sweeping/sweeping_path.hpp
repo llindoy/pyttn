@@ -69,7 +69,6 @@ public:
                 }
                 else if(i+1 != ntraversal_sites)
                 {
-                    std::cerr << i << " " << ntraversal_sites << std::endl;
                     RAISE_EXCEPTION("Critical Error: This condition should never be meet");
                 }
 

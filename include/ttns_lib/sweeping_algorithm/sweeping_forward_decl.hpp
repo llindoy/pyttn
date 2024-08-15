@@ -87,6 +87,8 @@ public:
 
     using hnode = typename ttn_type::node_type;
     using mat_type = linalg::matrix<T, backend>;
+    using bond_matrix_type = typename ttn_type::bond_matrix_type;
+    using population_matrix_type = typename ttn_type::population_matrix_type;
 
     using buffer_type = typename environment_type::buffer_type;
 
@@ -99,22 +101,22 @@ public:
     single_site& operator=(const single_site& o) = default;
     single_site& operator=(single_site&& o) = default;
     
-    void initialise(const ttn_type&, const env_container_type&){}
-    static inline void initialise(const ttn_type&, const env_container_type&, const parameter_list&){}
-    static inline void initialise(const ttn_type&, const env_container_type&, parameter_list&&){}
+    void initialise(const ttn_type&, const env_type&){}
+    static inline void initialise(const ttn_type&, const env_type&, const parameter_list&){}
+    static inline void initialise(const ttn_type&, const env_type&, parameter_list&&){}
     void clear(){}
 
 
     //perform the subspace expansion as we are moving down a tree.  This requires us to evaluate the optimal functions to add 
     //into A2.  For A1 they will be overwriten by the r matrix in the next step so we just 
     //here the A1 and A2 tensors must be left and right orthogonal respectively with the non-orthogonal component stored in r
-    bool subspace_expansion_down(hnode& /* A1 */, hnode& /* A2 */, env_node_type& /* h */, const env_type& /* op */, environment_type& /* env */)
+    bool subspace_expansion_down(hnode& /* A1 */, hnode& /* A2 */, const bond_matrix_type& /* r */, const population_matrix_type& /* s */, env_node_type& /* h */, const env_type& /* op */, environment_type& /* env */, std::mt19937& /* rng */)
     {
         return false;
     }
 
     //here the A1 and A2 tensors must be left and right orthogonal respectively with the non-orthogonal component stored in r
-    bool subspace_expansion_up(hnode& /* A1 */, hnode& /* A2 */, env_node_type& /* h */, const env_type& /* op */, environment_type& /* env */)
+    bool subspace_expansion_up(hnode& /* A1 */, hnode& /* A2 */, const bond_matrix_type& /* r */, const population_matrix_type& /* s */, env_node_type& /* h */, const env_type& /* op */, environment_type& /* env */, std::mt19937& /* rng */)
     {
         return false;
     }

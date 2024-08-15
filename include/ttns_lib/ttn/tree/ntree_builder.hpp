@@ -294,8 +294,17 @@ protected:
                 //set the child node data to the minimum of the two nodes data
                 if(curr_node->m_data < child_node->m_data){child_node->m_data = curr_node->m_data;}
 
+                //decrement the subtree size associated with the ancestor nodes of the current node
+                node_type* q = curr_node;
+                while(!q->is_root())
+                {
+                    q = q->m_parent;
+                    q->m_size -= 1;
+                }
+
                 if(!is_root){curr_node->m_parent->m_children[index] = child_node;}
 
+                
                 curr_node->m_children[0] = nullptr;
                 curr_node->m_parent = nullptr;
 
@@ -496,8 +505,9 @@ public:
         CALL_AND_HANDLE(degenerate_subtree(root, Nleaves, std::forward<Func>(fl), linds), "Failed to build balanced sub tree.");
         for(size_type i = 0; i < linds.size(); ++i)
         {
-            size_type ind  = root.at(linds[i]).insert(Hb[i]);
-            root.at(linds[i])[ind].insert(Hb[i]);
+            size_t ni = linds.size()-(i+1);
+            size_type ind  = root.at(linds[ni]).insert_front(Hb[ni]);
+            root.at(linds[ni])[ind].insert(Hb[ni]);
         }
     }
 
@@ -509,8 +519,9 @@ public:
         CALL_AND_HANDLE(degenerate_subtree(root, Nleaves, std::forward<Func>(fl), linds), "Failed to build balanced sub tree.");
         for(size_type i = 0; i < linds.size(); ++i)
         {
-            size_type ind  = root.at(linds[i]).insert(evaluate_value(f2, i));
-            root.at(linds[i])[ind].insert(Hb[i]);
+            size_t ni = linds.size()-(i+1);
+            size_type ind  = root.at(linds[ni]).insert_front(evaluate_value(f2, ni));
+            root.at(linds[ni])[ind].insert(Hb[ni]);
         }
     }
 };

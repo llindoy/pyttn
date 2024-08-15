@@ -16,6 +16,7 @@ class leaf_to_root_decomposition_engine
     using hdata = ttn_node_data<T, backend>;
     using mat = linalg::matrix<T, backend>;
     using real_type = typename tmp::get_real_type<T>::type;
+    using dmat = linalg::diagonal_matrix<real_type, backend>;
     using size_type = typename backend::size_type;
 public:
     //the base functions for acting on the underlying hdata objects
@@ -67,6 +68,20 @@ public:
         return bond_dimension;
     }    
 
+    //A = U R
+    template <typename engine>
+    static inline size_type evaluate(engine& eng, const hdata& a, mat& U, mat& R, dmat& S, real_type tol = real_type(0), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation, bool save_svd = false)
+    {
+        const auto& A = a.as_matrix();   
+        ASSERT(A.size() <= U.capacity(), "The U matrix is not the same size as the input matrix."); 
+        ASSERT(a.hrank()*a.hrank() <= R.capacity(), "The R matrix is not large enough to store the result of the decomposition.");
+        
+        CALL_AND_HANDLE(U.resize(A.shape(0), A.shape(1)), "Failed when resizing the U matrix so that it has the correct shape.");
+        CALL_AND_HANDLE(R.resize(A.shape(1), A.shape(1)), "Failed when resizing the R matrix so that it has the correct shape.");
+        size_type bond_dimension = 0;
+        CALL_AND_HANDLE(bond_dimension = eng(A, U, R, S, tol, nchi, rel_truncate, trunc_mode, save_svd), "Failed when using the decomposition engine to evaluate the decomposition.");
+        return bond_dimension;
+    }    
 
     template <typename engine>
     static inline void evaluate(engine& eng, const hdata& A)

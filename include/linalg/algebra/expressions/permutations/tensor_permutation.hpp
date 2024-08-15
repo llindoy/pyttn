@@ -31,7 +31,6 @@ public:
     tensor_permutation_3_expression() = delete;
     tensor_permutation_3_expression(const tensor_type& arr, size_type permind, const value_type& alpha = value_type(1.0)) : base_type(shape_type{{0,0,0}}), m_arr(arr), m_alpha(alpha), m_perm_ind(permind)
     {
-        std::cout << permind << std::endl;
         ASSERT(permind < 3, "Failed to construct tensor_permutation_3_expression object.  The selected permutation index is out of bounds.");
         switch(permind)
         {

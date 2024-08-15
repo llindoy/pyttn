@@ -250,6 +250,38 @@ public:
     static inline void copy(const T* src, size_type n, T* dest){std::copy_n(src, n, dest);}
 
     template <typename T> 
+    static inline void rank_3_strided_copy(const T* src, size_type n1, size_type n2, size_type n3, T* dest, size_type n4)
+    {
+        for(size_type i = 0; i < n1; ++i)
+        {
+            for(size_type j = 0; j < n2; ++j)
+            {
+                for(size_type k=0; k< n3; ++k)
+                {
+                    dest[(i*n4+j)*n3+k] = src[(i*n2+j)*n3+k];
+                }
+            }
+        }
+    }
+
+    template <typename T> 
+    static inline void rank_3_strided_append(const T* pad, size_type n1, size_type n2, size_type n3, size_type iadd, T* dest, size_type n4)
+    {
+        for(size_type i = 0; i < n1; ++i)
+        {
+            for(size_type j = 0; j < iadd; ++j)
+            {
+                size_type aj = j + n2;
+                for(size_type k=0; k< n3; ++k)
+                {
+                    dest[(i*n4+aj)*n3+k] = pad[(j*n1+i)*n3+k];
+                }
+            }
+
+        }
+    }
+
+    template <typename T> 
     static inline void assign(const T* src, size_type n, T* dest, T beta = T(0))
     {
         if(beta == T(0))

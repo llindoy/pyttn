@@ -110,6 +110,7 @@ void init_ttn(py::module &m, const std::string& label)
 
         .def("bond_dimensions", &_ttn::bond_dimensions)
         .def("bond_dimensions", [](const _ttn& o){typename _ttn::hrank_info res;  o.bond_dimensions(res);   return res;})
+        .def("bond_dimensions", [](const _ttn& o, typename _ttn::hrank_info& res){;  o.bond_dimensions(res);})
         .def("reset_orthogonality", &_ttn::reset_orthogonality)
         .def("reset_orthogonality_centre", &_ttn::reset_orthogonality_centre)
 

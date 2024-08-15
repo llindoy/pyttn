@@ -7,6 +7,7 @@ get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTO
 option(USE_CUDA "Compile with cuda" OFF)
 option(USE_OPENMP "Compile with openmp" OFF)
 option(USE_GEMM3M "Compile with openmp" OFF)
+option(EVAL_BUT_DONT_APPLY "Compile with eval but don't apply option set" OFF)
 
 set(PYTHON_BINDINGS_SRC pythonBinding.cpp 
           utils/orthopol.cpp utils/discretisation.cpp
@@ -18,12 +19,13 @@ set(PYTHON_BINDINGS_SRC pythonBinding.cpp
           ttns/algorithms/tdvp.cpp ttns/algorithms/dmrg.cpp
           )
 
+
 if(COMPILER_SET)
 else()
     if(MSVC)
         message(FATAL_ERROR "Request MSVC compiler.  I don't know how this works so exiting.")
     else()
-        set(CMAKE_CXX_FLAGS "-O3 -Wall -g -Wextra -Wshadow -pedantic -Wold-style-cast")
+        set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Wshadow -pedantic -Wold-style-cast")
         option(WITH_WERROR "Compile with '-Werror' C++ compiler flag" ON)
         if(WITH_WERROR)
             #set(CMAKE_CXX_FLAGS "-Werror ${CMAKE_CXX_FLAGS}")
@@ -31,7 +33,7 @@ else()
 
         #additional compilation flags for GNU compilers
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcx-fortran-rules")
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcx-fortran-rules -march=native -mtune=native")
             if(USE_OPENMP)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
             endif()
@@ -108,9 +110,16 @@ add_definitions(-DPYBIND11)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 message(STATUS "${PYTHON_BINDINGS_SRC}")
-pybind11_add_module(_pyttn ${PYTHON_BINDINGS_SRC})
+pybind11_add_module(_pyttn THIN_LTO ${PYTHON_BINDINGS_SRC})
 target_include_directories(_pyttn PUBLIC ${TTNS_INCLUDE_DIRECTORIES})
 target_link_libraries(_pyttn PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 
+set_target_properties(_pyttn PROPERTIES
+                            INTERPROCEDURAL_OPTIMIZATION ON
+                            VISIBILITY_INLINES_HIDDEN ON)
+if(EVAL_BUT_DONT_APPLY)
+  target_compile_definitions(_pyttn PUBLIC ALLOW_EVAL_BUT_DONT_APPLY=0)
+endif()
+
 install(
     TARGETS _pyttn
     DESTINATION ${CMAKE_INSTALL_PREFIX}

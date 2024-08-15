@@ -31,14 +31,12 @@ def discretise_bath(Nb, alpha, wc, s, beta = None, Nw = 10, moment_scaling=2, at
 
     return np.array(g), np.array(w), renorm
 
-def spin_boson_test(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep = 1, degree = 2, compress = True):
-    g, w = discretise_bath(Nb, alpha, wc, s, beta=beta)
-    plt.plot(w, g*g)
-    plt.show()
+def spin_boson_test(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep = 1, degree = 2, compress = True, adaptive=False):
+    g, w, renorm = discretise_bath(Nb, alpha, wc, s, beta=beta)
 
-
-    sbg = models.spin_boson(2*eps, 2*delta, w, g, geom="star")
-    sbg.mode_dims = [nbose for i in range(Nb)]
+    sbg = models.spin_boson(2*eps, 2*delta*renorm, w, g, geom="star")
+    mode_dims = [nbose for i in range(Nb)]
+    sbg.mode_dims = mode_dims
     H = sbg.hamiltonian()
     sysinf = sbg.system_info()
 
@@ -46,10 +44,23 @@ def spin_boson_test(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nst
     topo = ntree("(1(2(2))(2))")
     
     #and add the node that forms the root of the bath
-    ntreeBuilder.mlmctdh_subtree(topo()[1], sbg.mode_dims, degree, chi)
+    if(degree > 1):
+        ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi)
+    else:
+        ntreeBuilder.mps_subtree(topo()[1], mode_dims, chi, nbose)
     ntreeBuilder.sanitise(topo)
 
-    A = ttn(topo, dtype=np.complex128)
+    #construct the topology tree 
+    capacity = ntree("(1(2(2))(2))")
+    
+    #and add the node that forms the root of the bath
+    if(degree > 1):
+        ntreeBuilder.mlmctdh_subtree(capacity()[1], mode_dims, degree, chi+8)
+    else:
+        ntreeBuilder.mps_subtree(capacity()[1], mode_dims, chi+8, min(chi+8, nbose))
+    ntreeBuilder.sanitise(capacity)
+
+    A = ttn(topo, capacity, dtype=np.complex128)
     A.set_state([0 for i in range(Nb+1)])
 
     h = sop_operator(H, A, sysinf, compress=compress)
@@ -61,9 +72,18 @@ def spin_boson_test(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nst
         sysinf
     )
 
-    sweep = tdvp(A, h, krylov_dim = 12)
+    sweep = None
+    if not adaptive:
+        sweep = tdvp(A, h, krylov_dim = 12)
+    else:
+        sweep = tdvp(A, h, krylov_dim = 12, expansion='subspace')
+        sweep.spawning_threshold = 1e-5
+        sweep.unoccupied_threshold=1e-4
+        sweep.minimum_unoccupied=1
+        sweep.eval_but_dont_apply=True
+
     sweep.dt = dt
-    sweep.coefficient = 1.0j
+    sweep.coefficient = -1.0j
     sweep.prepare_environment(A, h)
 
     timings = np.zeros(nstep)

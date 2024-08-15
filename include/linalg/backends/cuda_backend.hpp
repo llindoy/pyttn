@@ -546,6 +546,18 @@ public:
 
 
     template <typename T> 
+    static inline void rank_3_strided_copy(const T* src, size_type n1, size_type n2, size_type n3, T* dest, size_type n4)
+    {
+        RAISE_EXCEPTION("rank 3 strided copy has not been implemented for cuda backend");
+    }
+
+    template <typename T> 
+    static inline void rank_3_strided_copy(const T* src, size_type n1, size_type n2, size_type n3, T* src2, size_type iadd, T* dest, size_type n4)
+    {
+        RAISE_EXCEPTION("rank 3 strided copy has not been implemented for cuda backend");
+    }
+
+    template <typename T> 
     static inline void assign(const T* src, size_type n, T* dest, T beta = T(0))
     {
         ASSERT(_environment.is_initialised(), "cuda backend addition_assign_real_to_complex operation failed.  The cuda environment has not yet been initialised.");

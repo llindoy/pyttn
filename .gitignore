@@ -6,3 +6,4 @@ build*
 pyttn
 bin
 temp
+*.h5

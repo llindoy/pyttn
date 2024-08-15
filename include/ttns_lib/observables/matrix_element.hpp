@@ -215,7 +215,7 @@ public:
                         const auto& p = psi[ind]; auto& mel = m_matel[ind]; auto& is_id = m_is_identity[ind];       
                         update_expectation_value(p, set_index, mel, r, is_id, m_buf);
                     }
-                    CALL_AND_HANDLE(retval += real(gather_result(m_matel[0]()[r])), "Failed to return result.");
+                    CALL_AND_HANDLE(retval += linalg::real(gather_result(m_matel[0]()[r])), "Failed to return result.");
                 }
             }
             else
@@ -227,7 +227,7 @@ public:
                         const auto& p = std::get<0>(z); auto& mel = std::get<1>(z); auto& is_id = std::get<2>(z); 
                         update_expectation_value(p, set_index, mel, r, is_id, m_buf);
                     }
-                    CALL_AND_HANDLE(retval += real(gather_result(m_matel[0]()[r])), "Failed to return result.");
+                    CALL_AND_HANDLE(retval += linalg::real(gather_result(m_matel[0]()[r])), "Failed to return result.");
                 }
             }
             
@@ -538,7 +538,7 @@ public:
                     {
                         CALL_AND_HANDLE(this->compute_norm_internal(psi, true, set_index, 0), "Failed to compute norm of diagonal term.");
                         T val(0);
-                        CALL_AND_HANDLE(val += real(gather_result(m_matel[0]()[0])), "Failed to return result.");
+                        CALL_AND_HANDLE(val += linalg::real(gather_result(m_matel[0]()[0])), "Failed to return result.");
                         retval += Eshift*val;
                     }
                     else

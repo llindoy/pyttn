@@ -423,7 +423,7 @@ public:
 
         size_type ind = m_children.size();
         m_children.insert(m_children.begin(), p);
-        return ind;
+        return 0;
     }  
 
     size_type insert_front(const value_type& src = value_type())
@@ -455,7 +455,7 @@ public:
         m_children.insert(m_children.begin(), p);
         p = nullptr;
         q = nullptr;
-        return ind;
+        return 0;
     }
 
 

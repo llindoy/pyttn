@@ -188,7 +188,7 @@ public:
                 size_type istart = 0;
                 size_type iend = krylov_dim;
                 bool keep_running = true;
-                size_type iend_start = std::min(size_type(2), krylov_dim);
+                size_type iend_start = 2 < krylov_dim ? 2 : krylov_dim;
 
                 for(iend = iend_start; iend < krylov_dim+istride && keep_running; iend+=istride)
                 {

@@ -7,6 +7,7 @@
 #include "../tree/tree.hpp"
 #include "../tree/tree_node.hpp"
 #include "../tree/ntree.hpp"
+#include "ttn_node_helper.hpp"
 
 #include <vector>
 #include <stdexcept>
@@ -14,14 +15,12 @@
 
 namespace ttns
 {
-using namespace linalg;
-
 
 template <typename T, typename backend = linalg::blas_backend>
-class ttn_node_data : public matrix<T, backend> 
+class ttn_node_data : public linalg::matrix<T, backend> 
 {
 public:
-    using matrix_type = matrix<T, backend>;
+    using matrix_type = linalg::matrix<T, backend>;
     using size_type = typename backend::size_type;
     using real_type = typename tmp::get_real_type<T>::type;
 
@@ -33,14 +32,13 @@ protected:
     friend tree_node<tree_base<ttn_node_data<T, backend> > >;
     friend tree_node<tree_base<std::vector<ttn_node_data<T, backend> > > >;
 
-
 public:
     ttn_node_data() : matrix_type(), m_mode_dims(), m_mode_capacity(), m_max_hrank(0), m_max_dimen(0) {}
     ttn_node_data(ttn_node_data&& o) = default;
     ttn_node_data(const ttn_node_data& o) : matrix_type()
     {
         CALL_AND_HANDLE(matrix_type::allocate(o.max_dimen(), o.max_hrank()), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
-        CALL_AND_HANDLE(matrix_type::operator=(static_cast<const matrix<T, backend>&>(o)), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
+        CALL_AND_HANDLE(matrix_type::operator=(static_cast<const linalg::matrix<T, backend>&>(o)), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
         m_mode_dims = o.m_mode_dims;
         m_mode_capacity = o.m_mode_capacity;
         m_max_hrank = o.m_max_hrank;
@@ -53,7 +51,7 @@ public:
         {
             CALL_AND_HANDLE(matrix_type::reallocate(o.max_dimen(), o.max_hrank()), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
         }
-        CALL_AND_HANDLE(matrix_type::operator=(static_cast<const matrix<T, backend>&>(o)), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
+        CALL_AND_HANDLE(matrix_type::operator=(static_cast<const linalg::matrix<T, backend>&>(o)), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
         m_mode_dims = o.m_mode_dims;
         m_mode_capacity = o.m_mode_capacity;
         m_max_hrank = o.m_max_hrank;
@@ -70,7 +68,7 @@ public:
             CALL_AND_HANDLE(matrix_type::reallocate(o.max_dimen(), o.max_hrank()), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
         }
 
-        CALL_AND_HANDLE(matrix_type::operator=(static_cast<const matrix<U, be>&>(o)), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
+        CALL_AND_HANDLE(matrix_type::operator=(static_cast<const linalg::matrix<U, be>&>(o)), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
         m_mode_dims = o.dims();
         m_mode_capacity = o.max_dims();
         m_max_hrank = o.max_hrank();
@@ -81,7 +79,7 @@ public:
     ttn_node_data& operator=(ttn_node_data&& o)
     {
         
-        CALL_AND_HANDLE(matrix_type::operator=(std::forward<matrix<T, backend>>(o)), "Failed to move assign ttn_node_data. Failed when applying base type move operator.");
+        CALL_AND_HANDLE(matrix_type::operator=(std::forward<linalg::matrix<T, backend>>(o)), "Failed to move assign ttn_node_data. Failed when applying base type move operator.");
         m_mode_dims = std::move(o.m_mode_dims);
         m_mode_capacity = std::move(o.m_mode_capacity);
         m_max_hrank = o.m_max_hrank;
@@ -90,7 +88,7 @@ public:
     }
 
     template <typename U, typename ube>
-    typename std::enable_if<std::is_convertible<U, T>::value, ttn_node_data&>::type operator=(const matrix<U, ube>& mat)
+    typename std::enable_if<std::is_convertible<U, T>::value, ttn_node_data&>::type operator=(const linalg::matrix<U, ube>& mat)
     {   
         ASSERT(mat.shape() == matrix_type::shape(), "Failed to copy assign ttn_node_data from matrix.  The matrix is not the correct size.")
         CALL_AND_HANDLE(matrix_type::operator=(mat), "Failed to copy assign ttn_node_data from matrix. Failed when applying base type copy operator.");
@@ -172,31 +170,31 @@ public:
     size_type max_dim(size_type n) const{return m_mode_capacity[n];}
     const std::vector<size_type>& max_dims() const{return m_mode_capacity;}
 
-    reinterpreted_tensor<T, 1, backend> as_rank_1(bool use_max_dim = false)
+    linalg::reinterpreted_tensor<T, 1, backend> as_rank_1(bool use_max_dim = false)
     {
         if(!use_max_dim){return this->reinterpret_shape(dimen()*hrank());}
         else{return this->reinterpret_capacity(dimen(use_max_dim)*hrank(use_max_dim));}
     }
 
-    reinterpreted_tensor<const T, 1, backend> as_rank_1(bool use_max_dim = false) const
+    linalg::reinterpreted_tensor<const T, 1, backend> as_rank_1(bool use_max_dim = false) const
     {
         if(!use_max_dim){return this->reinterpret_shape(dimen()*hrank());}
         else{return this->reinterpret_capacity(dimen(use_max_dim)*hrank(use_max_dim));}
     }
     
-    reinterpreted_tensor<T, 2, backend> as_rank_2(bool use_max_dim = false)
+    linalg::reinterpreted_tensor<T, 2, backend> as_rank_2(bool use_max_dim = false)
     {
         if(!use_max_dim){return this->reinterpret_shape(dimen(), hrank());}
         else{return this->reinterpret_capacity(dimen(use_max_dim), hrank(use_max_dim));}
     }
 
-    reinterpreted_tensor<const T, 2, backend> as_rank_2(bool use_max_dim = false) const
+    linalg::reinterpreted_tensor<const T, 2, backend> as_rank_2(bool use_max_dim = false) const
     {
         if(!use_max_dim){return this->reinterpret_shape(dimen(), hrank());}
         else{return this->reinterpret_capacity(dimen(use_max_dim), hrank(use_max_dim));}
     }
 
-    reinterpreted_tensor<T, 3, backend> as_rank_3(size_type mode, bool use_max_dim = false)
+    linalg::reinterpreted_tensor<T, 3, backend> as_rank_3(size_type mode, bool use_max_dim = false)
     {
         try
         {
@@ -237,7 +235,7 @@ public:
         }
     }
 
-    reinterpreted_tensor<const T, 3, backend> as_rank_3(size_type mode, bool use_max_dim = false) const
+    linalg::reinterpreted_tensor<const T, 3, backend> as_rank_3(size_type mode, bool use_max_dim = false) const
     {
         try
         {
@@ -279,7 +277,7 @@ public:
         }
     }
 
-    reinterpreted_tensor<T, 4, backend> as_rank_4(size_type mode)
+    linalg::reinterpreted_tensor<T, 4, backend> as_rank_4(size_type mode)
     {
         ASSERT(mode < nmodes(), "Failed to interpret ttn_node_data as rank 3 tensor.  The mode index is out of bounds.");
         std::array<size_type, 4> shape{{1, dim(mode), 1, hrank()}};
@@ -288,7 +286,7 @@ public:
         return this->reinterpret_shape(shape[0], shape[1], shape[2], shape[3]);
     }
 
-    reinterpreted_tensor<const T, 4, backend> as_rank_4(size_type mode) const
+    linalg::reinterpreted_tensor<const T, 4, backend> as_rank_4(size_type mode) const
     {
         ASSERT(mode < nmodes(), "Failed to interpret ttn_node_data as rank 3 tensor.  The mode index is out of bounds.");
         std::array<size_type, 4> shape{{1, dim(mode), 1, hrank()}};
@@ -304,6 +302,95 @@ public:
     {
         m_mode_dims.clear();
         matrix_type::clear();
+    }
+
+public:
+    std::array<size_t, 3> expand_bond(size_type mode, size_type iadd, matrix_type& temp)
+    {
+        try
+        {
+            CALL_AND_HANDLE(temp.resize(this->shape(0), this->shape(1)), "Failed to resize temporary array.");
+            CALL_AND_HANDLE(temp = this->as_matrix(), "Failed to copy array into temporary buffer.");
+
+            auto atens = this->as_rank_3(mode);
+            std::array<size_t, 3> _shape = atens.shape();
+            if(mode == this->nmodes())
+            {
+                this->resize(this->hrank()+iadd, this->dims());
+            }
+            else
+            {
+                auto dims = this->dims();
+                dims[mode] += iadd;
+                this->resize(this->hrank(), dims);
+            }
+            this->as_matrix().fill_zeros();
+            backend::rank_3_strided_copy(temp.buffer(), _shape[0], _shape[1], _shape[2], this->as_matrix().buffer(), _shape[1]+iadd);
+            return _shape;
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to expand tensor.");
+        }
+    }
+
+    void expand_bond(size_type mode, size_type iadd, matrix_type& temp, std::mt19937& rng)
+    {
+        try
+        {
+            std::array<size_t, 3> _shape;
+            CALL_AND_RETHROW(_shape = this->expand_bond(mode, iadd, temp));
+
+            //now transform this object into the correct rank 3 tensor
+            auto atens = this->as_rank_3(mode);
+            temp.resize(this->shape(0), this->shape(1));
+            auto ttens = temp.reinterpret_shape(atens.shape(1), atens.shape(0), atens.shape(2));
+            
+            CALL_AND_HANDLE(ttens = linalg::trans(atens, {1, 0, 2}), "Failed to transpose the atens object into utens.");
+            auto tmat = ttens.reinterpret_shape(atens.shape(1), atens.shape(0)*atens.shape(2));
+
+            using orthog = helper::orthogonal_vector<T, backend>;
+            CALL_AND_RETHROW(orthog::pad_random_vectors(tmat, _shape[1], rng));
+
+            //now transpose the results back into the original vector
+            CALL_AND_HANDLE(atens = linalg::trans(ttens, {1, 0, 2}), "Failed to transpose the atens object into utens.");
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to expand tensor.");
+        }
+    }
+
+    template <typename RType>
+    void generate_random_orthogonal(size_type mode, matrix_type& temp, std::mt19937& rng, RType&& r)
+    {
+        auto atens = this->as_rank_3(mode);
+        temp.resize(this->shape(0), this->shape(1));
+        auto ttens = temp.reinterpret_shape(atens.shape(1), atens.shape(0), atens.shape(2));
+        
+        CALL_AND_HANDLE(ttens = linalg::trans(atens, {1, 0, 2}), "Failed to transpose the atens object into utens.");
+        auto tmat = ttens.reinterpret_shape(atens.shape(1), atens.shape(0)*atens.shape(2));
+
+        CALL_AND_HANDLE(r.resize(tmat.shape(1)), "Failed to resize random vector.");
+        using orthog = helper::orthogonal_vector<T, backend>;
+        CALL_AND_RETHROW(orthog::generate_random_vector(tmat, r, rng));
+    }
+
+    void expand_bond(size_type mode, size_type iadd, matrix_type& temp, const matrix_type& pad)
+    {
+        try
+        {
+            std::array<size_t, 3> _shape;
+            CALL_AND_RETHROW(_shape = this->expand_bond(mode, iadd, temp));
+            backend::rank_3_strided_append(pad.buffer(), _shape[0], _shape[1], _shape[2], iadd, this->as_matrix().buffer(), _shape[1]+iadd);
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to expand tensor.");
+        }
     }
 
 #ifdef CEREAL_LIBRARY_FOUND
@@ -344,7 +431,8 @@ public:
 
         linalg::matrix<T, linalg::blas_backend> ct(s2, s1);  ct.fill_zeros();
         ct(0, i) = T(1.0);
-        CALL_AND_RETHROW(pad_random_vectors(ct, rng));
+        using orthog = helper::orthogonal_vector<T, backend>;
+        CALL_AND_RETHROW(orthog::pad_random_vectors(ct, 1, rng));
 
         this->as_matrix() = linalg::trans(ct);
     }
@@ -358,7 +446,8 @@ public:
 
         linalg::matrix<T, linalg::blas_backend> ct(s2, s1);  ct.fill_zeros();
         CALL_AND_HANDLE(ct[0] = psi0, "Failed to assign psi0 in htucker.");
-        CALL_AND_RETHROW(pad_random_vectors(ct, rng));
+        using orthog = helper::orthogonal_vector<T, backend>;
+        CALL_AND_RETHROW(orthog::pad_random_vectors(ct, 1, rng));
 
         this->as_matrix() = linalg::trans(ct);
     }
@@ -375,45 +464,9 @@ public:
         {
             ct(0, i*ns + ((i + 1)%ns)) = 1.0/std::sqrt(ns);
         }
-        CALL_AND_RETHROW(pad_random_vectors(ct, rng));
+        using orthog = helper::orthogonal_vector<T, backend>;
+        CALL_AND_RETHROW(orthog::pad_random_vectors(ct, 1, rng));
         this->as_matrix() = linalg::trans(ct);
-    }
-
-    static void pad_random_vectors(linalg::matrix<T, linalg::blas_backend>& ct, std::mt19937& rng)
-    {
-        std::uniform_real_distribution<real_type> dist(0, 2.0*acos(real_type(-1.0)));
-        std::normal_distribution<real_type> length_dist(0, 1);
-        for(size_type i=1; i<ct.shape(0); ++i)
-        {
-            bool vector_generated = false;
-        
-            while(!vector_generated)
-            {
-                //generate a random vector
-                for(size_type j=0; j<ct.shape(1); ++j)
-                {
-                    ct(i, j) = length_dist(rng);
-                }
-
-                //now we normalise it
-                ct[i] /= sqrt(dot_product(conj(ct[i]), ct[i]));
-
-                //now we attempt to modified gram-schmidt this
-                //if we run into linear dependence then we need to try another random vector
-                for(size_type j=0; j < i; ++j)
-                {
-                    ct[i] -= dot_product(conj(ct[j]), ct[i])*ct[j];
-                }
-
-                //now we compute the norm of the new vector
-                real_type norm = sqrt(real(dot_product(conj(ct[i]), ct[i])));
-                if(norm > 1e-12)
-                {
-                    ct[i] /= norm;
-                    vector_generated = true;
-                }
-            }
-        }
     }
 
     static void query_node_sizes(const ttn_node_data<T, backend>& a, std::array<size_type, 3>& sizes, bool is_leaf = false)
@@ -548,11 +601,11 @@ protected:
     }
 };
 
-template <typename T, typename backend, typename = typename std::enable_if<std::is_same<backend, blas_backend>::value, void>::type> 
+template <typename T, typename backend, typename = typename std::enable_if<std::is_same<backend, linalg::blas_backend>::value, void>::type> 
 std::ostream& operator<<(std::ostream& os, const ttn_node_data<T, backend>& t)
 {
     os << "dims: " << "[ ";     for(size_t i=0; i<t.nmodes(); ++i){os << t.dim(i) << (i+1 != t.nmodes() ? ", " : "]");}    os << std::endl;
-    os << static_cast<const matrix<T, backend>&>(t) << std::endl;
+    os << static_cast<const linalg::matrix<T, backend>&>(t) << std::endl;
     return os;
 }
 
@@ -572,7 +625,7 @@ template <template <typename, typename> class node_data_type, typename T, typena
 class ttn_node_helper
 {
 public:
-    using matrix_type = matrix<T, backend>;
+    using matrix_type = linalg::matrix<T, backend>;
     using value_type = node_data_type<T, backend>;
     using tree_type = tree_base<value_type>;
     using base_type = tree_node_base<tree_type>;
@@ -615,7 +668,7 @@ public:
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
-                r2l_core::evaluate(orth.eng(omp_get_thread_num()), A.dataview(i), orth.U(i), orth.R(i), orth.work(i), mode, tol, nchi, true, orth.truncation_mode(), save_svd), 
+                r2l_core::evaluate(orth.eng(omp_get_thread_num()), A.dataview(i), orth.U(i), orth.R(i), orth.S(i), orth.work(i), mode, tol, nchi, true, orth.truncation_mode(), save_svd), 
                 "Failed to compute the root to leaf decomposition for a node."
             );
         }
@@ -631,7 +684,7 @@ public:
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
-                l2r_core::evaluate(orth.eng(omp_get_thread_num()), A.dataview(i), orth.U(i), orth.R(i), tol, nchi, true, orth.truncation_mode(), save_svd), 
+                l2r_core::evaluate(orth.eng(omp_get_thread_num()), A.dataview(i), orth.U(i), orth.R(i), orth.S(i), tol, nchi, true, orth.truncation_mode(), save_svd), 
                 "Failed to evaluate the leaf_to_root_decomposition for a given node."
             );
         }
@@ -735,7 +788,7 @@ public:
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
-                r2l_core::evaluate(orth.eng(omp_get_thread_num()), A.dataview(i), orth.U(i), orth.R(i), orth.work(i), mode, tol, nchi, true, orth.truncation_mode(), save_svd), 
+                r2l_core::evaluate(orth.eng(omp_get_thread_num()), A.dataview(i), orth.U(i), orth.R(i), orth.S(i), orth.work(i), mode, tol, nchi, true, orth.truncation_mode(), save_svd), 
                 "Failed to compute the root to leaf decomposition for a node."
             );
 
@@ -756,7 +809,7 @@ public:
         for(size_type i = 0; i < A.nset(); ++i)  
         {
             CALL_AND_HANDLE(
-                l2r_core::evaluate(orth.eng(omp_get_thread_num()), A.dataview(i), orth.U(i), orth.R(i), tol, nchi, true, orth.truncation_mode(), save_svd), 
+                l2r_core::evaluate(orth.eng(omp_get_thread_num()), A.dataview(i), orth.U(i), orth.R(i), orth.S(i), tol, nchi, true, orth.truncation_mode(), save_svd), 
                 "Failed to evaluate the leaf_to_root_decomposition for a given node."
             );
 
@@ -776,9 +829,9 @@ template <typename T, typename backend>
 class tree_node<tree_base<ttn_node_data<T, backend> > > : 
     public tree_node_base<tree_base<ttn_node_data<T, backend> > >
 {
-    static_assert(std::is_base_of<backend_base, backend>::value, "The second template argument to the ttn_node object must be a valid backend.");
+    static_assert(std::is_base_of<linalg::backend_base, backend>::value, "The second template argument to the ttn_node object must be a valid backend.");
 public:
-    using matrix_type = matrix<T, backend>;
+    using matrix_type = linalg::matrix<T, backend>;
     using value_type = ttn_node_data<T, backend>;
     using tree_type = tree_base<value_type>;
     using base_type = tree_node_base<tree_type>;
@@ -789,6 +842,7 @@ public:
     using node_helper = ttn_node_helper<ttn_node_data, T, backend>;
 
     using bond_matrix_type = matrix_type;
+    using population_matrix_type = linalg::diagonal_matrix<real_type, backend>;
 
     using engine_type = orthogonality::decomposition_engine<T, backend, false>;
     using hrank_type = size_type;
@@ -826,6 +880,7 @@ public:
             for(const auto& a : nodes)
             {
                 CALL_AND_HANDLE(r2l_core::resize_r_matrix(a(), m_R, true), "Failed to resize elements of the r tensor.");
+                m_S.resize(m_R.shape(0), m_R.shape(1));
             }
             try
             {
@@ -849,6 +904,7 @@ public:
             m_ortho_engine.clear();
             m_U.clear();
             m_R.clear();
+            m_S.clear();
             m_workspace.clear();
             m_most_recent_node = 0;
             m_maxsize = 0;
@@ -872,18 +928,23 @@ public:
         size_type most_recent_node() const{return m_most_recent_node;}
         size_type& most_recent_node(){return m_most_recent_node;}
 
+        linalg::diagonal_matrix<real_type, backend>& population_matrix(){return m_S;}
         matrix_type& bond_matrix(){return m_R;}
         engine_type& eng(){return m_ortho_engine;}
         matrix_type& work(){return m_workspace;}
         matrix_type& R(){return m_R;}
         matrix_type& U(){return m_U;}
+        linalg::diagonal_matrix<real_type, backend>& S(){return m_S;}
 
+        const linalg::diagonal_matrix<real_type, backend>& population_matrix() const{return m_S;}
         const matrix_type& bond_matrix() const{return m_R;}
         const engine_type& eng() const{return m_ortho_engine;}
         const matrix_type& work() const{return m_workspace;}
         const matrix_type& R() const{return m_R;}
         const matrix_type& U() const{return m_U;}
+        const linalg::diagonal_matrix<real_type, backend>& S() const{return m_S;}
 
+        linalg::diagonal_matrix<real_type, backend>& population_matrix(size_type ){return m_S;}
         matrix_type& bond_matrix(size_type ){return m_R;}
         engine_type& eng(size_type i)
         {       
@@ -893,7 +954,9 @@ public:
         matrix_type& work(size_type ){return m_workspace;}
         matrix_type& R(size_type ){return m_R;}
         matrix_type& U(size_type ){return m_U;}
-        
+        linalg::diagonal_matrix<real_type, backend>& S(size_type ){return m_S;}
+
+        const linalg::diagonal_matrix<real_type, backend>& population_matrix(size_type ) const{return m_S;}
         const matrix_type& bond_matrix(size_type ) const{return m_R;}
         const engine_type& eng(size_type i) const
         {   
@@ -903,6 +966,7 @@ public:
         const matrix_type& work(size_type ) const{return m_workspace;}
         const matrix_type& R(size_type ) const{return m_R;}
         const matrix_type& U(size_type ) const{return m_U;}
+        const linalg::diagonal_matrix<real_type, backend>& S(size_type ) const{return m_S;}
         
         size_type nthreads() const{return 1;}
         bool parallelise() const{return false;}
@@ -910,6 +974,7 @@ public:
         engine_type m_ortho_engine;
         matrix_type m_U;
         matrix_type m_R;
+        linalg::diagonal_matrix<real_type, backend> m_S;
         matrix_type m_workspace;
         size_type m_most_recent_node = 0;
         size_type m_maxsize = 0;
@@ -995,10 +1060,10 @@ public:
     real_type norm() const{auto vec = m_data.as_rank_1();    return std::sqrt(std::real(linalg::dot_product(linalg::conj(vec), vec))); }
 
     template <typename U>
-    typename std::enable_if<is_number<U>::value, self_type&>::type operator*=(const U& u){m_data.as_matrix() *= u;    return *this;    }
+    typename std::enable_if<linalg::is_number<U>::value, self_type&>::type operator*=(const U& u){m_data.as_matrix() *= u;    return *this;    }
 
     template <typename U>
-    typename std::enable_if<is_number<U>::value, self_type&>::type operator/=(const U& u){m_data.as_matrix() /= u;    return *this;    }
+    typename std::enable_if<linalg::is_number<U>::value, self_type&>::type operator/=(const U& u){m_data.as_matrix() /= u;    return *this;    }
 
 public:
     template <typename Itype, typename Atype>

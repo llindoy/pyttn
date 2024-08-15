@@ -61,7 +61,6 @@ def setup_star_hamiltonian(eps, delta, g, w, Nb):
 
     return H, w
 
-
 #setup the chain hamiltonian for the spin boson model - this is the tedopa method
 def setup_chain_hamiltonian(eps, delta, g, w, Nb):
     N = Nb+1
@@ -123,6 +122,10 @@ def setup_ipchain_hamiltonian(eps, delta, g, w, Nb):
 
 import matplotlib.pyplot as plt
 
+def bond_dimension_histogram(bond_dim_info):
+    import collections
+    return collections.Counter(bond_dim_info.values())
+
 
 def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5'):
     g, w, renorm = discretise_bath(Nb, alpha, wc, s, beta=None, Nw=Nw)
@@ -138,7 +141,8 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
     else:
         H, l = setup_star_hamiltonian(eps, delta*renorm, 2*g, w, Nb)
 
-    mode_dims = [min(max(4, int(wc*Ncut/l[i])), nbose) for i in range(Nb)]
+    #mode_dims = [min(max(4, int(wc*Ncut/l[i])), nbose) for i in range(Nb)]
+    mode_dims = [max(nbose, chi) for i in range(Nb)]
     N = Nb+1
     sysinf = system_modes(N)
     sysinf[0] = spin_mode(2)
@@ -146,14 +150,24 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
         sysinf[i+1] = boson_mode(mode_dims[i])
 
 
-    #and add the node that forms the root of the bath
-    topo = ntree("(1(2(2))(2))")
     degree = 2
     #and add the node that forms the root of the bath
-    ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi)
+    topo = ntree("(1(2(2))(2))")
+    if(degree > 1):
+        ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi)
+    else:
+        ntreeBuilder.mps_subtree(topo()[1], sbg.mode_dims, degree, chi)
     ntreeBuilder.sanitise(topo)
+    print(topo)
 
-    A = ttn(topo, dtype=np.complex128)
+    capacity = ntree("(1(2(2))(2))")
+    if(degree > 1):
+        ntreeBuilder.mlmctdh_subtree(capacity()[1], mode_dims, degree, chi*2)
+    else:
+        ntreeBuilder.mps_subtree(capacity()[1], sbg.mode_dims, degree, chi*2)
+    ntreeBuilder.sanitise(capacity)
+
+    A = ttn(topo, capacity, dtype=np.complex128)
     A.set_state([0 for i in range(Nb+1)])
 
     h = sop_operator(H, A, sysinf)
@@ -165,23 +179,40 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
         sysinf
     )
 
-    sweep = tdvp(A, h, krylov_dim = 12)
+    sweep = tdvp(A, h, krylov_dim = 12)#, subspace_krylov_dim=8, subspace_neigs = 2, expansion='subspace')
     sweep.dt = dt
     sweep.coefficient = -1.0j
+    #sweep.spawning_threshold = 1e-5
+    #sweep.unoccupied_threshold=1e-4
+    #sweep.minimum_unoccupied=1
+    #sweep.only_apply_when_no_unoccupied=True
+    #sweep.eval_but_dont_apply=True
 
     if(geom == 'ipchain'):
         sweep.use_time_dependent_hamiltonian = True
 
     res = np.zeros(nstep+1)
 
+    bdims = A.bond_dimensions()
+    d = bond_dimension_histogram(bdims)
     res[0] = np.real(mel(op, A, A))
+
+    fig, ax = plt.subplots(nrows=1, ncols=1)
+    ax.scatter(d.keys(), d.values())
+    ax.set_xlim([0, chi])
+    mv = max(d.values())
+    ax.set_ylim([0, mv])
+    num = fig.number
+    plt.ion()
+    bars = None
+
     for i in range(nstep):
         t1 = time.time()
         sweep.step(A, h, dt)
         t2 = time.time()
         res[i+1] = np.real(mel(op, A, A))
 
-        print((i+1)*dt, t2-t1, res[i+1], mel(A))
+        print((i+1)*dt, t2-t1, res[i+1], mel(A), A.maximum_bond_dimension())
         sys.stdout.flush()
 
         if(i % 100):
@@ -189,11 +220,22 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
             h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
             h5.create_dataset('Sz', data=res)
             h5.close()
+            bdims=A.bond_dimensions()
+            d = bond_dimension_histogram(bdims)
+            if(plt.fignum_exists(num)):
+                plt.gcf().canvas.draw()
+                ax.clear()
+                ax.set_xlim([0, chi])
+                ax.set_ylim([0, mv])
+                ax.scatter(d.keys(), d.values())
+                plt.pause(0.01)
 
     h5 = h5py.File(ofname, 'w')
     h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
     h5.create_dataset('Sz', data=res)
     h5.close()
+    plt.ioff()
+    plt.show()
 
 import argparse
 
@@ -205,11 +247,11 @@ if __name__ == "__main__":
     parser.add_argument('--delta', type = float, default=0)
     parser.add_argument('--eps', type = float, default=1)
     parser.add_argument('--chi', type=int, default=16)
-    parser.add_argument('--nbose', type=int, default=20)
+    parser.add_argument('--nbose', type=int, default=10)
     parser.add_argument('--dt', type=float, default=0.005)
     parser.add_argument('--geom', type = str, default='star')
     parser.add_argument('--fname', type=str, default='sbm.h5')
     args = parser.parse_args()
 
     nstep = int(30.0/args.dt)+1
-    sbm_dynamics(300, args.alpha, args.wc, args.s, args.delta, args.eps, args.chi, args.nbose, args.dt, nstep = nstep, geom=args.geom, ofname = args.fname)
+    sbm_dynamics(16, args.alpha, args.wc, args.s, args.delta, args.eps, args.chi, args.nbose, args.dt, nstep = nstep, geom=args.geom, ofname = args.fname)

@@ -12,6 +12,10 @@ from pyttn.utils import orthopol_discretisation
 from numba import jit
 from chain_map import chain_map
 
+#setup a class for combining spin boson modes together
+class spin_boson:
+    def __init__(self, g, w, mode_combination = None):
+
 
 def discretise_bath(Nb, alpha, wc, s, beta = None, Nw = 10, moment_scaling=2, atol=0, rtol=1e-10):
     #the exponential cutoff spectral density
@@ -62,15 +66,81 @@ def setup_star_hamiltonian(eps, delta, g, w, Nb):
     return H, w
 
 
+#setup the chain hamiltonian for the spin boson model - this is the tedopa method
+def setup_chain_hamiltonian(eps, delta, g, w, Nb):
+    N = Nb+1
+
+    t, e = chain_map(g, w)
+
+    H = SOP(N)
+    H += eps*sOP("sz", 0)
+    H += delta*sOP("sx", 0)
+
+    for i in range(Nb):
+        if i == 0:
+            H += np.sqrt(2)*t[i]*sOP("sz", 0) * sOP("q", i+1)
+        else:
+            H += t[i]*sOP("adag", i)*sOP("a", i+1)  
+            H += t[i]*sOP("a", i)*sOP("adag", i+1) 
+        H += e[i] * sOP("n", i+1)
+
+    return H, e
+
+
+#setup the chain hamiltonian for the spin boson model - that is this implements the method described in Nuomin, Beratan, Zhang, Phys. Rev. A 105, 032406
+def setup_ipchain_hamiltonian(eps, delta, g, w, Nb):
+    N = Nb+1
+
+    t, e, U = chain_map(g, w, return_unitary = True)
+    t0 = t[0]
+
+    l = w
+    P = U
+
+    H = SOP(N)
+    H += eps*sOP("sz", 0)
+    H += delta*sOP("sx", 0)
+
+    class func_class:
+        def __init__(self, i, t0, e0, U0, conj = False):
+            self.i = i
+            self.conj=conj
+            self.t0 = t0
+            self.e = copy.deepcopy(e0)
+            self.U = copy.deepcopy(U0)
+
+        def __call__(self, ti):
+            val = self.t0*np.conj(self.U[:, 0])@(np.exp(-1.0j*ti*self.e)*self.U[:, self.i])
+
+            if(self.conj):
+                val = np.conj(val)
+
+            return val
+
+    for i in range(Nb):
+        H += coeff(func_class(i, t0, l, P, conj=False))*sOP("sz", 0)*sOP("a", i+1) 
+        H += coeff(func_class(i, t0, l, P, conj=True ))*sOP("sz", 0)*sOP("adag", i+1)  
+
+    return H, e
+
+
+
 import matplotlib.pyplot as plt
 
 
-def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, Ncut = 20, nstep = 1, Nw = 10, nsamples = 100, seed = 0, ofname='sbm.h5'):
+def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5'):
     g, w, renorm = discretise_bath(Nb, alpha, wc, s, beta=None, Nw=Nw)
+
+
 
     H = None
 
-    H, l = setup_star_hamiltonian(eps, delta*renorm, 2*g, w, Nb)
+    if geom  == 'chain':
+        H, l = setup_chain_hamiltonian(eps, delta*renorm, 2*g, w, Nb)
+    elif geom == 'ipchain':
+        H, l = setup_ipchain_hamiltonian(eps, delta*renorm, 2*g, w, Nb)
+    else:
+        H, l = setup_star_hamiltonian(eps, delta*renorm, 2*g, w, Nb)
 
     mode_dims = [min(max(4, int(wc*Ncut/l[i])), nbose) for i in range(Nb)]
     N = Nb+1
@@ -103,10 +173,10 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, Ncut = 
     sweep.dt = dt
     sweep.coefficient = -1.0j
 
+    if(geom == 'ipchain'):
+        sweep.use_time_dependent_hamiltonian = True
+
     res = np.zeros(nstep+1)
-
-
-
 
     res[0] = np.real(mel(op, A, A))
     for i in range(nstep):
@@ -139,11 +209,11 @@ if __name__ == "__main__":
     parser.add_argument('--delta', type = float, default=0)
     parser.add_argument('--eps', type = float, default=1)
     parser.add_argument('--chi', type=int, default=16)
-    parser.add_argument('--beta', type=float, default=5)
     parser.add_argument('--nbose', type=int, default=20)
     parser.add_argument('--dt', type=float, default=0.005)
+    parser.add_argument('--geom', type = str, default='star')
     parser.add_argument('--fname', type=str, default='sbm.h5')
     args = parser.parse_args()
 
-    nstep = int(10.0/args.dt)+1
-    sbm_dynamics(140, args.alpha, args.wc, args.s, args.delta, args.eps, args.chi, args.nbose, args.dt, nstep = nstep, ofname = args.fname, beta=args.beta)
+    nstep = int(30.0/args.dt)+1
+    sbm_dynamics(300, args.alpha, args.wc, args.s, args.delta, args.eps, args.chi, args.nbose, args.dt, nstep = nstep, geom=args.geom, ofname = args.fname)
