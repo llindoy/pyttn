@@ -301,7 +301,7 @@ protected:
         //For updating schemes that do not have an explicit time dependence this 
         if(op.is_time_dependent())
         {
-            update_type::advance_hamiltonian(A, m_env, m_ham, op);
+            CALL_AND_HANDLE(update_type::advance_hamiltonian(A, m_env, m_ham, op), "Failed to update time dependent Hamiltonian.")
         }
 
         CALL_AND_HANDLE
@@ -315,7 +315,7 @@ protected:
         //if the operator is time dependent then we need to advance it to the current time point and update the single particle function operators
         if(op.is_time_dependent())
         {
-            update_type::advance_hamiltonian(A, m_env, m_ham, op);
+            CALL_AND_HANDLE(update_type::advance_hamiltonian(A, m_env, m_ham, op), "Failed to update time dependent Hamiltonian.");
         }
 
         //if the forward step failed due to a numerical issue we return that it failed.

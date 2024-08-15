@@ -57,10 +57,14 @@ def spin_boson_test(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nst
     if(degree > 1):
         ntreeBuilder.mlmctdh_subtree(capacity()[1], mode_dims, degree, chi+8)
     else:
-        ntreeBuilder.mps_subtree(capacity()[1], mode_dims, chi+8, min(chi+8, nbose))
+        ntreeBuilder.mps_subtree(capacity()[1], mode_dims, chi+8, nbose)
     ntreeBuilder.sanitise(capacity)
 
-    A = ttn(topo, capacity, dtype=np.complex128)
+    A = None
+    if(adaptive):
+        A = ttn(topo, capacity, dtype=np.complex128)
+    else:
+        A = ttn(topo, capacity, dtype=np.complex128)
     A.set_state([0 for i in range(Nb+1)])
 
     h = sop_operator(H, A, sysinf, compress=compress)

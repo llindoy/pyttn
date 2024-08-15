@@ -451,7 +451,6 @@ public:
             q->m_nleaves += additional_leaves;
         }
 
-        size_type ind = m_children.size();
         m_children.insert(m_children.begin(), p);
         p = nullptr;
         q = nullptr;

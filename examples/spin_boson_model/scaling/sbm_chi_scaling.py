@@ -9,9 +9,9 @@ from pyttn import *
 from sbm_core import *
 
 def chi_scaling_mps_binary_ternary(adaptive = False):
-    nbose = 20
+    nbose = 10
     nb = 32
-    nstep = 1
+    nstep = 10
 
     jtype=""
     if(adaptive):
@@ -73,5 +73,5 @@ def chi_scaling_mps_binary_ternary(adaptive = False):
         h5.close()
 
 
-#chi_scaling_mps_binary_ternary(adaptive=False)
-chi_scaling_mps_binary_ternary(adaptive=True)
+chi_scaling_mps_binary_ternary(adaptive=False)
+#chi_scaling_mps_binary_ternary(adaptive=True)

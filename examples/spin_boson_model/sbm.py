@@ -138,7 +138,8 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
     else:
         H, l = setup_star_hamiltonian(eps, delta*renorm, 2*g, w, Nb)
 
-    mode_dims = [min(max(4, int(wc*Ncut/l[i])), nbose) for i in range(Nb)]
+    mode_dims = [nbose for i in range(Nb)]
+    #mode_dims = [min(max(4, int(wc*Ncut/l[i])), nbose) for i in range(Nb)]
     N = Nb+1
     sysinf = system_modes(N)
     sysinf[0] = spin_mode(2)
@@ -146,13 +147,13 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
         sysinf[i+1] = boson_mode(mode_dims[i])
 
 
-    degree = 2
+    degree = 1
     #and add the node that forms the root of the bath
     topo = ntree("(1(2(2))(2))")
     if(degree > 1):
         ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi)
     else:
-        ntreeBuilder.mps_subtree(topo()[1], sbg.mode_dims, degree, chi)
+        ntreeBuilder.mps_subtree(topo()[1], mode_dims, degree, nbose)
     ntreeBuilder.sanitise(topo)
 
     A = ttn(topo, dtype=np.complex128)
@@ -175,6 +176,9 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
         sweep.use_time_dependent_hamiltonian = True
 
     res = np.zeros(nstep+1)
+    plt.ion()
+    plt.ylim([0, 0.5])
+    line = plt.plot(np.arange(nstep+1)*dt, res)[0]
 
     res[0] = np.real(mel(op, A, A))
     for i in range(nstep):
@@ -185,6 +189,9 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
 
         print((i+1)*dt, t2-t1, res[i+1], mel(A))
         sys.stdout.flush()
+        plt.gcf().canvas.draw()
+        line.set_data(np.arange(nstep+1)*dt, res)
+        plt.pause(0.1)
 
         if(i % 100):
             h5 = h5py.File(ofname, 'w')
@@ -192,6 +199,8 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
             h5.create_dataset('Sz', data=res)
             h5.close()
 
+    plt.ioff()
+    plt.close()
     h5 = h5py.File(ofname, 'w')
     h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
     h5.create_dataset('Sz', data=res)
