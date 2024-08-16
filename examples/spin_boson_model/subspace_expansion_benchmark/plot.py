@@ -13,5 +13,5 @@ def plot(fname, ax):
 chis = np.arange(2, 384)
 fig, ax= plt.subplots(nrows=1, ncols=2)
 #plot("sbm_subspace_expansion_24_1e-05_0.0001.h5",ax)
-plot("sbm_subspace_expansion_24_1e-06_0.0001.h5",ax)
+plot("sbm_subspace_expansion_16_1e-05_0.0001.h5",ax)
 plt.show()

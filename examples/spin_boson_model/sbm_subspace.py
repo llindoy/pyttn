@@ -151,20 +151,21 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
 
 
     degree = 2
+    chi0=2
     #and add the node that forms the root of the bath
     topo = ntree("(1(2(2))(2))")
     if(degree > 1):
-        ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi0)
     else:
-        ntreeBuilder.mps_subtree(topo()[1], sbg.mode_dims, degree, chi)
+        ntreeBuilder.mps_subtree(topo()[1], mode_dims, degree, chi0)
     ntreeBuilder.sanitise(topo)
     print(topo)
 
     capacity = ntree("(1(2(2))(2))")
     if(degree > 1):
-        ntreeBuilder.mlmctdh_subtree(capacity()[1], mode_dims, degree, chi*2)
+        ntreeBuilder.mlmctdh_subtree(capacity()[1], mode_dims, degree, chi)
     else:
-        ntreeBuilder.mps_subtree(capacity()[1], sbg.mode_dims, degree, chi*2)
+        ntreeBuilder.mps_subtree(capacity()[1], mode_dims, degree, chi)
     ntreeBuilder.sanitise(capacity)
 
     A = ttn(topo, capacity, dtype=np.complex128)
@@ -179,14 +180,13 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
         sysinf
     )
 
-    sweep = tdvp(A, h, krylov_dim = 12)#, subspace_krylov_dim=8, subspace_neigs = 2, expansion='subspace')
+    sweep = tdvp(A, h, krylov_dim = 12, subspace_krylov_dim=8, subspace_neigs = 2, expansion='subspace')
     sweep.dt = dt
     sweep.coefficient = -1.0j
-    #sweep.spawning_threshold = 1e-5
-    #sweep.unoccupied_threshold=1e-4
-    #sweep.minimum_unoccupied=1
-    #sweep.only_apply_when_no_unoccupied=True
-    #sweep.eval_but_dont_apply=True
+    sweep.spawning_threshold = 1e-5
+    sweep.unoccupied_threshold=1e-4
+    sweep.minimum_unoccupied=1
+    sweep.only_apply_when_no_unoccupied=True
 
     if(geom == 'ipchain'):
         sweep.use_time_dependent_hamiltonian = True

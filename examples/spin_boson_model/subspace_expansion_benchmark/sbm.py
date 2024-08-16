@@ -89,14 +89,14 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
     if(degree > 1):
         ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi0)
     else:
-        ntreeBuilder.mps_subtree(topo()[1], sbg.mode_dims, degree, chi0)
+        ntreeBuilder.mps_subtree(topo()[1], mode_dims, degree, chi0)
     ntreeBuilder.sanitise(topo)
 
     capacity = ntree("(1(2(2))(2))")
     if(degree > 1):
         ntreeBuilder.mlmctdh_subtree(capacity()[1], mode_dims, degree, chi)
     else:
-        ntreeBuilder.mps_subtree(capacity()[1], sbg.mode_dims, degree, chi)
+        ntreeBuilder.mps_subtree(capacity()[1], mode_dims, degree, chi)
     ntreeBuilder.sanitise(capacity)
 
     A = ttn(topo, capacity, dtype=np.complex128)
@@ -119,7 +119,6 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
         sweep.spawning_threshold = spawning_threshold
         sweep.unoccupied_threshold=unoccupied_threshold
         sweep.minimum_unoccupied=1
-        sweep.eval_but_dont_apply=True
 
     sweep.dt = dt
     sweep.coefficient = -1.0j
@@ -127,16 +126,19 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
 
     res = np.zeros(nstep+1)
     runtime = np.zeros(nstep+1)
+    maxchi = np.zeros(nstep+1)
 
     res[0] = np.real(mel(op, A, A))
+    maxchi[0] = A.maximum_bond_dimension()
     for i in range(nstep):
         t1 = time.time()
         sweep.step(A, h, dt)
         t2 = time.time()
         res[i+1] = np.real(mel(op, A, A))
         runtime[i+1] = runtime[i]+(t2-t1)
+        maxchi[i+1] = A.maximum_bond_dimension()
 
-        print((i+1)*dt, t2-t1, res[i+1], mel(A))
+        print((i+1)*dt, t2-t1, res[i+1], mel(A), maxchi[i+1])
         sys.stdout.flush()
 
         if(i % 100):
@@ -144,12 +146,14 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
             h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
             h5.create_dataset('Sz', data=res)
             h5.create_dataset('runtime', data=runtime)
+            h5.create_dataset('maxchi', data=maxchi)
             h5.close()
 
     h5 = h5py.File(ofname, 'w')
     h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
     h5.create_dataset('Sz', data=res)
     h5.create_dataset('runtime', data=runtime)
+    h5.create_dataset('maxchi', data=maxchi)
     h5.close()
 
 import argparse

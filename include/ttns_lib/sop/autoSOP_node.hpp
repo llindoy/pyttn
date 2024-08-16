@@ -371,13 +371,13 @@ protected:
     void get_contraction_info_spf_term(const SPType& spf, spfind& sp, bool& identity_spf, bool exploit_identity_opt) const
     {
         //if the current term is the identity term
-        if(spf.is_identity())
+        if(spf.is_identity() && exploit_identity_opt)
         {
             identity_spf = true;
         }
 
         //if it is not the identity and we are making use of this fact
-        if(!exploit_identity_opt || !spf.is_identity())
+        if(!identity_spf)
         {
             sp.reserve(spf.nterms());
 
@@ -425,14 +425,13 @@ protected:
     template <typename MFType>
     void get_contraction_info_mf_term(const MFType& mf, mfind& m, bool& identity_mf, bool exploit_identity_opt) const
     {
-        if(mf.is_identity())
+        if((mf.is_identity() && exploit_identity_opt) || this->is_root())
         {
             identity_mf = true;
         }
 
-        //if the current term is the identity term
-        //if it is not the identity
-        if(!exploit_identity_opt || !mf.is_identity())
+        //if the current term is not the identity term
+        if(!identity_mf)
         {
             m.reserve(mf.nterms());            
             const auto& op = mf.operator_definition();
@@ -464,14 +463,17 @@ protected:
                     m.push_back(mf_index<size_t>{parent_index, {indexing.begin(), indexing.end()}});
                 }
             }
-            else
+        }
+        if(this->is_root() && !mf.is_identity())
+        {
+            m.reserve(mf.nterms());            
+            const auto& op = mf.operator_definition();
+
+            mf_index<size_t> empty(0);
+            empty.parent_index() = 0;
+            for(size_t mi = 0; mi < op.size(); ++mi)
             {
-                mf_index<size_t> empty(0);
-                empty.parent_index() = 0;
-                for(size_t mi = 0; mi < op.size(); ++mi)
-                {
-                    m.push_back(empty);
-                }
+                m.push_back(empty);
             }
         }
     }

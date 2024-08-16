@@ -661,7 +661,7 @@ public:
         this->normalise();
         if(truncate)
         {
-        //    this->truncate(tol, nchi, rel_truncate);
+            this->truncate(tol, nchi);
             this->normalise();
         }
 
@@ -715,7 +715,7 @@ public:
 
         if(truncate)
         {
-        //    this->truncate(tol, nchi, rel_truncate);
+            this->truncate(tol, nchi);
             this->normalise();
         }
 
@@ -739,26 +739,26 @@ public:
     }
 
     //function for performing a measurement on all modes.
-    void measure_all_without_collapse(std::vector<std::vector<real_type>>& res)
-    {
-        res.resize(m_nleaves);
-        for(size_t i = 0; i < m_nleaves; ++i)
-        {
-            measure_without_collapse(i, res[i]);
-        }
-    }
+    //void measure_all_without_collapse(std::vector<std::vector<real_type>>& res)
+    //{
+    //    res.resize(m_nleaves);
+    //    for(size_t i = 0; i < m_nleaves; ++i)
+    //    {
+    //        measure_without_collapse(i, res[i]);
+    //    }
+    //}
 
 
 };
 
 template <typename T, typename backend, typename real_type = typename linalg::get_real_type<T>::type>
-real_type collapse_wavefunction(const ttn<T, backend>& o, ttn<T, backend>& res, std::vector<size_t>& state, bool truncate=false, real_type tol = real_type(0), typename backend::size_type nchi = 0, bool rel_truncate = false, bool compute_be = false)
+real_type collapse_wavefunction(const ttn<T, backend>& o, ttn<T, backend>& res, std::vector<size_t>& state, bool truncate=false, real_type tol = real_type(0), typename backend::size_type nchi = 0)
 {
     //first we copy the res array into o
     res = o;
 
     //now perform the inplace collapse on o
-    return o.collapse(state, truncate, tol, nchi, rel_truncate, compute_be);
+    return o.collapse(state, truncate, tol, nchi);
 }
 
 template <typename T, typename backend> 

@@ -256,15 +256,15 @@ void init_ttn(py::module &m, const std::string& label)
                     return p0;
                 }
             )
-        .def(
-                "measure_all_without_collapse", 
-                [](_ttn& o)
-                {
-                    std::vector<std::vector<real_type>> p0;
-                    o.measure_all_without_collapse(p0);
-                    return p0;
-                }
-            )
+        //.def(
+        //        "measure_all_without_collapse", 
+        //        [](_ttn& o)
+        //        {
+        //            std::vector<std::vector<real_type>> p0;
+        //            o.measure_all_without_collapse(p0);
+        //            return p0;
+        //        }
+        //    )
         .def(
                 "collapse_basis", 
                 [](_ttn& o, std::vector<linalg::matrix<T>>& U, bool truncate=true, real_type tol=real_type(0), size_t nchi=0)

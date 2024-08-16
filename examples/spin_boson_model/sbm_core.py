@@ -31,7 +31,7 @@ def discretise_bath(Nb, alpha, wc, s, beta = None, Nw = 10, moment_scaling=2, at
 
     return np.array(g), np.array(w), renorm
 
-def spin_boson_test(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep = 1, degree = 2, compress = True, adaptive=False):
+def spin_boson_test(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep = 1, degree = 2, compress = True, adaptive=False, identity_opt=True):
     g, w, renorm = discretise_bath(Nb, alpha, wc, s, beta=beta)
 
     sbg = models.spin_boson(2*eps, 2*delta*renorm, w, g, geom="star")
@@ -67,7 +67,7 @@ def spin_boson_test(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nst
         A = ttn(topo, capacity, dtype=np.complex128)
     A.set_state([0 for i in range(Nb+1)])
 
-    h = sop_operator(H, A, sysinf, compress=compress)
+    h = sop_operator(H, A, sysinf, compress=compress, identity_opt=identity_opt)
 
     mel = matrix_element(A)
 

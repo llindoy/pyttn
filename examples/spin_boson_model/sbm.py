@@ -158,8 +158,9 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
 
     A = ttn(topo, dtype=np.complex128)
     A.set_state([0 for i in range(Nb+1)])
+    print(topo)
 
-    h = sop_operator(H, A, sysinf)
+    h = sop_operator(H, A, sysinf, identity_opt=True, compress=True)
 
     mel = matrix_element(A)
 
@@ -223,4 +224,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     nstep = int(30.0/args.dt)+1
-    sbm_dynamics(300, args.alpha, args.wc, args.s, args.delta, args.eps, args.chi, args.nbose, args.dt, nstep = nstep, geom=args.geom, ofname = args.fname)
+    sbm_dynamics(30, args.alpha, args.wc, args.s, args.delta, args.eps, args.chi, args.nbose, args.dt, nstep = nstep, geom=args.geom, ofname = args.fname)
