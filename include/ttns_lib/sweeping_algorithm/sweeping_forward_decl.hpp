@@ -130,6 +130,9 @@ public:
 template <typename T, typename backend, template <typename, typename> class ttn_class, template <typename, typename, template <typename, typename> class > class Environment>
 class variance_subspace_expansion;
 
+template <typename T, typename backend, template <typename, typename> class ttn_class, template <typename, typename, template <typename, typename> class > class Environment>
+class variance_subspace_expansion_full_two_site;
+
 /* 
  *  Forward declaration of the different update types that have been implemented
  */

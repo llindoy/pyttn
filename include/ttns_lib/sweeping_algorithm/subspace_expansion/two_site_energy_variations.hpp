@@ -227,8 +227,8 @@ public:
             auto rtens =  res.reinterpret_shape(h2s1[0].size(0), h2s2[0].size(0), h2s2[0].size(2));
             for(size_type r = 0; r < h2s1.size(); ++r)
             {
-                auto contraction = contract(h2s1[r], 1, h2s2[r], 1);
-                CALL_AND_HANDLE(ttens += hcoeff[r]*contraction, "Failed to contract element into res.");
+                auto contraction = contract(hcoeff[r]*h2s1[r], 1, h2s2[r], 1);
+                CALL_AND_HANDLE(ttens += contraction, "Failed to contract element into res.");
             }
             rtens = linalg::transpose(ttens, {1, 0, 2});
         }

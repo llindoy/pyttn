@@ -1,5 +1,5 @@
-#ifndef TTNS_LIB_SWEEPING_ALGORITHM_SUBSPACE_EXPANSION_HPP
-#define TTNS_LIB_SWEEPING_ALGORITHM_SUBSPACE_EXPANSION_HPP
+#ifndef TTNS_LIB_SWEEPING_ALGORITHM_SUBSPACE_EXPANSION_FULL_TWO_SITE_HPP
+#define TTNS_LIB_SWEEPING_ALGORITHM_SUBSPACE_EXPANSION_FULL_TWO_SITE_HPP
 
 #include "two_site_energy_variations.hpp"
 #include "../environment/sum_of_product_operator_env.hpp"
@@ -9,7 +9,7 @@ namespace ttns
 {
 
 template <typename T, typename backend>
-class subspace_expansion
+class subspace_expansion_full_two_site
 {
 public:
     using twosite = two_site_variations<T, backend>;
@@ -33,31 +33,45 @@ public:
     using bond_matrix_type = typename ttn<T, backend>::bond_matrix_type;
 
 public:
-    subspace_expansion() : m_twosite() {}
-    subspace_expansion(const ttn<T, backend>& A, const env_type& ham, size_type neigs, size_type seed = 0)  : m_twosite(seed)
+    subspace_expansion_full_two_site() : m_twosite() {}
+    subspace_expansion_full_two_site(const ttn<T, backend>& A, const env_type& ham, size_type seed = 0)  : m_twosite(seed)
     {
-        CALL_AND_HANDLE(initialise(A, ham, neigs), "Failed to construct subspace_expansion.");
+        CALL_AND_HANDLE(initialise(A, ham), "Failed to construct subspace_expansion_full_two_site.");
     }   
-    subspace_expansion(const subspace_expansion& o) = default;
-    subspace_expansion(subspace_expansion&& o) = default;
+    subspace_expansion_full_two_site(const subspace_expansion_full_two_site& o) = default;
+    subspace_expansion_full_two_site(subspace_expansion_full_two_site&& o) = default;
 
-    subspace_expansion& operator=(const subspace_expansion& o) = default;
-    subspace_expansion& operator=(subspace_expansion&& o) = default;
+    subspace_expansion_full_two_site& operator=(const subspace_expansion_full_two_site& o) = default;
+    subspace_expansion_full_two_site& operator=(subspace_expansion_full_two_site&& o) = default;
 
-    void initialise(const ttn<T, backend>& A, const env_type& sop, size_type neigs)
+    void initialise(const ttn<T, backend>& A, const env_type& sop)
     {
         try
         {
             ASSERT(A.is_orthogonalised(), "The input hierarchical tucker tensor must have been orthogonalised.");
 
             CALL_AND_HANDLE(clear(), "Failed to clear the projector_splitting_intgrator.");
-            m_neigenvalues = neigs;
 
             size_type maxcapacity = 0;  size_type maxnmodes = 0;
+            size_type mtwosite_capacity = 0;    size_type mtwosite_size = 0;
             for(const auto& a : A)
             {
                 size_type capacity = a().capacity();    if(capacity > maxcapacity){maxcapacity = capacity;}
                 size_type nmodes = a().nmodes();    if(nmodes > maxnmodes){maxnmodes = nmodes;}
+
+                if(!a.is_root())
+                {
+                    for(size_type mode = 0;  mode < nmodes;  ++mode)
+                    {
+                        auto aptens_c = a.parent()().as_rank_3(mode, true);
+                        auto aptens_s = a.parent()().as_rank_3(mode);
+
+                        size_type c2s = a().max_dimen()*aptens_c.shape(0)*aptens_c.shape(1);
+                        size_type s2s = a().max_dimen()*aptens_s.shape(0)*aptens_s.shape(1);
+                        if(c2s > mtwosite_capacity){mtwosite_capacity=c2s;}
+                        if(s2s > mtwosite_size){mtwosite_size=s2s;}
+                    }
+                }
             }
 
             size_type max_two_site_energy_terms = 0;
@@ -67,6 +81,11 @@ public:
                 size_type two_site_energy_terms = twosite::get_nterms(hinf());
                 if(two_site_energy_terms > max_two_site_energy_terms){max_two_site_energy_terms = two_site_energy_terms;}
             }
+
+            m_twosite_energy.reallocate(mtwosite_capacity);
+            m_twosite_temp.reallocate(mtwosite_capacity);
+            m_twosite_energy.resize(1, mtwosite_size);
+            m_twosite_temp.resize(1, mtwosite_size);
 
             CALL_AND_HANDLE(m_2s_1.resize(max_two_site_energy_terms), "Failed to resize two site spf buffer.");
             CALL_AND_HANDLE(m_2s_2.resize(max_two_site_energy_terms), "Failed to resize two site mf buffer.");
@@ -82,9 +101,6 @@ public:
             m_coeffs.resize(maxnmodes);
             m_dim.resize(maxnmodes);
 
-            m_S.resize(m_neigenvalues);
-            m_U.reallocate(m_neigenvalues*maxcapacity);
-            m_V.reallocate(m_neigenvalues*maxcapacity);
             m_rvec.reallocate(maxcapacity);
             m_trvec.reallocate(maxcapacity);
             m_trvec2.reallocate(maxcapacity);
@@ -118,6 +134,9 @@ public:
             CALL_AND_HANDLE(m_2s_2.clear(), "Failed to clear the rvec object.");
             m_onesite_expansions = 0;
             m_twosite_expansions = 0;
+            m_twosite_energy.clear();
+            m_twosite_temp.clear();
+            m_svd.clear();
         }
         catch(const std::exception& ex)
         {
@@ -126,8 +145,8 @@ public:
         }
     }
 
-    template <typename IntegType, typename BufType>
-    bool down(hnode& A1, hnode& A2, bond_matrix_type& r, const dmat_type& pops, env_node_type& h, const env_type& op, std::mt19937& rng, IntegType& eigensolver, BufType& buf, real_type svd_scale)
+    template <typename BufType>
+    bool down(hnode& A1, hnode& A2, bond_matrix_type& r, const dmat_type& pops, env_node_type& h, const env_type& op, std::mt19937& rng, BufType& buf, real_type svd_scale)
     {
         try
         {
@@ -198,26 +217,11 @@ public:
                 CALL_AND_HANDLE(twosite::construct_two_site_energy_terms_upper(A2, hinf,  h, m_2s_2, buf.HA, buf.temp, buf.temp2, m_inds, true), 
                                 "Failed to construct the component of the two site energy acting on the upper site.");
 
-                //now we compute the singular value using the sparse functions
+                CALL_AND_HANDLE(m_twosite_energy.resize(A1().shape(0), A2tens.shape(0)*A2tens.shape(2)), "Failed to resize two site energy object.");
+                CALL_AND_HANDLE(m_twosite_temp.resize(A1().shape(0), A2tens.shape(0)*A2tens.shape(2)), "Failed to resize two site energy object.");
 
-                CALL_AND_HANDLE(A2().generate_random_orthogonal(mode, buf.temp[0], rng, m_rvec), "Failed to generate othrogonal tensor.");
-                CALL_AND_HANDLE(m_V.resize(m_neigenvalues, m_rvec.size()), "Failed to resize m_U array.");
-
-                //now we compute the singular value using the sparse functions
-                for(size_type i = 0; i < m_neigenvalues; ++i)
-                {
-                    CALL_AND_HANDLE(m_V[i] = m_rvec, "Failed to copy rvec.");
-                }
-                
-                //now compute the eigenvectors using this 
-                bool mconjm = true;
-                size_type maxkrylov_dim = eigensolver.krylov_dim();
-                if(m_rvec.size() < maxkrylov_dim){maxkrylov_dim = m_rvec.size();}
-
-                //computes the complex conjugate of the right singular vectors
-                CALL_AND_HANDLE(eigensolver(m_V, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
-
-                CALL_AND_HANDLE(m_V = linalg::conj(m_V), "Failed to conjugate the right singular vectors.");
+                CALL_AND_HANDLE(twosite::construct_two_site_energy(m_coeffs, m_2s_1, m_2s_2, m_twosite_temp, m_twosite_energy), "Failed to construct two site energy object.");
+                CALL_AND_HANDLE(m_svd(m_twosite_energy, m_S, m_twosite_temp, m_V), "Failed to compute svd.");
 
                 for(size_type i = 0; i < m_S.size(); ++i)
                 {
@@ -301,8 +305,8 @@ public:
         }
     }
 
-    template <typename IntegType, typename BufType>
-    bool up(hnode& A1, hnode& A2, bond_matrix_type& r, const dmat_type& pops, env_node_type& h, const env_type& op, std::mt19937& rng, IntegType& eigensolver, BufType& buf, real_type svd_scale)
+    template <typename BufType>
+    bool up(hnode& A1, hnode& A2, bond_matrix_type& r, const dmat_type& pops, env_node_type& h, const env_type& op, std::mt19937& rng, BufType& buf, real_type svd_scale)
     {
         try
         {
@@ -372,24 +376,13 @@ public:
                                 "Failed to construct the component of the two site energy acting on the upper site.");
                 CALL_AND_HANDLE(twosite::construct_two_site_energy_terms_lower(A1, hinf, h, op, m_2s_1, buf.HA, buf.temp, m_inds, r, true), 
                                 "Failed to construct the component of the two site energy acting on the lower site.");
-                        
-                //CALL_AND_HANDLE(m_twosite.generate_orthogonal_trial_vector(A1(), A1().nmodes(), rng, m_rvec), "Failed to generate othrogonal tensor.");
-                CALL_AND_HANDLE(A1().generate_random_orthogonal(A1().nmodes(), buf.temp[0], rng, m_rvec), "Failed to generate othrogonal tensor.");
-                CALL_AND_HANDLE(m_U.resize(m_neigenvalues, m_rvec.size()), "Failed to resize m_U array.");
-                //now we compute the singular value using the sparse functions
-                for(size_type i = 0; i < m_neigenvalues; ++i)
-                {
-                    CALL_AND_HANDLE(m_U[i] = m_rvec, "Failed to copy rvec into U");
-                }
 
-                //firs go ahead and generate random r vector
-                size_type maxkrylov_dim = eigensolver.krylov_dim();
-                if(m_rvec.size() < maxkrylov_dim){maxkrylov_dim = m_rvec.size();}
+                CALL_AND_HANDLE(m_twosite_energy.resize(A1().shape(0), A2tens.shape(0)*A2tens.shape(2)), "Failed to resize two site energy object.");
+                CALL_AND_HANDLE(m_twosite_temp.resize(A1().shape(0), A2tens.shape(0)*A2tens.shape(2)), "Failed to resize two site energy object.");
 
-                bool mconjm = false;
-
-                //computes U but stored with its columns as rows - e.g. this is U^T.  E.g. the singular vectors are currently the rows of m_U
-                CALL_AND_HANDLE(eigensolver(m_U, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
+                CALL_AND_HANDLE(twosite::construct_two_site_energy(m_coeffs, m_2s_1, m_2s_2, m_twosite_temp, m_twosite_energy), "Failed to construct two site energy object.");
+                CALL_AND_HANDLE(m_svd(m_twosite_energy, m_S, m_twosite_temp, m_V), "Failed to compute svd.");
+                m_U = linalg::trans(m_twosite_temp);
 
                 for(size_type i = 0; i < m_S.size(); ++i)
                 {
@@ -567,13 +560,17 @@ protected:
 
     orthogonality::truncation_mode m_trunc_mode = orthogonality::truncation_mode::singular_values_truncation;
 
+    linalg::singular_value_decomposition<mat_type, true> m_svd;
+    mat_type m_twosite_energy;
+    mat_type m_twosite_temp;
+
     mat_type m_U;
-    linalg::diagonal_matrix<T, backend> m_S;
+    linalg::diagonal_matrix<real_type, backend> m_S;
     mat_type m_V;
     bool m_only_apply_when_no_unoccupied = false;
     bool m_eval_but_dont_apply = false;
 
-};  //class subspace_expansion
+};  //class subspace_expansion_full_two_site
 }   //namespace ttns
 
 #endif

@@ -3,19 +3,16 @@ import time
 import sys
 import h5py
 sys.path.append("../../../")
-sys.path.append("../")
 
 from pyttn import *
-from sbm_core import *
+from sbm_core_ts import *
 
-def chi_scaling_mps_binary_ternary(adaptive = False):
+def chi_scaling_mps_binary_ternary():
     nbose = 10
     nb = 32
     nstep = 2
 
-    jtype=""
-    if(adaptive):
-        jtype="_subspace"
+    jtype="_ts_subspace"
 
     chis = [2, 4, 8, 16, 32, 48, 64]#, 96, 128, 160, 192, 256, 384]
     timings_mps = []
@@ -24,7 +21,7 @@ def chi_scaling_mps_binary_ternary(adaptive = False):
     chivs = []
     for chi in chis:
         print(chi)
-        m, std = spin_boson_test(nb, 1.0, 5, 1.0, 0.0, 1.0, chi, nbose, 0.01, nstep=nstep, degree = 1, compress = True, adaptive=adaptive)
+        m, std = spin_boson_test(nb, 1.0, 5, 1.0, 0.0, 1.0, chi, nbose, 0.01, nstep=nstep, degree = 1)
         chivs.append(chi)
         timings_mps.append(m)
         stdevs_mps.append(std/np.sqrt(1.0*nstep))
@@ -42,7 +39,7 @@ def chi_scaling_mps_binary_ternary(adaptive = False):
     chis = [2, 4, 8, 16, 32]#, 48, 64, 96, 128, 160, 192]
     for chi in chis:
         print(chi)
-        m, std = spin_boson_test(nb, 1.0, 5, 1.0, 0.0, 1.0, chi, nbose, 0.01, nstep=nstep, degree = 2, compress = True, adaptive=adaptive)
+        m, std = spin_boson_test(nb, 1.0, 5, 1.0, 0.0, 1.0, chi, nbose, 0.01, nstep=nstep, degree = 2)
         chivs.append(chi)
         timings_binary.append(m)
         stdevs_binary.append(std/np.sqrt(1.0*nstep))
@@ -60,7 +57,7 @@ def chi_scaling_mps_binary_ternary(adaptive = False):
     stdevs_3 = []
     chivs = []
     for chi in chis:
-        m, std = spin_boson_test(nb, 1.0, 5, 1.0, 0.0, 1.0, chi, nbose, 0.01, nstep=nstep, degree = 3, compress = True, adaptive=adaptive)
+        m, std = spin_boson_test(nb, 1.0, 5, 1.0, 0.0, 1.0, chi, nbose, 0.01, nstep=nstep, degree = 3)
         chivs.append(chi)
         timings_3.append(m)
         stdevs_3.append(std/np.sqrt(1.0*nstep))
@@ -73,5 +70,4 @@ def chi_scaling_mps_binary_ternary(adaptive = False):
         h5.close()
 
 
-chi_scaling_mps_binary_ternary(adaptive=True)
-#chi_scaling_mps_binary_ternary(adaptive=True)
+chi_scaling_mps_binary_ternary()
