@@ -66,6 +66,8 @@ import matplotlib.pyplot as plt
 def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5'):
     g, w, renorm = discretise_bath(Nb, alpha, wc, s, beta=None, Nw=Nw)
 
+
+
     H = None
 
     if geom  == 'chain':

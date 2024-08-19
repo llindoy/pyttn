@@ -16,7 +16,7 @@ def plot(fname, ax, style='o-'):
     except:
         return 0,0
 
-chis = np.arange(2, 64)
+chis = np.arange(2, 128)
 fig, ax= plt.subplots(nrows=1, ncols=3, sharey=True)
 plt.subplots_adjust(wspace=0, hspace=0)
 mv = 0
@@ -42,7 +42,7 @@ ax[2].loglog(chis, np.power(chis/chim, 7)*mm, 'k--', zorder=-1)
 chim, mm = plot("chi_scaling_ternary_subspace.h5", ax[2], style='o-')
 mv = max(mm, mv)
 ax[2].loglog(chis, np.power(chis/chim, 5)*mm, 'k--', zorder=-1)
-ax[0].set_ylim([1e-2, mv*2])
+#ax[0].set_ylim([1e-2, mv*2])
 ax[0].set_ylabel('Runtime (s)')
 fig.add_subplot(111,frameon=False)
 plt.tick_params(labelcolor='none',which='both', top=False, bottom=False, left=False, right=False)

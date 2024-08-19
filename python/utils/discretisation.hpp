@@ -1,6 +1,8 @@
 #ifndef PYTHON_BINDING_DISCRETISATION_HPP
 #define PYTHON_BINDING_DISCRETISATION_HPP
 
+#include <limits>
+
 #include <utils/bath/density_discretisation.hpp>
 #include <utils/bath/orthopol_discretisation.hpp>
 #include <linalg/linalg.hpp>
@@ -58,6 +60,28 @@ void init_discretisation(py::module &m)
                     return wg;
                 }, 
                 py::arg(), py::arg(), py::arg(), py::arg(), py::arg("moment_scaling") = 1.0, py::arg("alpha") = 1.0, py::arg("beta") = 0.0, py::arg("atol") = 1e-10, py::arg("rtol") = 1e-12, py::arg("nquad") = 100
+            )
+        .def_static
+            (
+                "moments", 
+                [](const std::function<T(const T&)>& J, orthopol<T>& poly, T wrange, T moment_scaling, T atol, T rtol, size_t nquad, T minbound, T maxbound)
+                {
+                    std::vector<T> moments;
+                    orthopol_discretisation::get_modified_moments(J, poly, moments, wrange, moment_scaling, atol, rtol, nquad, minbound, maxbound);
+                    return moments;
+                }, 
+                py::arg(), py::arg(),  py::arg("wrange") = 1.0, py::arg("moment_scaling") = 1.0, py::arg("atol") = 1e-10, py::arg("rtol") = 1e-12, py::arg("nquad") = 100, py::arg("minbound") = 0, py::arg("maxbound") = std::numeric_limits<T>::max()
+            )
+        .def_static
+            (
+                "moments", 
+                [](const std::function<T(const T&)>& J, T wmin, T wmax, size_t N, T moment_scaling, T alpha, T beta, T atol, T rtol, size_t nquad, T minbound, T maxbound)
+                {
+                    std::vector<T> moments;
+                    orthopol_discretisation::get_modified_moments(J, wmin, wmax, N, moments, moment_scaling, alpha, beta, atol, rtol, nquad, minbound, maxbound);
+                    return moments;
+                }, 
+                py::arg(), py::arg(), py::arg(), py::arg(), py::arg("moment_scaling") = 1.0, py::arg("alpha") = 1.0, py::arg("beta") = 0.0, py::arg("atol") = 1e-10, py::arg("rtol") = 1e-12, py::arg("nquad") = 100, py::arg("minbound") = 0, py::arg("maxbound") = std::numeric_limits<T>::max()
             );
 }
 

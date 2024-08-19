@@ -173,7 +173,6 @@ public:
         if(m_p0 == T(0)){m_p0 = normalisation;}
 
         linalg::symmetric_tridiagonal_matrix<T> poly_recurrence(npoints, npoints);
-        //std::cerr << m_scale << std::endl;
         for(size_t i = 0; i < npoints; ++i)
         {
             poly_recurrence(i, i) = alpha(i);
@@ -411,6 +410,92 @@ void hermite_polynomial(orthopol<T>& orth, size_t nmax )
 }
 
 
+
+
+
+//construct nonclassical orthogonal polynomial object from a weight function f using the polynomials in orthref to compute modified moments.
+//This function will likely fail if the function f has a divergence at zero as the adaptive integration scheme does not necessarily handle this gracefully.
+template <typename T, typename F> 
+void polynomial_moments(std::vector<T>& modified_moments, const orthopol<T>& orthref, size_t nmax, F&& f, T rel_tol  = 1e-14, T tol = 1e-15, T scale_factor = 1, size_t quadrature_order = 100, size_t max_order = 100, T minbound = 0, T maxbound = std::numeric_limits<T>::max())
+{
+    try
+    {
+        ASSERT(orthref.size() >= 2*nmax, "The reference orthonormal polynomial object is not large enough to calculate all of the moments that are of interest.");
+        
+        T xmin = orthref.xmin();
+        T xmax = orthref.xmax();
+
+        ASSERT(std::abs(xmin) != std::numeric_limits<T>::infinity() && std::abs(xmax) != std::numeric_limits<T>::infinity(), "The modified Chebyshev method is not suitable for infinite ranges.");
+        quad::gauss::legendre<T> gauss_leg(quadrature_order);
+
+        //compute the first 2N modified moments of the weight function F using the monic polynomials stored in orthref
+        modified_moments.resize(2*nmax);
+        for(size_t i = 0; i < 2*nmax; ++i)
+        {
+            modified_moments[i] = quad::adaptive_integrate([&](T x){return orthref.monic(x, i)*f(x)*scale_factor;}, gauss_leg, xmin, xmax, false, tol, true, rel_tol, 0.0, max_order, false);
+            //allow for early exit if moments are out of bounds
+            if(std::abs(modified_moments[i]) < minbound || std::abs(modified_moments[i]) > maxbound)
+            {
+                modified_moments.resize(i);
+                return;
+            }
+        }
+    }
+    catch(const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+        RAISE_EXCEPTION("Failed to construct orthonormal polynomials that are orthogonal to a non-classical weight function. ");
+    }
+}
+
+
+//construct nonclassical orthogonal polynomial object from a weight function f using the polynomials in orthref to compute modified moments.
+//This function will likely fail if the function f has a divergence at zero as the adaptive integration scheme does not necessarily handle this gracefully.
+template <typename T, typename F> 
+void polynomial_moments(std::vector<T>& modified_moments, const orthopol<T>& orthref, T xmin, T xmax, size_t nmax, F&& f, T rel_tol  = 1e-14, T tol = 1e-15, T scale_factor = 1, size_t quadrature_order = 100, size_t max_order = 100, T minbound = 0, T maxbound = std::numeric_limits<T>::max())
+{
+    try
+    {
+        ASSERT(orthref.size() >= 2*nmax, "The reference orthonormal polynomial object is not large enough to calculate all of the moments that are of interest.");
+        
+        //ASSERT(xmin >= orthref.xmin() && xmax <= orthref.xmax(), "Unable to compute nonclassical orthogonal polynomail object.  Xmin and xmax are not compatible with reference polynomial.");
+        quad::gauss::legendre<T> gauss_leg(quadrature_order);
+        ASSERT(std::abs(xmin) != std::numeric_limits<T>::infinity() && std::abs(xmax) != std::numeric_limits<T>::infinity(), "The modified Chebyshev method is not suitable for infinite ranges.");
+
+        //compute the first 2N modified moments of the weight function F using the monic polynomials stored in orthref
+        modified_moments.resize(2*nmax);
+        for(size_t i = 0; i < 2*nmax; ++i)
+        {
+            modified_moments[i] = quad::adaptive_integrate([&](T x){return orthref.monic(x, i)*f(x)*scale_factor;}, gauss_leg, xmin, xmax, false, tol, true, rel_tol, 0.0, max_order, false);
+            //allow for early exit if moments are out of bounds
+            if(std::abs(modified_moments[i]) < minbound || std::abs(modified_moments[i]) > maxbound)
+            {
+                modified_moments.resize(i);
+                return;
+            }
+        }
+    }
+    catch(const std::exception& ex)
+    {
+        std::cerr << ex.what() << std::endl;
+        RAISE_EXCEPTION("Failed to construct modified momentswith respect to function.");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //computes a set of nonclassical orthonormal polynomials.  Here with the modified moments (integrals of orthref with respect to the weight function of the new polynomials) as input.
 template <typename T>
 void nonclassical_polynomial(orthopol<T>& orth, const orthopol<T>& orthref, const linalg::vector<T>& modified_moments, T scale_factor = 1)
@@ -458,7 +543,6 @@ void nonclassical_polynomial(orthopol<T>& orth, const orthopol<T>& orthref, cons
         orth.set_alpha(i, a(i));
         if(i != 0)
         {
-            std::cerr << "b" << i << " " << b(i) << "\r";
             ASSERT(b(i) >= 0, "Failed to construct nonclassical orthogonal polynomial object.  Invalid beta coefficients encountered.  This may be caused by inaccurate evaluation of the moments or overflow or underflow issues in the calculation.  These issues may be resolved by changing the monic polynomials used for the construction of the moments..");
             orth.set_beta(i-1, std::sqrt(b(i)));
         }
@@ -487,7 +571,6 @@ void nonclassical_polynomial(orthopol<T>& orth, const orthopol<T>& orthref, size
         for(size_t i = 0; i < 2*nmax; ++i)
         {
             modified_moments[i] = quad::adaptive_integrate([&](T x){return orthref.monic(x, i)*f(x)*scale_factor;}, gauss_leg, xmin, xmax, false, tol, true, rel_tol, 0.0, max_order, false);
-            std::cerr << i << " " << modified_moments[i] << std::endl;
         }
         CALL_AND_HANDLE(nonclassical_polynomial(orth, orthref, modified_moments, scale_factor), "An issues occured when applying modified Chebyshev algorithm.  This is likely a result of a poor choice of the monic polynomials, resulting in inaccurate evaluation of moments.");
         orth.set_domain(xmin, xmax);
@@ -519,7 +602,6 @@ void nonclassical_polynomial(orthopol<T>& orth, const orthopol<T>& orthref, T xm
         for(size_t i = 0; i < 2*nmax; ++i)
         {
             modified_moments[i] = quad::adaptive_integrate([&](T x){return orthref.monic(x, i)*f(x)*scale_factor;}, gauss_leg, xmin, xmax, false, tol, true, rel_tol, 0.0, max_order, false);
-            std::cerr << i << " " << modified_moments[i] << std::endl;
         }
         CALL_AND_HANDLE(nonclassical_polynomial(orth, orthref, modified_moments, scale_factor), "An issues occured when applying modified Chebyshev algorithm.  This is likely a result of a poor choice of the monic polynomials, resulting in inaccurate evaluation of moments.");
         orth.set_domain(xmin, xmax);

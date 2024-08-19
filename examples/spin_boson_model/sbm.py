@@ -128,7 +128,6 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, Ncut = 20, nstep 
     g, w, renorm = discretise_bath(Nb, alpha, wc, s, beta=None, Nw=Nw)
 
 
-
     H = None
 
     if geom  == 'chain':
