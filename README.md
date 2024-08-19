@@ -8,7 +8,7 @@ A Tree Tensor Network Software Package written in C++ with a Python Wrapper
 ## Dependencies
 External Libraries:
 - Required: [Pybind11](https://github.com/pybind/pybind11) Python bindings
-            [Catch2](https://rapidjson.org/) C++ Unit Tests
+            [Catch2](https://github.com/catchorg/Catch2) C++ Unit Tests
             [BLAS](https://netlib.org/blas/) linear algebra
             [Lapack](https://netlib.org/lapack/) linear algebra
             [CMake](https://cmake.org/) Build System Version 3.11 onwards
