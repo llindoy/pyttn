@@ -45,17 +45,16 @@ def add_chain_bath_hamiltonian(H, Sp, t, e, Sm=None, binds = None):
     return H
 
 #setup the chain hamiltonian for the spin boson model - that is this implements the method described in Nuomin, Beratan, Zhang, Phys. Rev. A 105, 032406
-def add_ipchain_bath_hamiltonian(H, Sp, t0, w, P, Sm = None, binds = None):
-    Nb = w.shape[0]
+def add_ipchain_bath_hamiltonian(H, Sp, Nb, t0, w, P, Sm = None, binds = None):
     if not isinstance(binds, np.ndarray):
         if binds is None:
             binds = [i+1 for i in range(Nb)]
 
     class func_class:
         def __init__(self, i, t0, e0, U0, conj = False):
-            self.i = i
+            self.i = copy.deepcopy(i)
             self.conj=conj
-            self.t0 = t0
+            self.t0 = copy.deepcopy(t0)
             self.e = copy.deepcopy(e0)
             self.U = copy.deepcopy(U0)
 
@@ -84,8 +83,9 @@ def add_bath_hamiltonian(H, Sp, g, w, Sm = None, binds = None, geom='star'):
         t, e = chain_map(g, w)
         return add_chain_bath_hamiltonian(H, Sp, t, e, Sm=Sm, binds=binds), e
     elif geom == 'ipchain':
+        w2 = copy.deepcopy(w)
         t, e, U = chain_map(g, w, return_unitary = True)
-        return add_ipchain_bath_hamiltonian(H, Sp, t[0], w, U, Sm = Sm, binds=binds), e
+        return add_ipchain_bath_hamiltonian(H, Sp, e.shape[0], t[0], w2, U, Sm = Sm, binds=binds), e
     else:
         raise RuntimeError("Cannot add bath Hamiltonian geometry not recognised.")
 

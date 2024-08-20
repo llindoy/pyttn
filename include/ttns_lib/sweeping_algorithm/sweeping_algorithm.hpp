@@ -296,7 +296,6 @@ protected:
 
         bool subspace_expanded_f = false;
 
-
         //if the operator is time dependent then we need to advance it to the current time point and update the single particle function operators.  
         //For updating schemes that do not have an explicit time dependence this 
         if(op.is_time_dependent())

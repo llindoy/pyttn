@@ -73,8 +73,8 @@ public:
         }
     }
 
-    void initialise(const ttn_type& A, const env_type& ham, const parameter_list& o){CALL_AND_RETHROW(initialise(A, ham));}
-    void initialise(const ttn_type& A, const env_type& ham, parameter_list&& o){CALL_AND_RETHROW(initialise(A, ham));}
+    void initialise(const ttn_type& A, const env_type& ham, const parameter_list& /* o */){CALL_AND_RETHROW(initialise(A, ham));}
+    void initialise(const ttn_type& A, const env_type& ham, parameter_list&& /* o */){CALL_AND_RETHROW(initialise(A, ham));}
 
     void clear()
     {

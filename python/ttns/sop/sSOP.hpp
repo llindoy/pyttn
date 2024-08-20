@@ -62,6 +62,7 @@ void init_sSOP(py::module& m)
 
 
     m.def("fermion_operator", &fermion_operator);
+    m.def("fOP", &fermion_operator);
 
     //wrapper for the sPOP type 
     py::class_<sPOP>(m, "sPOP")

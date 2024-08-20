@@ -4,26 +4,23 @@ import scipy as sp
 from pyttn.utils import orthopol
 from . import bath_discretisation as disc
 
-class bosonic_bath:
-    def __init__(self, Jw, Sp, Sm = None, beta=None):
+class fermionic_bath:
+    def __init__(self, Jw, Sp, Sm, beta=None):
         self.Sp = Sp
         self.Sm = Sm
         self.Jw = Jw
         self.beta = beta
 
-    def Ct(self, t, wmax, wmin=None):
+    def Ct(self, t, wmax, wmin=None, Ef = 0):
         if wmin == None:
-            if self.beta == None:
-                wmin = 0
-            else:
-                wmin = -wmax
+            wmin = -wmax
         Ct = np.zeros(t.shape, dtype=np.complex128)
 
         if self.beta == None:
             J = self.Jw
             @jit(nopython=True)
             def S(w):
-                return J(np.abs(w))*np.where(w > 0, 1.0, 0.0)
+                return J(w)*np.where(w < Ef, 1.0, 0.0)
             wc = 1e-10
             if wmin < wc:
                 for ti in range(t.shape[0]):
@@ -41,7 +38,7 @@ class bosonic_bath:
             J = self.Jw
             @jit(nopython=True)
             def S(w):
-                return J(np.abs(w))*0.5*(1.0+1.0/np.tanh(beta*np.abs(w)/2.0))*np.where(w > 0, 1.0, np.exp(beta*w))
+                return J(w)*np.exp(-beta*(w-Ef)))(1+np.exp(-beta*(w-Ef)))
 
             wc = 1e-10
             for ti in range(t.shape[0]):
@@ -55,16 +52,18 @@ class bosonic_bath:
         return Ct/np.pi
 
 
-    def Sw(self, w):
+    def Sw(self, w, Ef = 0):
         if self.beta == None:
-            return self.Jw(np.abs(w))*np.where(w > 0, 1.0, 0.0)
+            return self.Jw(w)*np.where(w < Ef, 1.0, 0.0)
         else:
-            return self.Jw(np.abs(w))*0.5*(1.0+1.0/np.tanh(self.beta*np.abs(w)/2.0))*np.where(w > 0, 1.0, np.exp(self.beta*w))
+            return self.Jw(w)*np.exp(-beta*(w-Ef)))(1+np.exp(-beta*(w-Ef)))
 
 
-    def discretise(self, Nb, wmax, method='orthopol', *args, **kwargs):
-        return disc.discretise_bosonic(self.Jw, Nb, wmax, method=method, beta=self.beta, *args, **kwargs)
+    def discretise(self, Nb, wmax, wmin=None, Ef = 0, method='orthopol', *args, **kwargs):
+        if(wmin == None):
+            wmin = -wmax
+        return disc.discretise_fermionic(self.Jw, Ef, Nb, wmin=wmin, wmax, method=method, beta=self.beta, *args, **kwargs)
 
-    def fitCt(self, wmax = None, wmin=None, aaa_tol = 1e-3, Naaa=1000, aaa_nmax=500, aaa_support_points = None):
+    def fitCt(self, wmax = None, wmin=None, aaa_tol = 1e-3, Naaa=1000, aaa_nmax=500, aaa_support_points = None, Ef = 0):
         from .heom.aaa_bath_fitting import aaa_fit_correlation_function
-        return aaa_fit_correlation_function(lambda x : self.Sw(x), wmax = wmax, wmin=wmin, aaa_tol = aaa_tol, Naaa=Naaa, aaa_nmax=aaa_nmax, aaa_support_points = aaa_support_points)
+        return aaa_fit_correlation_function(lambda x : self.Sw(x, Ef=Ef), wmax = wmax, wmin=wmin, aaa_tol = aaa_tol, Naaa=Naaa, aaa_nmax=aaa_nmax, aaa_support_points = aaa_support_points)
