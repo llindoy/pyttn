@@ -171,7 +171,7 @@ def discretise_orthopol_fermionic(J, Ef, Nb, wmax, wmin = None, beta=None, momen
         #setup the bath spectral function for finite temperature
         @jit(nopython=True)
         def S(w):
-            return J(w)*np.exp(-beta*(w-Ef)))(1+np.exp(-beta*(w-Ef)))
+            return J(w)*np.exp(-beta*(w-Ef))/(1+np.exp(-beta*(w-Ef)))
 
         #if wmin is not specified set it uero
         if wmin is None:
@@ -215,7 +215,7 @@ def discretise_density_fermionic(J, Nb, wmax, rho=None, wmin = None, beta=None, 
         #setup the bath spectral function for zero temperature
         @jit(nopython=True)
         def S(w):
-            return J(w)*np.exp(-beta*(w-Ef)))(1+np.exp(-beta*(w-Ef)))
+            return J(w)*np.exp(-beta*(w-Ef))/(1+np.exp(-beta*(w-Ef)))
 
         #if wmin is not specified set it to zero
         if wmin is None:

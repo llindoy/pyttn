@@ -38,7 +38,7 @@ class fermionic_bath:
             J = self.Jw
             @jit(nopython=True)
             def S(w):
-                return J(w)*np.exp(-beta*(w-Ef)))(1+np.exp(-beta*(w-Ef)))
+                return J(w)*np.exp(-beta*(w-Ef))/(1+np.exp(-beta*(w-Ef)))
 
             wc = 1e-10
             for ti in range(t.shape[0]):
@@ -56,7 +56,7 @@ class fermionic_bath:
         if self.beta == None:
             return self.Jw(w)*np.where(w < Ef, 1.0, 0.0)
         else:
-            return self.Jw(w)*np.exp(-beta*(w-Ef)))(1+np.exp(-beta*(w-Ef)))
+            return self.Jw(w)*np.exp(-beta*(w-Ef))/(1+np.exp(-beta*(w-Ef)))
 
 
     def discretise(self, Nb, wmax, wmin=None, Ef = 0, method='orthopol', *args, **kwargs):
