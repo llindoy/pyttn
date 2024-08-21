@@ -31,11 +31,12 @@ class bosonic_bath:
                     ctr += sp.integrate.quad(lambda x : S(x)*np.cos(x*t[ti]), wmin, wc, points=0)[0]
                     cti = sp.integrate.quad(S, wc, wmax, weight='sin', wvar = t[ti])[0]
                     cti += sp.integrate.quad(lambda x : S(x)*np.sin(x*t[ti]), wmin, wc, points=0)[0]
+                    Ct[ti] = ctr - 1.0j*cti
             else:
                 for ti in range(t.shape[0]):
                     ctr = sp.integrate.quad(S, wmin, wmax, weight='cos', wvar = t[ti])[0] 
                     cti = sp.integrate.quad(S, wmin, wmax, weight='sin', wvar = t[ti])[0]
-                Ct[ti] = ctr - 1.0j*cti
+                    Ct[ti] = ctr - 1.0j*cti
         else:
             beta = self.beta
             J = self.Jw

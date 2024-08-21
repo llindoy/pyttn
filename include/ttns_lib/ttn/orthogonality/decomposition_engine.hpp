@@ -312,42 +312,10 @@ public:
 
             CALL_AND_HANDLE(resizeU(U, A.shape(0), bond_dimension), "Failed to resize U matrix to make it compatible with expected bond dimension.");
             CALL_AND_HANDLE(resizeS(S, bond_dimension), "Failed to resize S matrix to make it compatible with expected bond dimension.");
-            CALL_AND_HANDLE(resizeV(V, bond_dimension, A.shape(1)), "Failed to resize V matrix to make it compatible with expected bond dimension.");
+            CALL_AND_HANDLE(resizeV(m_temp, bond_dimension, A.shape(1)), "Failed to resize V matrix to make it compatible with expected bond dimension.");
 
             if(save_shost){CALL_AND_HANDLE(m_shost = S, "Failed to copy singular values to host.");}
 
-            //if(S.size(0) == bond_dimension && S.size(1) == bond_dimension)  
-            //{
-            //
-            //    //if A.shape(0) < A.shape(1) then the resultant U matrix is the square matrix.  For our implementation this matrix must be 
-            //    //a rectangular matrix and so now we resize and zero pad the U and S matrices to make sure everything is correct.
-            //    if(A.shape(0) < A.shape(1))
-            //    {       
-            //        std::cerr << "ruynning this one b" << std::endl;
-            //        CALL_AND_HANDLE(pad_buffer(A, U, S, A.shape(1)), "Failed to pad buffer");
-            //    }
-            //    CALL_AND_HANDLE(V = S*m_temp, "Failed to assign rb matrix.");
-            //}
-            //////now handle the case where we need to perform truncation
-            //////first truncate s and temp so that the matrix multiplication can be performed as required
-            //else
-            //{
-            //    //if A.shape(0) < A.shape(1) then the resultant U matrix is the square matrix.  For our implementation this matrix must be 
-            //    //a rectangular matrix and so now we resize and zero pad the U and S matrices to make sure everything is correct.  If we are truncating then
-            //    //in the case where we are truncating we only pad up to bond_dimension
-            //    if(A.shape(0) < A.shape(1))
-            //    {       
-            //        std::cerr << "ruynning this one a" << std::endl;
-            //        //if the shape is less than bond dimension then we pad up to bond-dimension in size - we don't do the full padding
-            //        CALL_AND_HANDLE(pad_buffer(A, U, S, A.shape(1)), "Failed to pad buffer");
-            //    }
-            //    CALL_AND_HANDLE(truncateU(U, bond_dimension), "Failed to truncate U matrix.");
-            //    CALL_AND_HANDLE(truncateV(m_temp, bond_dimension), "Failed to truncate U matrix.");
-
-            //    CALL_AND_HANDLE(V.resize(bond_dimension, V.size(1)), "Failed to resize V array.");
-            //    S.resize(bond_dimension, bond_dimension);
-
-            //}
             CALL_AND_HANDLE(V = S*m_temp, "Failed to compute V");
 
             return bond_dimension;
@@ -447,7 +415,6 @@ public:
             }
             else
             {
-                std::cerr << "here" << std::endl;
                 ASSERT(V.size() <= m_temp.capacity(), "The temporary matrix does not have sufficient capacity.");
                 CALL_AND_HANDLE(m_temp = trans(V), "Failed to evaluate transpose of V matrix into temporary buffer.");
                 CALL_AND_HANDLE(V = m_temp, "Failed to store transposed V matrix.");

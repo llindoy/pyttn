@@ -55,7 +55,7 @@ def add_bath_subtree(node, degree, b_mode_dims, chi, nbose):
         ntreeBuilder.mps_subtree(node, b_mode_dims, chi, min(chi, nbose))
 
 def build_tree(degree, b_mode_dims, chi, nbose):
-    ret = ntree("(1(7(7))(1(%d(%d(%d)(%d))(%d(%d)(%d)))(%d(%d(%d)(%d))(%d))))" %( chi, chi, chi,  chi, chi, chi,  chi, chi, chi,  chi, chi, chi ))
+    ret = ntree("(1(7(7))(7(%d(%d(%d)(%d))(%d(%d)(%d)))(%d(%d(%d)(%d))(%d))))" %( chi, chi, chi,  chi, chi, chi,  chi, chi, chi,  chi, chi, chi ))
     add_bath_subtree(ret()[1][0][0][0], degree, b_mode_dims, chi, nbose)
     add_bath_subtree(ret()[1][0][0][1], degree, b_mode_dims, chi, nbose)
     add_bath_subtree(ret()[1][0][1][0], degree, b_mode_dims, chi, nbose)
@@ -70,7 +70,6 @@ def build_tree(degree, b_mode_dims, chi, nbose):
 #TODO: Need to figure out why the ipchain version of this function randomly changes the normalisation of the state we are interested in.
 import copy
 def single_set_fmo_dynamics(T, Nb, chi, nbose, dt, nstep, geom='star', ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0):
-
     @jit(nopython=True)
     def spectral_density(w):
         return Jdebye(w)#ar(w)+Jh(w)
@@ -87,7 +86,6 @@ def single_set_fmo_dynamics(T, Nb, chi, nbose, dt, nstep, geom='star', ofname='s
         v = np.zeros(7)
         v[i] = 1.0
         op =  site_operator(v, optype="diagonal_matrix", mode=0)
-        print(op)
         observables.append(copy.deepcopy(op))
         opdict.insert(0, "S"+str(i),op)
 
@@ -134,14 +132,12 @@ def single_set_fmo_dynamics(T, Nb, chi, nbose, dt, nstep, geom='star', ofname='s
         #add the bath hamiltonian on
         H, w = oqs.add_bath_hamiltonian(H, bath.Sp, 2*g, w, geom=geom, binds = [i*Nb+1+ x for x in range(Nb)])
 
-    print(H)
     #construct the Hamiltonian
     h = sop_operator(H, A, sysinf, opdict)
 
     mel = matrix_element(A, 10)
 
     sweep = None
-    adaptive = False
     if not adaptive:
         sweep = tdvp(A, h, krylov_dim = 12)
     else:
@@ -150,7 +146,7 @@ def single_set_fmo_dynamics(T, Nb, chi, nbose, dt, nstep, geom='star', ofname='s
         sweep.unoccupied_threshold=unoccupied_threshold
         sweep.minimum_unoccupied=nunoccupied
 
-    sweep.dt = 1e-6
+    sweep.dt = dt
     sweep.coefficient = -1.0j
 
     if(geom == 'ipchain'):
@@ -164,14 +160,10 @@ def single_set_fmo_dynamics(T, Nb, chi, nbose, dt, nstep, geom='star', ofname='s
     maxchi[0] = A.maximum_bond_dimension()
     for i in range(nstep):
         t1 = time.time()
-        print(mel(A, A), res[j, i+1])
         sweep.step(A, h)
-        print(mel(A, A), res[j, i+1])
-        exit()
         t2 = time.time()
         for j in range(7):
             res[j, i+1] = np.real(mel(observables[j], A, A))
-            print(mel(A, A), res[j, i+1])
         sys.stdout.flush()
         maxchi[i+1] = A.maximum_bond_dimension()
 
@@ -205,7 +197,7 @@ if __name__ == "__main__":
     parser.add_argument('--geom', type = str, default='star')
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=14)
+    parser.add_argument('--chi', type=int, default=36)
     parser.add_argument('--degree', type=int, default=1)
 
     #maximum bosonic hilbert space dimension

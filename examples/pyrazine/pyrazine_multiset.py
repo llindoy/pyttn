@@ -12,47 +12,42 @@ from pyrazine_hamiltonian import *
 
 fs = 41.341374575751
 
-def pyrazine_test(N1, N2, N3, N4, N5, Nb, Nprim, nstep, dt, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, ofname='pyrazine.h5'):
+def pyrazine_test(N1, N2, N3, N4, N5, Nb, Nprim, nstep, dt, ofname='pyrazine.h5'):
 
-    N = 25
+    N = 24
     #set up the vibrational basis set sizes
     m = [Nprim for i in range(24)]
 
     #build topology and capacity trees
-    topo = build_topology_from_string(2,2,2,2,2,2,Nprim)
-    capacity= build_topology_from_string(N1, N2, N3, N4, N5, Nb, Nprim)
+    topo= build_topology_from_string_multiset(N1, N2, N3, N4, N5, Nb, Nprim)
+    topoB= build_topology_from_string_multiset(1,1,1,1,1,1, Nprim)
 
     #set up the sum of product operator Hamiltonian
-    H, sysinf, opdict = hamiltonian(m)  
+    H, sysinf = multiset_hamiltonian(m)  
 
     #setup the wavefunction
-    A = ttn(topo, capacity, dtype=np.complex128)
-    state = np.zeros(N, dtype=int)
-    state[0]=1
-    A.set_state(state)
+    A = ms_ttn(topo, 2, dtype=np.complex128)
+    coeff = np.zeros(2)
+    coeff[1] = 1.0
+    state = [[0 for i in range(N)] for j in range(2)]
+    A.set_state(coeff, state)
 
-    B = ttn(topo, dtype=np.complex128)
-    state = np.zeros(N, dtype=int)
-    state[0]=1
-    B.set_state(state)
+    B = ms_ttn(topoB, 2, dtype=np.complex128)
+    B.set_state(coeff, state)
 
     #setup the hierarchical SOP hamiltonian
-    h = sop_operator(H, A, sysinf, opdict)
+    h = multiset_sop_operator(H, A, sysinf)
 
     mel = matrix_element(A)
 
     #csetup the evolution object
-    sweepA = tdvp(A, h, krylov_dim = 12, expansion='subspace')
-    sweepA.spawning_threshold = spawning_threshold
-    sweepA.unoccupied_threshold=unoccupied_threshold
-    sweepA.minimum_unoccupied=nunoccupied
+    sweepA = tdvp(A, h, krylov_dim = 12)
     sweepA.dt = dt
     sweepA.coefficient = -1.0j
 
     res = np.zeros(nstep+1, dtype=np.complex128)
     maxchi = np.zeros(nstep+1)
     res[0] = mel(B, A)
-    maxchi[0] = A.maximum_bond_dimension()
 
     print(0, np.real(res[0]), np.imag(res[0]), maxchi[0])
     for i in range(nstep):
@@ -60,25 +55,26 @@ def pyrazine_test(N1, N2, N3, N4, N5, Nb, Nprim, nstep, dt, spawning_threshold=1
         sweepA.step(A, h)
         t2 = time.time()
         res[i+1] = mel(B, A)
-        maxchi[i+1] = A.maximum_bond_dimension()
 
-        if(i % 100):
-            h5 = h5py.File(ofname, 'w')
-            h5.create_dataset('t', data=(np.arange(nstep+1)*dt/fs))
-            h5.create_dataset('Sz', data=res)
-            h5.create_dataset('maxchi', data=maxchi)
-            h5.close()
+        print((i+1)*dt/fs, np.real(res[i+1]), np.imag(res[i+1]), np.real(mel(A, A)))
+        sys.stdout.flush()
 
-    h5 = h5py.File(ofname, 'w')
-    h5.create_dataset('t', data=(np.arange(nstep+1)*dt/fs))
-    h5.create_dataset('Sz', data=res)
-    h5.create_dataset('maxchi', data=maxchi)
-    h5.close()
+        #if(i % 100):
+        #    h5 = h5py.File(ofname, 'w')
+        #    h5.create_dataset('t', data=(np.arange(nstep+1)*dt/fs))
+        #    h5.create_dataset('Sz', data=res)
+        #    h5.create_dataset('maxchi', data=maxchi)
+        #    h5.close()
+
+    #h5 = h5py.File(ofname, 'w')
+    #h5.create_dataset('t', data=(np.arange(nstep+1)*dt/fs))
+    #h5.create_dataset('Sz', data=res)
+    #h5.create_dataset('maxchi', data=maxchi)
+    #h5.close()
 
 tmax = 600*fs
 dt = 0.05*fs
 nsteps = int(tmax/dt)+1
-
 
 from multiprocessing.pool import Pool
 import os
