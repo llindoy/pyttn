@@ -254,8 +254,10 @@ def hamiltonian(mode_dims):
     op =  site_operator(v, optype="matrix", mode=0)
     opdict.insert(0, "sx", op)
 
-    #now set up the Hamiltonian
+    #energy spacing of the S1 and S2 state
     H += -delta*sOP("sz", 0)
+
+    #add on the vibrational mode terms
     for v in vs:
         H += omegas[v]*sOP("n", mode_index(v))
 
@@ -300,6 +302,8 @@ def multiset_hamiltonian(mode_dims):
 
     #now set up the Hamiltonian
     H[0,0] -= delta
+    H[0,1] += 0
+    H[1,0] += 0
     H[1,1] += delta
     for v in vs:
         H[0,0] += omegas[v]*sOP("n", vibrational_mode_index(v))

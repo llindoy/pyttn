@@ -728,6 +728,22 @@ public:
         }
     }
 
+    void conj()
+    {
+        try
+        {
+            for(auto& a : m_nodes)
+            {
+                CALL_AND_RETHROW(a.conj());
+            }
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to conjugate ttn object.");
+        }
+    }
+
     real_type norm() const
     {
         real_type norm=0;

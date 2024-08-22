@@ -36,6 +36,7 @@ void init_msttn(py::module &m, const std::string& label)
         .def("is_root", &_msttn_node::is_root)
         .def("is_leaf", &_msttn_node::is_leaf)
         .def("complex_dtype", [](const _msttn_node&){return !std::is_same<T, real_type>::value;})
+        .def("conj", &_msttn_node::conj)
         .def("__len__", &_msttn_node::size)
         .def("__str__", [](const _msttn_node& o){std::ostringstream oss; oss << o; return oss.str();})
         .def(
@@ -128,6 +129,7 @@ void init_msttn(py::module &m, const std::string& label)
         .def("__idiv__", [](_msttn& a, const real_type& b){return a*=b;})
         .def("__idiv__", [](_msttn& a, const T& b){return a*=b;})
         
+        .def("conj", &_msttn::conj)
         .def("random", &_msttn::random)
         .def("zero", &_msttn::zero)
 

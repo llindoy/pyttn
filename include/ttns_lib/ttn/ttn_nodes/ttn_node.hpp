@@ -163,6 +163,11 @@ public:
         this->m_mode_dims[n]  = dim;
     }
 
+    void conj()
+    {
+        this->as_matrix() = linalg::conj(this->as_matrix());
+    }
+
     size_type nelems(bool use_max_dim = false) const{return this->hrank(use_max_dim)*this->dimen(use_max_dim);}
     size_type nset() const {return 1;}
     size_type max_hrank() const{return m_max_hrank;}
@@ -1099,6 +1104,11 @@ public:
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
         this->m_data.set_node_purification(rng);
+    }
+
+    void conj()
+    {
+        this->m_data.conj();
     }
 public:
     static size_type contraction_capacity(const node_type& a, const node_type& b){CALL_AND_RETHROW(return node_helper::contraction_capacity(a, b));}

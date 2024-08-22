@@ -36,6 +36,7 @@ void init_ttn(py::module &m, const std::string& label)
         .def("is_orthogonalised", &_ttn_node_data::reallocate)
         .def("complex_dtype", [](const _ttn_node_data&){return !std::is_same<T, real_type>::value;})
 
+        .def("conj", &_ttn_node_data::conj)
         .def("nmodes", &_ttn_node_data::nmodes)
         .def("hrank", &_ttn_node_data::hrank)
         .def("dimen", &_ttn_node_data::dimen)
@@ -73,6 +74,7 @@ void init_ttn(py::module &m, const std::string& label)
         .def("is_root", &_ttn_node::is_root)
         .def("is_leaf", &_ttn_node::is_leaf)
         .def("complex_dtype", [](const _ttn_node&){return !std::is_same<T, real_type>::value;})
+        .def("conj", &_ttn_node::conj)
         .def("__len__", &_ttn_node::size)
         .def("__str__", [](const _ttn_node& o){std::ostringstream oss; oss << o; return oss.str();})
         .def(
@@ -154,6 +156,7 @@ void init_ttn(py::module &m, const std::string& label)
         .def("__idiv__", [](_ttn& a, const real_type& b){return a*=b;})
         .def("__idiv__", [](_ttn& a, const T& b){return a*=b;})
         
+        .def("conj", &_ttn::conj)
         .def("random", &_ttn::random)
         .def("zero", &_ttn::zero)
 

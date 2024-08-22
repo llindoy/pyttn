@@ -17,6 +17,7 @@ def evolve_imaginary_time(A, h, mel, sweep, betasteps):
     beta_p = 0
     rho0 = 1.0
     for i in range(betasteps.shape[0]):
+        sweep.dt = betasteps[i]-beta_p
         beta_p = betasteps[i]
         sweep.step(A, h)
         rho = A.normalise()
@@ -29,7 +30,7 @@ def sigma(w, ij, eps, kappa):
     if (kappa*np.abs(w*ij) < eps):
         return kappa*w*ij
     else:
-        return w
+        return eps
 
 def measurement_basis(w, eps, kappa, n):
     res = np.exp(1.0j*np.random.uniform(0, 2*np.pi, size=(n, n)))
@@ -122,11 +123,11 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, nbeta =
     Uproj.append(np.array([[0, 1], [1, 0]], dtype=np.complex128))
 
     if geom == 'star':
-        eps = 4
-        kappa = 0.1
+        eps = 2
+        kappa = 1
     else:
-        eps = 1.2*np.amin(w)
-        kappa = 1/np.amin(w)
+        eps = 10
+        kappa = 1
     for i in range(Nb):
         Uproj.append(measurement_basis(w[i], eps, kappa, mode_dims[i]))
 

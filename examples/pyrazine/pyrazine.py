@@ -59,25 +59,27 @@ def pyrazine_test(N1, N2, N3, N4, N5, Nb, Nprim, nstep, dt, spawning_threshold=1
         t1 = time.time()
         sweepA.step(A, h)
         t2 = time.time()
+        B = copy.deepcopy(A)
+        B.conj()
         res[i+1] = mel(B, A)
         maxchi[i+1] = A.maximum_bond_dimension()
 
         if(i % 100):
             h5 = h5py.File(ofname, 'w')
-            h5.create_dataset('t', data=(np.arange(nstep+1)*dt/fs))
+            h5.create_dataset('t', data=(np.arange(nstep+1)*dt*2/fs))
             h5.create_dataset('Sz', data=res)
             h5.create_dataset('maxchi', data=maxchi)
             h5.close()
 
     h5 = h5py.File(ofname, 'w')
-    h5.create_dataset('t', data=(np.arange(nstep+1)*dt/fs))
+    h5.create_dataset('t', data=(np.arange(nstep+1)*dt*2/fs))
     h5.create_dataset('Sz', data=res)
     h5.create_dataset('maxchi', data=maxchi)
     h5.close()
 
-tmax = 600*fs
+tmax = 150*fs
 dt = 0.05*fs
-nsteps = int(tmax/dt)+1
+nsteps = int(tmax/(2*dt))+1
 
 
 from multiprocessing.pool import Pool
@@ -85,8 +87,6 @@ import os
 
 def run(x):
     os.environ['OMP_NUM_THREADS']='1'
-    if x == 8:
-        pyrazine_test(8, 8, 8, 5, 5, 8, 60, nsteps, dt, ofname='pyrazine-8.h5')
     elif x == 12:
         pyrazine_test(12, 12, 12, 8, 8, 8, 60, nsteps, dt, ofname='pyrazine-12.h5')
     elif x == 16:
@@ -99,11 +99,12 @@ def run(x):
         pyrazine_test(48, 48, 48, 24, 24, 16, 60, nsteps, dt, ofname='pyrazine-48.h5')
     elif x == 64:
         pyrazine_test(64, 64, 64, 30, 30, 16, 60, nsteps, dt, ofname='pyrazine-64.h5')
+    elif x == 80:
+        pyrazine_test(80, 80, 80, 30, 30, 16, 60, nsteps, dt, ofname='pyrazine-80.h5')
     elif x == 128:
-        pyrazine_test(128, 128, 128, 35, 25, 16, 60, nsteps, dt, ofname='pyrazine-128.h5')
-
+        pyrazine_test(128, 128, 128, 30, 30, 16, 60, nsteps, dt, ofname='pyrazine-128.h5')
 
 if __name__ == '__main__':
     p = Pool(8)
-    inds = [8, 12, 16, 24, 32, 48, 64, 128]
+    inds = [12, 16, 24, 32, 48, 64, 80, 128]
     p.map(run, inds)

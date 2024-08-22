@@ -8,12 +8,14 @@ import copy
 sys.path.append("../../")
 from pyttn import *
 from pyttn import oqs
+from pyttn.oqs.heom import softmspace
 
 from numba import jit
 
 
-def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0):
+def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut = 20, nstep = 1, nbeta=100, Nw = 7.5, ofname='sbm_purification.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0):
 
+    geom='chain'
     t = np.arange(nstep+1)*dt
 
     #setup the function for evaluating the exponential cutoff spectral density
@@ -22,7 +24,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
         return np.abs(np.pi/2*alpha*wc*np.power(w/wc, s)*np.exp(-np.abs(w/wc)))*np.where(w > 0, 1.0, -1.0)
 
     #set up the open quantum system bath object
-    bath = oqs.bosonic_bath(J, sOP("sz", 0), beta=beta)
+    bath = oqs.bosonic_bath(J, sOP("sz", 0), beta=None)
 
     #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
     g,w = bath.discretise(Nb, Nw*wc, method='orthopol')
@@ -35,7 +37,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
 
     #and add on the system parts
     H += eps*sOP("sz", 0)
-    H += delta*sOP("sx", 0)
+    H += 2*delta*sOP("sx", 0)
 
     #now add on the bath bits getting additionally getting a frequency parameter that can be used in energy based
     #truncation schemes
@@ -72,46 +74,96 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     ntreeBuilder.sanitise(capacity)
 
 
-    A = ttn(topo, capacity, dtype=np.complex128)
-    A.set_state([0 for i in range(Nb+1)])
-    print(topo)
+    A = ttn(topo, capacity, dtype=np.complex128, purification=True)
+    A.set_identity_purification()
 
-    h = sop_operator(H, A, sysinf, identity_opt=True, compress=True)
+    B = ttn(topo, capacity, dtype=np.complex128, purification=True)
+    B.set_identity_purification()
+
+    C = ttn(topo, capacity, dtype=np.complex128, purification=False)
+    C.set_state([0 for x in range(N)])
+
 
     mel = matrix_element(A)
 
-    op = site_operator_complex(
-        sOP("sz", 0),
-        sysinf
-    )
+    sz_op = site_operator([0.5, 0.5, -0.5, -0.5], optype="diagonal_matrix", mode=0)
 
-    sweep = None
+    #estimate the ground state energy to allow for a less dramatic shift of the dynamics
+    if(True):
+        h = sop_operator(H, C, sysinf, identity_opt=True, compress=True)
+        sweepC = dmrg(C, h, krylov_dim = 12)
+        sweepC.step(C, h)
+        print(sweepC.E())
+        sweepC.step(C, h)
+        print(sweepC.E())
+        sweepC.step(C, h)
+        print(sweepC.E())
+        sweepC.step(C, h)
+        E = sweepC.E()
+        H -= E
+
+    h = sop_operator(H, A, sysinf, identity_opt=True, compress=True)
+    sweepA = None
     if not adaptive:
-        sweep = tdvp(A, h, krylov_dim = 12)
+        sweepA = tdvp(A, h, krylov_dim = 12)
     else:
-        sweep = tdvp(A, h, krylov_dim = 12, expansion='subspace')
-        sweep.spawning_threshold = spawning_threshold
-        sweep.unoccupied_threshold=unoccupied_threshold
-        sweep.minimum_unoccupied=nunoccupied
+        sweepA = tdvp(A, h, krylov_dim = 12, expansion='subspace')
+        sweepA.spawning_threshold = spawning_threshold
+        sweepA.unoccupied_threshold=unoccupied_threshold
+        sweepA.minimum_unoccupied=nunoccupied
+    sweepA.coefficient = -1.0
 
-    sweep.dt = dt
-    sweep.coefficient = -1.0j
 
-    if(geom == 'ipchain'):
-        sweep.use_time_dependent_hamiltonian = True
+    sweepB = None
+    if not adaptive:
+        sweepB = tdvp(B, h, krylov_dim = 12)
+    else:
+        sweepB = tdvp(B, h, krylov_dim = 12, expansion='subspace')
+        sweepB.spawning_threshold = spawning_threshold
+        sweepB.unoccupied_threshold=unoccupied_threshold
+        sweepB.minimum_unoccupied=nunoccupied
+    sweepB.coefficient = -1.0
+
+    beta_steps = softmspace(1e-9, beta/2.0, nbeta)
+    beta_p = 0
+    for i in range(beta_steps.shape[0]):
+        sweepA.dt = beta_steps[i]-beta_p
+        beta_p = beta_steps[i]
+        sweepA.step(A, h)
+        rhoA = A.normalise()
+        print(sweepA.t, i, A.maximum_bond_dimension(), rhoA)
+        sys.stdout.flush()
+    #perform the imaginary time evolution steps
+    B = copy.deepcopy(A)
+    B.apply_one_body_operator(sz_op)
+
 
     res = np.zeros(nstep+1)
     maxchi = np.zeros(nstep+1)
-    res[0] = np.real(mel(op, A, A))
+    res[0] = np.real(mel(sz_op, B, A))
     maxchi[0] = A.maximum_bond_dimension()
+
+    sweepA.t = 0
+    sweepA.dt = dt
+    sweepA.coefficient = -1.0j
+    sweepA.use_time_dependent_hamiltonian = True
+
+    sweepB.t = 0
+    sweepB.dt = dt
+    sweepB.coefficient = -1.0j
+    sweepB.use_time_dependent_hamiltonian = True
 
     for i in range(nstep):
         t1 = time.time()
-        sweep.step(A, h, dt)
+        sweepA.step(A, h)
+        sweepB.step(B, h)
         t2 = time.time()
-        res[i+1] = np.real(mel(op, A, A))
+        res[i+1] = np.real(mel(sz_op, B, A))
         maxchi[i+1] = A.maximum_bond_dimension()
 
+        print((i+1)*dt, res[i+1], maxchi[i+1])
+        sys.stdout.flush()
+            
         if(i % 100):
             h5 = h5py.File(ofname, 'w')
             h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
@@ -138,15 +190,12 @@ if __name__ == "__main__":
     #number of bath modes
     parser.add_argument('--N', type=int, default=300)
 
-    #geometry to be used for bath dynamics
-    parser.add_argument('--geom', type = str, default='star')
-
     #system hamiltonian parameters
-    parser.add_argument('--delta', type = float, default=1)
     parser.add_argument('--eps', type = float, default=0)
+    parser.add_argument('--delta', type = float, default=1)
 
     #bath inverse temperature
-    parser.add_argument('--beta', type = float, default=None)
+    parser.add_argument('--beta', type = float, default=5)
 
     #maximum bond dimension
     parser.add_argument('--chi', type=int, default=16)
@@ -154,6 +203,7 @@ if __name__ == "__main__":
 
     #maximum bosonic hilbert space dimension
     parser.add_argument('--nbose', type=int, default=20)
+    parser.add_argument('--nbeta', type=int, default=100)
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.005)
@@ -171,4 +221,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     nstep = int(args.tmax/args.dt)+1
-    sbm_dynamics(args.N, args.alpha, args.wc, args.s, args.eps, args.delta, args.chi, args.nbose, args.dt, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree)
+    sbm_dynamics(args.N, args.alpha, args.wc, args.s, args.eps, args.delta, args.chi, args.nbose, args.dt, beta = args.beta, nstep = nstep, nbeta = args.nbeta, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree)

@@ -466,6 +466,14 @@ public:
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
         this->m_data[sind].set_node_purification(rng);
     }
+
+    void conj()
+    {
+        for(size_t i = 0; i < this->nset(); ++i)
+        {
+            this->m_data[i].conj();
+        }
+    }
 public:
     static size_type contraction_capacity(const node_type& a, const node_type& b){CALL_AND_RETHROW(return node_helper::contraction_capacity(a, b));}
 

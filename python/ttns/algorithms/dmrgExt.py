@@ -2,7 +2,7 @@ from pyttn._pyttn import one_site_dmrg_complex, adaptive_one_site_dmrg_complex, 
 from pyttn._pyttn import multiset_one_site_dmrg_complex, ms_ttn_complex, ms_ttn_real, multiset_sop_operator_complex
 import numpy as np
 
-def dmrg(A, h, krylov_dim = 16, numthreads=1, subspace_krylov_dim = 6, subspace_neigs = 2, expansion='onesite'):
+def single_set_dmrg(A, h, krylov_dim = 16, numthreads=1, subspace_krylov_dim = 6, subspace_neigs = 2, expansion='onesite'):
     if isinstance(A, ttn_complex) and isinstance(h, sop_operator_complex):
         if expansion == 'onesite':
             return one_site_dmrg_complex(A, h, krylov_dim, numthreads)
