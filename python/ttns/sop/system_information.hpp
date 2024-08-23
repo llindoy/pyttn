@@ -61,8 +61,10 @@ inline void init_system_info(py::module &m)
         .def(py::init())
         .def(py::init<size_t>())
         .def(py::init<size_t, size_t>())
+        .def(py::init<size_t, size_t, const std::vector<size_t>&>())
         .def(py::init<const system_modes&>())
         .def(py::init<const std::vector<mode_data>&>())
+        .def(py::init<const std::vector<mode_data>&, const std::vector<size_t>&>())
         .def("assign", [](system_modes& self, const system_modes& o){self=o;})
         .def("__copy__",[](const system_modes& o){return system_modes(o);})
         .def("__deepcopy__", [](const system_modes& o, py::dict){return system_modes(o);}, py::arg("memo"))
@@ -82,6 +84,12 @@ inline void init_system_info(py::module &m)
                 "mode", 
                 static_cast<const mode_data& (system_modes::*)(size_t) const>(&system_modes::mode), 
                 py::return_value_policy::reference
+            )
+        .def("mode_index", [](const system_modes& o, size_t i){return o.mode_index(i);})
+        .def_property(
+                "mode_indices", 
+                &system_modes::mode_indices,
+                &system_modes::set_mode_indices
             );
     
 }

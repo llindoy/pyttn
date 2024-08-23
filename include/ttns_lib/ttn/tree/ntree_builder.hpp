@@ -457,7 +457,6 @@ public:
         CALL_AND_RETHROW(htucker_subtree(std::forward<Args>(args)...));
     }
 
-    //TODO: something is currently going wrong when using mps subtrees.  Need to fix this shortly
     template <typename Func>
     static tree_type mps_tree(const std::vector<T>& Hb, Func&& fl)
     {

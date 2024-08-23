@@ -48,7 +48,7 @@ def Ct(t, w, g):
     fourier = np.exp(-1.0j*W*T)
     return g2@fourier
 
-def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, nbeta = 100, nsamples=256, Ncut = 50, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 2, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0):
+def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, nbeta = 100, nsamples=256, Ncut = 50, nstep = 1, Nw = 9, geom='star', ofname='sbm.h5', degree = 2, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0):
 
     t = np.arange(nstep+1)*dt
 
@@ -62,6 +62,12 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, nbeta =
 
     #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
     g,w = bath.discretise(Nb, Nw*wc, method='orthopol')
+
+    import matplotlib.pyplot as plt
+    ct = bath.Ct(t, Nw*wc)
+    plt.plot(t, np.real(ct))
+    plt.plot(t, np.real( Ct(t, w, g)))
+    plt.show()
 
     #set up the total Hamiltonian
     N = Nb+1
@@ -94,7 +100,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, nbeta =
         sysinf[i+1] = boson_mode(mode_dims[i])
 
     #construct the topology and capacity trees used for constructing 
-    chi0 = 2
+    chi0 = 4
 
     #and add the node that forms the root of the bath.  
     #TODO: Add some better functions for handling the construction of tree structures
@@ -259,7 +265,7 @@ if __name__ == "__main__":
     parser.add_argument('--s', type = float, default=1)
 
     #number of bath modes
-    parser.add_argument('--N', type=int, default=48)
+    parser.add_argument('--N', type=int, default=128)
 
     #geometry to be used for bath dynamics
     parser.add_argument('--geom', type = str, default='star')

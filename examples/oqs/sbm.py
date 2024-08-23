@@ -49,11 +49,12 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     sysinf[0] = spin_mode(2)
     for i in range(Nb):
         sysinf[i+1] = boson_mode(mode_dims[i])
+    print(sysinf.mode_indices)
 
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
     if adaptive:
-        chi0 = 2
+        chi0 = 8
 
     #and add the node that forms the root of the bath.  
     #TODO: Add some better functions for handling the construction of tree structures

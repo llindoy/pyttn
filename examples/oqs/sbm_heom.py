@@ -31,6 +31,8 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, nbose, dt, nbose_min = None, bet
     w = np.linspace(-Nw*wc, Nw*wc, 1000)
 
     Nb = 2*dk.shape[0]
+    print(Nb)
+    exit()
     N = Nb+1
 
     sz = np.array([[1, 0], [0, -1]], dtype=np.complex128)
@@ -185,7 +187,7 @@ if __name__ == "__main__":
     parser.add_argument('--s', type = float, default=1)
 
     #number of bath modes
-    parser.add_argument('--aaatol', type=float, default=1e-3)
+    parser.add_argument('--aaatol', type=float, default=1e-5)
 
     #geometry to be used for bath dynamics
     parser.add_argument('--geom', type = str, default='star')

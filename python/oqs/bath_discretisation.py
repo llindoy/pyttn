@@ -92,7 +92,7 @@ def discretise_density_bosonic(J, Nb, wmax, rho=None, wmin = None, beta=None, at
             @jit(nopython=True)
             def rhofunc(w):
                 return J(w)/np.where(np.abs(w) < 1e-12, 1e-12, np.abs(w))
-            g, w = density_discretisation.discretise(S, S, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
+            g, w = density_discretisation.discretise(S, rhofunc, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
         else:
             g, w = density_discretisation.discretise(S, rho, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
     else:
@@ -111,7 +111,7 @@ def discretise_density_bosonic(J, Nb, wmax, rho=None, wmin = None, beta=None, at
             @jit(nopython=True)
             def rhofunc(w):
                 return J(w)/np.where(np.abs(w) < 1e-12, 1e-12, np.abs(w))
-            g, w = density_discretisation.discretise(S, S, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
+            g, w = density_discretisation.discretise(S, rhofunc, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
         else:
             g, w = density_discretisation.discretise(S, rho, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
 
@@ -148,108 +148,41 @@ def discretise_bosonic(J, Nb, wmax, method='orthopol', *args, **kwargs):
 
 #a function for discretising a fermionic bath (optionally allowing finite temperature baths treated using thermofield theory) using an orthonormal
 #polynomial based quadrature scheme.  
-def discretise_orthopol_fermionic(J, Ef, Nb, wmax, wmin = None, beta=None, moment_scaling = None, atol=0, rtol=1e-10, minbound=1e-25, maxbound=1e25, moment_scaling_steps = 4, find_wmin_points=100, nquad=100):
+def discretise_orthopol_fermionic(J, Nb, wmin, wmax, moment_scaling = None, atol=0, rtol=1e-10, minbound=1e-25, maxbound=1e25, moment_scaling_steps = 4, find_wmin_points=100, nquad=100):
     g = None
     w = None
-    if beta == None:
-        #setup the bath spectral function for zero temperature
-        @jit(nopython=True)
-        def S(w):
-            return J(w)*np.where(w < Ef, 1.0, 0.0)
 
-        #if wmin is not specified set it to zero
-        if wmin is None:
-            wmin = -wmax
+    #if the moment scaling parameter is not zero set its value
+    if moment_scaling is None:
+        moment_scaling = find_moment_scaling_factor(J, wmin, wmax, Nb, atol=atol, rtol=rtol, minbound=minbound, maxbound=maxbound, Nsteps=moment_scaling_steps, nquad=nquad)
 
-        #if the moment scaling parameter is not zero set its value
-        if moment_scaling is None:
-            moment_scaling = find_moment_scaling_factor(S, wmin, wmax, Nb, atol=atol, rtol=rtol, minbound=minbound, maxbound=maxbound, Nsteps=moment_scaling_steps, nquad=nquad)
+    g, w = orthopol_discretisation.discretise(J, wmin, wmax, Nb, moment_scaling=moment_scaling, atol=atol, rtol=rtol, nquad=nquad)
 
-        g, w = orthopol_discretisation.discretise(S, wmin, wmax, Nb, moment_scaling=moment_scaling, atol=atol, rtol=rtol, nquad=nquad)
-
-    else:
-        #setup the bath spectral function for finite temperature
-        @jit(nopython=True)
-        def S(w):
-            return J(w)*np.exp(-beta*(w-Ef))/(1+np.exp(-beta*(w-Ef)))
-
-        #if wmin is not specified set it uero
-        if wmin is None:
-            wmin = -wmax
-
-        #if the moment scaling parameter is not zero set its value
-        if moment_scaling is None:
-            moment_scaling = find_moment_scaling_factor(S, wmin, wmax, Nb, atol=atol, rtol=rtol, minbound=minbound, maxbound=maxbound, Nsteps=moment_scaling_steps, nquad=nquad)
-
-        g, w = orthopol_discretisation.discretise(S, wmin, wmax, Nb, moment_scaling=moment_scaling, atol=atol, rtol=rtol, nquad=nquad)
 
     return np.array(g), np.array(w)
 
 #discretise a fermionic bath using the density algorithm.  Here we allow for specification of the density of frequencies (rho), if this isn't specified we use a density of frequencies
 #that is given by S(w)/w for np.abs(w) > 1e-12 and S(w)/1e-12 for np.abs(w) < 1e-12. 
 #this currently doesn't seem to work
-def discretise_density_fermionic(J, Nb, wmax, rho=None, wmin = None, beta=None, atol=0, rtol=1e-10, nquad=100, wtol=1e-10, ftol=1e-10, niters=100, find_wmin_points=100):
+def discretise_density_fermionic(J, Nb, wmin, wmax, rho=None, atol=0, rtol=1e-10, nquad=100, wtol=1e-10, ftol=1e-10, niters=100, find_wmin_points=100):
     g = None
     w = None
 
-    if beta is None:
-        #setup the bath spectral function for zero temperature
+    if rho is None:
         @jit(nopython=True)
-        def S(w):
-            return J(w)*np.where(w < Ef, 1.0, 0.0)
-
-        #if wmin is not specified set it to zero
-        if wmin is None:
-            wmin = -wmax
-
-        if rho is None:
-            @jit(nopython=True)
-            def rhofunc(w):
-                return J(w)/np.where(np.abs(w) < 1e-12, 1e-12, np.abs(w))
-            g, w = density_discretisation.discretise(S, S, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
-        else:
-            g, w = density_discretisation.discretise(S, rho, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
+        def rhofunc(w):
+            return J(w)/np.where(np.abs(w) < 1e-12, 1e-12, np.abs(w))
+        g, w = density_discretisation.discretise(J, rhofunc, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
     else:
-        Nb = Nb//2
-
-        #setup the bath spectral function for zero temperature
-        @jit(nopython=True)
-        def S(w):
-            return J(w)*np.exp(-beta*(w-Ef))/(1+np.exp(-beta*(w-Ef)))
-
-        #if wmin is not specified set it to zero
-        if wmin is None:
-            wmin = -wmax
-
-        if rho is None:
-            @jit(nopython=True)
-            def rhofunc(w):
-                return J(w)/np.where(np.abs(w) < 1e-12, 1e-12, np.abs(w))
-            g, w = density_discretisation.discretise(S, S, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
-        else:
-            g, w = density_discretisation.discretise(S, rho, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
-
-        g = np.array(g)
-        w = np.array(w)
-        wr = np.zeros(2*Nb-1)
-        gr = np.zeros(2*Nb-1)
-        wr[Nb-1:] = w
-        gr[Nb-1:] = np.array(g)
-
-        wf = np.flip(w)[:-1]
-        gf = np.flip(g)[:-1]
-        wr[:(Nb-1)] = -wf
-        gr[:(Nb-1)] = gf*np.exp(-beta*wf/2.0)
-
-        g = gr
-        w = wr
+        g, w = density_discretisation.discretise(J, rho, wmin, wmax, Nb, atol=atol, rtol=rtol, nquad=nquad, wtol=wtol, ftol=ftol, niters=niters)
     return np.array(g), np.array(w)
 
 
-def discretise_fermionic(J, Eb, Nb, wmin, wmax, method='orthopol', *args, **kwargs):
+def discretise_fermionic(S, Nb, wmin, wmax, method='orthopol', *args, **kwargs):
+
     if method == 'orthopol':
-        return discretise_orthopol_fermionic(J, Nb, wmin, wmax, *args, **kwargs)
+        return discretise_orthopol_fermionic(S, Nb, wmin, wmax, *args, **kwargs)
     elif method == 'density':
-        return discretise_density_fermionic(J, Nb, wmin, wmax, *args, **kwargs)
+        return discretise_density_fermionic(S, Nb, wmin, wmax, *args, **kwargs)
     else:
         raise RuntimeError("Discretisation method not recognised.")

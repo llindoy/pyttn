@@ -157,6 +157,20 @@ public:
         }    
     }
 
+
+    compressedSOP(const SOP<T>& op, const std::vector<size_t>& inds) 
+    {
+        try
+        {
+            initialise(op, inds);
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to construct sum of product operator object.");
+        }    
+    }
+
     compressedSOP& operator=(const compressedSOP& o) = default;
     compressedSOP& operator=(compressedSOP&& o) = default;
 
@@ -170,6 +184,63 @@ public:
         {
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct sum of product operator object.");
+        }    
+    }
+
+    void initialise(const SOP<T>& o, const std::vector<size_t>& inds, size_t nmodes = 0)
+    {
+        try
+        {
+            m_label = o.label();
+            resize(o.nterms(), nmodes > o.nmodes() ? nmodes : o.nmodes());
+
+            //start by copying the base operator dictionary object across
+            m_op_dict = o.reordered_operator_dictionary(inds);
+
+            size_t r = 0;
+            
+            //iterate over each term in the SOP 
+            for(const auto& pop : o)
+            {
+                //and extract the operators acting on each mode.  Here we need to take into acconut
+                //that we can have multiple operators all acting on the same mode and need to form a new
+                //operator label corresponding to these
+                m_coeff[r] = pop.second;
+        
+                std::unordered_map<size_t, compositeSiteOperator> terms;    
+                //now we iterate over the prodOP object and get the compressed 
+                
+                //iterate over each term and store the mode and the compositeSiteOperator.  Here we are using the fact
+                //that the SOP object enforces ordering of operators
+                for(const auto& op : pop.first)
+                {
+                    terms[inds[std::get<1>(op)]].push_back(std::get<0>(op));
+                }
+                if(pop.first.contains_jordan_wigner_string())
+                {
+                    for(size_t i = 0; i < o.nmodes(); ++i)
+                    {
+                        if(pop.first.prepend_jordan_wigner_string(i))
+                        {
+                            terms[inds[i]].push_back(o.jordan_wigner_index(i));
+                        }
+                    }
+                }
+
+                //now attempt to insert these terms into the mode_operator object
+                for(const auto& kv : terms)
+                {
+                    this->_insert(kv.second, r, kv.first);
+                }
+                ++r;
+            }
+
+            CALL_AND_HANDLE(insert_identities(), "Failed to insert identity operators into array.");
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to initialise compressed sum of product operator object.");
         }    
     }
 

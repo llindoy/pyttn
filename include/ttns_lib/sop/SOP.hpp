@@ -470,6 +470,16 @@ public:
 
     const operator_dictionary_type& operator_dictionary() const{return m_opdict;}
 
+    operator_dictionary_type reordered_operator_dictionary(const std::vector<size_t>& order) const
+    {
+        operator_dictionary_type ret(m_opdict.size());
+        for(size_t i = 0; i < m_opdict.size(); ++i)
+        {
+            ret[order[i]] = m_opdict[i];
+        }
+        return ret;
+    }
+
     friend std::ostream& operator<< <T>(std::ostream& os, const SOP<T>& op);
 
     size_t nterms() const{return m_terms.size();}

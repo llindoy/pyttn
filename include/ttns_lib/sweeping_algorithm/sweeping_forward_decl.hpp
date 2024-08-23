@@ -127,6 +127,10 @@ public:
 
 };  //class single_site
 
+
+template <typename T, typename backend, template <typename, typename> class ttn_class, template <typename, typename, template <typename, typename> class > class Environment>
+class population_subspace_expansion;
+
 template <typename T, typename backend, template <typename, typename> class ttn_class, template <typename, typename, template <typename, typename> class > class Environment>
 class variance_subspace_expansion;
 

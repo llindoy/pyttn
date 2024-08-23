@@ -1121,7 +1121,7 @@ protected:
 
 public:
     template <typename tree_type>
-    static void compressed(const SOP<T>& sop, const tree_type& A, tree<auto_sop::node_op_info<T>>& bp, site_ops_type& site_ops)
+    static void compressed(const SOP<T>& sop, const tree_type& A, const std::vector<size_t>& mode_ordering, tree<auto_sop::node_op_info<T>>& bp, site_ops_type& site_ops)
     {
         //first ensure that the SOP object has the same dimensionality as the bp object.
         ASSERT(sop.nmodes() == A.nleaves(), "Failed to compute trivial tree bipartitioning of the SOP.  SOP and Tree do not have the same dimension.");
@@ -1129,7 +1129,7 @@ public:
         INIT_TIMER;
 
         START_TIMER;
-        ttns::compressedSOP<T> csop(sop);
+        ttns::compressedSOP<T> csop(sop, mode_ordering);
         STOP_TIMER("Compressed SOP");
 
         auto coeff = csop.coeff();
@@ -1162,7 +1162,7 @@ public:
     }
 
     template <typename ttn_type>
-    static void literal(const SOP<T>& sop, const ttn_type& A, tree<auto_sop::node_op_info<T>>& bp, site_ops_type& site_ops)
+    static void literal(const SOP<T>& sop, const ttn_type& A, const std::vector<size_t>& mode_ordering, tree<auto_sop::node_op_info<T>>& bp, site_ops_type& site_ops)
     {
         //first ensure that the SOP object has the same dimensionality as the bp object.
         ASSERT(sop.nmodes() == A.nleaves(), "Failed to compute trivial tree bipartitioning of the SOP.  SOP and Tree do not have the same dimension.");
@@ -1174,7 +1174,7 @@ public:
         //now we go through and initialise the trivial bipartitioning at each node.  To do this we want to have a tree containing the mode dimensions
         INIT_TIMER;
         START_TIMER;
-        ttns::compressedSOP<T> csop(sop);
+        ttns::compressedSOP<T> csop(sop, mode_ordering);
         site_ops = csop.site_operators();
 
         STOP_TIMER("Compressed SOP");
@@ -1191,7 +1191,7 @@ public:
 
 public:
     template <typename tree_type>
-    static bool construct(const SOP<T>& sop, const tree_type& A, tree<auto_sop::node_op_info<T>>& bp, site_ops_type& site_ops, bool compress = true)
+    static bool construct(const SOP<T>& sop, const tree_type& A, const std::vector<size_t>& mode_ordering, tree<auto_sop::node_op_info<T>>& bp, site_ops_type& site_ops, bool compress = true)
     {
         if(sop.nterms() > 0)
         {
@@ -1199,11 +1199,11 @@ public:
             //we only compress the term if it has at least two terms
             if(compress && sop.nterms() > 1)
             {
-                autoSOP<T>::compressed(sop, A, bp, site_ops);
+                autoSOP<T>::compressed(sop, A, mode_ordering, bp, site_ops);
             }
             else
             {
-                autoSOP<T>::literal(sop, A, bp, site_ops);
+                autoSOP<T>::literal(sop, A, mode_ordering, bp, site_ops);
             }
             return true;
         }

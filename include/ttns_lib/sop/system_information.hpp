@@ -71,14 +71,37 @@ public:
     using reverse_iterator = typename std::vector<mode_data>::reverse_iterator;
     using const_reverse_iterator = typename std::vector<mode_data>::const_reverse_iterator;
 
+    void set_default_mode_ordering()
+    {
+        for(size_t i = 0; i < m_mode_ordering.size(); ++i){m_mode_ordering[i] = i;}
+    }
+
 public:
     system_modes(){}
-    system_modes(size_t N) : m_primitive_modes(N){}
-    system_modes(size_t N, size_t d) : m_primitive_modes(N)
+    system_modes(size_t N) : m_primitive_modes(N), m_mode_ordering(N)
     {
+        set_default_mode_ordering();
+    }
+    system_modes(size_t N, size_t d) : m_primitive_modes(N), m_mode_ordering(N)
+    {
+        set_default_mode_ordering();
         for(auto& mode : m_primitive_modes){mode.lhd() = d;}
     }
-    system_modes(const std::vector<mode_data>& o) : m_primitive_modes(o) {}
+    system_modes(const std::vector<mode_data>& o) : m_primitive_modes(o) , m_mode_ordering(o.size())
+    {
+        set_default_mode_ordering();
+    }
+
+    system_modes(size_t N, size_t d, const std::vector<size_t>& ordering) : m_primitive_modes(N), m_mode_ordering(ordering)
+    {
+        ASSERT(ordering.size() == N, "Failed to construct system modes object ordering size incorrect.");
+        for(auto& mode : m_primitive_modes){mode.lhd() = d;}
+    }
+    system_modes(const std::vector<mode_data>& o, const std::vector<size_t>& ordering) : m_primitive_modes(o) , m_mode_ordering(ordering)
+    {
+        ASSERT(ordering.size() == o.size(), "Failed to construct system modes object ordering size incorrect.");
+    }
+
     system_modes(const system_modes& o) = default;
     system_modes(system_modes&& o) = default;
 
@@ -92,11 +115,15 @@ public:
         if(N >= nmodes())
         {
             m_primitive_modes.resize(N);
+            m_mode_ordering.resize(N);
+            set_default_mode_ordering();
         }
         else
         {
             clear();
             m_primitive_modes.resize(N);
+            m_mode_ordering.resize(N);
+            set_default_mode_ordering();
         }
     }
 
@@ -124,9 +151,24 @@ public:
         return m_primitive_modes[i];
     }
 
+    const std::vector<size_t>& mode_indices()const
+    {
+        return m_mode_ordering;
+    }
+
+    void set_mode_indices(const std::vector<size_t>& inds)
+    {
+        ASSERT(inds.size() == m_mode_ordering.size(), "Failed to set mode indices.");
+        m_mode_ordering = inds;
+    }
+
+    size_t& mode_index(size_t i){return m_mode_ordering[i];}
+    const size_t& mode_index(size_t i) const {return m_mode_ordering[i];}
+
     void clear() noexcept
     {
         m_primitive_modes.clear();
+        m_mode_ordering.clear();
         m_composite_modes.clear();
         m_bound_primitive_modes.clear();
     }
@@ -144,6 +186,7 @@ public:
 
 protected:
     std::vector<mode_data> m_primitive_modes;
+    std::vector<size_t> m_mode_ordering;
     std::vector<composite_mode> m_composite_modes;
     std::list<size_t> m_bound_primitive_modes;
 };

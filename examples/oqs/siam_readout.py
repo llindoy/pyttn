@@ -28,6 +28,11 @@ def siam_tree(chi, chiU, degree, Nbo, Nbe):
     ntreeBuilder.sanitise(topo)
     return topo
 
+def Ct(t, w, g):
+    T, W = np.meshgrid(t, w)
+    g2 = g**2
+    fourier = np.exp(-1.0j*W*T)
+    return g2@fourier
 
 def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0):
     if chiU is None:
@@ -38,10 +43,11 @@ def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut
     #setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
     def V(w):
-        return np.where(np.abs(w) <= W, Gamma * np.sqrt(1-(w/W)**2), 0.0)
+        return np.where(np.abs(w) <= W, Gamma, 0.0)
 
     #set up the open quantum system bath object
     bath = oqs.fermionic_bath(V, beta=beta)
+
 
     gf,wf, ge, we = bath.discretise(Nb, W, method='orthopol')
     g = np.sqrt(np.pi)*np.concatenate((gf, ge))
@@ -95,6 +101,7 @@ def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut
     for i in range(Nbo):
         state[1+i] = 1
         state[N+1+i] = 1
+    state[N]=1
     print(state)
     A.set_state(state)
 
@@ -173,9 +180,9 @@ if __name__ == "__main__":
 
     #exponential bath cutoff parameters
     parser.add_argument('--Gamma', type = float, default=1)
-    parser.add_argument('--W', type = float, default=10)
-    parser.add_argument('--epsd', type = float, default=-1.25)
-    parser.add_argument('--U', type = float, default=2.5)
+    parser.add_argument('--W', type = float, default=1)
+    parser.add_argument('--epsd', type = float, default=-0.1875)
+    parser.add_argument('--U', type = float, default=15)
 
     #number of bath modes
     parser.add_argument('--N', type=int, default=64)
@@ -187,14 +194,14 @@ if __name__ == "__main__":
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=156)
-    parser.add_argument('--chiU', type=int, default=48)
+    parser.add_argument('--chi', type=int, default=128)
+    parser.add_argument('--chiU', type=int, default=36)
     parser.add_argument('--degree', type=int, default=1)
 
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.01)
-    parser.add_argument('--tmax', type=float, default=5)
+    parser.add_argument('--tmax', type=float, default=100)
 
     #output file name
     parser.add_argument('--fname', type=str, default='siam.h5')
@@ -202,10 +209,10 @@ if __name__ == "__main__":
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
     parser.add_argument('--nunoccupied', type=int, default=0)
-    parser.add_argument('--spawning_threshold', type=float, default=1e-7)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-6)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
     args = parser.parse_args()
 
     nstep = int(args.tmax/args.dt)+1
-    siam_dynamics(args.N, args.Gamma, args.W, args.epsd*np.pi*args.Gamma, args.U*np.pi*args.Gamma, args.chi, args.dt, chiU=args.chiU, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree)
+    siam_dynamics(args.N, args.Gamma, args.W, args.epsd, args.U, args.chi, args.dt, chiU=args.chiU, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree)

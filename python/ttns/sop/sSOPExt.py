@@ -1,4 +1,4 @@
-from pyttn._pyttn import fermion_operator
+from pyttn._pyttn import fermion_operator, fOP
 from pyttn._pyttn import sNBO_real, sNBO_complex, sSOP_real, sSOP_complex, coeff_real, coeff_complex
 import numpy as np
 

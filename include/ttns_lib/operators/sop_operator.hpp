@@ -210,7 +210,7 @@ public:
 
         //setup the autoSOP indexing object
         site_ops_type site_ops;
-        setup_indexing_tree(sop, A, compress, exploit_identity, site_ops);
+        setup_indexing_tree(sop, A, sys.mode_indices(), compress, exploit_identity, site_ops);
 
         CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, site_ops, use_sparse, A.is_purification()));
         setup_time_dependence();
@@ -230,7 +230,7 @@ public:
 
         //setup the autoSOP indexing object
         site_ops_type site_ops;
-        setup_indexing_tree(sop, A, compress, exploit_identity, site_ops);
+        setup_indexing_tree(sop, A, sys.mode_indices(), compress, exploit_identity, site_ops);
 
         CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, opdict, site_ops, use_sparse, A.is_purification()));
         setup_time_dependence();
@@ -412,14 +412,19 @@ protected:
     }
 
 
-    void setup_indexing_tree(SOP<T>& sop, const ttn_type& A, bool compress, bool exploit_identity, site_ops_type& site_ops)
+    void setup_indexing_tree(SOP<T>& sop, const ttn_type& A, const std::vector<size_t>& mode_indices, bool compress, bool exploit_identity, site_ops_type& site_ops)
     {
+        ASSERT(mode_indices.size() == A.nleaves(), "Failed to setup indexing tree.  Invalid mode_indices array.");
+        for(size_t i = 0; i < mode_indices.size(); ++i){ASSERT(mode_indices[i] < mode_indices.size(), "Failed to setup indexing tree. Invalid mode index.");}
+        std::set<size_t> inds(mode_indices.begin(), mode_indices.end());
+        ASSERT(inds.size() == mode_indices.size(), "Failed to setup indexing tree. Repeated mode index.");
+
         tree<auto_sop::node_op_info<T>> bp;
 
         CALL_AND_HANDLE(m_contraction_info.construct_topology(A), "Failed to construct topology of sop_operator.");
 
         bool autosop_run = false;
-        CALL_AND_HANDLE(autosop_run = autoSOP<T>::construct(sop, A, bp, site_ops, compress), "Failed to construct spo_operator.  Failed to convert SOP to indexing tree.");
+        CALL_AND_HANDLE(autosop_run = autoSOP<T>::construct(sop, A, mode_indices, bp, site_ops, compress), "Failed to construct spo_operator.  Failed to convert SOP to indexing tree.");
 
         if(autosop_run)
         {

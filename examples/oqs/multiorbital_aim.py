@@ -12,26 +12,43 @@ from pyttn import oqs
 from numba import jit
 
 
-def siam_tree(chi, chiU, degree, Nbo, Nbe):
-    topo = ntree(str("(1(chiU(2(2))(chiU))(chiU(2(2))(chiU)))").replace('chiU', str(chiU)))
-    print(topo)
+def siam_tree(chi, chiU, chiM, degree, Nbo, Nbe):
+    topo = ntree(str("(1(chiM(chiU(2(2))(chiU))(chiU(2(2))(chiU)))(chiM(chiU(2(2))(chiU))(chiU(2(2))(chiU)))(chiM(chiU(2(2))(chiU))(chiU(2(2))(chiU))))").replace('chiU', str(chiU)).replace('chiM', str(chiM)))
     if(degree > 1):
-        ntreeBuilder.mlmctdh_subtree(topo()[0][1], [2 for i in range(Nbo)], degree, chi)
-        ntreeBuilder.mlmctdh_subtree(topo()[0][1], [2 for i in range(Nbe)], degree, chi)
-        ntreeBuilder.mlmctdh_subtree(topo()[1][1], [2 for i in range(Nbo)], degree, chi)
-        ntreeBuilder.mlmctdh_subtree(topo()[1][1], [2 for i in range(Nbe)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[0][0][1], [2 for i in range(Nbo)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[0][0][1], [2 for i in range(Nbe)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[0][1][1], [2 for i in range(Nbo)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[0][1][1], [2 for i in range(Nbe)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[1][0][1], [2 for i in range(Nbo)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[1][0][1], [2 for i in range(Nbe)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[1][1][1], [2 for i in range(Nbo)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[1][1][1], [2 for i in range(Nbe)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[2][0][1], [2 for i in range(Nbo)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[2][0][1], [2 for i in range(Nbe)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[2][1][1], [2 for i in range(Nbo)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[2][1][1], [2 for i in range(Nbe)], degree, chi)
     else:
-        ntreeBuilder.mps_subtree(topo()[0][1], [2 for i in range(Nbo)], chi, min(chi, 2))
-        ntreeBuilder.mps_subtree(topo()[0][1], [2 for i in range(Nbe)], chi, min(chi, 2))
-        ntreeBuilder.mps_subtree(topo()[1][1], [2 for i in range(Nbo)], chi, min(chi, 2))
-        ntreeBuilder.mps_subtree(topo()[1][1], [2 for i in range(Nbe)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[0][0][1], [2 for i in range(Nbo)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[0][0][1], [2 for i in range(Nbe)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[0][1][1], [2 for i in range(Nbo)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[0][1][1], [2 for i in range(Nbe)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[1][0][1], [2 for i in range(Nbo)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[1][0][1], [2 for i in range(Nbe)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[1][1][1], [2 for i in range(Nbo)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[1][1][1], [2 for i in range(Nbe)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[2][0][1], [2 for i in range(Nbo)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[2][0][1], [2 for i in range(Nbe)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[2][1][1], [2 for i in range(Nbo)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[2][1][1], [2 for i in range(Nbe)], chi, min(chi, 2))
     ntreeBuilder.sanitise(topo)
     return topo
 
 
-def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0):
+def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, chiM = None, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0):
     if chiU is None:
         chiU = chi
+    if chiM is None:
+        chiM = chi
 
     t = np.arange(nstep+1)*dt
 
@@ -62,8 +79,10 @@ def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut
     modes_e_u = [N+1+Nbo + x for x in range(Nbe)]
 
     #set up the topology tree - this structure would ensure that the mode ordering in the Hamiltonian would be {c_d f^o_1d, f^o_2d, \dots, f^o_{Nd},  f^e_1d, f^e_2d, \dots, f^e_{Nd}, c_u, f^o_1u, f^o_2u, \dots, f^o_{Nu},  f^e_1u, f^e_2u, \dots, f^e_{Nu}}
-    topo = siam_tree(8, 8, degree, Nbo, Nbe)
-    capacity = siam_tree(chi, chiU, degree, Nbo, Nbe)
+    topo = siam_tree(8, 8, 8, degree, Nbo, Nbe)
+    capacity = siam_tree(chi, chiU, chiM, degree, Nbo, Nbe)
+    print(topo)
+    exit()
 
     #In order to avoid long range JW strings we want the hamiltonian ordering to be  {f^e_Nd, \dots, f^e_{1d}, f^o_Nd, \dots, f^o_{1d}, c_d, c_u, f^o_1u, \dots, f^e_{Nu}, f^e_1u, \dots, f^e_{Nu}}.  
     #As such we will set up the optional mode ordering object allowed within the system_info class.  This allows us to specify a different ordering of modes
