@@ -34,7 +34,7 @@ def Ct(t, w, g):
     fourier = np.exp(-1.0j*W*T)
     return g2@fourier
 
-def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0):
+def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, init_state = 'up'):
     if chiU is None:
         chiU = chi
 
@@ -83,7 +83,7 @@ def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut
 
     #add on the impurity Hamiltonian terms
     H += epsd*fOP("n", N-1)
-    H += epsd*fOP("n", N)
+    H += (epsd+deps)*fOP("n", N)    #the up impurity site has an energy of epsd + deps 
     H += U*fOP("n", N-1)*fOP("n", N)
 
     #add on spin down occupied chain
@@ -101,7 +101,10 @@ def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut
     for i in range(Nbo):
         state[1+i] = 1
         state[N+1+i] = 1
-    state[N]=1
+    if init_state = 'up':
+        state[N]=1
+    else:
+        state[N-1] = 1
     print(state)
     A.set_state(state)
 
@@ -182,6 +185,7 @@ if __name__ == "__main__":
     parser.add_argument('--Gamma', type = float, default=1)
     parser.add_argument('--W', type = float, default=1)
     parser.add_argument('--epsd', type = float, default=-0.1875)
+    parser.add_argument('--deps', type = float, default=0.0)
     parser.add_argument('--U', type = float, default=15)
 
     #number of bath modes
@@ -212,7 +216,9 @@ if __name__ == "__main__":
     parser.add_argument('--spawning_threshold', type=float, default=1e-6)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
+    parser.add_argument('--initial_state', type=str, default='up')
+
     args = parser.parse_args()
 
     nstep = int(args.tmax/args.dt)+1
-    siam_dynamics(args.N, args.Gamma, args.W, args.epsd, args.U, args.chi, args.dt, chiU=args.chiU, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree)
+    siam_dynamics(args.N, args.Gamma, args.W, args.epsd, args.deps, args.U, args.chi, args.dt, chiU=args.chiU, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree, init_state = args.initial_state)
