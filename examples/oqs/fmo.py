@@ -72,7 +72,7 @@ import copy
 def single_set_fmo_dynamics(T, Nb, chi, nbose, dt, nstep, geom='star', ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0):
     @jit(nopython=True)
     def spectral_density(w):
-        return Jdebye(w)#ar(w)+Jh(w)
+        return Jar(w)+Jh(w)
 
     N = Nb*7
     mode_dims = [nbose for i in range(Nb*7)]
@@ -130,8 +130,8 @@ def single_set_fmo_dynamics(T, Nb, chi, nbose, dt, nstep, geom='star', ofname='s
         bath = oqs.bosonic_bath(spectral_density, sOP("S"+str(i), 0), beta=beta)
         g,w = bath.discretise(Nb, wmax, method='orthopol')
         #add the bath hamiltonian on
-        H, w = oqs.add_bath_hamiltonian(H, bath.Sp, 2*g, w, geom=geom, binds = [i*Nb+1+ x for x in range(Nb)])
-
+        H, w = oqs.add_bath_hamiltonian(H, bath.Sp, 4*g, w, geom=geom, binds = [i*Nb+1+ x for x in range(Nb)])
+        print(i)
     #construct the Hamiltonian
     h = sop_operator(H, A, sysinf, opdict)
 
@@ -159,9 +159,11 @@ def single_set_fmo_dynamics(T, Nb, chi, nbose, dt, nstep, geom='star', ofname='s
 
     maxchi[0] = A.maximum_bond_dimension()
     for i in range(nstep):
+        print(i)
         t1 = time.time()
         sweep.step(A, h)
         t2 = time.time()
+        print(i, t2-t1, mel(A, A))
         for j in range(7):
             res[j, i+1] = np.real(mel(observables[j], A, A))
         sys.stdout.flush()

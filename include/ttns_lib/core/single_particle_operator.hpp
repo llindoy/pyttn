@@ -41,70 +41,70 @@ class single_particle_operator_engine
 
 public:
     template <typename spfnode>
-    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
         //resize the matrices in the event that the tensor objects have changed size
-        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, A, A, HA, hspf, compute_identity, only_update_time_dependent));}
-        else{CALL_AND_RETHROW(evaluate_branch(cinf, A, A, HA, temp, hspf, compute_identity, only_update_time_dependent));}
+        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, A, A, HA, hspf, compute_identity, update_all));}
+        else{CALL_AND_RETHROW(evaluate_branch(cinf, A, A, HA, temp, hspf, compute_identity, update_all));}
     }
 
     template <typename spfnode>
-    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
         //resize the matrices in the event that the tensor objects have changed size
-        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, B, A, HA, hspf, compute_identity, only_update_time_dependent));}
-        else{CALL_AND_RETHROW(evaluate_branch(cinf, B, A, HA, temp, hspf, compute_identity, only_update_time_dependent));}
+        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, B, A, HA, hspf, compute_identity, update_all));}
+        else{CALL_AND_RETHROW(evaluate_branch(cinf, B, A, HA, temp, hspf, compute_identity, update_all));}
     }
 
     template <typename spfnode>
-    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& A, size_t /* i */, size_t /* c */, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& A, size_t /* i */, size_t /* c */, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
-        CALL_AND_RETHROW(evaluate(h, cinf, A, A, hspf, HA, temp, compute_identity, only_update_time_dependent));
+        CALL_AND_RETHROW(evaluate(h, cinf, A, A, hspf, HA, temp, compute_identity, update_all));
     }
 
     template <typename spfnode>
-    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, size_t /* i */, size_t /* c */, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, size_t /* i */, size_t /* c */, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
-        CALL_AND_RETHROW(evaluate(h, cinf, B, A, hspf, HA, temp, compute_identity, only_update_time_dependent));
+        CALL_AND_RETHROW(evaluate(h, cinf, B, A, hspf, HA, temp, compute_identity, update_all));
     }
 
 
 public:
     template <typename spfnode>
-    static inline void evaluate(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
         //resize the matrices in the event that the tensor objects have changed size
-        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, A, A, HA, hspf, compute_identity, only_update_time_dependent));}
-        else{CALL_AND_RETHROW(evaluate_branch(cinf, A, A, HA, temp, hspf, compute_identity, only_update_time_dependent));}
+        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, A, A, HA, hspf, compute_identity, update_all));}
+        else{CALL_AND_RETHROW(evaluate_branch(cinf, A, A, HA, temp, hspf, compute_identity, update_all));}
     }
 
     template <typename spfnode>
-    static inline void evaluate(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
         //resize the matrices in the event that the tensor objects have changed size
-        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, B, A, HA, hspf, compute_identity, only_update_time_dependent));}
-        else{CALL_AND_RETHROW(evaluate_branch(cinf, B, A, HA, temp, hspf, compute_identity, only_update_time_dependent));}
+        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, B, A, HA, hspf, compute_identity, update_all));}
+        else{CALL_AND_RETHROW(evaluate_branch(cinf, B, A, HA, temp, hspf, compute_identity, update_all));}
     }
 
     template <typename spfnode>
-    static inline void evaluate(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& A, size_t i, size_t c, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& A, size_t i, size_t c, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
         //resize the matrices in the event that the tensor objects have changed size
-        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, A, A, i, c, HA, hspf, compute_identity, only_update_time_dependent));}
-        else{CALL_AND_RETHROW(evaluate_branch(cinf, A, A, i, c, HA, temp, hspf, compute_identity, only_update_time_dependent));}
+        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, A, A, i, c, HA, hspf, compute_identity, update_all));}
+        else{CALL_AND_RETHROW(evaluate_branch(cinf, A, A, i, c, HA, temp, hspf, compute_identity, update_all));}
     }
 
     template <typename spfnode>
-    static inline void evaluate(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, size_t i, size_t c, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, size_t i, size_t c, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
         //resize the matrices in the event that the tensor objects have changed size
-        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, B, A, i, c, HA, hspf, compute_identity, only_update_time_dependent));}
-        else{CALL_AND_RETHROW(evaluate_branch(cinf, B, A, i, c, HA, temp, hspf, compute_identity, only_update_time_dependent));}
+        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, B, A, i, c, HA, hspf, compute_identity, update_all));}
+        else{CALL_AND_RETHROW(evaluate_branch(cinf, B, A, i, c, HA, temp, hspf, compute_identity, update_all));}
     }
 
 protected:
     template <typename spftype>
-    static inline void evaluate_leaf(const op_container& h, const cinftype& cinf, const hdata& B, const hdata& A, triad& HA, spftype& hspf, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate_leaf(const op_container& h, const cinftype& cinf, const hdata& B, const hdata& A, triad& HA, spftype& hspf, bool compute_identity = false, bool update_all = true)
     {
         try
         {
@@ -115,7 +115,7 @@ protected:
             const auto& b = B.as_matrix();  
 
             //if the A matrix and B matrix are not the same then we simply go through and compute the identity matrix
-            if( (&A != &B || compute_identity) && !only_update_time_dependent)
+            if( (&A != &B || compute_identity) && update_all)
             {
                 CALL_AND_HANDLE(hspf.spf_id() = adjoint(b)*a, "Failed to compute the id matrix term.");
             }
@@ -124,7 +124,7 @@ protected:
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
             {
                 //update all terms if we aren't worrying about time dependence otherwise only deal with time dependence
-                if( !only_update_time_dependent || (only_update_time_dependent && cinf[ind].is_time_dependent()))
+                if( update_all ||  cinf[ind].is_time_dependent())
                 {
                     if(!cinf[ind].is_identity_spf())
                     {
@@ -154,36 +154,35 @@ protected:
     //static inline void resize_buffer(const hnode& A, triad& HA, 
 
     template <typename spfnode>
-    static inline void evaluate_leaf(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, triad& HA, spfnode& hspf, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate_leaf(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, triad& HA, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
-        CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), HA, hspf(), compute_identity, only_update_time_dependent));
-       
+        CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), HA, hspf(), compute_identity, update_all));
     }
 
     template <typename spfnode>
-    static inline void evaluate_leaf(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, size_t i, size_t c, triad& HA, spfnode& hspf, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate_leaf(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, size_t i, size_t c, triad& HA, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
         //now we need to iterate over each of the set indices and perform the correct contractions storing them in the correct locations
         size_t j = cinf()[i][c].col();
-        CALL_AND_RETHROW(evaluate_leaf(h.mode_operators()[i][c], cinf()[i][c], B(i), A(j), HA, hspf(), compute_identity, only_update_time_dependent));
+        CALL_AND_RETHROW(evaluate_leaf(h.mode_operators()[i][c], cinf()[i][c], B(i), A(j), HA, hspf(), compute_identity, update_all));
     }
 
     template <typename spfnode>
-    static inline void evaluate_leaf(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, triad& HA, spfnode& hspf, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate_leaf(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, triad& HA, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
         for(size_t row = 0; row < cinf().size(); ++row)
         {
             for(size_t ci = 0; ci < cinf()[row].size(); ++ci)
             {
                 size_t col = cinf()[row][ci].col();
-                CALL_AND_RETHROW(evaluate_leaf(h.mode_operators()[row][ci], cinf()[row][ci], B(row), A(col), HA, hspf()[row][ci], compute_identity, only_update_time_dependent));
+                CALL_AND_RETHROW(evaluate_leaf(h.mode_operators()[row][ci], cinf()[row][ci], B(row), A(col), HA, hspf()[row][ci], compute_identity, update_all));
             }
         }
     }
 
 protected:
     template <typename spfnode>
-    static inline void _evaluate_branch(const cinftype& cinf, const hdata& A, triad& HA, triad& temp, spfnode& hspf, bool only_update_time_dependent = false)
+    static inline void _evaluate_branch(const cinftype& cinf, const hdata& A, triad& HA, triad& temp, spfnode& hspf, bool update_all = true)
     {
         try
         {
@@ -196,7 +195,7 @@ protected:
             //#pragma omp parallel for default(shared) schedule(dynamic, 1)
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
             {
-                if( !only_update_time_dependent || (only_update_time_dependent && cinf[ind].is_time_dependent()))
+                if( update_all || cinf[ind].is_time_dependent())
                 {
                     if(!cinf[ind].is_identity_spf())
                     {
@@ -223,7 +222,7 @@ protected:
     }
 
     template <typename spfnode>
-    static inline void _evaluate_branch(const cinftype& cinf, const hdata& B, const hdata& A, triad& HA, triad& temp, spfnode& hspf, bool only_update_time_dependent = false)
+    static inline void _evaluate_branch(const cinftype& cinf, const hdata& B, const hdata& A, triad& HA, triad& temp, spfnode& hspf, bool update_all = true)
     {
         try
         {
@@ -233,7 +232,7 @@ protected:
             CALL_AND_HANDLE(hspf().resize_matrices(B.size(1), A.size(1)), "Failed to resize the single-particle Hamiltonian operator matrices.");
 
             const auto& b = B.as_matrix();  
-            if(!only_update_time_dependent)
+            if(update_all)
             {
                 CALL_AND_HANDLE(kpo::kpo_id(hspf, A, temp[0], HA[0]), "Failed to apply kronecker product operator.");
                 CALL_AND_HANDLE(hspf().spf_id() = adjoint(b)*HA[0], "Failed to compute the id matrix term.");
@@ -242,7 +241,7 @@ protected:
             //#pragma omp parallel for default(shared) schedule(dynamic, 1)
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
             {
-                if( !only_update_time_dependent || (only_update_time_dependent && cinf[ind].is_time_dependent()))
+                if( update_all || cinf[ind].is_time_dependent())
                 {
                     if(!cinf[ind].is_identity_spf())
                     {
@@ -269,33 +268,33 @@ protected:
     }
 
     template <typename spfnode>
-    static inline void evaluate_branch(const cinftype& cinf, const hdata& B, const hdata& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate_branch(const cinftype& cinf, const hdata& B, const hdata& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
         if(&A == &B && !compute_identity)
         {
-            CALL_AND_RETHROW(_evaluate_branch(cinf, A, HA, temp, hspf, only_update_time_dependent));
+            CALL_AND_RETHROW(_evaluate_branch(cinf, A, HA, temp, hspf, update_all));
         }
         else
         {
-            CALL_AND_RETHROW(_evaluate_branch(cinf, B, A, HA, temp, hspf, only_update_time_dependent));
+            CALL_AND_RETHROW(_evaluate_branch(cinf, B, A, HA, temp, hspf, update_all));
         }
     }
 protected:
     template <typename spfnode>
-    static inline void evaluate_branch(const cinfnode& cinf, const hnode& B, const hnode& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate_branch(const cinfnode& cinf, const hnode& B, const hnode& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
-        CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), HA, temp, hspf, compute_identity, only_update_time_dependent));
+        CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), HA, temp, hspf, compute_identity, update_all));
     }
 
     template <typename spfnode>
-    static inline void evaluate_branch(const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, size_t i, size_t c, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate_branch(const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, size_t i, size_t c, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
         size_t j = cinf()[i][c].col();
-        CALL_AND_RETHROW(evaluate_branch(cinf()[i][c], B(i), A(j), HA, temp, hspf, compute_identity, only_update_time_dependent));
+        CALL_AND_RETHROW(evaluate_branch(cinf()[i][c], B(i), A(j), HA, temp, hspf, compute_identity, update_all));
     }
 
     template <typename spfnode>
-    static inline void evaluate_branch(const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool only_update_time_dependent = false)
+    static inline void evaluate_branch(const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
         for(size_t row = 0; row < cinf().size(); ++row)
         {
@@ -303,7 +302,7 @@ protected:
             {
                 size_t col = cinf()[row][ci].col();
                 ms_sop_env_slice<T, backend> hslice(hspf, row, ci);
-                CALL_AND_RETHROW(evaluate_branch(cinf()[row][ci], B(row), A(col), HA, temp, hslice, compute_identity, only_update_time_dependent));
+                CALL_AND_RETHROW(evaluate_branch(cinf()[row][ci], B(row), A(col), HA, temp, hslice, compute_identity, update_all));
             }
         }
     }

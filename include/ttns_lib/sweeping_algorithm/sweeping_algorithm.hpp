@@ -214,7 +214,13 @@ public:
     { 
         //ASSERT(has_same_structure(A, op), "Incompatible tensor and environment object.");
         using common::zip;   using common::rzip;
+
         if(!A.is_orthogonalised()){A.orthogonalise();}
+
+        if(op.is_time_dependent())
+        {
+            CALL_AND_HANDLE(update_type::advance_hamiltonian(A, m_env, m_ham, op), "Failed to update time dependent Hamiltonian.")
+        }
 
         //first iterate through the tree computing the single particle Hamiltonians.  Here we do not attempt to do any bond dimension adaptation
         //as as we are not time-evolving all information about the optimal unoccupied SHFs will be destroyed before it could be used.
