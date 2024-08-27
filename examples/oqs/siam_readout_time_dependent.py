@@ -34,10 +34,11 @@ def Ct(t, w, g):
     fourier = np.exp(-1.0j*W*T)
     return g2@fourier
 
-def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, init_state = 'up'):
+def siam_dynamics(Nb, Gamma, W, epsd0, epsd1, deps, nu, delay, U, chi, dt, chiU = None, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, init_state = 'up'):
     if chiU is None:
         chiU = chi
 
+    geom='chain'
     t = np.arange(nstep+1)*dt
 
     #setup the function for evaluating the exponential cutoff spectral density
@@ -80,10 +81,11 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
     print(sysinf.mode_indices)
 
     #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
+    epsrange = epsd1-epsd0
 
     #add on the impurity Hamiltonian terms
-    H += epsd*fOP("n", N-1)
-    H += (epsd+deps)*fOP("n", N)    #the up impurity site has an energy of epsd + deps 
+    H += coeff(lambda x : epsd0 + epsrange/(1+np.exp(-nu*(x-delay))))*fOP("n", N-1)
+    H += coeff(lambda x : epsd0 + epsrange/(1+np.exp(-nu*(x-delay)))+ deps)*fOP("n", N)    #the up impurity site has an energy of epsd + deps 
     H += U*fOP("n", N-1)*fOP("n", N)
 
     #add on spin down occupied chain
@@ -140,8 +142,7 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
     sweep.dt = dt
     sweep.coefficient = -1.0j
 
-    if(geom == 'ipchain'):
-        sweep.use_time_dependent_hamiltonian = True
+    sweep.use_time_dependent_hamiltonian = True
 
     maxchi = np.zeros(nstep+1)
     results = []
@@ -160,6 +161,8 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
         for res, op in zip(results, ops):
             res[i+1] = np.real(mel(op, A, A)/renorm)
         maxchi[i+1] = A.maximum_bond_dimension()
+
+        print((i+1)*dt, epsd0 + epsrange/(1+np.exp(-nu*((sweep.t-delay)))), epsd0 + epsrange/(1+np.exp(-nu*(sweep.t-delay)))+ deps, nu, delay)
 
         if(i % 100):
             h5 = h5py.File(ofname, 'w')
@@ -184,15 +187,15 @@ if __name__ == "__main__":
     #exponential bath cutoff parameters
     parser.add_argument('--Gamma', type = float, default=1)
     parser.add_argument('--W', type = float, default=1)
-    parser.add_argument('--epsd', type = float, default=-0.1875)
+    parser.add_argument('--epsd0', type = float, default=-0.9)
+    parser.add_argument('--epsd1', type = float, default=-0.05)
+    parser.add_argument('--nu', type=float, default = 1)
+    parser.add_argument('--delay', type=float, default = 20)
     parser.add_argument('--deps', type = float, default=0.0)
     parser.add_argument('--U', type = float, default=15)
 
     #number of bath modes
     parser.add_argument('--N', type=int, default=64)
-
-    #geometry to be used for bath dynamics
-    parser.add_argument('--geom', type = str, default='star')
 
     #bath inverse temperature
     parser.add_argument('--beta', type = float, default=None)
@@ -221,4 +224,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     nstep = int(args.tmax/args.dt)+1
-    siam_dynamics(args.N, args.Gamma, args.W, args.epsd, args.deps, args.U, args.chi, args.dt, chiU=args.chiU, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree, init_state = args.initial_state)
+    siam_dynamics(args.N, args.Gamma, args.W, args.epsd0, args.epsd1, args.deps, args.nu, args.delay, args.U, args.chi, args.dt, chiU=args.chiU, beta = args.beta, nstep = nstep, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree, init_state = args.initial_state)

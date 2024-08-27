@@ -25,7 +25,7 @@ def evolve_imaginary_time_two(A, B, h, mel, sweep, sweepB, betasteps):
         rho0 *= rhoB/rho0
         #print("imstep:",i, A.maximum_bond_dimension())
         sys.stdout.flush()
-    return rh0
+    return rho0
 
 def evolve_imaginary_time(A, h, mel, sweep, betasteps):
     beta_p = 0
@@ -180,9 +180,6 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, nbeta =
     sweepB.unoccupied_threshold=unoccupied_threshold
     sweepB.minimum_unoccupied=nunoccupied
 
-    if(geom == 'ipchain'):
-        sweep.use_time_dependent_hamiltonian = False
-
     res = np.zeros((nsamples, nstep+1), dtype=np.complex128)
 
     beta_steps = softmspace(1e-6, beta/2.0, nbeta)
@@ -192,9 +189,6 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, nbeta =
         sys.stdout.flush()
         sweep_therm.dt = dt
         sweep_therm.coefficient = -1.0
-
-        if(geom == 'ipchain'):
-            sweep_therm.use_time_dependent_hamiltonian = False
 
         sweep_therm.t=0
         print(A.collapse_basis(Uproj, nchi=2), mode_dims)
@@ -213,9 +207,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, nbeta =
         sys.stdout.flush()
 
         sweep_therm.t=0
-        
-        if(geom == 'ipchain'):
-            sweep_therm.use_time_dependent_hamiltonian = False
+
         sweep_therm.coefficient = -1.0
         for iter in range(1):
             sweep.t=0
@@ -247,10 +239,6 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, nbeta =
         coeff = evolve_imaginary_time_two(A, B, hb, mel, sweep_therm, sweep_thermB, beta_steps)
 
         C = copy.deepcopy(A)
-
-        if(geom == 'ipchain'):
-            sweep.use_time_dependent_hamiltonian = True
-            sweepB.use_time_dependent_hamiltonian = True
 
         sweep.dt = dt
         sweep.coefficient = -1.0j
