@@ -270,7 +270,7 @@ public:
                 }
             }
         }
-        update_coefficients(t);
+        update_coefficients(t, false);
     }
 
     const single_set_container& mode_operators(size_t i, size_t j) const
@@ -280,7 +280,7 @@ public:
         return m_mode_operators[i][j];
     }
 
-    void update_coefficients(real_type t, bool force_update = false)
+    void update_coefficients(real_type t, bool force_update = true)
     {
         for(size_t i = 0; i < m_nset; ++i)
         {

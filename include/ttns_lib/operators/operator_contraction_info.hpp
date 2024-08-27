@@ -67,7 +67,7 @@ public:
         m_is_identity_mf = false;
     }
 
-    void update_coefficients(real_type t, bool force_update = false)
+    void update_coefficients(real_type t, bool force_update = true)
     {
         if(_m_coeff.is_time_dependent() || force_update)
         {

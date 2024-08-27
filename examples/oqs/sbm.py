@@ -54,7 +54,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
     if adaptive:
-        chi0 = 8
+        chi0 = 4
 
     #and add the node that forms the root of the bath.  
     #TODO: Add some better functions for handling the construction of tree structures

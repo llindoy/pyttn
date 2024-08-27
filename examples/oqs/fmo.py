@@ -129,8 +129,11 @@ def single_set_fmo_dynamics(T, Nb, chi, nbose, dt, nstep, geom='star', ofname='s
     for i in range(7):
         bath = oqs.bosonic_bath(spectral_density, sOP("S"+str(i), 0), beta=beta)
         g,w = bath.discretise(Nb, wmax, method='orthopol')
+        g = 10*g
         #add the bath hamiltonian on
-        H, w = oqs.add_bath_hamiltonian(H, bath.Sp, 4*g, w, geom=geom, binds = [i*Nb+1+ x for x in range(Nb)])
+        print(g, w)
+        H, w = oqs.add_bath_hamiltonian(H, bath.Sp, g, w, geom=geom, binds = [i*Nb+1+ x for x in range(Nb)])
+        print(H)
         print(i)
     #construct the Hamiltonian
     h = sop_operator(H, A, sysinf, opdict)

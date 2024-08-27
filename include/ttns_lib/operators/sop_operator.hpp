@@ -68,7 +68,7 @@ public:
         }
     }
 
-    void update_coefficients(real_type t, bool force_update = false)
+    void update_coefficients(real_type t, bool force_update = true)
     {
         for(size_t i = 0; i < m_terms.size(); ++i)
         {
@@ -562,7 +562,7 @@ public:
     const T& Eshift() const{return m_Eshift;}
     literal::coeff<T>& Eshift() {return _m_Eshift;}
 
-    void update_coefficients(real_type t, bool force_update = false)
+    void update_coefficients(real_type t, bool force_update = true)
     {
         //we don't need the rest of the operator to be time dependent to update the Eshift term.
         if(m_time_dependent_coefficients || force_update)
