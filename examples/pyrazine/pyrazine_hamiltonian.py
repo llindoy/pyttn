@@ -226,7 +226,6 @@ def hamiltonian(mode_dims):
     omegas = w()
     vs = modes()[1:]
     
-
     delta = 0.8460/2.0*eV
     #set up the system information object
     sysinf = system_modes(N)

@@ -41,8 +41,8 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     #truncation schemes
     H, w = oqs.add_bath_hamiltonian(H, bath.Sp, 2*g, w, geom=geom)
 
-    mode_dims = [nbose for i in range(Nb)]
-    #mode_dims = [min(max(4, int(wc*Ncut/l[i])), nbose) for i in range(Nb)]
+    #mode_dims = [nbose for i in range(Nb)]
+    mode_dims = [min(max(4, int(wc*Ncut/l[i])), nbose) for i in range(Nb)]
 
     #setup the system information object
     sysinf = system_modes(N)

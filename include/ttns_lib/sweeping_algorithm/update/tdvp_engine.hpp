@@ -168,7 +168,7 @@ public:
                 for(auto z : common::rzip(A, h))
                 {
                     const auto& a = std::get<0>(z); auto& hspf = std::get<1>(z);
-                    CALL_AND_HANDLE(env.update_env_up(op, a, hspf, false), "Failed to update the environment tensor.");
+                    CALL_AND_HANDLE(env.update_env_up(op, a, hspf, true), "Failed to update the environment tensor.");
                 }
             }
         }

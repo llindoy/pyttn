@@ -128,12 +128,10 @@ def single_set_fmo_dynamics(T, Nb, chi, nbose, dt, nstep, geom='star', ofname='s
     w = np.linspace(-1000*cmn1, 2000*cmn1,1000)
     for i in range(7):
         bath = oqs.bosonic_bath(spectral_density, sOP("S"+str(i), 0), beta=beta)
+        Sp= sOP("S"+str(i), 0)
         g,w = bath.discretise(Nb, wmax, method='orthopol')
-        g = 10*g
         #add the bath hamiltonian on
-        print(g, w)
         H, w = oqs.add_bath_hamiltonian(H, bath.Sp, g, w, geom=geom, binds = [i*Nb+1+ x for x in range(Nb)])
-        print(H)
         print(i)
     #construct the Hamiltonian
     h = sop_operator(H, A, sysinf, opdict)
@@ -172,7 +170,7 @@ def single_set_fmo_dynamics(T, Nb, chi, nbose, dt, nstep, geom='star', ofname='s
         sys.stdout.flush()
         maxchi[i+1] = A.maximum_bond_dimension()
 
-        if(i % 100):
+        if(i % 10 == 0):
             h5 = h5py.File(ofname, 'w')
             h5.create_dataset('t', data=(np.arange(nstep+1)*dt/fs))
             for j in range(7):

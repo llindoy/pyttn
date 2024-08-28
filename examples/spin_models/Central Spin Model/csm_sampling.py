@@ -40,10 +40,11 @@ def sample_spin_half_coherent_state():
     return np.array([np.sin(theta/2), np.cos(theta/2)*np.exp(-1.0j*phi)])
     
 
-def csm_dynamics(A, B, chi, dt, nstep = 1, yrange=[0, 0.25], nsamples=100, sampling_scheme = 'cs', ofname = 'csm.h5'):
+def csm_dynamics(A, B, chi, dt, nstep = 1, yrange=[0, 0.25], nsamples=100, sampling_scheme = 'cs', ofname = 'csm.h5', degree = 2, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, seed = 0):
     Nb = len(A)
     N = Nb+1
     H = hamiltonian(B, A)
+    print(H)
 
     bath_dims = [2 for i in range(Nb)]
 
@@ -52,25 +53,36 @@ def csm_dynamics(A, B, chi, dt, nstep = 1, yrange=[0, 0.25], nsamples=100, sampl
     for i in range(N):
         sysinf[i] = spin_mode(2)
 
-    #construct the tree topology used for these calculations.  Here we are using a binary tree to partition the up and down spin sectors
-    #with the impurity orbitals taking the first site on each subtree
-    topo = ntree("(1(2(2))(2))")
+    #construct the topology and capacity trees used for constructing 
+    chi0 = chi
+    if adaptive:
+        chi0 = 4
 
-    degree = 2 
-    #then we are adding on trees for the bath degrees of freedom
-    ntreeBuilder.mlmctdh_subtree(topo()[1], bath_dims, degree, chi)
+    #and add the node that forms the root of the bath.  
+    #TODO: Add some better functions for handling the construction of tree structures
+    topo = ntree("(1(2(2))(2))")
+    if(degree > 1):
+        ntreeBuilder.mlmctdh_subtree(topo()[1], bath_dims, degree, chi0)
+    else:
+        ntreeBuilder.mps_subtree(topo()[1], bath_dims, chi0, min(chi0, 2))
     ntreeBuilder.sanitise(topo)
 
-    A = ttn(topo, dtype=np.complex128)
+    capacity = ntree("(1(2(2))(2))")
+    if(degree > 1):
+        ntreeBuilder.mlmctdh_subtree(capacity()[1], bath_dims, degree, chi)
+    else:
+        ntreeBuilder.mps_subtree(capacity()[1], bath_dims, chi, min(chi, 2))
+    ntreeBuilder.sanitise(capacity)
 
+    np.random.seed(seed)
     #op = site_operator([1/np.sqrt(2), 1.0j/np.sqrt(2), 1/np.sqrt(2), 1.0j/np.sqrt(2)], optype="diagonal_matrix", mode=0)
     sz_op = site_operator([0.5, -0.5], optype="diagonal_matrix", mode=0)
 
-    h = sop_operator(H, A, sysinf)
-
     res = np.zeros((nsamples, nstep+1))
-    mel = matrix_element(A)
     for sample in range(nsamples):
+        A = ttn(topo, capacity, dtype=np.complex128)
+        mel = matrix_element(A)
+        h = sop_operator(H, A, sysinf)
         if(sampling_scheme == 'cs'):
             state = []
             state.append(np.array([1, 0], dtype=np.complex128))
@@ -84,10 +96,16 @@ def csm_dynamics(A, B, chi, dt, nstep = 1, yrange=[0, 0.25], nsamples=100, sampl
             A.sample_product_state(dist)
 
         #set up the tdvp engine
-        sweep = tdvp(A, h, krylov_dim = 8)
+        sweep = None
+        if not adaptive:
+            sweep = tdvp(A, h, krylov_dim = 12)
+        else:
+            sweep = tdvp(A, h, krylov_dim = 12, expansion='subspace')
+            sweep.spawning_threshold = spawning_threshold
+            sweep.unoccupied_threshold=unoccupied_threshold
+            sweep.minimum_unoccupied=nunoccupied
         sweep.dt = dt
         sweep.coefficient = -1.0j
-        sweep.prepare_environment(A, h)
 
         res[sample, 0] = np.real(mel(sz_op, A, A))
         #do the time evolution
@@ -96,7 +114,7 @@ def csm_dynamics(A, B, chi, dt, nstep = 1, yrange=[0, 0.25], nsamples=100, sampl
             sweep.step(A, h)
             t2 = time.time()
             res[sample, i+1] = np.real(mel(sz_op, A, A))
-            print(i)
+            print((i+1)*dt, nstep*dt, res[sample, i+1], mel(A, A), A.maximum_bond_dimension())
 
         
         h5 = h5py.File(ofname, 'w')
@@ -110,10 +128,18 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Sampling based dynamics of the central spin model')
     parser.add_argument('N', type = int)
-    parser.add_argument('--chi', type=int, default=16)
+    parser.add_argument('--chi', type=int, default=64)
     parser.add_argument('--nsamples', type=int, default=512)
+    parser.add_argument('--degree', type=int, default=2)
     parser.add_argument('--type', type = str, default='uniform')
-    parser.add_argument('--fname', type=str, default='csm.h5')
+    parser.add_argument('--fname', type=str, default='csm')
+    parser.add_argument('--seed', type = int, default=0)
+
+    #the minimum number of unoccupied modes for the dynamics
+    parser.add_argument('--subspace', type=bool, default = True)
+    parser.add_argument('--nunoccupied', type=int, default=0)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-5)
+    parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
     args = parser.parse_args()
 
     N = args.N
@@ -126,5 +152,5 @@ if __name__ == "__main__":
     else:
         A = hyperfines_exp(48, N)
 
-    csm_dynamics(A, 0.0, 16, 0.05, nstep = 500, nsamples=nsamples, ofname = args.fname)
+    csm_dynamics(A, 0.0, args.chi, 0.025, nstep = 10000, nsamples=nsamples, ofname = args.fname+"_"+str(args.type)+"_"+str(N)+"_"+str(args.seed)+"_"+str(args.chi)+"_"+str(args.spawning_threshold)+".h5", degree = args.degree, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, seed=args.seed)
 
