@@ -110,11 +110,6 @@ def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut
 
     h = sop_operator(H, A, sysinf, identity_opt=True, compress=True)
 
-    nund = fOP("n", N-1)*fOP("n", N)
-    print(type(nund))
-    op = product_operator(nund, sysinf)
-    print(op)
-
     mel = matrix_element(A)
 
     ops = []
@@ -132,6 +127,25 @@ def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut
         op += fOP("n", N-1)*fOP("n", N)
         ops.append(sop_operator(op, A, sysinf))
     labels = ["n_u", "n_d", "n_u n_d"]
+
+    #prepare the ground state of the non-interacting Hamiltonian
+    dmrg_sweep = None
+    if not adaptive:
+        dmrg_sweep = dmrg(A, h, krylov_dim = 12)
+    else:
+        dmrg_sweep = dmrg_(A, h, krylov_dim = 12, subspace_krylov_dim=10, subspace_neigs=2, expansion='subspace')
+        dmrg_sweep.spawning_threshold = spawning_threshold
+        dmrg_sweep.unoccupied_threshold=unoccupied_threshold
+        dmrg_sweep.minimum_unoccupied=nunoccupied
+
+    dmrg_sweep.restarts = 1
+    dmrg_sweep.prepare_environment(A, h0)
+
+    for i in range(ndmrg):
+        dmrg_sweep.step(A, h0)
+        print(i, dmrg_sweep.E())
+
+    #
 
     sweep = None
     if not adaptive:

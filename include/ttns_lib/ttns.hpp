@@ -22,6 +22,7 @@
 #include "operators/site_operators/dvr_operator.hpp"
 //#include "operators/site_operators/sum_operator.hpp"
 #include "operators/site_operators/site_operator.hpp"
+#include "operators/product_operator.hpp"
 
 //actual integrator
 //#include "algorithms/one_site_gso_engine.hpp"

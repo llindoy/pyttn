@@ -11,7 +11,7 @@ class bosonic_bath:
         self.Jw = Jw
         self.beta = beta
 
-    def Ct(self, t, wmax, wmin=None):
+    def Ct(self, t, wmax, wmin=None, epsabs=1.49e-08, epsrel=1.49e-08, limit=50):
         if wmin == None:
             if self.beta == None:
                 wmin = 0
@@ -27,15 +27,15 @@ class bosonic_bath:
             wc = 1e-10
             if wmin < wc:
                 for ti in range(t.shape[0]):
-                    ctr = sp.integrate.quad(S, wc, wmax, weight='cos', wvar = t[ti])[0] 
-                    ctr += sp.integrate.quad(lambda x : S(x)*np.cos(x*t[ti]), wmin, wc, points=0)[0]
-                    cti = sp.integrate.quad(S, wc, wmax, weight='sin', wvar = t[ti])[0]
-                    cti += sp.integrate.quad(lambda x : S(x)*np.sin(x*t[ti]), wmin, wc, points=0)[0]
+                    ctr = sp.integrate.quad(S, wc, wmax, weight='cos', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
+                    ctr += sp.integrate.quad(lambda x : S(x)*np.cos(x*t[ti]), wmin, wc, points=0, epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                    cti = sp.integrate.quad(S, wc, wmax, weight='sin', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                    cti += sp.integrate.quad(lambda x : S(x)*np.sin(x*t[ti]), wmin, wc, points=0, epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
                     Ct[ti] = ctr - 1.0j*cti
             else:
                 for ti in range(t.shape[0]):
-                    ctr = sp.integrate.quad(S, wmin, wmax, weight='cos', wvar = t[ti])[0] 
-                    cti = sp.integrate.quad(S, wmin, wmax, weight='sin', wvar = t[ti])[0]
+                    ctr = sp.integrate.quad(S, wmin, wmax, weight='cos', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
+                    cti = sp.integrate.quad(S, wmin, wmax, weight='sin', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
                     Ct[ti] = ctr - 1.0j*cti
         else:
             beta = self.beta
@@ -46,12 +46,12 @@ class bosonic_bath:
 
             wc = 1e-10
             for ti in range(t.shape[0]):
-                ctr = sp.integrate.quad(S, wc, wmax, weight='cos', wvar = t[ti])[0]
-                ctr += sp.integrate.quad(lambda x : S(x)*np.cos(x*t[ti]), -wc, wc, points=0)[0]
-                ctr += sp.integrate.quad(S, wmin, -wc, weight='cos', wvar = t[ti])[0]
-                cti = sp.integrate.quad(S, wc, wmax, weight='sin', wvar = t[ti])[0]
-                cti += sp.integrate.quad(lambda x : S(x)*np.sin(x*t[ti]), -wc, wc, points=0)[0]
-                cti += sp.integrate.quad(S, wmin, -wc, weight='sin', wvar = t[ti])[0]
+                ctr = sp.integrate.quad(S, wc, wmax, weight='cos', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                ctr += sp.integrate.quad(lambda x : S(x)*np.cos(x*t[ti]), -wc, wc, points=0, epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                ctr += sp.integrate.quad(S, wmin, -wc, weight='cos', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                cti = sp.integrate.quad(S, wc, wmax, weight='sin', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                cti += sp.integrate.quad(lambda x : S(x)*np.sin(x*t[ti]), -wc, wc, points=0, epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                cti += sp.integrate.quad(S, wmin, -wc, weight='sin', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
                 Ct[ti] = ctr - 1.0j*cti
         return Ct/np.pi
 

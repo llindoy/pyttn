@@ -29,6 +29,17 @@ void init_ntree_node(py::module &m)
         .def("empty", &node_type::empty)
         .def("is_root", &node_type::is_root)
         .def("is_leaf", &node_type::is_leaf)
+        .def("leaf_indices", &node_type::leaf_indices, py::arg(), py::arg("resize") = true)
+        .def(   
+                "leaf_indices", 
+                [](const node_type& n, bool resize=true)
+                {
+                    std::vector<std::vector<size_t>> linds;
+                    n.leaf_indices(linds, resize);
+                    return linds;
+                }, 
+                py::arg("resize") = true
+            )
         .def("parent", &node_type::parent)
         .def("clear", &node_type::clear)
         .def_property
@@ -120,6 +131,16 @@ void init_ntree(py::module &m)
         .def("load", &ntree<T>::load)
         .def("insert", &ntree<T>::insert)
         .def("insert_at", &ntree<T>::insert_at)
+        .def("leaf_indices", &ntree<T>::leaf_indices)
+        .def(   
+                "leaf_indices", 
+                [](const ntree<T>& n)
+                {
+                    std::vector<std::vector<size_t>> linds;
+                    n.leaf_indices(linds);
+                    return linds;
+                }
+            )
         .def("clear", &ntree<T>::clear)
         .def("__len__", &ntree<T>::size)
         .def(

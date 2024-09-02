@@ -47,9 +47,20 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
 
     #set up the open quantum system bath object
     bath = oqs.fermionic_bath(V, beta=beta)
+    
+    import matplotlib.pyplot as plt
+    w = np.linspace(-2*W, 2*W, 10000)
+    plt.plot(w, bath.Sw_filled(w))
+    plt.plot(w, bath.Sw_empty(w))
+    plt.show()
 
-
-    gf,wf, ge, we = bath.discretise(Nb, W, method='orthopol')
+    gf,wf, ge, we = bath.discretise(Nb, W, method='orthopol', rtol=1e-12, wmin_tol=1e-10)
+    #else:
+    #    Ef = 0
+    #    tol = 1e-10
+    #    win = 1.0/beta*np.log(1/tol-1)+Ef
+    #    print(win, W)
+    #    gf,wf, ge, we = bath.discretise(Nb, W, method='orthopol', rtol=1e-12, wmax_filled=win, wmin_empty=-win)
     g = np.sqrt(np.pi)*np.concatenate((gf, ge))
     w = np.concatenate((wf, we))
 

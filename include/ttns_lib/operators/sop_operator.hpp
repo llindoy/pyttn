@@ -481,6 +481,7 @@ public:
                     for(const auto& op : t.ops())
                     {
                         std::string label = op.op();
+                        std::cerr << label << std::endl;
                         CALL_AND_HANDLE(ops.push_back(operator_from_default_dictionaries<T, backend>::query(label, basis, sys[nu].type(), use_sparse)), "Failed to insert new element in mode operator.");
                     }
                     mode_operators[nu].push_back(site_operator<T, backend>(ops::sequential_product_operator<T, backend>{ops}, nu, use_purification));

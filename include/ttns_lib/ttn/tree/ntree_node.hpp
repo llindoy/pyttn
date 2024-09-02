@@ -459,6 +459,36 @@ public:
 
 
 protected:
+    size_t leaf_indices_internal(std::vector<std::vector<size_type>>& linds, std::vector<size_type>& lcurr, size_t ind) const
+    {
+        if(this->empty())
+        {
+            linds[ind] = lcurr;
+            return ind+1;
+        }
+        else
+        {
+            for(size_t i = 0; i < this->size(); ++i)
+            {
+                std::vector<size_type> lc(lcurr);
+                lc.push_back(i);
+                ind = m_children[i]->leaf_indices_internal(linds, lc, ind);
+            }
+            return ind;
+        }
+    }
+
+public:
+    void leaf_indices(std::vector<std::vector<size_type>>& linds, bool resize=true) const
+    {
+        if(resize || linds.size() < this->nleaves())
+        {
+            linds.resize(this->nleaves());
+        }
+        std::vector<size_type> lcurr;
+        this->leaf_indices_internal(linds, lcurr, 0);
+    }
+protected:
     void remove_child(child_iterator it)
     {
         size_type _size = (*it)->m_size;

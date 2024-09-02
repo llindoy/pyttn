@@ -31,6 +31,7 @@
 #include "ttns/ttn/ms_ttn.hpp"
 #include "ttns/operators/siteOperators.hpp"
 #include "ttns/operators/sop_operator.hpp"
+#include "ttns/operators/product_operator.hpp"
 
 #include "ttns/observables/matrix_element.hpp"
 
@@ -93,6 +94,7 @@ PYBIND11_MODULE(_pyttn, m)
     //
     auto m_ops = m.def_submodule("ops", "Operator submodule for TTNS library.");
     initialise_site_operators(m_ops);
+    initialise_product_operator(m);
     initialise_sop_operator(m);
 
 

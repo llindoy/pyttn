@@ -50,26 +50,32 @@ class fermionic_bath:
                 Ct[ti] = ctr - 1.0j*cti
         return Ct/np.pi
 
+    def fermi_distrib(self, w, Ef):
+        if self.beta == None:
+            return np.where(w <= Ef, 1.0, 0.0)
+        else:
+            if isinstance(w, np.ndarray):
+                res = 0.0*w
+                res[w < Ef] = 1/(1+np.exp(self.beta*(w[w<Ef]-Ef)))
+                res[w >= Ef] = np.exp(-self.beta*(w[w>=Ef]-Ef))/(1+np.exp(-self.beta*(w[w>=Ef]-Ef)))
+            else:
+                if(w < Ef):
+                    return 1/(1+np.exp(self.beta*(w-Ef)))
+                else:
+                    return np.exp(-self.beta*(w-Ef))/(1+np.exp(-self.beta*(w-Ef)))
+
+            return res
 
     def Sw(self, w, Ef = 0):
-        if self.beta == None:
-            return self.Jw(w)*np.where(w <= Ef, 1.0, 0.0)
-        else:
-            return self.Jw(w)*np.exp(-self.beta*(w-Ef))/(1+np.exp(-self.beta*(w-Ef)))
-
+        return self.Jw(w)*self.fermi_distrib(w, Ef)
 
     def Sw_filled(self, w, Ef=0):
         return self.Sw(w, Ef)
 
     def Sw_empty(self, w, Ef=0):
-        if self.beta == None:
-            return self.Jw(w)*np.where(w > Ef, 1.0, 0.0)
-        else:
-            return self.Jw(w)*(1-np.exp(-self.beta*(w-Ef))/(1+np.exp(-self.beta*(w-Ef))))
+        return self.Jw(w)*(1-self.fermi_distrib(w, Ef))
 
-
-    def discretise(self, Nb, wmax, wmin=None, Ef = 0, method='orthopol', *args, **kwargs):
-
+    def discretise(self, Nb, wmax, wmin=None, wmin_empty = None, wmax_filled = None, Ef = 0, method='orthopol', wmin_tol = None, *args, **kwargs):
         Nm = Nb//2
         if Nm == 0:
             Nm = 1
@@ -82,8 +88,27 @@ class fermionic_bath:
         else:
             if(wmin == None):
                 wmin = -wmax
-            gf, wf = disc.discretise_fermionic(lambda x : self.Sw_filled(x), Nm, wmin, wmax, method=method, *args, **kwargs)
-            ge, we =  disc.discretise_fermionic(lambda x : self.Sw_empty(x), Nm, wmin, wmax, method=method, *args, **kwargs)
+            if wmin_tol == None:
+                if(wmin_empty == None):
+                    wmin_empty = wmin
+                if wmax_filled == None:
+                    wmax_filled = wmax
+            else:
+                Ef = 0
+                tol = 1e-10
+                win = 1.0/self.beta*np.log(1/tol-1)+Ef
+                if(wmin_empty == None):
+                    wmin_empty = -win
+                if wmax_filled == None:
+                    wmax_filled = win
+
+            if(wmax_filled > wmax):
+                wmax_filled = wmax
+            if(wmin_empty < wmin):
+                wmin_empty = wmin
+
+            gf, wf = disc.discretise_fermionic(lambda x : self.Sw_filled(x), Nm, wmin, wmax_filled, method=method, *args, **kwargs)
+            ge, we =  disc.discretise_fermionic(lambda x : self.Sw_empty(x), Nm, wmin_empty, wmax, method=method, *args, **kwargs)
             return gf, wf, ge, we
 
 

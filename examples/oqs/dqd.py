@@ -17,12 +17,11 @@ def siam_tree(chiU, chi, degree_impurity, degree, Nbo, Nbe):
     mde = [2 for i in range(Nbe)]
     topo = None
     if(degree_impurity > 1):
-        topo = ntreeBuilder.mlmctdh_tree([chiU for i in range(2)], degree_impurity, chiU)
+        topo = ntreeBuilder.mlmctdh_tree([chiU for i in range(4)], degree_impurity, chiU)
     else:
-        topo = ntreeBuilder.mps_tree([chiU for i in range(2)], chiU, chiU)
+        topo = ntreeBuilder.mps_tree([chiU for i in range(4)], chiU, chiU)
 
     leaf_indices = topo.leaf_indices()
-    c = 0
     for li in leaf_indices:
         topo.at(li).insert(2)
         topo.at(li)[0].insert(2)
@@ -38,8 +37,8 @@ def siam_tree(chiU, chi, degree_impurity, degree, Nbo, Nbe):
     ntreeBuilder.sanitise(topo)
     return topo
 
-
-def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0):
+#arxiv 2305.17686
+def dqd_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, nstep = 1, ofname='siam.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0):
     if chiU is None:
         chiU = chi
 
@@ -109,11 +108,6 @@ def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut
     A.set_state(state)
 
     h = sop_operator(H, A, sysinf, identity_opt=True, compress=True)
-
-    nund = fOP("n", N-1)*fOP("n", N)
-    print(type(nund))
-    op = product_operator(nund, sysinf)
-    print(op)
 
     mel = matrix_element(A)
 

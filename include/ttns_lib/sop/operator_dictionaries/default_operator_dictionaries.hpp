@@ -131,7 +131,7 @@ public:
     static op_type query(const std::string& key)
     {
         auto it = s_dict.find(key);
-        ASSERT(it != s_dict.end(), "Failed to query default bosonic operator.  Operator not recognised.");
+        ASSERT(it != s_dict.end(), "Failed to query default spin operator.  Operator not recognised.");
         return (*it).second;
     }
 
@@ -177,7 +177,7 @@ public:
     static op_type query(const std::string& key)
     {
         auto it = s_dict.find(key);
-        ASSERT(it != s_dict.end(), "Failed to query default bosonic operator.  Operator not recognised.");
+        ASSERT(it != s_dict.end(), "Failed to query default pauli operator.  Operator not recognised.");
         return (*it).second;
     }
 
