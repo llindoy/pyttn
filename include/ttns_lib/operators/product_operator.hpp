@@ -16,6 +16,7 @@
 #include "../sop/system_information.hpp"
 #include "../sop/sSOP.hpp"
 #include "../sop/operator_dictionaries/operator_dictionary.hpp"
+#include "../sop/coeff_type.hpp"
 #include "site_operators/sequential_product_operator.hpp"
 
 #ifdef CEREAL_LIBRARY_FOUND
@@ -47,10 +48,21 @@ public:
 
 protected:
     container_type m_mode_operators;
+    literal::coeff<T> _m_coeff = T(1.0);
+    T m_coeff = T(1.0);
 public:
     product_operator(){}
     product_operator(const product_operator& o) = default;
     product_operator(product_operator&& o) = default;
+    product_operator(const sOP& op, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    {
+        CALL_AND_HANDLE(initialise(op, sys, use_sparse, use_purification), "Failed to construct sop operator.");
+    }
+    product_operator(const sOP& op, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false) 
+    {
+        CALL_AND_HANDLE(initialise(op, sys, opdict, use_sparse, use_purification), "Failed to construct sop operator.");
+    }
+
     product_operator(const sPOP& op, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
     {
         CALL_AND_HANDLE(initialise(op, sys, use_sparse, use_purification), "Failed to construct sop operator.");
@@ -59,7 +71,14 @@ public:
     {
         CALL_AND_HANDLE(initialise(op, sys, opdict, use_sparse, use_purification), "Failed to construct sop operator.");
     }
-
+    product_operator(const sNBO<T>& op, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    {
+        CALL_AND_HANDLE(initialise(op, sys, use_sparse, use_purification), "Failed to construct sop operator.");
+    }
+    product_operator(const sNBO<T>& op, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false) 
+    {
+        CALL_AND_HANDLE(initialise(op, sys, opdict, use_sparse, use_purification), "Failed to construct sop operator.");
+    }
     product_operator& operator=(const product_operator& o) = default;
     product_operator& operator=(product_operator&& o) = default;
 
@@ -81,7 +100,9 @@ public:
     //This implementation does not support composite modes currently.  To do add mode combination
     void initialise(const sPOP& pop, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
     {
-        m_mode_operators.resize(pop.nmodes());
+        m_coeff = T(1.0);
+        _m_coeff = T(1.0);
+        m_mode_operators.resize(pop.size());
         auto up = unpack_pop(pop);
 
         using dfop_dict = operator_from_default_dictionaries<T, backend>;
@@ -93,25 +114,20 @@ public:
             size_t hilbert_space_dimension = sys[nu].lhd();
             std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension, 1);
 
-
             const auto& t = x.second;
             if(t.size() == 1)
             {
                 std::string label = t.front();
-                std::cerr << i << " " << nu << " " << label << std::endl;
                 CALL_AND_HANDLE(m_mode_operators[i] = element_type(dfop_dict::query(label, basis, sys[nu].type(), use_sparse), nu, use_purification), "Failed to insert new element in mode operator.");
-                std::cerr << m_mode_operators[i].to_string() << std::endl;
             }
             else
             {
                 std::vector<std::shared_ptr<ops::primitive<T, backend>>> ops;   ops.reserve(t.size());
                 for(const auto& label : t)
                 {
-                    std::cerr << i << " " << nu << " " << label << std::endl;
                     CALL_AND_HANDLE(ops.push_back(dfop_dict::query(label, basis, sys[nu].type(), use_sparse)), "Failed to insert new element in mode operator.");
                 }
                 CALL_AND_HANDLE(m_mode_operators[i] = element_type(ops::sequential_product_operator<T, backend>{ops}, nu, use_purification), "Failed to insert new element in mode operator");
-                std::cerr << m_mode_operators[i].to_string() << std::endl;
             }
             ++i;
         }
@@ -119,7 +135,9 @@ public:
 
     void initialise(const sPOP& pop, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false)
     {
-        m_mode_operators.resize(pop.nmodes());
+        m_coeff = T(1.0);
+        _m_coeff = T(1.0);
+        m_mode_operators.resize(pop.size());
         auto up = unpack_pop(pop);
 
         using dfop_dict = operator_from_default_dictionaries<T, backend>;
@@ -169,6 +187,64 @@ public:
             ++i;
         }
     }
+    //resize this object from a tree structure, a SOP object, a system info class and an optional operator dictionary.
+    //This implementation does not support composite modes currently.  To do add mode combination
+    void initialise(const sOP& _op, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    {
+        m_coeff = T(1.0);
+        _m_coeff = T(1.0);
+        m_mode_operators.resize(1);
+
+        using dfop_dict = operator_from_default_dictionaries<T, backend>;
+        size_t nu = _op.mode();
+        size_t hilbert_space_dimension = sys[nu].lhd();
+        std::string label = _op.op();
+
+        std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension, 1);
+
+        CALL_AND_HANDLE(m_mode_operators[0] = element_type(dfop_dict::query(label, basis, sys[nu].type(), use_sparse), nu, use_purification), "Failed to insert new element in mode operator.");
+    }
+
+    void initialise(const sOP& _op, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false)
+    {
+        m_mode_operators.resize(1);
+        m_coeff = T(1.0);
+        _m_coeff = T(1.0);
+        size_t nu = _op.mode();
+        size_t hilbert_space_dimension = sys[nu].lhd();
+        std::string label = _op.op();
+
+        using dfop_dict = operator_from_default_dictionaries<T, backend>;
+        std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension, 1);
+
+        //first start to access element from opdict
+        std::shared_ptr<op_type> op = opdict.query(nu, label);
+        if(op != nullptr)
+        {
+            ASSERT(op->size() == hilbert_space_dimension, "Failed to construct product_operator.  Mode operator from operator dictionary has incorrect size.");
+            CALL_AND_HANDLE(m_mode_operators[0] = element_type(op, nu, use_purification), "Failed to insert new element in mode operator.");
+        }
+        else
+        {
+            CALL_AND_HANDLE(m_mode_operators[0] = element_type(dfop_dict::query(label, basis, sys[nu].type(), use_sparse), nu, use_purification), "Failed to insert new element in mode operator.");
+        }
+    }
+
+    //resize this object from a tree structure, a SOP object, a system info class and an optional operator dictionary.
+    //This implementation does not support composite modes currently.  To do add mode combination
+    void initialise(const sNBO<T>& pop, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    {
+        CALL_AND_RETHROW(initialise(pop.pop(), sys, use_sparse, use_purification));
+        _m_coeff = pop.coeff();
+        update_coefficients(0);
+    }
+
+    void initialise(const sNBO<T>& pop, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false)
+    {
+        CALL_AND_RETHROW(initialise(pop.pop(), sys, opdict, use_sparse, use_purification));
+        _m_coeff = pop.coeff();
+        update_coefficients(0);
+    }
 
     void clear()
     {
@@ -190,7 +266,26 @@ public:
         return m_mode_operators[nu];
     }
 
+    std::ostream& print(std::ostream& os) const
+    {
+        os << "prod_op: [" << m_coeff << " ";
+        for(size_t i = 0; i<m_mode_operators.size(); ++i)
+        {
+            os << m_mode_operators[i].to_string() << (i+1 != this->nmodes() ? ", " : "]");
+        }
+        return os;
+    }
+
+    void update_coefficients(real_type t)
+    {
+        m_coeff = _m_coeff(t);   
+    }
+
+    const T& coeff() const{return m_coeff;}
+    T& coeff() {return m_coeff;}
+
     const container_type& mode_operators() const{return m_mode_operators;}
+    container_type& mode_operators() {return m_mode_operators;}
 
     size_type nmodes() const{return m_mode_operators.size();}
 
@@ -210,7 +305,7 @@ public:
     void serialize(archive& ar)
     {
         CALL_AND_HANDLE(ar(cereal::make_nvp("operators", m_mode_operators)), "Failed to serialise sum of product operator.  Failed to serialise array of operators.");
-        CALL_AND_HANDLE(ar(cereal::make_nvp("modes", m_modes)), "Failed to serialise sum of product operator.  Failed to serialise array of product operators.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", m_coeff)), "Failed to serialise sum of product operator.  Failed to serialise array of operators.");
     }
 #endif
 };  //class product_operator
@@ -219,9 +314,7 @@ public:
 template <typename T, typename backend> 
 std::ostream& operator<<(std::ostream& os, const product_operator<T, backend>& t)
 {
-    os << "prod_op: [";
-    for(size_t i = 0; i<t.nmodes(); ++i){os << t[i].to_string() << (i+1 != t.nmodes() ? ", " : "]");}
-    return os;
+    return t.print(os);
 }
 
 }   //namespace ttns

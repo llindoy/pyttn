@@ -21,6 +21,7 @@ void init_matrix_element(py::module &m, const std::string& label)
 
 
     using siteop = site_operator<T, linalg::blas_backend>;
+    using prodop = product_operator<T, linalg::blas_backend>;
     using matel = matrix_element<T, linalg::blas_backend>;
     using _ttn = ttn<T, linalg::blas_backend>;
     using _msttn = ms_ttn<T, linalg::blas_backend>;
@@ -66,8 +67,18 @@ void init_matrix_element(py::module &m, const std::string& label)
             )
         .def(
               "__call__", 
+              [](matel& o, std::vector<siteop>& ops, const _ttn& A, bool use_sparsity){return o(ops, A, use_sparsity);}, 
+              py::arg(), py::arg(), py::arg("use_sparsity")=true
+            )           
+        .def(
+              "__call__", 
               [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _ttn& A, bool use_sparsity){return o(ops, modes, A, use_sparsity);}, 
               py::arg(), py::arg(), py::arg(), py::arg("use_sparsity")=true
+            )
+        .def(
+              "__call__", 
+              [](matel& o, prodop& ops, const _ttn& A, bool use_sparsity){return o(ops, A, use_sparsity);}, 
+              py::arg(), py::arg(), py::arg("use_sparsity")=true
             )
         .def("__call__", [](matel& o, sop_op& sop, const _ttn& A){return o(sop, A);})
         .def("__call__", [](matel& o, const _ttn& A, const _ttn& B){return o(A, B);})
@@ -77,6 +88,7 @@ void init_matrix_element(py::module &m, const std::string& label)
         //inline T operator()(one_body_operator<T, backend>& op, const state_type& bra, const state_type& ket)
         .def("__call__", [](matel& o, std::vector<siteop>& ops, const _ttn& A, const _ttn& B){return o(ops, A, B);})
         .def("__call__", [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _ttn& A, const _ttn& B){return o(ops, modes, A, B);})
+        .def("__call__", [](matel& o, prodop& ops, const _ttn& A, const _ttn& B){return o(ops, A, B);})
         .def("__call__", [](matel& o, sop_op& sop, const _ttn& A, const _ttn& B){return o(sop, A, B);})
 
         .def(

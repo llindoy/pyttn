@@ -7,6 +7,7 @@
 #include "../core/single_particle_operator.hpp"
 
 #include "../operators/site_operators/site_operator.hpp"
+#include "../operators/product_operator.hpp"
 #include "../operators/sop_operator.hpp"
 #include "../ttn/ttn_nodes/node_traits/bool_node_traits.hpp"
 
@@ -383,6 +384,18 @@ public:
         CALL_AND_HANDLE(return this->expectation_value_internal(ops, modes, psi, use_sparsity), "Failed to compute expectation value.");
     }
 
+
+    template <typename state_type>
+    inline T operator()(product_operator<T, backend>& ops, const state_type& psi)
+    {
+        CALL_AND_RETHROW(return ops.coeff()*this->operator()(ops.mode_operators(), psi));
+    }
+
+    template <typename state_type>
+    inline T operator()(product_operator<T, backend>& ops, const state_type& psi, bool use_sparsity)
+    {
+        CALL_AND_RETHROW(return ops.coeff()*this->operator()(ops.mode_operators(), psi, use_sparsity));
+    }
 public:
     template <typename state_type>
     T operator()(const state_type& bra, const state_type& ket)
@@ -480,6 +493,12 @@ public:
     inline T operator()(std::vector<site_operator<T, backend>>& ops, const std::vector<size_type>& modes, const state_type& bra, const state_type& ket)
     {
         CALL_AND_HANDLE(return this->matrix_element_internal(ops, modes, bra, ket), "Failed to compute matrix element.");
+    }    
+
+    template <typename state_type>
+    inline T operator()(product_operator<T, backend>& ops, const state_type& bra, const state_type& ket)
+    {
+        CALL_AND_RETHROW(return ops.coeff()*this->operator()(ops.mode_operators(), bra, ket));
     }
 
 protected:

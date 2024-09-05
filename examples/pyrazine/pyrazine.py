@@ -12,14 +12,14 @@ from pyrazine_hamiltonian import *
 
 fs = 41.341374575751
 
-def pyrazine_test(N1, N2, N3, N4, N5, Nb, Nprim, nstep, dt, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, ofname='pyrazine.h5'):
+def pyrazine_test(N1, N2, N3, N4, N5, Nb, nstep, dt, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, ofname='pyrazine.h5'):
 
     N = 25
     #set up the vibrational basis set sizes
-    m = [Nprim for i in range(24)]
+    m = [40, 32, 20, 12, 8, 4, 8, 24, 24, 8, 8, 24, 20, 4, 72, 80, 6, 20, 6, 6, 6, 32, 6, 4]
 
     #build topology and capacity trees
-    topo = build_topology_from_string(2,2,2,2,2,2,Nprim)
+    topo = build_topology_from_string(2,2,2,2,2,2,m)
     capacity= build_topology_from_string(N1, N2, N3, N4, N5, Nb, Nprim)
 
     #set up the sum of product operator Hamiltonian

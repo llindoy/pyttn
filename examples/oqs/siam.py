@@ -106,32 +106,39 @@ def siam_dynamics(Nb, Gamma, W, epsd, U, chi, dt, chiU = None, beta = None, Ncut
         state[1+i] = 1
         state[N+1+i] = 1
     print(state)
+    state[N]=1
     A.set_state(state)
 
     h = sop_operator(H, A, sysinf, identity_opt=True, compress=True)
 
     nund = fOP("n", N-1)*fOP("n", N)
+    print("testing siam dynamics code")
     print(type(nund))
+    print(nund)
     op = product_operator(nund, sysinf)
     print(op)
 
     mel = matrix_element(A)
 
+
     ops = []
     Nu = None
     if Nu is None:
-        op = SOP(2*N)
-        op += fOP("n", N-1)
-        ops.append(sop_operator(op, A, sysinf))
+        op = fOP("n", N-1)
+        ops.append(product_operator(op, sysinf))
 
-        op = SOP(2*N)
-        op += fOP("n", N)
-        ops.append(sop_operator(op, A, sysinf))
+        op = fOP("n", N)
+        ops.append(product_operator(op, sysinf))
 
-        op = SOP(2*N)
-        op += fOP("n", N-1)*fOP("n", N)
-        ops.append(sop_operator(op, A, sysinf))
+        op = fOP("n", N-1)*fOP("n", N)
+        ops.append(product_operator(op, sysinf))
+    A.apply_operator(ops[0])
     labels = ["n_u", "n_d", "n_u n_d"]
+    print(mel(A))
+
+    for op in ops:
+        print(mel(op, A))
+    exit()
 
     sweep = None
     if not adaptive:

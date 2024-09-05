@@ -159,7 +159,7 @@ public:
     //on different nodes and so will lead to errors if dealing with fermionic systems.
     void order_modes()
     {
-        //ensure that we ahve stored the current hash before we edit the form of the object.
+        //ensure that we have stored the current hash before we edit the form of the object.
         //here we use stable sort to preserve order of elements acting on a common mode
         std::stable_sort(m_ops.begin(), m_ops.end(), [](const elem_type& a, const elem_type& b){return std::get<1>(a) < std::get<1>(b);});
         if(!m_has_hash){get_hash();}

@@ -9,6 +9,7 @@
 #include "ttn_nodes/ttn_node.hpp"
 #include "../op.hpp"
 #include "../operators/site_operators/site_operator.hpp"
+#include "../operators/product_operator.hpp"
 
 #include "ttnbase.hpp"
 #include "ms_ttn.hpp"
@@ -529,6 +530,23 @@ protected:
     }
 
 public:
+    ttn& apply_product_operator(product_operator<T, backend>& op, bool shift_orthogonality = true)
+    {
+        for(auto& _op : op)
+        {
+            CALL_AND_HANDLE(apply_one_body_operator(_op, shift_orthogonality), "Failed to apply product operator error when applying one body operator.");
+        }
+        if(this->has_orthogonality_centre())
+        {
+            m_nodes[this->m_orthogonality_centre] *= op.coeff();
+        }
+        else
+        {
+            m_nodes[0] *= op.coeff();
+        }
+        return *this;
+    }
+
     ttn& apply_one_body_operator(const linalg::matrix<T, backend>& op, size_type index, bool shift_orthogonality = true)
     {
         ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
@@ -618,6 +636,17 @@ public:
         return *this;
     }
 
+    ttn& apply_operator(site_operator<T, backend>& op, bool shift_orthogonality = true)
+    {
+        CALL_AND_RETHROW(return apply_one_body_operator(op, shift_orthogonality));
+    }
+
+    ttn& apply_operator(product_operator<T, backend>& op, bool shift_orthogonality = true)
+    {
+        CALL_AND_RETHROW(return apply_product_operator(op, shift_orthogonality));
+    }
+
+    //TODO Implement action of hSOP on ttn object
 public:
     //here the collapse algorithm will be implemented in place.  This will be done iteratively shifting the orthogonality centre of the tree to a leaf.  Computing the probability of observing the state in each possible configuration of that leaf.  Then sampling the state based on this.  
     real_type collapse(std::vector<size_t>& state, bool truncate=false, real_type tol = real_type(0), size_type nchi = 0)

@@ -8,10 +8,14 @@
 #include <utils/io/input_wrapper.hpp>
 #include <common/zip.hpp>
 #include "coeff_type.hpp"
+#include "system_information.hpp"
+#include "operator_dictionaries/default_operator_dictionaries.hpp"
 
 namespace ttns
 {
 
+class sPOP;
+template <typename T> class sNBO;
 
 class sOP
 {
@@ -305,12 +309,9 @@ inline ttns::sPOP operator*(const ttns::sPOP& a, const ttns::sPOP& b)
 }
 
 
-#include "coeff_type.hpp"
-
 namespace ttns
 {
 
-template <typename T> class sNBO;
 template <typename T> std::ostream& operator<<(std::ostream& os, const sNBO<T>& op);
 
 //TODO: Allow for mapping of sNBO operator to a vector of site_operators.
@@ -1216,7 +1217,60 @@ ttns::sSOP<decltype(T()*U())> operator*(const ttns::sSOP<T>& a, const ttns::sSOP
     return  ret;
 }
 
+/*  
+namespace ttns
+{
+template <typename T>
+sNBO<T> jordan_wigner(const sOP& op, const system_modes& sys_info) const
+{
+    if(op.fermionic())
+    {       
+        using fermi_dict = fermion::default_fermion_operator_dictionary<double>;
+        std::vector<bool> is_fermion_mode(op.mode());      std::fill(is_fermion_mode.begin(), is_fermion_mode.end(), false);
+        for(size_t i = 0; i < op.mode(); ++i)
+        {
+            is_fermion_mode[i] = sys_info[i].fermionic();
+        }
 
+        bool do_jw;
+        CALL_AND_HANDLE(do_jw = fermi_dict::query(op.op())->changes_parity(), "Failed to jordan_wigner map fermionic mode.");
+
+        if(do_jw)
+        {
+            std::list<sOP> res;
+            for(size_t i = 0; i < op.mode(); ++i)
+            {
+                if(is_fermion_mode[i])
+                {
+                    res.push_back({"jw", i});
+                }
+            }
+            res.push_back({op.op(), op.mode()});
+            sPOP ret(res);
+            return 1.0*ret;
+        }
+        else
+        {
+            sOP res(op.op(), op.mode());
+            return 1.0*res;
+        }
+
+    }
+    else
+    {
+        sOP res(op.op(), op.mode());
+        return 1.0*res;
+    }
+}
+
+
+template <typename T>
+sNBO<T> jordan_wigner(const sPOP& op, const system_modes& sys_info) const
+{
+    RAISE_EXCEPTION("Jordan wigner mapping of product operator has not yet been implement.");
+}
+}
+*/
 
 #endif  //TTNS_OPERATOR_GEN_LIB_SSOP_HPP
 

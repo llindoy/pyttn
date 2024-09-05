@@ -25,6 +25,7 @@ void init_ttn(py::module &m, const std::string& label)
     using _ttn_node_data = ttn_node_data<T, linalg::blas_backend>;
     using real_type = typename linalg::get_real_type<T>::type;
     using siteop = site_operator<T, linalg::blas_backend>;
+    using prodop = product_operator<T, linalg::blas_backend>;
 
     py::class_<_ttn_node_data>(m, (std::string("ttn_data_")+label).c_str())
         .def(py::init())
@@ -329,6 +330,23 @@ void init_ttn(py::module &m, const std::string& label)
                 [](_ttn& o, siteop& op, size_t index, bool shift_orthogonality){CALL_AND_RETHROW(return o.apply_one_body_operator(op, index, shift_orthogonality));},
                 py::arg(), py::arg(), py::arg("shift_orthogonality") = true
             )
+        .def(
+                "apply_product_operator", 
+                [](_ttn& o, prodop& op, bool shift_orthogonality){CALL_AND_RETHROW(return o.apply_product_operator(op, shift_orthogonality));},
+                py::arg(), py::arg("shift_orthogonality") = true
+            )
+        .def(
+                "apply_operator", 
+                [](_ttn& o, siteop& op, bool shift_orthogonality){CALL_AND_RETHROW(return o.apply_operator(op, shift_orthogonality));},
+                py::arg(), py::arg("shift_orthogonality") = true
+            )
+        .def(
+                "apply_operator", 
+                [](_ttn& o, prodop& op, bool shift_orthogonality){CALL_AND_RETHROW(return o.apply_operator(op, shift_orthogonality));},
+                py::arg(), py::arg("shift_orthogonality") = true
+            )
+
+
         //Increment with additional operators as they are bound.
 
         //ttn& apply_one_body_operator(const Op<T, backend>& op, bool shift_orthogonality = true)
