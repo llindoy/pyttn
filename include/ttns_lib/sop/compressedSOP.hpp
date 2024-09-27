@@ -41,24 +41,48 @@ public:
     size_t operator[](size_t i) const{return m_op_indices[i];}
     size_t& operator[](size_t i){return m_op_indices[i];}
 
-    std::string label(const std::vector<std::string>& opdict) const
+    //std::string label(const std::vector<std::string>& opdict) const
+    //{
+    //    std::string ret;
+    //    for(auto ind : m_op_indices)
+    //    {
+    //        ASSERT(ind  < opdict.size(), "failed to get label for compositeSiteOperator.");
+    //        ret += opdict[ind];
+    //    }
+    //    return ret;
+    //}
+
+    std::string label(const std::vector<std::pair<size_t, size_t>>& copdict, const std::vector<std::vector<std::string>>& opdict) const
     {
         std::string ret;
         for(auto ind : m_op_indices)
         {
             ASSERT(ind  < opdict.size(), "failed to get label for compositeSiteOperator.");
-            ret += opdict[ind];
+            auto rv = copdict[ind];
+            ret += opdict[std::get<0>(rv)][std::get<1>(rv)];
         }
         return ret;
     }
 
-    sPOP as_product_operator(const std::vector<std::string>& opdict, size_t mode) const
+    //sPOP as_product_operator(const std::vector<std::string>& opdict, size_t mode) const
+    //{
+    //    sPOP ret;
+    //    for(auto ind : m_op_indices)
+    //    {
+    //        ASSERT(ind  < opdict.size(), "failed to get label for compositeSiteOperator.");
+    //        ret *= sOP(opdict[ind], mode);
+    //    }
+    //    return ret;
+    //}
+
+    sPOP as_product_operator(const std::vector<std::pair<size_t, size_t>>& copdict, const std::vector<std::vector<std::string>>& opdict) const
     {
         sPOP ret;
         for(auto ind : m_op_indices)
         {
-            ASSERT(ind  < opdict.size(), "failed to get label for compositeSiteOperator.");
-            ret *= sOP(opdict[ind], mode);
+            ASSERT(ind < copdict.size(), "failed to get label for compositeSiteOperator.");
+            auto rv = copdict[ind];
+            ret *= sOP(opdict[std::get<0>(rv)][std::get<1>(rv)], std::get<0>(rv));
         }
         return ret;
     }
@@ -128,6 +152,9 @@ public:
     using dict_type = std::vector<std::string>;
     using dict_container = std::vector<dict_type>;
 
+    using composite_dict_type = std::vector<std::pair<size_t, size_t>>;
+    using composite_dict_container = std::vector<composite_dict_type>;
+
     using site_ops_type = std::vector<std::vector<sPOP>>;
 public:
 
@@ -144,21 +171,8 @@ public:
     compressedSOP(const compressedSOP& o) = default;
     compressedSOP(compressedSOP&& o) = default;
 
-    compressedSOP(const SOP<T>& op) 
-    {
-        try
-        {
-            initialise(op);
-        }
-        catch(const std::exception& ex)
-        {
-            std::cerr << ex.what() << std::endl;
-            RAISE_EXCEPTION("Failed to construct sum of product operator object.");
-        }    
-    }
 
-
-    compressedSOP(const SOP<T>& op, const std::vector<size_t>& inds) 
+    compressedSOP(const SOP<T>& op, const system_modes& inds) 
     {
         try
         {
@@ -187,79 +201,48 @@ public:
         }    
     }
 
-    void initialise(const SOP<T>& o, const std::vector<size_t>& inds, size_t nmodes = 0)
+    void initialise(const SOP<T>& o, const system_modes& sysinf, size_t nmodes = 0)
     {
         try
         {
             m_label = o.label();
             resize(o.nterms(), nmodes > o.nmodes() ? nmodes : o.nmodes());
 
-            //start by copying the base operator dictionary object across
-            m_op_dict = o.reordered_operator_dictionary(inds);
-
-            size_t r = 0;
-            
-            //iterate over each term in the SOP 
-            for(const auto& pop : o)
-            {
-                //and extract the operators acting on each mode.  Here we need to take into acconut
-                //that we can have multiple operators all acting on the same mode and need to form a new
-                //operator label corresponding to these
-                m_coeff[r] = pop.second;
-        
-                std::unordered_map<size_t, compositeSiteOperator> terms;    
-                //now we iterate over the prodOP object and get the compressed 
-                
-                //iterate over each term and store the mode and the compositeSiteOperator.  Here we are using the fact
-                //that the SOP object enforces ordering of operators
-                for(const auto& op : pop.first)
-                {
-                    terms[inds[std::get<1>(op)]].push_back(std::get<0>(op));
-                }
-                if(pop.first.contains_jordan_wigner_string())
-                {
-                    for(size_t i = 0; i < o.nmodes(); ++i)
-                    {
-                        if(pop.first.prepend_jordan_wigner_string(i))
-                        {
-                            terms[inds[i]].push_back(o.jordan_wigner_index(i));
-                        }
-                    }
-                }
-
-                //now attempt to insert these terms into the mode_operator object
-                for(const auto& kv : terms)
-                {
-                    this->_insert(kv.second, r, kv.first);
-                }
-                ++r;
-            }
-
-            CALL_AND_HANDLE(insert_identities(), "Failed to insert identity operators into array.");
-        }
-        catch(const std::exception& ex)
-        {
-            std::cerr << ex.what() << std::endl;
-            RAISE_EXCEPTION("Failed to initialise compressed sum of product operator object.");
-        }    
-    }
-
-    void initialise(const SOP<T>& o, size_t nmodes = 0)
-    {
-        try
-        {
-            m_label = o.label();
-            resize(o.nterms(), nmodes > o.nmodes() ? nmodes : o.nmodes());
+            //an object for mapping the composite mode indices back onto the primitive mode indices
+            m_composite_op_dict.resize(sysinf.nmodes());
 
             //start by copying the base operator dictionary object across
             m_op_dict = o.operator_dictionary();
 
+            //an object for mapping the primitive mode indices back on the composite mode indices.  This is only 
+            //needed locally as it is used to construct the m_mode_operators infor for composite modes.
+            std::map<std::pair<size_t, size_t>, std::pair<size_t, size_t>> prim_to_comp;
+
+            //now iterate over the primitive modes 
+            for(size_t i = 0; i < m_op_dict.size(); ++i)
+            {
+                //get the composite mode info associated with the mode
+                auto cminf = sysinf.primitive_mode_index(i);
+                size_t mode = std::get<0>(cminf);
+
+                //now map the composite mode index from the underlying hamiltonian ordering to the tree ordering
+                size_t cmode = sysinf.mode_index(mode);
+
+                for(size_t j = 0; j < m_op_dict[i].size(); ++j)
+                {
+                    //and add in a pair pointing to the correct primitive mode in the primitive mode ordering of the Hamiltonian as well as the index in the op_dict.
+                    m_composite_op_dict[cmode].push_back(std::make_pair(i, j));
+
+                    //now map the primitive mode index and composite mode index 
+                    prim_to_comp[std::make_pair(i, j)] = std::make_pair(cmode, m_composite_op_dict[cmode].size()-1);
+                }
+            }
+
             size_t r = 0;
-            
             //iterate over each term in the SOP 
             for(const auto& pop : o)
             {
-                //and extract the operators acting on each mode.  Here we need to take into acconut
+                //and extract the operators acting on each mode.  Here we need to take into account
                 //that we can have multiple operators all acting on the same mode and need to form a new
                 //operator label corresponding to these
                 m_coeff[r] = pop.second;
@@ -267,19 +250,25 @@ public:
                 std::unordered_map<size_t, compositeSiteOperator> terms;    
                 //now we iterate over the prodOP object and get the compressed 
                 
-                //iterate over each term and store the mode and the compositeSiteOperator.  Here we are using the fact
-                //that the SOP object enforces ordering of operators
                 for(const auto& op : pop.first)
                 {
-                    terms[std::get<1>(op)].push_back(std::get<0>(op));
+                    std::pair<size_t, size_t> prim_data = std::make_pair(std::get<1>(op), std::get<0>(op));
+                    ASSERT(prim_to_comp.find(prim_data) != prim_to_comp.end(), "Primitive mode term is not in the map.");
+                    auto mp = prim_to_comp[prim_data];
+                    terms[std::get<0>(mp)].push_back(std::get<1>(mp));
                 }
+
                 if(pop.first.contains_jordan_wigner_string())
                 {
                     for(size_t i = 0; i < o.nmodes(); ++i)
                     {
                         if(pop.first.prepend_jordan_wigner_string(i))
                         {
-                            terms[i].push_back(o.jordan_wigner_index(i));
+                            std::pair<size_t, size_t> prim_data = std::make_pair(i, o.jordan_wigner_index(i));
+                            ASSERT(prim_to_comp.find(prim_data) != prim_to_comp.end(), "Primitive mode term is not in the map.");
+                            auto mp = prim_to_comp[prim_data];
+                            
+                            terms[std::get<0>(mp)].push_back(std::get<1>(mp));
                         }
                     }
                 }
@@ -292,7 +281,7 @@ public:
                 ++r;
             }
 
-            CALL_AND_HANDLE(insert_identities(), "Failed to insert identity operators into array.");
+            CALL_AND_HANDLE(insert_identities(sysinf), "Failed to insert identity operators into array.");
         }
         catch(const std::exception& ex)
         {
@@ -300,13 +289,18 @@ public:
             RAISE_EXCEPTION("Failed to initialise compressed sum of product operator object.");
         }    
     }
-
-    void insert_identities()
+    //Insert additional identity elements into the network.  Here we start by searching through the mode object and checking if
+    //and identity elements have already been bound reusing it if present.  And only bind a new one if no identity terms are 
+    //present.  We also note that in the event of a composite mode with multiple identities bound we do not combine these together
+    //which may lead to slightly larger bond dimensions in these case, this can be avoided by not explicitly binding identity operators 
+    //unless absolutely necessary.
+    void insert_identities(const system_modes& sysinf)
     {
         try
         {
+            //resize that holds the mode label corresponding to the identity element
             m_identity_index.resize(m_mode_operators.size());
-            for(size_t nu = 0; nu < m_mode_operators.size(); ++nu)
+            for(size_t mode = 0; mode < m_mode_operators.size(); ++mode)
             {
                 element_container_type rinds, tval;   
                 rinds.reserve(m_coeff.size());
@@ -314,50 +308,109 @@ public:
                 size_t count = 0;
                 bool rinds_set = false;
 
-                //check if the operator dictionary contains the m_op
+                //get the current modes composite operator dictionary.
+                auto& mcompdict = m_composite_op_dict[mode];
+
+                //now set up the spin label associated with the identity term.
                 std::string op("id");
-                auto& mlabels = m_op_dict[nu];
-                auto it = std::find(mlabels.begin(), mlabels.end(), op);
-                size_t ind = 0;
-                if(it == mlabels.end())
-                {
-                    ind = mlabels.size();
-                    mlabels.push_back(op);
-                }
-                else
-                {
-                    ind = static_cast<size_t>(it - mlabels.begin());
-                }
 
-                compositeSiteOperator id({ind});
+                //now we iterate over each of the terms in the composite operator dictionary and check to see if any of the 
+                //corresponding mode operators are the identity.  If they are we will set that to be the identity index.
+                //Otherwise we inset an identity operator at the end of the composite operator dictionary.
+                
+                //the index of the identity element
+                size_t idind = 0;
 
-                for(const auto& combop : m_mode_operators[nu])
+                //the mode that we will store this on.  
+                size_t idnu = 0;
+
+                //iterate over all terms in the composite operator dictionary associated with this mode
+                bool identity_found = false;
+                for(size_t index = 0; index < mcompdict.size() && !identity_found; ++index)
                 {
-                    if(count == 0)
-                    {
-                        tval = combop.second;
-                        ++count;
+                    auto ind = mcompdict[index];
+
+                    //extract the op_dict mode and term index from this composite site operator
+                    size_t nu = std::get<0>(ind);
+                    size_t tindex = std::get<1>(ind);
+
+                    //now if the label associated with this mode is the identity we have found the identity
+                    //term store the current mode and the index associated with this term and set identity_found
+                    //to terminate the iteration
+                    if(m_op_dict[idnu][tindex] == op)
+                    {   
+                        idnu = nu;
+                        idind = index;
+                        identity_found = true;
                     }
                     else
                     {
-                        if(rinds_set)
+                        idnu = nu;
+                    }
+                }
+                
+                if(identity_found)
+                {
+                    compositeSiteOperator id({idind});
+                    auto id_iter = m_mode_operators[mode].find(id);
+                    ASSERT(id_iter != m_mode_operators[mode].end(), "Id operator has not been added.");
+                    m_identity_index[mode] = std::distance(m_mode_operators[mode].begin(), id_iter);
+
+                    for(const auto& combop : m_mode_operators[mode])
+                    {
+                        if(count != m_identity_index[mode])
                         {
-                            element_container_type::set_union(rinds, combop.second, tval);
-                            rinds_set = false;
+                            if(rinds_set)
+                            {
+                                element_container_type::set_union(rinds, combop.second, tval);
+                                rinds_set = false;
+                            }
+                            else
+                            {
+                                element_container_type::set_union(tval, combop.second, rinds);
+                                rinds_set = true;
+                            }
+                        }
+                        ++count;
+                    }
+                    if(!rinds_set){element_container_type::complement(tval, m_mode_operators[mode][id]);}
+                    else{element_container_type::complement(rinds, m_mode_operators[mode][id]);}
+                }
+                else
+                {
+                    idind = mcompdict.size();
+                    mcompdict.push_back(std::make_pair(idnu, m_op_dict[idnu].size()));
+                    m_op_dict[idnu].push_back(op);
+                    compositeSiteOperator id({idind});
+
+                    //iterate through the mode_operator index and combine together all 
+                    for(const auto& combop : m_mode_operators[mode])
+                    {
+                        if(count == 0)
+                        {
+                            tval = combop.second;
+                            ++count;
                         }
                         else
                         {
-                            element_container_type::set_union(tval, combop.second, rinds);
-                            rinds_set = true;
+                            if(rinds_set)
+                            {
+                                element_container_type::set_union(rinds, combop.second, tval);
+                                rinds_set = false;
+                            }
+                            else
+                            {
+                                element_container_type::set_union(tval, combop.second, rinds);
+                                rinds_set = true;
+                            }
                         }
                     }
+                    if(!rinds_set){element_container_type::complement(tval, m_mode_operators[mode][id]);}
+                    else{element_container_type::complement(rinds, m_mode_operators[mode][id]);}
+                    auto id_iter = m_mode_operators[mode].find(id);
+                    ASSERT(id_iter != m_mode_operators[mode].end(), "Id operator has not been added.");
+                    m_identity_index[mode] = std::distance(m_mode_operators[mode].begin(), id_iter);
                 }
-                if(!rinds_set){element_container_type::complement(tval, m_mode_operators[nu][id]);}
-                else{element_container_type::complement(rinds, m_mode_operators[nu][id]);}
-
-                auto id_iter = m_mode_operators[nu].find(id);
-                ASSERT(id_iter != m_mode_operators[nu].end(), "Id operator has not been added.");
-                m_identity_index[nu] = std::distance(m_mode_operators[nu].begin(), id_iter);
             }
         }
         catch(const std::exception& ex)
@@ -374,7 +427,7 @@ public:
             clear();
             m_coeff.resize(nterms); std::fill(m_coeff.begin(), m_coeff.end(), T(1));
             m_mode_operators.resize(nmodes);
-            //m_composite_operators.resize(nmodes);
+            m_composite_op_dict.resize(nmodes);
             m_nterms = nterms;
         }
         catch(const std::exception& ex)
@@ -391,15 +444,11 @@ public:
     }
 
 protected:
-
-
-
-    void _insert(const compositeSiteOperator& op, const element_container_type& r, size_t nu)
+    void _insert(const compositeSiteOperator& op, size_t r, size_t nu)
     {
         try
         {
             auto& v = m_mode_operators[nu][op];
-            std::cerr << "inserting at mode: " << nu << " term: " << r << " label:" << op.label(m_op_dict[nu]) << std::endl;
             v.reserve(m_nterms);
             v.insert(r);
         }
@@ -410,70 +459,12 @@ protected:
         }
     } 
     
-    void _insert(const compositeSiteOperator& op, const std::vector<size_t>& r, size_t nu)
-    {
-        try
-        {
-            auto& v = m_mode_operators[nu][op];
-            v.reserve(m_nterms);
-            v.insert(std::begin(r), std::end(r));
-        }
-        catch(const std::exception& ex)
-        {
-            std::cerr << ex.what() << std::endl;
-            RAISE_EXCEPTION("Failed to insert operator into compressedSOP");
-        }
-    } 
-
-    void _insert(const compositeSiteOperator& op, size_t r, size_t nu)
-    {
-        try
-        {
-            auto& v = m_mode_operators[nu][op];
-            v.reserve(m_nterms);
-            CALL_AND_HANDLE(v.insert(r), "Failed to push mode operator term to list.");
-        }
-        catch(const std::exception& ex)
-        {
-            std::cerr << ex.what() << std::endl;
-            RAISE_EXCEPTION("Failed to insert operator into compressedSOP");
-        }
-    } 
-
-    template <typename rtype>
-    void _insert(const std::string& op, rtype&& r, size_t nu)
-    {
-        try
-        {
-            auto& mlabels = m_op_dict[nu];
-            auto it = std::find(mlabels.begin(), mlabels.end(), op);
-            size_t ind = 0;
-            if(it == mlabels.end())
-            {
-                ind = mlabels.size();
-                mlabels.push_back(op);
-            }
-            else
-            {
-                ind = static_cast<size_t>(it - mlabels.begin());
-            }
-
-            compositeSiteOperator cOP({ind});
-            CALL_AND_RETHROW(_insert(cOP, r, nu));
-        }
-        catch(const std::exception& ex)
-        {
-            std::cerr << ex.what() << std::endl;
-            RAISE_EXCEPTION("Failed to insert operator into cSSOP");
-        }
-    } 
-
 
 public:
     void clear()
     {
         m_mode_operators.clear();
-        //m_composite_operators.clear();
+        m_composite_op_dict.clear();
         m_op_dict.clear();
         m_coeff.clear();
         m_nterms = 0;
@@ -526,7 +517,6 @@ public:
 
     friend std::ostream& operator<< <T>(std::ostream& os, const compressedSOP<T>& op);
 
-
     site_ops_type site_operators() const
     {
         site_ops_type ret(m_mode_operators.size());
@@ -534,11 +524,12 @@ public:
         {
             for(const auto& op : m_mode_operators[i])
             {
-                ret[i].push_back(op.first.as_product_operator(m_op_dict[i], i));
+                ret[i].push_back(op.first.as_product_operator(m_composite_op_dict[i], m_op_dict));
             }
         }
         return ret;
     }
+
 
     const std::string& label() const{return m_label;}
     std::string& label(){return m_label;}
@@ -577,7 +568,7 @@ public:
         {   
             for(const auto& op : m_mode_operators[i])
             {
-                sPOP top = op.first.as_product_operator(m_op_dict[i], i);
+                sPOP top = op.first.as_product_operator(m_composite_op_dict[i], m_op_dict);
 
                 //if this operator is the identity operator we don't actually add it to the sop
                 if(top.size() == 1 && top.ops().front() == sOP("id", i)){}
@@ -603,6 +594,7 @@ public:
 protected:
     container_type m_mode_operators;
     dict_container m_op_dict;
+    composite_dict_container m_composite_op_dict;
 
     size_t m_nterms;
     std::vector<literal::coeff<T>> m_coeff;
@@ -614,40 +606,39 @@ protected:
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const compressedSOP<T>& op)
 {
-    if(!op.label().empty()){os << op.label() << ": " << std::endl;}
+    RAISE_EXCEPTION("Stream operator not currently working for compressedSOP operator.");
+    //if(!op.label().empty()){os << op.label() << ": " << std::endl;}
 
 
-    for(size_t i = 0; i < op.m_coeff.size(); ++i)
-    {
-        os << "(" << i << "," << op.m_coeff[i] << ")" << " ";
-    }
-    os << std::endl;
-    //print out the sparse mode operators info info
-    for(size_t nu = 0; nu < op.m_mode_operators.size(); ++nu)
-    {
-        os << "mode: " << nu << std::endl;
-        os << "labels: { ";
-        for(const auto& id : op.m_op_dict[nu])
-        {
-            os << id << " ";
-        }
-        os <<"}" << std::endl;
+    //for(size_t i = 0; i < op.m_coeff.size(); ++i)
+    //{
+    //    os << "(" << i << "," << op.m_coeff[i] << ")" << " ";
+    //}
+    //os << std::endl;
+    ////print out the sparse mode operators info info
+    //for(size_t nu = 0; nu < op.m_mode_operators.size(); ++nu)
+    //{
+    //    os << "mode: " << nu << std::endl;
+    //    os << "labels: { ";
+    //    for(const auto& id : op.m_op_dict[nu])
+    //    {
+    //        os << id << " ";
+    //    }
+    //    os <<"}" << std::endl;
 
-        size_t i = 0;
-        for( auto& mop : op.m_mode_operators[nu])
-        {
-            os << i << ": " << std::get<0>(mop).label(op.m_op_dict[nu]) << " " << std::get<1>(mop) << std::endl;
-            ++i;
-        }
-        os << std::endl;
-    }
-    
-    return os;
+    //    size_t i = 0;
+    //    for( auto& mop : op.m_mode_operators[nu])
+    //    {
+    //        os << i << ": " << std::get<0>(mop).label(op.m_op_dict[nu]) << " " << std::get<1>(mop) << std::endl;
+    //        ++i;
+    //    }
+    //    os << std::endl;
+    //}
+    //
+    //return os;
 }
 
 
 }   //namespace ttns
 
 #endif  //UTILS_OPERATOR_GEN_COMPRESSED_SOP_HPP
-
-

@@ -39,6 +39,12 @@ def bkm(nbose, dk, mind=True):
     return ret
     #return sp.sparse.csr_matrix(b1, (row, col), shape=(nbose, nbose))
 
+def Sl(S):
+    return np.kron(S, np.identity(S.shape[0]))
+
+def Sr(S):
+    return np.kron(np.identity(S.shape[0]), S.T)
+
 def Sp(S):
     Scomm = commutator(S)
     return Scomm

@@ -34,7 +34,9 @@ void init_dmrg_core(py::module& m, const std::string& label)
         .def(py::init<>())
         .def(py::init<const _ttn&, const _sop&, size_type, size_type>(),
                   py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("num_threads")=1)
-        .def("assign", [](dmrg& self, const dmrg& o){self=o;})
+        .def("assign", [](dmrg& self, const dmrg& o){self=o;}, R"mydelimiter(
+            Assign the DMRG object from another DMRG object
+          )mydelimiter")
         .def("__copy__",[](const dmrg& o){return dmrg(o);})
         .def("__deepcopy__", [](const dmrg& o, py::dict){return dmrg(o);}, py::arg("memo"))
         .def("initialise", &dmrg::initialise, py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("num_threads")=1)
@@ -58,9 +60,26 @@ void init_dmrg_core(py::module& m, const std::string& label)
                 [](dmrg& o, const real_type& i){o.eigensolver_reltol() = i;}
             )
         .def("clear", &dmrg::clear)
-        .def("step", &dmrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
-        .def("__call__", &dmrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
-        .def("prepare_environment", &dmrg::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false);
+        .def("step", &dmrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false, R"mydelimiter(
+            Performs a single step of the single site DMRG algorithm
+            :param Psi: The input tree tensor network state.  This object is modified inplace by the DMRG algorithm
+            :param SOP: The sum of product operator representation of the Hamiltonian 
+            :param update_env: Whether or not to force an update of the environment object.
+          )mydelimiter")
+        .def("__call__", &dmrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false, R"mydelimiter(
+            Performs a single step of the single site DMRG algorithm
+            :param Psi: The input tree tensor network state.  This object is modified inplace by the DMRG algorithm
+            :param SOP: The sum of product operator representation of the Hamiltonian 
+            :param update_env: Whether or not to force an update of the environment object.
+          )mydelimiter")
+        .def("prepare_environment", &dmrg::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false)
+        .doc() = R"mydelimiter(
+                  A class implementing the single site DMRG algorithm on trees.
+                  :param Psi: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+                  :param SOP: The sum of product operator representation of the Hamiltonian
+                  :param krylov_dim: The krylov subspace dimension used for the internal optimisation step
+                  :param num_threads: The number of threads used for updating schemes.
+                 )mydelimiter";
     //utils::eigenvalue_target& mode(){return m_eigensolver.mode();}
     //const utils::eigenvalue_target& mode() const{return m_eigensolver.mode();}
 }
@@ -166,7 +185,8 @@ void init_dmrg_adaptive(py::module& m, const std::string& label)
         .def("clear", &admrg::clear)
         .def("step", &admrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
         .def("__call__", &admrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
-        .def("prepare_environment", &admrg::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false);
+        .def("prepare_environment", &admrg::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false)
+        .doc() = "A class implementing the adaptive single site DMRG algorithm on trees.";
 
     //orthogonality::truncation_mode& truncation_mode() {return m_ss_expand.truncation_mode();}
     //const orthogonality::truncation_mode& truncation_mode() const {return m_ss_expand.truncation_mode();}

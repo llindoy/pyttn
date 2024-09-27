@@ -52,6 +52,8 @@ void init_SOP(py::module &m, const std::string& label)
         .def("prune_zeros", &_SOP::prune_zeros, py::arg("tol")=1e-15)
         .def("jordan_wigner", static_cast<_SOP& (_SOP::*)(const system_modes&, double)>(&_SOP::jordan_wigner), py::arg(), py::arg("tol")=1e-15)
 
+        .def("expand", &_SOP::expand)
+
         .def_property
             (
                 "label", 

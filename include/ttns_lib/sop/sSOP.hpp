@@ -408,7 +408,13 @@ public:
         return *this;
     }
 
-    sNBO<T>& operator*=(const T& b)
+    //sNBO<T>& operator*=(const T& b)
+    //{
+    //    m_coeff*=b;
+    //    return *this;
+    //}
+
+    sNBO<T>& operator*=(const literal::coeff<T>& b)
     {
         m_coeff*=b;
         return *this;
@@ -516,7 +522,7 @@ ttns::sNBO<T> operator*(const ttns::sPOP& a, const ttns::literal::coeff<T>& b)
 
 
 
-template <typename T, typename U>
+template <typename T, typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
 ttns::sNBO<decltype(T()*U())> operator*(const ttns::sNBO<T>& a, const U& b)
 {
     ttns::sNBO<decltype(T()*U())> ret(a);
@@ -524,8 +530,24 @@ ttns::sNBO<decltype(T()*U())> operator*(const ttns::sNBO<T>& a, const U& b)
     return ret;
 }
 
-template <typename T, typename U>
+template <typename T, typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
 ttns::sNBO<decltype(T()*U())> operator*(const U& a, const ttns::sNBO<T>& b)
+{
+    ttns::sNBO<decltype(T()*U())> ret(b);
+    ret.coeff()*=a;
+    return ret;
+}
+
+template <typename T, typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
+ttns::sNBO<decltype(T()*U())> operator*(const ttns::sNBO<T>& a, const ttns::literal::coeff<U>& b)
+{
+    ttns::sNBO<decltype(T()*U())> ret(a);
+    ret.coeff()*=b;
+    return ret;
+}
+
+template <typename T, typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
+ttns::sNBO<decltype(T()*U())> operator*(const ttns::literal::coeff<U>& a, const ttns::sNBO<T>& b)
 {
     ttns::sNBO<decltype(T()*U())> ret(b);
     ret.coeff()*=a;
@@ -1127,6 +1149,28 @@ ttns::sSOP<decltype(T()*U())> operator*(const ttns::sSOP<T>& a, const U& b)
 
 template <typename T, typename U> 
 ttns::sSOP<decltype(T()*U())> operator*(const U& a, const ttns::sSOP<T>& b)
+{
+    ttns::sSOP<decltype(T()*U())> ret(b);
+    for(auto& op : ret.terms())
+    {
+        op *= a;
+    }
+    return  ret;
+}
+template <typename T, typename U> 
+ttns::sSOP<decltype(T()*U())> operator*(const ttns::sSOP<T>& a, const ttns::literal::coeff<U>& b)
+{
+    ttns::sSOP<decltype(T()*U())> ret(a);
+    for(auto& op : ret.terms())
+    {
+        op *= b;
+    }
+    return  ret;
+}
+
+
+template <typename T, typename U> 
+ttns::sSOP<decltype(T()*U())> operator*(const ttns::literal::coeff<U>& a, const ttns::sSOP<T>& b)
 {
     ttns::sSOP<decltype(T()*U())> ret(b);
     for(auto& op : ret.terms())

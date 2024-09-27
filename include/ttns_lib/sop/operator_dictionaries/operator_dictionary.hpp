@@ -22,7 +22,7 @@ class operator_from_default_dictionaries
 {
     using op_type = ops::primitive<T, backend>;
 public:
-    static std::shared_ptr<op_type> query(const std::string& label, std::shared_ptr<utils::occupation_number_basis> basis, const mode_type& type, bool use_sparse)
+    static std::shared_ptr<op_type> query(const std::string& label, std::shared_ptr<utils::occupation_number_basis> basis, const mode_type& type, bool use_sparse, size_t mode_index = 0)
     {
         size_t hilbert_space_dimension = basis->nstates();
         if(label == "id" || label == "Id" || label == "1")
@@ -37,26 +37,26 @@ public:
                 if(s_op->is_diagonal())
                 {
                     linalg::diagonal_matrix<T, backend> M;
-                    s_op->as_diagonal(basis, 0, M);
+                    s_op->as_diagonal(basis, mode_index, M);
                     return std::make_shared<ops::diagonal_matrix_operator<T, backend>>(M);
                 }
                 else if(s_op->is_sparse())
                 {
                     linalg::csr_matrix<T, backend> M;
-                    s_op->as_csr(basis, 0, M);
+                    s_op->as_csr(basis, mode_index, M);
                     return std::make_shared<ops::sparse_matrix_operator<T, backend>>(M);
                 }
                 else
                 {
                     linalg::matrix<T, backend> M;
-                    s_op->as_dense(basis, 0, M);
+                    s_op->as_dense(basis, mode_index, M);
                     return std::make_shared<ops::dense_matrix_operator<T, backend>>(M);
                 }
             }
             else
             {
                 linalg::matrix<T, backend> M;
-                s_op->as_dense(basis, 0, M);
+                s_op->as_dense(basis, mode_index, M);
                 return std::make_shared<ops::dense_matrix_operator<T, backend>>(M);
             }
         }

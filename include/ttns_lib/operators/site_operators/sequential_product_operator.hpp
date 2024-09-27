@@ -27,6 +27,8 @@ public:
     using typename base_type::const_vector_ref;
     using typename base_type::matview;
     using typename base_type::resview;
+    using typename base_type::tensview;
+    using typename base_type::restensview;
 
 public:
     sequential_product_operator()  : base_type() {}
@@ -55,12 +57,14 @@ public:
 
     void append_operator(std::shared_ptr<base_type> op)
     {
+        ASSERT(op.size() == base_type::m_size, "Failed to append operator invalid size.");
         m_operators.insert(m_operators.begin(), op);
     }
 
     template <typename OpType>
     void append_operator(const OpType& op)
     {
+        ASSERT(op.size() == base_type::m_size, "Failed to append operator invalid size.");
         m_operators.insert(m_operators.begin(), std::make_shared<OpType>(op));
     }
 
@@ -77,76 +81,28 @@ public:
     std::shared_ptr<base_type> clone() const{return std::make_shared<sequential_product_operator>(m_operators);}
 
 
-    void apply(const resview& A, resview& HA) final
-    {
-        ASSERT(m_operators.size() > 0, "Invalid operator object.");
-        __apply_internal(A, HA);
-    }  
-    void apply(const resview& A, resview& HA, real_type t, real_type dt) final 
-    {
-        ASSERT(m_operators.size() > 0, "Invalid operator object.");
-        this->update(t, dt);
-        __apply_internal(A, HA);
-    } 
+    void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const matview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));} 
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+  
+    void apply(const_matrix_ref A, matrix_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
 
-    void apply(const matview& A, resview& HA) final
-    {
-        ASSERT(m_operators.size() > 0, "Invalid operator object.");
-        __apply_internal(A, HA);
-    }  
-    void apply(const matview& A, resview& HA, real_type t, real_type dt) final 
-    {
-        ASSERT(m_operators.size() > 0, "Invalid operator object.");
-        this->update(t, dt);
-        __apply_internal(A, HA);
-    } 
+    //functions for applying the operator to rank 3 tensor views
+    void apply(const restensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const restensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final  {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
 
-
-    void apply(const_matrix_ref A, matrix_ref HA) final
-    {
-        HA.resize(A.shape(0), A.shape(1));
-        ASSERT(m_operators.size() > 0, "Invalid operator object.");
-        __apply_internal(A, HA);
-    }  
-    void apply(const_matrix_ref A, matrix_ref HA, real_type t, real_type dt) final
-    {
-        HA.resize(A.shape(0), A.shape(1));
-        ASSERT(m_operators.size() > 0, "Invalid operator object.");
-        this->update(t, dt);
-        __apply_internal(A, HA);
-    } 
-
-    void apply(const_vector_ref A , vector_ref HA) final
-    {
-        ASSERT(m_operators.size() > 0, "Invalid operator object.");
-        __apply_internal(A, HA);
-    }  
-
-    void apply(const_vector_ref A, vector_ref HA, real_type t, real_type dt) final
-    {
-        ASSERT(m_operators.size() > 0, "Invalid operator object.");
-        this->update(t, dt);
-        __apply_internal(A, HA);
-    }
-
-    std::string to_string() const final
-    {
-        std::stringstream oss;
-        oss << "sequential product operator: " << std::endl;
-        for(size_t i = 0; i < m_operators.size(); ++i)
-        {
-            oss << m_operators[i]->to_string() << std::endl;
-        }
-        return oss.str();
-    }
 
 protected:
-    std::vector<std::shared_ptr<base_type>> m_operators;
-    linalg::vector<T, backend> m_temp;
-
     template <typename T1, typename T2>
-    void __apply_internal(const T1& A, T2& HA)
+    void apply_rank_2(const T1& A, T2& HA)
     {
+        ASSERT(m_operators.size() > 0, "Invalid operator object.");
         try
         {
             m_temp.resize(A.size());
@@ -166,6 +122,45 @@ protected:
             RAISE_EXCEPTION("Failed to apply sequential product operator.");
         }
     }
+
+    template <typename T1, typename T2>
+    void apply_rank_3(const T1& A, T2& HA)
+    {
+        ASSERT(m_operators.size() > 0, "Invalid operator object.");
+        try
+        {
+            m_temp.resize(A.size());
+            restensview t = m_temp.reinterpret_shape(A.shape(0), A.shape(1), A.shape(2));
+            restensview _HA = HA.reinterpret_shape(A.shape(0), A.shape(1), A.shape(2));
+            for(size_t i = 0; i < m_operators.size(); ++i)
+            {
+                if(i == 0){t.set_buffer(A);}
+                else{t.set_buffer(_HA);}
+                size_t ind = m_operators.size() - (i+1);
+                m_operators[ind]->apply(t, _HA);
+            }
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to apply sequential product operator.");
+        }
+    }
+public:
+    std::string to_string() const final
+    {
+        std::stringstream oss;
+        oss << "sequential product operator: " << std::endl;
+        for(size_t i = 0; i < m_operators.size(); ++i)
+        {
+            oss << m_operators[i]->to_string() << std::endl;
+        }
+        return oss.str();
+    }
+
+protected:
+    std::vector<std::shared_ptr<base_type>> m_operators;
+    linalg::vector<T, backend> m_temp;
 
 #ifdef CEREAL_LIBRARY_FOUND
 public:

@@ -54,30 +54,30 @@ public:
     product_operator(){}
     product_operator(const product_operator& o) = default;
     product_operator(product_operator&& o) = default;
-    product_operator(const sOP& op, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    product_operator(const sOP& op, const system_modes& sys, bool use_sparse = true)
     {
-        CALL_AND_HANDLE(initialise(op, sys, use_sparse, use_purification), "Failed to construct sop operator.");
+        CALL_AND_HANDLE(initialise(op, sys, use_sparse), "Failed to construct sop operator.");
     }
-    product_operator(const sOP& op, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false) 
+    product_operator(const sOP& op, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true) 
     {
-        CALL_AND_HANDLE(initialise(op, sys, opdict, use_sparse, use_purification), "Failed to construct sop operator.");
+        CALL_AND_HANDLE(initialise(op, sys, opdict, use_sparse), "Failed to construct sop operator.");
     }
 
-    product_operator(const sPOP& op, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    product_operator(const sPOP& op, const system_modes& sys, bool use_sparse = true)
     {
-        CALL_AND_HANDLE(initialise(op, sys, use_sparse, use_purification), "Failed to construct sop operator.");
+        CALL_AND_HANDLE(initialise(op, sys, use_sparse), "Failed to construct sop operator.");
     }
-    product_operator(const sPOP& op, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false) 
+    product_operator(const sPOP& op, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true) 
     {
-        CALL_AND_HANDLE(initialise(op, sys, opdict, use_sparse, use_purification), "Failed to construct sop operator.");
+        CALL_AND_HANDLE(initialise(op, sys, opdict, use_sparse), "Failed to construct sop operator.");
     }
-    product_operator(const sNBO<T>& op, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    product_operator(const sNBO<T>& op, const system_modes& sys, bool use_sparse = true)
     {
-        CALL_AND_HANDLE(initialise(op, sys, use_sparse, use_purification), "Failed to construct sop operator.");
+        CALL_AND_HANDLE(initialise(op, sys, use_sparse), "Failed to construct sop operator.");
     }
-    product_operator(const sNBO<T>& op, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false) 
+    product_operator(const sNBO<T>& op, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true) 
     {
-        CALL_AND_HANDLE(initialise(op, sys, opdict, use_sparse, use_purification), "Failed to construct sop operator.");
+        CALL_AND_HANDLE(initialise(op, sys, opdict, use_sparse), "Failed to construct sop operator.");
     }
     product_operator& operator=(const product_operator& o) = default;
     product_operator& operator=(product_operator&& o) = default;
@@ -98,7 +98,7 @@ protected:
 public:
     //resize this object from a tree structure, a SOP object, a system info class and an optional operator dictionary.
     //This implementation does not support composite modes currently.  To do add mode combination
-    void initialise(const sPOP& pop, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    void initialise(const sPOP& pop, const system_modes& sys, bool use_sparse = true)
     {
         m_coeff = T(1.0);
         _m_coeff = T(1.0);
@@ -110,30 +110,37 @@ public:
         for(const auto& x : up)
         {
             size_t nu = x.first;
+            std::pair<size_t, size_t> mode_info = sys.primitive_mode_index(nu);
+            size_t mode = std::get<0>(mode_info);
+            size_t lmode = std::get<1>(mode_info);
 
-            size_t hilbert_space_dimension = sys[nu].lhd();
-            std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension, 1);
+            std::vector<size_t> hilbert_space_dimension(sys[mode].nmodes());
+            for(size_t lmi = 0; lmi < sys[mode].nmodes(); ++lmi)
+            {
+                hilbert_space_dimension[lmi] = sys[mode][lmi].lhd();
+            }
+            std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension);
 
             const auto& t = x.second;
             if(t.size() == 1)
             {
                 std::string label = t.front();
-                CALL_AND_HANDLE(m_mode_operators[i] = element_type(dfop_dict::query(label, basis, sys[nu].type(), use_sparse), nu, use_purification), "Failed to insert new element in mode operator.");
+                CALL_AND_HANDLE(m_mode_operators[i] = element_type(dfop_dict::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode), sys.mode_index(mode)), "Failed to insert new element in mode operator.");
             }
             else
             {
                 std::vector<std::shared_ptr<ops::primitive<T, backend>>> ops;   ops.reserve(t.size());
                 for(const auto& label : t)
                 {
-                    CALL_AND_HANDLE(ops.push_back(dfop_dict::query(label, basis, sys[nu].type(), use_sparse)), "Failed to insert new element in mode operator.");
+                    CALL_AND_HANDLE(ops.push_back(dfop_dict::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode)), "Failed to insert new element in mode operator.");
                 }
-                CALL_AND_HANDLE(m_mode_operators[i] = element_type(ops::sequential_product_operator<T, backend>{ops}, nu, use_purification), "Failed to insert new element in mode operator");
+                CALL_AND_HANDLE(m_mode_operators[i] = element_type(ops::sequential_product_operator<T, backend>{ops}, sys.mode_index(mode)), "Failed to insert new element in mode operator");
             }
             ++i;
         }
     }
 
-    void initialise(const sPOP& pop, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false)
+    void initialise(const sPOP& pop, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true)
     {
         m_coeff = T(1.0);
         _m_coeff = T(1.0);
@@ -145,8 +152,16 @@ public:
         for(const auto& x : up)
         {
             size_t nu = x.first;
-            size_t hilbert_space_dimension = sys[nu].lhd();
-            std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension, 1);
+            std::pair<size_t, size_t> mode_info = sys.primitive_mode_index(nu);
+            size_t mode = std::get<0>(mode_info);
+            size_t lmode = std::get<1>(mode_info);
+
+            std::vector<size_t> hilbert_space_dimension(sys[mode].nmodes());
+            for(size_t lmi = 0; lmi < sys[mode].nmodes(); ++lmi)
+            {
+                hilbert_space_dimension[lmi] = sys[mode][lmi].lhd();
+            }
+            std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension);
 
             const auto& t = x.second;
             if(t.size() == 1)
@@ -157,12 +172,12 @@ public:
 
                 if(op != nullptr)
                 {
-                    ASSERT(op->size() == hilbert_space_dimension, "Failed to construct product_operator.  Mode operator from operator dictionary has incorrect size.");
-                    CALL_AND_HANDLE(m_mode_operators[i] = element_type(op, nu, use_purification), "Failed to insert new element in mode operator.");
+                    ASSERT(op->size() == sys[mode].lhd(), "Invalid operator size in default operator dictionary.");
+                    CALL_AND_HANDLE(m_mode_operators[i] = element_type(op, sys.mode_index(mode)), "Failed to insert new element in mode operator.");
                 }
                 else
                 {
-                    CALL_AND_HANDLE(m_mode_operators[i] = element_type(dfop_dict::query(label, basis, sys[nu].type(), use_sparse), nu, use_purification), "Failed to insert new element in mode operator.");
+                    CALL_AND_HANDLE(m_mode_operators[i] = element_type(dfop_dict::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode), sys.mode_index(mode)), "Failed to insert new element in mode operator.");
                 }
 
             }
@@ -174,22 +189,22 @@ public:
                     std::shared_ptr<op_type> curr_op = opdict.query(nu, label);
                     if(curr_op != nullptr)
                     {
-                        ASSERT(curr_op->size() == hilbert_space_dimension, "Failed to construct product_operator.  Mode operator from operator dictionary has incorrect size.");
+                        ASSERT(curr_op->size() == sys[mode].lhd(), "Invalid operator size in default operator dictionary.");
                         ops.push_back(curr_op);
                     }
                     else
                     {
-                        CALL_AND_HANDLE(ops.push_back(dfop_dict::query(label, basis, sys[nu].type(), use_sparse)), "Failed to insert new element in mode operator.");
+                        CALL_AND_HANDLE(ops.push_back(dfop_dict::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode)), "Failed to insert new element in mode operator.");
                     }
                 }
-                CALL_AND_HANDLE(m_mode_operators[i] = element_type(ops::sequential_product_operator<T, backend>{ops}, nu, use_purification), "Failed to insert new element in mode operator");
+                CALL_AND_HANDLE(m_mode_operators[i] = element_type(ops::sequential_product_operator<T, backend>{ops}, sys.mode_index(mode)), "Failed to insert new element in mode operator");
             }
             ++i;
         }
     }
     //resize this object from a tree structure, a SOP object, a system info class and an optional operator dictionary.
     //This implementation does not support composite modes currently.  To do add mode combination
-    void initialise(const sOP& _op, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    void initialise(const sOP& _op, const system_modes& sys, bool use_sparse = true)
     {
         m_coeff = T(1.0);
         _m_coeff = T(1.0);
@@ -197,51 +212,69 @@ public:
 
         using dfop_dict = operator_from_default_dictionaries<T, backend>;
         size_t nu = _op.mode();
-        size_t hilbert_space_dimension = sys[nu].lhd();
         std::string label = _op.op();
 
-        std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension, 1);
+        std::pair<size_t, size_t> mode_info = sys.primitive_mode_index(nu);
+        size_t mode = std::get<0>(mode_info);
+        size_t lmode = std::get<1>(mode_info);
 
-        CALL_AND_HANDLE(m_mode_operators[0] = element_type(dfop_dict::query(label, basis, sys[nu].type(), use_sparse), nu, use_purification), "Failed to insert new element in mode operator.");
+        std::vector<size_t> hilbert_space_dimension(sys[mode].nmodes());
+        for(size_t i = 0; i < sys[mode].nmodes(); ++i)
+        {
+            hilbert_space_dimension[i] = sys[mode][i].lhd();
+        }
+        std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension);
+
+        CALL_AND_HANDLE(m_mode_operators[0] = element_type(dfop_dict::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode), sys.mode_index(mode)), "Failed to insert new element in mode operator.");
     }
 
-    void initialise(const sOP& _op, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false)
+    void initialise(const sOP& _op, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true)
     {
         m_mode_operators.resize(1);
         m_coeff = T(1.0);
         _m_coeff = T(1.0);
+
         size_t nu = _op.mode();
-        size_t hilbert_space_dimension = sys[nu].lhd();
         std::string label = _op.op();
 
         using dfop_dict = operator_from_default_dictionaries<T, backend>;
-        std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension, 1);
+
+        std::pair<size_t, size_t> mode_info = sys.primitive_mode_index(nu);
+        size_t mode = std::get<0>(mode_info);
+        size_t lmode = std::get<1>(mode_info);
+
+        std::vector<size_t> hilbert_space_dimension(sys[mode].nmodes());
+        for(size_t i = 0; i < sys[mode].nmodes(); ++i)
+        {
+            hilbert_space_dimension[i] = sys[mode][i].lhd();
+        }
+        std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension);
 
         //first start to access element from opdict
         std::shared_ptr<op_type> op = opdict.query(nu, label);
         if(op != nullptr)
         {
-            ASSERT(op->size() == hilbert_space_dimension, "Failed to construct product_operator.  Mode operator from operator dictionary has incorrect size.");
-            CALL_AND_HANDLE(m_mode_operators[0] = element_type(op, nu, use_purification), "Failed to insert new element in mode operator.");
+            ASSERT(op->size() == sys[mode].lhd(), "Failed to construct product_operator.  Mode operator from operator dictionary has incorrect size.");
+            CALL_AND_HANDLE(m_mode_operators[0] = element_type(op, sys.mode_index(mode)), "Failed to insert new element in mode operator.");
         }
         else
         {
-            CALL_AND_HANDLE(m_mode_operators[0] = element_type(dfop_dict::query(label, basis, sys[nu].type(), use_sparse), nu, use_purification), "Failed to insert new element in mode operator.");
+            CALL_AND_HANDLE(m_mode_operators[0] = element_type(dfop_dict::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode), sys.mode_index(mode)), "Failed to insert new element in mode operator.");
         }
     }
 
     //resize this object from a tree structure, a SOP object, a system info class and an optional operator dictionary.
-    //This implementation does not support composite modes currently.  To do add mode combination
-    void initialise(const sNBO<T>& pop, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    //This implementation does not support composite modes currently.
+    void initialise(const sNBO<T>& pop, const system_modes& sys, bool use_sparse = true)
     {
-        CALL_AND_RETHROW(initialise(pop.pop(), sys, use_sparse, use_purification));
+        CALL_AND_RETHROW(initialise(pop.pop(), sys, use_sparse));
         _m_coeff = pop.coeff();
         update_coefficients(0);
     }
 
-    void initialise(const sNBO<T>& pop, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false)
+    void initialise(const sNBO<T>& pop, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true)
     {
-        CALL_AND_RETHROW(initialise(pop.pop(), sys, opdict, use_sparse, use_purification));
+        CALL_AND_RETHROW(initialise(pop.pop(), sys, opdict, use_sparse));
         _m_coeff = pop.coeff();
         update_coefficients(0);
     }

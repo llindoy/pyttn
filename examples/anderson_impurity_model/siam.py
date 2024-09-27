@@ -1,202 +1,236 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 import sys
+import h5py
+import scipy
 import copy
 
 sys.path.append("../../")
 from pyttn import *
-from chain_map import chain_map
+from pyttn import oqs
 
-from siam_core import *
-
-def setup_interactive_plots(nstep, dt, N, res, yrange):
-    plt.ion()
-    fig, ax = plt.subplots(nrows=1, ncols=2)
-    num = fig.number
-    im = ax[0].imshow(res[:N, :] + res[-1:(N-1):-1, :], vmin=0, vmax=2, aspect='auto', interpolation='nearest')
-    l1 = ax[1].plot(np.arange(nstep+1)*dt, res[N-1, :]+res[N,:])[0]
-    ax[1].set(xlim=[0, dt*nstep])
-    ax[1].set(ylim=yrange)
-    ax[1].set_xlabel(r"$t$")
-    ax[1].set_ylabel(r"$n_u(t) + n_d(t)$")
-    ax[1].set_ylabel(r"$n(t)$")
-    return fig, ax, num, im, l1
-
-def update_interactive_plots(num, im, l1, nstep, dt, N, res):
-    if(plt.fignum_exists(num)):
-        plt.gcf().canvas.draw()
-        im.set_data(res[:N, :] + res[-1:(N-1):-1, :])
-        l1.set_data(np.arange(nstep+1)*dt, res[N-1, :]+res[N, :])
-        plt.pause(0.01)
+from numba import jit
 
 
-#setup the star Hamiltonian for the spin boson model
-def setup_star_hamiltonian(ek, U, V, e):
-    Nb = len(V)
-    N = Nb+1
-    #set up the Hamiltonian
-    H = SOP(2*N)
-
-    #add on the on-site interaction term
-    H += U * fermion_operator("n", nU(0, N)) * fermion_operator("n", nD(0, N))
-
-    for s in ['u', 'd']:
-        H += ek * fermion_operator("n", ind(0, N, s))
-
-        for i in range(Nb):
-            H += V[i]*(fermion_operator("cdag", ind(0, N, s))*fermion_operator("c", ind(i+1, N, s)))
-            H += V[i]*(fermion_operator("cdag", ind(i+1, N, s))*fermion_operator("c", ind(0, N, s)))
-            H += e[i]*fermion_operator("n", ind(i+1, N, s))
-    return H
-
-
-
-
-#setup the chain hamiltonian for the spin boson model - this is the tedopa method
-def setup_chain_hamiltonian(ek, U, _V, _e, include_coupling = True):
-    Nb = len(_V)
-    N = Nb+1
-    #set up the Hamiltonian
-    H = SOP(2*N)
-
-    V, e = chain_map(_V, _e)
-    V = np.array(V)
-
-    if not include_coupling:
-        V[0] = 0.0
-    #add on the on-site interaction term
-    H += U * fermion_operator("n", nU(0, N)) * fermion_operator("n", nD(0, N))
-
-    for s in ['u', 'd']:
-        H += ek * fermion_operator("n", ind(0, N, s))
-        for i in range(Nb):
-            H += V[i]*(fermion_operator("cdag", ind(i, N, s))*fermion_operator("c", ind(i+1, N, s)))
-            H += V[i]*(fermion_operator("cdag", ind(i+1, N, s))*fermion_operator("c", ind(i, N, s)))
-            H += e[i]*fermion_operator("n", ind(i+1, N, s))
-    return H
-
-
-#setup the chain hamiltonian for the spin boson model - that is this implements the method described in Nuomin, Beratan, Zhang, Phys. Rev. A 105, 032406
-#TO DO: Implement this correctly for fermionic baths.
-def setup_ipchain_hamiltonian(ek, _U, _V, _e):
-    Nb = len(_V)
-    N = Nb+1
-    #set up the Hamiltonian
-    H = SOP(2*N)
-
-    t, e, P = chain_map(_V, _e, return_unitary = True)
-    t0 = t[0]
-
-    l = _e
-
-    #add on the on-site interaction term
-    H += _U * fermion_operator("n", nU(0, N)) * fermion_operator("n", nD(0, N))
-
-    class func_class:
-        def __init__(self, i, t0, e0, U0, conj = False):
-            self.i = i
-            self.conj=conj
-            self.t0 = t0
-            self.e = copy.deepcopy(e0)
-            self.U = copy.deepcopy(U0)
-
-        def __call__(self, ti):
-            val = self.t0*np.conj(self.U[:, 0])@(np.exp(-1.0j*ti*self.e)*self.U[:, self.i])
-
-            if(self.conj):
-                val = np.conj(val)
-
-            return val
-
-    for s in ['u', 'd']:
-        H += ek * fermion_operator("n", ind(0, N, s))
-        for i in range(Nb):
-            H += coeff(func_class(i, t0, l, P, conj=True))*(fermion_operator("cdag", ind(i, N, s))*fermion_operator("c", ind(i+1, N, s)))
-            H += coeff(func_class(i, t0, l, P, conj=False ))*(fermion_operator("cdag", ind(i+1, N, s))*fermion_operator("c", ind(i, N, s)))
-
-    return H
-
-def siam_test(Nb, Gamma,  W, ek, U, chi, dt, geom='star', nstep = 1, degree = 2, yrange=[0, 2], ndmrg=4):
-    V = None
-    e = None
-    V, e = siam_star(Nb, Gamma, W)
-
-    N = Nb+1
-    #set up the system information
-    sysinf = system_modes(2*N)
-    for i in range(2*N):
-        sysinf[i] = fermion_mode()
-
-    H0 = None
-    if(geom == 'star'):
-        H0 = setup_star_hamiltonian(10, 0, 0.0*V, e)
+def siam_tree(chi, chiU, degree, Nbo, Nbe):
+    topo = ntree(str("(1(chiU(2(2))(chiU))(chiU(2(2))(chiU)))").replace('chiU', str(chiU)))
+    print(topo)
+    if(degree > 1):
+        ntreeBuilder.mlmctdh_subtree(topo()[0][1], [2 for i in range(Nbo)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[0][1], [2 for i in range(Nbe)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[1][1], [2 for i in range(Nbo)], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[1][1], [2 for i in range(Nbe)], degree, chi)
     else:
-        H0 = setup_chain_hamiltonian(10.0, 0, V, e, include_coupling = False)
+        ntreeBuilder.mps_subtree(topo()[0][1], [2 for i in range(Nbo)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[0][1], [2 for i in range(Nbe)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[1][1], [2 for i in range(Nbo)], chi, min(chi, 2))
+        ntreeBuilder.mps_subtree(topo()[1][1], [2 for i in range(Nbe)], chi, min(chi, 2))
+    ntreeBuilder.sanitise(topo)
+    return topo
 
-    H0.jordan_wigner(sysinf)
-
-    H = None
-    if(geom == 'star'):
-        H = setup_star_hamiltonian(ek, U, V, e)
-    elif (geom=='chain'):
-        H = setup_chain_hamiltonian(ek, U, V, e)
+def Ct(t, w, g, sigma='+'):
+    T, W = np.meshgrid(t, w)
+    g2 = g**2
+    if(sigma == '+'):
+        fourier = np.exp(1.0j*W*T)
     else:
-        H = setup_ipchain_hamiltonian(ek, U, V, e)
+        fourier = np.exp(-1.0j*W*T)
+    return g2@fourier
 
+#def ESPRIT(Ct, K):
+#    T = Ct.shape[0]
+#    Y = scipy.linalg.toeplitz(Ct)
+#    U, _, _ = np.linalg.svd(Y)
+#    Us = U[:K, :]
+#    S1 = Us[:, :T-1]
+#    S2 = Us[:, 1:]
+#    P = np.linalg.lstsq(S1, S2)[0]
+#    ls, _ = np.linalg.eig(P)
+#    ls = ls[np.argsort(np.abs(ls))[::-1]]
+
+def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, init_state = 'up'):
+    if chiU is None:
+        chiU = chi
+
+    t = np.arange(nstep+1)*dt
+
+    #setup the function for evaluating the exponential cutoff spectral density
+    @jit(nopython=True)
+    def V(w):
+        return np.where(np.abs(w) <= W, Gamma*np.sqrt(1-(w*w)/(W*W)), 0.0)
+
+    #set up the open quantum system bath object
+    bath = oqs.fermionic_bath(V, beta=beta)
+    
+    dkf, zkf, Swf_aaa = bath.fitCt(4*W, Ef = 0.2, sigma='+', aaa_tol=1e-6, Naaa=2000)
+    dke, zke, Swe_aaa = bath.fitCt(4*W, Ef = 0.2, sigma='-', aaa_tol=1e-6, Naaa=2000)
+
+    Nbo = gf.shape[0]
+    Nbe = ge.shape[0]
+    Nb = gf.shape[0]+ge.shape[0]
+
+    #set up the total Hamiltonian
+    N = Nb+1
+    H = SOP(2*N)
+
+    modes_f_d = [N-1 - (x+1) for x in range(Nbo)]
+    modes_f_u = [N+1 + x for x in range(Nbo)]
+
+    modes_e_d = [N-1-Nbo - (x+1) for x in range(Nbe)]
+    modes_e_u = [N+1+Nbo + x for x in range(Nbe)]
+
+    #set up the topology tree - this structure would ensure that the mode ordering in the Hamiltonian would be {c_d f^o_1d, f^o_2d, \dots, f^o_{Nd},  f^e_1d, f^e_2d, \dots, f^e_{Nd}, c_u, f^o_1u, f^o_2u, \dots, f^o_{Nu},  f^e_1u, f^e_2u, \dots, f^e_{Nu}}
+    topo = siam_tree(8, 8, degree, Nbo, Nbe)
+    capacity = siam_tree(chi, chiU, degree, Nbo, Nbe)
+
+    #In order to avoid long range JW strings we want the hamiltonian ordering to be  {f^e_Nd, \dots, f^e_{1d}, f^o_Nd, \dots, f^o_{1d}, c_d, c_u, f^o_1u, \dots, f^e_{Nu}, f^e_1u, \dots, f^e_{Nu}}.  
+    #As such we will set up the optional mode ordering object allowed within the system_info class.  This allows us to specify a different ordering of modes
+    #for the system information compared to tree structure - setup the mode ordering so that the down impurity ordering is flipped while the up ordering 
+    #is the current order
+    mode_ordering = [N - (x+1) for x in range(N)] + [N + x for x in range(N)]
+    sysinf = system_modes([fermion_mode() for x in range(2*N)], mode_ordering)
+    print(sysinf.mode_indices)
+
+    #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
+
+    #add on the impurity Hamiltonian terms
+    H += epsd*fOP("n", N-1)
+    H += (epsd+deps)*fOP("n", N)    #the up impurity site has an energy of epsd + deps 
+    H += U*fOP("n", N-1)*fOP("n", N)
+
+    #add on spin down occupied chain
+    H = oqs.add_fermionic_bath_hamiltonian(H, fOP("cdag", N-1), fOP("c", N-1), gf, wf, geom=geom, binds=modes_f_d)
+    H = oqs.add_fermionic_bath_hamiltonian(H, fOP("cdag", N-1), fOP("c", N-1), ge, we, geom=geom, binds=modes_e_d)
+    H = oqs.add_fermionic_bath_hamiltonian(H, fOP("cdag", N), fOP("c", N), gf, wf, geom=geom, binds=modes_f_u)
+    H = oqs.add_fermionic_bath_hamiltonian(H, fOP("cdag", N), fOP("c", N), ge, we, geom=geom, binds=modes_e_u)
+
+    print(H)
     H.jordan_wigner(sysinf)
+    print(H)
 
-    bath_dims = [2 for i in range(Nb)]
+    A = ttn(topo, capacity, dtype=np.complex128)
+    state = [0 for i in range(2*N)]
+    for i in range(Nbo):
+        state[1+i] = 1
+        state[N+1+i] = 1
+    if init_state == 'up':
+        state[N]=1
+    else:
+        state[N-1] = 1
+    print(state)
+    A.set_state(state)
 
-    topo = build_tree(bath_dims, degree, chi)
-
-    A = ttn(topo, dtype=np.complex128)
-    A.random()
-
-    h0 = sop_operator(H0, A, sysinf, compress=True)
-    h = sop_operator(H, A, sysinf, compress=True)
+    h = sop_operator(H, A, sysinf, identity_opt=True, compress=True)
 
     mel = matrix_element(A)
 
-    #set up observables
     ops = []
-    for i in range(2*N):
-        ops.append(site_operator_complex(sOP("n", i), sysinf))
-    
-    #prepare the ground state of the non-interacting Hamiltonian
-    dmrg_sweep = dmrg(A, h0, krylov_dim = 4)
-    dmrg_sweep.restarts = 1
-    dmrg_sweep.prepare_environment(A, h0)
+    Nu = None
+    if Nu is None:
+        op = SOP(2*N)
+        op += fOP("n", N-1)
+        ops.append(sop_operator(op, A, sysinf))
 
-    for i in range(ndmrg):
-        dmrg_sweep.step(A, h0)
-        print(i, dmrg_sweep.E())
+        op = SOP(2*N)
+        op += fOP("n", N)
+        ops.append(sop_operator(op, A, sysinf))
 
-    #set up the tdvp engine
-    sweep = tdvp(A, h, krylov_dim = 8)
+        op = SOP(2*N)
+        op += fOP("n", N-1)*fOP("n", N)
+        ops.append(sop_operator(op, A, sysinf))
+    labels = ["n_u", "n_d", "n_u n_d"]
+
+    sweep = None
+    if not adaptive:
+        sweep = tdvp(A, h, krylov_dim = 12)
+    else:
+        sweep = tdvp(A, h, krylov_dim = 12, subspace_krylov_dim=10, subspace_neigs=2, expansion='subspace')
+        sweep.spawning_threshold = spawning_threshold
+        sweep.unoccupied_threshold=unoccupied_threshold
+        sweep.minimum_unoccupied=nunoccupied
+
     sweep.dt = dt
-    sweep.coefficient = 1.0j
-    sweep.prepare_environment(A, h)
+    sweep.coefficient = -1.0j
 
-    res = np.zeros((2*N, nstep+1))
+    if(geom == 'ipchain'):
+        sweep.use_time_dependent_hamiltonian = True
 
-    #set up interactive plotting
-    fig, ax, num, im, l1 = setup_interactive_plots(nstep, dt, N, res, yrange)
+    maxchi = np.zeros(nstep+1)
+    results = []
+    for i in range(len(ops)):
+        results.append(np.zeros(nstep+1))
 
-    for j in range(2*N):
-        res[j, 0] = np.real(mel(ops[j], A, A))
-    #do the time evolution
+
+    for res, op in zip(results, ops):
+        res[0] = np.real(mel(op, A, A))
+    maxchi[0] = A.maximum_bond_dimension()
     for i in range(nstep):
         t1 = time.time()
         sweep.step(A, h)
         t2 = time.time()
-        for j in range(2*N):
-            res[j, i+1] = np.real(mel(ops[j], A, A))
-        print((i+1)*dt, t2-t1)
-        update_interactive_plots(num, im, l1, nstep, dt, N, res)
+        renorm = mel(A, A)
+        for res, op in zip(results, ops):
+            res[i+1] = np.real(mel(op, A, A)/renorm)
+        maxchi[i+1] = A.maximum_bond_dimension()
 
-    plt.ioff()
-    plt.show()
+        if(i % 100):
+            h5 = h5py.File(ofname, 'w')
+            h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
+            for label, res in zip(labels, results):
+                h5.create_dataset(label, data=res)
+            h5.create_dataset('maxchi', data=maxchi)
+            h5.close()
 
-siam_test(16, 1.0, 10, -1.25*np.pi, 2.5*np.pi, 16, 0.01, geom='ipchain', nstep = 1000, ndmrg = 20)
+    h5 = h5py.File(ofname, 'w')
+    h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
+    for label, res in zip(labels, results):
+        h5.create_dataset(label, data=res)
+    h5.create_dataset('maxchi', data=maxchi)
+    h5.close()
 
+import argparse
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Dynamics of the single impurity anderson model.')
+
+    #exponential bath cutoff parameters
+    parser.add_argument('--Gamma', type = float, default=1)
+    parser.add_argument('--W', type = float, default=1)
+    parser.add_argument('--epsd', type = float, default=-0.1875)
+    parser.add_argument('--deps', type = float, default=0.0)
+    parser.add_argument('--U', type = float, default=15)
+
+    #number of bath modes
+    parser.add_argument('--N', type=int, default=64)
+
+    #geometry to be used for bath dynamics
+    parser.add_argument('--geom', type = str, default='star')
+
+    #bath inverse temperature
+    parser.add_argument('--beta', type = float, default=100)
+
+    #maximum bond dimension
+    parser.add_argument('--chi', type=int, default=128)
+    parser.add_argument('--chiU', type=int, default=36)
+    parser.add_argument('--degree', type=int, default=1)
+
+
+    #integration time parameters
+    parser.add_argument('--dt', type=float, default=0.01)
+    parser.add_argument('--tmax', type=float, default=100)
+
+    #output file name
+    parser.add_argument('--fname', type=str, default='siam.h5')
+
+    #the minimum number of unoccupied modes for the dynamics
+    parser.add_argument('--subspace', type=bool, default = True)
+    parser.add_argument('--nunoccupied', type=int, default=0)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-6)
+    parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
+
+    parser.add_argument('--initial_state', type=str, default='up')
+
+    args = parser.parse_args()
+
+    nstep = int(args.tmax/args.dt)+1
+    siam_dynamics(args.N, args.Gamma, args.W, args.epsd, args.deps, args.U, args.chi, args.dt, chiU=args.chiU, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree, init_state = args.initial_state)

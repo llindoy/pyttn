@@ -28,28 +28,46 @@ inline void init_system_info(py::module &m)
         .value("generic_mode", mode_type::GENERIC_MODE)
         .def("__str__", [](const mode_type& o){std::stringstream oss;   oss << o; return oss.str();});
 
+    py::class_<primitive_mode_data>(m, "primitive_mode_data")
+        .def(py::init())
+        .def(py::init<size_t>())
+        .def(py::init<size_t, mode_type>())
+        .def(py::init<const primitive_mode_data&>())
+        .def("assign", [](primitive_mode_data& self, const primitive_mode_data& o){self=o;})
+        .def("__copy__",[](const primitive_mode_data& o){return primitive_mode_data(o);})
+        .def("__deepcopy__", [](const primitive_mode_data& o, py::dict){return primitive_mode_data(o);}, py::arg("memo"))
+        .def("fermionic", &primitive_mode_data::fermionic)
+        .def("__str__", [](const primitive_mode_data& o){std::stringstream oss;   oss << o; return oss.str();})
+        .def_property
+            (
+                "type", 
+                static_cast<const mode_type& (primitive_mode_data::*)() const>(&primitive_mode_data::type),
+                [](primitive_mode_data& o,  mode_type i){o.type() = i;}
+            )
+        .def_property
+          (
+                "lhd", 
+                static_cast<const size_t& (primitive_mode_data::*)() const>(&primitive_mode_data::lhd),
+                [](primitive_mode_data& o,  size_t i){o.lhd() = i;}
+            );
+
+
     py::class_<mode_data>(m, "mode_data")
         .def(py::init())
         .def(py::init<size_t>())
         .def(py::init<size_t, mode_type>())
         .def(py::init<const mode_data&>())
+        .def(py::init<const primitive_mode_data&>())
+        .def(py::init<const std::vector<primitive_mode_data>&>())
         .def("assign", [](mode_data& self, const mode_data& o){self=o;})
+        .def("assign", [](mode_data& self, const primitive_mode_data& o){self=o;})
+        .def("assign", [](mode_data& self, const std::vector<primitive_mode_data>& o){self=o;})
+        .def("append", static_cast<void (mode_data::*)(const primitive_mode_data&)>(&mode_data::append))
         .def("__copy__",[](const mode_data& o){return mode_data(o);})
         .def("__deepcopy__", [](const mode_data& o, py::dict){return mode_data(o);}, py::arg("memo"))
-        .def("fermionic", &mode_data::fermionic)
         .def("__str__", [](const mode_data& o){std::stringstream oss;   oss << o; return oss.str();})
-        .def_property
-            (
-                "type", 
-                static_cast<const mode_type& (mode_data::*)() const>(&mode_data::type),
-                [](mode_data& o,  mode_type i){o.type() = i;}
-            )
-        .def_property
-          (
-                "lhd", 
-                static_cast<const size_t& (mode_data::*)() const>(&mode_data::lhd),
-                [](mode_data& o,  size_t i){o.lhd() = i;}
-            );
+        .def("liouville_space", &mode_data::liouville_space)
+        .def("lhd", static_cast<size_t (mode_data::*)() const>(&mode_data::lhd));
 
     m.def("fermion_mode", &fermion_mode);
     m.def("boson_mode", &boson_mode);
@@ -69,8 +87,10 @@ inline void init_system_info(py::module &m)
         .def("__copy__",[](const system_modes& o){return system_modes(o);})
         .def("__deepcopy__", [](const system_modes& o, py::dict){return system_modes(o);}, py::arg("memo"))
         .def("nmodes", &system_modes::nmodes)
+        .def("nprimitive_modes", &system_modes::nprimitive_modes)
         .def("resize", &system_modes::resize)
         .def("clear", &system_modes::clear)
+        .def("liouville_space", &system_modes::liouville_space)
         .def("__str__", [](const system_modes& o){std::stringstream oss;   oss << o; return oss.str();})
         .def(
                 "__getitem__", 
@@ -81,9 +101,29 @@ inline void init_system_info(py::module &m)
                 [](system_modes& o, size_t j, const mode_data& i){o[j]=i;}
             )       
         .def(
+                "__setitem__", 
+                [](system_modes& o, size_t j, const primitive_mode_data& i){o[j]=i;}
+            )       
+        .def(
+                "__setitem__", 
+                [](system_modes& o, size_t j, const std::vector<primitive_mode_data>& i){o[j]=i;}
+            )       
+        .def(
                 "mode", 
                 static_cast<const mode_data& (system_modes::*)(size_t) const>(&system_modes::mode), 
                 py::return_value_policy::reference
+            )
+        .def(
+                "primitive_mode", 
+                static_cast<const primitive_mode_data& (system_modes::*)(size_t) const>(&system_modes::primitive_mode), 
+                py::return_value_policy::reference
+            )
+        .def(
+                "set_primitive_mode", 
+                [](system_modes& o, size_t i, const primitive_mode_data& d)
+                {
+                    o.primitive_mode(i) = d;
+                }
             )
         .def("mode_index", [](const system_modes& o, size_t i){return o.mode_index(i);})
         .def_property(

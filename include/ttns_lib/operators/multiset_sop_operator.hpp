@@ -162,12 +162,12 @@ public:
 
             auto& _sop = data.second;
 
-            setup_indexing_tree(_sop, i, j, A, sys.mode_indices(), compress, exploit_identity, site_ops);
+            setup_indexing_tree(_sop, i, j, A, sys, compress, exploit_identity, site_ops);
 
             single_set_container mode_operators;
             //set the single set literal mode operators from the information provided
             using sop_op_type = sop_operator<T, backend>;
-            CALL_AND_RETHROW(sop_op_type::set_primitive_operators(mode_operators, sys, site_ops, use_sparse, A.is_purification()));
+            CALL_AND_RETHROW(sop_op_type::set_primitive_operators(mode_operators, sys, site_ops, use_sparse));
 
             //and set the element as required.
             m_mode_operators[i].push_back(mode_operators);
@@ -219,13 +219,13 @@ public:
             size_t j = std::get<1>(data.first);
             auto& _sop = data.second;
 
-            setup_indexing_tree(_sop, i, j, A, sys.mode_indices(), compress, exploit_identity, site_ops);
+            setup_indexing_tree(_sop, i, j, A, sys, compress, exploit_identity, site_ops);
 
             single_set_container mode_operators;
 
             using sop_op_type = sop_operator<T, backend>;
             //set the single set literal mode operators from the information provided
-            CALL_AND_RETHROW(sop_op_type::set_primitive_operators(mode_operators, sys, opdict, site_ops, use_sparse, A.is_purification()));
+            CALL_AND_RETHROW(sop_op_type::set_primitive_operators(mode_operators, sys, opdict, site_ops, use_sparse));
 
             //and set the element as required.
             m_mode_operators[i].push_back(mode_operators);
@@ -502,15 +502,16 @@ protected:
         }
     }
 
-    void setup_indexing_tree(SOP<T>& sop, size_t i, size_t j, const ttn_type& A, const std::vector<size_t>& mode_indices, bool compress, bool exploit_identity, site_ops_type& site_ops)
+    void setup_indexing_tree(SOP<T>& sop, size_t i, size_t j, const ttn_type& A, const system_modes& sysinf, bool compress, bool exploit_identity, site_ops_type& site_ops)
     {
+        const auto& mode_indices = sysinf.mode_indices();
         ASSERT(mode_indices.size() == A.nleaves(), "Failed to setup indexing tree.  Invalid mode_indices array.");
         for(size_t ii = 0; ii < mode_indices.size(); ++ii){ASSERT(mode_indices[ii] < mode_indices.size(), "Failed to setup indexing tree. Invalid mode index.");}
         std::set<size_t> inds(mode_indices.begin(), mode_indices.end());
         ASSERT(inds.size() == mode_indices.size(), "Failed to setup indexing tree. Repeated mode index.");
         tree<auto_sop::node_op_info<T>> bp;
 
-        CALL_AND_HANDLE(autoSOP<T>::construct(sop, A, mode_indices, bp, site_ops, compress), "Failed to construct spo_operator.  Failed to convert SOP to indexing tree.");
+        CALL_AND_HANDLE(autoSOP<T>::construct(sop, A, sysinf, bp, site_ops, compress), "Failed to construct spo_operator.  Failed to convert SOP to indexing tree.");
 
         //now iterate through all nodes in the node_op_info object created by the autoSOP class and the contraction info object
         for(auto z : common::zip(bp, m_contraction_info))

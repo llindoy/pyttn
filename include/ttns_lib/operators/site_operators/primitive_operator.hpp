@@ -32,9 +32,12 @@ public:
     using vector_ref = vector_type&;
     using const_vector_ref = const vector_type&;
     using real_type = typename tmp::get_real_type<T>::type;
+
+    //objects needed for applying operators to views
     using matview = linalg::reinterpreted_tensor<const T, 2, backend>;
     using resview = linalg::reinterpreted_tensor<T, 2, backend>;
-
+    using tensview = linalg::reinterpreted_tensor<const T, 3, backend>;
+    using restensview = linalg::reinterpreted_tensor<T, 3, backend>;
 protected:
     size_type m_size;
     bool m_is_identity;
@@ -51,14 +54,23 @@ public:
     primitive& operator=(primitive&& o) = default;
 
 
-    virtual void apply(const resview& A, resview& HA) = 0;
-    virtual void apply(const resview& A, resview& HA, real_type t, real_type dt) = 0;
-    virtual void apply(const matview& A, resview& HA) = 0;
-    virtual void apply(const matview& A, resview& HA, real_type t, real_type dt) = 0;
+    //apply to matrix
     virtual void apply(const_matrix_ref A, matrix_ref HA) = 0;
     virtual void apply(const_matrix_ref A, matrix_ref HA, real_type t, real_type dt) = 0;
     virtual void apply(const_vector_ref A, vector_ref HA) = 0;
     virtual void apply(const_vector_ref A, vector_ref HA, real_type t, real_type dt) = 0;
+
+    //apply to rank 2 views
+    virtual void apply(const resview& A, resview& HA) = 0;
+    virtual void apply(const resview& A, resview& HA, real_type t, real_type dt) = 0;
+    virtual void apply(const matview& A, resview& HA) = 0;
+    virtual void apply(const matview& A, resview& HA, real_type t, real_type dt) = 0;
+
+    //apply to rank 3 views
+    virtual void apply(const restensview& A, restensview& HA) = 0;
+    virtual void apply(const restensview& A, restensview& HA, real_type t, real_type dt) = 0;
+    virtual void apply(const tensview& A, restensview& HA) = 0;
+    virtual void apply(const tensview& A, restensview& HA, real_type t, real_type dt) = 0;
 
     //function for allowing you to update time-dependent Hamiltonians
     virtual void update(real_type t, real_type dt) = 0;     
@@ -126,6 +138,8 @@ public:
     using typename base_type::real_type;
     using typename base_type::matview;
     using typename base_type::resview;
+    using typename base_type::tensview;
+    using typename base_type::restensview;
 
 public:
     identity() : base_type() {}
@@ -134,14 +148,24 @@ public:
     identity(identity&& o) = default;
     ~identity() {}
 
-    void apply(const resview& A, resview& HA) final {HA = A;}
-    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final {HA = A;}
-    void apply(const matview& A, resview& HA) final {HA = A;}
-    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final {HA = A;}
+    //apply to matrices
     void apply(const_matrix_ref A, matrix_ref HA) final {HA = A;}
     void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final {HA = A;}
     void apply(const_vector_ref A, vector_ref HA) final {HA = A;}
     void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final {HA = A;}
+
+    //apply to rank 2 views
+    void apply(const resview& A, resview& HA) final {HA = A;}
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final {HA = A;}
+    void apply(const matview& A, resview& HA) final {HA = A;}
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final {HA = A;}
+
+    //functions for applying the operator to rank 3 tensor views
+    void apply(const restensview& A, restensview& HA) final {HA = A;}
+    void apply(const restensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {HA = A;}
+    void apply(const tensview& A, restensview& HA) final {HA = A;}
+    void apply(const tensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {HA = A;}
+
     void update(real_type /* t */, real_type /* dt */) final{};    
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<identity>(base_type::m_size);}

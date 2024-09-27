@@ -1,6 +1,7 @@
 #ifndef PYTHON_BINDING_TTNS_SOP_OPERATOR_HPP
 #define PYTHON_BINDING_TTNS_SOP_OPERATOR_HPP
 
+#include <ttns_lib/sop/system_information.hpp>
 #include <ttns_lib/operators/sop_operator.hpp>
 #include <ttns_lib/operators/multiset_sop_operator.hpp>
 

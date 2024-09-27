@@ -11,6 +11,7 @@ class bosonic_bath:
         self.Jw = Jw
         self.beta = beta
 
+    #improve this code to make it all work a bit better
     def Ct(self, t, wmax, wmin=None, epsabs=1.49e-08, epsrel=1.49e-08, limit=50):
         if wmin == None:
             if self.beta == None:
@@ -66,6 +67,12 @@ class bosonic_bath:
     def discretise(self, Nb, wmax, method='orthopol', *args, **kwargs):
         return disc.discretise_bosonic(self.Jw, Nb, wmax, method=method, beta=self.beta, *args, **kwargs)
 
-    def fitCt(self, wmax = None, wmin=None, aaa_tol = 1e-3, Naaa=1000, aaa_nmax=500, aaa_support_points = None):
+    def fitCt(self, wmax, wmin=None, aaa_tol = 1e-3, Naaa=1000, aaa_nmax=500, aaa_support_points = "softm"):
+        if wmin == None:
+            if self.beta == None:
+                wmin = 0
+            else:
+                wmin = -wmax
+
         from .heom.aaa_bath_fitting import aaa_fit_correlation_function
         return aaa_fit_correlation_function(lambda x : self.Sw(x), wmax = wmax, wmin=wmin, aaa_tol = aaa_tol, Naaa=Naaa, aaa_nmax=aaa_nmax, aaa_support_points = aaa_support_points)

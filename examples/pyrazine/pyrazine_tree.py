@@ -16,7 +16,6 @@ def build_topology_from_string_multiset(N1, N2, N3, N4, N5, Nb, m):
     ntreeBuilder.sanitise(res)
     return res
 
-
 def build_topology_from_string(N1, N2, N3, N4, N5, Nb, m):
     ret = "(1(2(2))(2(N1(N2(Nb(m))(Nb(m)))(N2(Nb(m))(Nb(m))(Nb(m))))(N1(N3(N4(Nb(m))(Nb(m))(Nb(m)))(N4(Nb(m))(Nb(m))(Nb(m)))(N4(Nb(m))(Nb(m))(Nb(m))))(N3(N5(Nb(m))(Nb(m)))(N5(Nb(m))(Nb(m))(Nb(m))(Nb(m)))(N5(Nb(m))(Nb(m))(Nb(m))(Nb(m)))))))"
     ret=ret.replace("N1", str(N1))
@@ -27,6 +26,49 @@ def build_topology_from_string(N1, N2, N3, N4, N5, Nb, m):
     ret=ret.replace("Nb", str(Nb))
     ret=ret.replace("m", str(m))
     return ntree(ret)
+
+def build_topology_mode_combination(N1, N2, N3, N4, N5, m):
+    topo = ntree()
+    topo.insert(1)
+    #add electronic degrees of freedom
+    topo().insert(2)
+    topo()[0].insert(2)
+    topo().insert(2)
+ 
+    topo()[1].insert(N1)
+
+    topo()[1][0].insert(N2)
+    topo()[1][0][0].insert(m[0])
+
+    topo()[1][0].insert(N2)
+ 
+    topo()[1][0][1].insert(m[1])
+
+    topo()[1].insert(N1)
+    topo()[1][1].insert(N3)
+    topo()[1][1][0].insert(N4)
+ 
+    topo()[1][1][0][0].insert(m[2])
+            
+    topo()[1][1][0].insert(N4)
+ 
+    topo()[1][1][0][1].insert(m[3])
+
+    topo()[1][1][0].insert(N4)
+ 
+    topo()[1][1][0][2].insert(m[4])
+
+    topo()[1][1].insert(N3)
+    topo()[1][1][1].insert(N5)
+ 
+    topo()[1][1][1][0].insert(m[5])
+
+    topo()[1][1][1].insert(N5)
+    topo()[1][1][1][1].insert(m[6])
+
+    topo()[1][1][1].insert(N5)
+    topo()[1][1][1][2].insert(m[7])
+    return topo
 
 def build_topology(N1, N2, N3, N4, N5, Nb, m):
     topo = ntree()

@@ -25,68 +25,68 @@ void init_product_operator(py::module &m, const std::string& label)
     py::class_<pop>(m, (std::string("product_operator_")+label).c_str())
         .def(py::init())
         .def(py::init<const pop&>())
-        .def(py::init<sNBO<T>&,  const system_modes&, bool, bool>(), 
-              py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false)
-        .def(py::init<sNBO<T>&, const system_modes&, const opdict&, bool, bool>(), 
-              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false)
-        .def(py::init<sPOP&,  const system_modes&, bool, bool>(), 
-              py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false)
-        .def(py::init<sPOP&, const system_modes&, const opdict&, bool, bool>(), 
-              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false)
-        .def(py::init<sOP&,  const system_modes&, bool, bool>(), 
-              py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false)
-        .def(py::init<sOP&, const system_modes&, const opdict&, bool, bool>(), 
-              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false)
+        .def(py::init<sNBO<T>&,  const system_modes&, bool>(), 
+              py::arg(), py::arg(), py::arg("use_sparse") = true)
+        .def(py::init<sNBO<T>&, const system_modes&, const opdict&, bool>(), 
+              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
+        .def(py::init<sPOP&,  const system_modes&, bool>(), 
+              py::arg(), py::arg(), py::arg("use_sparse") = true)
+        .def(py::init<sPOP&, const system_modes&, const opdict&, bool>(), 
+              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
+        .def(py::init<sOP&,  const system_modes&, bool>(), 
+              py::arg(), py::arg(), py::arg("use_sparse") = true)
+        .def(py::init<sOP&, const system_modes&, const opdict&, bool>(), 
+              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
         .def("assign", [](pop& self, const pop& o){self=o;})
         .def("__copy__",[](const pop& o){return pop(o);})
         .def("__deepcopy__", [](const pop& o, py::dict){return pop(o);}, py::arg("memo"))
         .def(
               "initialise", 
-              [](pop& o, sNBO<T>& sop, const system_modes& sys, bool use_sparse, bool use_purification)
+              [](pop& o, sNBO<T>& sop, const system_modes& sys, bool use_sparse)
               {
-                  o.initialise(sop, sys, use_sparse, use_purification);
+                  o.initialise(sop, sys, use_sparse);
               },
-              py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false
+              py::arg(), py::arg(), py::arg("use_sparse") = true
             )
         .def(
               "initialise", 
-              [](pop& o, sNBO<T>& sop, const system_modes& sys, const opdict& opd, bool use_sparse, bool use_purification)
+              [](pop& o, sNBO<T>& sop, const system_modes& sys, const opdict& opd, bool use_sparse)
               {
-                  o.initialise(sop, sys, opd, use_sparse, use_purification);
+                  o.initialise(sop, sys, opd, use_sparse);
               },
-              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false
+              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true
             )
         .def(
               "initialise", 
-              [](pop& o, sPOP& sop, const system_modes& sys, bool use_sparse, bool use_purification)
+              [](pop& o, sPOP& sop, const system_modes& sys, bool use_sparse)
               {
-                  o.initialise(sop, sys, use_sparse, use_purification);
+                  o.initialise(sop, sys, use_sparse);
               },
-              py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false
+              py::arg(), py::arg(), py::arg("use_sparse") = true
             )
         .def(
               "initialise", 
-              [](pop& o, sPOP& sop, const system_modes& sys, const opdict& opd, bool use_sparse, bool use_purification)
+              [](pop& o, sPOP& sop, const system_modes& sys, const opdict& opd, bool use_sparse)
               {
-                  o.initialise(sop, sys, opd, use_sparse, use_purification);
+                  o.initialise(sop, sys, opd, use_sparse);
               },
-              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false
+              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true
             )
         .def(
               "initialise", 
-              [](pop& o, sOP& sop, const system_modes& sys, bool use_sparse, bool use_purification)
+              [](pop& o, sOP& sop, const system_modes& sys, bool use_sparse)
               {
-                  o.initialise(sop, sys, use_sparse, use_purification);
+                  o.initialise(sop, sys, use_sparse);
               },
-              py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false
+              py::arg(), py::arg(), py::arg("use_sparse") = true
             )
         .def(
               "initialise", 
-              [](pop& o, sOP& sop, const system_modes& sys, const opdict& opd, bool use_sparse, bool use_purification)
+              [](pop& o, sOP& sop, const system_modes& sys, const opdict& opd, bool use_sparse)
               {
-                  o.initialise(sop, sys, opd, use_sparse, use_purification);
+                  o.initialise(sop, sys, opd, use_sparse);
               },
-              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true, py::arg("use_purification")=false
+              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true
             )
         .def("clear", &pop::clear)
         .def("nmodes", &pop::nmodes)

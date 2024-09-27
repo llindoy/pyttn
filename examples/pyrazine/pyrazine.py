@@ -18,12 +18,18 @@ def pyrazine_test(N1, N2, N3, N4, N5, Nb, nstep, dt, spawning_threshold=1e-5, un
     #set up the vibrational basis set sizes
     m = [40, 32, 20, 12, 8, 4, 8, 24, 24, 8, 8, 24, 20, 4, 72, 80, 6, 20, 6, 6, 6, 32, 6, 4]
 
+    #set up the system information object
+    sysinf = system_modes(N)
+    sysinf[0] = generic_mode(2)
+    for i in range(N-1):
+        sysinf[i+1] = boson_mode(m[i])
+
     #build topology and capacity trees
-    topo = build_topology_from_string(2,2,2,2,2,2,m)
-    capacity= build_topology_from_string(N1, N2, N3, N4, N5, Nb, Nprim)
+    topo = build_topology(4,4,4,4,4,4,m)
+    capacity= build_topology(N1, N2, N3, N4, N5, Nb, m)
 
     #set up the sum of product operator Hamiltonian
-    H, sysinf, opdict = hamiltonian(m)  
+    H, opdict = hamiltonian(m)  
 
     #setup the wavefunction
     A = ttn(topo, capacity, dtype=np.complex128)
@@ -64,7 +70,7 @@ def pyrazine_test(N1, N2, N3, N4, N5, Nb, nstep, dt, spawning_threshold=1e-5, un
         res[i+1] = mel(B, A)
         maxchi[i+1] = A.maximum_bond_dimension()
 
-        if(i % 100):
+        if(i % 10 == 0):
             h5 = h5py.File(ofname, 'w')
             h5.create_dataset('t', data=(np.arange(nstep+1)*dt*2/fs))
             h5.create_dataset('Sz', data=res)
@@ -87,7 +93,7 @@ import os
 
 def run(x):
     os.environ['OMP_NUM_THREADS']='1'
-    elif x == 12:
+    if x == 12:
         pyrazine_test(12, 12, 12, 8, 8, 8, 60, nsteps, dt, ofname='pyrazine-12.h5')
     elif x == 16:
         pyrazine_test(16, 16, 16, 10, 10, 8, 60, nsteps, dt, ofname='pyrazine-16.h5')
@@ -105,6 +111,8 @@ def run(x):
         pyrazine_test(128, 128, 128, 30, 30, 16, 60, nsteps, dt, ofname='pyrazine-128.h5')
 
 if __name__ == '__main__':
-    p = Pool(8)
-    inds = [12, 16, 24, 32, 48, 64, 80, 128]
-    p.map(run, inds)
+    os.environ['OMP_NUM_THREADS']='1'
+    pyrazine_test(24, 24, 24, 12, 12, 12, nsteps, dt, ofname='pyrazine-16.h5')
+    #p = Pool(8)
+    #inds = [12, 16, 24, 32, 48, 64, 80, 128]
+    #p.map(run, inds)

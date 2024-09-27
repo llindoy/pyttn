@@ -72,7 +72,7 @@ def w():
         'v8b' : 0.1891*eV, 
         'v7b' : 0.3769*eV,
         'v16a': 0.0423*eV, 
-        'v17a': 0.1189*eV,
+        'v17a': 0.1190*eV,
         'v12' : 0.1266*eV, 
         'v18a': 0.1408*eV, 
         'v19a': 0.1840*eV, 
@@ -227,11 +227,6 @@ def hamiltonian(mode_dims):
     vs = modes()[1:]
     
     delta = 0.8460/2.0*eV
-    #set up the system information object
-    sysinf = system_modes(N)
-    sysinf[0] = generic_mode(2)
-    for i in range(N-1):
-        sysinf[i+1] = boson_mode(mode_dims[i])
 
     #set up the system operator dictionary
     opdict = operator_dictionary_complex(N)
@@ -284,7 +279,7 @@ def hamiltonian(mode_dims):
             for j, vj in enumerate(gj):
                 H += Cij[i, j]*sOP("sx", 0)*sOP("q", mode_index(vi))*sOP("q", mode_index(vj))
     print(H)
-    return H, sysinf, opdict
+    return H, opdict
 
 def multiset_hamiltonian(mode_dims):
     N = len(modes())
@@ -294,10 +289,6 @@ def multiset_hamiltonian(mode_dims):
     vs = modes()[1:]
 
     delta = 0.8460/2.0*eV
-    #set up the system information object
-    sysinf = system_modes(Nb)
-    for i in range(Nb):
-        sysinf[i] = boson_mode(mode_dims[i])
 
     #now set up the Hamiltonian
     H[0,0] -= delta
@@ -334,4 +325,4 @@ def multiset_hamiltonian(mode_dims):
                 H[0,1] += Cij[i, j]*sOP("q", vibrational_mode_index(vi))*sOP("q", vibrational_mode_index(vj))
                 H[1,0] += Cij[i, j]*sOP("q", vibrational_mode_index(vi))*sOP("q", vibrational_mode_index(vj))
     print(H)
-    return H, sysinf
+    return H

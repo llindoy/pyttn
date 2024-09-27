@@ -154,8 +154,8 @@ void init_ttn(py::module &m, const std::string& label)
 
         .def("__imul__", [](_ttn& a, const real_type& b){return a*=b;})
         .def("__imul__", [](_ttn& a, const T& b){return a*=b;})
-        .def("__idiv__", [](_ttn& a, const real_type& b){return a*=b;})
-        .def("__idiv__", [](_ttn& a, const T& b){return a*=b;})
+        .def("__idiv__", [](_ttn& a, const real_type& b){return a/=b;})
+        .def("__idiv__", [](_ttn& a, const T& b){return a/=b;})
         
         .def("conj", &_ttn::conj)
         .def("random", &_ttn::random)

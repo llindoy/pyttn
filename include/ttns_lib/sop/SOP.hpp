@@ -142,6 +142,19 @@ public:
         return os;
     }
 
+    sPOP as_prod_op(const std::vector<std::vector<std::string>>& opdict) const
+    {
+        sPOP ret;
+        for(const auto& t : m_ops)
+        {
+            if(opdict[std::get<1>(t)][std::get<0>(t)] != std::string("id"))
+            {
+                ret *= sOP(opdict[std::get<1>(t)][std::get<0>(t)],std::get<1>(t) );
+            }
+        }
+        return ret;
+    }
+
 public:
     iterator begin() {  return iterator(m_ops.begin());  }
     iterator end() {  return iterator(m_ops.end());  }
@@ -333,7 +346,6 @@ public:
 
 protected:
     iterator last_insert;
-    bool m_has_hint = false;
     literal::coeff<T> m_Eshift = literal::coeff<T>(T(0));
 
 public:
@@ -469,16 +481,6 @@ public:
     }
 
     const operator_dictionary_type& operator_dictionary() const{return m_opdict;}
-
-    operator_dictionary_type reordered_operator_dictionary(const std::vector<size_t>& order) const
-    {
-        operator_dictionary_type ret(m_opdict.size());
-        for(size_t i = 0; i < m_opdict.size(); ++i)
-        {
-            ret[order[i]] = m_opdict[i];
-        }
-        return ret;
-    }
 
     friend std::ostream& operator<< <T>(std::ostream& os, const SOP<T>& op);
 
@@ -641,12 +643,12 @@ public:
 
     SOP& jordan_wigner(const system_modes& sys_info, double tol = 1e-15)
     {
-        size_t nmodes = sys_info.nmodes();
+        size_t nmodes = sys_info.nprimitive_modes();
         ASSERT(nmodes == this->nmodes(), "Failed to simplify sum of product operator object operator sys_info object does not have the correct size.");
         std::vector<bool> is_fermion_mode(nmodes);      std::fill(is_fermion_mode.begin(), is_fermion_mode.end(), false);
         for(size_t i = 0; i < nmodes; ++i)
         {
-            is_fermion_mode[i] = sys_info[i].fermionic();
+            is_fermion_mode[i] = sys_info.primitive_mode(i).fermionic();
         }
         this->jordan_wigner(is_fermion_mode, tol);
         return *this;
@@ -660,6 +662,17 @@ public:
     //    this->jordan_wigner(is_fermion_mode, tol);
     //    return *this;
     //}
+    
+    
+    sSOP<T> expand() const
+    {
+        sSOP<T> ret;
+        for(const auto& t : *this)
+        {
+            ret += t.second*t.first.as_prod_op(this->m_opdict);
+        }
+        return ret;
+    }
 };
 
 

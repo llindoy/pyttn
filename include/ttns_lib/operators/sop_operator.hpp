@@ -11,8 +11,8 @@
 #include <map>
 
 #include <linalg/linalg.hpp>
-#include "site_operators/site_operator.hpp"
 #include "../sop/system_information.hpp"
+#include "site_operators/site_operator.hpp"
 #include "../sop/SOP.hpp"
 #include "../sop/autoSOP.hpp"
 #include "../sop/coeff_type.hpp"
@@ -210,9 +210,9 @@ public:
 
         //setup the autoSOP indexing object
         site_ops_type site_ops;
-        setup_indexing_tree(sop, A, sys.mode_indices(), compress, exploit_identity, site_ops);
+        setup_indexing_tree(sop, A, sys, compress, exploit_identity, site_ops);
 
-        CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, site_ops, use_sparse, A.is_purification()));
+        CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, site_ops, use_sparse));
         setup_time_dependence();
         _m_Eshift = sop.Eshift();
         update_coefficients(real_type(0.0), true);
@@ -226,13 +226,13 @@ public:
         //first check that the system modes info object is suitable for the resize function that does not take a user defined 
         //operator dictionary.  That is none of the system modes can be generic modes
         ASSERT(sys.nmodes() == A.nleaves(), "Failed to construct sop operator.  The ttn object and sys object do not have compatible numbers of modes.");
-        ASSERT(opdict.nmodes() == sys.nmodes(), "Failed to construct sop operator.  opdict does not have a compatible dimension.");
+        ASSERT(opdict.nmodes() == sys.nprimitive_modes(), "Failed to construct sop operator.  opdict does not have a compatible dimension.");
 
         //setup the autoSOP indexing object
         site_ops_type site_ops;
-        setup_indexing_tree(sop, A, sys.mode_indices(), compress, exploit_identity, site_ops);
+        setup_indexing_tree(sop, A, sys, compress, exploit_identity, site_ops);
 
-        CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, opdict, site_ops, use_sparse, A.is_purification()));
+        CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, opdict, site_ops, use_sparse));
         setup_time_dependence();
         _m_Eshift = sop.Eshift();
         update_coefficients(real_type(0.0), true);
@@ -411,9 +411,9 @@ protected:
         if(_m_Eshift.is_time_dependent()){m_time_dependent_coefficients = true;}
     }
 
-
-    void setup_indexing_tree(SOP<T>& sop, const ttn_type& A, const std::vector<size_t>& mode_indices, bool compress, bool exploit_identity, site_ops_type& site_ops)
+    void setup_indexing_tree(SOP<T>& sop, const ttn_type& A, const system_modes& sysinf, bool compress, bool exploit_identity, site_ops_type& site_ops)
     {
+        const auto& mode_indices = sysinf.mode_indices();
         ASSERT(mode_indices.size() == A.nleaves(), "Failed to setup indexing tree.  Invalid mode_indices array.");
         for(size_t i = 0; i < mode_indices.size(); ++i){ASSERT(mode_indices[i] < mode_indices.size(), "Failed to setup indexing tree. Invalid mode index.");}
         std::set<size_t> inds(mode_indices.begin(), mode_indices.end());
@@ -424,7 +424,7 @@ protected:
         CALL_AND_HANDLE(m_contraction_info.construct_topology(A), "Failed to construct topology of sop_operator.");
 
         bool autosop_run = false;
-        CALL_AND_HANDLE(autosop_run = autoSOP<T>::construct(sop, A, mode_indices, bp, site_ops, compress), "Failed to construct spo_operator.  Failed to convert SOP to indexing tree.");
+        CALL_AND_HANDLE(autosop_run = autoSOP<T>::construct(sop, A, sysinf, bp, site_ops, compress), "Failed to construct spo_operator.  Failed to convert SOP to indexing tree.");
 
         if(autosop_run)
         {
@@ -452,65 +452,85 @@ protected:
     }
 
 public:
-    static void set_primitive_operators(container_type& mode_operators, const system_modes& sys, site_ops_type& site_ops, bool use_sparse = true, bool use_purification = false)
+    static void set_primitive_operators(container_type& mode_operators, const system_modes& sys, site_ops_type& site_ops, bool use_sparse = true)
     {
         //now go though and set up the system operator solely using the default dictionaries
+        mode_operators.clear();
         mode_operators.resize(sys.nmodes());
         //now we go through and attempt to create the site operators for this class.
-        for(size_t nu = 0; nu < sys.nmodes(); ++nu)
+        for(size_t mode = 0; mode < sys.nmodes(); ++mode)
         {
-            size_t hilbert_space_dimension = sys[nu].lhd();
-            std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension, 1);
+            size_t cmode = sys.mode_index(mode);
 
-            for(size_t j = 0; j < site_ops[nu].size(); ++j)
+            std::vector<size_t> hilbert_space_dimension(sys[mode].nmodes());
+            for(size_t lmi = 0; lmi < sys[mode].nmodes(); ++lmi)
             {
-                sPOP t = site_ops[nu][j];
-                for(const auto& op : t.ops())
-                {
-                    ASSERT(op.mode() == nu, "Invalid site operators.");
-                }
+                hilbert_space_dimension[lmi] = sys[mode][lmi].lhd();
+            }
+            std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension);
+
+            for(size_t j = 0; j < site_ops[cmode].size(); ++j)
+            {
+                sPOP t = site_ops[mode][j];
 
                 if(t.size() == 1)
                 {
+                    size_t nu = t.ops().front().mode();
+                    std::pair<size_t, size_t> op_mode_info = sys.primitive_mode_index(nu);
+                    size_t _mode = std::get<0>(op_mode_info);
+                    size_t lmode = std::get<1>(op_mode_info);
                     std::string label = t.ops().front().op();
-                    CALL_AND_HANDLE(mode_operators[nu].push_back(site_operator<T, backend>(operator_from_default_dictionaries<T, backend>::query(label, basis, sys[nu].type(), use_sparse), nu, use_purification)), "Failed to insert new element in mode operator.");
+                    CALL_AND_HANDLE(mode_operators[mode].push_back(site_operator<T, backend>(operator_from_default_dictionaries<T, backend>::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode), mode)), "Failed to insert new element in mode operator.");
                 }
                 else
                 {
                     std::vector<std::shared_ptr<ops::primitive<T, backend>>> ops;   ops.reserve(t.size());
                     for(const auto& op : t.ops())
                     {
+                        size_t nu = op.mode();
+                        std::pair<size_t, size_t> op_mode_info = sys.primitive_mode_index(nu);
+                        size_t _mode = std::get<0>(op_mode_info);
+                        size_t lmode = std::get<1>(op_mode_info);
+                        ASSERT(_mode == mode, "Invalid mode encountered.");
                         std::string label = op.op();
-                        std::cerr << label << std::endl;
-                        CALL_AND_HANDLE(ops.push_back(operator_from_default_dictionaries<T, backend>::query(label, basis, sys[nu].type(), use_sparse)), "Failed to insert new element in mode operator.");
+                        CALL_AND_HANDLE(ops.push_back(operator_from_default_dictionaries<T, backend>::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode)), "Failed to insert new element in mode operator.");
                     }
-                    mode_operators[nu].push_back(site_operator<T, backend>(ops::sequential_product_operator<T, backend>{ops}, nu, use_purification));
+                    mode_operators[mode].push_back(site_operator<T, backend>(ops::sequential_product_operator<T, backend>{ops}, mode));
                 }
             }
         }
     }
 
-    static void set_primitive_operators(container_type& mode_operators, const system_modes& sys, const operator_dictionary<T, backend>& opdict, site_ops_type& site_ops, bool use_sparse = true, bool use_purification = false)
+    static void set_primitive_operators(container_type& mode_operators, const system_modes& sys, const operator_dictionary<T, backend>& opdict, site_ops_type& site_ops, bool use_sparse = true)
     {
         //now go though and set up the system operator solely using the default dictionaries
+        mode_operators.clear();
         mode_operators.resize(sys.nmodes());
 
-        //now we go through and attempt to create the site operators for this class.
-        for(size_t nu = 0; nu < sys.nmodes(); ++nu)
-        {
-            size_t hilbert_space_dimension = sys[nu].lhd();
-            std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension, 1);
 
-            for(size_t j = 0; j < site_ops[nu].size(); ++j)
+        for(size_t mode = 0; mode < sys.nmodes(); ++mode)
+        {
+            size_t cmode = sys.mode_index(mode);
+
+            std::vector<size_t> hilbert_space_dimension(sys[mode].nmodes());
+            for(size_t lmi = 0; lmi < sys[mode].nmodes(); ++lmi)
             {
-                sPOP t = site_ops[nu][j];
-                for(const auto& op : t.ops())
-                {
-                    ASSERT(op.mode() == nu, "Invalid site operators.");
-                }
+                hilbert_space_dimension[lmi] = sys[mode][lmi].lhd();
+            }
+            std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension);
+
+            for(size_t j = 0; j < site_ops[cmode].size(); ++j)
+            {
+                sPOP t = site_ops[cmode][j];
 
                 if(t.size() == 1)
                 {
+                    size_t nu = t.ops().front().mode();
+                    std::pair<size_t, size_t> op_mode_info = sys.primitive_mode_index(nu);
+                    size_t _mode = std::get<0>(op_mode_info);
+                    size_t lmode = std::get<1>(op_mode_info);
+                    ASSERT(_mode == mode, "Invalid mode encountered.");
+
                     std::string label = t.ops().front().op();
 
                     //first start to access element from opdict
@@ -518,12 +538,12 @@ public:
 
                     if(op != nullptr)
                     {
-                        ASSERT(op->size() == hilbert_space_dimension, "Failed to construct sop_operator.  Mode operator from operator dictionary has incorrect size.");
-                        mode_operators[nu].push_back(site_operator<T, backend>(op, nu, use_purification));
+                        ASSERT(op->size() == sys[mode].lhd(), "Failed to construct sop_operator.  Mode operator from operator dictionary has incorrect size.");
+                        mode_operators[mode].push_back(site_operator<T, backend>(op, mode));
                     }
                     else
                     {
-                        CALL_AND_HANDLE(mode_operators[nu].push_back(site_operator<T, backend>(operator_from_default_dictionaries<T, backend>::query(label, basis, sys[nu].type(), use_sparse), nu, use_purification)), "Failed to insert new element in mode operator.");
+                        CALL_AND_HANDLE(mode_operators[mode].push_back(site_operator<T, backend>(operator_from_default_dictionaries<T, backend>::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode), mode)), "Failed to insert new element in mode operator.");
                     }
                 }
                 else
@@ -532,19 +552,24 @@ public:
                     for(const auto& op : t.ops())
                     {
                         std::string label = op.op();
+                        size_t nu = op.mode();
+                        std::pair<size_t, size_t> op_mode_info = sys.primitive_mode_index(nu);
+                        size_t _mode = std::get<0>(op_mode_info);
+                        size_t lmode = std::get<1>(op_mode_info);
+                        ASSERT(_mode == mode, "Invalid mode encountered.");
 
                         std::shared_ptr<op_type> curr_op = opdict.query(nu, label);
                         if(curr_op != nullptr)
                         {
-                            ASSERT(curr_op->size() == hilbert_space_dimension, "Failed to construct sop_operator.  Mode operator from operator dictionary has incorrect size.");
+                            ASSERT(curr_op->size() == sys[mode].lhd(), "Failed to construct sop_operator.  Mode operator from operator dictionary has incorrect size.");
                             ops.push_back(curr_op);
                         }
                         else
                         {
-                            CALL_AND_HANDLE(ops.push_back(operator_from_default_dictionaries<T, backend>::query(label, basis, sys[nu].type(), use_sparse)), "Failed to insert new element in mode operator.");
+                            CALL_AND_HANDLE(ops.push_back(operator_from_default_dictionaries<T, backend>::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode)), "Failed to insert new element in mode operator.");
                         }
                     }
-                    mode_operators[nu].push_back(site_operator<T, backend>(ops::sequential_product_operator<T, backend>{ops}, nu, use_purification));
+                    mode_operators[mode].push_back(site_operator<T, backend>(ops::sequential_product_operator<T, backend>{ops}, mode));
                 }
             }
         }

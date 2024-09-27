@@ -30,6 +30,8 @@ public:
     using typename base_type::const_vector_ref;
     using typename base_type::matview;
     using typename base_type::resview;
+    using typename base_type::tensview;
+    using typename base_type::restensview;
 
 public:
     dense_matrix_operator()  : base_type() {}
@@ -59,65 +61,37 @@ public:
     bool is_resizable() const final{return false;}
     void resize(size_type /*n*/){ASSERT(false, "This shouldn't be called.");}
 
-    std::shared_ptr<base_type> clone() const
+    std::shared_ptr<base_type> clone() const {return std::make_shared<dense_matrix_operator>(m_operator);}
+
+    void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const matview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));} 
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+  
+    void apply(const_matrix_ref A, matrix_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+
+    //functions for applying the operator to rank 3 tensor views
+    void apply(const restensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const restensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final  {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+
+protected:
+    template <typename A1, typename A2>
+    void apply_rank_2(const A1& A, A2& HA)
     {
-        return std::make_shared<dense_matrix_operator>(m_operator);
+        CALL_AND_HANDLE(HA = m_operator*A, "Failed to apply dense matrix operator.  Failed to rank 2 tensor.");
+    }  
+    template <typename A1, typename A2>
+    void apply_rank_3(const A1& A, A2& HA)
+    {
+        CALL_AND_HANDLE(HA = linalg::contract(m_operator, 1, A, 1), "Failed to apply dense matrix operator to rank 3 tensor.");
     }
 
-    void apply(const resview& A, resview& HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            HA = m_operator*A, 
-            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
-        );
-    }  
-
-    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final
-    {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
-
-    void apply(const matview& A, resview& HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            HA = m_operator*A, 
-            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
-        );
-    }  
-
-    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final
-    {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
-
-    void apply(const_matrix_ref A, matrix_ref HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            HA = m_operator*A, 
-            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
-        );
-    }  
-
-    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
-
-
-    void apply(const_vector_ref A, vector_ref HA) final
-    {
-        CALL_AND_HANDLE(HA = m_operator*A, 
-        "Failed to apply dense matrix operator.  Failed to compute matrix vector product.");
-    }  
-
-    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
-
+public:
     void update(real_type /*t*/, real_type /*dt*/) final{}  
     const matrix_type& mat()const{return m_operator;}
 
@@ -128,6 +102,7 @@ public:
         oss << m_operator << std::endl;
         return oss.str();
     }
+
 protected:
     matrix_type m_operator;
 
@@ -184,6 +159,8 @@ public:
     using typename base_type::const_vector_ref;
     using typename base_type::matview;
     using typename base_type::resview;
+    using typename base_type::tensview;
+    using typename base_type::restensview;
 
 public:
     adjoint_dense_matrix_operator()  : base_type() {}
@@ -218,65 +195,35 @@ public:
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<adjoint_dense_matrix_operator>(m_operator);}
 
-    void apply(const resview& A, resview& HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            HA = adjoint(m_operator->m_operator)*A, 
-            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
-        );
-    }  
+    void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const matview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));} 
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+  
+    void apply(const_matrix_ref A, matrix_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
 
-    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final
-    {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
+    //functions for applying the operator to rank 3 tensor views
+    void apply(const restensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const restensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final  {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
 
-    void apply(const matview& A, resview& HA) final
+protected:
+    template <typename A1, typename A2>
+    void apply_rank_2(const A1& A, A2& HA) 
     {
-        CALL_AND_HANDLE
-        (
-            HA = adjoint(m_operator->m_operator)*A, 
-            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
-        );
+        CALL_AND_HANDLE(HA = adjoint(m_operator->m_operator)*A, "Failed to apply adjoint dense matrix operator.  Failed to rank 2 tensor.");
     }  
+    template <typename A1, typename A2>
+    void apply_rank_3(const A1& A, A2& HA)
+    {
+        CALL_AND_HANDLE(HA = linalg::contract(adjoint(m_operator->m_operator), 1, A, 1), "Failed to apply adjoint dense matrix operator to rank 3 tensor.");
+    }
 
-    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final
-    {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
-
-    void apply(const_matrix_ref A, matrix_ref HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            HA = adjoint(m_operator->m_operator)*A, 
-            "Failed to adjoint apply dense matrix operator.  Failed to compute matrix matrix product."
-        );
-    }  
-    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
-
-    void apply(const_vector_ref A, vector_ref HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            m_HA.resize(A.size(0)),
-            "Failed to apply adjoint dense matrix operator.  Failed to resize HA buffer."
-        );
-        CALL_AND_HANDLE
-        (
-            HA = (adjoint(m_operator->m_operator)*A).bind_conjugate_workspace(m_HA), 
-            "Failed to apply adjoint dense matrix operator.  Failed to compute matrix vector product."
-        );
-    }  
-    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
-
+public:
     void update(real_type /*t*/, real_type /*dt*/) final{}  
     const matrix_type& mat()const{return m_operator->mat();}
     std::string to_string() const final
@@ -286,6 +233,7 @@ public:
         oss << m_operator << std::endl;
         return oss.str();
     }
+
 protected:
     std::shared_ptr<dense_matrix_operator<T, backend>> m_operator;
     vector_type m_HA;
@@ -352,6 +300,8 @@ public:
     using typename base_type::const_vector_ref;
     using typename base_type::matview;
     using typename base_type::resview;
+    using typename base_type::tensview;
+    using typename base_type::restensview;
 
 public:
     sparse_matrix_operator() : base_type() {}
@@ -375,57 +325,40 @@ public:
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<sparse_matrix_operator>(m_operator);}
 
-    void apply(const resview& A, resview& HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            HA = m_operator*A, 
-            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
-        );
-    }  
+    void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const matview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));} 
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+  
+    void apply(const_matrix_ref A, matrix_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
 
-    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final
-    {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
+    //functions for applying the operator to rank 3 tensor views
+    void apply(const restensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const restensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final  {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
 
-    void apply(const matview& A, resview& HA) final
+protected:
+    template <typename A1, typename A2>
+    void apply_rank_2(const A1& A, A2& HA) 
     {
-        CALL_AND_HANDLE
-        (
-            HA = m_operator*A, 
-            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
-        );
+        ASSERT(this->size() == A.shape(0), "Failed to apply rank 2 contraction.");
+        CALL_AND_HANDLE(HA = m_operator*A, "Failed to apply sparse matrix operator.  Failed to rank 2 tensor.");
     }  
-
-    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final
+    template <typename At1, typename At2>
+    void apply_rank_3(const At1& A, At2& HA)
     {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
-
-    void apply(const_matrix_ref A, matrix_ref HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            HA = m_operator*A, 
-            "Failed to apply sparse matrix operator.  Failed to compute sparse matrix matrix product."
-        );
+        ASSERT(this->size() == A.shape(1), "Failed to apply rank 3 contraction.");
+        for(size_t i = 0; i < A.shape(0); ++i)
+        {
+            CALL_AND_HANDLE(HA[i] = m_operator*A[i], "Failed to apply sparse matrix operator.");
+        }
     }
 
-    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {CALL_AND_RETHROW(this->apply(A, HA));}  
-
-    void apply(const_vector_ref A, vector_ref HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            HA = m_operator*A, 
-            "Failed to apply sparse matrix operator.  Failed to compute sparse matrix vector product."
-        );
-    }
-
-    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {CALL_AND_RETHROW(this->apply(A, HA));}  
+public:
 
     void update(real_type /*t*/, real_type /*dt*/) final{}  
     const linalg::csr_matrix<T, backend>& mat()const{return m_operator;}
@@ -437,6 +370,7 @@ public:
         oss << m_operator << std::endl;
         return oss.str();
     }
+
 protected:
     linalg::csr_matrix<T, backend> m_operator;
 #ifdef CEREAL_LIBRARY_FOUND
@@ -494,6 +428,8 @@ public:
     using typename base_type::const_vector_ref;
     using typename base_type::matview;
     using typename base_type::resview;
+    using typename base_type::tensview;
+    using typename base_type::restensview;
 
 protected:
     linalg::csr_matrix<T, backend> m_operator;
@@ -579,57 +515,30 @@ public:
 
     const linalg::csr_matrix<T, backend>& mat()const{return m_operator;}
 
+    void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const matview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));} 
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+  
+    void apply(const_matrix_ref A, matrix_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA) final{RAISE_EXCEPTION("Sparse matrix vector product is not implemented for CUDA.");}
+    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final{RAISE_EXCEPTION("Sparse matrix vector product is not implemented for CUDA.");}
 
-    void apply(const resview& A, resview& HA) final
-    {
-        CALL_AND_RETHROW(apply_internal(A, HA));
-    }
-    void apply(const resview& A, resview& HA, real_type /*t*/, real_type /*dt*/) final
-    {CALL_AND_RETHROW(this->apply(A, HA));}  
-
-    void apply(const matview& A, resview& HA) final
-    {
-        CALL_AND_RETHROW(apply_internal(A, HA));
-    }
-    void apply(const matview& A, resview& HA, real_type /*t*/, real_type /*dt*/) final
-    {CALL_AND_RETHROW(this->apply(A, HA));}  
-
-    //now we need to apply the matrix matrix product using the cusparse routine.  The cusparse routine expects a column major order A matrix
-    //but here we have a row major A matrix so it is necessary to appropriately transpose A and the result matrix. 
-    void apply(const_matrix_ref A, matrix_ref HA) final
-    {
-        CALL_AND_RETHROW(apply_internal(A, HA));
-    }
-    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {CALL_AND_RETHROW(this->apply(A, HA));}  
-
-
-    //now we need to apply the matrix vector product using the cusparse routine.  
-    //The cusparse routine expects a column major order A matrix but here we have 
-    //a row major A matrix so it is necessary to appropriately transpose A and the result matrix. 
-    void apply(const_vector_ref A, vector_ref HA) final
-    {
-        ASSERT
-        (
-            backend::environment().is_initialised(), 
-            "Failed to apply sparse matrix operator.  The cuda backend has not been initialised."
-        );
-
-        ASSERT
-        (
-            m_sparse_init, 
-            "Failed to apply sparse matrix operator.  The sparse matrix descriptor has not been initialised."
-        );
-        ASSERT(false, "Sparse matrix vector product is currently not implemented.");
-    }
-
-    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {CALL_AND_RETHROW(this->apply(A, HA));}  
-    void update(real_type /*t*/, real_type /*dt*/) final{}  
+    //functions for applying the operator to rank 3 tensor views
+    void apply(const restensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const restensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final  {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
 
 protected:
+    template <typename At1, typename At2>
+    void apply_rank_3(const At1& A, At2& HA)
+    {
+        RAISE_EXCEPTION("CSR TENSOR MULTIPLICATION NOT SUPPORTED FOR CUDA MATRICES.");
+    }
     template <typename Atype, typename Rtype>
-    void apply_internal(const Atype& a, Rtype& HA)
+    void apply_rank_2(const Atype& a, Rtype& HA)
     {
         ASSERT
         (
@@ -797,6 +706,8 @@ public:
     using typename base_type::const_vector_ref;
     using typename base_type::matview;
     using typename base_type::resview;
+    using typename base_type::tensview;
+    using typename base_type::restensview;
 
 public:
     diagonal_matrix_operator() : base_type() {}
@@ -828,56 +739,39 @@ public:
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<diagonal_matrix_operator>(m_operator);}
 
-    void apply(const resview& A, resview& HA) final
+    void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const matview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));} 
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+  
+
+    void apply(const_matrix_ref A, matrix_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+
+    //functions for applying the operator to rank 3 tensor views
+    void apply(const restensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const restensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final  {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+
+protected:
+    template <typename A1, typename A2>
+    void apply_rank_2(const A1& A, A2& HA) 
     {
-        CALL_AND_HANDLE
-        (
-            HA = m_operator*A, 
-            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
-        );
+        CALL_AND_HANDLE(HA = m_operator*A, "Failed to apply dense matrix operator.  Failed to rank 2 tensor.");
     }  
-
-    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final
+    template <typename At1, typename At2>
+    void apply_rank_3(const At1& A, At2& HA)
     {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
-
-    void apply(const matview& A, resview& HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            HA = m_operator*A, 
-            "Failed to apply dense matrix operator.  Failed to compute matrix matrix product."
-        );
-    }  
-
-    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final
-    {
-        CALL_AND_RETHROW(this->apply(A, HA));
-    }  
-
-    void apply(const_matrix_ref& A, matrix_ref HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            HA = m_operator*A, 
-            "Failed to apply diagonal matrix operator.  Failed to compute diagonal matrix matrix product."
-        );
-    }
-    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {CALL_AND_RETHROW(this->apply(A, HA));}  
-
-    void apply(const_vector_ref& A, vector_ref HA) final
-    {
-        CALL_AND_HANDLE
-        (
-            HA = m_operator*A, 
-            "Failed to apply diagonal matrix operator.  Failed to compute diagonal matrix vector product."
-        );
+        for(size_t i = 0; i < A.shape(0); ++i)
+        {
+            CALL_AND_RETHROW(HA[i] = m_operator*A[i]);
+        }
     }
 
-    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final
-    {CALL_AND_RETHROW(this->apply(A, HA));}  
+public:
 
     void update(real_type /*t*/, real_type /*dt*/) final{}  
     const linalg::diagonal_matrix<T, backend>& mat()const{return m_operator;}
@@ -889,6 +783,7 @@ public:
         oss << m_operator << std::endl;
         return oss.str();
     }
+
 protected:
     linalg::diagonal_matrix<T, backend> m_operator;
 

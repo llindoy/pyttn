@@ -350,6 +350,21 @@ public:
     }
 
  
+public:
+    //scalar inplace multiplication and division
+    template <typename U>
+    typename std::enable_if<linalg::is_number<U>::value, ttn&>::type operator*=(const U& u)
+    {
+        base_type::operator*=(u);
+        return *this;
+    }
+
+    template <typename U>
+    typename std::enable_if<linalg::is_number<U>::value, ttn&>::type operator/=(const U& u)
+    {
+        base_type::operator/=(u);
+        return *this;
+    }
   #ifdef CEREAL_LIBRARY_FOUND
 public:
     template <typename archive>

@@ -11,43 +11,25 @@ class fermionic_bath:
         self.Jw = Jw
         self.beta = beta
 
-    def Ct(self, t, wmax, wmin=None, Ef = 0):
-        if wmin == None:
-            wmin = -wmax
+    def Ct(self, t, wmax=np.inf, wmin=None, wtol=None, Ef = 0, sigma = '+'):
+        wmin, wmax = self.estimate_bounds(wmax, wmin=wmin, wtol=wtol, Ef=Ef, sigma = sigma)
         Ct = np.zeros(t.shape, dtype=np.complex128)
 
-        if self.beta == None:
-            J = self.Jw
-            @jit(nopython=True)
-            def S(w):
-                return J(w)*np.where(w <= Ef, 1.0, 0.0)
-            wc = 1e-10
-            if wmin < wc:
-                for ti in range(t.shape[0]):
-                    ctr = sp.integrate.quad(S, wc, wmax, weight='cos', wvar = t[ti])[0] 
-                    ctr += sp.integrate.quad(lambda x : S(x)*np.cos(x*t[ti]), wmin, wc, points=0)[0]
-                    cti = sp.integrate.quad(S, wc, wmax, weight='sin', wvar = t[ti])[0]
-                    cti += sp.integrate.quad(lambda x : S(x)*np.sin(x*t[ti]), wmin, wc, points=0)[0]
-            else:
-                for ti in range(t.shape[0]):
-                    ctr = sp.integrate.quad(S, wmin, wmax, weight='cos', wvar = t[ti])[0] 
-                    cti = sp.integrate.quad(S, wmin, wmax, weight='sin', wvar = t[ti])[0]
-                Ct[ti] = ctr - 1.0j*cti
-        else:
-            J = self.Jw
-            @jit(nopython=True)
-            def S(w):
-                return J(w)*np.exp(-self.beta*(w-Ef))/(1+np.exp(-self.beta*(w-Ef)))
+        coeff = 1
+        if sigma == '-':
+            coeff = -1
 
-            wc = 1e-10
+        if(wmax == np.inf or wmin == -np.inf):
+            ctr = sp.integrate.quad_vec(lambda x : self.Sw(x, Ef=Ef, sigma=sigma)*np.cos(x*t), wmin, wmax, limit=5000)[0] 
+            cti = sp.integrate.quad_vec(lambda x : self.Sw(x, Ef=Ef, sigma=sigma)*np.sin(x*t), wmin, wmax, limit=5000)[0]
+            Ct = ctr + coeff*1.0j*cti
+        else:
             for ti in range(t.shape[0]):
-                ctr = sp.integrate.quad(S, wc, wmax, weight='cos', wvar = t[ti])[0]
-                ctr += sp.integrate.quad(lambda x : S(x)*np.cos(x*t[ti]), -wc, wc, points=0)[0]
-                ctr += sp.integrate.quad(S, wmin, -wc, weight='cos', wvar = t[ti])[0]
-                cti = sp.integrate.quad(S, wc, wmax, weight='sin', wvar = t[ti])[0]
-                cti += sp.integrate.quad(lambda x : S(x)*np.sin(x*t[ti]), -wc, wc, points=0)[0]
-                cti += sp.integrate.quad(S, wmin, -wc, weight='sin', wvar = t[ti])[0]
-                Ct[ti] = ctr - 1.0j*cti
+
+                ctr = sp.integrate.quad(lambda x : self.Sw(x, Ef=Ef, sigma=sigma), wmin, wmax, weight='cos', wvar = t[ti])[0] 
+                cti = sp.integrate.quad(lambda x : self.Sw(x, Ef=Ef, sigma=sigma), wmin, wmax, weight='sin', wvar = t[ti])[0]
+
+                Ct[ti] = ctr + coeff*1.0j*cti
         return Ct/np.pi
 
     def fermi_distrib(self, w, Ef):
@@ -66,49 +48,42 @@ class fermionic_bath:
 
             return res
 
-    def Sw(self, w, Ef = 0):
-        return self.Jw(w)*self.fermi_distrib(w, Ef)
-
-    def Sw_filled(self, w, Ef=0):
-        return self.Sw(w, Ef)
-
-    def Sw_empty(self, w, Ef=0):
-        return self.Jw(w)*(1-self.fermi_distrib(w, Ef))
-
-    def discretise(self, Nb, wmax, wmin=None, wmin_empty = None, wmax_filled = None, Ef = 0, method='orthopol', wmin_tol = None, *args, **kwargs):
-        Nm = Nb//2
-        if Nm == 0:
-            Nm = 1
-        if(self.beta == None):
-            if(wmin == None):
-                wmin = -wmax
-            gf, wf = disc.discretise_fermionic(lambda x : self.Sw_filled(x), Nm, wmin, Ef, method=method, *args, **kwargs)
-            ge, we =  disc.discretise_fermionic(lambda x : self.Sw_empty(x), Nm, Ef, wmax, method=method, *args, **kwargs)
-            return gf, wf, ge, we
+    def Sw(self, w, Ef = 0, sigma = '+'):
+        if(sigma == '+'):
+            return self.Jw(w)*self.fermi_distrib(w, Ef)
         else:
-            if(wmin == None):
+            return self.Jw(w)*(1-self.fermi_distrib(w, Ef))
+
+    def estimate_bounds(self, wmax, wmin=None, wtol=None, Ef = 0, sigma = '+'): 
+
+        wmax = np.abs(wmax)
+        if self.beta is None:
+            if(sigma == '+'):
                 wmin = -wmax
-            if wmin_tol == None:
-                if(wmin_empty == None):
-                    wmin_empty = wmin
-                if wmax_filled == None:
-                    wmax_filled = wmax
+                wmax = Ef
             else:
-                Ef = 0
-                tol = 1e-10
-                win = 1.0/self.beta*np.log(1/tol-1)+Ef
-                if(wmin_empty == None):
-                    wmin_empty = -win
-                if wmax_filled == None:
-                    wmax_filled = win
+                wmin = Ef
+        else:
+            if(wtol == None):
+                wmin = -wmax
+            else:
+                if(sigma == '+'):
+                    wmin = -wmax
+                    wmax = min(wmax, (1.0/self.beta*np.log(1/wtol-1)) + Ef)
+                else:
+                    wmin = min(wmax, (Ef-1.0/self.beta*np.log(1/wtol-1)) )
 
-            if(wmax_filled > wmax):
-                wmax_filled = wmax
-            if(wmin_empty < wmin):
-                wmin_empty = wmin
+        return wmin, wmax
 
-            gf, wf = disc.discretise_fermionic(lambda x : self.Sw_filled(x), Nm, wmin, wmax_filled, method=method, *args, **kwargs)
-            ge, we =  disc.discretise_fermionic(lambda x : self.Sw_empty(x), Nm, wmin_empty, wmax, method=method, *args, **kwargs)
-            return gf, wf, ge, we
+    def discretise(self, Nm, wmax, wmin=None, wtol = None, Ef = 0, sigma = '+', method='orthopol', *args, **kwargs):
+        wmin, wmax = self.estimate_bounds(wmax, wmin=wmin, wtol=wtol, Ef=Ef, sigma = sigma)
+        print(wmin, wmax)
 
+        gf, wf = disc.discretise_fermionic(lambda x : self.Sw(x, Ef=Ef, sigma=sigma), Nm, wmin, wmax, method=method, *args, **kwargs)
+        return gf, wf
 
+    def fitCt(self, wmax, wmin=None, wtol=None, Ef = 0, sigma='+', aaa_tol = 1e-3, Naaa=1000, aaa_nmax=500, aaa_support_points = "linear"):
+        wmin, wmax = self.estimate_bounds(wmax, wmin=wmin, wtol=wtol, Ef=Ef)
+
+        from .heom.aaa_bath_fitting import aaa_fit_correlation_function
+        return aaa_fit_correlation_function(lambda x : self.Sw(x, Ef=Ef, sigma=sigma), wmax = wmax, wmin=wmin, aaa_tol = aaa_tol, Naaa=Naaa, aaa_nmax=aaa_nmax, aaa_support_points = aaa_support_points)

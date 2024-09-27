@@ -16,18 +16,18 @@ enum mode_type
     GENERIC_MODE
 };
 
-class mode_data
+class primitive_mode_data
 {
 public:
-    mode_data() : m_lhd(1), m_type(mode_type::GENERIC_MODE){}
-    mode_data(size_t d) : m_lhd(d), m_type(mode_type::GENERIC_MODE){}
-    mode_data(size_t d, mode_type type) : m_lhd(d), m_type(type){}
+    primitive_mode_data() : m_lhd(1), m_type(mode_type::GENERIC_MODE){}
+    primitive_mode_data(size_t d) : m_lhd(d), m_type(mode_type::GENERIC_MODE){}
+    primitive_mode_data(size_t d, mode_type type) : m_lhd(d), m_type(type){}
 
-    mode_data(const mode_data& o) = default;
-    mode_data(mode_data&& o) = default;
+    primitive_mode_data(const primitive_mode_data& o) = default;
+    primitive_mode_data(primitive_mode_data&& o) = default;
 
-    mode_data& operator=(const mode_data& o) = default;
-    mode_data& operator=(mode_data&& o) = default;
+    primitive_mode_data& operator=(const primitive_mode_data& o) = default;
+    primitive_mode_data& operator=(primitive_mode_data&& o) = default;
 
     const mode_type& type() const{return m_type;}
     mode_type& type(){return m_type;}
@@ -42,26 +42,138 @@ protected:
     mode_type m_type;
 };
 
-
-inline mode_data fermion_mode(){return mode_data(2, mode_type::FERMION_MODE);}
-inline mode_data boson_mode(size_t N){return mode_data(N, mode_type::BOSON_MODE);}
-inline mode_data qubit_mode(){return mode_data(2, mode_type::QUBIT_MODE);}
-inline mode_data spin_mode(size_t N){return mode_data(N, mode_type::SPIN_MODE);}
-inline mode_data generic_mode(size_t N){return mode_data(N, mode_type::GENERIC_MODE);}
-
-class composite_mode
-{   
+class mode_data
+{
 public:
-    composite_mode(){}
-    composite_mode(const composite_mode& o) = default;
-    composite_mode(composite_mode&& o) = default;
+    mode_data(){}
+    mode_data(size_t d)
+    {
+        m_modes.resize(1);
+        m_modes[0] = primitive_mode_data(d);
+    }
+    mode_data(size_t d, mode_type type)
+    {
+        m_modes.resize(1);
+        m_modes[0] = primitive_mode_data(d, type);
+    }
 
-    composite_mode& operator=(const composite_mode& o) = default;
-    composite_mode& operator=(composite_mode&& o) = default;
+    mode_data(const mode_data& o) = default;
+    mode_data(mode_data&& o) = default;
+
+    mode_data(const std::vector<primitive_mode_data>& m) : m_modes(m){}
+
+    mode_data(const primitive_mode_data& o) 
+    {
+        m_modes.resize(1);
+        m_modes[0] = o;
+    }
+    mode_data(primitive_mode_data&& o) 
+    {
+        m_modes.resize(1);
+        m_modes[0] = std::move(o);
+    }
+
+    mode_data& operator=(const mode_data& o) = default;
+    mode_data& operator=(mode_data&& o) = default;
+
+    mode_data& operator=(const std::vector<primitive_mode_data>& m) 
+    {
+        m_modes = m;
+        return *this;
+    }
+
+    mode_data& operator=(const primitive_mode_data& o)
+    {
+        m_modes.resize(1);
+        m_modes[0] = o;
+        return *this;
+    }
+
+    mode_data& operator=(primitive_mode_data&& o)
+    {
+        m_modes.resize(1);
+        m_modes[0] = std::move(o);
+        return *this;
+    }
+
+    primitive_mode_data& operator[](size_t i)
+    {
+        ASSERT(i < m_modes.size(), "Index out of bounds.");
+        return m_modes[i];
+    }
+
+    const primitive_mode_data& operator[](size_t i) const
+    {
+        ASSERT(i < m_modes.size(), "Index out of bounds.");
+        return m_modes[i];
+    }
+
+    void append(const primitive_mode_data& o)
+    {
+        m_modes.push_back(o);
+    }
+
+    void append(primitive_mode_data&& o)
+    {
+        m_modes.push_back(std::move(o));
+    }
+
+    void clear(){m_modes.clear();}
+
+    void resize(size_t n)
+    {
+        m_modes.resize(n);
+    }
+
+    size_t nmodes() const{return m_modes.size();}
+    size_t lhd() const
+    {
+        size_t _lhd = 1;
+        for(const auto& m : m_modes)
+        {
+            _lhd *= m.lhd();
+        }
+        return _lhd;
+    }
+
+    mode_data liouville_space() const
+    {
+        std::vector<primitive_mode_data> mr;
+        mr.reserve(m_modes.size()*2);
+        for(const auto& mode : m_modes)
+        {
+            mr.push_back(mode);
+            mr.push_back(mode);
+        }
+        return mode_data(mr);
+    }
+
+public:
+    using iterator = typename std::vector<primitive_mode_data>::iterator;
+    using const_iterator = typename std::vector<primitive_mode_data>::const_iterator;
+    using reverse_iterator = typename std::vector<primitive_mode_data>::reverse_iterator;
+    using const_reverse_iterator = typename std::vector<primitive_mode_data>::const_reverse_iterator;
+
+    iterator begin() {  return iterator(m_modes.begin());  }
+    iterator end() {  return iterator(m_modes.end());  }
+    const_iterator begin() const {  return const_iterator(m_modes.begin());  }
+    const_iterator end() const {  return const_iterator(m_modes.end());  }
+
+    reverse_iterator rbegin() {  return reverse_iterator(m_modes.rbegin());  }
+    reverse_iterator rend() {  return reverse_iterator(m_modes.rend());  }
+    const_reverse_iterator rbegin() const {  return const_reverse_iterator(m_modes.rbegin());  }
+    const_reverse_iterator rend() const {  return const_reverse_iterator(m_modes.rend());  }
 protected:
-    std::vector<size_t> m_primitive_mode_indices;
-    std::shared_ptr<utils::occupation_number_basis> m_composite_basis;
+    std::vector<primitive_mode_data> m_modes;
 };
+
+
+
+inline primitive_mode_data fermion_mode(){return primitive_mode_data(2, mode_type::FERMION_MODE);}
+inline primitive_mode_data boson_mode(size_t N){return primitive_mode_data(N, mode_type::BOSON_MODE);}
+inline primitive_mode_data qubit_mode(){return primitive_mode_data(2, mode_type::QUBIT_MODE);}
+inline primitive_mode_data spin_mode(size_t N){return primitive_mode_data(N, mode_type::SPIN_MODE);}
+inline primitive_mode_data generic_mode(size_t N){return primitive_mode_data(N, mode_type::GENERIC_MODE);}
 
 class system_modes
 {
@@ -73,31 +185,39 @@ public:
 
     void set_default_mode_ordering()
     {
-        for(size_t i = 0; i < m_mode_ordering.size(); ++i){m_mode_ordering[i] = i;}
+        for(size_t i = 0; i < m_tree_leaf_indices.size(); ++i){m_tree_leaf_indices[i] = i;}
     }
 
 public:
     system_modes(){}
-    system_modes(size_t N) : m_primitive_modes(N), m_mode_ordering(N)
+    system_modes(size_t N) : m_modes(N), m_tree_leaf_indices(N)
     {
         set_default_mode_ordering();
     }
-    system_modes(size_t N, size_t d) : m_primitive_modes(N), m_mode_ordering(N)
+    system_modes(size_t N, size_t d) : m_modes(N), m_tree_leaf_indices(N)
     {
         set_default_mode_ordering();
-        for(auto& mode : m_primitive_modes){mode.lhd() = d;}
+        for(auto& mode : m_modes)
+        {   
+            mode.resize(1);
+            mode[0].lhd() = d;
+        }
     }
-    system_modes(const std::vector<mode_data>& o) : m_primitive_modes(o) , m_mode_ordering(o.size())
+    system_modes(const std::vector<mode_data>& o) : m_modes(o) , m_tree_leaf_indices(o.size())
     {
         set_default_mode_ordering();
     }
 
-    system_modes(size_t N, size_t d, const std::vector<size_t>& ordering) : m_primitive_modes(N), m_mode_ordering(ordering)
+    system_modes(size_t N, size_t d, const std::vector<size_t>& ordering) : m_modes(N), m_tree_leaf_indices(ordering)
     {
         ASSERT(ordering.size() == N, "Failed to construct system modes object ordering size incorrect.");
-        for(auto& mode : m_primitive_modes){mode.lhd() = d;}
+        for(auto& mode : m_modes)
+        {   
+            mode.resize(1);
+            mode[0].lhd() = d;
+        }
     }
-    system_modes(const std::vector<mode_data>& o, const std::vector<size_t>& ordering) : m_primitive_modes(o) , m_mode_ordering(ordering)
+    system_modes(const std::vector<mode_data>& o, const std::vector<size_t>& ordering) : m_modes(o) , m_tree_leaf_indices(ordering)
     {
         ASSERT(ordering.size() == o.size(), "Failed to construct system modes object ordering size incorrect.");
     }
@@ -108,87 +228,158 @@ public:
     system_modes& operator=(const system_modes& o) = default;
     system_modes& operator=(system_modes&& o) = default;
 
-    size_t nmodes() const{return m_primitive_modes.size();}
+
+    system_modes liouville_space() const
+    {
+        system_modes ret(nmodes());
+        ret.m_tree_leaf_indices = m_tree_leaf_indices;
+        for(size_t i = 0; i < nmodes(); ++i)
+        {
+            ret[i] = m_modes[i].liouville_space();
+        }
+        return ret;
+    }
+
+    size_t nmodes() const{return m_modes.size();}
+    size_t nprimitive_modes() const
+    {
+        size_t nm=0;
+        for(size_t i = 0; i < m_modes.size(); ++i)
+        {
+            nm += m_modes[i].nmodes();
+        }
+        return nm;
+    }
 
     void resize(size_t N)
     {
         if(N >= nmodes())
         {
-            m_primitive_modes.resize(N);
-            m_mode_ordering.resize(N);
+            m_modes.resize(N);
+            m_tree_leaf_indices.resize(N);
             set_default_mode_ordering();
         }
         else
         {
             clear();
-            m_primitive_modes.resize(N);
-            m_mode_ordering.resize(N);
+            m_modes.resize(N);
+            m_tree_leaf_indices.resize(N);
             set_default_mode_ordering();
         }
     }
 
+    //functions for accessing the composite mode information
     mode_data& operator[](size_t i)
     {
-        ASSERT(i < m_primitive_modes.size(), "Index out of bounds.");
-        return m_primitive_modes[i];
+        ASSERT(i < m_modes.size(), "Index out of bounds.");
+        return m_modes[i];
     }
 
     const mode_data& operator[](size_t i) const
     {
-        ASSERT(i < m_primitive_modes.size(), "Index out of bounds.");
-        return m_primitive_modes[i];
+        ASSERT(i < m_modes.size(), "Index out of bounds.");
+        return m_modes[i];
     }
 
     mode_data& mode(size_t i)
     {
-        ASSERT(i < m_primitive_modes.size(), "Index out of bounds.");
-        return m_primitive_modes[i];
+        ASSERT(i < m_modes.size(), "Index out of bounds.");
+        return m_modes[i];
     }
 
     const mode_data& mode(size_t i) const
     {
-        ASSERT(i < m_primitive_modes.size(), "Index out of bounds.");
-        return m_primitive_modes[i];
+        ASSERT(i < m_modes.size(), "Index out of bounds.");
+        return m_modes[i];
+    }
+
+
+    std::pair<size_t, size_t> primitive_mode_index(size_t i) const
+    {
+        size_t counter = 0;
+        for(size_t ind = 0; ind <= i; ++ind)
+        {
+            if(counter + m_modes[ind].nmodes() > i)
+            {
+                return std::make_pair(ind, i-counter);
+            }
+            else
+            {
+                counter += m_modes[ind].nmodes();
+            }
+        }
+        RAISE_EXCEPTION("Index out of bounds.");
+    }
+
+    //functions for accessing the underlying primitive modes
+    primitive_mode_data& primitive_mode(size_t i)
+    {
+        size_t counter = 0;
+        for(size_t ind = 0; ind <= i; ++ind)
+        {
+            if(counter + m_modes[ind].nmodes() > i)
+            {
+                return m_modes[ind][i-counter];
+            }
+            else
+            {
+                counter += m_modes[ind].nmodes();
+            }
+        }
+        RAISE_EXCEPTION("Index out of bounds.");
+    }
+
+    const primitive_mode_data& primitive_mode(size_t i) const
+    {
+        size_t counter = 0;
+        for(size_t ind = 0; ind <= i; ++ind)
+        {
+            if(counter + m_modes[ind].nmodes() > i)
+            {
+                return m_modes[ind][i-counter];
+            }
+            else
+            {
+                counter += m_modes[ind].nmodes();
+            }
+        }
+        RAISE_EXCEPTION("Index out of bounds.");
     }
 
     const std::vector<size_t>& mode_indices()const
     {
-        return m_mode_ordering;
+        return m_tree_leaf_indices;
     }
 
     void set_mode_indices(const std::vector<size_t>& inds)
     {
-        ASSERT(inds.size() == m_mode_ordering.size(), "Failed to set mode indices.");
-        m_mode_ordering = inds;
+        ASSERT(inds.size() == m_tree_leaf_indices.size(), "Failed to set mode indices.");
+        m_tree_leaf_indices = inds;
     }
 
-    size_t& mode_index(size_t i){return m_mode_ordering[i];}
-    const size_t& mode_index(size_t i) const {return m_mode_ordering[i];}
+    size_t& mode_index(size_t i){return m_tree_leaf_indices[i];}
+    const size_t& mode_index(size_t i) const {return m_tree_leaf_indices[i];}
 
     void clear() noexcept
     {
-        m_primitive_modes.clear();
-        m_mode_ordering.clear();
-        m_composite_modes.clear();
-        m_bound_primitive_modes.clear();
+        m_modes.clear();
+        m_tree_leaf_indices.clear();
     }
 
 public:
-    iterator begin() {  return iterator(m_primitive_modes.begin());  }
-    iterator end() {  return iterator(m_primitive_modes.end());  }
-    const_iterator begin() const {  return const_iterator(m_primitive_modes.begin());  }
-    const_iterator end() const {  return const_iterator(m_primitive_modes.end());  }
+    iterator begin() {  return iterator(m_modes.begin());  }
+    iterator end() {  return iterator(m_modes.end());  }
+    const_iterator begin() const {  return const_iterator(m_modes.begin());  }
+    const_iterator end() const {  return const_iterator(m_modes.end());  }
 
-    reverse_iterator rbegin() {  return reverse_iterator(m_primitive_modes.rbegin());  }
-    reverse_iterator rend() {  return reverse_iterator(m_primitive_modes.rend());  }
-    const_reverse_iterator rbegin() const {  return const_reverse_iterator(m_primitive_modes.rbegin());  }
-    const_reverse_iterator rend() const {  return const_reverse_iterator(m_primitive_modes.rend());  }
+    reverse_iterator rbegin() {  return reverse_iterator(m_modes.rbegin());  }
+    reverse_iterator rend() {  return reverse_iterator(m_modes.rend());  }
+    const_reverse_iterator rbegin() const {  return const_reverse_iterator(m_modes.rbegin());  }
+    const_reverse_iterator rend() const {  return const_reverse_iterator(m_modes.rend());  }
 
 protected:
-    std::vector<mode_data> m_primitive_modes;
-    std::vector<size_t> m_mode_ordering;
-    std::vector<composite_mode> m_composite_modes;
-    std::list<size_t> m_bound_primitive_modes;
+    std::vector<mode_data> m_modes;
+    std::vector<size_t> m_tree_leaf_indices;
 };
 
 
@@ -217,9 +408,20 @@ inline std::ostream& operator<<(std::ostream& o, const ttns::mode_type& m)
     }
     return o;
 }
-inline std::ostream& operator<<(std::ostream& o, const ttns::mode_data& m)
+
+inline std::ostream& operator<<(std::ostream& o, const ttns::primitive_mode_data& m)
 {
     return o << m.type() << " mode (" << m.lhd() << ") ";
+}
+inline std::ostream& operator<<(std::ostream& o, const ttns::mode_data& m)
+{
+    o << "( ";
+    for(const auto& i : m)
+    {
+        o << i;
+    }
+    o << ") ";
+    return o;
 }
 inline std::ostream& operator<<(std::ostream& o, const ttns::system_modes& m)
 {

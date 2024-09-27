@@ -27,11 +27,13 @@ public:
     using typename base_type::const_vector_ref;
     using typename base_type::matview;
     using typename base_type::resview;
+    using typename base_type::tensview;
+    using typename base_type::restensview;
 
 public:
     direct_product_operator()  : base_type() {}
 
-    direct_product_operator(const std::vector<matrix_type>& ops) try : base_type()   
+    direct_product_operator(const std::vector<std::shared_ptr<base_type>>& ops) try : base_type()   
     {
         CALL_AND_RETHROW(initialise(ops));
     }
@@ -42,15 +44,14 @@ public:
     }
 
     template <typename ... Args>
-    direct_product_operator(const matrix_type& m, Args&& ... args) try : base_type()
+    direct_product_operator(const std::shared_ptr<base_type>& m, Args&& ... args) try : base_type()
     {
         m_operators.resize(sizeof...(args)+1);
         set_operators(0, m, std::forward<Args>(args)...);
         size_type size = 1;
         for(size_type i=0; i < m_operators.size(); ++i)
         {
-            ASSERT(m_operators[i].shape(0) == m_operators[i].shape(1), "The operator to be bound must be a square matrix.");
-            size *= m_operators[i].shape(0);
+            size *= m_operators[i]->size();
         }
         base_type::m_size = size;
         ASSERT(m_operators.size() > 0, "Invliad operator object.");
@@ -61,14 +62,13 @@ public:
         RAISE_EXCEPTION("Failed to construct dense matrix operator object.");
     }
 
-    void initialise(const std::vector<matrix_type>& ops)
+    void initialise(const std::vector<std::shared_ptr<base_type>>& ops)
     {
         m_operators=ops;        
         size_type size = 1;
         for(size_type i=0; i < m_operators.size(); ++i)
         {
-            ASSERT(m_operators[i].shape(0) == m_operators[i].shape(1), "The operator to be bound must be a square matrix.");
-            size *= m_operators[i].shape(0);
+            size *= m_operators[i]->size();
         }
         base_type::m_size = size;
         ASSERT(m_operators.size() > 0, "Invliad operator object.");
@@ -86,105 +86,130 @@ public:
     void update(real_type /*t*/, real_type /*dt*/) final{}  
     std::shared_ptr<base_type> clone() const{return std::make_shared<direct_product_operator>(m_operators);}
 
-    void apply(const resview& A, resview& HA) final
-    {
-        CALL_AND_RETHROW(apply_internal(A, HA));
-    }
-    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(this->apply(A, HA));}
+    void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const matview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));} 
+    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+  
+    void apply(const_matrix_ref A, matrix_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA) final{CALL_AND_RETHROW(apply_rank_1(A, HA));}
+    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_1(A, HA));}
 
-    void apply(const matview& A, resview& HA) final
-    {
-        CALL_AND_RETHROW(apply_internal(A, HA));
-    }
-    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(this->apply(A, HA));}
-
-    void apply(const_matrix_ref A, matrix_ref HA) final
-    {
-        CALL_AND_RETHROW(apply_internal(A, HA));
-    }  
-    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(this->apply(A, HA));}  
-    void apply(const_vector_ref A , vector_ref HA) final
-    {
-        CALL_AND_HANDLE(m_temp.resize(A.size()), "Failed to resize temporary array object.");
-        ASSERT(m_operators.size() > 0, "Invliad operator object.");
-
-        bool HA_set = __apply_internal(A, HA);
-        if(!HA_set){CALL_AND_HANDLE(HA = m_temp.reinterpret_shape(HA.size()), "Failed to copy temp array.");}
-    }  
-    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(this->apply(A, HA));}  
-    std::string to_string() const final
-    {
-        std::stringstream oss;
-        oss << "direct product operator: " << std::endl;
-        for(size_t i = 0; i < m_operators.size(); ++i)
-        {
-            oss << m_operators[i] << std::endl;
-        }
-        return oss.str();
-    }
+    //functions for applying the operator to rank 3 tensor views
+    void apply(const restensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const restensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final  {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
 
 protected:
-    template <typename Atype, typename Rtype>
-    void apply_internal(const Atype& A, Rtype& HA)
+    template <typename T1, typename T2>
+    void apply_rank_1(const T1& A, T2& HA)
     {
         CALL_AND_HANDLE(m_temp.resize(A.size()), "Failed to resize temporary array object.");
         ASSERT(m_operators.size() > 0, "Invliad operator object.");
         
-        bool HA_set = __apply_internal(A, HA);
+        bool HA_set = apply_internal(A, HA);
+        if(!HA_set){CALL_AND_HANDLE(HA = m_temp, "Failed to copy temp array.");}
+    }
+
+    template <typename T1, typename T2>
+    void apply_rank_2(const T1& A, T2& HA)
+    {
+        CALL_AND_HANDLE(m_temp.resize(A.size()), "Failed to resize temporary array object.");
+        ASSERT(m_operators.size() > 0, "Invliad operator object.");
+        
+        bool HA_set = apply_internal(A, HA);
         if(!HA_set){CALL_AND_HANDLE(HA = m_temp.reinterpret_shape(HA.shape(0), HA.shape(1)), "Failed to copy temp array.");}
     }
 
-protected:
-    std::vector<matrix_type> m_operators;
-    vector_type m_temp;
+    template <typename T1, typename T2>
+    void apply_rank_3(const T1& A, T2& HA)
+    {
+        CALL_AND_HANDLE(m_temp.resize(A.size()), "Failed to resize temporary array object.");
+        ASSERT(m_operators.size() > 0, "Invliad operator object.");
+        
+        bool HA_set = apply_internal(A, HA, A.shape(0));
+        if(!HA_set){CALL_AND_HANDLE(HA = m_temp.reinterpret_shape(HA.shape(0), HA.shape(1), HA.shape(2)), "Failed to copy temp array.");}
+
+    }
 
     template <typename T1, typename T2>
-    bool __apply_internal(const T1& A, T2& HA)
+    bool apply_internal(const T1& A, T2& HA, size_t d1=1)
     {
-        std::array<size_type, 3> mdims = {{1,1,A.size()}};
+        std::array<size_type, 3> mdims = {{d1,1,A.size()/d1}};
         
         bool HA_set = false;
+        bool applied = false;
         for(size_type i = 0; i < m_operators.size(); ++i)
         {
             mdims[0] *= mdims[1];
-            mdims[1] = m_operators[i].shape(0);
+            mdims[1] = m_operators[i]->size();
             mdims[2] /= mdims[1];
 
             auto At = A.reinterpret_shape(mdims[0], mdims[1], mdims[2]);
             auto HAt = HA.reinterpret_shape(mdims[0], mdims[1], mdims[2]);
             auto Tt = m_temp.reinterpret_shape(mdims[0], mdims[1], mdims[2]);
 
-            if(i == 0)
+            if(!m_operators[i]->is_identity())
             {
-                CALL_AND_HANDLE(HAt = contract(m_operators[i], 1, At, 1), "Failed to compute kronecker product contraction.");      
-                HA_set = true;
-            }
-            else
-            {
-                if(HA_set)
+                if(!applied)
                 {
-                    CALL_AND_HANDLE(Tt = contract(m_operators[i], 1, HAt, 1), "Failed to compute kronecker product contraction.");      
-                    HA_set = false;
+                    CALL_AND_HANDLE(m_operators[i]->apply(At, HAt), "Failed to compute kronecker product contraction."); 
+                    HA_set = true;
+                    applied = true;
                 }
                 else
                 {
-                    CALL_AND_HANDLE(HAt = contract(m_operators[i], 1, Tt, 1), "Failed to compute kronecker product contraction.");      
-                    HA_set = true;
+                    if(HA_set)
+                    {
+                        CALL_AND_HANDLE(m_operators[i]->apply(HAt, Tt), "Failed to compute kronecker product contraction."); 
+                        HA_set = false;
+                    }
+                    else
+                    {
+                        CALL_AND_HANDLE(m_operators[i]->apply(Tt, HAt), "Failed to compute kronecker product contraction."); 
+                        HA_set = true;
+                    }
                 }
             }
+        }
+        if(!applied)
+        {
+            HA = A;
+            HA_set = true;
         }
         return HA_set;
     }
 
+
+public:    
+    std::string to_string() const final
+    {
+        std::stringstream oss;
+        oss << "direct product operator: " << std::endl;
+        for(size_t i = 0; i < m_operators.size(); ++i)
+        {
+            oss << m_operators[i]->to_string() << std::endl;
+        }
+        return oss.str();
+    }
+
+
+
+protected:
+    std::vector<std::shared_ptr<base_type>> m_operators;
+    vector_type m_temp;
+
 protected:
 
-    void set_operators(size_t i, const matrix_type& m)
+    void set_operators(size_t i, const std::shared_ptr<base_type>& m)
     {
         m_operators[i] = m;
     }
 
     template <typename ... Args>
-    void set_operators(size_t i, const matrix_type& m, Args&& ... args)
+    void set_operators(size_t i, const std::shared_ptr<base_type>& m, Args&& ... args)
     {
         m_operators[i] = m;
         set_operators(i+1, std::forward<Args>(args)...);

@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: pyttn
+Version: 0.0.1
+Summary: python bindings of ttns_lib using pybind11
+Home-page: UNKNOWN
+Author: Lachlan Lindoy
+Author-email: lplindoy@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.7
+Provides-Extra: test
+License-File: LICENSE.txt
+
+UNKNOWN
+

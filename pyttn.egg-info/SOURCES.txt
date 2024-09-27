@@ -1,0 +1,11 @@
+LICENSE.txt
+README.md
+pyproject.toml
+setup.py
+pyttn/__init__.py
+pyttn.egg-info/PKG-INFO
+pyttn.egg-info/SOURCES.txt
+pyttn.egg-info/dependency_links.txt
+pyttn.egg-info/not-zip-safe
+pyttn.egg-info/requires.txt
+pyttn.egg-info/top_level.txt

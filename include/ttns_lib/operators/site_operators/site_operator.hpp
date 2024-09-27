@@ -9,7 +9,6 @@
 #include <common/tmp_funcs.hpp>
 
 #include "primitive_operator.hpp"
-#include "purification_operator.hpp"
 
 #include "../../sop/sSOP.hpp"
 #include "../../sop/system_information.hpp"
@@ -43,65 +42,27 @@ public:
     site_operator() : m_op(nullptr) {}
 
     site_operator(std::shared_ptr<ops::primitive<T, backend>> op) : m_op(op->clone()), m_mode(0) {}
-    site_operator(std::shared_ptr<ops::primitive<T, backend>> op, bool use_purification) : m_mode(0) 
-    {
-        if(!use_purification){m_op = op->clone();}
-        else{m_op = std::make_shared<ops::purification_operator<T, backend>>(op->clone());}
-    }
     site_operator(std::shared_ptr<ops::primitive<T, backend>> op, size_type mode) : m_op(op->clone()), m_mode(mode) {}
-    site_operator(std::shared_ptr<ops::primitive<T, backend>> op, size_type mode, bool use_purification) : m_mode(mode) 
-    {
-        if(!use_purification){m_op = op->clone();}
-        else{m_op = std::make_shared<ops::purification_operator<T, backend>>(op->clone());}
-    }
 
     template <typename OpType, typename = typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, void>::type>
     site_operator(const OpType& op) : m_op(std::make_shared<OpType>(op)), m_mode(0) {}
 
     template <typename OpType, typename = typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, void>::type>
-    site_operator(const OpType& op, bool use_purification) : m_mode(0) 
-    {
-        if(!use_purification){m_op = std::make_shared<OpType>(op);}
-        else{m_op = std::make_shared<ops::purification_operator<T, backend>>(std::make_shared<OpType>(op));}
-    }
-
-    template <typename OpType, typename = typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, void>::type>
     site_operator(OpType&& op) : m_op(std::make_shared<OpType>(std::move(op))), m_mode(0) {}
-
-    template <typename OpType, typename = typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, void>::type>
-    site_operator(OpType&& op, bool use_purification) : m_op(), m_mode(0) 
-    {
-        if(!use_purification){m_op = std::make_shared<OpType>(std::move(op));}
-        else{m_op = std::make_shared<ops::purification_operator<T, backend>>(std::make_shared<OpType>(std::move(op)));}
-    }
 
     template <typename OpType, typename = typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, void>::type>
     site_operator(const OpType& op, size_type mode) : m_op(std::make_shared<OpType>(op)), m_mode(mode) {}
 
     template <typename OpType, typename = typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, void>::type>
-    site_operator(const OpType& op, size_type mode, bool use_purification) : m_mode(mode) 
-    {
-        if(!use_purification){m_op = std::make_shared<OpType>(op);}
-        else{m_op = std::make_shared<ops::purification_operator<T, backend>>(std::make_shared<OpType>(op));}
-    }
-
-    template <typename OpType, typename = typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, void>::type>
     site_operator(OpType&& op, size_type mode) : m_op(std::make_shared<OpType>(std::move(op))), m_mode(mode) {}
 
-    template <typename OpType, typename = typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, void>::type>
-    site_operator(OpType&& op, size_type mode, bool use_purification) : m_mode(mode) 
+    site_operator(sOP& sop, const system_modes& sys, bool use_sparse = true)
     {
-        if(!use_purification){m_op = std::make_shared<OpType>(std::move(op));}
-        else{m_op = std::make_shared<ops::purification_operator<T, backend>>(std::make_shared<OpType>(std::move(op)));}
+        CALL_AND_HANDLE(initialise(sop, sys, use_sparse), "Failed to construct sop operator.");
     }
-
-    site_operator(sOP& sop, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    site_operator(sOP& sop, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true)
     {
-        CALL_AND_HANDLE(initialise(sop, sys, use_sparse, use_purification), "Failed to construct sop operator.");
-    }
-    site_operator(sOP& sop, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false)
-    {
-        CALL_AND_HANDLE(initialise(sop, sys, opdict, use_sparse, use_purification), "Failed to construct sop operator.");
+        CALL_AND_HANDLE(initialise(sop, sys, opdict, use_sparse), "Failed to construct sop operator.");
     }
 
     site_operator(const site_operator& o) = default;
@@ -113,36 +74,48 @@ public:
 
     //resize this object from a tree structure, a SOP object, a system info class and an optional operator dictionary.
     //This implementation does not support composite modes currently.  To do add mode combination
-    void initialise(sOP& sop, const system_modes& sys, bool use_sparse = true, bool use_purification = false)
+    void initialise(sOP& sop, const system_modes& sys, bool use_sparse = true)
     {
+        //get the primitive mode index associated with this sop term
         size_type nu = sop.mode();
-        m_mode = sop.mode();
-        size_t hilbert_space_dimension = sys[nu].lhd();
-        std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension, 1);
+        std::pair<size_t, size_t> mode_info = sys.primitive_mode_index(nu);
+        size_t mode = std::get<0>(mode_info);
+        size_t lmode = std::get<1>(mode_info);
+
+        //now get the composite mode index associated with this primitive mode
+        m_mode = sys.mode_index(mode);
+
+        std::vector<size_t> hilbert_space_dimension(sys[mode].nmodes());
+        for(size_t lmi = 0; lmi < sys[mode].nmodes(); ++lmi)
+        {
+            hilbert_space_dimension[lmi] = sys[mode][lmi].lhd();
+        }
+        std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension);
 
         std::string label = sop.op();
         using opdictype = operator_from_default_dictionaries<T, backend>;
 
-        if(!use_purification)
-        {
-            CALL_AND_HANDLE(m_op = opdictype::query(label, basis, sys[nu].type(), use_sparse), "Failed to insert new element in mode operator.");
-            ASSERT(m_op != nullptr, "Failed to construct site operator object.");
-        }
-        else
-        {
-            std::shared_ptr<ops::primitive<T, backend>> op;
-            CALL_AND_HANDLE(op = opdictype::query(label, basis, sys[nu].type(), use_sparse), "Failed to insert new element in mode operator.");
-            ASSERT(op != nullptr, "Failed to construct site operator object.");
-            m_op = std::make_shared<ops::purification_operator<T, backend>>(op);
-        }
+        CALL_AND_HANDLE(m_op = opdictype::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode), "Failed to insert new element in mode operator.");
+        ASSERT(m_op != nullptr, "Failed to construct site operator object.");
     }
 
-    void initialise(sOP& sop, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true, bool use_purification = false)
+    void initialise(sOP& sop, const system_modes& sys, const operator_dictionary<T, backend>& opdict, bool use_sparse = true)
     {
+        //get the primitive mode index associated with this sop term
         size_type nu = sop.mode();
-        m_mode = sop.mode();
-        size_t hilbert_space_dimension = sys[nu].lhd();
-        std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension, 1);
+        std::pair<size_t, size_t> mode_info = sys.primitive_mode_index(nu);
+        size_t mode = std::get<0>(mode_info);
+        size_t lmode = std::get<1>(mode_info);
+
+        //now get the composite mode index associated with this primitive mode
+        m_mode = sys.mode_index(mode);
+
+        std::vector<size_t> hilbert_space_dimension(sys[mode].nmodes());
+        for(size_t lmi = 0; lmi < sys[mode].nmodes(); ++lmi)
+        {
+            hilbert_space_dimension[lmi] = sys[mode][lmi].lhd();
+        }
+        std::shared_ptr<utils::occupation_number_basis> basis = std::make_shared<utils::direct_product_occupation_number_basis>(hilbert_space_dimension);
 
         using opdictype = operator_from_default_dictionaries<T, backend>;
         std::string label = sop.op();
@@ -155,32 +128,16 @@ public:
 
             if(op != nullptr)
             {
-                if(!use_purification)
-                {
-                    m_op = op;
-                }
-                else
-                {
-                    m_op = std::make_shared<ops::purification_operator<T, backend>>(op);
-                }
+                ASSERT(op->size() == sys[mode].lhd(), "Invalid operator size in default operator dictionary.");
+                m_op = op;
                 opbound = true;
             }
         }
 
         if(!opbound)
         {
-            if(!use_purification)
-            {
-                CALL_AND_HANDLE(m_op = opdictype::query(label, basis, sys[nu].type(), use_sparse), "Failed to insert new element in mode operator.");
-                ASSERT(m_op != nullptr, "Failed to construct site operator object.");
-            }
-            else
-            {
-                std::shared_ptr<ops::primitive<T, backend>> op;
-                CALL_AND_HANDLE(op = opdictype::query(label, basis, sys[nu].type(), use_sparse), "Failed to insert new element in mode operator.");
-                ASSERT(op != nullptr, "Failed to construct site operator object.");
-                m_op = std::make_shared<ops::purification_operator<T, backend>>(op);
-            }
+            CALL_AND_HANDLE(m_op = opdictype::query(label, basis, sys.primitive_mode(nu).type(), use_sparse, lmode), "Failed to insert new element in mode operator.");
+            ASSERT(m_op != nullptr, "Failed to construct site operator object.");
         }
 
     }
