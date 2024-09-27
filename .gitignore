@@ -8,3 +8,4 @@ bin
 temp
 *.h5
 *.pdf
+*.egg-info/
