@@ -99,6 +99,12 @@ public:
             RAISE_EXCEPTION("Failed to construct S_+ as dense.");
         }
     }
+
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("s-"));
+        return ret;
+    }
 };
 
 template <typename T> 
@@ -190,6 +196,11 @@ public:
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct S_- as dense.");
         }
+    }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("s+"));
+        return ret;
     }
 };
 
@@ -301,6 +312,11 @@ public:
             RAISE_EXCEPTION("Failed to construct S_x as dense.");
         }
     }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("sx"));
+        return ret;
+    }
 };
 
 template <typename T, bool is_complex = linalg::is_complex<T>::value>
@@ -328,6 +344,12 @@ public:
     virtual void as_dense(const std::shared_ptr<utils::occupation_number_basis>& /* op */, size_t /* index */, linalg::matrix<T>& /* mat */) const
     {
         RAISE_EXCEPTION("Cannot form S_y as a real valued operator.");
+    }
+
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(-1), std::string("sy"));
+        return ret;
     }
 };
 
@@ -451,6 +473,11 @@ public:
             RAISE_EXCEPTION("Failed to construct S_y as dense.");
         }
     }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(-1), std::string("sy"));
+        return ret;
+    }
 };
 
 template <typename T> 
@@ -539,6 +566,11 @@ public:
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct S_z as dense.");
         }
+    }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("sz"));
+        return ret;
     }
 };
 

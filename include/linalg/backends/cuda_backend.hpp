@@ -504,7 +504,7 @@ public:
         dim3 db(nthreads);
         cuda_kernels::eval_sub_expression_strided_kernel<<<dg, db, 0, _environment.current_stream()>>>(res, n, stride, e);
     }
-public:
+public: 
     template <typename T>
     static inline void transpose(bool conj, int m, int n, const T& alpha, const T* in, const T& beta, T* out)
     {

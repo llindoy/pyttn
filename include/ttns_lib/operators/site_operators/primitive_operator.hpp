@@ -53,6 +53,7 @@ public:
     primitive& operator=(const primitive& o) = default;
     primitive& operator=(primitive&& o) = default;
 
+    virtual std::shared_ptr<primitive> transpose() const = 0;
 
     //apply to matrix
     virtual void apply(const_matrix_ref A, matrix_ref HA) = 0;
@@ -147,6 +148,8 @@ public:
     identity(const identity& o) = default;
     identity(identity&& o) = default;
     ~identity() {}
+
+    std::shared_ptr<base_type> transpose() const{return std::make_shared<identity>(base_type::m_size);}
 
     //apply to matrices
     void apply(const_matrix_ref A, matrix_ref HA) final {HA = A;}

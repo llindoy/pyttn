@@ -216,7 +216,7 @@ public:
     template <typename array_type>
     typename std::enable_if<is_csr_matrix_type<_mat_type>::value && compatible_traits<_mat_type, array_type>::value, void>::type applicative(array_type& res) const
     {
-        CALL_AND_HANDLE(_mat_type::transpose(m_arr, res, m_alpha), "Failed to transpose csr matrix.");
+        CALL_AND_HANDLE(_mat_type::transpose(std::forward<matrix_type>(m_arr), res, m_alpha), "Failed to transpose csr matrix.");
     }
 
     template <typename array_type>

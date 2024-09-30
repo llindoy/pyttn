@@ -86,6 +86,16 @@ public:
     void update(real_type /*t*/, real_type /*dt*/) final{}  
     std::shared_ptr<base_type> clone() const{return std::make_shared<direct_product_operator>(m_operators);}
 
+    std::shared_ptr<base_type> transpose() const 
+    {
+        std::vector<std::shared_ptr<base_type>> operators;  operators.resize(m_operators.size());
+        for(size_t i = 0; i < m_operators.size(); ++i)
+        {
+            operators.push_back(m_operators[i]->transpose());
+        }
+        return std::make_shared<direct_product_operator>(operators);
+    }
+
     void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
     void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
     void apply(const matview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));} 

@@ -565,6 +565,11 @@ public:
     const_iterator end() const {  return const_iterator(m_terms.end());  }
 
     size_t jordan_wigner_index(size_t i) const{ASSERT(i < m_jordan_wigner_indices.size(), "Failed to access jordan wigner index.") return m_jordan_wigner_indices[i];}
+
+
+
+
+
 protected:
     operator_dictionary_type m_opdict;
     container_type m_terms;
@@ -662,7 +667,6 @@ public:
     //    this->jordan_wigner(is_fermion_mode, tol);
     //    return *this;
     //}
-    
     
     sSOP<T> expand() const
     {

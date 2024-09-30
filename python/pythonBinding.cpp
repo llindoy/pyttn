@@ -39,6 +39,7 @@
 #include "ttns/sop/sSOP.hpp"
 #include "ttns/sop/system_information.hpp"
 #include "ttns/sop/SOP.hpp"
+#include "ttns/sop/liouville_space.hpp"
 
 #include "ttns/sop/models/models.hpp"
 
@@ -98,6 +99,7 @@ PYBIND11_MODULE(_pyttn, m)
     initialise_SOP(m);
     initialise_models(m);
     initialise_operator_dictionary(m);
+    initialise_liouville_space(m);
     
     //
     //Wrap core ttns functionality

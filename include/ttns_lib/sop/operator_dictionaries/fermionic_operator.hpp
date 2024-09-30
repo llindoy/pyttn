@@ -90,6 +90,11 @@ public:
             RAISE_EXCEPTION("Failed to construct fermion creation operator as dense.");
         }
     }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("c"));
+        return ret;
+    }
 };
 
 template <typename T> 
@@ -171,6 +176,11 @@ public:
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct fermion annihilation operator as dense.");
         }
+    }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("cdag"));
+        return ret;
     }
 };
 
@@ -272,6 +282,11 @@ public:
             RAISE_EXCEPTION("Failed to construct fermion number operator as dense.");
         }
     }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("n"));
+        return ret;
+    }
 };
 
 template <typename T> 
@@ -370,6 +385,11 @@ public:
             RAISE_EXCEPTION("Failed to construct fermion number operator as dense.");
         }
     }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("v"));
+        return ret;
+    }
 };
 
 
@@ -455,6 +475,11 @@ public:
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct jordan_wigner as dense.");
         }
+    }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("jw"));
+        return ret;
     }
 };
 }  //namespace fermion

@@ -507,7 +507,6 @@ public:
         mode_operators.clear();
         mode_operators.resize(sys.nmodes());
 
-
         for(size_t mode = 0; mode < sys.nmodes(); ++mode)
         {
             size_t cmode = sys.mode_index(mode);

@@ -2,6 +2,7 @@
 #define PYTHON_BINDING_TTNS_OPERATOR_DICTIONARY_HPP
 
 #include <ttns_lib/operators/sop_operator.hpp>
+#include <sstream>
 
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
@@ -33,6 +34,7 @@ void init_operator_dictionary(py::module &m, const std::string& label)
         .def("__deepcopy__", [](const opdict& o, py::dict){return opdict(o);}, py::arg("memo"))
 
         .def("clear", &opdict::clear)
+        .def("resize", &opdict::resize)
 
         .def("__setitem__", [](opdict& o, size_t i, const elem_type& el){o[i] = el;})
         .def("__getitem__", [](opdict& o, size_t i){return o[i];})
@@ -42,7 +44,22 @@ void init_operator_dictionary(py::module &m, const std::string& label)
         .def("__call__", [](const opdict& o, size_t nu, const std::string & l){return o(nu, l);})
 
         .def("__len__", &opdict::size)
-        .def("nmodes", &opdict::nmodes);
+        .def("nmodes", &opdict::nmodes)
+
+
+        .def("__str__", [](const opdict& o)
+        {
+            std::ostringstream oss;
+            for(size_t i = 0; i < o.nmodes(); ++i)
+            {
+                oss << "mode: " << i << std::endl;
+                for(const auto& t : o[i])
+                {
+                    oss << t.first << " " << t.second.to_string() << std::endl;
+                }
+            }
+            return oss.str();
+        });
 }
 
 

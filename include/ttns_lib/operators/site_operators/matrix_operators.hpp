@@ -62,6 +62,8 @@ public:
     void resize(size_type /*n*/){ASSERT(false, "This shouldn't be called.");}
 
     std::shared_ptr<base_type> clone() const {return std::make_shared<dense_matrix_operator>(m_operator);}
+    std::shared_ptr<base_type> transpose() const {return std::make_shared<dense_matrix_operator>(linalg::trans(m_operator));}
+    std::shared_ptr<dense_matrix_operator> transpose_matrix() const {return std::make_shared<dense_matrix_operator>(linalg::trans(m_operator));}
 
     void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
     void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
@@ -194,6 +196,10 @@ public:
     void resize(size_type /*n*/){ASSERT(false, "This shouldn't be called.");}
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<adjoint_dense_matrix_operator>(m_operator);}
+    std::shared_ptr<base_type> transpose() const 
+    {
+        return std::make_shared<adjoint_dense_matrix_operator>(m_operator->transpose_matrix());
+    }
 
     void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
     void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
@@ -324,6 +330,12 @@ public:
     void resize(size_type /*n*/){ASSERT(false, "This shouldn't be called.");}
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<sparse_matrix_operator>(m_operator);}
+    std::shared_ptr<base_type> transpose() const
+    {
+        linalg::csr_matrix<T, backend> mat;
+        m_operator.transpose(mat);
+        return std::make_shared<sparse_matrix_operator>(mat);
+    }
 
     void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
     void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
@@ -512,6 +524,7 @@ public:
     void resize(size_type /*n*/){ASSERT(false, "This shouldn't be called.");}
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<sparse_matrix_operator>(m_operator);}
+    std::shared_ptr<base_type> transpose() const {RAISE_EXCEPTION("Transpose of cuda sparse matrices currently not supported.");}
 
     const linalg::csr_matrix<T, backend>& mat()const{return m_operator;}
 
@@ -738,6 +751,7 @@ public:
     void resize(size_type /* n */){ASSERT(false, "This shouldn't be called.");}
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<diagonal_matrix_operator>(m_operator);}
+    std::shared_ptr<base_type> transpose() const {return std::make_shared<diagonal_matrix_operator>(m_operator);}
 
     void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
     void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  

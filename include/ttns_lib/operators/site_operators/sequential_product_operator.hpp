@@ -80,6 +80,18 @@ public:
     }  
     std::shared_ptr<base_type> clone() const{return std::make_shared<sequential_product_operator>(m_operators);}
 
+    std::shared_ptr<base_type> transpose() const 
+    {
+        std::vector<std::shared_ptr<base_type>> operators;  operators.resize(m_operators.size());
+
+        //transpose each term and swap ordering.
+        for(size_t i = 0; i < m_operators.size(); ++i)
+        {
+            size_t j = m_operators.size() - (i+1);
+            operators.push_back(m_operators[j]->transpose());
+        }
+        return std::make_shared<sequential_product_operator>(operators);
+    }
 
     void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
     void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
@@ -96,7 +108,6 @@ public:
     void apply(const restensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final  {CALL_AND_RETHROW(apply_rank_3(A, HA));}
     void apply(const tensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
     void apply(const tensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
-
 
 protected:
     template <typename T1, typename T2>

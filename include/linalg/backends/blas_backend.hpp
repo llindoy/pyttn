@@ -1179,7 +1179,6 @@ public:
             out[inds_to_index(ind, inds, permuted_stride)] = in[i];
         }
     }
-
 };
 
 

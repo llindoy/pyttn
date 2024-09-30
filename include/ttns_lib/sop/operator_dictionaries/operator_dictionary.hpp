@@ -83,6 +83,10 @@ public:
     operator_dictionary& operator=(operator_dictionary&& o) = default;
 
     void clear(){m_dict.clear();}
+    void resize(size_t N)
+    {
+        m_dict.resize(N);
+    }
 
     elem_type& operator[](size_t i){return m_dict[i];}
     const elem_type& operator[](size_t i) const{return m_dict[i];}
@@ -92,8 +96,11 @@ public:
     void insert(size_t nu, const std::string& label, const site_operator<T, backend>& op)
     {
         ASSERT(nu < m_dict.size(), "Failed to query element from operator dictionary.  Index out of bounds.");
-        ASSERT(m_dict[nu].find(label) == m_dict[nu].end(), "Failed to insert element in operator dict.  The requested label has already been bound.");
-        m_dict[nu].insert({label, op});
+        auto it = m_dict[nu].find(label);
+
+        //if the object is already in the map we don't do anything
+        if(it == m_dict[nu].end()){m_dict[nu].insert({label, op});}
+        
     }
 
     const site_operator<T, backend>& operator()(size_t nu, const std::string& label) const

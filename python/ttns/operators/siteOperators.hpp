@@ -66,6 +66,8 @@ void init_site_operators(py::module &m, const std::string& label)
 
         .def("complex_dtype", [](const siteop&){return !std::is_same<T, real_type>::value;})
 
+        .def("transpose", &siteop::transpose)
+
         .def("assign", [](siteop& op, const siteop& o){return op=o;})
         .def("assign", [](siteop& op, const ident& o){return op=o;})
         .def("assign", [](siteop& op, const dmat& o){return op=o;})
@@ -120,6 +122,7 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("is_resizable", &prim::is_resizable)
         .def("resize", &prim::resize)
         .def("clone", &prim::clone)
+        .def("transpose", &prim::transpose)
         .def("complex_dtype", [](const prim&){return !std::is_same<T, real_type>::value;})
         .def("__str__", &prim::to_string);
 

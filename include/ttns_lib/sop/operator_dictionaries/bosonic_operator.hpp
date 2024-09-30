@@ -106,6 +106,11 @@ public:
         }
     }
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("a"));
+        return ret;
+    }
 };
 
 
@@ -297,6 +302,11 @@ public:
         }
     }
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("a"));
+        return ret;
+    }
 protected:
     bool m_has_disp = false;
     T m_disp = T(0);
@@ -401,6 +411,11 @@ public:
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct bosonic operator.");
         }
+    }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("adag"));
+        return ret;
     }
 };
 
@@ -595,6 +610,11 @@ public:
         }
     }
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("adag"));
+        return ret;
+    }
 protected:
     bool m_has_disp = false;
     T m_disp = T(0);
@@ -694,6 +714,11 @@ public:
             RAISE_EXCEPTION("Failed to construct bosonic operator.");
         }
     }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("n"));
+        return ret;
+    }
 };
 
 template <typename T> 
@@ -757,6 +782,10 @@ public:
     }
 
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        RAISE_EXCEPTION("Diagonal displacement operator transpose is invalid.");
+    }
 public:
     static void form_single_mode_displacement_operator(linalg::matrix<T>& Dk, const T& a, size_t ni)
     {   
@@ -961,6 +990,11 @@ public:
         }
     }
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("q"));
+        return ret;
+    }
 protected:
     bool m_has_disp = false;
     T m_disp = T(0);
@@ -993,6 +1027,12 @@ public:
     virtual void as_dense(const std::shared_ptr<utils::occupation_number_basis>& /* op */, size_t /* index */, linalg::matrix<T>& /* mat */) const
     {
         RAISE_EXCEPTION("Cannot form momentum as a real valued operator.");
+    }
+
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(-1), std::string("p"));
+        return ret;
     }
 };
 
@@ -1098,6 +1138,11 @@ public:
         }
     }
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(-1), std::string("p"));
+        return ret;
+    }
 };
 
 }   //utils

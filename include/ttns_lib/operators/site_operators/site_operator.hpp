@@ -142,8 +142,6 @@ public:
 
     }
 
-
-
     template <typename OpType>
     typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, site_operator&>::type 
     operator=(const OpType& op)
@@ -247,6 +245,12 @@ public:
 
     size_t mode() const {return m_mode;}
     size_t& mode() {return m_mode;}
+
+    site_operator transpose() const
+    {
+        site_operator ret(m_op->transpose(), m_mode);
+        return ret;
+    }
 
 #ifdef CEREAL_LIBRARY_FOUND
 public:
