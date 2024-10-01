@@ -21,13 +21,13 @@ void init_msttn(py::module &m, const std::string& label)
 {
     using namespace ttns;
     using _msttn = ms_ttn<T, linalg::blas_backend>;
-    using const_msttn_slice = multiset_ttn_slice<T, linalg::blas_backend, true>;
+    //using const_msttn_slice = multiset_ttn_slice<T, linalg::blas_backend, true>;
     using _msttn_slice = multiset_ttn_slice<T, linalg::blas_backend, false>;
     using _msttn_node = typename _msttn::node_type;
     using _msttn_node_data = multiset_node_data<T, linalg::blas_backend>;
     using real_type = typename linalg::get_real_type<T>::type;
     using size_type = typename linalg::blas_backend::size_type;
-    using siteop = site_operator<T, linalg::blas_backend>;
+    //using siteop = site_operator<T, linalg::blas_backend>;
 
     py::class_<_msttn_node>(m, (std::string("ms_ttn_node_")+label).c_str())
         .def(py::init())

@@ -14,7 +14,6 @@
 #include "../sop/system_information.hpp"
 #include "../sop/autoSOP.hpp"
 #include "../sop/operator_dictionaries/operator_dictionary.hpp"
-#include "site_operators/sequential_product_operator.hpp"
 #include "../ttn/ttn.hpp"
 #include "../sop/coeff_type.hpp"
 

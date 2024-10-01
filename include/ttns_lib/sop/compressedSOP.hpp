@@ -281,7 +281,7 @@ public:
                 ++r;
             }
 
-            CALL_AND_HANDLE(insert_identities(sysinf), "Failed to insert identity operators into array.");
+            CALL_AND_HANDLE(insert_identities(), "Failed to insert identity operators into array.");
         }
         catch(const std::exception& ex)
         {
@@ -294,7 +294,7 @@ public:
     //present.  We also note that in the event of a composite mode with multiple identities bound we do not combine these together
     //which may lead to slightly larger bond dimensions in these case, this can be avoided by not explicitly binding identity operators 
     //unless absolutely necessary.
-    void insert_identities(const system_modes& sysinf)
+    void insert_identities()
     {
         try
         {

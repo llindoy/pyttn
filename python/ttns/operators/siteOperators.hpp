@@ -2,8 +2,6 @@
 #define PYTHON_BINDING_TTNS_SITE_OPERATORS_HPP
 
 #include <ttns_lib/operators/site_operators/matrix_operators.hpp>
-#include <ttns_lib/operators/site_operators/direct_product_operator.hpp>
-#include <ttns_lib/operators/site_operators/sequential_product_operator.hpp>
 #include <ttns_lib/operators/site_operators/site_operator.hpp>
 #include "../../utils.hpp"
 
@@ -24,10 +22,8 @@ void init_site_operators(py::module &m, const std::string& label)
     using prim = ops::primitive<T, linalg::blas_backend>;
     using ident = ops::identity<T, linalg::blas_backend>;
     using dmat = ops::dense_matrix_operator<T, linalg::blas_backend>;
-    using adjmat = ops::adjoint_dense_matrix_operator<T, linalg::blas_backend>;
     using spmat = ops::sparse_matrix_operator<T, linalg::blas_backend>;
     using diagmat = ops::diagonal_matrix_operator<T, linalg::blas_backend>;
-    using dirprodop = ops::direct_product_operator<T, linalg::blas_backend>;
 
     using size_type = typename prim::size_type;
     using real_type = typename prim::real_type;
@@ -46,23 +42,19 @@ void init_site_operators(py::module &m, const std::string& label)
         .def(py::init<const siteop&>())
         .def(py::init<const ident&>())
         .def(py::init<const dmat&>())
-        .def(py::init<const adjmat&>())
         .def(py::init<const spmat&>())
         .def(py::init<const diagmat&>())
-        .def(py::init<const dirprodop&>())
 
         .def(py::init<const ident&, size_t>())
         .def(py::init<const dmat&, size_t>())
-        .def(py::init<const adjmat&, size_t>())
         .def(py::init<const spmat&, size_t>())
         .def(py::init<const diagmat&, size_t>())
-        .def(py::init<const dirprodop&, size_t>())
 
-        .def(py::init<sOP&, const system_modes&, bool>(), py::arg(), py::arg(), py::arg("use_sparse")=true)
-        .def(py::init<sOP&, const system_modes&, const opdict&, bool>(), py::arg(), py::arg(), py::arg(), py::arg("use_sparse")=true)
+        .def(py::init<const sOP&, const system_modes&, bool>(), py::arg(), py::arg(), py::arg("use_sparse")=true)
+        .def(py::init<const sOP&, const system_modes&, const opdict&, bool>(), py::arg(), py::arg(), py::arg(), py::arg("use_sparse")=true)
 
-        .def("initialise", static_cast<void (siteop::*)(sOP&, const system_modes&, bool)>(&siteop::initialise), py::arg(), py::arg(), py::arg("use_sparse")=true)
-        .def("initialise", static_cast<void (siteop::*)(sOP&, const system_modes&, const opdict&, bool)>(&siteop::initialise), py::arg(), py::arg(), py::arg(), py::arg("use_sparse")=true)
+        .def("initialise", static_cast<void (siteop::*)(const sOP&, const system_modes&, bool)>(&siteop::initialise), py::arg(), py::arg(), py::arg("use_sparse")=true)
+        .def("initialise", static_cast<void (siteop::*)(const sOP&, const system_modes&, const opdict&, bool)>(&siteop::initialise), py::arg(), py::arg(), py::arg(), py::arg("use_sparse")=true)
 
         .def("complex_dtype", [](const siteop&){return !std::is_same<T, real_type>::value;})
 
@@ -71,17 +63,13 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("assign", [](siteop& op, const siteop& o){return op=o;})
         .def("assign", [](siteop& op, const ident& o){return op=o;})
         .def("assign", [](siteop& op, const dmat& o){return op=o;})
-        .def("assign", [](siteop& op, const adjmat& o){return op=o;})
         .def("assign", [](siteop& op, const spmat& o){return op=o;})
         .def("assign", [](siteop& op, const diagmat& o){return op=o;})
-        .def("assign", [](siteop& op, const dirprodop& o){return op=o;})
 
         .def("bind", [](siteop& op, const ident& o){return op.bind(o);})
         .def("bind", [](siteop& op, const dmat& o){return op.bind(o);})
-        .def("bind", [](siteop& op, const adjmat& o){return op.bind(o);})
         .def("bind", [](siteop& op, const spmat& o){return op.bind(o);})
         .def("bind", [](siteop& op, const diagmat& o){return op.bind(o);})
-        .def("bind", [](siteop& op, const dirprodop& o){return op.bind(o);})
 
         .def("__copy__", [](const siteop& o){return siteop(o);})
         .def("__deepcopy__", [](const siteop& o, py::dict){return siteop(o);}, py::arg("memo"))
@@ -147,21 +135,6 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("complex_dtype", [](const dmat&){return !std::is_same<T, real_type>::value;})
         .def("matrix", &dmat::mat);
 
-    //a dense matrix representation of the adjoint of an operator
-    py::class_<adjmat, prim>(m, (std::string("adjoint_matrix_")+label).c_str())
-        .def(py::init())
-        .def(py::init<matrix_type>())
-        .def(py::init([](py::buffer& b)
-                {
-                    linalg::matrix<T, linalg::blas_backend> mat;
-                    copy_pybuffer_to_tensor(b, mat);
-                    return adjmat(mat);
-                }
-            )
-        )
-        .def("complex_dtype", [](const adjmat&){return !std::is_same<T, real_type>::value;})
-        .def("matrix", &adjmat::mat);
-
     //a csr matrix representation of an operator
     using csr_type = linalg::csr_matrix<T, linalg::blas_backend>;
     using index_type = typename csr_type::index_type;
@@ -193,24 +166,6 @@ void init_site_operators(py::module &m, const std::string& label)
         .def(py::init<const linalg::tensor<T, 1>&, size_t, size_t>())
         .def("complex_dtype", [](const diagmat&){return !std::is_same<T, real_type>::value;})
         .def("matrix", &diagmat::mat);
-
-    //a special operator form for a direct product operator
-    py::class_<dirprodop, prim>(m, (std::string("direct_product_")+label).c_str())
-        .def(py::init())
-        .def("complex_dtype", [](const dirprodop&){return !std::is_same<T, real_type>::value;});
-
-    //a special operator form for a sequential product operator
-    //using seqprodop = ops::sequential_product_operator<T, linalg::blas_backend>;
-    //py::class_<seqprodop, prim>(m, (std::string("sequential_product_")+label).c_str())
-    //    .def(py::init())
-    //    .def("append", &seqprodop::append_operator<diagmat>)
-    //    .def("append", &seqprodop::append_operator<dmat>)
-    //    .def("append", &seqprodop::append_operator<adjmat>)
-    //    .def("append", &seqprodop::append_operator<spmat>)
-    //    .def("append", &seqprodop::append_operator<commmat>)
-    //    .def("append", &seqprodop::append_operator<anti_commmat>)
-    //    .def("append", &seqprodop::append_operator<dvrop>)
-    //    .def("append", &seqprodop::append_operator<dirprodop>);
 }
 
 void initialise_site_operators(py::module& m);

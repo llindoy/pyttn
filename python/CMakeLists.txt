@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 3.12)
 project(_pyttn)
 
+include(CheckIPOSupported)
+
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 
 #compiler flags
@@ -92,7 +94,7 @@ else()
     endif()
 endif()
 
-
+set(CMAKE_BUILD_PARALLEL_LEVEL 4)
 set(PYBIND11_ROOT_DIR ${CMAKE_SOURCE_DIR}/external/Pybind11)
 include(FetchContent)
 FetchContent_Declare(
@@ -110,12 +112,16 @@ add_definitions(-DPYBIND11)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 message(STATUS "${PYTHON_BINDINGS_SRC}")
-pybind11_add_module(_pyttn THIN_LTO ${PYTHON_BINDINGS_SRC})
+pybind11_add_module(_pyttn ${PYTHON_BINDINGS_SRC})
 target_include_directories(_pyttn PUBLIC ${TTNS_INCLUDE_DIRECTORIES})
 target_link_libraries(_pyttn PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 
+
 set_target_properties(_pyttn PROPERTIES
-                            INTERPROCEDURAL_OPTIMIZATION ON
                             VISIBILITY_INLINES_HIDDEN ON)
+check_ipo_supported(RESULT ipo)
+if(ipo)
+set_property(TARGET _pyttn PROPERTY VISIBILITY_INLINES_HIDDEN TRUE)
+endif()
 if(EVAL_BUT_DONT_APPLY)
   target_compile_definitions(_pyttn PUBLIC ALLOW_EVAL_BUT_DONT_APPLY=0)
 endif()

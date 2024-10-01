@@ -5,7 +5,6 @@ import h5py
 import scipy
 import copy
 
-sys.path.append("../../")
 import pyttn
 from pyttn import *
 from pyttn import oqs
@@ -93,7 +92,7 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, nbose, dt, nbose_min = None, bet
         sysinf = system_modes(N)
         sysinf[0] = generic_mode(mode_dims[0])
         for i in range(Nb):
-            sysinf[i+1] = boson_mode(b_mode_dims[i])
+            sysinf[i+1] = generic_mode(b_mode_dims[i])
     else:
         Nbc = dk.shape[0]
         b_mode_dims = np.zeros(Nbc, dtype=int)
@@ -103,7 +102,20 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, nbose, dt, nbose_min = None, bet
         sysinf = system_modes(Nbc+1)
         sysinf[0] = generic_mode(mode_dims[0])
         for i in range(Nbc):
-            sysinf[i+1] = [boson_mode(mode_dims[2*i+1]), boson_mode(mode_dims[2*i+2])]
+            sysinf[i+1] = [generic_mode(mode_dims[2*i+1]), generic_mode(mode_dims[2*i+2])]
+
+    def bops(Nb):
+        d = np.sqrt(np.arange(Nb-1)+1.0)
+        c = np.arange(Nb-1, dtype=int)
+        r = c+1
+        return scipy.sparse.coo_matrix((d, (c, r)), shape=(Nb, Nb)).tocsr(), scipy.sparse.coo_matrix((d, (r, c)), shape=(Nb, Nb)).tocsr()
+
+    for i in range(Nb):
+        a, adag = bops(mode_dims[i+1])
+        print(np.arange(mode_dims[i+1]))
+        opdict.insert(i+1, "n", site_operator(np.arange(mode_dims[i+1], dtype=np.complex128), optype="diagonal_matrix", mode=i+1))
+        opdict.insert(i+1, "adag", site_operator(adag, optype="sparse_matrix", mode=i+1))
+        opdict.insert(i+1, "a", site_operator(a, optype="sparse_matrix", mode=i+1))
 
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
