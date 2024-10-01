@@ -3,9 +3,9 @@
 external
 build
 build*
-pyttn
 bin
 temp
 *.h5
 *.pdf
 *.egg-info/
+pyttn.egg-info
