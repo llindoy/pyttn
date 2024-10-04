@@ -6,8 +6,7 @@ import scipy
 import copy
 import random
 
-sys.path.append("../../")
-import pyttn
+sys.path.append("../")
 from pyttn import *
 from pyttn.utils import visualise_tree
 from numba import jit
