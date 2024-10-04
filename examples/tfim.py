@@ -33,8 +33,12 @@ for i in range(N):
 
 topo = ntreeBuilder.mps_tree(dims, chi)
 
-#topo = ntree("(1(2))")
-#ntreeBuilder.mps_subtree(topo(), dims, chi)
+print(topo)
+
+ntreeBuilder.insert_basis_nodes(topo)
+ntreeBuilder.collapse_bond_matrices(topo)
+ntreeBuilder.sanitise_bond_dimensions(topo)
+
 print(topo)
 
 A = ttn(topo, dtype=np.complex128)

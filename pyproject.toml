@@ -27,6 +27,9 @@ dependencies = [
     "numpy",
     "h5py",
     "numba",
+    "networkx",
+    "pydot",
+    "graphviz",
 ]
 
 docs = [     
