@@ -1,5 +1,4 @@
 
-
 class system_bath_info:
     #the system info object here expects a single 
     def __init__(self, sysinf, Hs = None, baths =[]):
@@ -15,5 +14,6 @@ class system_bath_info:
         self._baths.append(bath)
 
 
+    
 
 

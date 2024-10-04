@@ -14,7 +14,6 @@ from pyttn._pyttn.linalg import csr_matrix_complex, diagonal_matrix_complex
 
 from numba import jit
 
-
 def build_topology(nsys, chi, nbose, b_mode_dims, degree):
     topo = ntree("(1(%d(%d))(%d))"%(nsys, nsys, nsys))
     if(degree > 1):
@@ -24,19 +23,51 @@ def build_topology(nsys, chi, nbose, b_mode_dims, degree):
     ntreeBuilder.sanitise(topo)
     return topo
 
+def Ct_fit(t, w, nu):
+    res = np.zeros(t.shape, dtype=np.complex128)
+    for i in range(len(w)):
+        res += w[i]*np.exp(-nu[i]*t)
+    return res
+
 def sbm_dynamics(alpha, wc, s, eps, delta, chi, nbose, dt, nbose_min = None, beta = None, nstep = 1, Nw = 10.0, ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, aaa_tol=1e-4, use_mode_combination=True):
+
+    dt = 0.005
+    nstep = 3000
     t = np.arange(nstep+1)*dt
 
     #setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
     def J(w):
-        return np.abs(np.pi/2*alpha*wc*np.power(w/wc, s)*np.exp(-np.abs(w/wc)))*np.where(w > 0, 1.0, -1.0)
+        return np.abs(np.pi/2*alpha*wc*np.power(w/wc, s)*np.exp(-np.abs(w/wc)))*np.where(w > 0, 1.0, -1.0)#np.where(np.abs(w) < 1, 1, 0)#
 
     #set up the open quantum system bath object
-    bath = oqs.bosonic_bath(J, sOP("sz", 0), beta=beta)
+    bath = oqs.bosonic_bath(J, beta=beta)
+    g,w = bath.discretise(32, Nw*wc, method='orthopol')
+
+    Ct = bath.Ct(t)
+    import matplotlib.pyplot as plt
+    plt.plot(t, Ct, label='exact')
+    plt.show()
+    plt.plot(t, Ct, label='exact')
+
+    #dk, zk = bath.expfit(wmax = 2, method='aaa', aaa_tol=1e-6)
+    #plt.plot(t, oqs.bosonic_bath.Ctexp(t, dk, -1.0j*zk))
+
+    plt.plot(t, oqs.bosonic_bath.Ctexp(t, g*g, w))
+
+    dk, zk = bath.expfit( K=4, tmax=nstep*dt, Nt = nstep)
+    plt.plot(t, oqs.bosonic_bath.Ctexp(t, dk, -1.0j*zk), label='ESPRIT 4')
+    dk, zk = bath.expfit(K=8, tmax=nstep*dt, Nt = nstep)
+    plt.plot(t, oqs.bosonic_bath.Ctexp(t, dk, -1.0j*zk), label='ESPRIT 8')
+    dk, zk = bath.expfit(K=12, tmax=nstep*dt, Nt = nstep)
+    plt.plot(t, oqs.bosonic_bath.Ctexp(t, dk, -1.0j*zk), label='ESPRIT 12')
+
+    plt.legend()
+    plt.show()
+    exit(1)
 
     #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
-    dk,zk, Sw_aaa = bath.fitCt(wmax=Nw*wc, aaa_tol=aaa_tol)
+    #dk,zk, Sw_aaa = bath.fitCt(wmax=Nw*wc, aaa_tol=aaa_tol)
 
     Nb = 2*dk.shape[0]
     N = Nb+1
@@ -217,7 +248,7 @@ if __name__ == "__main__":
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.005)
-    parser.add_argument('--tmax', type=float, default=40)
+    parser.add_argument('--tmax', type=float, default=10)
 
     #output file name
     parser.add_argument('--fname', type=str, default='sbm.h5')

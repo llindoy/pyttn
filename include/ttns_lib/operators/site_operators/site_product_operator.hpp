@@ -131,7 +131,7 @@ public:
             operators[i].first = m_operators[i].first;
 
             //reserve storage for the operator elements
-           operators[i].second.reserve(m_operators[i].second.size());
+            operators[i].second.reserve(m_operators[i].second.size());
 
             //now iterate through all operators acting on this mode and bind 
             for(size_type j = 0; j < m_operators[i].second.size(); ++j)
@@ -141,6 +141,42 @@ public:
         }
         return std::make_shared<site_product_operator>(m_dims, operators);
     }
+
+
+    linalg::matrix<T> todense() const 
+    {
+        linalg::matrix<T> ret(base_type::m_size, base_type::m_size, T(0));
+        return ret;
+        //std::vector<linalg::matrix<T, backend>> matrices(m_dims.size());
+
+        ////set up a vector of identity matrices
+        //for(size_type i = 0; i < matrices.size(); ++i)
+        //{
+        //    identity<T, backend> idop(m_dims[i]);
+        //    matrices[i] = idop->todense();
+        //}
+
+        ////now iterate over each term and apply all operators to the matrices.
+        //for(size_type i = 0; i < m_operators.size(); ++i)
+        //{
+        //    size_type mode = m_operators[i].first;
+        //    //reserve storage for the operator elements
+        //    matrices[mode].reserve(m_operators[i].second.size());
+        //    linalg::matrix<T> temp;
+
+        //    //now iterate through all operators acting on this mode and bind 
+        //    for(size_type j = 0; j < m_operators[i].second.size(); ++j)
+        //    {
+        //        size_t ind = m_operators[i].second.size() - (j+1);
+        //        temp = m_operators[i].second[ind]->apply(matrices[i]);
+        //        matrices[i] = temp;
+        //    }
+        //}
+    
+        ////now we need to do the kronecker product of all of the matrices
+
+    }
+
 
     void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
     void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  

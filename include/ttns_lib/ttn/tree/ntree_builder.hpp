@@ -329,76 +329,82 @@ protected:
     }
 
 public:
-    static void sanitise_tree(tree_type& tree, bool remove_bond_matrices = true)
+    //iterate through the tree and anytime an internal bond matrix is found collapse this into the neighbouring nodes
+    static void collapse_bond_matrices(tree_type& tree)
     {
         if(tree.size() < 2){return;}
 
-        if(remove_bond_matrices)
+        //now iterate through the tree and see if there are any modes that have a single child and that are not the parents of leaf nodes.
+        //In this case we collapse the tree
+        collapse_trivial(tree, tree.root(), 0);
+
+        //first check if the root node is a bond tensor and if so contract it into its first child
+        if(tree.root().size() == 2)
         {
-            //now iterate through the tree and see if there are any modes that have a single child and that are not the parents of leaf nodes.
-            //In this case we collapse the tree
-            collapse_trivial(tree, tree.root(), 0);
-
-            //first check if the root node is a bond tensor and if so contract it into its first child
-            if(tree.root().size() == 2)
+            //get the current root 
+            node_type* root = &tree.root();
+            node_type* new_root;
+            //if either of the two subtrees are greater than two we do the merging.  If this isn't the case we just skip this step
+            if(tree.root()[0].subtree_size() > 2 || tree.root()[1].subtree_size() > 2)
             {
-                //get the current root 
-                node_type* root = &tree.root();
-                node_type* new_root;
-                //if either of the two subtrees are greater than two we do the merging.  If this isn't the case we just skip this step
-                if(tree.root()[0].subtree_size() > 2 || tree.root()[1].subtree_size() > 2)
+                if(tree.root()[0].subtree_size() >= tree.root()[1].subtree_size())
                 {
-                    if(tree.root()[0].subtree_size() >= tree.root()[1].subtree_size())
-                    {
-                        //and the node that will be the new_root
-                        new_root = root->m_children[0];
-                        new_root->decrement_level();
+                    //and the node that will be the new_root
+                    new_root = root->m_children[0];
+                    new_root->decrement_level();
 
-                        //set the new root to the root
-                        new_root->m_parent = nullptr;
-                        new_root->m_data = 1;
+                    //set the new root to the root
+                    new_root->m_parent = nullptr;
+                    new_root->m_data = 1;
 
-                        new_root->m_size = root->m_size - 1;
-                        new_root->m_nleaves = root->m_nleaves;
+                    new_root->m_size = root->m_size - 1;
+                    new_root->m_nleaves = root->m_nleaves;
 
-                        //and insert the current roots children other child into it
-                        new_root->m_children.push_back(root->m_children[1]);
-                        new_root->m_children.back()->m_parent = new_root;
-                    }
-                    else
-                    {
-                        //and the node that will be the new_root
-                        new_root = root->m_children[1];
-                        new_root->decrement_level();
-
-                        //set the new root to the root
-                        new_root->m_parent = nullptr;
-                        new_root->m_data = 1;
-
-                        new_root->m_size = root->m_size - 1;
-                        new_root->m_nleaves = root->m_nleaves;
-
-                        //and insert the current roots children other child into it
-                        new_root->m_children.insert(new_root->m_children.begin(), root->m_children[0]);
-                        new_root->m_children.front()->m_parent = new_root;
-                    }
-                
-                    //set the current nodes
-                    for(size_t i = 0; i < tree.root().size(); ++i)
-                    {
-                        root->m_children[i] = nullptr;
-                    }
-
-                    root->m_children.clear();
-                    tree.destroy_node(root);
-                    root = nullptr;
-
-                    tree.m_root = new_root;
-                    new_root = nullptr;
+                    //and insert the current roots children other child into it
+                    new_root->m_children.push_back(root->m_children[1]);
+                    new_root->m_children.back()->m_parent = new_root;
                 }
+                else
+                {
+                    //and the node that will be the new_root
+                    new_root = root->m_children[1];
+                    new_root->decrement_level();
+
+                    //set the new root to the root
+                    new_root->m_parent = nullptr;
+                    new_root->m_data = 1;
+
+                    new_root->m_size = root->m_size - 1;
+                    new_root->m_nleaves = root->m_nleaves;
+
+                    //and insert the current roots children other child into it
+                    new_root->m_children.insert(new_root->m_children.begin(), root->m_children[0]);
+                    new_root->m_children.front()->m_parent = new_root;
+                }
+            
+                //set the current nodes
+                for(size_t i = 0; i < tree.root().size(); ++i)
+                {
+                    root->m_children[i] = nullptr;
+                }
+
+                root->m_children.clear();
+                tree.destroy_node(root);
+                root = nullptr;
+
+                tree.m_root = new_root;
+                new_root = nullptr;
             }
         }
+    }
 
+    //iterate through the tree and ensure that the bond dimension is not larger than the number of states required to represent the state
+    //Currently this only performs the operation up the tree.  
+    //TODO: Add an iteration down the tree to ensure that the number of single hole functions is bounded by the number of states that can
+    //be represented
+    static void sanitise_bond_dimensions(tree_type& tree)
+    {
+        if(tree.size() < 2){return;}
         //we need to correctly implement the post_order_iterator here
         for(typename tree_type::post_iterator tree_iter = tree.post_begin(); tree_iter != tree.post_end(); ++tree_iter)
         {
@@ -415,6 +421,76 @@ public:
                 if(size2 < tree_iter->value()){tree_iter->value() = size2;}
             }
         }
+    }
+
+protected:
+    static void insert_local_nodes(node_type& node)
+    {
+        //for the current node determine how many of its children are not leaves 
+        //if the node has a child which is a leaf.  But this is not its only child.
+        //Then we insert a new node below that child.
+
+        if(!node.is_leaf())
+        {
+            size_type nchildren = 0;
+            size_type nleaves = 0;
+            for(auto& child : node)
+            {
+                if(!child.is_leaf()){++nchildren;}
+                else{++nleaves;}
+            }
+
+            //if the children of this node are all leaf nodes.
+            if(nchildren == 0)
+            {
+                //if the node has 1 or fewer leaf child then we are done.  If it has more than one childn
+                //the exterior node has too many children and we will pad each of them with a new mode
+                if(nleaves > 1)
+                {
+                    for(auto& child : node)
+                    {
+                        child.insert(child());
+                    }
+                }
+            }
+            //if the node has a child that is not the leaf node
+            else
+            {
+                //then iterate over the children of this node
+                for(auto& child : node)
+                {
+                    //and if the child is a leaf node.  We insert a new child into the node
+                    if(child.is_leaf())
+                    {
+                        child.insert(child());
+                    }
+                    else
+                    {
+                        insert_local_nodes(child);
+                    }
+                }
+            }
+        }
+    }
+
+
+public:
+    static void insert_basis_nodes(tree_type& tree)
+    {
+        if(tree.size() < 2){return;}
+        insert_local_nodes(tree.root());
+    }
+
+    static void sanitise_tree(tree_type& tree, bool remove_bond_matrices = true)
+    {
+        if(tree.size() < 2){return;}
+
+        insert_basis_nodes(tree);
+        if(remove_bond_matrices)
+        {
+            collapse_bond_matrices(tree);
+        }
+        sanitise_bond_dimensions(tree);
     }
 
 public:
@@ -467,15 +543,8 @@ public:
         
         for(size_type i = 0; i < linds.size(); ++i)
         {
-            if(i+1 != linds.size())
-            {
-                size_type ind  = ret.at(linds[i]).insert(Hb[i]);
-                ret.at(linds[i])[ind].insert(Hb[i]);
-            }
-            else
-            {
-                ret.at(linds[i]).insert(Hb[i]);
-            }
+            size_t ni = linds.size()-(i+1);
+            ret.at(linds[ni]).insert_front(Hb[ni]);
         }
         return ret;
     }
@@ -490,8 +559,9 @@ public:
         
         for(size_type i = 0; i < linds.size(); ++i)
         {
-            size_type ind  = ret.at(linds[i]).insert(evaluate_value(f2, i));
-            ret.at(linds[i])[ind].insert(Hb[i]);
+            size_t ni = linds.size()-(i+1);
+            size_type ind  = ret.at(linds[ni]).insert_front(evaluate_value(f2, ni));
+            ret.at(linds[ni])[ind].insert(Hb[ni]);
         }
         return ret;
     }
@@ -505,8 +575,7 @@ public:
         for(size_type i = 0; i < linds.size(); ++i)
         {
             size_t ni = linds.size()-(i+1);
-            size_type ind  = root.at(linds[ni]).insert_front(Hb[ni]);
-            root.at(linds[ni])[ind].insert(Hb[ni]);
+            root.at(linds[ni]).insert_front(Hb[ni]);
         }
     }
 

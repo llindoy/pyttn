@@ -148,6 +148,18 @@ public:
         return mode_data(mr);
     }
 
+    bool contains_fermion() const
+    {
+        for(const auto& pm : m_modes)
+        {
+            if(pm.fermionic())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 public:
     using iterator = typename std::vector<primitive_mode_data>::iterator;
     using const_iterator = typename std::vector<primitive_mode_data>::const_iterator;
@@ -203,6 +215,19 @@ public:
             mode[0].lhd() = d;
         }
     }
+
+    system_modes(const primitive_mode_data& o) : m_tree_leaf_indices(1)
+    {
+        m_modes.resize(1);  m_modes[0] = o;
+        set_default_mode_ordering();
+    }
+
+    system_modes(const mode_data& o) : m_tree_leaf_indices(1)
+    {
+        m_modes.resize(1);  m_modes[0] = o;
+        set_default_mode_ordering();
+    }
+
     system_modes(const std::vector<mode_data>& o) : m_modes(o) , m_tree_leaf_indices(o.size())
     {
         set_default_mode_ordering();
@@ -266,6 +291,32 @@ public:
             m_tree_leaf_indices.resize(N);
             set_default_mode_ordering();
         }
+    }
+    
+    //functions for adding additional modes to the system information
+    void add_mode(const primitive_mode_data& m)
+    {
+        CALL_AND_RETHROW(add_mode(mode_data(m)));
+    }
+
+    void add_mode(const primitive_mode_data& m, size_t tree_index)
+    {
+        CALL_AND_RETHROW(add_mode(mode_data(m), tree_index));
+    }
+
+    void add_mode(const mode_data& m)
+    {
+        CALL_AND_RETHROW(add_mode(m, m_modes.size()));
+    }
+
+    void add_mode(const mode_data& m, size_t i)
+    {
+        if(std::find(m_tree_leaf_indices.begin(), m_tree_leaf_indices.end(), i) != m_tree_leaf_indices.end())
+        {
+            RAISE_EXCEPTION("Failed to add mode to system information.  The tree leaf index specified has already been bound.");
+        }
+        m_modes.push_back(m);
+        m_tree_leaf_indices.push_back(i);
     }
 
     //functions for accessing the composite mode information
@@ -366,6 +417,35 @@ public:
         m_tree_leaf_indices.clear();
     }
 
+      
+    //flatten the entire system mode to a single composite mode
+    mode_data as_combined_mode() const
+    {
+        std::vector<primitive_mode_data> md;
+        md.reserve(this->nprimitive_modes());
+
+        for(const auto& cm : m_modes)
+        {
+            for(const auto& pm : cm)
+            {
+                md.push_back(pm);
+            }
+        }
+        return mode_data(md);
+    }
+
+    bool contains_fermion() const
+    {
+        for(const auto& cm : m_modes)
+        {
+            if(cm.contains_fermion())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 public:
     iterator begin() {  return iterator(m_modes.begin());  }
     iterator end() {  return iterator(m_modes.end());  }

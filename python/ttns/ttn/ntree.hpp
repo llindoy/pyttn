@@ -218,7 +218,6 @@ void init_ntree(py::module &m)
 
 }
 
-
 template <typename T> 
 void init_ntree_builder(py::module &m)
 {
@@ -226,11 +225,10 @@ void init_ntree_builder(py::module &m)
     //wrap the ntree_builder c++ class
     py::class_<ntree_builder<T>>(m, "ntreeBuilder")
         //wrap the sanitise function for taking an ntree and ensuring it can is a valid topology for a hierarchical tucker object
-        .def_static(
-                        "sanitise", 
-                        static_cast<void(*)(ntree<T>&, bool)>(ntree_builder<T>::sanitise_tree),
-                        py::arg(), py::arg("remove_bond_matrices") = true
-                   )
+        .def_static("sanitise", &ntree_builder<T>::sanitise_tree, py::arg(), py::arg("remove_bond_matrices")=true)
+        .def_static("insert_basis_nodes", &ntree_builder<T>::insert_basis_nodes)
+        .def_static("sanitise_bond_dimensions", &ntree_builder<T>::sanitise_bond_dimensions)
+        .def_static("collapse_bond_matrices", &ntree_builder<T>::collapse_bond_matrices)
 
         //construct balanced ml-mctdh trees and subtrees
         .def_static(    

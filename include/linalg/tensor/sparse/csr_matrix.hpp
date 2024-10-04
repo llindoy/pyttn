@@ -756,6 +756,28 @@ public:
         }
         orowptr[0] = 0;
     }
+
+
+    inline matrix<T, blas_backend> todense() const
+    {
+        matrix<T> ret(this->shape(0), this->shape(1), T(0));
+        auto buffer = this->buffer();
+        auto rowptr = this->rowptr();
+        auto colind = this->colind();
+
+        size_type rpi = 0;
+        for(size_t i = 0; i < this->nrows(); ++i)
+        {
+            size_type rpi1 = static_cast<size_type>(rowptr[i+1]);
+            for(size_type j=rpi; j<rpi1; ++j)
+            {
+                index_type index = colind[j];
+                ret(i, index) = buffer[j];
+            }
+            rpi = rpi1;
+        }
+        return ret;
+    }
 };  //csr_matrix<T, blas_backend>
 
 
@@ -779,6 +801,12 @@ public:
     inline void transpose(csr_matrix<T, cuda_backend>& o, T alpha=T(1)) const
     {
         RAISE_EXCEPTION("CUDA CSR MATRIX TRANSPOSE NOT IMPLEMENTED.");
+    }
+
+    inline matrix<T, blas_backend> todense() const
+    {
+        csr_matrix<T, blas_backend> ret(*this);
+        return ret.todense();
     }
 };  //csr_matrix<T, blas_backend>
 #endif

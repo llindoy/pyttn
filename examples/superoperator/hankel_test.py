@@ -1,0 +1,16 @@
+import numpy as np
+from scipy.linalg import hankel
+
+N=10
+x = np.arange(N)
+print(hankel(x))
+L = (N+1)//2
+x1 = x[:L]
+x2 = x[L-1:-1]
+print(hankel(x1, x2))
+
+L = (N+1)//2
+N=9
+x1 = x[:L]
+x2 = x[L-1:-1]
+print(hankel(x1, x2))

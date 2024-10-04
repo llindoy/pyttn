@@ -55,6 +55,8 @@ public:
 
     virtual std::shared_ptr<primitive> transpose() const = 0;
 
+    virtual linalg::matrix<T> todense() const = 0;
+
     //apply to matrix
     virtual void apply(const_matrix_ref A, matrix_ref HA) = 0;
     virtual void apply(const_matrix_ref A, matrix_ref HA, real_type t, real_type dt) = 0;
@@ -150,6 +152,12 @@ public:
     ~identity() {}
 
     std::shared_ptr<base_type> transpose() const{return std::make_shared<identity>(base_type::m_size);}
+
+    linalg::matrix<T> todense() const 
+    {
+        linalg::matrix<T> ret(base_type::m_size, base_type::m_size, [](size_type i, size_type j){return i==j ? T(1) : T(1);});
+        return ret;
+    }
 
     //apply to matrices
     void apply(const_matrix_ref A, matrix_ref HA) final {HA = A;}

@@ -8,15 +8,11 @@ namespace ttns
 {
 namespace ops
 {
-template <typename T, typename backend = linalg::blas_backend>
-class adjoint_dense_matrix_operator;
 
 template <typename T, typename backend = linalg::blas_backend> 
 class dense_matrix_operator : public primitive<T, backend>
 {
 public:
-    friend class adjoint_dense_matrix_operator<T, backend>;
-
     using base_type = primitive<T, backend>;
 
     //use the parent class type aliases
@@ -64,6 +60,12 @@ public:
     std::shared_ptr<base_type> clone() const {return std::make_shared<dense_matrix_operator>(m_operator);}
     std::shared_ptr<base_type> transpose() const {return std::make_shared<dense_matrix_operator>(linalg::trans(m_operator));}
     std::shared_ptr<dense_matrix_operator> transpose_matrix() const {return std::make_shared<dense_matrix_operator>(linalg::trans(m_operator));}
+
+    linalg::matrix<T> todense() const 
+    {
+        linalg::matrix<T> ret(m_operator);
+        return ret;
+    }
 
     void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
     void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
@@ -143,146 +145,6 @@ public:
 #endif
 };
 
-
-template <typename T, typename backend> 
-class adjoint_dense_matrix_operator : public primitive<T, backend>
-{
-public:
-    using base_type = primitive<T, backend>;
-
-    //use the parent class type aliases
-    using typename base_type::matrix_type;
-    using typename base_type::size_type;
-    using typename base_type::matrix_ref;
-    using typename base_type::const_matrix_ref;
-    using typename base_type::real_type;
-    using typename base_type::vector_type;
-    using typename base_type::vector_ref;
-    using typename base_type::const_vector_ref;
-    using typename base_type::matview;
-    using typename base_type::resview;
-    using typename base_type::tensview;
-    using typename base_type::restensview;
-
-public:
-    adjoint_dense_matrix_operator()  : base_type() {}
-    template <typename ... Args>
-    adjoint_dense_matrix_operator(Args&& ... args) 
-    try : base_type(), m_operator(std::make_shared<dense_matrix_operator<T, backend>>(std::forward<Args>(args)...))
-    {
-        base_type::m_size = m_operator->m_size;;
-    }
-    catch(const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        RAISE_EXCEPTION("Failed to construct adjoint dense matrix operator object.");
-    }
-
-    adjoint_dense_matrix_operator(std::shared_ptr<dense_matrix_operator<T,backend>> op) try : base_type(), m_operator(op)
-    {
-        base_type::m_size = m_operator->m_size;;
-    }
-    catch(const std::exception& ex)
-    {
-        std::cerr << ex.what() << std::endl;
-        RAISE_EXCEPTION("Failed to construct adjoint dense matrix operator object.");
-    }
-    adjoint_dense_matrix_operator(const adjoint_dense_matrix_operator& o) = default;
-    adjoint_dense_matrix_operator(adjoint_dense_matrix_operator&& o) = default;
-    adjoint_dense_matrix_operator& operator=(const adjoint_dense_matrix_operator& o) = default;
-    adjoint_dense_matrix_operator& operator=(adjoint_dense_matrix_operator&& o) = default;
-
-    bool is_resizable() const final{return false;}
-    void resize(size_type /*n*/){ASSERT(false, "This shouldn't be called.");}
-
-    std::shared_ptr<base_type> clone() const{return std::make_shared<adjoint_dense_matrix_operator>(m_operator);}
-    std::shared_ptr<base_type> transpose() const 
-    {
-        return std::make_shared<adjoint_dense_matrix_operator>(m_operator->transpose_matrix());
-    }
-
-    void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
-    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
-    void apply(const matview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));} 
-    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
-  
-    void apply(const_matrix_ref A, matrix_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
-    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
-    void apply(const_vector_ref A, vector_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
-    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
-
-    //functions for applying the operator to rank 3 tensor views
-    void apply(const restensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
-    void apply(const restensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final  {CALL_AND_RETHROW(apply_rank_3(A, HA));}
-    void apply(const tensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
-    void apply(const tensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
-
-protected:
-    template <typename A1, typename A2>
-    void apply_rank_2(const A1& A, A2& HA) 
-    {
-        CALL_AND_HANDLE(HA = adjoint(m_operator->m_operator)*A, "Failed to apply adjoint dense matrix operator.  Failed to rank 2 tensor.");
-    }  
-    template <typename A1, typename A2>
-    void apply_rank_3(const A1& A, A2& HA)
-    {
-        CALL_AND_HANDLE(HA = linalg::contract(adjoint(m_operator->m_operator), 1, A, 1), "Failed to apply adjoint dense matrix operator to rank 3 tensor.");
-    }
-
-public:
-    void update(real_type /*t*/, real_type /*dt*/) final{}  
-    const matrix_type& mat()const{return m_operator->mat();}
-    std::string to_string() const final
-    {
-        std::stringstream oss;
-        oss << "adjoint dense matrix operator: " << std::endl;
-        oss << m_operator << std::endl;
-        return oss.str();
-    }
-
-protected:
-    std::shared_ptr<dense_matrix_operator<T, backend>> m_operator;
-    vector_type m_HA;
-
-#ifdef CEREAL_LIBRARY_FOUND
-public:
-    template <typename archive>
-    void save(archive& ar) const
-    {
-        CALL_AND_HANDLE
-        (
-            ar(cereal::base_class<primitive<T, backend> >(this)), 
-            "Failed to serialise dense_matrix operator object.  Error when serialising the base object."
-        );
-
-        CALL_AND_HANDLE
-        (
-            ar(cereal::make_nvp("dense matrix op", m_operator)), 
-            "Failed to serialise dense_matrix operator object.  \
-             Error when serialising the associated dense matrix operator."
-        );
-    }
-
-    template <typename archive>
-    void load(archive& ar)
-    {
-        CALL_AND_HANDLE
-        (   
-            ar(cereal::base_class<primitive<T, backend> >(this)), 
-            "Failed to serialise dense_matrix operator object.  Error when serialising the base object."
-        );
-
-        CALL_AND_HANDLE
-        (
-            ar(cereal::make_nvp("dense matrix op", m_operator)), 
-            "Failed to serialise dense_matrix operator object.  \
-             Error when serialising the associated dense matrix operator."
-        );
-    }
-#endif
-};
-
-
 //A class for wrapping the multiplication by a sparse matrix.  This stores the matrix in csr form to make it easy to perform all of the required operations.
 template <typename T, typename backend = linalg::blas_backend>
 class sparse_matrix_operator;
@@ -328,6 +190,11 @@ public:
 
     bool is_resizable() const final{return false;}
     void resize(size_type /*n*/){ASSERT(false, "This shouldn't be called.");}
+
+    linalg::matrix<T> todense() const 
+    {
+        return m_operator.todense();
+    }
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<sparse_matrix_operator>(m_operator);}
     std::shared_ptr<base_type> transpose() const
@@ -683,6 +550,12 @@ protected:
         return oss.str();
     }
 #ifdef CEREAL_LIBRARY_FOUND
+
+
+    linalg::matrix<T> todense() const 
+    {
+        return m_operator.todense();
+    }
 public:
     template <typename archive>
     void save(archive& ar) const
@@ -752,6 +625,11 @@ public:
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<diagonal_matrix_operator>(m_operator);}
     std::shared_ptr<base_type> transpose() const {return std::make_shared<diagonal_matrix_operator>(m_operator);}
+
+    linalg::matrix<T> todense() const 
+    {
+        return m_operator.todense();
+    }
 
     void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
     void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
@@ -843,7 +721,6 @@ public:
 
 #ifdef CEREAL_LIBRARY_FOUND
 TTNS_REGISTER_SERIALIZATION(ttns::ops::dense_matrix_operator, ttns::ops::primitive)
-TTNS_REGISTER_SERIALIZATION(ttns::ops::adjoint_dense_matrix_operator, ttns::ops::primitive)
 TTNS_REGISTER_SERIALIZATION(ttns::ops::sparse_matrix_operator, ttns::ops::primitive)
 TTNS_REGISTER_SERIALIZATION(ttns::ops::diagonal_matrix_operator, ttns::ops::primitive)
 #endif

@@ -67,6 +67,7 @@ inline void init_system_info(py::module &m)
         .def("__deepcopy__", [](const mode_data& o, py::dict){return mode_data(o);}, py::arg("memo"))
         .def("__str__", [](const mode_data& o){std::stringstream oss;   oss << o; return oss.str();})
         .def("liouville_space", &mode_data::liouville_space)
+        .def("contains_fermion", &mode_data::contains_fermion)
         .def("lhd", static_cast<size_t (mode_data::*)() const>(&mode_data::lhd));
 
     m.def("fermion_mode", &fermion_mode);
@@ -81,6 +82,8 @@ inline void init_system_info(py::module &m)
         .def(py::init<size_t, size_t>())
         .def(py::init<size_t, size_t, const std::vector<size_t>&>())
         .def(py::init<const system_modes&>())
+        .def(py::init<const primitive_mode_data&>())
+        .def(py::init<const mode_data&>())
         .def(py::init<const std::vector<mode_data>&>())
         .def(py::init<const std::vector<mode_data>&, const std::vector<size_t>&>())
         .def("assign", [](system_modes& self, const system_modes& o){self=o;})
@@ -91,6 +94,11 @@ inline void init_system_info(py::module &m)
         .def("resize", &system_modes::resize)
         .def("clear", &system_modes::clear)
         .def("liouville_space", &system_modes::liouville_space)
+        .def("contains_fermion", &system_modes::contains_fermion)
+        .def("add_mode", static_cast<void (system_modes::*)(const primitive_mode_data&)>(&system_modes::add_mode))
+        .def("add_mode", static_cast<void (system_modes::*)(const primitive_mode_data&, size_t)>(&system_modes::add_mode))
+        .def("add_mode", static_cast<void (system_modes::*)(const mode_data&)>(&system_modes::add_mode))
+        .def("add_mode", static_cast<void (system_modes::*)(const mode_data&, size_t)>(&system_modes::add_mode))
         .def("__str__", [](const system_modes& o){std::stringstream oss;   oss << o; return oss.str();})
         .def(
                 "__getitem__", 
@@ -125,6 +133,7 @@ inline void init_system_info(py::module &m)
                     o.primitive_mode(i) = d;
                 }
             )
+        .def("as_combined_mode", &system_modes::as_combined_mode)
         .def("mode_index", [](const system_modes& o, size_t i){return o.mode_index(i);})
         .def_property(
                 "mode_indices", 

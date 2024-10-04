@@ -37,16 +37,17 @@ def Ct(t, w, g, sigma='+'):
         fourier = np.exp(-1.0j*W*T)
     return g2@fourier
 
-#def ESPRIT(Ct, K):
-#    T = Ct.shape[0]
-#    Y = scipy.linalg.toeplitz(Ct)
-#    U, _, _ = np.linalg.svd(Y)
-#    Us = U[:K, :]
-#    S1 = Us[:, :T-1]
-#    S2 = Us[:, 1:]
-#    P = np.linalg.lstsq(S1, S2)[0]
-#    ls, _ = np.linalg.eig(P)
-#    ls = ls[np.argsort(np.abs(ls))[::-1]]
+def ESPRIT(Ct, K):
+    T = Ct.shape[0]
+    Y = scipy.linalg.toeplitz(Ct)
+    U, _, _ = np.linalg.svd(Y)
+    Us = U[:K, :]
+    S1 = Us[:, :T-1]
+    S2 = Us[:, 1:]
+    P = np.linalg.lstsq(S1, S2)[0]
+    ls, _ = np.linalg.eig(P)
+    ls = -np.log(ls[np.argsort(np.abs(ls))[::-1]])
+    print(ls)
 
 def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, init_state = 'up'):
     if chiU is None:
@@ -61,6 +62,7 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
 
     #set up the open quantum system bath object
     bath = oqs.fermionic_bath(V, beta=beta)
+
     
     dkf, zkf, Swf_aaa = bath.fitCt(4*W, Ef = 0.2, sigma='+', aaa_tol=1e-6, Naaa=2000)
     dke, zke, Swe_aaa = bath.fitCt(4*W, Ef = 0.2, sigma='-', aaa_tol=1e-6, Naaa=2000)

@@ -700,6 +700,12 @@ public:
         }
     }
 
+    //a function for constructing a dense matrix representation of the SOP operator object.  
+    linalg::matrix<T, backend> todense() const
+    {
+
+    }
+
 #ifdef CEREAL_LIBRARY_FOUND
 public:
     template <typename archive>

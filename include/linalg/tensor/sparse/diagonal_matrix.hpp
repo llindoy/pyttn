@@ -74,6 +74,16 @@ public:
         ASSERT(i == j, "Failed to access element of diagonal matrix.  Requested element is not on the diagonal.");
         return base_type::m_vals[i];
     }
+
+    matrix<T, blas_backend> todense() const
+    {
+        matrix<T, blas_backend> mat(base_type::m_shape[0], base_type::m_shape[1]);
+        for(size_t i = 0; i < base_type::m_nnz; ++i)
+        {
+            mat(i, i) = base_type::m_vals[i];
+        }
+        return mat;
+    }
 };  //diagonal_matrix<T, blas_backend>
 
 
@@ -95,6 +105,12 @@ public:
     __host__ __device__ const_pointer buffer()const{return base_type::m_vals;}
     __host__ __device__ pointer data(){return base_type::m_vals;}
     __host__ __device__ const_pointer data()const{return base_type::m_vals;}
+
+    matrix<T> todense() const
+    {
+        diagonal_matrix<T> mat(*this);
+        return mat.todense();
+    }
 };  //diagonal_matrix<T, cuda_backend>
 #endif
 

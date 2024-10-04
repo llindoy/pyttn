@@ -11,6 +11,8 @@
 #include "ttn_nodes/ms_ttn_node.hpp"
 #include "ttn_nodes/ttn_node.hpp"
 
+#include "tree/ntree_builder.hpp"
+
 #include "sweeping/sweeping_path.hpp"
 #include "orthogonality/decomposition_engine.hpp"
 #include "orthogonality/root_to_leaf_decomposition.hpp"
@@ -1022,10 +1024,10 @@ protected:
     }
 
     template <typename INTEGER, typename Alloc>
-    void construct_topology(const ntree<INTEGER, Alloc>& _tree, const ntree<INTEGER, Alloc>& capacity, size_type nset = 1)
+    void construct_topology(const ntree<INTEGER, Alloc>& __tree, const ntree<INTEGER, Alloc>& _capacity, size_type nset = 1)
     {
-        ASSERT(_tree.size() > 2, "Failed to build ttn from topology tree.  The input topology must contain at least 3 elements.  If it contains fewer than 3 elements then this is just a vector and we won't want to use the full TTN structure.");
-        ASSERT(_tree.size() == capacity.size(), "Failed to construct ttn topology with capacity.");
+        ASSERT(__tree.size() > 2, "Failed to build ttn from topology tree.  The input topology must contain at least 3 elements.  If it contains fewer than 3 elements then this is just a vector and we won't want to use the full TTN structure.");
+        ASSERT(__tree.size() == _capacity.size(), "Failed to construct ttn topology with capacity.");
 
         m_nset = nset;
         m_nset_lhd = nset;
@@ -1034,6 +1036,13 @@ protected:
             m_nset = nset*nset;
             m_nset_lhd = nset;
         }
+
+
+        ntree<INTEGER, Alloc> _tree(__tree);
+        ntree<INTEGER, Alloc> capacity(_capacity);
+
+        ntree_builder<INTEGER>::sanitise_tree(_tree, true);
+        ntree_builder<INTEGER>::sanitise_tree(capacity, true);
 
         //otherwise if the topology tree contains more than 2 more elements we will attempt to interpret it as a (hierarchical) tucker tensor
         //and solve the problem in this space.
@@ -1051,8 +1060,8 @@ protected:
         size_type count = 0;
         size_type leaf_counter = 0; 
         auto this_it = m_nodes.begin();
-        typename ntree<INTEGER, Alloc>::const_iterator capacity_iter = capacity.begin();
-        for(typename ntree<INTEGER, Alloc>::const_iterator tree_iter = _tree.begin(); tree_iter != _tree.end(); ++tree_iter, ++capacity_iter)
+        typename ntree<INTEGER, Alloc>::iterator capacity_iter = capacity.begin();
+        for(typename ntree<INTEGER, Alloc>::iterator tree_iter = _tree.begin(); tree_iter != _tree.end(); ++tree_iter, ++capacity_iter)
         {
             ASSERT(capacity_iter != capacity.end(), "The capacity and tree iter objects are not the same size.");
             ASSERT(tree_iter->value() <= capacity_iter->value(), "Failed to construct ttn object.  The capacity is less than the size.");
