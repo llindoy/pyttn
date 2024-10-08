@@ -31,13 +31,10 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, nbose, dt, nbose_min = None, bet
     def J(w):
         return np.abs(np.pi/2*alpha*wc*np.power(w/wc, s)*np.exp(-np.abs(w/wc)))*np.where(w > 0, 1.0, -1.0)
 
-    #set up the open quantum system bath object
-    bath = oqs.bosonic_bath(J, sOP("sz", 0), beta=beta)
+    bath = oqs.BosonicBath(J, beta=beta)
+    dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=8, tmax=nstep*dt, Nt = nstep))
 
-    #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
-    dk,zk, Sw_aaa = bath.fitCt(wmax=Nw*wc, aaa_tol=aaa_tol)
     w = np.linspace(-Nw*wc, Nw*wc, 1000)
-
     Nb = dk.shape[0]
 
     sz = np.array([[1, 0], [0, -1]], dtype=np.complex128)

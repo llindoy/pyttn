@@ -3,9 +3,6 @@ from numba import jit
 import numpy as np
 
 
-
-
-
 class DensityDiscretisation:
     def __init__(self,  Nb, wmin, wmax, rho=None, atol=0, rtol=1e-10, nquad=100, wtol=1e-10, ftol=1e-10, niters=100, wcut=1e-8):
         self.Nb = Nb
@@ -19,7 +16,6 @@ class DensityDiscretisation:
         self.wtol = wtol
         self.ftol=ftol
         self.niters=niters
-
 
     #discretise a bosonic bath using the density algorithm.  Here we allow for specification of the density of frequencies (rho), if this isn't specified we use a density of frequencies
     #that is given by S(w)/w for np.abs(w) > 1e-12 and S(w)/1e-12 for np.abs(w) < 1e-12. 
@@ -81,8 +77,8 @@ class OrthopolDiscretisation:
         w = None
 
         #if the moment scaling parameter is not zero set its value
-        if moment_scaling is None:
-            moment_scaling = find_moment_scaling_factor(J, wmin, wmax, Nb, atol=atol, rtol=rtol, minbound=minbound, maxbound=maxbound, Nsteps=moment_scaling_steps, nquad=nquad)
+        if self.moment_scaling is None:
+            self.moment_scaling = OrthopolDiscretisation.find_moment_scaling_factor(S, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, minbound=self.minbound, maxbound=self.maxbound, Nsteps=self.moment_scaling_steps, nquad=self.nquad)
 
-        g, w = orthopol_discretisation.discretise(J, wmin, wmax, Nb, moment_scaling=moment_scaling, atol=atol, rtol=rtol, nquad=nquad)
+        g, w = orthopol_discretisation.discretise(S, self.wmin, self.wmax, self.Nb, moment_scaling=self.moment_scaling, atol=self.atol, rtol=self.rtol, nquad=self.nquad)
         return np.array(g), np.array(w)

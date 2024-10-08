@@ -41,30 +41,8 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, nbose, dt, nbose_min = None, bet
         return np.abs(np.pi/2*alpha*wc*np.power(w/wc, s)*np.exp(-np.abs(w/wc)))*np.where(w > 0, 1.0, -1.0)#np.where(np.abs(w) < 1, 1, 0)#
 
     #set up the open quantum system bath object
-    bath = oqs.bosonic_bath(J, beta=beta)
-    g,w = bath.discretise(32, Nw*wc, method='orthopol')
-
-    Ct = bath.Ct(t)
-    import matplotlib.pyplot as plt
-    plt.plot(t, Ct, label='exact')
-    plt.show()
-    plt.plot(t, Ct, label='exact')
-
-    #dk, zk = bath.expfit(wmax = 2, method='aaa', aaa_tol=1e-6)
-    #plt.plot(t, oqs.bosonic_bath.Ctexp(t, dk, -1.0j*zk))
-
-    plt.plot(t, oqs.bosonic_bath.Ctexp(t, g*g, w))
-
-    dk, zk = bath.expfit( K=4, tmax=nstep*dt, Nt = nstep)
-    plt.plot(t, oqs.bosonic_bath.Ctexp(t, dk, -1.0j*zk), label='ESPRIT 4')
-    dk, zk = bath.expfit(K=8, tmax=nstep*dt, Nt = nstep)
-    plt.plot(t, oqs.bosonic_bath.Ctexp(t, dk, -1.0j*zk), label='ESPRIT 8')
-    dk, zk = bath.expfit(K=12, tmax=nstep*dt, Nt = nstep)
-    plt.plot(t, oqs.bosonic_bath.Ctexp(t, dk, -1.0j*zk), label='ESPRIT 12')
-
-    plt.legend()
-    plt.show()
-    exit(1)
+    bath = oqs.BosonicBath(J, beta=beta)
+    dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=8, tmax=nstep*dt, Nt = nstep))
 
     #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
     #dk,zk, Sw_aaa = bath.fitCt(wmax=Nw*wc, aaa_tol=aaa_tol)

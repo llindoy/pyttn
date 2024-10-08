@@ -1,4 +1,4 @@
-from .bath_discretisation import *
+from .bath_fitting import *
 from .chain_map import *
 from .bosonic_bath import *
 from .fermionic_bath import *

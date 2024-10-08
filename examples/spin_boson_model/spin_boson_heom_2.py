@@ -5,7 +5,7 @@ import h5py
 import scipy
 import copy
 
-import pyttn
+sys.path.append("../../")
 from pyttn import *
 from pyttn import oqs
 from pyttn._pyttn import operator_dictionary_complex
@@ -32,10 +32,8 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, nbose, dt, nbose_min = None, bet
         return np.abs(np.pi/2*alpha*wc*np.power(w/wc, s)*np.exp(-np.abs(w/wc)))*np.where(w > 0, 1.0, -1.0)
 
     #set up the open quantum system bath object
-    bath = oqs.bosonic_bath(J, sOP("sz", 0), beta=beta)
-
-    #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
-    dk,zk, Sw_aaa = bath.fitCt(wmax=Nw*wc, aaa_tol=aaa_tol)
+    bath = oqs.BosonicBath(J, beta=beta)
+    dk, zk = bath.expfit(oqs.AAADecomposition(tol=1e-4, wmin = -2*Nw*wc, wmax=2*Nw*wc))
 
     Nb = 2*dk.shape[0]
     N = Nb+1

@@ -1,7 +1,6 @@
 import numpy as np
 from numba import jit
 import scipy as sp
-from pyttn.utils import orthopol
 
 class BosonicBath:
     """A class for managing a continuous bosonic gaussian bath.  This provides
@@ -140,17 +139,15 @@ class BosonicBath:
             return self.Jw(np.abs(w))*0.5*(1.0+1.0/np.tanh(self.beta*np.abs(w)/2.0))*np.where(w > 0, 1.0, np.exp(self.beta*w))
 
     def discretise(self, discretisation_engine):
-        from .bath_fitting import OrthopolDiscretisation
+        from .bath_fitting import OrthopolDiscretisation, DensityDiscretisation
         if(discretisation_engine.wmin is None):
             discretisation_engine.wmin = -2*self.wmax
         if(discretisation_engine.wmax is None):
             discretisation_engine.wmin = 2*self.wmax
-        return discretise_engine(self.Sw)
+        return discretisation_engine(self.Sw)
 
     def expfit(self, fitting_engine):
-        from .bath_fitting.aaa_bath_fitting import AAADecomposition
-        from .bath_fitting.ESPRIT_bath_fitting import ESPRITDecomposition
-
+        from .bath_fitting import AAADecomposition, ESPRITDecomposition
         dk = None
         zk = None
         if isinstance(fitting_engine, AAADecomposition):

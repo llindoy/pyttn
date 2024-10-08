@@ -140,10 +140,10 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
         return np.abs(np.pi/2*alpha*wc*np.power(w/wc, s)*np.exp(-np.abs(w/wc)))*np.where(w > 0, 1.0, -1.0)
 
     #set up the open quantum system bath object
-    bath = oqs.bosonic_bath(J, sOP("sz", 0), beta=beta)
+    bath = oqs.BosonicBath(J, S=sOP("sz", 0), beta=beta)
 
     #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
-    g,w = bath.discretise(Nb, Nw*wc, method='orthopol')
+    g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, 0, Nw*wc))
 
     #set up the total Hamiltonian
     N = Nb+1
@@ -161,8 +161,11 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
         raise RuntimeError("Hamiltonian geometry not recognised.")
     print(H)
     sH = H.expand()
-    for t in sH:
-        print(t)
+    sH2 = sH*sH
+
+    H2 = SOP(N)
+    for t in sH2:
+        H2 += t
 
     #mode_dims = [nbose for i in range(Nb)]
     mode_dims = [min(max(4, int(wc*Ncut/w[i])), nbose) for i in range(Nb)]
@@ -200,6 +203,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
 
     #set up the Hamiltonian
     h = sop_operator(H, A, sysinf, identity_opt=True, compress=True)
+    h2 = sop_operator(H2, A, sysinf, identity_opt=True, compress=True)
 
     #construct objects need for evaluating observables
     mel = matrix_element(A)
@@ -208,6 +212,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
         sOP("sz", 0),
         sysinf
     )
+
 
     #set up tdvp sweeping algorithm parameters
     sweep = None
@@ -250,6 +255,10 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
         t2 = time.time()
         res[i+1] = np.real(mel(op, A, A))
         maxchi[i+1] = A.maximum_bond_dimension()
+        B = h@A
+        C = h2@A
+        print("<H>:", mel(h, A), mel(A, B))
+        print("<H^2>:", mel(h2, A), mel(B, B), mel(A, C))
 
         if(i % 10 == 0):
             h5 = h5py.File(ofname, 'w')
