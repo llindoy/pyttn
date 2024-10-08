@@ -15,7 +15,9 @@
 
 namespace ttns
 {
-
+//Potential TODO: Add in a better way to flag whether or not a node interacts with a physical degree of freedom.  This is currently done by ensuring 
+//that only leaf nodes are physical nodes and consequently requires inserting local basis rotation nodes whenever we want to have a physical degree
+//of freedom.
 template <typename T, typename backend = linalg::blas_backend>
 class ttn_node_data : public linalg::matrix<T, backend> 
 {
@@ -126,6 +128,7 @@ public:
     void reallocate(size_type max_hrank, const std::vector<size_type>& max_mode_dims)
     {
         m_mode_capacity = max_mode_dims;    
+        m_mode_dims.resize(max_mode_dims.size());
         size_type ndimen = 1;
         for(size_type i = 0; i < max_mode_dims.size(); ++i)
         {

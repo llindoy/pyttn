@@ -2,7 +2,10 @@ import sys
 sys.path.append("../")
 from pyttn import *
 
+from pyttn._pyttn import apply_sop_to_ttn
+
 import numpy as np
+import random
 import time
 import h5py
 import scipy
@@ -11,25 +14,44 @@ from numba import jit
 
 # set up Hamiltonian
 
-N = 16
+N = 32
 J = 1
 h = 1
 
 H = SOP(N)
+Hsop = sSOP()
 for i in range(N-1):
-    H += -4.0*J*sOP("sz",i)*sOP("sz",i+1)
-    H += -2.0*h*sOP("sx",i)
-H += -2.0*h*sOP("sx",N-1)
-print(H)
+    H += J*sOP("z",i)*sOP("z",i+1)
+    Hsop += J*sOP("z",i)*sOP("z",i+1)
+    H += -h*sOP("x",i)
+    Hsop += -h*sOP("x",i)
 
+H += -h*sOP("x",N-1)
+Hsop += -h*sOP("x",N-1)
+H2sop = Hsop*Hsop
+
+H2 = SOP(N)
+for t in H2sop:
+    H2 += t
+print(H2)
+
+
+H3 = SOP(N)
+
+inds = ['x', 'y', 'z']
+for i in range(16):
+    ret = sPOP()
+    for ind in range(N):
+        ret *= sOP(inds[random.randint(0, 2)], ind)
+    H3 += random.uniform(-1, 1)*ret
 
 # set up TTN
-chi = 8
+chi =16
 dims = [2 for i in range(N)]
 
 sysinf = system_modes(N)
 for i in range(N):
-    sysinf[i] = spin_mode(2)
+    sysinf[i] = qubit_mode()
 
 topo = ntreeBuilder.mps_tree(dims, chi)
 
@@ -42,22 +64,52 @@ ntreeBuilder.sanitise_bond_dimensions(topo)
 print(topo)
 
 A = ttn(topo, dtype=np.complex128)
+A.set_state([0 for i in range(N)])
 A.random()
 
 h = sop_operator(H, A, sysinf, compress=True)
-
+h2 = sop_operator(H2, A, sysinf, compress=True)
+op = sop_operator(H3, A, sysinf, compress=True)
 mel = matrix_element(A)
 
 print(sysinf.nmodes())
 
 # set up simulation
 
-ndmrg = 4
+ndmrg = 20
 
 dmrg_sweep = dmrg(A, h, krylov_dim=8)
 dmrg_sweep.prepare_environment(A, h)
 dmrg_sweep.restarts = 1
 
+B = ttn(topo, dtype=np.complex128)
+C = ttn(topo, dtype=np.complex128)
+D = ttn(topo, dtype=np.complex128)
+
+#apply it using the apply function.  This takes an optional coefficient that scales the result
+apply_sop_to_ttn(h, A, B, coeff=1.0)
+apply_sop_to_ttn(h2, A, C)
+apply_sop_to_ttn(op, A, D)
+
+print("H: ", H)
+print("H^2: ", H2)
+print("op: ", H3)
+
+print(A.maximum_bond_dimension(), B.maximum_bond_dimension(), C.maximum_bond_dimension(), D.maximum_bond_dimension())
+print("<H>: ", mel(A, B), mel(h, A), dmrg_sweep.E())
+print("<H^2>: ", mel(A, C), mel(B, B), mel(h2, A))
+print("<O>: ", mel(A, D), mel(op, A))
+
 for i in range(ndmrg):
     dmrg_sweep.step(A,h)
-    print(i, dmrg_sweep.E()/N)
+
+    B = h@A
+    C = h2@A
+    D = op@A
+    print(A.maximum_bond_dimension(), B.maximum_bond_dimension(), C.maximum_bond_dimension(), D.maximum_bond_dimension())
+    print("<H>: ", mel(A, B), mel(h, A), dmrg_sweep.E())
+    print("<H^2>: ", mel(A, C), mel(B, B), mel(h2, A))
+    print("<O>: ", mel(A, D), mel(op, A))
+    
+
+

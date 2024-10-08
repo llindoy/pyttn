@@ -102,7 +102,6 @@ public:
 
     const spf_index_type& spf_indexing() const{return m_spf_index;}
     const mf_index_type& mf_indexing() const{return m_mf_index;}
-
     
     size_type nspf_terms() const{return m_spf_index.size();}
     size_type nmf_terms() const{return m_mf_index.size();}

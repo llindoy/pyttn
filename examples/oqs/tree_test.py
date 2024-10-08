@@ -24,9 +24,6 @@ for i in range(N):
 topo = ntree("(1(2))")
 ntreeBuilder.mps_subtree(topo(), dims, chi)
 topo().insert(2)
-topo().insert(2)
-topo().insert(2)
-topo().insert(2)
 
 for i in range(100):
     node_index = random.randint(1, topo.size())

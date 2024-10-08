@@ -4,6 +4,8 @@
 #include <ttns_lib/ttn/ttn.hpp>
 #include <ttns_lib/ttn/multiset_ttn_slice.hpp>
 #include <ttns_lib/operators/site_operators/site_operator.hpp>
+#include <ttns_lib/operators/sop_operator.hpp>
+#include <ttns_lib/ttn/sop_ttn_contraction.hpp>
 #include "../../utils.hpp"
 
 #include <pybind11/operators.h>
@@ -26,6 +28,7 @@ void init_ttn(py::module &m, const std::string& label)
     using real_type = typename linalg::get_real_type<T>::type;
     using siteop = site_operator<T, linalg::blas_backend>;
     using prodop = product_operator<T, linalg::blas_backend>;
+    using sop = sop_operator<T, linalg::blas_backend>;
 
     py::class_<_ttn_node_data>(m, (std::string("ttn_data_")+label).c_str())
         .def(py::init())
@@ -122,7 +125,6 @@ void init_ttn(py::module &m, const std::string& label)
         .def("resize", static_cast<void (_ttn::*)(const std::string&, size_t, bool)>(&_ttn::resize), py::arg(), py::arg("nset")=1, py::arg("purification") = false)
         .def("resize", static_cast<void (_ttn::*)(const std::string&, const std::string&, size_t, bool)>(&_ttn::resize), py::arg(), py::arg(), py::arg("nset")=1, py::arg("purification") = false)
         .def("set_seed", &_ttn::template set_seed<int>)
-
 
         .def("set_state", &_ttn::template set_state<int>)
         .def("set_state", &_ttn::template set_state<size_t>)
@@ -250,7 +252,6 @@ void init_ttn(py::module &m, const std::string& label)
                 }
             )
 
-
         .def(
                 "measure_without_collapse", 
                 [](_ttn& o, size_t i)
@@ -346,14 +347,51 @@ void init_ttn(py::module &m, const std::string& label)
                 py::arg(), py::arg("shift_orthogonality") = true
             )
 
+        .def(
+                "__imatmul__",
+                [](_ttn& o, siteop& op)
+                {
+                    CALL_AND_RETHROW(return o.apply_one_body_operator(op));
+                }
+            )
+        .def(
+                "__imatmul__",
+                [](_ttn& o, prodop& op)
+                {
+                    CALL_AND_RETHROW(return o.apply_operator(op));
+                }
+            )
 
-        //Increment with additional operators as they are bound.
-
-        //ttn& apply_one_body_operator(const Op<T, backend>& op, bool shift_orthogonality = true)
-        //ttn& apply_operator(const Op<T, backend>& op, real_type tol = real_type(0), size_type nchi=0)
+        .def(
+                "__rmatmul__",
+                [](const _ttn& o, siteop& op)
+                {
+                    _ttn i(o);
+                    CALL_AND_RETHROW(return i.apply_one_body_operator(op));
+                }
+            )
+        .def(
+                "__rmatmul__",
+                [](const _ttn& o, prodop& op)
+                {
+                    _ttn i(o);
+                    CALL_AND_RETHROW(return i.apply_operator(op));
+                }
+            )
+        .def(
+                "__rmatmul__",
+                [](const _ttn& o, sop& op)
+                {
+                    _ttn i;
+                    using contr = sop_ttn_contraction_engine<T, linalg::blas_backend>;
+                    CALL_AND_RETHROW(contr::sop_ttn_contraction(op, o, i));
+                    return i;
+                }
+            )
         ;
 
-
+      
+    m.def("apply_sop_to_ttn", &sop_ttn_contraction_engine<T, linalg::blas_backend>::sop_ttn_contraction, py::arg(), py::arg(), py::arg(), py::arg("coeff")=T(1), py::arg("cutoff")=real_type(1e-12));
 
 }
 

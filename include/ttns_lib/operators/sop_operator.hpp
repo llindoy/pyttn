@@ -555,7 +555,6 @@ public:
 
                     //now construct the mode operator object from this local mode information.
                     CALL_AND_HANDLE(mode_operators[cmode].push_back(element_type(ops::site_product_operator<T, backend>{mode_dims, ops}, cmode)), "Failed to insert new element in mode operator");
-
                 }
             }
         }
@@ -688,7 +687,7 @@ public:
         //we don't need the rest of the operator to be time dependent to update the Eshift term.
         if(m_time_dependent_coefficients || force_update)
         {
-            if(_m_Eshift.is_time_dependent() )
+            if(_m_Eshift.is_time_dependent() || force_update)
             {
                 m_Eshift = _m_Eshift(t);
             }

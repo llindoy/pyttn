@@ -14,6 +14,7 @@
 namespace ttns
 {
 
+
 template <typename ttn_type>
 struct ttn_sop_type;
 

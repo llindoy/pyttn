@@ -201,12 +201,13 @@ public:
         }    
     }
 
-    void initialise(const SOP<T>& o, const system_modes& sysinf, size_t nmodes = 0)
+    void initialise(const SOP<T>& o, const system_modes& sysinf)
     {
         try
         {
+            ASSERT(o.nmodes() <= sysinf.nprimitive_modes(), "Cannot construct compressed SOP operator index out of bounds.");
             m_label = o.label();
-            resize(o.nterms(), nmodes > o.nmodes() ? nmodes : o.nmodes());
+            resize(o.nterms(), sysinf.nmodes());
 
             //an object for mapping the composite mode indices back onto the primitive mode indices
             m_composite_op_dict.resize(sysinf.nmodes());
@@ -218,6 +219,8 @@ public:
             //needed locally as it is used to construct the m_mode_operators infor for composite modes.
             std::map<std::pair<size_t, size_t>, std::pair<size_t, size_t>> prim_to_comp;
 
+            std::vector<size_t> first_primitive_mode(sysinf.nmodes());
+
             //now iterate over the primitive modes 
             for(size_t i = 0; i < m_op_dict.size(); ++i)
             {
@@ -227,6 +230,7 @@ public:
 
                 //now map the composite mode index from the underlying hamiltonian ordering to the tree ordering
                 size_t cmode = sysinf.mode_index(mode);
+                first_primitive_mode[cmode] = i;
 
                 for(size_t j = 0; j < m_op_dict[i].size(); ++j)
                 {
@@ -281,7 +285,7 @@ public:
                 ++r;
             }
 
-            CALL_AND_HANDLE(insert_identities(), "Failed to insert identity operators into array.");
+            CALL_AND_HANDLE(insert_identities(first_primitive_mode), "Failed to insert identity operators into array.");
         }
         catch(const std::exception& ex)
         {
@@ -290,11 +294,11 @@ public:
         }    
     }
     //Insert additional identity elements into the network.  Here we start by searching through the mode object and checking if
-    //and identity elements have already been bound reusing it if present.  And only bind a new one if no identity terms are 
+    //any identity elements have already been bound reusing it if present.  And only bind a new one if no identity terms are 
     //present.  We also note that in the event of a composite mode with multiple identities bound we do not combine these together
     //which may lead to slightly larger bond dimensions in these case, this can be avoided by not explicitly binding identity operators 
     //unless absolutely necessary.
-    void insert_identities()
+    void insert_identities(const std::vector<size_t>& first_primitive_mode)
     {
         try
         {
@@ -321,8 +325,8 @@ public:
                 //the index of the identity element
                 size_t idind = 0;
 
-                //the mode that we will store this on.  
-                size_t idnu = 0;
+                //the mode that we will store this on.  Default to mode so that in the event that the system 
+                size_t idnu = first_primitive_mode[mode];
 
                 //iterate over all terms in the composite operator dictionary associated with this mode
                 bool identity_found = false;
