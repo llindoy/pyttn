@@ -3,6 +3,9 @@ sys.path.append("../")
 from pyttn import *
 
 from pyttn._pyttn import apply_sop_to_ttn
+from pyttn.utils import visualise_tree
+
+import matplotlib.pyplot as plt
 
 import numpy as np
 import random
@@ -14,7 +17,7 @@ from numba import jit
 
 # set up Hamiltonian
 
-N = 32
+N = 16
 J = 1
 h = 1
 
@@ -53,9 +56,14 @@ sysinf = system_modes(N)
 for i in range(N):
     sysinf[i] = qubit_mode()
 
-topo = ntreeBuilder.mps_tree(dims, chi)
+
+topo = ntreeBuilder.mlmctdh_tree(dims, 2, chi, [i+2 for i in range(N)])
+
+visualise_tree(topo)
+plt.show()
 
 print(topo)
+exit()
 
 ntreeBuilder.insert_basis_nodes(topo)
 ntreeBuilder.collapse_bond_matrices(topo)
@@ -110,6 +118,17 @@ for i in range(ndmrg):
     print("<H>: ", mel(A, B), mel(h, A), dmrg_sweep.E())
     print("<H^2>: ", mel(A, C), mel(B, B), mel(h2, A))
     print("<O>: ", mel(A, D), mel(op, A))
+
+    B.truncate(nchi=16)
+    #B.truncate(tol=1e-12, nbond)
+    C.truncate(nchi=16)
+    #C.truncate(tol=1e-10)
+    D.truncate(nchi=16)
+    #D.truncate(tol=1e-10)
     
+    print(A.maximum_bond_dimension(), B.maximum_bond_dimension(), C.maximum_bond_dimension(), D.maximum_bond_dimension())
+    print("<H>: ", mel(A, B), mel(h, A), dmrg_sweep.E())
+    print("<H^2>: ", mel(A, C), mel(B, B), mel(h2, A))
+    print("<O>: ", mel(A, D), mel(op, A))
 
 

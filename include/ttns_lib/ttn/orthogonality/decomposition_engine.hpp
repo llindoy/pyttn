@@ -128,6 +128,7 @@ protected:
                 for(size_type i = 0; i < bond_dimension; ++i)
                 {
                     if(std::abs(m_shost(i, i)) > tol*snorm){++nb;}
+                    std::cerr << i << " " << m_shost(i, i) << " " << tol << " " << snorm << std::endl;
                 }
             }
             else if(trunc_mode == truncation_mode::weight_truncation)

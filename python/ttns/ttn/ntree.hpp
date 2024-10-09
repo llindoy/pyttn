@@ -231,37 +231,57 @@ void init_ntree_builder(py::module &m)
         .def_static("collapse_bond_matrices", &ntree_builder<T>::collapse_bond_matrices)
 
         //construct balanced ml-mctdh trees and subtrees
-        .def_static(    
+        .def_static(
                         "mlmctdh_tree", 
-                        static_cast<ntree<T>(*)(const std::vector<T>&, size_t, size_t&&)>(ntree_builder<T>::htucker_tree)
+                        static_cast<ntree<T>(*)(const std::vector<T>&, size_t, size_t&&, bool)>(ntree_builder<T>::htucker_tree), 
+                        py::arg(), py::arg(), py::arg(), py::arg("include_local_basis_transformation")=true
                    )
         .def_static(
                         "mlmctdh_tree", 
-                        static_cast<ntree<T>(*)(const std::vector<T>&, size_t, const std::function<size_t(size_t)>&)>(ntree_builder<T>::htucker_tree)
+                        static_cast<ntree<T>(*)(const std::vector<T>&, size_t, const std::function<size_t(size_t)>&, bool)>(ntree_builder<T>::htucker_tree),
+                        py::arg(), py::arg(), py::arg(), py::arg("include_local_basis_transformation")=true
+                   )
+        .def_static(    
+                        "mlmctdh_tree", 
+                        static_cast<ntree<T>(*)(const std::vector<T>&, size_t, size_t&&, T)>(ntree_builder<T>::htucker_tree) 
+                   )
+        .def_static(
+                        "mlmctdh_tree", 
+                        static_cast<ntree<T>(*)(const std::vector<T>&, size_t, const std::function<size_t(size_t)>&, T)>(ntree_builder<T>::htucker_tree)
+                   )
+        .def_static(    
+                        "mlmctdh_tree", 
+                        static_cast<ntree<T>(*)(const std::vector<T>&, size_t, size_t&&, const std::vector<T>&)>(ntree_builder<T>::htucker_tree) 
+                   )
+        .def_static(
+                        "mlmctdh_tree", 
+                        static_cast<ntree<T>(*)(const std::vector<T>&, size_t, const std::function<size_t(size_t)>&, const std::vector<T>&)>(ntree_builder<T>::htucker_tree)
+                   )
+        .def_static(
+                        "mlmctdh_subtree", 
+                        static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, size_t, const std::function<size_t(size_t)>&, bool)>(ntree_builder<T>::htucker_subtree),
+                        py::arg(), py::arg(), py::arg(), py::arg(), py::arg("include_local_basis_transformation")=true
                    )
         .def_static(    
                         "mlmctdh_subtree", 
-                        static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, size_t, size_t&&)>(ntree_builder<T>::htucker_subtree)
+                        static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, size_t, size_t&&, bool)>(ntree_builder<T>::htucker_subtree), 
+                        py::arg(), py::arg(), py::arg(), py::arg(), py::arg("include_local_basis_transformation")=true
                    )
         .def_static(
                         "mlmctdh_subtree", 
-                        static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, size_t, const std::function<size_t(size_t)>&)>(ntree_builder<T>::htucker_subtree)
+                        static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, size_t, const std::function<size_t(size_t)>&, T)>(ntree_builder<T>::htucker_subtree)
                    )
         .def_static(    
-                        "htucker_tree", 
-                        static_cast<ntree<T>(*)(const std::vector<T>&, size_t, size_t&&)>(ntree_builder<T>::htucker_tree)
+                        "mlmctdh_subtree", 
+                        static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, size_t, size_t&&, T)>(ntree_builder<T>::htucker_subtree) 
                    )
         .def_static(
-                        "htucker_tree", 
-                        static_cast<ntree<T>(*)(const std::vector<T>&, size_t, const std::function<size_t(size_t)>&)>(ntree_builder<T>::htucker_tree)
+                        "mlmctdh_subtree", 
+                        static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, size_t, const std::function<size_t(size_t)>&, const std::vector<T>&)>(ntree_builder<T>::htucker_subtree)
                    )
         .def_static(    
-                        "htucker_subtree", 
-                        static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, size_t, size_t&&)>(ntree_builder<T>::htucker_subtree)
-                   )
-        .def_static(
-                        "htucker_subtree", 
-                        static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, size_t, const std::function<size_t(size_t)>&)>(ntree_builder<T>::htucker_subtree)
+                        "mlmctdh_subtree", 
+                        static_cast<void(*)(ntree_node<ntree<T>>&, const std::vector<T>&, size_t, size_t&&, const std::vector<T>&)>(ntree_builder<T>::htucker_subtree) 
                    )
         //construct degenerate trees representing mps's 
         .def_static(

@@ -495,7 +495,7 @@ public:
 
 public:
     template <typename Func>
-    static tree_type htucker_tree(const std::vector<T>& Hb, size_type degree, Func&& fl)
+    static tree_type htucker_tree(const std::vector<T>& Hb, size_type degree, Func&& fl, bool include_local_basis_transform = true)
     {
         size_type Nleaves = Hb.size();
         std::vector<std::vector<size_type>> linds(Nleaves);
@@ -504,19 +504,93 @@ public:
         
         for(size_type i = 0; i < linds.size(); ++i)
         {
-            ret.at(linds[i]).insert(Hb[i]);
+            if(include_local_basis_transform)
+            {
+                ret.at(linds[i]).insert(Hb[i]);
+            }
+            else
+            {
+                ret.at(linds[i])() = Hb[i];
+            }
         }
         return ret;
     }
 
     template <typename Func>
-    static void htucker_subtree(node_type& root, const std::vector<T>& Hb, size_type degree, Func&& fl)
+    static void htucker_subtree(node_type& root, const std::vector<T>& Hb, size_type degree, Func&& fl, bool include_local_basis_transform = true)
     {
         size_type Nleaves = Hb.size();
         std::vector<std::vector<size_type>> linds(Nleaves);
         CALL_AND_HANDLE(balanced_subtree(root, Nleaves, degree, std::forward<Func>(fl), linds), "Failed to build balanced sub tree.");
         for(size_type i = 0; i < linds.size(); ++i)
         {
+            if(include_local_basis_transform)
+            {
+                root.at(linds[i]).insert(Hb[i]);
+            }
+            else
+            {
+                root.at(linds[i])() = Hb[i];
+            }
+        }
+    }
+
+    template <typename Func>
+    static tree_type htucker_tree(const std::vector<T>& Hb, size_type degree, Func&& fl, const std::vector<T>& lHd)
+    {
+        size_type Nleaves = Hb.size();
+        ASSERT(lHd.size() == Nleaves, "Failed to add in local hilbert space dimension nodes.  Invalid size.");
+        std::vector<std::vector<size_type>> linds(Nleaves);
+        tree_type ret;
+        CALL_AND_HANDLE(ret = balanced_tree(Nleaves, degree, std::forward<Func>(fl), linds), "Failed to build balanced tree.");
+        
+        for(size_type i = 0; i < linds.size(); ++i)
+        {
+            ret.at(linds[i])() = lHd[i];
+            ret.at(linds[i]).insert(Hb[i]);
+        }
+        return ret;
+    }
+
+    template <typename Func>
+    static void htucker_subtree(node_type& root, const std::vector<T>& Hb, size_type degree, Func&& fl, const std::vector<T>& lHd)
+    {
+        size_type Nleaves = Hb.size();
+        ASSERT(lHd.size() == Nleaves, "Failed to add in local hilbert space dimension nodes.  Invalid size.");
+        std::vector<std::vector<size_type>> linds(Nleaves);
+        CALL_AND_HANDLE(balanced_subtree(root, Nleaves, degree, std::forward<Func>(fl), linds), "Failed to build balanced sub tree.");
+        for(size_type i = 0; i < linds.size(); ++i)
+        {
+            root.at(linds[i])() = lHd[i];
+            root.at(linds[i]).insert(Hb[i]);
+        }
+    }
+
+    template <typename Func>
+    static tree_type htucker_tree(const std::vector<T>& Hb, size_type degree, Func&& fl, T lHd)
+    {
+        size_type Nleaves = Hb.size();
+        std::vector<std::vector<size_type>> linds(Nleaves);
+        tree_type ret;
+        CALL_AND_HANDLE(ret = balanced_tree(Nleaves, degree, std::forward<Func>(fl), linds), "Failed to build balanced tree.");
+        
+        for(size_type i = 0; i < linds.size(); ++i)
+        {
+            ret.at(linds[i])() = lHd;
+            ret.at(linds[i]).insert(Hb[i]);
+        }
+        return ret;
+    }
+
+    template <typename Func>
+    static void htucker_subtree(node_type& root, const std::vector<T>& Hb, size_type degree, Func&& fl, T lHd)
+    {
+        size_type Nleaves = Hb.size();
+        std::vector<std::vector<size_type>> linds(Nleaves);
+        CALL_AND_HANDLE(balanced_subtree(root, Nleaves, degree, std::forward<Func>(fl), linds), "Failed to build balanced sub tree.");
+        for(size_type i = 0; i < linds.size(); ++i)
+        {
+            root.at(linds[i])() = lHd;
             root.at(linds[i]).insert(Hb[i]);
         }
     }

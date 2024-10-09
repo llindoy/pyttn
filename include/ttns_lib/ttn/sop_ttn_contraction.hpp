@@ -171,6 +171,37 @@ public:
             }
         }
     }
+
+
+    static inline void sop_ttn_contraction_zip_up(const sop_type& Op, const ttn_type& A, ttn_type& B, T coeff = T(1.0), real_type tol = real_type(0), size_type nchi = 0, real_type cutoff = real_type(1e-12))
+    {
+        bool include_constant = false;
+        CALL_AND_HANDLE(include_constant = resize_output_network(Op, A, B, cutoff), "Failed to perform sop ttn contraction.  Failed to resize output TTN.");
+
+        const auto & cinf = Op.contraction_info();
+        //now we know that B is the correct size we perform the exact contractions.
+        //For all interior nodes.  This just corresponds to a kronecker product.  
+        //For all exterior nodes.  We actually need to perform the required contractions.
+        
+        for(size_type i = 0; i < A.size(); ++i)
+        {
+            const auto& op = cinf[i];
+            const auto& a = A[i]();
+            auto& b = B[i]();
+            //start by filling the output matrix with zeros
+            b.as_matrix().fill_zeros();
+
+            if(A[i].is_leaf())
+            {
+                CALL_AND_HANDLE(sop_ttn_contraction_leaf(Op, op(), a, b, include_constant), "Failed to perform leaf contraction.")
+            }
+            else
+            {
+                CALL_AND_HANDLE(sop_ttn_contraction_branch(op, a, b, include_constant, Op.Eshift(), coeff), "Failed to perform branch contraction.")
+            }
+        }
+    }
+
 protected:
     template <typename Optype, typename Atype, typename Btype>
     static inline void sop_ttn_contraction_leaf(const sop_type& Op, const Optype& op, const Atype& a, Btype& b, bool include_constant_contribution)

@@ -182,6 +182,7 @@ public:
             //if the other tensor is not square then we are in a regime where the two-site algorithm will provide a search direction so we should attempt it
             if(A1().shape(1) < A1().shape(0) && A1().shape(1) != 1 && subspace_spawning)
             {
+
                 const auto& hinf = op.contraction_info()[h.id()];
                 //now resize the onesite buffer objects used for evaluation of the two site (projected energy) so that everything is the correct size
                 size_type nterms = twosite::get_nterms(hinf()); 

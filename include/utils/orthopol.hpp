@@ -91,7 +91,7 @@ public:
         if(norder == 0){return p0;}
         else
         {
-            //compute the first term in the recurrence
+            //compute the first term in the recurrence      
             T px = (x - alpha(0))*p0/beta(0);
             T pxm = p0;
 
