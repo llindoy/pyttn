@@ -12,7 +12,7 @@ from model_hamiltonian import *
 
 fs = 41.341374575751
 
-def run_mps_dynamics(ofname='model_B_mps_48_12.h5'):
+def run_mps_dynamics(ofname='model_B/out_mps_32.h5'):
     tmax = 200*fs
     dt = 0.1*fs
     nsteps = int(tmax/(dt))+1
@@ -27,19 +27,19 @@ def run_mps_dynamics(ofname='model_B_mps_48_12.h5'):
     
     ldims = [0 for i in range(Nmodes)]
     ldims[0] = 26
-    ldims[2] = 16
-    for i in range(1, Nmodes):
+    ldims[1] = 24
+    for i in range(2, Nmodes):
         ldims[i] = 12
 
     ldims0 = [0 for i in range(Nmodes)]
-    ldims0[0] = 4
+    ldims0[0] = 26
     for i in range(1, Nmodes):
-        ldims0[i] = 4
+        ldims0[i] = 6
 
     #set up the sum of product operator Hamiltonian
     H, opdict = hamiltonian()
 
-    chimax = 48
+    chimax = 32
     chi0 = 16
 
     sysinf = system_modes(Nmodes)
@@ -66,7 +66,7 @@ def run_mps_dynamics(ofname='model_B_mps_48_12.h5'):
     sweepA = tdvp(A, h, krylov_dim = 24, expansion='subspace', subspace_neigs=6)
     sweepA.spawning_threshold = 1e-6
     sweepA.unoccupied_threshold = 1e-6
-    sweepA.expmv_tol=1e-13
+    sweepA.expmv_tol=1e-12
     sweepA.minimum_unoccupied=1
     sweepA.dt = dt
     sweepA.coefficient = -1.0j
@@ -77,9 +77,9 @@ def run_mps_dynamics(ofname='model_B_mps_48_12.h5'):
     for i in range(len(ops)):
         res[0, i] = mel(ops[i], A)
 
-    ts = np.logspace(-6, -1, 5)*fs
+    ts = np.logspace(-7, -1, 10)*fs
     tp = 0
-    for i in range(5):
+    for i in range(len(ts)):
         sweepA.dt = ts[i]-tp
         t1 = time.time()
         sweepA.step(A, h)
@@ -117,7 +117,7 @@ def run_mps_dynamics(ofname='model_B_mps_48_12.h5'):
         h5.close()
 
 #set this up to use mode combination to make convergence easier
-def run_mctdh_dynamics(ofname='model_B_mlmctdh_48_12.h5'):
+def run_mctdh_dynamics(ofname='model_B/out_mlmctdh_32.h5'):
     tmax = 200*fs
     dt = 0.1*fs
     nsteps = int(tmax/(dt))+1
@@ -139,7 +139,7 @@ def run_mctdh_dynamics(ofname='model_B_mlmctdh_48_12.h5'):
         ldims[i] = 12
 
     ldims0 = [0 for i in range(Nmodes)]
-    ldims0[0] = 4
+    ldims0[0] = 26
     for i in range(1, Nmodes):
         ldims0[i] = 6
 
@@ -149,8 +149,8 @@ def run_mctdh_dynamics(ofname='model_B_mlmctdh_48_12.h5'):
     H, opdict = hamiltonian()
 
 
-    chimax = 48
-    chimax2 = 32
+    chimax = 32
+    chimax2 = 24
     chimax3 = 24
     chi0 = 16
 
@@ -197,7 +197,7 @@ def run_mctdh_dynamics(ofname='model_B_mlmctdh_48_12.h5'):
     sweepA = tdvp(A, h, krylov_dim = 24, expansion='subspace', subspace_neigs=6)
     sweepA.spawning_threshold = 1e-6
     sweepA.unoccupied_threshold = 1e-6
-    sweepA.expmv_tol=1e-13
+    sweepA.expmv_tol=1e-12
     sweepA.minimum_unoccupied=1
     sweepA.dt = dt
     sweepA.coefficient = -1.0j
@@ -208,9 +208,9 @@ def run_mctdh_dynamics(ofname='model_B_mlmctdh_48_12.h5'):
     for i in range(len(ops)):
         res[0, i] = mel(ops[i], A)
 
-    ts = np.logspace(-6, -1, 5)*fs
+    ts = np.logspace(-7, -1, 10)*fs
     tp = 0
-    for i in range(5):
+    for i in range(len(ts)):
         sweepA.dt = ts[i]-tp
         t1 = time.time()
         sweepA.step(A, h)

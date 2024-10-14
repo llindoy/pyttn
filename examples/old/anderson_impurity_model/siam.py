@@ -4,7 +4,7 @@ import time
 import sys
 import copy
 
-sys.path.append("../../")
+sys.path.append("../../../")
 from pyttn import *
 from chain_map import chain_map
 
