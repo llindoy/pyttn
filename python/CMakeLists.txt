@@ -116,8 +116,13 @@ pybind11_add_module(_pyttn ${PYTHON_BINDINGS_SRC})
 target_include_directories(_pyttn PUBLIC ${TTNS_INCLUDE_DIRECTORIES})
 target_link_libraries(_pyttn PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 
 
-set_target_properties(_pyttn PROPERTIES
-                            VISIBILITY_INLINES_HIDDEN ON)
+
+add_library(restore_default_visibility INTERFACE)
+target_compile_options(restore_default_visibility INTERFACE -fvisibility=default)
+target_link_libraries(_pyttn PRIVATE restore_default_visibility)
+
+#set_target_properties(_pyttn PROPERTIES
+#        VISIBILITY_INLINES_HIDDEN ON)
 check_ipo_supported(RESULT ipo)
 if(ipo)
 set_property(TARGET _pyttn PROPERTY VISIBILITY_INLINES_HIDDEN TRUE)

@@ -212,6 +212,12 @@ protected:
         return t(l);
     }
 
+
+    static inline T evaluate_value(const std::vector<T>& t, size_type l)
+    {
+        return t[l];
+    }
+
 public:
     /*
      *  Functions fo constructing degenerate trees with values in the tree specified by a function of the level or as a constant value.  
@@ -666,6 +672,7 @@ public:
             root.at(linds[ni])[ind].insert(Hb[ni]);
         }
     }
+
 };
 
 }   //namespace ttns

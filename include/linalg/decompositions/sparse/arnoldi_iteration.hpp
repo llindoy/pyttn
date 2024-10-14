@@ -220,7 +220,7 @@ protected:
     
 public:
     template <typename vecs_type, typename ... Args>
-    bool partial_krylov_step_deflation(const vecs_type& vec, size_type vindex, real_type scale, size_type istart, size_type iend, Args&& ... args) 
+    bool partial_krylov_step(const vecs_type& vec, size_type vindex, real_type scale, size_type istart, size_type iend, bool deflation, Args&& ... args) 
     {
         try
         {
@@ -245,7 +245,10 @@ public:
                     m_beta = fnorm;
                     q0 = q0/fnorm;
 
-                    CALL_AND_HANDLE(deflation_step(q0, vec, vindex), "Deflation step failed.");
+                    if(deflation)
+                    {
+                        CALL_AND_HANDLE(deflation_step(q0, vec, vindex), "Deflation step failed.");
+                    }
                 }
                 else
                 {
@@ -258,7 +261,10 @@ public:
                     CALL_AND_HANDLE(compute_action(rqp, wp, std::forward<Args>(args)...), "Failed to compute the partial krylov subspace.  Failed to evaluate action on vector.");
                     m_w *= scale;       // and handle the scaling
 
-                    CALL_AND_HANDLE(deflation_step(m_w, vec, vindex), "Deflation step failed.");
+                    if(deflation)
+                    {
+                        CALL_AND_HANDLE(deflation_step(m_w, vec, vindex), "Deflation step failed.");
+                    }
 
                     //now we orthogonalise this vector against the current krylov subspace
                     for(size_type j=0; j<i; ++j)

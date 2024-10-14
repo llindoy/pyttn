@@ -3,6 +3,8 @@ import numpy as np
 import scipy as sp
 
 def identity(*args, dtype=np.complex128):
+    """
+    """
     if(dtype == np.complex128):
         return ops.identity_complex(*args)
     elif(dtype == np.float64):

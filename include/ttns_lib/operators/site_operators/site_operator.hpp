@@ -154,7 +154,7 @@ public:
             }
         }
 
-        if(op != nullptr)
+        if(op == nullptr)
         {
             CALL_AND_HANDLE(op = opdictype::query(label, basis, sys.primitive_mode(nu).type(), use_sparse), "Failed to insert new element in mode operator.");
             ASSERT(op != nullptr, "Failed to construct site operator object.");

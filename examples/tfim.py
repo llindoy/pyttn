@@ -2,6 +2,7 @@ import sys
 sys.path.append("../")
 from pyttn import *
 
+import pyttn
 from pyttn._pyttn import apply_sop_to_ttn
 from pyttn.utils import visualise_tree
 
@@ -61,6 +62,9 @@ topo = ntreeBuilder.mlmctdh_tree(dims, 2, chi, [i+2 for i in range(N)])
 
 visualise_tree(topo)
 plt.show()
+
+print(sop_operator.__doc__)
+print(pyttn._pyttn.sop_operator_complex.__doc__)
 
 print(topo)
 exit()

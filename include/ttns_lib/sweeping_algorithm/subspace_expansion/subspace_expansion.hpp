@@ -215,12 +215,13 @@ public:
                 size_type maxkrylov_dim = eigensolver.krylov_dim();
                 if(m_rvec.size() < maxkrylov_dim){maxkrylov_dim = m_rvec.size();}
 
+                size_type neigs_evaluated = 0;
                 //computes the complex conjugate of the right singular vectors
-                CALL_AND_HANDLE(eigensolver(m_V, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
+                CALL_AND_HANDLE(neigs_evaluated = eigensolver(m_V, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
 
                 CALL_AND_HANDLE(m_V = linalg::conj(m_V), "Failed to conjugate the right singular vectors.");
 
-                for(size_type i = 0; i < m_S.size(); ++i)
+                for(size_type i = 0; i < neigs_evaluated; ++i)
                 {
                     real_type sv = 0;
                     //check if any of the dominant svds of the Hamiltonian acting on the twosite coefficient tensor are occupied through the half step
@@ -390,9 +391,10 @@ public:
                 bool mconjm = false;
 
                 //computes U but stored with its columns as rows - e.g. this is U^T.  E.g. the singular vectors are currently the rows of m_U
-                CALL_AND_HANDLE(eigensolver(m_U, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
+                size_type neigs_evaluated = 0;
+                CALL_AND_HANDLE(neigs_evaluated = eigensolver(m_U, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
 
-                for(size_type i = 0; i < m_S.size(); ++i)
+                for(size_type i = 0; i < neigs_evaluated; ++i)
                 {
                     real_type sv = 0;
                     //check if any of the dominant svds of the Hamiltonian acting on the twosite coefficient tensor are occupied through the half step

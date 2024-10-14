@@ -66,13 +66,19 @@ public:
     variance_subspace_expansion& operator=(const variance_subspace_expansion& o) = default;
     variance_subspace_expansion& operator=(variance_subspace_expansion&& o) = default;
     
-    void initialise(const ttn_type& A, const env_type& ham, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2)
+    void initialise(const ttn_type& A, const env_type& ham, size_type eigensolver_krylov_dim = 12, size_type neigenvalues = 6)
     {
         try
         {
             ASSERT(A.is_orthogonalised(), "The input hierarchical tucker tensor must have been orthogonalised.");
 
             CALL_AND_HANDLE(clear(), "Failed to clear the projector_splitting_intgrator.");
+
+            //ensure that the eigensolver krylov dimension is large enough given the number of request eigenvalues
+            if(eigensolver_krylov_dim < 2*neigenvalues)
+            {
+                eigensolver_krylov_dim = 2*neigenvalues;
+            }
             
             size_type maxcapacity = 0;
             for(const auto& a : A){size_type capacity = a().capacity();    if(capacity > maxcapacity){maxcapacity = capacity;}}

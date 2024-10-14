@@ -132,6 +132,7 @@ def combine_modes(bath_mode_dims, bath_mode_inds, nbmax, nhilbmax):
 
 
 def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut = 20, nstep = 1, Nw = 10.0, geom='star', ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, nbmax=10, nhilbmax=1024):
+    nstep = 10
     t = np.arange(nstep+1)*dt
 
     #setup the function for evaluating the exponential cutoff spectral density
@@ -219,7 +220,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     if not adaptive:
         sweep = tdvp(A, h, krylov_dim = 12)
     else:
-        sweep = tdvp(A, h, krylov_dim = 12, expansion='subspace')
+        sweep = tdvp(A, h, krylov_dim=12, subspace_neigs = 6, expansion='subspace')
         sweep.spawning_threshold = spawning_threshold
         sweep.unoccupied_threshold=unoccupied_threshold
         sweep.minimum_unoccupied=nunoccupied
@@ -257,6 +258,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
         maxchi[i+1] = A.maximum_bond_dimension()
         B = h@A
         C = h2@A
+        print(A.maximum_bond_dimension(), B.maximum_bond_dimension(), C.maximum_bond_dimension())#, C.maximum_bond_dimension())
         print("<H>:", mel(h, A), mel(A, B))
         print("<H^2>:", mel(h2, A), mel(B, B), mel(A, C))
 

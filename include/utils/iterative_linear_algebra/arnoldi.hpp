@@ -21,7 +21,8 @@ class arnoldi;
 enum eigenvalue_target
 {
     largest_magnitude = 0,
-    smallest_real = 1
+    smallest_real = 1,
+    largest_real
 };
 
 template <typename T, typename backend>
@@ -284,79 +285,80 @@ public:
             //compute the arnoldi iteration. 
             real_type scalefactor = 1.0;
 
-            CALL_AND_HANDLE(m_residues.resize(neigs, m_max_iter), "Failed to resize residues array.");  m_residues.fill_zeros();
-            CALL_AND_HANDLE(m_converged.resize(neigs), "Failed to resize converged array.");    m_converged.fill_value(false);
+            CALL_AND_HANDLE(m_residues.resize(krylov_dim, m_max_iter), "Failed to resize residues array.");  m_residues.fill_zeros();
 
             //now compute the eigenvalues in the arnoldi subspace
             CALL_AND_HANDLE(m_vals.resize(krylov_dim), "Failed to resize the working buffer.");
 
-            bool all_converged = true;
             size_type max_iters = 0;
-            for(size_type eigindex = 0; eigindex < neigs; ++eigindex)
+            size_type iter = 0;
+
+            size_type eigenvalues_evaluated = 0;
+            std::vector<size_type> eigorder(krylov_dim);
+            std::vector<std::pair<T, size_type>> temp(krylov_dim);
+            bool do_restart = true;
+
+            for(iter = 0; iter < m_max_iter && do_restart; ++iter)
             {
-                size_type iter = 0;
+                size_type istart = 0;
+                size_type iend = krylov_dim;
+                bool keep_running = true;
+                size_type iend_start = std::min(neigs, krylov_dim);
 
-                size_type eigenvalue_index=0;
-                bool do_restart = true;
-                for(iter = 0; iter < m_max_iter && do_restart; ++iter)
+                for(iend = iend_start; iend < krylov_dim+istride && keep_running; iend+=istride)
                 {
-                    size_type istart = 0;
-                    size_type iend = krylov_dim;
-                    bool keep_running = true;
-                    size_type iend_start = std::min(size_type(2), krylov_dim);
-
-                    for(iend = iend_start; iend < krylov_dim+istride && keep_running; iend+=istride)
+                    if(iend > krylov_dim){iend = krylov_dim; keep_running = false;}   
+                    try
                     {
-                        if(iend > krylov_dim){iend = krylov_dim; keep_running = false;}   
-                        try
+                        bool ended_early = false;
+
+                        //perform partial arnoldi step 
+                        CALL_AND_HANDLE(ended_early = m_arnoldi.partial_krylov_step(x, 0, scalefactor, istart, iend, false, std::forward<Args>(args)...), "Failed to construct the krylov subspace using a arnoldi iteration");
+
+                        if(iend > 1)
                         {
-                            bool ended_early = false;
+                            if(ended_early){keep_running = false;}
+                            auto H = m_arnoldi.H();      
 
-                            //perform partial arnoldi step 
-                            CALL_AND_HANDLE(ended_early = m_arnoldi.partial_krylov_step_deflation(x, eigindex, scalefactor, istart, iend, std::forward<Args>(args)...), "Failed to construct the krylov subspace using a arnoldi iteration");
+                            m_eigensolver(H, m_vals, m_rvecs, m_lvecs, false);
+                            eigenvalues_evaluated = eigenvalue_ordering(temp, eigorder);
 
-                            if(iend > 1)
+                            //get the last eigenvalue index
+                            size_type eigindex = eigorder[eigenvalues_evaluated-1];
+
+                            //and compute the associated residue
+                            m_residues(iter) = m_arnoldi.hk1k()*std::abs(m_rvecs(m_vals.size()-1, eigindex));
+
+                            if(m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps*std::abs((m_invert_mode ? 1.0/m_vals(eigindex, eigindex) : m_vals(eigindex, eigindex))))
                             {
-                                if(ended_early){keep_running = false;}
-                                auto H = m_arnoldi.H();      
-
-                                m_eigensolver(H, m_vals, m_rvecs, m_lvecs, false);
-                                size_type n = get_eig_index();
-                                eigenvalue_index = n;
-
-                                m_residues(eigindex, iter) = m_arnoldi.hk1k()*std::abs(m_rvecs(m_vals.size()-1, n));
-                                if(m_verbose)
-                                {
-                                    std::cerr << eigindex << " " << iter << " " << iend << " " << m_residues(eigindex, iter) << " " << (m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n)) << std::endl;
-                                }
-                                if(m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps*std::abs((m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n))))
-                                {
-                                    do_restart = false;
-                                    keep_running=false;
-                                    m_converged(eigindex) = true;
-                                }
+                                do_restart = false;
+                                keep_running=false;
                             }
-                        } 
-                        catch(const std::exception& ex)
-                        {
-                            std::cerr << ex.what() << std::endl;
-                            RAISE_EXCEPTION("Error when attempting to compute eigenvalues.");
                         }
-                    }
-
-                    auto xeig = x[eigindex];
-                    get_vecs_and_vals(E[eigindex], xeig, eigenvalue_index);
-                    if(max_iters < iter)
+                    } 
+                    catch(const std::exception& ex)
                     {
-                        max_iters = iter;
+                        std::cerr << ex.what() << std::endl;
+                        RAISE_EXCEPTION("Error when attempting to compute eigenvalues.");
                     }
-                    istart = iend + 1;
-                    if(istart > krylov_dim){keep_running = false;}
                 }
-                if(!m_converged(eigindex)){all_converged = false;}
+
+                for(size_type i = 0; i < std::min(eigenvalues_evaluated, neigs); ++i)
+                {
+                    auto xeig = x[i];
+                    size_type eigenvalue_index = eigorder[i];
+                    get_vecs_and_vals(E[i], xeig, eigenvalue_index);
+
+                }
+                if(max_iters < iter)
+                {
+                    max_iters = iter;
+                }
+                istart = iend + 1;
+                if(istart > krylov_dim){keep_running = false;}
             }
             m_niters = max_iters+1;
-            return all_converged;
+            return eigenvalues_evaluated;
         }
         catch(const common::invalid_value& ex)
         {
@@ -369,6 +371,121 @@ public:
             RAISE_EXCEPTION("Failed to perform krylov subspace integration.");
         }
     }
+    //TODO: Need to fix arnoldi with explicit deflation.  Currently not using this code
+    //template <typename vals_type, typename vecs_type,  typename ... Args>
+    //typename std::enable_if<linalg::is_same_backend<vals_type, linalg::vector<value_type, backend_type>>::value && linalg::is_same_backend<vecs_type, linalg::vector<value_type, backend_type>>::value, size_t>::type 
+    //operator()(vecs_type& x, vals_type& E, Args&& ... args)
+    //{
+    //    try
+    //    {
+    //        size_type neigs = x.shape(0);
+    //        size_type size =  x.size()/neigs;
+    //        
+    //        if(m_neigs > 0)
+    //        {
+    //            neigs = std::min(neigs, m_neigs);
+    //        }
+    //        m_neigs = neigs;
+
+    //        size_type krylov_dim = std::min(m_krylov_dim, size);
+    //        size_type istride = std::min(m_istride, krylov_dim);
+
+    //        ASSERT(neigs <= m_krylov_dim, "Cannot compute more eigenvalues than the dimension of the krylov subspace.");  
+    //        if(neigs > size){neigs = size;}
+    //        if(E.size(0) != neigs){E.resize(neigs);}
+
+    //        //construct the krylov subspace and store the final matrix element required for computing error estimates and matrix exponentials
+    //        CALL_AND_HANDLE(m_arnoldi.resize(krylov_dim, size), "Failed to resize krylov subspace.");
+    //        CALL_AND_HANDLE(m_arnoldi.reset_zeros(), "Failed to reset arnoldi iteration.");
+    //    
+    //        //compute the arnoldi iteration. 
+    //        real_type scalefactor = 1.0;
+
+    //        CALL_AND_HANDLE(m_residues.resize(neigs, m_max_iter), "Failed to resize residues array.");  m_residues.fill_zeros();
+    //        CALL_AND_HANDLE(m_converged.resize(neigs), "Failed to resize converged array.");    m_converged.fill_value(false);
+
+    //        //now compute the eigenvalues in the arnoldi subspace
+    //        CALL_AND_HANDLE(m_vals.resize(krylov_dim), "Failed to resize the working buffer.");
+
+    //        bool all_converged = true;
+    //        size_type max_iters = 0;
+    //        for(size_type eigindex = 0; eigindex < neigs; ++eigindex)
+    //        {
+    //            size_type iter = 0;
+
+    //            size_type eigenvalue_index=0;
+    //            bool do_restart = true;
+    //            for(iter = 0; iter < m_max_iter && do_restart; ++iter)
+    //            {
+    //                size_type istart = 0;
+    //                size_type iend = krylov_dim;
+    //                bool keep_running = true;
+    //                size_type iend_start = std::min(size_type(2), krylov_dim);
+
+    //                for(iend = iend_start; iend < krylov_dim+istride && keep_running; iend+=istride)
+    //                {
+    //                    if(iend > krylov_dim){iend = krylov_dim; keep_running = false;}   
+    //                    try
+    //                    {
+    //                        bool ended_early = false;
+
+    //                        //perform partial arnoldi step 
+    //                        CALL_AND_HANDLE(ended_early = m_arnoldi.partial_krylov_step_deflation(x, eigindex, scalefactor, istart, iend, std::forward<Args>(args)...), "Failed to construct the krylov subspace using a arnoldi iteration");
+
+    //                        if(iend > 1)
+    //                        {
+    //                            if(ended_early){keep_running = false;}
+    //                            auto H = m_arnoldi.H();      
+
+    //                            m_eigensolver(H, m_vals, m_rvecs, m_lvecs, false);
+    //                            size_type n = get_eig_index();
+    //                            eigenvalue_index = n;
+
+    //                            m_residues(eigindex, iter) = m_arnoldi.hk1k()*std::abs(m_rvecs(m_vals.size()-1, n));
+    //                            if(m_verbose)
+    //                            {
+    //                                std::cerr << eigindex << " " << iter << " " << iend << " " << m_residues(eigindex, iter) << " " << (m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n)) << std::endl;
+    //                            }
+    //                            if(m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps*std::abs((m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n))))
+    //                            {
+    //                                do_restart = false;
+    //                                keep_running=false;
+    //                                m_converged(eigindex) = true;
+    //                            }
+    //                        }
+    //                    } 
+    //                    catch(const std::exception& ex)
+    //                    {
+    //                        std::cerr << ex.what() << std::endl;
+    //                        RAISE_EXCEPTION("Error when attempting to compute eigenvalues.");
+    //                    }
+    //                }
+
+    //                auto xeig = x[eigindex];
+    //                get_vecs_and_vals(E[eigindex], xeig, eigenvalue_index);
+    //                if(max_iters < iter)
+    //                {
+    //                    max_iters = iter;
+    //                }
+    //                istart = iend + 1;
+    //                if(istart > krylov_dim){keep_running = false;}
+    //            }
+    //            if(!m_converged(eigindex)){all_converged = false;}
+    //        }
+    //        m_niters = max_iters+1;
+    //        return all_converged;
+    //    }
+    //    catch(const common::invalid_value& ex)
+    //    {
+    //        std::cerr << ex.what() << std::endl;
+    //        RAISE_NUMERIC("performing krylov subspace integration");
+    //    }
+    //    catch(const std::exception& ex)
+    //    {
+    //        std::cerr << ex.what() << std::endl;
+    //        RAISE_EXCEPTION("Failed to perform krylov subspace integration.");
+    //    }
+    //}
 
 protected:
     size_t get_eig_index()
@@ -389,7 +506,42 @@ protected:
                 if(std::real(m_vals(i,i)) < m_val || i == 0 ){m_val = linalg::real(m_vals(i,i)); index = i;}
             }
         }
+        else if(m_mode == eigenvalue_target::largest_real)
+        {
+            for(size_type i = 0; i < m_vals.size(0); ++i)
+            {
+                if(std::real(m_vals(i,i)) > m_val || i == 0 ){m_val = linalg::real(m_vals(i,i)); index = i;}
+            }
+        }
         return index;
+    }
+
+
+    size_type eigenvalue_ordering(std::vector<std::pair<T, size_type>>& eigs, std::vector<size_type>& inds) const
+    {
+        for(size_type i = 0; i < m_vals.size(0); ++i)
+        {
+            eigs[i] = std::make_pair(m_vals(i, i), i);
+        }
+
+        if(m_mode == eigenvalue_target::largest_magnitude)
+        {   
+            std::sort(eigs.begin(), eigs.end(), [](const std::pair<T, size_type>& a, const std::pair<T, size_type>& b){return std::abs(a.first) > std::abs(b.first);});
+        }
+        else if(m_mode == eigenvalue_target::smallest_real)
+        {
+            std::sort(eigs.begin(), eigs.end(), [](const std::pair<T, size_type>& a, const std::pair<T, size_type>& b){return linalg::real(a.first) < linalg::real(b.first);});
+        }
+        else if(m_mode == eigenvalue_target::largest_real)
+        {
+            std::sort(eigs.begin(), eigs.end(), [](const std::pair<T, size_type>& a, const std::pair<T, size_type>& b){return linalg::real(a.first) > linalg::real(b.first);});
+        }
+
+        for(size_type i =0; i < m_vals.size(0); ++i)
+        {
+            inds[i] = eigs[i].second;
+        }
+        return m_vals.size(0);
     }
 
 

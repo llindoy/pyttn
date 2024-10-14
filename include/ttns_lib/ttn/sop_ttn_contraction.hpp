@@ -12,7 +12,6 @@ namespace ttns
 template <typename T, typename backend>
 class sop_ttn_contraction_engine;
 
-
 //implementation of sum of product operator ttn contraction for blas types.  This also supports action of two-mode operators on the sop
 template <typename T>
 class sop_ttn_contraction_engine<T, linalg::blas_backend>
@@ -23,7 +22,6 @@ public:
     using ttn_type = ttn<T, backend>;
     using size_type = typename ttn_type::size_type;
     using real_type = typename ttn_type::real_type;
-
 
     template <typename ntype>
     static inline bool node_has_identity(const ntype& op)

@@ -150,14 +150,11 @@ class OQSEngine:
             else:
                 b.mode_combination(mode_comb)
 
-
     #def setup_system_bath_models(self):
     #    #we start by building the total sysinfo object which is going to be the system degrees of freedom augemented with the bath degrees of freedom
 
-
     def add_observable(self, observable):
         self._observables.append(validate_SOP(observable,self._sys))
-
 
     def bath_fitting_info(self, t, index = None):
         if index == None:
