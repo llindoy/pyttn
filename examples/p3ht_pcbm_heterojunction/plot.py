@@ -21,7 +21,7 @@ def plot(fnames, params):
 
         for par, label in zip(pars, params):
             try:
-                plt.plot(t, np.abs(par), '-', label=label+'_'+fname)
+                plt.plot(t, np.abs(par), '-', label=label+'_'+fname, linewidth=3)
                 #plt.plot(t, np.imag(par), '-', label=label+'_'+fname)
                 #plt.plot(t, np.real(par)/np.amax(np.real(par)), '-', label=label+'_'+fname)
             except:

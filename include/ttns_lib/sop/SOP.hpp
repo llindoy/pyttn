@@ -216,7 +216,9 @@ public:
                     if(changes_parity[j] && changes_parity[j+1]){flip_sign = !flip_sign;}
 
                     std::swap(m_ops[j], m_ops[j+1]);
-                    std::swap(changes_parity[j], changes_parity[j+1]);
+                    bool temp = changes_parity[j+1];
+                    changes_parity[j+1] = changes_parity[j];
+                    changes_parity[j] = temp;
                     swapped = true;
                 }
             }
