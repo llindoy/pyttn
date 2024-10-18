@@ -76,7 +76,6 @@ public:
             //now iterate over each term in the product
             for(const auto& site_op : term)
             {
-                
                 //now for each term we get the transpose operator.  This requires a query of the default operator dictionary associated
                 //with the system mode std::pair<T, std::string>
                 auto opinfo = query_default_operator_dictionary<T>(sysinf.primitive_mode(site_op.mode()).type(), site_op.op());

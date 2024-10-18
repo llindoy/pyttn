@@ -81,6 +81,8 @@ def run_mps_dynamics(ofname='multiset_model_B/out_mps_12.h5'):
         if(As.maximum_bond_dimension()> mchi):
             mchi = As.maximum_bond_dimension()
         res[1, j] = mel(As)
+
+
     maxchi[1] = mchi
     for i in range(1, nsteps):
         t1 = time.time()

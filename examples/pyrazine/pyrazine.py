@@ -7,6 +7,7 @@ import h5py
 
 sys.path.append("../../")
 from pyttn import *
+from pyttn.utils import visualise_tree
 from pyrazine_tree import *
 from pyrazine_hamiltonian import *
 
@@ -25,7 +26,7 @@ def pyrazine_test(N1, N2, N3, N4, N5, Nb, nstep, dt, spawning_threshold=1e-5, un
         sysinf[i+1] = boson_mode(m[i])
 
     #build topology and capacity trees
-    topo = build_topology(4,4,4,4,4,4,m)
+    topo = build_topology(1,2,3,4,5,4,m)
     capacity= build_topology(N1, N2, N3, N4, N5, Nb, m)
 
     #set up the sum of product operator Hamiltonian
@@ -33,6 +34,10 @@ def pyrazine_test(N1, N2, N3, N4, N5, Nb, nstep, dt, spawning_threshold=1e-5, un
 
     #setup the wavefunction
     A = ttn(topo, capacity, dtype=np.complex128)
+
+    visualise_tree(topo)
+    plt.show()
+
     state = np.zeros(N, dtype=int)
     state[0]=1
     A.set_state(state)

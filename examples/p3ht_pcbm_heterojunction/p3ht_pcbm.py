@@ -149,7 +149,7 @@ def run_mctdh_dynamics(ofname='model_B/out_mlmctdh_24.h5'):
     H, opdict = hamiltonian()
 
 
-    chimax = 24
+    chimax = 40
     chimax2 = 24
     chimax3 = 24
     chi0 = 16
@@ -172,15 +172,33 @@ def run_mctdh_dynamics(ofname='model_B/out_mlmctdh_24.h5'):
 
 
     topo = ntree("(1(%d(26))(%d(%d(128)))(%d(%d)(%d)))"%(ldims0[0], chi0, ldims0[1], chi0, chi0, chi0))
-    ntreeBuilder.mlmctdh_subtree(topo()[1], mdims[mode_F[:]], 2, chi0, ldims0[mode_F[:]])
-    ntreeBuilder.mlmctdh_subtree(topo()[2][0], mdims[modeOT_lf[:]], 2, chi0, ldims0[modeOT_lf[:]])
-    ntreeBuilder.mlmctdh_subtree(topo()[2][1], mdims[modeOT_hf[:]], 2, chi0, ldims0[modeOT_hf[:]])
 
+
+    class exp_step:
+        def __init__(self, chimax, chimin, N, degree = 2):
+            self.chimin = chimin
+            if N%degree == 0:
+                self.Nl = int(int(np.log(N)/np.log(degree))+1)
+            else:
+                self.Nl = int(int(np.log(N)/np.log(degree))+2)
+
+            self.nx = int((chimax-chimin)//self.Nl)
+
+        def __call__(self, l):
+            ret=int((self.Nl-l)*self.nx+self.chimin)
+            return ret
+
+
+    ntreeBuilder.mlmctdh_subtree(topo()[1], mdims[mode_F[:]], 2, exp_step(chi0, 6, len(mode_F), 6), ldims0[mode_F[:]])
+    ntreeBuilder.mlmctdh_subtree(topo()[2][0], mdims[modeOT_lf[:]], 2, exp_step(chi0, 6, len(modeOT_lf)), ldims0[modeOT_lf[:]])
+    ntreeBuilder.mlmctdh_subtree(topo()[2][1], mdims[modeOT_hf[:]], 2, exp_step(chi0, 6, len(modeOT_hf)), ldims0[modeOT_hf[:]])
 
     capacity = ntree("(1(%d(26))(%d(%d(128)))(%d(%d)(%d)))"%(mdims[0], chimax, ldims[1], chimax,chimax, chimax))
-    ntreeBuilder.mlmctdh_subtree(capacity()[1], mdims[mode_F[:]], 2, chimax2, ldims[mode_F[:]])
-    ntreeBuilder.mlmctdh_subtree(capacity()[2][0], mdims[modeOT_lf[:]], 2, chimax, ldims[modeOT_lf[:]])
-    ntreeBuilder.mlmctdh_subtree(capacity()[2][1], mdims[modeOT_hf[:]], 2, chimax3, ldims[modeOT_hf[:]])
+
+    ntreeBuilder.mlmctdh_subtree(capacity()[1], mdims[mode_F[:]], 2, exp_step(chimax2, 6, len(mode_F), 6), ldims0[mode_F[:]])
+    ntreeBuilder.mlmctdh_subtree(capacity()[2][0], mdims[modeOT_lf[:]], 2, exp_step(chimax, 6, len(modeOT_lf)), ldims0[modeOT_lf[:]])
+    ntreeBuilder.mlmctdh_subtree(capacity()[2][1], mdims[modeOT_hf[:]], 2, exp_step(chimax3, 6, len(modeOT_hf)), ldims0[modeOT_hf[:]])
+
 
     A = ttn(topo, capacity, dtype=np.complex128)
     state = np.zeros(Nmodes, dtype=int)
@@ -248,5 +266,5 @@ def run_mctdh_dynamics(ofname='model_B/out_mlmctdh_24.h5'):
         h5.close()
 
 
-#run_mctdh_dynamics()
-run_mps_dynamics()
+run_mctdh_dynamics()
+#run_mps_dynamics()

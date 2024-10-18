@@ -9,6 +9,7 @@ sys.path.append("../../")
 from pyttn import *
 from pyrazine_tree import *
 from pyrazine_hamiltonian import *
+from pyttn.utils import visualise_tree
 
 fs = 41.341374575751
 
@@ -28,8 +29,13 @@ def pyrazine_test(N1, N2, N3, N4, N5, nstep, dt, spawning_threshold=1e-6, unoccu
         sysinf[ind+1] = [boson_mode(m[x]) for x in comb]
         mc.append(sysinf[ind+1].lhd())
 
+    N1_0 = N1#min(16, N1)
+    N2_0 = N2#min(16, N2)
+    N3_0 = N3#min(16, N3)
+    N4_0 = N4#min(16, N4)
+    N5_0 = N5#min(16, N5)
     #build topology and capacity trees
-    topo = build_topology_mode_combination(4,4,4,4,4,mc)
+    topo = build_topology_mode_combination(N1_0,N2_0,N3_0,N4_0,N5_0,mc)
     capacity= build_topology_mode_combination(N1, N2, N3, N4, N5, mc)
 
     #set up the sum of product operator Hamiltonian
@@ -37,6 +43,7 @@ def pyrazine_test(N1, N2, N3, N4, N5, nstep, dt, spawning_threshold=1e-6, unoccu
 
     #setup the wavefunction
     A = ttn(topo, capacity, dtype=np.complex128)
+
     state = np.zeros(Nc+1, dtype=int)
     state[0]=1
     A.set_state(state)
@@ -52,9 +59,10 @@ def pyrazine_test(N1, N2, N3, N4, N5, nstep, dt, spawning_threshold=1e-6, unoccu
     mel = matrix_element(A)
 
     #csetup the evolution object
-    sweepA = tdvp(A, h, krylov_dim = 12, expansion='subspace')
+    sweepA = tdvp(A, h, krylov_dim = 16, expansion='subspace')
     sweepA.spawning_threshold = spawning_threshold
     sweepA.unoccupied_threshold=unoccupied_threshold
+    sweepA.expmv_tol=1e-12
     sweepA.minimum_unoccupied=nunoccupied
 
     sweepA.dt = dt
@@ -77,8 +85,8 @@ def pyrazine_test(N1, N2, N3, N4, N5, nstep, dt, spawning_threshold=1e-6, unoccu
         sweepA.step(A, h)
         tp = ts[i]
 
-    B = copy.deepcopy(A)
-    B.conj()
+    #B = copy.deepcopy(A)
+    #B.conj()
     res[1] = mel(B, A)
     maxchi[1] = A.maximum_bond_dimension()
 
@@ -88,27 +96,27 @@ def pyrazine_test(N1, N2, N3, N4, N5, nstep, dt, spawning_threshold=1e-6, unoccu
         t1 = time.time()
         sweepA.step(A, h)
         t2 = time.time()
-        B = copy.deepcopy(A)
-        B.conj()
+        #B = copy.deepcopy(A)
+        #B.conj()
         res[i+1] = mel(B, A)
         maxchi[i+1] = A.maximum_bond_dimension()
 
         if(i % 1 == 0):
             h5 = h5py.File(ofname, 'w')
-            h5.create_dataset('t', data=(np.arange(nstep+1)*dt*2/fs))
+            h5.create_dataset('t', data=(np.arange(nstep+1)*dt/fs))
             h5.create_dataset('Sz', data=res)
             h5.create_dataset('maxchi', data=maxchi)
             h5.close()
 
     h5 = h5py.File(ofname, 'w')
-    h5.create_dataset('t', data=(np.arange(nstep+1)*dt*2/fs))
+    h5.create_dataset('t', data=(np.arange(nstep+1)*dt/fs))
     h5.create_dataset('Sz', data=res)
     h5.create_dataset('maxchi', data=maxchi)
     h5.close()
 
 tmax = 150*fs
 dt = 0.5*fs
-nsteps = int(tmax/(2*dt))+1
+nsteps = int(tmax/(dt))+1
 
 
 from multiprocessing.pool import Pool
@@ -138,7 +146,7 @@ def run(x):
 
 if __name__ == '__main__':
     os.environ['OMP_NUM_THREADS']='1'
-    pyrazine_test(24,24,24,12,12, nsteps, dt, ofname='pyrazine_mc-24a.h5')
+    pyrazine_test(32,32,24,12,16, nsteps, dt, spawning_threshold=1e-6, ofname='pyrazine_32_b.h5')
     #p = Pool(8)
     #inds = [12, 16, 24, 32, 48, 64, 80, 128]
     #p.map(run, inds)

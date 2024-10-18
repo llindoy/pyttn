@@ -74,8 +74,10 @@ def hamiltonian():
     #first we do the vibronic couplings to the R mode
     H[1, 1] += gr_cs1cs1*sOP("adag", 0)
     H[1, 1] += gr_cs1cs1*sOP("a", 0)
+
     H[0, 1] += gr_lecs1*sOP("adag", 0)
     H[0, 1] += gr_lecs1*sOP("a", 0)
+
     H[1, 0] += gr_lecs1*sOP("adag", 0)
     H[1, 0] += gr_lecs1*sOP("a", 0)
 

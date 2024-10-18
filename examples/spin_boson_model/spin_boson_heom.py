@@ -3,7 +3,7 @@ import time
 import sys
 import h5py
 import scipy
-import copy
+import cop
 
 sys.path.append("../../")
 import pyttn
