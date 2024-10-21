@@ -108,8 +108,6 @@ protected:
     {
         try
         {
-            size_type ti = omp_get_thread_num();
-            CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
             CALL_AND_HANDLE(hspf.resize_matrices(B.size(1), A.size(1)), "Failed to resize the single-particle Hamiltonian operator matrices.");
             const auto& a = A.as_matrix();  
             const auto& b = B.as_matrix();  
@@ -127,6 +125,8 @@ protected:
 #endif
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
             {
+                size_type ti = omp_get_thread_num();
+                CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
                 //update all terms if we aren't worrying about time dependence otherwise only deal with time dependence
                 if( update_all ||  cinf[ind].is_time_dependent())
                 {
@@ -190,10 +190,6 @@ protected:
     {
         try
         {
-            size_type ti = omp_get_thread_num();
-            CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
-            CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
-
             CALL_AND_HANDLE(hspf().resize_matrices(A.size(1), A.size(1)), "Failed to resize the single-particle Hamiltonian operator matrices.");
             const auto& a = A.as_matrix();  
 #ifdef USE_OPENMP
@@ -203,6 +199,9 @@ protected:
 #endif
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
             {
+                size_type ti = omp_get_thread_num();
+                CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
+                CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
                 if( update_all || cinf[ind].is_time_dependent())
                 {
                     if(!cinf[ind].is_identity_spf())
@@ -242,8 +241,8 @@ protected:
             const auto& b = B.as_matrix();  
             if(update_all)
             {
-                CALL_AND_HANDLE(kpo::kpo_id(hspf, A, temp[0], HA[0]), "Failed to apply kronecker product operator.");
-                CALL_AND_HANDLE(hspf().spf_id() = adjoint(b)*HA[0], "Failed to compute the id matrix term.");
+                CALL_AND_HANDLE(kpo::kpo_id(hspf, A, temp[ti], HA[ti]), "Failed to apply kronecker product operator.");
+                CALL_AND_HANDLE(hspf().spf_id() = adjoint(b)*HA[ti], "Failed to compute the id matrix term.");
             }
 
 #ifdef USE_OPENMP
@@ -255,6 +254,9 @@ protected:
             {
                 if( update_all || cinf[ind].is_time_dependent())
                 {
+                    size_type ti = omp_get_thread_num();
+                    CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
+                    CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
                     if(!cinf[ind].is_identity_spf())
                     {
                         hspf().spf(ind).fill_zeros();
@@ -308,6 +310,11 @@ protected:
     template <typename spfnode>
     static inline void evaluate_branch(const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
+#ifdef USE_OPENMP 
+#ifdef PARALLELISE_SET_VARS
+                #pragma omp parallel for default(shared) if(cinf().size() > 1)
+#endif
+#endif
         for(size_t row = 0; row < cinf().size(); ++row)
         {
             for(size_t ci = 0; ci < cinf()[row].size(); ++ci)

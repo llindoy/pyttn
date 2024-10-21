@@ -83,6 +83,11 @@ public:
             size_type mode = h.child_id();
             const auto& hinf_p = hinf.parent();
 
+#ifdef USE_OPENMP 
+#ifdef PARALLELISE_SET_VARS
+                #pragma omp parallel for default(shared) if(hinf().size() > 1)
+#endif
+#endif
             for(size_t row = 0; row < hinf().size(); ++row)
             {
                 for(size_t ci = 0; ci < hinf()[row].size(); ++ci)
@@ -90,14 +95,13 @@ public:
                     size_t col = hinf()[row][ci].col();
                     //std::cerr << "row col" << row << " " << col << std::endl;
                     ms_sop_env_slice<T, backend> hslice(h, row, ci);
-                    size_type ti = omp_get_thread_num();
                     if(row == col)
                     {
-                        _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, ti, A(row), HA, temp, hslice);
+                        _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, A(row), HA, temp, hslice);
                     }
                     else
                     {
-                        _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, ti, A(row), A(col), HA, temp, hslice);
+                        _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, A(row), A(col), HA, temp, hslice);
                     }
                 }
             }
@@ -107,18 +111,24 @@ public:
 
 protected:
     template <typename opnode>
-    static inline void _evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, size_type ti, const hdata& A, triad& HA, triad& temp, opnode& h)
+    static inline void _evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, const hdata& A, triad& HA, triad& temp, opnode& h)
     {
         try
         {
-            CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
-            CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
 
             const auto& h_p = h.parent();
 
-            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
+#ifdef USE_OPENMP
+#ifdef PARALLELISE_HAMILTONIAN_SUM
+            #pragma omp parallel for default(shared) schedule(dynamic, 1)
+#endif
+#endif
             for(size_type ind = 0; ind < hinf.nterms(); ++ind)
             {
+                size_type ti = omp_get_thread_num();
+                CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+                CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+
                 //if the mean field operator is the identity then we don't need to do anything.
                 if(!hinf[ind].is_identity_mf())
                 {
@@ -163,21 +173,20 @@ protected:
         }
     }
 
-    //THE OFF DIAGONAL TERMS CURRENTLY SEEM TO BE INCORRECT. It seems that the values are correct but the sign is wrong.
     template <typename opnode>
-    static inline void _evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, size_type ti, const hdata& B, const hdata& A, triad& HA, triad& temp, opnode& h)
+    static inline void _evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, const hdata& B, const hdata& A, triad& HA, triad& temp, opnode& h)
     {
-        if(&A == &B){CALL_AND_RETHROW(return _evaluate_term(hinf, hinf_p, mode, ti, A, HA, temp, h));}
+        if(&A == &B){CALL_AND_RETHROW(return _evaluate_term(hinf, hinf_p, mode,A, HA, temp, h));}
         try
         {
-            CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
-            CALL_AND_HANDLE(temp[ti].resize(B.size(0), A.size(1)), "failed to resize working buffers.");
 
             const auto& h_p = h.parent();
             {
-                //std::cerr << "evaluating id pre" << std::endl;
+                size_type ti = omp_get_thread_num();
+                CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+                CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+
                 CALL_AND_HANDLE(kpo::kpo_id(h_p, A, mode, HA[ti], temp[ti]), "Failed to apply kronecker product operator.");
-                //std::cerr << "evaluating id post" << std::endl;
                 CALL_AND_HANDLE(HA[ti] = temp[ti]*trans(h_p().mf_id()), "Failed to apply action of parent mean field operator.");
                 CALL_AND_HANDLE(temp[ti] = conj(B.as_matrix()), "Failed to compute conjugate of the A matrix.");
 
@@ -197,12 +206,21 @@ protected:
                 }   
             }
 
-            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
+#ifdef USE_OPENMP
+#ifdef PARALLELISE_HAMILTONIAN_SUM
+            #pragma omp parallel for default(shared) schedule(dynamic, 1)
+#endif
+#endif
             for(size_type ind = 0; ind < hinf.nterms(); ++ind)
             {
                 //if the mean field operator is the identity then we don't need to do anything.
                 if(!hinf[ind].is_identity_mf())
                 {
+                    size_type ti = omp_get_thread_num();
+
+                    CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+                    CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+
                     h().mf(ind).fill_zeros();
                     for(size_type it = 0; it < hinf[ind].nmf_terms(); ++it)
                     {
@@ -210,15 +228,11 @@ protected:
                         
                         if(hinf[ind].mf_indexing()[it].sibling_indices().size() == 0)
                         {
-                            //std::cerr << "idop before" << std::endl;
                             CALL_AND_HANDLE(kpo::kpo_id(h_p, A, mode, HA[ti], temp[ti]), "Failed to apply kronecker product operator.");
-                            //std::cerr << "idop" << std::endl;
                         }
                         else
                         {
-                            //std::cerr << "standard before" << mode << std::endl;
                             CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, B, A, mode, HA[ti], temp[ti]), "Failed to evaluate action of kronecker product operator.");
-                            //std::cerr << "standard" << mode << std::endl;
                         }
                         if(!hinf_p[pi].is_identity_mf())
                         {
@@ -236,10 +250,6 @@ protected:
                             auto _A = A.as_rank_3(mode);
                             auto _B = B.as_rank_3(mode);
 
-                            //std::cerr << "A" << _A.size(0) << " " << _A.size(1) <<  " " << _A.size(2) << std::endl;
-                            //std::cerr << "B" << _B.size(0) << " " << _B.size(1) <<  " " << _B.size(2) << std::endl;
-                            //std::cerr << "HA" << HA[ti].size(0) << " " << HA[ti].size(1) << std::endl;
-                            //std::cerr << "temp" << temp[ti].size(0) << " " << temp[ti].size(1) << std::endl;
                             auto _HA = HA[ti].reinterpret_shape(_B.shape(0), _A.shape(1), _B.shape(2));
                             auto _temp = temp[ti].reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
 
@@ -262,15 +272,15 @@ protected:
     }
 
     template <typename opnode>
-    static inline void evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, size_type ti, const hdata& B, const hdata& A, triad& HA, triad& temp, opnode& h)
+    static inline void evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, size_type const hdata& B, const hdata& A, triad& HA, triad& temp, opnode& h)
     {
         if(&A == &B)
         {
-            CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, ti, A, HA, temp, h));
+            CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, A, HA, temp, h));
         }
         else
         {
-            CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, ti, B, A, HA, temp, h));
+            CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, B, A, HA, temp, h));
         }
     }
 public:     
