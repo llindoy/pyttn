@@ -145,6 +145,10 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
     g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, 0, Nw*wc))
 
+    import matplotlib.pyplot as plt
+    plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w))
+    plt.show()
+
     #set up the total Hamiltonian
     N = Nb+1
     H = SOP(N)
@@ -181,8 +185,6 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
 
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
-    if adaptive:
-        chi0 = 4
 
     topo = setup_topology(chi0, nbose, tree_mode_dims, degree)
     capacity = setup_topology(chi, nbose, tree_mode_dims, degree)
@@ -208,15 +210,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
 
 
     #set up tdvp sweeping algorithm parameters
-    sweep = None
-    if not adaptive:
-        sweep = tdvp(A, h, krylov_dim = 12)
-    else:
-        sweep = tdvp(A, h, krylov_dim=12, subspace_neigs = 6, expansion='subspace')
-        sweep.spawning_threshold = spawning_threshold
-        sweep.unoccupied_threshold=unoccupied_threshold
-        sweep.minimum_unoccupied=nunoccupied
-
+    sweep = tdvp(A, h, krylov_dim = 12)
     sweep.dt = dt
     sweep.coefficient = -1.0j
 
@@ -274,7 +268,7 @@ if __name__ == "__main__":
     parser.add_argument('--s', type = float, default=1)
 
     #number of bath modes
-    parser.add_argument('--N', type=int, default=16)
+    parser.add_argument('--N', type=int, default=400)
 
     #geometry to be used for bath dynamics
     parser.add_argument('--geom', type = str, default='star')
@@ -287,26 +281,20 @@ if __name__ == "__main__":
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=64)
+    parser.add_argument('--chi', type=int, default=32)
     parser.add_argument('--degree', type=int, default=1)
 
     #maximum bosonic hilbert space dimension
     parser.add_argument('--nbose', type=int, default=20)
 
     #integration time parameters
-    parser.add_argument('--dt', type=float, default=0.005)
-    parser.add_argument('--tmax', type=float, default=40)
+    parser.add_argument('--dt', type=float, default=0.01)
+    parser.add_argument('--tmax', type=float, default=30)
 
     #output file name
     parser.add_argument('--fname', type=str, default='sbm.h5')
 
-    #the minimum number of unoccupied modes for the dynamics
-    parser.add_argument('--subspace', type=bool, default = True)
-    parser.add_argument('--nunoccupied', type=int, default=0)
-    parser.add_argument('--spawning_threshold', type=float, default=1e-6)
-    parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
-
     args = parser.parse_args()
 
     nstep = int(args.tmax/args.dt)+1
-    sbm_dynamics(args.N, args.alpha, args.wc, args.s, args.eps, args.delta, args.chi, args.nbose, args.dt, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree)
+    sbm_dynamics(args.N, args.alpha, args.wc, args.s, args.eps, args.delta, args.chi, args.nbose, args.dt, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, degree = args.degree)

@@ -20,7 +20,7 @@ class BosonicBath:
     def __init__(self, Jw, S=None, beta=None, wmax=np.inf, wmin=None):
         self.Jw = Jw
         self.S = S
-        self.beta = bet
+        self.beta = beta
         if wmin == None:
             if self.beta == None:
                 wmin = 0

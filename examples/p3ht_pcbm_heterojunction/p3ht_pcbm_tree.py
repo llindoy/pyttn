@@ -177,6 +177,10 @@ def run_mctdh_dynamics(ofname='model_B/out_mlmctdh_24.h5'):
 
     topo = ntree("(1(%d(26))(%d(%d(128)))(%d(%d)(%d)))"%(ldims0[0], chi0, ldims0[1], chi0, chi0, chi0))
 
+    topo()[1].insert(4)
+    visualise_tree(topo, add_labels=False)
+    plt.show()
+    exit()
 
     class exp_step:
         def __init__(self, chimax, chimin, N, degree = 2):
@@ -196,6 +200,8 @@ def run_mctdh_dynamics(ofname='model_B/out_mlmctdh_24.h5'):
     ntreeBuilder.mlmctdh_subtree(topo()[1], mdims[mode_F[:]], 2, exp_step(chi0, 6, len(mode_F), 6), ldims0[mode_F[:]])
     ntreeBuilder.mlmctdh_subtree(topo()[2][0], mdims[modeOT_lf[:]], 2, exp_step(chi0, 6, len(modeOT_lf)), ldims0[modeOT_lf[:]])
     ntreeBuilder.mlmctdh_subtree(topo()[2][1], mdims[modeOT_hf[:]], 2, exp_step(chi0, 6, len(modeOT_hf)), ldims0[modeOT_hf[:]])
+
+    
 
     capacity = ntree("(1(%d(26))(%d(%d(128)))(%d(%d)(%d)))"%(mdims[0], chimax, ldims[1], chimax,chimax, chimax))
 
@@ -270,5 +276,5 @@ def run_mctdh_dynamics(ofname='model_B/out_mlmctdh_24.h5'):
         h5.close()
 
 
-#run_mctdh_dynamics()
-run_mps_dynamics()
+run_mctdh_dynamics()
+#run_mps_dynamics()

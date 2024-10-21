@@ -11,7 +11,7 @@ def site_operator(*args, mode = None, optype=None, dtype=np.complex128, **kwargs
                 ret = site_operator_complex(args[0])
             else:
                 ret = site_operator_real(args[0])
-        elif args and len(args) == 3:
+        elif args and len(args) <= 3:
             if(dtype == np.complex128):
                 ret = site_operator_complex(*args, **kwargs)
             else:
