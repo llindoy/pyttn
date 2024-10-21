@@ -70,7 +70,7 @@ public:
         {
             size_type mode = h.child_id();
             const auto& hinf_p = hinf.parent();
-            CALL_AND_RETHROW(_evaluate_term(hinf(), hinf_p(), mode, 0, A(), HA, temp, h));
+            CALL_AND_RETHROW(_evaluate_term(hinf(), hinf_p(), mode, A(), HA, temp, h));
         }
     }
 
@@ -272,7 +272,7 @@ protected:
     }
 
     template <typename opnode>
-    static inline void evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, size_type const hdata& B, const hdata& A, triad& HA, triad& temp, opnode& h)
+    static inline void evaluate_term(const cinftype& hinf, const cinftype& hinf_p, size_type mode, const hdata& B, const hdata& A, triad& HA, triad& temp, opnode& h)
     {
         if(&A == &B)
         {

@@ -254,16 +254,16 @@ protected:
             {
                 if( update_all || cinf[ind].is_time_dependent())
                 {
-                    size_type ti = omp_get_thread_num();
-                    CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
-                    CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
+                    size_type ti2 = omp_get_thread_num();
+                    CALL_AND_HANDLE(HA[ti2].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
+                    CALL_AND_HANDLE(temp[ti2].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
                     if(!cinf[ind].is_identity_spf())
                     {
                         hspf().spf(ind).fill_zeros();
                         for(size_type i = 0; i < cinf[ind].nspf_terms(); ++i)
                         {
-                            CALL_AND_HANDLE(kron_prod(hspf, cinf, ind, i, B, A, temp[ti], HA[ti]), "Failed to apply kronecker product operator.");
-                            CALL_AND_HANDLE(hspf().spf(ind) += cinf[ind].spf_coeff(i)*adjoint(b)*HA[ti], "Failed to apply matrix product to obtain result.");
+                            CALL_AND_HANDLE(kron_prod(hspf, cinf, ind, i, B, A, temp[ti2], HA[ti2]), "Failed to apply kronecker product operator.");
+                            CALL_AND_HANDLE(hspf().spf(ind) += cinf[ind].spf_coeff(i)*adjoint(b)*HA[ti2], "Failed to apply matrix product to obtain result.");
                         }
                     }
                 }
