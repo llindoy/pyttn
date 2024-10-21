@@ -12,9 +12,9 @@ from multiset_hamiltonian import *
 
 fs = 41.341374575751
 
-def run_mps_dynamics(ofname='multiset_model_B/out_mps_12.h5'):
+def run_mps_dynamics(ofname='multiset_model_B/out_mps_1.h5'):
     tmax = 200*fs
-    dt = 0.1*fs
+    dt = 0.125*fs
     nsteps = int(tmax/(dt))+1
 
     Nmodes = 113
@@ -32,7 +32,7 @@ def run_mps_dynamics(ofname='multiset_model_B/out_mps_12.h5'):
     #set up the sum of product operator Hamiltonian
     H = hamiltonian()
 
-    chimax = 12
+    chimax = 1
 
     sysinf = system_modes(Nmodes)
     for i in range(Nmodes):
@@ -237,5 +237,5 @@ def run_mctdh_dynamics(ofname='multiset_model_B/out_mlmctdh_4.h5'):
 
 
 
-run_mctdh_dynamics()
-#run_mps_dynamics()
+#run_mctdh_dynamics()
+run_mps_dynamics()

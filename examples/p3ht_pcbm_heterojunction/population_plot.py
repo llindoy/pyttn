@@ -78,6 +78,6 @@ if __name__ == "__main__":
     parser.add_argument('fname', nargs='+')
 
     args = parser.parse_args()
-    plot_diff(args.fname)
+    plot_imag(args.fname)
 
 

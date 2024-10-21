@@ -525,8 +525,10 @@ public:
             try
             { 
                 const auto& cinf = hprim.contraction_info()[h.id()]();
-#ifdef USE_OPENMP
-                #pragma omp parallel for num_threads(t1.size()) default(shared) if(t1.size() > 1)
+#ifdef USE_OPENMP 
+#ifdef PARALLELISE_SET_VARS
+                #pragma omp parallel for default(shared) if(t1.size() > 1)
+#endif
 #endif
                 for(size_t row = 0; row < v.size(); ++row)
                 {
@@ -577,8 +579,10 @@ public:
             try
             { 
                 const auto& cinf = hprim.contraction_info()[h.id()]();
-#ifdef USE_OPENMP
-                #pragma omp parallel for num_threads(t1.size()) default(shared) if(t1.size() > 1)
+#ifdef USE_OPENMP 
+#ifdef PARALLELISE_SET_VARS
+                #pragma omp parallel for default(shared) if(t1.size() > 1)
+#endif
 #endif
                 for(size_t row = 0; row < v.size(); ++row)
                 {
@@ -630,8 +634,10 @@ public:
             try
             { 
                 const auto& cinf = hprim.contraction_info()[h.id()]();
-#ifdef USE_OPENMP
-                #pragma omp parallel for num_threads(t1.size()) default(shared) if(t1.size() > 1)
+#ifdef USE_OPENMP 
+#ifdef PARALLELISE_SET_VARS
+                #pragma omp parallel for default(shared) if(t1.size() > 1)
+#endif
 #endif
                 for(size_t row = 0; row < v.size(); ++row)
                 {

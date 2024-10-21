@@ -8,8 +8,22 @@ get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTO
 #compiler flags
 option(USE_CUDA "Compile with cuda" OFF)
 option(USE_OPENMP "Compile with openmp" OFF)
+option(PARALLELISE_SET_VARIABLES "openmp parallelism over set variables" OFF)
+option(PARALLELISE_HAMILTONIAN_SUM "openmp parallelism over hamiltonian sum" ON)
 option(USE_GEMM3M "Compile with openmp" OFF)
 option(EVAL_BUT_DONT_APPLY "Compile with eval but don't apply option set" OFF)
+
+if(USE_OPENMP)
+  add_definitions(-DUSE_OPENMP)
+endif()
+
+if(PARALLELISE_SET_VARIABLES)
+  add_definitions(-DPARALLELISE_SET_VARIABLES)
+endif()
+
+if(PARALLELISE_HAMILTONIAN_SUM)
+  add_definitions(-DPARALLELISE_HAMILTONIAN_SUM)
+endif()
 
 set(PYTHON_BINDINGS_SRC pythonBinding.cpp 
           utils/orthopol.cpp utils/discretisation.cpp

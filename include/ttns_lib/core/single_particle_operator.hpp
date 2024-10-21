@@ -120,7 +120,11 @@ protected:
                 CALL_AND_HANDLE(hspf.spf_id() = adjoint(b)*a, "Failed to compute the id matrix term.");
             }
 
-            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
+#ifdef USE_OPENMP
+#ifdef PARALLELISE_HAMILTONIAN_SUM
+            #pragma omp parallel for default(shared) schedule(dynamic, 1)
+#endif
+#endif
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
             {
                 //update all terms if we aren't worrying about time dependence otherwise only deal with time dependence
@@ -192,7 +196,11 @@ protected:
 
             CALL_AND_HANDLE(hspf().resize_matrices(A.size(1), A.size(1)), "Failed to resize the single-particle Hamiltonian operator matrices.");
             const auto& a = A.as_matrix();  
-            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
+#ifdef USE_OPENMP
+#ifdef PARALLELISE_HAMILTONIAN_SUM
+            #pragma omp parallel for default(shared) schedule(dynamic, 1)
+#endif
+#endif
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
             {
                 if( update_all || cinf[ind].is_time_dependent())
@@ -238,7 +246,11 @@ protected:
                 CALL_AND_HANDLE(hspf().spf_id() = adjoint(b)*HA[0], "Failed to compute the id matrix term.");
             }
 
-            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
+#ifdef USE_OPENMP
+#ifdef PARALLELISE_HAMILTONIAN_SUM
+            #pragma omp parallel for default(shared) schedule(dynamic, 1)
+#endif
+#endif
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
             {
                 if( update_all || cinf[ind].is_time_dependent())

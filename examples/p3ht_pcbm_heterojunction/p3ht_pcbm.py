@@ -12,7 +12,7 @@ from model_hamiltonian import *
 
 fs = 41.341374575751
 
-def run_mps_dynamics(ofname='model_B/out_mps_24.h5'):
+def run_mps_dynamics(ofname='model_B/out_mps_1.h5'):
     tmax = 200*fs
     dt = 0.1*fs
     nsteps = int(tmax/(dt))+1
@@ -39,8 +39,8 @@ def run_mps_dynamics(ofname='model_B/out_mps_24.h5'):
     #set up the sum of product operator Hamiltonian
     H, opdict = hamiltonian()
 
-    chimax = 24
-    chi0 = 64
+    chimax = 1
+    chi0 = 1
 
     sysinf = system_modes(Nmodes)
     sysinf[0] = generic_mode(26)
@@ -49,10 +49,6 @@ def run_mps_dynamics(ofname='model_B/out_mps_24.h5'):
 
 
     topo = ntreeBuilder.mps_tree(mdims, chi0, ldims0)
-    ntreeBuilder.sanitise(topo)
-    visualise_tree(topo)
-    plt.show()
-    exit()
     capacity = ntreeBuilder.mps_tree(mdims, chimax, ldims)
 
     A = ttn(topo, capacity, dtype=np.complex128)
