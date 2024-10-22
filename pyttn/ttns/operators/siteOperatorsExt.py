@@ -1,18 +1,22 @@
-from pyttn._pyttn.ops import site_operator_real, site_operator_complex
 from .opsExt import ops
 from .opsExt import __site_op_dict__
 import numpy as np
 
 def site_operator(*args, mode = None, optype=None, dtype=np.complex128, **kwargs):
+    from pyttn._pyttn.ops import site_operator_complex
+    try:
+        from pyttn._pyttn.ops import site_operator_real
+    except:
+        site_operator_real = None
     ret = None
     if(optype is None):
         if(args and len(args) == 1):
-            if(args[0].complex_dtype()):
+            if(args[0].complex_dtype() or site_operator_real is None):
                 ret = site_operator_complex(args[0])
             else:
                 ret = site_operator_real(args[0])
         elif args and len(args) <= 3:
-            if(dtype == np.complex128):
+            if(dtype == np.complex128 or site_operator_real is None):
                 ret = site_operator_complex(*args, **kwargs)
             else:
                 ret = site_operator_real(*args, **kwargs)
@@ -21,7 +25,7 @@ def site_operator(*args, mode = None, optype=None, dtype=np.complex128, **kwargs
     else:
         if optype in __site_op_dict__:
             M = __site_op_dict__[optype](*args, dtype=dtype, **kwargs)
-            if(M.complex_dtype()):
+            if(M.complex_dtype() or site_operator_real is None):
                 ret = site_operator_complex(M)
             else:
                 ret = site_operator_real(M)

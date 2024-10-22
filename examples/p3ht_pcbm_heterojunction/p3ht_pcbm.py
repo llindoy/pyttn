@@ -39,8 +39,8 @@ def run_mps_dynamics(ofname='model_B/out_mps_1.h5'):
     #set up the sum of product operator Hamiltonian
     H, opdict = hamiltonian()
 
-    chimax = 1
-    chi0 = 1
+    chimax = 2
+    chi0 = 2
 
     sysinf = system_modes(Nmodes)
     sysinf[0] = generic_mode(26)
@@ -63,11 +63,11 @@ def run_mps_dynamics(ofname='model_B/out_mps_1.h5'):
     mel = matrix_element(A)
     h = sop_operator(H, A, sysinf, opdict)
 
-    sweepA = tdvp(A, h, krylov_dim = 24, expansion='subspace', subspace_neigs=6)
-    sweepA.spawning_threshold = 1e-6
-    sweepA.unoccupied_threshold = 1e-6
+    sweepA = tdvp(A, h, krylov_dim = 24)#, expansion='subspace', subspace_neigs=6)
+    #sweepA.spawning_threshold = 1e-6
+    #sweepA.unoccupied_threshold = 1e-6
     sweepA.expmv_tol=1e-12
-    sweepA.minimum_unoccupied=1
+    #sweepA.minimum_unoccupied=1
     sweepA.dt = dt
     sweepA.coefficient = -1.0j
 

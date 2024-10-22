@@ -82,21 +82,21 @@ public:
     {
         try
         {
-            for(size_type i = 0; i < HA.size(); ++i)
-            {
-                CALL_AND_HANDLE(HA[i].resize(A().size(0), A().size(1)), "Failed to resize temporary array.");
-                CALL_AND_HANDLE(temp[i].resize(A().size(0), A().size(1)), "Failed to resize temporary array.");
-            }
-    
             const auto& a = A().as_matrix();  
             //compute the action of the Hamiltonian on the lower of the two nodes and store the result in res
-            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
+#ifdef USE_OPENMP
+#ifdef PARALLELISE_HAMILTONIAN_SUM
+        #pragma omp parallel for default(shared) schedule(dynamic, 1) num_threads(HA.size())
+#endif
+#endif
             for(size_type r = 0; r < hinds.size(); ++r)
             {
                 size_type ind = hinds[r];
                 ASSERT(!hinf()[ind].is_identity_mf() && !hinf()[ind].is_identity_spf(), "Invalid index.");
 
                 size_type ti = omp_get_thread_num();
+                CALL_AND_HANDLE(HA[ti].resize(A().size(0), A().size(1)), "Failed to resize temporary array.");
+                CALL_AND_HANDLE(temp[ti].resize(A().size(0), A().size(1)), "Failed to resize temporary array.");
                 CALL_AND_HANDLE(res[r].fill_zeros(), "Failed to fill array with zeros.");
 
                 using spo_core = single_particle_operator_engine<T, backend>;
@@ -143,23 +143,23 @@ public:
     {
         try
         {
-            for(size_type i = 0; i < HA.size(); ++i)
-            {
-                CALL_AND_HANDLE(HA[i].resize(A().size(0), A().size(1)), "Failed to resize temporary array.");
-                CALL_AND_HANDLE(temp[i].resize(A().size(0), A().size(1)), "Failed to resize temporary array.");
-            }
-    
             size_type mode = h.child_id();
             const auto& h_p = h.parent();
             const auto& hinf_p = hinf.parent();
             //compute the action of the Hamiltonian on the upper of the two nodes and store the result in res
-            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
+#ifdef USE_OPENMP
+#ifdef PARALLELISE_HAMILTONIAN_SUM
+        #pragma omp parallel for default(shared) schedule(dynamic, 1) num_threads(HA.size())
+#endif
+#endif
             for(size_type r = 0; r < hinds.size(); ++r)
             {
                 size_type ind = hinds[r];
                 ASSERT(!hinf()[ind].is_identity_mf() && !hinf()[ind].is_identity_spf(), "Invalid index.");
 
                 size_type ti = omp_get_thread_num();
+                CALL_AND_HANDLE(HA[ti].resize(A().size(0), A().size(1)), "Failed to resize temporary array.");
+                CALL_AND_HANDLE(temp[ti].resize(A().size(0), A().size(1)), "Failed to resize temporary array.");
                 CALL_AND_HANDLE(res[r].fill_zeros(), "Failed to fill array with zeros.");
 
                 auto rmat = res[r].reinterpret_shape(A().shape(0), A().shape(1));
@@ -241,6 +241,7 @@ public:
     
 
     //function for evaluating the two matrices required to evaluate the singular vectors (either left or right) of the projected two site Hamiltonian onto 
+    //TODO: set up openmp parallelisation of this function call.
     template <typename vtype, typename rtype>
     inline void operator()(const vtype& v, const linalg::vector<T>& hcoeff, triad& op1, rank_4& op2, size_type nterms, mat& t1, mat& t2, mat& temp2, bool MconjM, rtype& res) const
     {       
@@ -261,6 +262,7 @@ public:
                     auto vtens = v.reinterpret_shape(op2[0].shape(0), 1, op2[0].shape(2));
                     auto rtens = res.reinterpret_shape(op2[0].shape(0), 1, op2[0].shape(2));
                     // t1 = M v
+
                     for(size_type r=0; r < nterms; ++r)
                     {
                         //first apply op2 to the v matrix

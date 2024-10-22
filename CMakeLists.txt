@@ -18,11 +18,11 @@ get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTO
 
 #compiler flags
 option(USE_CUDA "Compile with cuda" OFF)
-option(USE_OPENMP "Compile with openmp" ON)
+option(USE_OPENMP "Compile with openmp" OFF)
 option(USE_GEMM3M "Compile with openmp" OFF)
 option(BUILD_TESTS "Build Tests" OFF)
-option(BUILD_PYTHON_BINDINGS "Build Python Bindings" OFF)
-option(BUILD_SRC "Build C++ src" ON)
+option(BUILD_PYTHON_BINDINGS "Build Python Bindings" ON)
+option(BUILD_SRC "Build C++ src" OFF)
 
 if(USE_OPENMP)
     add_compile_definitions(USE_OPENMP)
@@ -59,6 +59,7 @@ if(DEFINED BLA_VENDOR)
     elseif(BLA_VENDOR MATCHES "OpenBLAS")   
         add_compile_definitions(USE_OPENBLAS)
         set(USE_DEFAULT_FIND_BLAS ON)
+        message("Using OpenBLAS")
     elseif(BLA_VENDOR MATCHES "FLAME")
         #here we allow for us to handle the multithreaded case.  This is not dealt with by the standard FindBLAS and FindLapack files.  
         #this has been setup to work with the aocl versions of blis and flame

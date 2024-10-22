@@ -4,6 +4,8 @@ import time
 import sys
 import copy
 import h5py
+import os
+os.environ['OPENBLAS_NUM_THREADS']=1
 
 sys.path.append("../../")
 from pyttn import *
@@ -32,7 +34,7 @@ def run_mps_dynamics(ofname='multiset_model_B/out_mps_1.h5'):
     #set up the sum of product operator Hamiltonian
     H = hamiltonian()
 
-    chimax = 1
+    chimax = 24
 
     sysinf = system_modes(Nmodes)
     for i in range(Nmodes):

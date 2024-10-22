@@ -20,11 +20,16 @@ void init_product_operator(py::module &m, const std::string& label)
 
     using opdict = operator_dictionary<T, linalg::blas_backend>;
     using pop = product_operator<T, linalg::blas_backend>;
+    using real_type = typename linalg::get_real_type<T>::type;
 
     //the base primitive operator type
     py::class_<pop>(m, (std::string("product_operator_")+label).c_str())
         .def(py::init())
         .def(py::init<const pop&>())
+        .def(py::init<sNBO<real_type>&,  const system_modes&, bool>(), 
+              py::arg(), py::arg(), py::arg("use_sparse") = true)
+        .def(py::init<sNBO<real_type>&, const system_modes&, const opdict&, bool>(), 
+              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
         .def(py::init<sNBO<T>&,  const system_modes&, bool>(), 
               py::arg(), py::arg(), py::arg("use_sparse") = true)
         .def(py::init<sNBO<T>&, const system_modes&, const opdict&, bool>(), 
@@ -51,6 +56,22 @@ void init_product_operator(py::module &m, const std::string& label)
         .def(
               "initialise", 
               [](pop& o, sNBO<T>& sop, const system_modes& sys, const opdict& opd, bool use_sparse)
+              {
+                  o.initialise(sop, sys, opd, use_sparse);
+              },
+              py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true
+            )
+        .def(
+              "initialise", 
+              [](pop& o, sNBO<real_type>& sop, const system_modes& sys, bool use_sparse)
+              {
+                  o.initialise(sop, sys, use_sparse);
+              },
+              py::arg(), py::arg(), py::arg("use_sparse") = true
+            )
+        .def(
+              "initialise", 
+              [](pop& o, sNBO<real_type>& sop, const system_modes& sys, const opdict& opd, bool use_sparse)
               {
                   o.initialise(sop, sys, opd, use_sparse);
               },

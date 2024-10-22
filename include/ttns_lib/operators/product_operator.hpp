@@ -97,13 +97,13 @@ protected:
         return ret;
     }
 
-    void setup_mode_operator(const system_modes& sys, size_t mode, size_t lmode, std::shared_ptr<op_type> op, bool is_composite_mode)
+    void setup_mode_operator(const system_modes& sys, size_t mode, size_t lmode, size_t mode_index, std::shared_ptr<op_type> op, bool is_composite_mode)
     {
         size_t smode = sys.mode_index(mode);
         //if this isn't a composite mode then we just bind the operator
         if(!is_composite_mode)
         {
-            m_mode_operators[smode] = element_type(op, smode);
+            m_mode_operators[mode_index] = element_type(op, smode);
             op = nullptr;
         }
         //otherwise we use this to construct a site operator object
@@ -116,7 +116,7 @@ protected:
             }
             std::vector<std::vector<std::shared_ptr<op_type>>> ops(sys[mode].nmodes());
             ops[lmode].push_back(op);
-            CALL_AND_HANDLE(m_mode_operators[smode] = element_type(ops::site_product_operator<T, backend>{mode_dims, ops}, smode), "Failed to insert new element in mode operator");
+            CALL_AND_HANDLE(m_mode_operators[mode_index] = element_type(ops::site_product_operator<T, backend>{mode_dims, ops}, smode), "Failed to insert new element in mode operator");
         }
     }
 
@@ -127,15 +127,16 @@ public:
     {
         m_coeff = T(1.0);
         _m_coeff = T(1.0);
-        m_mode_operators.resize(pop.size());
 
         //take the product operator which acts on the primitive modes and unpack it into a map
         //with key the tree mode index.  And key storing a list of the primitive mode index and
         //the label of each term 
         auto up = unpack_pop(sys, pop);
+        m_mode_operators.resize(up.size());
 
         using dfop_dict = operator_from_default_dictionaries<T, backend>;
 
+        size_type mode_index = 0;
         //now iterate over each of the separate mode terms in the object
         for(const auto& x : up)
         {
@@ -166,7 +167,7 @@ public:
                 CALL_AND_HANDLE(op = dfop_dict::query(label, basis, sys.primitive_mode(nu).type(), use_sparse), "Failed to query operator from dictionary.");
 
                 //and set up the mode operator
-                setup_mode_operator(sys, mode, lmode, op, is_composite_mode);
+                setup_mode_operator(sys, mode, lmode, mode_index, op, is_composite_mode);
             }
             //now if there are multiple terms acting on the mode we will always want to construct a site product operator
             else
@@ -201,8 +202,9 @@ public:
                 }
                 size_t smode = sys.mode_index(mode);
                 //now construct the mode operator object from this local mode information.
-                CALL_AND_HANDLE(m_mode_operators[smode] = element_type(ops::site_product_operator<T, backend>{mode_dims, ops}, smode), "Failed to insert new element in mode operator");
+                CALL_AND_HANDLE(m_mode_operators[mode_index] = element_type(ops::site_product_operator<T, backend>{mode_dims, ops}, smode), "Failed to insert new element in mode operator");
             }
+            ++mode_index;
         }
     }
 
@@ -210,16 +212,16 @@ public:
     {
         m_coeff = T(1.0);
         _m_coeff = T(1.0);
-        m_mode_operators.resize(pop.size());
 
         //take the product operator which acts on the primitive modes and unpack it into a map
         //with key the tree mode index.  And key storing a list of the primitive mode index and
         //the label of each term 
         auto up = unpack_pop(sys, pop);
+        m_mode_operators.resize(up.size());
 
         using dfop_dict = operator_from_default_dictionaries<T, backend>;
 
-
+        size_type mode_index = 0;
         //now iterate over each of the separate mode terms in the object
         for(const auto& x : up)
         {
@@ -258,7 +260,7 @@ public:
                 }
 
                 //and set up the mode operator
-                setup_mode_operator(sys, mode, lmode, op, is_composite_mode);
+                setup_mode_operator(sys, mode, lmode, mode_index, op, is_composite_mode);
             }
             //now if there are multiple terms acting on the mode we will always want to construct a site product operator
             else
@@ -305,8 +307,9 @@ public:
                 }
                 size_t smode = sys.mode_index(mode);
                 //now construct the mode operator object from this local mode information.
-                CALL_AND_HANDLE(m_mode_operators[smode] = element_type(ops::site_product_operator<T, backend>{mode_dims, ops}, smode), "Failed to insert new element in mode operator");
+                CALL_AND_HANDLE(m_mode_operators[mode_index] = element_type(ops::site_product_operator<T, backend>{mode_dims, ops}, smode), "Failed to insert new element in mode operator");
             }
+            ++mode_index;
         }
     }
 

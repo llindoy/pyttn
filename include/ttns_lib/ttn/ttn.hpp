@@ -188,14 +188,6 @@ public:
         return *this;
     }
 
-    //TODO: set up initialisation form sparse ttn object
-    //template <typename U>
-    //ttn& operator=(const tree<std::vector<sttn_node_data>& sTTN)
-    //{   
-
-    //}
-
-
     size_type maximum_bond_dimension() const
     {
         size_type mbd = 0;

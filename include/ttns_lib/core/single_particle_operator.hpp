@@ -120,7 +120,7 @@ protected:
 
 #ifdef USE_OPENMP
 #ifdef PARALLELISE_HAMILTONIAN_SUM
-            #pragma omp parallel for default(shared) schedule(dynamic, 1)
+            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
 #endif
 #endif
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
@@ -174,6 +174,11 @@ protected:
     template <typename spfnode>
     static inline void evaluate_leaf(const ms_soptype& h, const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, triad& HA, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
+#ifdef USE_OPENMP 
+#ifdef PARALLELISE_SET_VARIABLES
+        #pragma omp parallel for default(shared) if(HA.size() > 1 && cinf().size() > 1) num_threads(HA.size())
+#endif
+#endif
         for(size_t row = 0; row < cinf().size(); ++row)
         {
             for(size_t ci = 0; ci < cinf()[row].size(); ++ci)
@@ -194,7 +199,7 @@ protected:
             const auto& a = A.as_matrix();  
 #ifdef USE_OPENMP
 #ifdef PARALLELISE_HAMILTONIAN_SUM
-            #pragma omp parallel for default(shared) schedule(dynamic, 1)
+            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
 #endif
 #endif
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
@@ -247,7 +252,7 @@ protected:
 
 #ifdef USE_OPENMP
 #ifdef PARALLELISE_HAMILTONIAN_SUM
-            #pragma omp parallel for default(shared) schedule(dynamic, 1)
+            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
 #endif
 #endif
             for(size_type ind = 0; ind < cinf.nterms(); ++ind)
@@ -311,8 +316,8 @@ protected:
     static inline void evaluate_branch(const ms_cinfnode& cinf, const ms_hnode& B, const ms_hnode& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
 #ifdef USE_OPENMP 
-#ifdef PARALLELISE_SET_VARS
-                #pragma omp parallel for default(shared) if(cinf().size() > 1)
+#ifdef PARALLELISE_SET_VARIABLES
+        #pragma omp parallel for default(shared) if(temp.size() > 1 && cinf().size() > 1) num_threads(temp.size())
 #endif
 #endif
         for(size_t row = 0; row < cinf().size(); ++row)

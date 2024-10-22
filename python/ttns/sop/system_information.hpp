@@ -73,6 +73,7 @@ inline void init_system_info(py::module &m)
     m.def("fermion_mode", &fermion_mode);
     m.def("boson_mode", &boson_mode);
     m.def("qubit_mode", &qubit_mode);
+    m.def("tls_mode", &qubit_mode);
     m.def("spin_mode", &spin_mode);
     m.def("generic_mode", &generic_mode);
 

@@ -190,7 +190,9 @@ protected:
         if(static_cast<blas_int_type>(batchCount) >= K)
         {
 #ifdef USE_OPENMP
+#ifdef PARALLELISE_EXTENDED_BLAS
             #pragma omp parallel for schedule(static) 
+#endif
 #endif
             for(size_t i=0; i<batchCount; ++i){gemm(TRANSA, TRANSB, M, N, K, ALPHA, A+i*strideA, LDA, B+i*strideB, LDB, BETA, C+i*strideC, LDC);}
         }

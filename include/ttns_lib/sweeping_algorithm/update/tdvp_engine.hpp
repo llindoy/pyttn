@@ -144,7 +144,7 @@ public:
     {
         try
         {
-            CALL_AND_HANDLE(m_expmv(r, -m_dt/2.0, m_coeff, env.fha, h, op, env.buffer().HA), "Failed to time evolve the r matrix backwards in time.");
+            CALL_AND_HANDLE(m_expmv(r, -m_dt/2.0, m_coeff, env.fha, h, op, env.buffer().temp, env.buffer().HA), "Failed to time evolve the r matrix backwards in time.");
         }
         catch(const common::invalid_value& ex)
         {
@@ -332,7 +332,7 @@ public:
         {
             mbuf.setup(r);
             env.fha.set_pointer(&(r));
-            CALL_AND_HANDLE(m_expmv(mbuf.A(), -m_dt/2.0, m_coeff, env.fha, h, op, env.buffer().HA, mbuf.res()), "Failed to time evolve the r matrix backwards in time.");
+            CALL_AND_HANDLE(m_expmv(mbuf.A(), -m_dt/2.0, m_coeff, env.fha, h, op, env.buffer().temp, env.buffer().HA, mbuf.res()), "Failed to time evolve the r matrix backwards in time.");
             env.fha.unset_pointer();
             ttn_type::unpack(mbuf.A(), r);
         }

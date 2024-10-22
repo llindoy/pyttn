@@ -84,8 +84,8 @@ public:
             const auto& hinf_p = hinf.parent();
 
 #ifdef USE_OPENMP 
-#ifdef PARALLELISE_SET_VARS
-                #pragma omp parallel for default(shared) if(hinf().size() > 1)
+#ifdef PARALLELISE_SET_VARIABLES
+            #pragma omp parallel for default(shared) if(HA.size() > 1 && hinf().size() > 1) num_threads(HA.size())
 #endif
 #endif
             for(size_t row = 0; row < hinf().size(); ++row)
@@ -93,8 +93,8 @@ public:
                 for(size_t ci = 0; ci < hinf()[row].size(); ++ci)
                 {
                     size_t col = hinf()[row][ci].col();
-                    //std::cerr << "row col" << row << " " << col << std::endl;
                     ms_sop_env_slice<T, backend> hslice(h, row, ci);
+
                     if(row == col)
                     {
                         _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, A(row), HA, temp, hslice);
@@ -120,7 +120,7 @@ protected:
 
 #ifdef USE_OPENMP
 #ifdef PARALLELISE_HAMILTONIAN_SUM
-            #pragma omp parallel for default(shared) schedule(dynamic, 1)
+            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
 #endif
 #endif
             for(size_type ind = 0; ind < hinf.nterms(); ++ind)
@@ -208,7 +208,7 @@ protected:
 
 #ifdef USE_OPENMP
 #ifdef PARALLELISE_HAMILTONIAN_SUM
-            #pragma omp parallel for default(shared) schedule(dynamic, 1)
+            //#pragma omp parallel for default(shared) schedule(dynamic, 1)
 #endif
 #endif
             for(size_type ind = 0; ind < hinf.nterms(); ++ind)

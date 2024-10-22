@@ -1,5 +1,5 @@
-from pyttn._pyttn import one_site_dmrg_complex, adaptive_one_site_dmrg_complex, ttn_complex, ttn_real, sop_operator_complex
-from pyttn._pyttn import multiset_one_site_dmrg_complex, ms_ttn_complex, ms_ttn_real, multiset_sop_operator_complex
+from pyttn._pyttn import one_site_dmrg_complex, adaptive_one_site_dmrg_complex, ttn_complex, sop_operator_complex
+from pyttn._pyttn import multiset_one_site_dmrg_complex, ms_ttn_complex, multiset_sop_operator_complex
 import numpy as np
 
 def single_set_dmrg(A, h, krylov_dim = 16, numthreads=1, subspace_krylov_dim = 6, subspace_neigs = 2, expansion='onesite'):

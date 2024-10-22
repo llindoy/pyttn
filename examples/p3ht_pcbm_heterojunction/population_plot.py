@@ -27,7 +27,7 @@ def plot_imag(fnames):
             continue
 
         fig, ax = plt.subplots(num=fname)
-        im = ax.imshow(res, aspect=0.125, interpolation=None, vmin=0, vmax=0.25, origin='lower', extent=[0, 25, 0, 200])
+        im = ax.imshow(res, aspect=0.125, interpolation='Nearest', vmin=0, vmax=0.25, origin='lower', extent=[0, 25, 0, 200])
 
         labels = ['' for i in range(26)]
         labels[0] = 'CS$_{13}$'

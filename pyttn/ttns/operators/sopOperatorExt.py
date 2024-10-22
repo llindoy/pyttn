@@ -1,7 +1,18 @@
-from pyttn._pyttn import sop_operator_real, sop_operator_complex, ttn_real, ttn_complex, SOP_real, SOP_complex, system_modes
-from pyttn._pyttn import multiset_sop_operator_real, multiset_sop_operator_complex, ms_ttn_real, ms_ttn_complex, multiset_SOP_real, multiset_SOP_complex, system_modes
 import numpy as np
 
+from pyttn._pyttn import sop_operator_complex, ttn_complex, SOP_complex, system_modes
+from pyttn._pyttn import multiset_sop_operator_complex, ms_ttn_complex, multiset_SOP_complex
+try:
+    from pyttn._pyttn import sop_operator_real, ttn_real, SOP_real
+    from pyttn._pyttn import multiset_sop_operator_real, ms_ttn_real, multiset_SOP_real
+
+except ImportError:
+    sop_operator_real = None
+    ttn_real = None 
+    SOP_real = None
+    multiset_sop_operator_real = None
+    ms_ttn_real = None 
+    multiset_SOP_real = None
 
 def sop_operator(h: SOP_real|SOP_complex, A : ttn_real|ttn_complex, sysinf : system_modes, *args, **kwargs):
     r"""Function for constructing the hierarchical sum of product operator of a string operator
@@ -17,17 +28,29 @@ def sop_operator(h: SOP_real|SOP_complex, A : ttn_real|ttn_complex, sysinf : sys
     Keyword Args:
     compress (bool): Whether to perform a hierarchical SOP compression
     """
-    if isinstance(A, ttn_real) and isinstance(h, SOP_real):
-        return sop_operator_real(h, A, sysinf, *args, **kwargs)
-    elif isinstance(A, ttn_complex) and isinstance(h, SOP_complex):
-        return sop_operator_complex(h, A, sysinf, *args, **kwargs)
+    if SOP_real is None:
+        if isinstance(A, ttn_complex) and isinstance(h, SOP_complex):
+            return sop_operator_complex(h, A, sysinf, *args, **kwargs)
+        else:
+            raise RuntimeError("Invalid argument for the creation of a sop_operator.")
     else:
-        raise RuntimeError("Invalid argument for the creation of a sop_operator.")
+        if isinstance(A, ttn_real) and isinstance(h, SOP_real):
+            return sop_operator_real(h, A, sysinf, *args, **kwargs)
+        elif isinstance(A, ttn_complex) and isinstance(h, SOP_complex):
+            return sop_operator_complex(h, A, sysinf, *args, **kwargs)
+        else:
+            raise RuntimeError("Invalid argument for the creation of a sop_operator.")
 
 def multiset_sop_operator(h, A, sysinf, *args, **kwargs):
-    if isinstance(A, ms_ttn_real) and isinstance(h, multiset_SOP_real):
-        return multiset_sop_operator_real(h, A, sysinf, *args, **kwargs)
-    elif isinstance(A, ms_ttn_complex) and isinstance(h, multiset_SOP_complex):
-        return multiset_sop_operator_complex(h, A, sysinf, *args, **kwargs)
+    if multiset_SOP_real is None:
+        if isinstance(A, ms_ttn_complex) and isinstance(h, multiset_SOP_complex):
+            return multiset_sop_operator_complex(h, A, sysinf, *args, **kwargs)
+        else:
+            raise RuntimeError("Invalid argument for the creation of a sop_operator.")
     else:
-        raise RuntimeError("Invalid argument for the creation of a sop_operator.")
+        if isinstance(A, ms_ttn_real) and isinstance(h, multiset_SOP_real) and not multiset_SOP_real is None:
+            return multiset_sop_operator_real(h, A, sysinf, *args, **kwargs)
+        elif isinstance(A, ms_ttn_complex) and isinstance(h, multiset_SOP_complex):
+            return multiset_sop_operator_complex(h, A, sysinf, *args, **kwargs)
+        else:
+            raise RuntimeError("Invalid argument for the creation of a sop_operator.")

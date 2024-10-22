@@ -9,7 +9,8 @@ get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTO
 option(USE_CUDA "Compile with cuda" OFF)
 option(USE_OPENMP "Compile with openmp" OFF)
 option(PARALLELISE_SET_VARIABLES "openmp parallelism over set variables" OFF)
-option(PARALLELISE_HAMILTONIAN_SUM "openmp parallelism over hamiltonian sum" ON)
+option(PARALLELISE_HAMILTONIAN_SUM "openmp parallelism over hamiltonian sum" OFF)
+option(BUILD_REAL_TTN "build wrapper for real valued tensor network objects." OFF)
 option(USE_GEMM3M "Compile with openmp" OFF)
 option(EVAL_BUT_DONT_APPLY "Compile with eval but don't apply option set" OFF)
 
@@ -23,6 +24,10 @@ endif()
 
 if(PARALLELISE_HAMILTONIAN_SUM)
   add_definitions(-DPARALLELISE_HAMILTONIAN_SUM)
+endif()
+
+if(BUILD_REAL_TTN)
+  add_definitions(-DBUILD_REAL_TTN)
 endif()
 
 set(PYTHON_BINDINGS_SRC pythonBinding.cpp 
