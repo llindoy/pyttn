@@ -15,7 +15,7 @@ def add_star_bath_hamiltonian(H, Sp, g, w, Sm = None, binds = None):
 
     for i in range(Nb):
         if Sm is None:
-            H += np.sqrt(2.0)*g[i] * Sp * sOP("q", binds[i])
+            H += g[i] * Sp * (sOP("adag", binds[i])+sOP("a", binds[i]))
         else:
             H += g[i] * Sp * sOP("a", binds[i])
             H += g[i] * Sm * sOP("adag", binds[i])
@@ -33,7 +33,7 @@ def add_chain_bath_hamiltonian(H, Sp, t, e, Sm=None, binds = None):
     for i in range(Nb):
         if i == 0:
             if Sm is None:
-                H += np.sqrt(2.0)*t[i] * Sp * sOP("q", binds[i])
+                H += t[i] * Sp * (sOP("adag", binds[i])+sOP("a", binds[i]))
             else:
                 H += t[i]*Sp * sOP("a", binds[i])
                 H += t[i]*Sm * sOP("adag", binds[i])
@@ -88,4 +88,36 @@ def add_bath_hamiltonian(H, Sp, g, w, Sm = None, binds = None, geom='star'):
         return add_ipchain_bath_hamiltonian(H, Sp, e.shape[0], t[0], w2, U, Sm = Sm, binds=binds), e
     else:
         raise RuntimeError("Cannot add bath Hamiltonian geometry not recognised.")
+
+
+def add_heom_operator(H, Sp, alpha, nu, sys, Sm = None, binds = None, opdict=None, Lopdict=None):
+    from pyttn import liouville_space_superoperator
+    Nb = alpha.shape[0]
+        
+    Lsp_m = liouville_space_superoperator(Sp, sys, '-', opdict=opdict, Lopdict=Lopdict)
+    Lsp_p = liouville_space_superoperator(Sp, sys, '+', opdict=opdict, Lopdict=Lopdict)
+
+    Lsm_f = None
+    Lsm_b = None
+    if Sm is None:
+        Lsm_f = liouville_space_superoperator(Sp, sys, 'l', opdict=opdict, Lopdict=Lopdict)
+        Lsm_b = liouville_space_superoperator(Sp, sys, 'r', opdict=opdict, Lopdict=Lopdict)
+    else:
+        Lsm_f = liouville_space_superoperator(Sm, sys, 'l', opdict=opdict, Lopdict=Lopdict)
+        Lsm_b = liouville_space_superoperator(Sm, sys, 'r', opdict=opdict, Lopdict=Lopdict)
+
+    for i in range(Nb):
+        gk = 0
+        hk = 0
+        wk = 0
+
+        if(i%2 == 0):
+            wk = -1.0j*zk[i//2]
+            gk = dk[i//2]/np.sqrt(dk[i//2])
+            hk = np.sqrt(dk[i//2])
+        else:
+            wk = -1.0j*np.conj(zk[i//2])
+            gk = -np.conj(dk[i//2])/np.sqrt(np.conj(dk[i//2]))
+            hk = np.sqrt(np.conj(dk[i//2]))
+
 

@@ -50,10 +50,11 @@ def AAA_support_points(aaa_support_points = "linear", wmin=None, wmax = None, Na
 
 
 class AAA_decomposition:
-    def __init__(self, aaa_support_points = "linear", aaa_nmax=500, coeff=1.0. **kwargs):
-        self.Z1 = AAA_support_points(aaa_support_points = aaa_support_points, **kwargs)
-        self.aaa_nmax=aaa_nmax
+    def __init__(self, support_points = "linear", nmax=500, coeff=1.0, tol = 1e-4, **kwargs):
+        self.Z1 = AAA_support_points(aaa_support_points = support_points, **kwargs)
+        self.aaa_nmax=nmax
         self.coeff = coeff
+        sel.aaa_tol=tol
 
     def AAA_to_HEOM(p, r, coeff = 1.0):
         pp = coeff*p*1.0j
@@ -65,6 +66,6 @@ class AAA_decomposition:
 
 
     def __call__(self, Sw):
-        Sw_aaa, dk, zk = setup_heom_correlation_functions(Sw, self.Z1, nmax=self.aaa_nmax, aaa_tol=selfaaa_tol, coeff=coeff)
+        Sw_aaa, dk, zk = setup_heom_correlation_functions(Sw, self.Z1, nmax=self.aaa_nmax, aaa_tol=self.aaa_tol, coeff=coeff)
         return dk, zk, Sw_aaa
 

@@ -118,7 +118,7 @@ void init_ttn(py::module &m, const std::string& label)
         .def("bond_dimensions", [](const _ttn& o){typename _ttn::hrank_info res;  o.bond_dimensions(res);   return res;})
         .def("bond_dimensions", [](const _ttn& o, typename _ttn::hrank_info& res){;  o.bond_dimensions(res);})
         //.def("reset_orthogonality", &_ttn::reset_orthogonality)
-        //.def("reset_orthogonality_centre", &_ttn::reset_orthogonality_centre)
+        .def("reset_orthogonality_centre", &_ttn::reset_orthogonality_centre)
 
         .def("resize", static_cast<void (_ttn::*)(const ntree<size_t, std::allocator<size_t>>&, size_t, bool)>(&_ttn::resize), py::arg(), py::arg("nset")=1, py::arg("purification") = false)
         .def("resize", static_cast<void (_ttn::*)(const ntree<size_t, std::allocator<size_t>>&, const ntree<size_t, std::allocator<size_t>>&, size_t, bool)>(&_ttn::resize), py::arg(), py::arg(), py::arg("nset")=1, py::arg("purification") = false)
@@ -361,7 +361,17 @@ void init_ttn(py::module &m, const std::string& label)
                     CALL_AND_RETHROW(return o.apply_operator(op));
                 }
             )
-
+        .def(
+                "__imatmul__",
+                [](_ttn& o, sop& op)
+                {
+                    _ttn i;
+                    using contr = sop_ttn_contraction_engine<T, linalg::blas_backend>;
+                    CALL_AND_RETHROW(contr::sop_ttn_contraction(op, o, i));
+                    o = i;
+                    return o;
+                }
+            )
         .def(
                 "__rmatmul__",
                 [](const _ttn& o, siteop& op)

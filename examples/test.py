@@ -62,7 +62,7 @@ A = copy.deepcopy(B)
 ad = sOP("n",3)
 adag_3_a_5_adag8 = product_operator(ad, sysinf)
 print("D", mel(adag_3_a_5_adag8, A), mel(B, B), mel(A, B))
-A.apply_product_operator(adag_3_a_5_adag8)
+A@=adag_3_a_5_adag8
 print("E", mel(adag_3_a_5_adag8, B), mel(B, A), mel(A, B))
 A = copy.deepcopy(B)
 

@@ -83,14 +83,13 @@ void init_msttn(py::module &m, const std::string& label)
 
         .def("bond_dimensions", &_msttn::bond_dimensions)
         .def("bond_dimensions", [](const _msttn& o){typename _msttn::hrank_info res;  o.bond_dimensions(res);   return res;})
-        .def("reset_orthogonality", &_msttn::reset_orthogonality)
-        .def("reset_orthogonality_centre", &_msttn::reset_orthogonality_centre)
 
         .def("resize", static_cast<void (_msttn::*)(const ntree<size_t, std::allocator<size_t>>&, size_t, bool)>(&_msttn::resize), py::arg(), py::arg(), py::arg("purification") = false)
         .def("resize", static_cast<void (_msttn::*)(const ntree<size_t, std::allocator<size_t>>&, const ntree<size_t, std::allocator<size_t>>&, size_t, bool)>(&_msttn::resize), py::arg(), py::arg(), py::arg(), py::arg("purification") = false)
         .def("resize", static_cast<void (_msttn::*)(const std::string&, size_t, bool)>(&_msttn::resize), py::arg(), py::arg(), py::arg("purification") = false)
         .def("resize", static_cast<void (_msttn::*)(const std::string&, const std::string&, size_t, bool)>(&_msttn::resize), py::arg(), py::arg(), py::arg(), py::arg("purification") = false)
         .def("set_seed", &_msttn::template set_seed<int>)
+        .def("reset_orthogonality_centre", &_msttn::reset_orthogonality_centre)
 
         .def("set_state", &_msttn::template set_state<int>)
         .def("set_state", &_msttn::template set_state<size_t>)

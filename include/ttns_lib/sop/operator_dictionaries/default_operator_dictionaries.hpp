@@ -197,12 +197,15 @@ typename default_pauli_operator_dictionary<T>::dict_type default_pauli_operator_
     //bind the pauli x operators
     {std::string("sigmax"), std::make_shared<sigma_x<T>>()},
     {std::string("x"), std::make_shared<sigma_x<T>>()},
+    {std::string("sx"), std::make_shared<sigma_x<T>>()},
     //bind the pauli y operators
     {std::string("sigmay"), std::make_shared<sigma_y<T>>()},
     {std::string("y"), std::make_shared<sigma_y<T>>()},
+    {std::string("sy"), std::make_shared<sigma_y<T>>()},
     //bind the pauli z operators
     {std::string("sigmaz"), std::make_shared<sigma_z<T>>()},
-    {std::string("z"), std::make_shared<sigma_z<T>>()}
+    {std::string("z"), std::make_shared<sigma_z<T>>()},
+    {std::string("sz"), std::make_shared<sigma_z<T>>()}
 };
 
 }   //namespace pauli

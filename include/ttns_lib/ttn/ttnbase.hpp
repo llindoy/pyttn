@@ -87,7 +87,6 @@ private:
     size_type m_orthogonality_centre = 0;
     bool m_has_orthogonality_centre = false; 
 
-    size_type m_nthreads = 1;
     size_type m_nset=1;
     size_type m_nset_lhd=1;
 

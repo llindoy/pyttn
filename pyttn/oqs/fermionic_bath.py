@@ -126,8 +126,21 @@ class FermionicBath:
         else:
             return self.Jw(w)*(1-self.fermi_distrib(w, Ef))
 
-    def estimate_bounds(self, Ef = 0, sigma = '+'): 
-        wmax = self.wmax
+    def estimate_bounds(self, wmax=None, Ef = 0, sigma = '+'): 
+        """Returns estimates for the upper and lower bounds of the spectral density to be used for the
+        discretisation function
+        :param wmax: the maximum frequency bound, defaults to self.wmax
+        :type wmax: float, optional
+        :param Ef: Fermi Energy
+        :type Ef: float
+        :param sigma: Whether to compute the spectral function associated with the
+            greater (+) or lesser (-) Green's Function, default to +
+        :type sigma: str, optional
+        :return: the maximum and minimum frequency bounds
+        :rtype: float, float 
+        """
+        if wmax is None:
+            wmax = self.wmax
         wmin = self.wmin
         wtol = self.wtol
         wmax = np.abs(wmax)
@@ -149,16 +162,17 @@ class FermionicBath:
 
         return wmin, wmax
 
-    def discretise(self, Nm, Ef = 0, sigma = '+', method='orthopol', *args, **kwargs):
-        from .bath_fitting import bath_discretisation as disc
+    def discretise(self, discretisation_engine, Ef = 0, sigma = '+'):
+        from .bath_fitting import OrthopolDiscretisation, DensityDiscretisation
         wmin, wmax = self.estimate_bounds(Ef=Ef, sigma = sigma)
-        print(wmin, wmax)
+        if(discretisation_engine.wmin is None):
+            discretisation_engine.wmin = wmin
+        if(discretisation_engine.wmax is None):
+            discretisation_engine.wmin = wmax
+        return discretisation_engine(lambda x : self.Sw(x, Ef=Ef, sigma=sigma))
 
-        gf, wf = disc.discretise_fermionic(lambda x : self.Sw(x, Ef=Ef, sigma=sigma), Nm, wmin, wmax, method=method, *args, **kwargs)
-        return gf, wf
-
-
-    def expfit(self, fitting_engine, Ef=0, sigma='+'):
+    def expfit(self, fitting_engine, Ef = 0, sigma = '+'):
+        from .bath_fitting import AAADecomposition, ESPRITDecomposition
         dk = None
         zk = None
         if isinstance(fitting_engine, AAADecomposition):
@@ -171,6 +185,6 @@ class FermionicBath:
             dk, zk, _ = fitting_engine(lambda x : self.Sw(x, Ef=Ef, sigma=sigma))
 
         elif isinstance(fitting_engine, ESPRITDecomposition):
-            dk, zk, _ = fitting_engine(lambda x : self.Ct(x))
+            dk, zk, _ = fitting_engine(lambda x : self.Ct(x, Ef=Ef, sigma=sigma))
         return dk, zk
             

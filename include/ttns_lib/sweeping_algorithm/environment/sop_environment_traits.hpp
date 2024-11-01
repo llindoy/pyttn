@@ -697,7 +697,6 @@ public:
         {   
             try
             { 
-                INIT_TIMER;
                 const auto& cinf = hprim.contraction_info()[h.id()]();
 #ifdef USE_OPENMP 
 #ifdef PARALLELISE_SET_VARIABLES
@@ -712,8 +711,6 @@ public:
                         size_t col = cinf[row][ci].col();
 
                         ms_sop_env_slice<T, backend> hslice(h, row, ci);
-                        size_t ti = omp_get_thread_num();
-                        std::cout << row << " " << col << " " << ti << std::endl;
                         
                         if(row == col)
                         {
@@ -725,7 +722,6 @@ public:
                         }
                     }
                 }
-                STOP_TIMER("test timing");
             }
             catch(const std::exception& ex)
             {

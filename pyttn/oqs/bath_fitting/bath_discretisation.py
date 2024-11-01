@@ -20,7 +20,7 @@ class DensityDiscretisation:
     #discretise a bosonic bath using the density algorithm.  Here we allow for specification of the density of frequencies (rho), if this isn't specified we use a density of frequencies
     #that is given by S(w)/w for np.abs(w) > 1e-12 and S(w)/1e-12 for np.abs(w) < 1e-12. 
     #this currently doesn't seem to work
-    def discretise_density_bosonic(self, S):
+    def __call__(self, S):
         g = None
         w = None
 
@@ -35,9 +35,6 @@ class DensityDiscretisation:
             g, w = density_discretisation.discretise(S, self.rho, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, nquad=self.nquad, wtol=self.wtol, ftol=self.ftol, niters=niters)
 
         return np.array(g), np.array(w)
-
-
-
 
 
 class OrthopolDiscretisation:

@@ -22,19 +22,34 @@ class BosonicBath:
         self.S = S
         self.beta = beta
         if wmin == None:
-            if self.beta == None:
-                wmin = 0
-            else:
-                wmin = find_wmin(self.S, wmax)
+            wmin = self.find_wmin(wmax)
 
         self.wmin = wmin
         self.wmax = wmax
 
-    def find_wmin(Sw, wmax, npoints = 1000):
-        Swmax = Sw(wmax)
-        wrange = np.linspace(-wmax, 0, npoints, endpoint=False)
-        Swmin = Sw(wrange)
-        return wrange[np.argmax(Swmin > Swmax)-1]
+    def find_wmin(self, wmax, npoints = 1000):
+        if(self.beta is None):
+            return 0
+        else:
+            Swmax = self.Sw(wmax)
+            wrange = np.linspace(-wmax, 0, npoints, endpoint=False)
+            Swmin = self.Sw(wrange)
+            return wrange[np.argmax(Swmin > Swmax)-1]
+
+    def estimate_bounds(self, wmax=None):
+        """Returns estimates for the upper and lower bounds of the spectral density to be used for the
+        discretisation function
+        :param wmax: the maximum frequency bound, defaults to self.wmax
+        :type wmax: float, optional
+        :return: the maximum and minimum frequency bounds
+        :rtype: float, float 
+        """
+        if wmax is None:
+            wmax = self.wmax
+        wmax = np.abs(wmax)
+        wmin = self.find_wmin(wmax)
+
+        return wmin, wmax
 
     #improve this code to make it all work a bit better
     def Ct(self, t, epsabs=1.49e-12, epsrel=1.49e-12, limit=2000):
@@ -139,9 +154,24 @@ class BosonicBath:
             return self.Jw(np.abs(w))*0.5*(1.0+1.0/np.tanh(self.beta*np.abs(w)/2.0))*np.where(w > 0, 1.0, np.exp(self.beta*w))
 
     def discretise(self, discretisation_engine):
+        """Returns the coupling constants and frequencies associated with a discretised representation of the bath
+        :param discretisation_energy: The object used to discretise the c
+        :type w: np.ndarray
+        :param Ef: Fermi Energy
+        :type Ef: float
+        :param sigma: Whether to compute the spectral function associated with the
+            greater (+) or lesser (-) Green's Function, default to +
+        :type sigma: str, optional
+        :return: The bath correlation function
+        :rtype: np.ndarray
+        """
+
         from .bath_fitting import OrthopolDiscretisation, DensityDiscretisation
         if(discretisation_engine.wmin is None):
-            discretisation_engine.wmin = -2*self.wmax
+            if self.wmin is None:
+                discretisation_engine.wmin = -self.wmax
+            else:
+                discretisation_engine.wmin = self.wmin
         if(discretisation_engine.wmax is None):
             discretisation_engine.wmin = 2*self.wmax
         return discretisation_engine(self.Sw)
@@ -151,8 +181,10 @@ class BosonicBath:
         dk = None
         zk = None
         if isinstance(fitting_engine, AAADecomposition):
-            if(fitting_engine.wmin is None):
-                fitting_engine.wmin = -2*self.wmax
+            if self.wmin is None:
+                fitting_engine.wmin = -self.wmax
+            else:
+                fitting_engine.wmin = self.wmin
             if(fitting_engine.wmax is None):
                 fitting_engine.wmin = 2*self.wmax
             dk, zk, _ = fitting_engine(self.Sw)

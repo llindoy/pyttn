@@ -10,6 +10,9 @@ from pyttn import *
 from pyttn import oqs
 from numba import jit
 
+import matplotlib.pyplot as plt
+plt.rcParams.update({'font.size':22})
+
 
 #setup the star Hamiltonian for the spin boson model
 def star_hamiltonian(eps, delta, g, w, Nb):
@@ -131,7 +134,7 @@ def combine_modes(bath_mode_dims, bath_mode_inds, nbmax, nhilbmax):
     return composite_modes
 
 
-def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut = 20, nstep = 1, Nw = 10.0, geom='star', ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, nbmax=10, nhilbmax=1024):
+def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut = 20, nstep = 1, Nw = 10.0, geom='star', ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, nbmax=1, nhilbmax=1024):
     t = np.arange(nstep+1)*dt
 
     #setup the function for evaluating the exponential cutoff spectral density
@@ -142,8 +145,20 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     #set up the open quantum system bath object
     bath = oqs.BosonicBath(J, S=sOP("sz", 0), beta=beta)
 
-    #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
-    g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, 0, Nw*wc))
+    g,w = bath.discretise(oqs.OrthopolDiscretisation(512, 0, Nw*wc))
+    plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w), 'k-', label=r"Exact", linewidth=4)
+
+    tols = [1e-3, 1e-4, 1e-5]
+    for tol in tols:
+        #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
+        g,w = bath.expfit(oqs.AAADecomposition(wmin=-wc*Nw, wmax=2*wc*Nw, tol=tol))
+        plt.plot(t, oqs.BosonicBath.Ctexp(t, g, -1.0j*w), '--', label=r"$N_b="+str(len(g))+"$", linewidth=3)
+
+    plt.ylabel("$\sum_{k}<(a_k^\dagger+a_k)(t)(a_k^\dagger+a_k)>$")
+    plt.xlabel("$2\Delta t$")
+    plt.legend(frameon=False)
+    plt.show()
+    exit()
 
     #set up the total Hamiltonian
     N = Nb+1

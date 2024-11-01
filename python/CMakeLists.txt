@@ -14,17 +14,20 @@ option(BUILD_REAL_TTN "build wrapper for real valued tensor network objects." OF
 option(USE_GEMM3M "Compile with openmp" OFF)
 option(EVAL_BUT_DONT_APPLY "Compile with eval but don't apply option set" OFF)
 
-if(USE_OPENMP)
-  add_definitions(-DUSE_OPENMP)
-endif()
-
 if(PARALLELISE_SET_VARIABLES)
   add_definitions(-DPARALLELISE_SET_VARIABLES)
+  set(USE_OPENMP ON)
 endif()
 
 if(PARALLELISE_HAMILTONIAN_SUM)
   add_definitions(-DPARALLELISE_HAMILTONIAN_SUM)
+  set(USE_OPENMP ON)
 endif()
+
+if(USE_OPENMP)
+  add_definitions(-DUSE_OPENMP)
+endif()
+
 
 if(BUILD_REAL_TTN)
   add_definitions(-DBUILD_REAL_TTN)

@@ -49,7 +49,7 @@ def ESPRIT(Ct, K):
     ls = -np.log(ls[np.argsort(np.abs(ls))[::-1]])
     print(ls)
 
-def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None, Ncut = 20, nstep = 1, Nw = 7.5, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, init_state = 'up'):
+def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None, nstep = 1, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, init_state = 'up'):
     if chiU is None:
         chiU = chi
 
@@ -61,11 +61,10 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
         return np.where(np.abs(w) <= W, Gamma*np.sqrt(1-(w*w)/(W*W)), 0.0)
 
     #set up the open quantum system bath object
-    bath = oqs.fermionic_bath(V, beta=beta)
-
-    
-    dkf, zkf, Swf_aaa = bath.fitCt(4*W, Ef = 0.2, sigma='+', aaa_tol=1e-6, Naaa=2000)
-    dke, zke, Swe_aaa = bath.fitCt(4*W, Ef = 0.2, sigma='-', aaa_tol=1e-6, Naaa=2000)
+    bath = oqs.FermionicBath(V, beta=beta)
+   
+    gf, wf = bath.discretise(oqs.OrthopolDiscretisation(Nb, *bath.estimate_bounds(wmax=W)), Ef = 0.0, sigma='+')
+    ge, we = bath.discretise(oqs.OrthopolDiscretisation(Nb, *bath.estimate_bounds(wmax=W)), Ef = 0.0, sigma='-')
 
     Nbo = gf.shape[0]
     Nbe = ge.shape[0]
@@ -90,10 +89,10 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
     #for the system information compared to tree structure - setup the mode ordering so that the down impurity ordering is flipped while the up ordering 
     #is the current order
     mode_ordering = [N - (x+1) for x in range(N)] + [N + x for x in range(N)]
-    sysinf = system_modes([fermion_mode() for x in range(2*N)], mode_ordering)
-    print(sysinf.mode_indices)
-
-    #and discretise the bath getting the star Hamiltonian parameters using the orthpol discretisation strategy
+    sysinf = system_modes(2*N)
+    sysinf.mode_indices = mode_ordering
+    for i in range(2*N):
+        sysinf[i] = fermion_mode()
 
     #add on the impurity Hamiltonian terms
     H += epsd*fOP("n", N-1)
