@@ -63,6 +63,7 @@ inline void init_system_info(py::module &m)
         .def("assign", [](mode_data& self, const primitive_mode_data& o){self=o;})
         .def("assign", [](mode_data& self, const std::vector<primitive_mode_data>& o){self=o;})
         .def("append", static_cast<void (mode_data::*)(const primitive_mode_data&)>(&mode_data::append))
+        .def("append", static_cast<void (mode_data::*)(const mode_data&)>(&mode_data::append))
         .def("__copy__",[](const mode_data& o){return mode_data(o);})
         .def("__deepcopy__", [](const mode_data& o, py::dict){return mode_data(o);}, py::arg("memo"))
         .def("__str__", [](const mode_data& o){std::stringstream oss;   oss << o; return oss.str();})
@@ -73,7 +74,7 @@ inline void init_system_info(py::module &m)
     m.def("fermion_mode", &fermion_mode);
     m.def("boson_mode", &boson_mode);
     m.def("qubit_mode", &qubit_mode);
-    m.def("tls_mode", &qubit_mode);
+    m.def("tls_mode", &qubit_mode );
     m.def("spin_mode", &spin_mode);
     m.def("generic_mode", &generic_mode);
 
@@ -95,15 +96,18 @@ inline void init_system_info(py::module &m)
         .def("resize", &system_modes::resize)
         .def("clear", &system_modes::clear)
         .def("liouville_space", &system_modes::liouville_space)
+        .def("append", &system_modes::append_system)
         .def("contains_fermion", &system_modes::contains_fermion)
         .def("add_mode", static_cast<void (system_modes::*)(const primitive_mode_data&)>(&system_modes::add_mode))
         .def("add_mode", static_cast<void (system_modes::*)(const primitive_mode_data&, size_t)>(&system_modes::add_mode))
         .def("add_mode", static_cast<void (system_modes::*)(const mode_data&)>(&system_modes::add_mode))
         .def("add_mode", static_cast<void (system_modes::*)(const mode_data&, size_t)>(&system_modes::add_mode))
         .def("__str__", [](const system_modes& o){std::stringstream oss;   oss << o; return oss.str();})
+        .def("__len__", &system_modes::nmodes) 
         .def(
                 "__getitem__", 
-                static_cast<const mode_data& (system_modes::*)(size_t) const>(&system_modes::operator[])
+                static_cast<mode_data& (system_modes::*)(size_t)>(&system_modes::operator[]),
+                py::return_value_policy::reference
             )
         .def(
                 "__setitem__", 
@@ -141,6 +145,7 @@ inline void init_system_info(py::module &m)
                 &system_modes::mode_indices,
                 &system_modes::set_mode_indices
             );
+    m.def("combine_systems", &combine_systems);
     
 }
 

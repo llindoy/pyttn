@@ -1,13 +1,21 @@
 import copy
+import numpy as np
+
+from pyttn import system_modes
 
 
 class ModeCombination:
-    def __init__(self, nbmax = 2, nhilb = 1, blocksize=1):
+    def __init__(self, nhilb = 1, nbmax = 1, blocksize=1):
         self.nbmax = nbmax
         self.nhilb = nhilb
         self.blocksize = blocksize
 
-    def __call__(self, mode_dims, mode_inds, _blocksize = None):
+
+    def mode_combination_array(self, mode_dims, mode_inds=None, _blocksize=None):
+        if not isinstance(mode_inds, (np.ndarray, list)):
+            if mode_inds is None:
+                mode_inds = [x for x in range(len(mode_dims))]
+
         nbmax = self.nbmax
         nhilbmax = self.nhilb
         blocksize = self.blocksize
@@ -40,7 +48,7 @@ class ModeCombination:
                     if(mode < len(mode_dims)):
                         nextdims = nextdims*mode_dims[mode+j]
 
-                if len(cmode) < nbmax and chilb*nextdims <= nhilbmax:
+                if (nbmax == None or len(cmode) < nbmax) and chilb*nextdims <= nhilbmax:
                     #add all modes in the next block
                     for j in range(blocksize):
                         cmode.append(mode_inds[mode])
@@ -61,3 +69,21 @@ class ModeCombination:
                     chilb = 1
 
         return composite_modes
+
+    def mode_combination_system(self, system, _blocksize=None):
+        #extract the composite mode dimensions from the system
+        mode_dims = [system[i].lhd() for i in range(len(system))]
+
+        #now perform the mode combination on this array
+        composite_modes = self.mode_combination_array(mode_dims, _blocksize=_blocksize)
+
+        #and set up a composite system object using this information
+        composite_system = system_modes(len(composite_modes))
+        for i in range(len(composite_system)):
+            for j in composite_modes[i]:
+                composite_system[i].append(system[j])
+
+        return composite_system
+
+    def __call__(self, system, _blocksize = None):
+        return self.mode_combination_system(system, _blocksize=_blocksize)

@@ -230,7 +230,8 @@ void init_ttn(py::module &m, const std::string& label)
             )
         .def(
                 "__getitem__", 
-                [](const _ttn& i, size_t ind){ return i[ind]();}
+                [](_ttn& i, size_t ind) -> _ttn_node_data&{ return i[ind]();},
+                py::return_value_policy::reference
             )        
         .def(   
                 "site_tensor", 

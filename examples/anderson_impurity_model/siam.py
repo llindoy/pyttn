@@ -28,27 +28,6 @@ def siam_tree(chi, chiU, degree, Nbo, Nbe):
     ntreeBuilder.sanitise(topo)
     return topo
 
-def Ct(t, w, g, sigma='+'):
-    T, W = np.meshgrid(t, w)
-    g2 = g**2
-    if(sigma == '+'):
-        fourier = np.exp(1.0j*W*T)
-    else:
-        fourier = np.exp(-1.0j*W*T)
-    return g2@fourier
-
-def ESPRIT(Ct, K):
-    T = Ct.shape[0]
-    Y = scipy.linalg.toeplitz(Ct)
-    U, _, _ = np.linalg.svd(Y)
-    Us = U[:K, :]
-    S1 = Us[:, :T-1]
-    S2 = Us[:, 1:]
-    P = np.linalg.lstsq(S1, S2)[0]
-    ls, _ = np.linalg.eig(P)
-    ls = -np.log(ls[np.argsort(np.abs(ls))[::-1]])
-    print(ls)
-
 def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None, nstep = 1, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, init_state = 'up'):
     if chiU is None:
         chiU = chi

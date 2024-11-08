@@ -45,7 +45,8 @@ def add_chain_bath_hamiltonian(H, Sp, t, e, Sm=None, binds = None):
     return H
 
 #setup the chain hamiltonian for the spin boson model - that is this implements the method described in Nuomin, Beratan, Zhang, Phys. Rev. A 105, 032406
-def add_ipchain_bath_hamiltonian(H, Sp, Nb, t0, w, P, Sm = None, binds = None):
+def add_ipchain_bath_hamiltonian(H, Sp, t0, w, P, Sm = None, binds = None):
+    Nb = w.shape[0]
     if not isinstance(binds, np.ndarray):
         if binds is None:
             binds = [i+1 for i in range(Nb)]
@@ -76,7 +77,7 @@ def add_ipchain_bath_hamiltonian(H, Sp, Nb, t0, w, P, Sm = None, binds = None):
 
     return H
 
-def add_bath_hamiltonian(H, Sp, g, w, Sm = None, binds = None, geom='star'):
+def add_bosonic_bath_hamiltonian(H, Sp, g, w, Sm = None, binds = None, geom='star'):
     if geom == 'star':
         return add_star_bath_hamiltonian(H, Sp, g, w, Sm=Sm, binds=binds), w
     elif geom == 'chain':

@@ -160,7 +160,7 @@ public:
 
     void advance_hamiltonian(ttn_type& A, environment_type& env, env_container_type& h, env_type& op)
     {
-        if(m_use_time_dependent_hamiltonian)
+        if(m_use_time_dependent_hamiltonian && op.is_time_dependent())
         {
             op.update_coefficients(m_t+(m_dt/4.0));
             if(op.has_time_dependent_operators())
@@ -181,7 +181,7 @@ protected:
     real_type m_t;
     T m_coeff;
 
-    bool m_use_time_dependent_hamiltonian = false;
+    bool m_use_time_dependent_hamiltonian = true;
     
 };  //class tdvp_engine
 
@@ -350,7 +350,7 @@ public:
 
     void advance_hamiltonian(ttn_type& A, environment_type& env, env_container_type& h, env_type& op)
     {
-        if(m_use_time_dependent_hamiltonian)
+        if(m_use_time_dependent_hamiltonian && op.is_time_dependent())
         {
             op.update_coefficients(m_t+(m_dt/4.0));
 
@@ -372,7 +372,7 @@ protected:
     real_type m_t;
     T m_coeff;
 
-    bool m_use_time_dependent_hamiltonian = false;
+    bool m_use_time_dependent_hamiltonian = true;
     
     multiset_update_buffer<T, backend> mbuf;
 };  //class tdvp_engine

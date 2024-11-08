@@ -205,7 +205,8 @@ void init_msttn(py::module &m, const std::string& label)
             )
         .def(
                 "__getitem__", 
-                [](const _msttn& i, size_t ind){ return i[ind]();}
+                [](_msttn& i, size_t ind) -> _msttn_node_data& { return i[ind]();}, 
+                py::return_value_policy::reference
             )        
         .def(   
                 "site_tensor", 

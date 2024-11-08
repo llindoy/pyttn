@@ -24,7 +24,11 @@ struct ttn_sop_type<ttn<T, backend>>{using sop_type = sop_operator<T, backend>;}
 template <typename T, typename backend>
 struct ttn_sop_type<ms_ttn<T, backend>>{using sop_type = multiset_sop_operator<T, backend>;};
 
+template <typename T, typename backend, bool CONST>
+struct ttn_sop_type<multiset_ttn_slice<T, backend, CONST> >{using sop_type = sop_operator<T, backend>;};
+
 //TODO: Need to figure out best implementation for the multiset objects
+//TODO: Need to add support for multiset ttn slices.
 template <typename T, typename backend=linalg::blas_backend>
 class matrix_element
 {

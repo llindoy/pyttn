@@ -37,7 +37,8 @@ void init_operator_dictionary(py::module &m, const std::string& label)
         .def("resize", &opdict::resize)
 
         .def("__setitem__", [](opdict& o, size_t i, const elem_type& el){o[i] = el;})
-        .def("__getitem__", [](opdict& o, size_t i){return o[i];})
+        .def("__getitem__", [](opdict& o, size_t i)->elem_type& {return o[i];}, py::return_value_policy::reference)
+                
         .def("site_dictionary", [](opdict& o, size_t i){return o.site_dictionary(i);})
 
         .def("insert", &opdict::insert)

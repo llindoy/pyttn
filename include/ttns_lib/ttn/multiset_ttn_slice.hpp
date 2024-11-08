@@ -154,6 +154,19 @@ protected:
 
 };
 
+template <typename U, typename T, typename backend, bool CONST, typename = typename std::enable_if<is_tree<U>::value, void>::type>
+static inline bool 
+has_same_structure(const T& t, const multiset_ttn_slice<T, backend, CONST>& u)
+{
+    return has_same_structure(t, u.obj());
+}
+
+template <typename U, typename T, typename backend, bool CONST, typename = typename std::enable_if<is_tree<U>::value, void>::type>
+static inline bool 
+has_same_structure(const multiset_ttn_slice<T, backend, CONST>& u, const T& t)
+{
+    return has_same_structure(t, u.obj());
+}
 }   //namespace ttns
 
 #endif

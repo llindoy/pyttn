@@ -18,7 +18,7 @@ class EnergyTruncation:
         self.func = func
 
     def truncate_bosonic(self, ck, wk):
-        _wk = wk
+        _wk = np.zeros(wk.shape, dtype=float)
         if self.func == 'abs':
             for i in range(len(wk)):
                 _wk[i] = np.abs(wk[i])
@@ -30,7 +30,7 @@ class EnergyTruncation:
         for i in range(len(wk)):
             nbose = self.Lmax
             if not self.ecut is None:
-                nbose = int(self.ecut/wk[i])
+                nbose = int(self.ecut/np.real(_wk[i]))
             if nbose < self.Lmin:
                 nbose = self.Lmin
 

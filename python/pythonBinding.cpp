@@ -41,7 +41,7 @@
 #include "ttns/sop/SOP.hpp"
 #include "ttns/sop/liouville_space.hpp"
 
-#include "ttns/sop/models/models.hpp"
+//#include "ttns/sop/models/models.hpp"
 
 #include "ttns/algorithms/dmrg.hpp"
 #include "ttns/algorithms/tdvp.hpp"
@@ -97,7 +97,7 @@ PYBIND11_MODULE(_pyttn, m)
     initialise_sSOP(m);
     initialise_system_info(m);
     initialise_SOP(m);
-    initialise_models(m);
+    //initialise_models(m);
     initialise_operator_dictionary(m);
     initialise_liouville_space(m);
     

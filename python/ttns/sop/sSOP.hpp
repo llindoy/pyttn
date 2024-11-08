@@ -471,7 +471,8 @@ void init_sSOP(py::module& m)
                 )
             .def(
                     "__getitem__", 
-                    static_cast<const sNBO<real_type>& (_SOP::*)(size_t) const>(&_SOP::operator[])
+                    static_cast<sNBO<real_type>& (_SOP::*)(size_t)>(&_SOP::operator[]),
+                    py::return_value_policy::reference
                 )
             .def("__str__", [](const _SOP& o){std::ostringstream oss; oss << o; return oss.str();})
 
@@ -565,7 +566,8 @@ void init_sSOP(py::module& m)
                 )
             .def(
                     "__getitem__", 
-                    static_cast<const sNBO<complex_type>& (_SOP::*)(size_t) const>(&_SOP::operator[])
+                    static_cast<sNBO<complex_type>& (_SOP::*)(size_t)>(&_SOP::operator[]), 
+                    py::return_value_policy::reference
                 )
             .def("__str__", [](const _SOP& o){std::ostringstream oss; oss << o; return oss.str();})
 

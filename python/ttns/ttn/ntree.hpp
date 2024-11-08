@@ -76,7 +76,7 @@ void init_ntree_node(py::module &m)
             )
         .def(
                 "__getitem__", 
-                static_cast<const node_type& (node_type::*)(size_t) const>(&node_type::operator[]),
+                static_cast<node_type& (node_type::*)(size_t)>(&node_type::operator[]),
                 py::return_value_policy::reference
             )
         .def(
@@ -185,7 +185,8 @@ void init_ntree(py::module &m)
             )
         .def(
                 "__getitem__", 
-                static_cast<const node_type& (ntree<T>::*)(size_t) const>(&ntree<T>::operator[])
+                static_cast<node_type& (ntree<T>::*)(size_t)>(&ntree<T>::operator[]),
+                py::return_value_policy::reference
             )
         .def(
                 "at", 

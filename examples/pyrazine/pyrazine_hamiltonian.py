@@ -42,7 +42,6 @@ def B2u():
 def B3u():
     return ['v16b', 'v11']
 
-
 def G1():
     return Ag()
 
@@ -264,7 +263,6 @@ def hamiltonian(mode_dims):
     for g, Aij, Bij in zip(G2(), aij(), bij()):
         for i, vi in enumerate(g):
             for j, vj in enumerate(g):
-                print(vi, vj, mode_index(vi), mode_index(vj))
                 H += Aij[i, j]*sOP("|0><0|", 0)*sOP("q", mode_index(vi))*sOP("q", mode_index(vj))
                 H += Bij[i, j]*sOP("|1><1|", 0)*sOP("q", mode_index(vi))*sOP("q", mode_index(vj))
 
@@ -278,51 +276,6 @@ def hamiltonian(mode_dims):
         for i, vi in enumerate(gi):
             for j, vj in enumerate(gj):
                 H += Cij[i, j]*sOP("sx", 0)*sOP("q", mode_index(vi))*sOP("q", mode_index(vj))
-    print(H)
+
     return H, opdict
 
-def multiset_hamiltonian(mode_dims):
-    N = len(modes())
-    Nb = len(mode_dims)
-    H = multiset_SOP(2, Nb)
-    omegas = w()
-    vs = modes()[1:]
-
-    delta = 0.8460/2.0*eV
-
-    #now set up the Hamiltonian
-    H[0,0] -= delta
-    H[0,1] += 0
-    H[1,0] += 0
-    H[1,1] += delta
-    for v in vs:
-        H[0,0] += omegas[v]*sOP("n", vibrational_mode_index(v))
-        H[1,1] += omegas[v]*sOP("n", vibrational_mode_index(v))
-
-    #the linear on-diagonal couplings
-    for i, g in enumerate(G1()):
-        H[0,0] += ai()[i]*sOP("q", vibrational_mode_index(g))
-        H[1,1] += bi()[i]*sOP("q", vibrational_mode_index(g))
-
-    #the quadratic on-diagonal couplings
-    for g, Aij, Bij in zip(G2(), aij(), bij()):
-        for i, vi in enumerate(g):
-            for j, vj in enumerate(g):
-                print(vi, vj, vibrational_mode_index(vi), vibrational_mode_index(vj))
-                H[0,0] += Aij[i, j]*sOP("q", vibrational_mode_index(vi))*sOP("q", vibrational_mode_index(vj))
-                H[1,1] += Bij[i, j]*sOP("q", vibrational_mode_index(vi))*sOP("q", vibrational_mode_index(vj))
-
-    #the linear off-diagonal couplings
-    for i, g in enumerate(G3()):
-        H[0,1] += ci()[i]*sOP("q", vibrational_mode_index(g))
-        H[1,0] += ci()[i]*sOP("q", vibrational_mode_index(g))
-
-    #the quadratic on-diagonal couplings
-    G4i, G4j = G4()
-    for gi, gj, Cij in zip(G4i, G4j, cij()):
-        for i, vi in enumerate(gi):
-            for j, vj in enumerate(gj):
-                H[0,1] += Cij[i, j]*sOP("q", vibrational_mode_index(vi))*sOP("q", vibrational_mode_index(vj))
-                H[1,0] += Cij[i, j]*sOP("q", vibrational_mode_index(vi))*sOP("q", vibrational_mode_index(vj))
-    print(H)
-    return H

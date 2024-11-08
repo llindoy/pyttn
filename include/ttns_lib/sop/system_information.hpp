@@ -118,6 +118,14 @@ public:
         m_modes.push_back(std::move(o));
     }
 
+    void append(const mode_data& o)
+    {
+        for(size_t i = 0; i < o.nmodes(); ++i)
+        {
+            m_modes.push_back(o.m_modes[i]);
+        }
+    }
+
     void clear(){m_modes.clear();}
 
     void resize(size_t n)
@@ -189,6 +197,8 @@ inline primitive_mode_data generic_mode(size_t N){return primitive_mode_data(N, 
 
 class system_modes
 {
+public:
+    friend system_modes combine_systems(const system_modes& a, const system_modes& b);
 public:
     using iterator = typename std::vector<mode_data>::iterator;
     using const_iterator = typename std::vector<mode_data>::const_iterator;
@@ -317,6 +327,20 @@ public:
         }
         m_modes.push_back(m);
         m_tree_leaf_indices.push_back(i);
+    }
+  
+    //append another system to the end of this one.  This will keep the internal ordering of each system but have it so that
+    //the second system variables are appended
+    void append_system(const system_modes& o)
+    {
+        size_t nmodes = m_modes.size();
+        m_modes.reserve(nmodes + o.nmodes());
+        for(size_t i = 0; i < o.nmodes(); ++i)
+        {
+            //add a new mode which is the input mode object and points to the tree leaf index object indexed specified in o
+            //but incremented by the number of modes in the current tree to skip over all of these indices.
+            this->add_mode(o.m_modes[i], o.m_tree_leaf_indices[i]+nmodes);
+        }
     }
 
     //functions for accessing the composite mode information
@@ -463,6 +487,12 @@ protected:
 };
 
 
+inline system_modes combine_systems(const system_modes& a, const system_modes& b)
+{
+    system_modes ret(a);
+    ret.append_system(b);
+    return ret;
+}
 
 }
 
@@ -480,7 +510,7 @@ inline std::ostream& operator<<(std::ostream& o, const ttns::mode_type& m)
             o << "spin";
             break;
         case ttns::mode_type::QUBIT_MODE:
-            o << "qubit";
+            o << "tls";
             break;
         case ttns::mode_type::GENERIC_MODE:
             o << "generic";
