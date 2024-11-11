@@ -22,7 +22,7 @@ def plot(fnames, Ns):
         h5.close()
 
         for N in range(Ns):
-            plt.plot(t, 0.5-0.5*np.real(pars[N]/np.amax(np.abs(pars[1]))), styles[c], label='Sz'+str(N)+" "+fname)
+            plt.plot(t, 0.5-np.real(pars[N]), styles[c], label='Sz'+str(N)+" "+fname)
         c=c+1
         c=c%3
     plt.legend(frameon=False)

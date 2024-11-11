@@ -16,9 +16,15 @@ def plot(fnames, Ns):
             t = np.array(h5.get('t'))
             for N  in range(Ns):
                 if isinstance(pars, np.ndarray):
-                    pars += np.array(h5.get('Sz'+str(N)))
+                    if 'rSz'+str(N) in h5:
+                        pars += (np.array(h5.get('rSz'+str(N))))
+                    else:
+                        pars += (np.array(h5.get('Sz'+str(N))))
                 else:
-                    pars = np.array(h5.get('Sz'+str(N)))
+                    if 'rSz'+str(N) in h5:
+                        pars = (np.array(h5.get('rSz'+str(N))))
+                    else:
+                        pars = (np.array(h5.get('Sz'+str(N))))
 
             h5.close()
         except:

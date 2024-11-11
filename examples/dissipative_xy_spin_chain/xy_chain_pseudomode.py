@@ -269,23 +269,23 @@ if __name__ == "__main__":
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=16)
-    parser.add_argument('--chiS', type=int, default=32)
+    parser.add_argument('--chi', type=int, default=32)
+    parser.add_argument('--chiS', type=int, default=64)
     parser.add_argument('--degree', type=int, default=1)
 
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.05)
-    parser.add_argument('--tmax', type=float, default=10)
+    parser.add_argument('--tmax', type=float, default=40)
 
     #output file name
-    parser.add_argument('--fname', type=str, default='xychain_pm.h5')
+    parser.add_argument('--fname', type=str, default='xychain_pm_64.h5')
 
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
     parser.add_argument('--nunoccupied', type=int, default=0)
-    parser.add_argument('--spawning_threshold', type=float, default=2e-6)
-    parser.add_argument('--unoccupied_threshold', type=float, default=1e-6)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-5)
+    parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
     args = parser.parse_args()
 

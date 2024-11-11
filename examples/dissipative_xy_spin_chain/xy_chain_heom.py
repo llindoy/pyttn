@@ -63,6 +63,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
     expbath.truncate_modes(utils.EnergyTruncation(15*wc, Lmax=L, Lmin=Lmin))
     bsys = expbath.system_information()
 
+
     dk = expbath.dk
     zk = expbath.zk
 
@@ -245,7 +246,7 @@ if __name__ == "__main__":
     parser.add_argument('--wc', type = float, default=4)
 
     #number of bath modes
-    parser.add_argument('--K', type=int, default=4)
+    parser.add_argument('--K', type=int, default=6)
 
     #maximum bosonic hilbert space dimension
     parser.add_argument('--L', type=int, default=25)
@@ -270,10 +271,10 @@ if __name__ == "__main__":
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.05)
-    parser.add_argument('--tmax', type=float, default=10)
+    parser.add_argument('--tmax', type=float, default=40)
 
     #output file name
-    parser.add_argument('--fname', type=str, default='xychain.h5')
+    parser.add_argument('--fname', type=str, default='xychain_heom.h5')
 
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)

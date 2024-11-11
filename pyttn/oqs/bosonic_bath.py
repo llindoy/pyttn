@@ -70,6 +70,7 @@ class BosonicBath:
         Ctr = np.zeros(t.shape, dtype=np.complex128)
         Cti = np.zeros(t.shape, dtype=np.complex128)
 
+        print(wmin, wmax)
         wc = 1e-10
         #if wmin > wc we don't span zero
         if(wmin >= wc):
@@ -88,26 +89,26 @@ class BosonicBath:
             #depending on the value of wmin and -wc.  
             #Handle the region [wc, wmax]
             if wmax == np.inf:
-                Ctr = sp.integrate.quad_vec(lambda x : self.Sw(x)*np.cos(x*t), wc, wmax, epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
-                Cti = sp.integrate.quad_vec(lambda x : self.Sw(x)*np.sin(x*t), wc, wmax, epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                Ctr += sp.integrate.quad_vec(lambda x : self.Sw(x)*np.cos(x*t), wc, wmax, epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
+                Cti += sp.integrate.quad_vec(lambda x : self.Sw(x)*np.sin(x*t), wc, wmax, epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
             #otherwise we can make use of the weight function
             else:
                 for ti in range(t.shape[0]):
-                    Ctr[ti] = sp.integrate.quad(lambda x : self.Sw(x), wc, wmax, weight='cos', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
-                    Cti[ti] = sp.integrate.quad(lambda x : self.Sw(x), wc, wmax, weight='sin', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                    Ctr[ti] += sp.integrate.quad(lambda x : self.Sw(x), wc, wmax, weight='cos', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
+                    Cti[ti] += sp.integrate.quad(lambda x : self.Sw(x), wc, wmax, weight='sin', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
 
             #Handle the two regions [wmin, -wc], (-wc, wc)
             if(wmin < -wc):
                 if wmin == -np.inf:
-                    Ctr += sp.integrate.quad_vec(lambda x : self.Sw(x)*np.cos(x*t), wc, wmax, epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
-                    Cti += sp.integrate.quad_vec(lambda x : self.Sw(x)*np.sin(x*t), wc, wmax, epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                    Ctr += sp.integrate.quad_vec(lambda x : self.Sw(x)*np.cos(x*t), wmin, -wc, epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
+                    Cti += sp.integrate.quad_vec(lambda x : self.Sw(x)*np.sin(x*t), wmin, -wc, epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
                 #otherwise we can make use of the weight function
                 else:
                     for ti in range(t.shape[0]):
-                        Ctr[ti] += sp.integrate.quad(lambda x : self.Sw(x), wc, wmax, weight='cos', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
-                        Cti[ti] += sp.integrate.quad(lambda x : self.Sw(x), wc, wmax, weight='sin', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
-                Ctr+= sp.integrate.quad_vec(lambda x : self.Sw(x)*np.cos(x*t), -wc, wc, points=[0], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
-                Cti+= sp.integrate.quad_vec(lambda x : self.Sw(x)*np.sin(x*t), -wc, wc, points=[0], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                        Ctr[ti] += sp.integrate.quad(lambda x : self.Sw(x), wmin, wc, weight='cos', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
+                        Cti[ti] += sp.integrate.quad(lambda x : self.Sw(x), wmin, wc, weight='sin', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                    Ctr+= sp.integrate.quad_vec(lambda x : self.Sw(x)*np.cos(x*t), -wc, wc, points=[0], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
+                    Cti+= sp.integrate.quad_vec(lambda x : self.Sw(x)*np.sin(x*t), -wc, wc, points=[0], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
             #Handle the regions (wmin, wc)
             else:
                 if(wmin <= 0):
@@ -151,7 +152,7 @@ class BosonicBath:
         if self.beta == None:
             return self.Jw(np.abs(w))*np.where(w > 0, 1.0, 0.0)
         else:
-            return self.Jw(np.abs(w))*0.5*(1.0+1.0/np.tanh(self.beta*np.abs(w)/2.0))*np.where(w > 0, 1.0, np.exp(-np.abs(self.beta*w)))
+            return self.Jw(w)*0.5*(1.0+1.0/np.tanh(self.beta*w/2.0))#*np.where(w > 0, 1.0, np.exp(-self.beta*np.abs(w)))
 
     def discretise(self, discretisation_engine):
         """Returns the coupling constants and frequencies associated with a discretised representation of the bath
