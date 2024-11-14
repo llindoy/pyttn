@@ -34,7 +34,7 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chiS, chi, nbose, dt, nbose_min = N
     #setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
     def J(w):
-        return 2*np.pi*alpha*w*np.exp(-np.abs(w/wc)**2)
+        return np.abs(2*np.pi*alpha*w*np.exp(-np.abs(w/wc))**2)*np.where(w > 0, 1.0, -1.0)
 
     #set up the open quantum system bath object
     bath = oqs.BosonicBath(J, beta=beta)
@@ -43,17 +43,6 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chiS, chi, nbose, dt, nbose_min = N
     g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
 
     import matplotlib.pyplot as plt
-    plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w))
-
-    #set up the open quantum system bath object
-    bath = oqs.BosonicBath(J, beta=beta)
-
-    #discretise the bath correleation function using the orthonormal polynomial based cutoff 
-    g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(3*wc), 3*wc))
-    plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w))
-
-    #discretise the bath correleation function using the orthonormal polynomial based cutoff 
-    g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(2*wc), 2*wc))
     plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w))
     plt.show()
 
@@ -156,7 +145,6 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chiS, chi, nbose, dt, nbose_min = N
     sweep.dt = dt
     sweep.coefficient = -1.0j
 
-    t1 = time.time()
     #run dynamics and measure properties storing them in a file
     res = np.zeros((Ns, nstep+1), dtype=np.complex128)
     maxchi = np.zeros(nstep+1)
@@ -184,13 +172,14 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chiS, chi, nbose, dt, nbose_min = N
 
     #now perform standard time stepping
     for i in range(1,nstep):
+        t1 = time.time()
         sweep.step(A, h)
+        t2 = time.time()
         for si in range(Ns):
             res[si, i+1] = mel(ops[si], A)
         maxchi[i+1] = A.maximum_bond_dimension()
         print(i, res[(Ns-1)//2, i+1], A.maximum_bond_dimension())
 
-        t2 = time.time()
         #outputting results to files every 10 steps
         if(i % 1 == 0):
             h5 = h5py.File(ofname, 'w')
@@ -198,17 +187,14 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chiS, chi, nbose, dt, nbose_min = N
             for si in range(Ns):
                 h5.create_dataset('Sz'+str(si), data=np.real(res[si, :]))
             h5.create_dataset('maxchi', data=maxchi)
-            h5.create_dataset('time', data=np.array([t2-t1]))
             h5.close()
                 
-    t2 = time.time()
     #and finally dump everything to file at the end of the simulation
     h5 = h5py.File(ofname, 'w')
     h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
     for si in range(Ns):
         h5.create_dataset('Sz'+str(si), data=np.real(res[si, :]))
     h5.create_dataset('maxchi', data=maxchi)
-    h5.create_dataset('time', data=np.array([t2-t1]))
     h5.close()
 
 
@@ -218,7 +204,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Dynamics of the zero temperature spin boson model with')
 
-    parser.add_argument('--N', type=int, default=180)
+    parser.add_argument('--N', type=int, default=80)
     #number of spins in the system
     parser.add_argument('--Ns', type=int, default=21)
 
@@ -227,7 +213,7 @@ if __name__ == "__main__":
     parser.add_argument('--wc', type = float, default=4)
 
     #number of bath modes
-    parser.add_argument('--geom', type = str, default='star')
+    parser.add_argument('--geom', type = str, default='ipchain')
 
     #maximum bosonic hilbert space dimension
     parser.add_argument('--nbose', type=int, default=20)
@@ -245,14 +231,14 @@ if __name__ == "__main__":
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=64)
+    parser.add_argument('--chi', type=int, default=32)
     parser.add_argument('--chiS', type=int, default=64)
     parser.add_argument('--degree', type=int, default=1)
 
 
     #integration time parameters
-    parser.add_argument('--dt', type=float, default=0.05)
-    parser.add_argument('--tmax', type=float, default=40)
+    parser.add_argument('--dt', type=float, default=0.025)
+    parser.add_argument('--tmax', type=float, default=10)
 
     #output file name
     parser.add_argument('--fname', type=str, default='xychain.h5')
@@ -260,7 +246,7 @@ if __name__ == "__main__":
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
     parser.add_argument('--nunoccupied', type=int, default=1)
-    parser.add_argument('--spawning_threshold', type=float, default=5e-4)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-5)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
     args = parser.parse_args()

@@ -51,7 +51,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
     #setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
     def J(w):
-        return np.abs(2*np.pi*alpha*w*np.exp(-np.abs(w/wc))**2)*np.where(w > 0, 1.0, -1.0)
+        return 2*np.pi*alpha*w*np.exp(-np.abs(w/wc)**2)
 
     #set up the open quantum system bath object
     bath = oqs.BosonicBath(J, beta=beta, wmax=wc*100)
@@ -62,7 +62,6 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
     expbath = oqs.ExpFitBosonicBath(dk, zk)
     expbath.truncate_modes(utils.EnergyTruncation(15*wc, Lmax=L, Lmin=Lmin))
     bsys = expbath.system_information()
-
 
     dk = expbath.dk
     zk = expbath.zk
@@ -126,10 +125,14 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
 
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
+    chiS0 = chi
     if adaptive:
-        chi0 = 8
+        chi0 = 16
+        chiS0=16
+    chi0=min(chi0, chi)
+    chiS0=min(chiS0, chiS)
 
-    topo = build_topology(Ns, sysinfo[0].lhd(), chi0, chi0, L, b_mode_dims, degree)
+    topo = build_topology(Ns, sysinfo[0].lhd(), chiS0, chi0, L, b_mode_dims, degree)
     capacity = build_topology(Ns, sysinfo[0].lhd(), chiS, chi, L, b_mode_dims, degree)
 
     #utils.visualise_tree(topo)
@@ -158,9 +161,9 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
     #set up the tdvp object
     sweep = None
     if not adaptive:
-        sweep = tdvp(A, h, krylov_dim = 12)
+        sweep = tdvp(A, h, krylov_dim = 16)
     else:
-        sweep = tdvp(A, h, krylov_dim = 12, expansion='subspace')
+        sweep = tdvp(A, h, krylov_dim = 16, expansion='subspace')
         sweep.spawning_threshold = spawning_threshold
         sweep.unoccupied_threshold=unoccupied_threshold
         sweep.minimum_unoccupied=nunoccupied
@@ -178,6 +181,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
     maxchi[0] = A.maximum_bond_dimension()
 
 
+    t1 = time.time()
     #perform the dynamics
     renorm = mel(id_ttn, A)
     i=0
@@ -203,9 +207,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
     sweep.dt = dt
 
     for i in range(1, nstep):
-        t1 = time.time()
         sweep.step(A, h)
-        t2 = time.time()
         renorm = mel(id_ttn, A)
         for si in range(Ns):
             res[si, i+1] = mel(ops[si], A, id_ttn)
@@ -215,22 +217,28 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
 
         print((i+1)*dt, res[Ns//2, i+1], np.real(renorm), maxchi[i+1], np.real(mel(A, A)))
 
+        t2 = time.time()
         h5 = h5py.File(ofname, 'w')
         h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
         for si in range(Ns):
             h5.create_dataset('Sz'+str(si), data=np.real(res[si, :]))
             h5.create_dataset('rSz'+str(si), data=np.real(res[si, :]*Rnorm))
+        h5.create_dataset('rnorm', data=np.real(Rnorm))
         h5.create_dataset('maxchi', data=maxchi)
         h5.create_dataset('norm', data=norm)
+        h5.create_dataset('time', data=np.array([t2-t1]))
         h5.close()
 
+    t2 = time.time()
     h5 = h5py.File(ofname, 'w')
     h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
     for si in range(Ns):
         h5.create_dataset('Sz'+str(si), data=np.real(res[si, :]))
         h5.create_dataset('rSz'+str(si), data=np.real(res[si, :]*Rnorm))
     h5.create_dataset('maxchi', data=maxchi)
+    h5.create_dataset('rnorm'+str(si), data=np.real(Rnorm))
     h5.create_dataset('norm', data=norm)
+    h5.create_dataset('time', data=np.array([t2-t1]))
     h5.close()
 
 import argparse
@@ -264,14 +272,14 @@ if __name__ == "__main__":
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=32)
-    parser.add_argument('--chiS', type=int, default=64)
+    parser.add_argument('--chi', type=int, default=16)
+    parser.add_argument('--chiS', type=int, default=32)
     parser.add_argument('--degree', type=int, default=1)
 
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.05)
-    parser.add_argument('--tmax', type=float, default=40)
+    parser.add_argument('--tmax', type=float, default=10)
 
     #output file name
     parser.add_argument('--fname', type=str, default='xychain_heom.h5')
@@ -279,7 +287,7 @@ if __name__ == "__main__":
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
     parser.add_argument('--nunoccupied', type=int, default=1)
-    parser.add_argument('--spawning_threshold', type=float, default=1e-5)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-6)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
     args = parser.parse_args()

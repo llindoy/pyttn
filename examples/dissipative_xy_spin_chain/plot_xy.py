@@ -25,7 +25,9 @@ def plot(fnames, Ns):
             plt.plot(t, 0.5-np.real(pars[N]), styles[c], label='Sz'+str(N)+" "+fname)
         c=c+1
         c=c%3
-    plt.legend(frameon=False)
+    #plt.legend(frameon=False)
+    plt.xlim([0,10])
+    plt.ylim([0, 1])
     plt.show()
 
 

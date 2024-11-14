@@ -152,7 +152,7 @@ class BosonicBath:
         if self.beta == None:
             return self.Jw(np.abs(w))*np.where(w > 0, 1.0, 0.0)
         else:
-            return self.Jw(w)*0.5*(1.0+1.0/np.tanh(self.beta*w/2.0))#*np.where(w > 0, 1.0, np.exp(-self.beta*np.abs(w)))
+            return np.where(w>0, self.Jw(w), -self.Jw(-w))*0.5*(1.0+1.0/np.tanh(self.beta*w/2.0))
 
     def discretise(self, discretisation_engine):
         """Returns the coupling constants and frequencies associated with a discretised representation of the bath

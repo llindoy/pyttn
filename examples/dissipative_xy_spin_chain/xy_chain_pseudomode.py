@@ -50,7 +50,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
     #setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
     def J(w):
-        return np.abs(2*np.pi*alpha*w*np.exp(-np.abs(w/wc))**2)*np.where(w > 0, 1.0, -1.0)
+        return 2*np.pi*alpha*w*np.exp(-np.abs(w/wc)**2)
 
     #set up the open quantum system bath object
     bath = oqs.BosonicBath(J, beta=beta, wmax=wc*100)
@@ -183,6 +183,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
     maxchi[0] = A.maximum_bond_dimension()
 
 
+    t1 = time.time()
     #perform the dynamics
     renorm = mel(id_ttn, A)
     i=0
@@ -208,9 +209,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
     sweep.dt = dt
 
     for i in range(1, nstep):
-        t1 = time.time()
         sweep.step(A, h)
-        t2 = time.time()
         renorm = mel(id_ttn, A)
         for si in range(Ns):
             res[si, i+1] = mel(ops[si], A, id_ttn)
@@ -220,15 +219,19 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
 
         print((i+1)*dt, res[Ns//2, i+1], np.real(renorm), maxchi[i+1], np.real(mel(A, A)))
 
+        t2 = time.time()
         h5 = h5py.File(ofname, 'w')
         h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
         for si in range(Ns):
             h5.create_dataset('Sz'+str(si), data=np.real(res[si, :]))
             h5.create_dataset('rSz'+str(si), data=np.real(res[si, :]*Rnorm))
+        h5.create_dataset('time', data=np.array([t2-t1]))
         h5.create_dataset('maxchi', data=maxchi)
         h5.create_dataset('norm', data=norm)
+        h5.create_dataset('rnorm', data=Rnorm)
         h5.close()
 
+    t2 = time.time()
     h5 = h5py.File(ofname, 'w')
     h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
     for si in range(Ns):
@@ -236,6 +239,8 @@ def xychain_dynamics(Ns, alpha, wc, eta, chiS, chi, L, K, dt, Lmin = None, beta 
         h5.create_dataset('rSz'+str(si), data=np.real(res[si, :]*Rnorm))
     h5.create_dataset('maxchi', data=maxchi)
     h5.create_dataset('norm', data=norm)
+    h5.create_dataset('time', data=np.array([t2-t1]))
+    h5.create_dataset('rnorm', data=Rnorm)
     h5.close()
 
 import argparse

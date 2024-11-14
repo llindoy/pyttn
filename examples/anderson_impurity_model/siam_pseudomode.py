@@ -14,77 +14,132 @@ from pyttn import oqs, utils
 
 from numba import jit
 
-def build_topology(nsys, chi, nbose, b_mode_dims, degree):
-    topo = ntree("(1(%d(%d))(%d))"%(nsys, nsys, nsys))
+
+def siam_tree(chi, chiU, degree, bsysf, bsyse):
+    topo = ntree(str("(1(chiU(4(4))(chiU))(chiU(4(4))(chiU)))").replace('chiU', str(chiU)))
+    print(topo)
     if(degree > 1):
-        ntreeBuilder.mlmctdh_subtree(topo()[1], b_mode_dims, degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[0][1], [bsysf[i] for i in range(len(bsysf))], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[0][1], [bsyse[i] for i in range(len(bsyse))], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[1][1], [bsysf[i] for i in range(len(bsysf))], degree, chi)
+        ntreeBuilder.mlmctdh_subtree(topo()[1][1], [bsyse[i] for i in range(len(bsyse))], degree, chi)
     else:
-        ntreeBuilder.mps_subtree(topo()[1], b_mode_dims, chi, min(chi, nbose))
+        ntreeBuilder.mps_subtree(topo()[0][1], [bsysf[i] for i in range(len(bsysf))], chi, min(chi, 4))
+        ntreeBuilder.mps_subtree(topo()[0][1], [bsyse[i] for i in range(len(bsyse))], chi, min(chi, 4))
+        ntreeBuilder.mps_subtree(topo()[1][1], [bsysf[i] for i in range(len(bsysf))], chi, min(chi, 4))
+        ntreeBuilder.mps_subtree(topo()[1][1], [bsyse[i] for i in range(len(bsyse))], chi, min(chi, 4))
     ntreeBuilder.sanitise(topo)
     return topo
 
-def observable_tree(obstree, op, b_mode_dims):
+def observable_tree(obstree, dims):
     Opttn = ttn(obstree, dtype=np.complex128)
     #setup the Sz tree state
     prod_state = [op.flatten()]
-    for i in range(len(b_mode_dims)):
-        state_vec = np.identity(int(np.sqrt(b_mode_dims[i])), dtype=np.complex128).flatten()
+    for i in range(len(dims)):
+        state_vec = np.identity(int(np.sqrt(dims[i])), dtype=np.complex128).flatten()
         prod_state.append(state_vec)
     Opttn.set_product(prod_state)
     return Opttn
 
-def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = None, nstep = 1, ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024):
+
+def bath_parameters(K, nstep, dt, Ef, sigma):
+    dkf, zkf = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep), Ef = 0.0, sigma=sigma)
+
+    #set up the exp bath object this takes the dk and zk terms.  Truncate the modes and
+    #extract the system information object from this.
+    expbathf = oqs.ExpFitFermionicBath(dkf, zkf)
+    bsysf = expbathf.system_information()
+
+    gkf = np.real(zkf)
+    Ekf = np.imag(zkf)
+
+    Vkf = np.real(np.sqrt(dkf))
+    Mkf = -np.imag(np.sqrt(dkf))
+    return gkf, Ekf, Vkf, Mkf, bsysf
+
+
+def setup_system(bsysf, bsyse, use_mode_combination=True, nbmax=8, nhilbmax=1024):
+    #setup the system information object
+    sysinf = system_modes(1)
+    sysinf[0] = [fermion_mode(), fermion_mode()]
+
+    if use_mode_combination:
+        mode_comb = utils.ModeCombination(nhilbmax, nbmax)
+        bsyse = mode_comb(bsyse)
+        bsysf = mode_comb(bsysf)
+
+    Nf = bsysf.nprimitive_modes()
+    Ne = bsyse.nprimitive_modes()
+    N = 2+Ne+Nf
+
+    bsys = combine_system(sysinf, bsys)
+
+    #set the spin up spins
+    sysinfu = combine_systems(sysinf, bsys)
+
+    #and the down spin results.  Now order the modes the otherway around for the jordan-wigner mapping
+    sysinfd = system_modes(len(sysinfu))
+    for i in range(sysinfu):
+        sysinfd[i] = sysinfu[len(sysinfu)-(i+1)]
+
+
+    mode_ordering = [len(sysinfd) - (x+1) for x in range(len(sysinfd))] 
+    sysinfd.mode_indices=mode_ordering
+
+    #but reverese the ordering on the tree structure
+    dims=[sysinfu[i].lhd() for i in range(len(sysinfu))]+[sysinfu[i].lhd() for i in range(len(sysinfu))]
+
+    sysinf = combine_systems(sysinfd, sysinfu)
+
+    modes_f_d = [N - 2 - (x+1) for x in range(Nf)]
+    modes_f_u = [N + 2 - (x+1) for x in range(Nf)]
+
+    modes_e_d = [N - 2 - Nf - (x+1) for x in range(Ne)]
+    modes_e_u = [N + 2 - Nf - (x+1) for x in range(Ne)]
+
+    return sysinf, dims, bsysf, bsyse, modes_f_d, modes_f_u, modes_e_d, modes_e_u
+
+
+
+
+def siam_dynamics(Gamma, W, epsd, deps, U, chi, K, dt, chiU = None, beta = None, nstep = 1, ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, init_state = 'up', use_mode_combination=True, nbmax=8, nhilbmax=1024):
+    if chiU is None:
+        chiU = chi
+
     t = np.arange(nstep+1)*dt
 
     #setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
-    def J(w):
-        return np.abs(np.pi/2*alpha*wc*np.power(w/wc, s)*np.exp(-np.abs(w/wc)))*np.where(w > 0, 1.0, -1.0)#np.where(np.abs(w) < 1, 1, 0)#
+    def V(w):
+        return np.where(np.abs(w) <= W, Gamma*np.sqrt(1-(w*w)/(W*W)), 0.0)
 
     #set up the open quantum system bath object
-    bath = oqs.BosonicBath(J, beta=beta)
-    dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
+    bath = oqs.FermionicBath(V, beta=beta)
+   
+    dke, zke = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep), Ef = 0.0, sigma='-')
+    
+    gkf, Ekf, Vkf, Mkf, bsysf = bath_parameters(K, nstep, dt, 0.0, '+')
+    gke, Eke, Vke, Mke, bsyse = bath_parameters(K, nstep, dt, 0.0, '-')
 
-    #set up the exp bath object this takes the dk and zk terms.  Truncate the modes and
-    #extract the system information object from this.
-    expbath = oqs.ExpFitBosonicBath(dk, zk)
-    expbath.truncate_modes(utils.EnergyTruncation(10*wc, Lmax=L, Lmin=Lmin))
-    bsys = expbath.system_information()
+    sysinf, dims, bsysf, bsyse, modes_f_d, modes_f_u, modes_e_d, modes_e_u = setup_system(bsysf, bsyse, use_mode_combination, nbmax, nhilbmax)
 
-    gk = np.real(zk)
-    Ek = np.imag(zk)
-
-    Vk = np.real(np.sqrt(dk))
-    Mk = -np.imag(np.sqrt(dk))
-
-    Nb = bsys.nprimitive_modes()
-    N = Nb+2
-
-    #setup the system information object
-    sysinf = system_modes(1)
-    sysinf[0] = [tls_mode(), tls_mode()]
-
-    #now attempt mode combination on the bath modes
-    if use_mode_combination:
-        mode_comb = utils.ModeCombination(nhilbmax, nbmax)
-        bsys = mode_comb(bsys)
-
-    #extract the bath mode dimensions
-    b_mode_dims = np.zeros(len(bsys), dtype=int)
-    for i in range(len(bsys)):
-        b_mode_dims[i] = bsys[i].lhd()
-
-    #construct the system information object by combining the system information with the bath
-    #information
-    sysinf = combine_systems(sysinf, bsys)
-    print(sysinf.nprimitive_modes(), N)
+    N = sysinf.nprimitive_modes()
+    Nh = N//2
 
     #set up the total Hamiltonian
     H = SOP(N)
 
     #add on the system liouvillian - here we are using that sz^T = sz and "sx^T=sx"
-    Lsys = (eps*sOP("sz", 0) + delta*sOP("sx", 0)) - (eps*sOP("sz", 1)+delta*sOP("sx", 1))
+
+    Lsys = epsd* ( fOP("n", Nn-2) - fOP("n", Nn-1))
+    Lsys += (epsd+deps)* ( fOP("n", Nn) - fOP("n", Nn+1))
+    Lsys += U* ( fOP("n", Nn-2)*fOP("n", Nn) - fOP("n", Nn-1)*fOP("n", Nn+1))
+
     H += Lsys
+
+    #now add on the filled bath terms
+
+    #and the empty bath terms
 
     for i in range(len(zk)):
         i1 = 2*(i+1)
@@ -95,11 +150,6 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
         H += 2.0j*(complex(np.conj(Mk[i]))*sOP("sz", 0)*sOP("a", i2) + complex(Mk[i])*sOP("sz", 1)*sOP("a", i1))
         H += (Vk[i]-1.0j*Mk[i])*sOP("sz", 0)*sOP("adag", i1) - (Vk[i]+1.0j*Mk[i])*sOP("sz", 1)*sOP("adag", i2)
         H += (Vk[i]-1.0j*Mk[i])*sOP("sz", 0)*sOP("a", i1) - (Vk[i]+1.0j*Mk[i])*sOP("sz", 1)*sOP("a", i2)
-        #H += complex(Ek[i])*(sOP("n", i1)-sOP("n", i2))
-        #H += 2.0j*complex(gk[i])*(sOP("a", i1)*sOP("a", i2)-0.5*(sOP("n", i1)+sOP("n", i2)))
-        #H += complex(Vk[i])*(sOP("sz", 0)*(sOP("adag", i1)+sOP("a", i1)) - sOP("sz", 1)*(sOP("adag", i2)+sOP("a", i2)))
-        #H += 2.0j*complex(Mk[i])*(sOP("sz", 1)*sOP("a", i1) - 0.5*(sOP("sz", 0)*sOP("a", i1) + sOP("sz", 1)*sOP("adag", i2)))
-        #H += 2.0j*complex(np.conj(Mk[i]))*(sOP("sz", 0)*sOP("a", i2) - 0.5*(sOP("sz", 0)*sOP("adag", i1) + sOP("sz", 1)*sOP("a", i2)))
 
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
@@ -115,9 +165,8 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
     h = sop_operator(H, A, sysinf)
     #set up ttns storing the observable to be measured.  Here these are just system observables
     #so we form a tree with the same topology as A but with all bath bond dimensions set to 1
-    obstree = build_topology(sysinf[0].lhd(), 1, L, b_mode_dims, degree)
-    Sz_ttn = observable_tree(obstree, np.array([[1, 0], [0, -1]], dtype=np.complex128), b_mode_dims)
-    id_ttn = observable_tree(obstree, np.identity(2), b_mode_dims)
+    obstree = siam_tree(1,1, degree, bsysf, bsyse)
+    id_ttn = observable_tree(obstree, dims)
 
     mel = matrix_element(A)
 
