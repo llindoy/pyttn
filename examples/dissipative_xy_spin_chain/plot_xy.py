@@ -13,7 +13,8 @@ def plot(fnames, Ns):
         h5 = None
         h5 = h5py.File(fname, 'r')
         t = np.array(h5.get('t'))
-        for N  in range(Ns):
+        for Ni  in range(4):
+            N = Ni + (Ns-1)//2
             if 'rSz'+str(N) in h5:
                 pars.append(np.array(h5.get('rSz'+str(N))))
             else:
@@ -21,12 +22,15 @@ def plot(fnames, Ns):
 
         h5.close()
 
-        for N in range(Ns):
-            plt.plot(t, 0.5-np.real(pars[N]), styles[c], label='Sz'+str(N)+" "+fname)
+        for N in range(4):
+            if(N == 0):
+                plt.plot(t, 0.5-np.real(pars[N]), styles[c], label='Sz'+str(N)+" "+fname)
+            else:
+                plt.plot(t, 0.5-np.real(pars[N]), styles[c])
         c=c+1
         c=c%3
-    #plt.legend(frameon=False)
-    plt.xlim([0,10])
+    plt.legend(frameon=False)
+    plt.xlim([0,40])
     plt.ylim([0, 1])
     plt.show()
 

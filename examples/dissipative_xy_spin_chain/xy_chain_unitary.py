@@ -13,22 +13,22 @@ from pyttn import *
 from pyttn import oqs, utils
 from numba import jit
 
-def build_topology(Ns, ds, chiS,  chi, nbose, b_mode_dims, degree):
+def build_topology(Ns, ds, chi, chiS,  chiB, nbose, b_mode_dims, degree):
     lchi = [chiS for i in range(Ns)]
-    topo = ntreeBuilder.mps_tree(lchi, chiS)
+    topo = ntreeBuilder.mps_tree(lchi, chi)
 
     leaf_indices=topo.leaf_indices()
     for li in leaf_indices:
         topo.at(li).insert(ds)
         if degree == 1:
-            ntreeBuilder.mps_subtree(topo.at(li), b_mode_dims, chi, min(chi, nbose))
+            ntreeBuilder.mps_subtree(topo.at(li), b_mode_dims, chiB, min(chiB, nbose))
         else:
-            ntreeBuilder.mlmctdh_subtree(topo.at(li), b_mode_dims, degree, chi)
+            ntreeBuilder.mlmctdh_subtree(topo.at(li), b_mode_dims, degree, chiB)
 
     ntreeBuilder.sanitise(topo)
     return topo
 
-def xychain_dynamics(Ns, Nb, alpha, wc, eta, chiS, chi, nbose, dt, nbose_min = None, beta = None, nstep = 1, Nw=4.0, geom='ipchain', ofname='xychain.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024):
+def xychain_dynamics(Ns, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_min = None, beta = None, nstep = 1, Nw=4.0, geom='ipchain', ofname='xychain.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024):
     t = np.arange(nstep+1)*dt
 
     #setup the function for evaluating the exponential cutoff spectral density
@@ -41,21 +41,6 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chiS, chi, nbose, dt, nbose_min = N
 
     #discretise the bath correleation function using the orthonormal polynomial based cutoff 
     g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
-
-    import matplotlib.pyplot as plt
-    plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w))
-
-    #set up the open quantum system bath object
-    bath = oqs.BosonicBath(J, beta=beta)
-
-    #discretise the bath correleation function using the orthonormal polynomial based cutoff 
-    g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(3*wc), 3*wc))
-    plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w))
-
-    #discretise the bath correleation function using the orthonormal polynomial based cutoff 
-    g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(2*wc), 2*wc))
-    plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w))
-    plt.show()
 
     #set up the total Hamiltonian
     N = Nb+1
@@ -109,14 +94,19 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chiS, chi, nbose, dt, nbose_min = N
 
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
-    chiS0 = chi
+    chiS0 = chiS
+    chiB0 = chiB
     if adaptive:
         chi0 = 8
         chiS0 = 8
+        chiB0 = 8
+    chi0=min(chi0, chi)
+    chiS0=min(chiS0, chiS)
+    chiB0=min(chiB0, chiB)
 
     #now build the topology and capacity arrays
-    topo = build_topology(Ns, 2, chi0, chi0, nbose, tree_mode_dims, degree)
-    capacity = build_topology(Ns, 2, chiS, chi, nbose, tree_mode_dims, degree)
+    topo = build_topology(Ns, 2, chi0, chiS0, chiB0, nbose, tree_mode_dims, degree)
+    capacity = build_topology(Ns, 2, chi, chiS, chiB, nbose, tree_mode_dims, degree)
     
     print("topology built")
 
@@ -218,7 +208,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Dynamics of the zero temperature spin boson model with')
 
-    parser.add_argument('--N', type=int, default=180)
+    parser.add_argument('--N', type=int, default=300)
     #number of spins in the system
     parser.add_argument('--Ns', type=int, default=21)
 
@@ -245,8 +235,9 @@ if __name__ == "__main__":
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=64)
-    parser.add_argument('--chiS', type=int, default=64)
+    parser.add_argument('--chi', type=int, default=32)
+    parser.add_argument('--chiS', type=int, default=24)
+    parser.add_argument('--chiB', type=int, default=16)
     parser.add_argument('--degree', type=int, default=1)
 
 
@@ -259,13 +250,13 @@ if __name__ == "__main__":
 
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
-    parser.add_argument('--nunoccupied', type=int, default=1)
-    parser.add_argument('--spawning_threshold', type=float, default=5e-4)
+    parser.add_argument('--nunoccupied', type=int, default=0)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-5)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
     args = parser.parse_args()
 
     nstep = int(args.tmax/args.dt)+1
 
-    xychain_dynamics(args.Ns, args.N, args.alpha, args.wc, args.eta, args.chiS, args.chi, args.nbose, args.dt, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree, nbose_min=args.nbose_min, use_mode_combination=True, nbmax=args.nbmax, nhilbmax=args.nhilbmax)
+    xychain_dynamics(args.Ns, args.N, args.alpha, args.wc, args.eta, args.chi, args.chiS, args.chiB, args.nbose, args.dt, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree, nbose_min=args.nbose_min, use_mode_combination=True, nbmax=args.nbmax, nhilbmax=args.nhilbmax)
 
