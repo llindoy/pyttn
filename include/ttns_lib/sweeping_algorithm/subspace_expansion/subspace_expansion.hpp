@@ -48,8 +48,6 @@ public:
     {
         try
         {
-            ASSERT(A.is_orthogonalised(), "The input hierarchical tucker tensor must have been orthogonalised.");
-
             CALL_AND_HANDLE(clear(), "Failed to clear the projector_splitting_intgrator.");
             m_neigenvalues = neigs;
 

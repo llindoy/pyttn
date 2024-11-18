@@ -36,167 +36,92 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chiS, chi, nbose, dt, nbose_min = N
     def J(w):
         return np.abs(2*np.pi*alpha*w*np.exp(-np.abs(w/wc))**2)*np.where(w > 0, 1.0, -1.0)
 
-    #set up the open quantum system bath object
-    bath = oqs.BosonicBath(J, beta=beta)
-
-    #discretise the bath correleation function using the orthonormal polynomial based cutoff 
-    g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
 
     import matplotlib.pyplot as plt
-    plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w))
+
+    Nbs = [64, 128, 180]
+
+    #set up the open quantum system bath object
+    bath = oqs.BosonicBath(J, beta=beta)
+    plt.rcParams.update({'font.size':22})
+    fig, ax = plt.subplots(2, 2, figsize=(3.25*2.5, 3.25*2), sharey=False)
+    plt.subplots_adjust(wspace=0, hspace=0)
+
+    Ctval = bath.Ct(t)
+    ax[0,0].plot(t, Ctval, 'k', linewidth=5, label='Exact', zorder=-1)
+
+    colors = ['red', 'blue', 'green']
+    for i, Nb in enumerate(Nbs):
+        #discretise the bath correleation function using the orthonormal polynomial based cutoff 
+        g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
+        ax[0, 0].plot(t, oqs.BosonicBath.Ctexp(t, g*g, w), '--', color=colors[i], linewidth=3, label=r'$N_{b}='+str(Nb)+'$')
+    ax[0, 0].set_xlim([0, 40])
+    ax[0, 0].legend(frameon=False, prop={'size':16}, labelspacing=0)
+
+    Ks = [1, 2, 4]
+
+    #set up the open quantum system bath object
+    bath = oqs.BosonicBath(J, beta=beta)
+    ax[0, 1].plot(t, Ctval, 'k', linewidth=5, label='Exact', zorder=-1)
+
+    colors = ['red', 'blue', 'green']
+    for i, K in enumerate(Ks):
+        #discretise the bath correleation function using the orthonormal polynomial based cutoff 
+        dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
+        ax[0,1].plot(t, oqs.BosonicBath.Ctexp(t, dk, -1.0j*zk), '--', color=colors[i], linewidth=3, label=r'$K='+str(K)+'$')
+    ax[0,0].set_xlim([0, 40])
+    ax[0,1].set_xlim([0, 40])
+    ax[0,0].set_ylim([-1, np.max(np.abs(Ctval))])
+    ax[0,1].set_ylim([-1, np.max(np.abs(Ctval))])
+    ax[0,1].legend(frameon=False, prop={'size':16}, labelspacing=0)
+
+
+    Nbs = [100, 200, 300]
+
+    #set up the open quantum system bath object
+    bath = oqs.BosonicBath(J, beta=0.625)
+
+    Ctval = bath.Ct(t)
+    ax[1,0].plot(t, Ctval, 'k', linewidth=5, label='Exact', zorder=-1)
+
+    colors = ['red', 'blue', 'green']
+    for i, Nb in enumerate(Nbs):
+        #discretise the bath correleation function using the orthonormal polynomial based cutoff 
+        g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
+        ax[1, 0].plot(t, oqs.BosonicBath.Ctexp(t, g*g, w), '--', color=colors[i], linewidth=3, label=r'$N_{b}='+str(Nb)+'$')
+    ax[1, 0].set_xlim([0, 40])
+    ax[1, 0].legend(frameon=False, prop={'size':16}, labelspacing=0)
+
+    Ks = [1, 2, 4]
+
+    #set up the open quantum system bath object
+    bath = oqs.BosonicBath(J, beta=0.625)
+    ax[1,1].plot(t, Ctval, 'k', linewidth=5, label='Exact', zorder=-1)
+
+    colors = ['red', 'blue', 'green']
+    for i, K in enumerate(Ks):
+        #discretise the bath correleation function using the orthonormal polynomial based cutoff 
+        dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
+        ax[1,1].plot(t, oqs.BosonicBath.Ctexp(t, dk, -1.0j*zk), '--', color=colors[i], linewidth=3, label=r'$K='+str(K)+'$')
+    ax[1,0].set_xlim([0, 40])
+    ax[1,1].set_xlim([0, 40])
+    ax[1,0].set_ylim([-1, np.max(np.abs(Ctval))])
+    ax[1,1].set_ylim([-1, np.max(np.abs(Ctval))])
+    ax[1,1].legend(frameon=False, prop={'size':16}, labelspacing=0)
+
+    ax[0, 0].set_xticklabels([])
+    ax[0, 1].set_xticklabels([])
+    ax[0, 1].set_yticklabels([])
+    ax[1, 1].set_yticklabels([])
+    ax[1, 0].set_xticks([0, 10, 20, 30])
+    ax[1, 1].set_xticks([0, 10, 20, 30, 40])
+
+    fig.text(0.5, 0.01, r'$t$', ha='center')
+    fig.text(0.01, 0.5, r'$C(t)$', va='center', rotation='vertical')
+
+
+    plt.savefig('dissipative_xy_bath_discretisation_convergence.pdf', bbox_inches='tight')
     plt.show()
-
-    #set up the total Hamiltonian
-    N = Nb+1
-    H = SOP(Ns*N)
-
-    frequencies = None
-    #add on the system part of the system bath Hamiltonian
-    for si in range(Ns):
-        skip = si*(Nb+1)
-        H += sOP("sz", skip)
-        print("adding spin " + str(si))
-
-        if(si + 1 != Ns):
-            skip2 = (si+1)*(Nb+1)
-            H += (1-eta)*sOP("sx", skip)*sOP("sx", skip2) + (1+eta)*sOP("sy", skip)*sOP("sy", skip2) 
-
-
-        binds = [skip+1+i for i in range(Nb)]
-
-        #add on the bath and system bath contributions of the bath hamiltonian
-        H, frequencies = oqs.unitary.add_bosonic_bath_hamiltonian(H, sOP("sz", skip), g, w, geom=geom, return_frequencies=True, binds=binds)
-
-    print("hamiltonian string setup")
-
-    #set up the local hilbert space dimensions of the bosonic modes
-    b_mode_dims = [min(max(4, int(wc*20/frequencies[i])), nbose) for i in range(Nb)]
-    bsys = system_modes(Nb)
-    for i in range(Nb):
-        bsys[i] = boson_mode(b_mode_dims[i])
-
-    #set up the mode combination informatino
-    mode_comb = utils.ModeCombination(nbmax, nhilbmax)
-    bsys = mode_comb(bsys)
-
-    #setup the system information object.  Additionally work out the local hilbert space dimensions os that we can set up the system mode informmation
-    sysinf = system_modes(1)
-    sysinf[0] = spin_mode(2)
-    sysinf = combine_systems(sysinf, bsys)
-    tree_mode_dims = []
-    for ind in range(len(bsys)):
-        tree_mode_dims.append(bsys[ind].lhd())
-
-    sysinfo = copy.deepcopy(sysinf)
-    #and add on the system information objects for the remaining spins
-    for i in range(Ns-1):
-        sysinfo = combine_systems(sysinfo, sysinf)
-
-    sysinf=sysinfo
-
-    print("system built")
-
-    #construct the topology and capacity trees used for constructing 
-    chi0 = chi
-    chiS0 = chi
-    if adaptive:
-        chi0 = 8
-        chiS0 = 8
-
-    #now build the topology and capacity arrays
-    topo = build_topology(Ns, 2, chi0, chi0, nbose, tree_mode_dims, degree)
-    capacity = build_topology(Ns, 2, chiS, chi, nbose, tree_mode_dims, degree)
-    
-    print("topology built")
-
-    #utils.visualise_tree(topo)
-    #plt.show()
-
-    #construct and initialise the ttn wavefunction
-    A = ttn(topo, capacity, dtype=np.complex128)
-    state = [0 for i in range(Ns*(len(bsys)+1))]
-    state[(Ns-1)//2*(len(bsys)+1)]=1
-    A.set_state(state)
-
-    print("psi0 built")
-    #set up the Hamiltonian as a sop object
-    h = sop_operator(H, A, sysinf)
-    print("H built")
-
-    #construct objects need for evaluating observables
-    mel = matrix_element(A)
-
-    #set up the observable to measure
-    ops = []
-    for si in range(Ns):
-        skip = si*(Nb+1)
-        ops.append(site_operator(sOP("sz", skip), sysinf))
-
-    #set up tdvp sweeping algorithm parameters
-    sweep = None
-    if not adaptive:
-        sweep = tdvp(A, h, krylov_dim = 12)
-    else:
-        sweep = tdvp(A, h, krylov_dim=12, subspace_neigs = 6, expansion='subspace')
-        sweep.spawning_threshold = spawning_threshold
-        sweep.unoccupied_threshold=unoccupied_threshold
-        sweep.minimum_unoccupied=nunoccupied
-
-    sweep.dt = dt
-    sweep.coefficient = -1.0j
-
-    #run dynamics and measure properties storing them in a file
-    res = np.zeros((Ns, nstep+1), dtype=np.complex128)
-    maxchi = np.zeros(nstep+1)
-    for i in range(Ns):
-        res[i, 0] = mel(ops[i], A)
-    maxchi[0] = A.maximum_bond_dimension()
-
-    #perform the first timestep using a logarithmic discretisation of time over this period.  
-    #This can be useful to allow for suitable adaptation of weakly occupied single particle 
-    #functions through the initial time point.
-    tp = 0
-    ts = np.logspace(np.log10(dt*1e-5), np.log10(dt), 5)
-    for i in range(5):
-        dti = ts[i]-tp
-        sweep.dt = dti
-        sweep.step(A, h)
-        tp = ts[i]
-    i=1
-
-    #set the values after the first timestep
-    for si in range(Ns):
-        res[si, 1] = mel(ops[si], A)
-    maxchi[1] = A.maximum_bond_dimension()
-    sweep.dt = dt
-
-    #now perform standard time stepping
-    for i in range(1,nstep):
-        t1 = time.time()
-        sweep.step(A, h)
-        t2 = time.time()
-        for si in range(Ns):
-            res[si, i+1] = mel(ops[si], A)
-        maxchi[i+1] = A.maximum_bond_dimension()
-        print(i, res[(Ns-1)//2, i+1], A.maximum_bond_dimension())
-
-        #outputting results to files every 10 steps
-        if(i % 1 == 0):
-            h5 = h5py.File(ofname, 'w')
-            h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
-            for si in range(Ns):
-                h5.create_dataset('Sz'+str(si), data=np.real(res[si, :]))
-            h5.create_dataset('maxchi', data=maxchi)
-            h5.close()
-                
-    #and finally dump everything to file at the end of the simulation
-    h5 = h5py.File(ofname, 'w')
-    h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
-    for si in range(Ns):
-        h5.create_dataset('Sz'+str(si), data=np.real(res[si, :]))
-    h5.create_dataset('maxchi', data=maxchi)
-    h5.close()
-
 
 if __name__ == "__main__":
 
@@ -238,7 +163,7 @@ if __name__ == "__main__":
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.025)
-    parser.add_argument('--tmax', type=float, default=10)
+    parser.add_argument('--tmax', type=float, default=40)
 
     #output file name
     parser.add_argument('--fname', type=str, default='xychain.h5')

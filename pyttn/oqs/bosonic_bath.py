@@ -31,10 +31,13 @@ class BosonicBath:
         if(self.beta is None):
             return 0
         else:
-            Swmax = self.Sw(wmax)
-            wrange = np.linspace(-wmax, 0, npoints, endpoint=False)
-            Swmin = self.Sw(wrange)
-            return wrange[np.argmax(Swmin > Swmax)-1]
+            if ( wmax == np.inf):
+                return -np.inf
+            else:
+                Swmax = self.Sw(wmax)
+                wrange = np.linspace(-wmax, 0, npoints, endpoint=False)
+                Swmin = self.Sw(wrange)
+                return wrange[np.argmax(Swmin > Swmax)-1]
 
     def estimate_bounds(self, wmax=None):
         """Returns estimates for the upper and lower bounds of the spectral density to be used for the
