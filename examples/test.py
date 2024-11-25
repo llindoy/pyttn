@@ -67,7 +67,7 @@ H += 2*fOP("adag", 5)
 H += 2*fOP("a", 5)
 H += 5*fOP("a", 4)*fOP("adag",5)
 
-H.jordan_wigner(sysinf)
+#H.jordan_wigner(sysinf)
 
 h = sop_operator(H, A, sysinf)
 

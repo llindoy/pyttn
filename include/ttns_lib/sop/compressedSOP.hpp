@@ -221,6 +221,7 @@ public:
 
             std::vector<size_t> first_primitive_mode(sysinf.nmodes());
 
+
             //now iterate over the primitive modes 
             for(size_t i = 0; i < m_op_dict.size(); ++i)
             {
@@ -328,6 +329,7 @@ public:
                 //the mode that we will store this on.  Default to mode so that in the event that the system 
                 size_t idnu = first_primitive_mode[mode];
 
+
                 //iterate over all terms in the composite operator dictionary associated with this mode
                 bool identity_found = false;
                 for(size_t index = 0; index < mcompdict.size() && !identity_found; ++index)
@@ -341,18 +343,17 @@ public:
                     //now if the label associated with this mode is the identity we have found the identity
                     //term store the current mode and the index associated with this term and set identity_found
                     //to terminate the iteration
-                    if(m_op_dict[idnu][tindex] == op)
-                    {   
-                        idnu = nu;
-                        idind = index;
-                        identity_found = true;
-                    }
-                    else
+                    if(m_op_dict[idnu].size() != 0)
                     {
-                        idnu = nu;
+                        if(m_op_dict[idnu][tindex] == op)
+                        {   
+                            idnu = nu;
+                            idind = index;
+                            identity_found = true;
+                        }
                     }
                 }
-                
+
                 if(identity_found)
                 {
                     compositeSiteOperator id({idind});

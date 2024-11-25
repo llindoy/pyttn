@@ -196,7 +196,9 @@ for i in range(Nbo):
     
 print(H)
 
-H.jordan_wigner(sysinf)
+#H.jordan_wigner(sysinf)
+
+print(H)
 
 A = ttn(topo)
 
@@ -209,7 +211,7 @@ A.set_state(state)
 
 h = sop_operator(H, A, sysinf, identity_opt=True, compress=True)
 
-
+exit()
 
 obstree = ntree(str("(1(chi(4(4))(chi))(chi(4(4))(chi)))").replace('chi', str(chi)))
 ntreeBuilder.mps_subtree(obstree()[0][1], [2*2 for _ in range(Nbo)], 1, 1)
