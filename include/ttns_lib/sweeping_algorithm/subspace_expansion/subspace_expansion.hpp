@@ -180,90 +180,93 @@ public:
             //if the other tensor is not square then we are in a regime where the two-site algorithm will provide a search direction so we should attempt it
             if(A1().shape(1) < A1().shape(0) && A1().shape(1) != 1 && subspace_spawning)
             {
-
+          
                 const auto& hinf = op.contraction_info()[h.id()];
                 //now resize the onesite buffer objects used for evaluation of the two site (projected energy) so that everything is the correct size
                 size_type nterms = twosite::get_nterms(hinf()); 
-                ASSERT(m_2s_1.size() >= nterms, "Unable to store temporaries needed for computing the two-site energy.  The buffers are not sufficient.");
-                CALL_AND_HANDLE(resize_two_site_energy_buffers(nterms, A1(), A2(), mode), "Failed to resize the objects needed to compute the two-site energy.");
-                CALL_AND_HANDLE(m_inds.resize(nterms), "Failed to resize indices array.");
-                CALL_AND_HANDLE(m_coeffs.resize(nterms), "Failed to resize coefficients array.");
-
-                twosite::set_indices(hinf(), m_inds, m_coeffs); 
-
-                //compute the one site objects that are used to compute the two site projected energy
-                CALL_AND_HANDLE(twosite::construct_two_site_energy_terms_lower(A1, hinf, h, op, m_2s_1, buf.HA, buf.temp, m_inds, r, true), 
-                                "Failed to construct the component of the two site energy acting on the lower site.");
-                CALL_AND_HANDLE(twosite::construct_two_site_energy_terms_upper(A2, hinf,  h, m_2s_2, buf.HA, buf.temp, buf.temp2, m_inds, true), 
-                                "Failed to construct the component of the two site energy acting on the upper site.");
-
-                //now we compute the singular value using the sparse functions
-
-                CALL_AND_HANDLE(A2().generate_random_orthogonal(mode, buf.temp[0], rng, m_rvec), "Failed to generate othrogonal tensor.");
-                CALL_AND_HANDLE(m_V.resize(m_neigenvalues, m_rvec.size()), "Failed to resize m_U array.");
-
-                //now we compute the singular value using the sparse functions
-                for(size_type i = 0; i < m_neigenvalues; ++i)
+                if(nterms != 0)
                 {
-                    CALL_AND_HANDLE(m_V[i] = m_rvec, "Failed to copy rvec.");
-                }
-                
-                //now compute the eigenvectors using this 
-                bool mconjm = true;
-                size_type maxkrylov_dim = eigensolver.krylov_dim();
-                if(m_rvec.size() < maxkrylov_dim){maxkrylov_dim = m_rvec.size();}
+                    ASSERT(m_2s_1.size() >= nterms, "Unable to store temporaries needed for computing the two-site energy.  The buffers are not sufficient.");
+                    CALL_AND_HANDLE(resize_two_site_energy_buffers(nterms, A1(), A2(), mode), "Failed to resize the objects needed to compute the two-site energy.");
+                    CALL_AND_HANDLE(m_inds.resize(nterms), "Failed to resize indices array.");
+                    CALL_AND_HANDLE(m_coeffs.resize(nterms), "Failed to resize coefficients array.");
 
-                size_type neigs_evaluated = 0;
-                //computes the complex conjugate of the right singular vectors
-                CALL_AND_HANDLE(neigs_evaluated = eigensolver(m_V, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
+                    twosite::set_indices(hinf(), m_inds, m_coeffs); 
 
-                CALL_AND_HANDLE(m_V = linalg::conj(m_V), "Failed to conjugate the right singular vectors.");
+                    //compute the one site objects that are used to compute the two site projected energy
+                    CALL_AND_HANDLE(twosite::construct_two_site_energy_terms_lower(A1, hinf, h, op, m_2s_1, buf.HA, buf.temp, m_inds, r, true), 
+                                    "Failed to construct the component of the two site energy acting on the lower site.");
+                    CALL_AND_HANDLE(twosite::construct_two_site_energy_terms_upper(A2, hinf,  h, m_2s_2, buf.HA, buf.temp, buf.temp2, m_inds, true), 
+                                    "Failed to construct the component of the two site energy acting on the upper site.");
 
-                for(size_type i = 0; i < neigs_evaluated; ++i)
-                {
-                    real_type sv = 0;
-                    //check if any of the dominant svds of the Hamiltonian acting on the twosite coefficient tensor are occupied through the half step
-                    if(m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
+                    //now we compute the singular value using the sparse functions
+
+                    CALL_AND_HANDLE(A2().generate_random_orthogonal(mode, buf.temp[0], rng, m_rvec), "Failed to generate othrogonal tensor.");
+                    CALL_AND_HANDLE(m_V.resize(m_neigenvalues, m_rvec.size()), "Failed to resize m_U array.");
+
+                    //now we compute the singular value using the sparse functions
+                    for(size_type i = 0; i < m_neigenvalues; ++i)
                     {
-                        if(std::real(m_S(i, i)) > 0){sv = std::sqrt(std::real(m_S(i, i)))*svd_scale;}
-                        if(!std::isnan(sv))
+                        CALL_AND_HANDLE(m_V[i] = m_rvec, "Failed to copy rvec.");
+                    }
+                    
+                    //now compute the eigenvectors using this 
+                    bool mconjm = true;
+                    size_type maxkrylov_dim = eigensolver.krylov_dim();
+                    if(m_rvec.size() < maxkrylov_dim){maxkrylov_dim = m_rvec.size();}
+
+                    size_type neigs_evaluated = 0;
+                    //computes the complex conjugate of the right singular vectors
+                    CALL_AND_HANDLE(neigs_evaluated = eigensolver(m_V, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
+
+                    CALL_AND_HANDLE(m_V = linalg::conj(m_V), "Failed to conjugate the right singular vectors.");
+
+                    for(size_type i = 0; i < neigs_evaluated; ++i)
+                    {
+                        real_type sv = 0;
+                        //check if any of the dominant svds of the Hamiltonian acting on the twosite coefficient tensor are occupied through the half step
+                        if(m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
                         {
-                            if(sv > m_spawning_threshold){++nadd;}
+                            if(std::real(m_S(i, i)) > 0){sv = std::sqrt(std::real(m_S(i, i)))*svd_scale;}
+                            if(!std::isnan(sv))
+                            {
+                                if(sv > m_spawning_threshold){++nadd;}
+                            }
+                        }
+                        else
+                        {
+                            if(std::real(m_S(i, i)) > 0){sv = std::real(m_S(i, i))*svd_scale*svd_scale;}
+                            if(!std::isnan(sv))
+                            {
+                                if(sv > m_spawning_threshold){++nadd;}
+                            }
                         }
                     }
-                    else
-                    {
-                        if(std::real(m_S(i, i)) > 0){sv = std::real(m_S(i, i))*svd_scale*svd_scale;}
-                        if(!std::isnan(sv))
-                        {
-                            if(sv > m_spawning_threshold){++nadd;}
-                        }
-                    }
-                }
 
-                if(nadd > max_add){nadd = max_add;}
+                    if(nadd > max_add){nadd = max_add;}
 #ifdef ALLOW_EVAL_BUT_DONT_APPLY
-                if(nadd != 0 && !m_eval_but_dont_apply)
+                    if(nadd != 0 && !m_eval_but_dont_apply)
 #else
-                if(nadd != 0)
+                    if(nadd != 0)
 #endif
-                {
-                    //expand the A1 tensor zero padding
-                    CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), nadd, buf.temp[0]), "Failed to expand A1 tensor."); 
+                    {
+                        //expand the A1 tensor zero padding
+                        CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), nadd, buf.temp[0]), "Failed to expand A1 tensor."); 
 
-                    //expand the r-matrix
-                    CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], nadd), "Failed to expand R matrix.");
+                        //expand the r-matrix
+                        CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], nadd), "Failed to expand R matrix.");
 
-                    //expand the A2 tensor padding with the right singular vectors
-                    CALL_AND_HANDLE(A2().expand_bond(mode, nadd, buf.temp[0], m_V), "Failed to expand A1 tensor."); 
+                        //expand the A2 tensor padding with the right singular vectors
+                        CALL_AND_HANDLE(A2().expand_bond(mode, nadd, buf.temp[0], m_V), "Failed to expand A1 tensor."); 
 
-                    //resize the Hamiltonian object stored at the child node to the correct size.  Here we don't care about the values 
-                    //stored in these matrices as they will be updated before they are used for anything.
-                    CALL_AND_HANDLE(h().resize_matrices(r.shape(0), r.shape(1)), "Failed to resize Hamiltonian matrices.");
+                        //resize the Hamiltonian object stored at the child node to the correct size.  Here we don't care about the values 
+                        //stored in these matrices as they will be updated before they are used for anything.
+                        CALL_AND_HANDLE(h().resize_matrices(r.shape(0), r.shape(1)), "Failed to resize Hamiltonian matrices.");
 
-                    subspace_expanded = true;
+                        subspace_expanded = true;
+                    }
+                    ++m_twosite_expansions;
                 }
-                ++m_twosite_expansions;
             } 
 #ifdef ALLOW_EVAL_BUT_DONT_APPLY
             if(nadd < required_terms && unoccupied_spawning && !m_eval_but_dont_apply)
@@ -360,85 +363,88 @@ public:
                 //now resize the onesite buffer objects used for evaluation of the two site (projected energy) so that everything is the correct size
                 size_type nterms = twosite::get_nterms(hinf()); 
 
-                ASSERT(m_2s_1.size() >= nterms, "Unable to store temporaries needed for computing the two-site energy.  The buffers are not sufficient.");
-                CALL_AND_HANDLE(resize_two_site_energy_buffers(nterms, A1(), A2(), mode), "Failed to resize the objects needed to compute the two-site energy.");
-                CALL_AND_HANDLE(m_inds.resize(nterms), "Failed to resize indices array.");
-                CALL_AND_HANDLE(m_coeffs.resize(nterms), "Failed to resize coefficients array.");
+                if(nterms != 0)
+                {
+                    ASSERT(m_2s_1.size() >= nterms, "Unable to store temporaries needed for computing the two-site energy.  The buffers are not sufficient.");
+                    CALL_AND_HANDLE(resize_two_site_energy_buffers(nterms, A1(), A2(), mode), "Failed to resize the objects needed to compute the two-site energy.");
+                    CALL_AND_HANDLE(m_inds.resize(nterms), "Failed to resize indices array.");
+                    CALL_AND_HANDLE(m_coeffs.resize(nterms), "Failed to resize coefficients array.");
 
-                twosite::set_indices(hinf(), m_inds, m_coeffs); 
+                    twosite::set_indices(hinf(), m_inds, m_coeffs); 
 
-                //compute the one site objects that are used to compute the two site projected energy
-                CALL_AND_HANDLE(twosite::construct_two_site_energy_terms_upper(A2, hinf, h, m_2s_2, buf.HA, buf.temp, buf.temp2, m_inds, true), 
-                                "Failed to construct the component of the two site energy acting on the upper site.");
-                CALL_AND_HANDLE(twosite::construct_two_site_energy_terms_lower(A1, hinf, h, op, m_2s_1, buf.HA, buf.temp, m_inds, r, true), 
-                                "Failed to construct the component of the two site energy acting on the lower site.");
+                    //compute the one site objects that are used to compute the two site projected energy
+                    CALL_AND_HANDLE(twosite::construct_two_site_energy_terms_upper(A2, hinf, h, m_2s_2, buf.HA, buf.temp, buf.temp2, m_inds, true), 
+                                    "Failed to construct the component of the two site energy acting on the upper site.");
+                    CALL_AND_HANDLE(twosite::construct_two_site_energy_terms_lower(A1, hinf, h, op, m_2s_1, buf.HA, buf.temp, m_inds, r, true), 
+                                    "Failed to construct the component of the two site energy acting on the lower site.");
+                            
+                    //CALL_AND_HANDLE(m_twosite.generate_orthogonal_trial_vector(A1(), A1().nmodes(), rng, m_rvec), "Failed to generate othrogonal tensor.");
+                    CALL_AND_HANDLE(A1().generate_random_orthogonal(A1().nmodes(), buf.temp[0], rng, m_rvec), "Failed to generate othrogonal tensor.");
+                    CALL_AND_HANDLE(m_U.resize(m_neigenvalues, m_rvec.size()), "Failed to resize m_U array.");
+                    //now we compute the singular value using the sparse functions
+                    for(size_type i = 0; i < m_neigenvalues; ++i)
+                    {
+                        CALL_AND_HANDLE(m_U[i] = m_rvec, "Failed to copy rvec into U");
+                    }
+
+                    //firs go ahead and generate random r vector
+                    size_type maxkrylov_dim = eigensolver.krylov_dim();
+                    if(m_rvec.size() < maxkrylov_dim){maxkrylov_dim = m_rvec.size();}
+
+                    bool mconjm = false;
+
+                    //computes U but stored with its columns as rows - e.g. this is U^T.  E.g. the singular vectors are currently the rows of m_U
+                    size_type neigs_evaluated = 0;
+                    CALL_AND_HANDLE(neigs_evaluated = eigensolver(m_U, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
+
+                    for(size_type i = 0; i < neigs_evaluated; ++i)
+                    {
+                        real_type sv = 0;
+                        //check if any of the dominant svds of the Hamiltonian acting on the twosite coefficient tensor are occupied through the half step
                         
-                //CALL_AND_HANDLE(m_twosite.generate_orthogonal_trial_vector(A1(), A1().nmodes(), rng, m_rvec), "Failed to generate othrogonal tensor.");
-                CALL_AND_HANDLE(A1().generate_random_orthogonal(A1().nmodes(), buf.temp[0], rng, m_rvec), "Failed to generate othrogonal tensor.");
-                CALL_AND_HANDLE(m_U.resize(m_neigenvalues, m_rvec.size()), "Failed to resize m_U array.");
-                //now we compute the singular value using the sparse functions
-                for(size_type i = 0; i < m_neigenvalues; ++i)
-                {
-                    CALL_AND_HANDLE(m_U[i] = m_rvec, "Failed to copy rvec into U");
-                }
-
-                //firs go ahead and generate random r vector
-                size_type maxkrylov_dim = eigensolver.krylov_dim();
-                if(m_rvec.size() < maxkrylov_dim){maxkrylov_dim = m_rvec.size();}
-
-                bool mconjm = false;
-
-                //computes U but stored with its columns as rows - e.g. this is U^T.  E.g. the singular vectors are currently the rows of m_U
-                size_type neigs_evaluated = 0;
-                CALL_AND_HANDLE(neigs_evaluated = eigensolver(m_U, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
-
-                for(size_type i = 0; i < neigs_evaluated; ++i)
-                {
-                    real_type sv = 0;
-                    //check if any of the dominant svds of the Hamiltonian acting on the twosite coefficient tensor are occupied through the half step
-                    
-                    if(m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
-                    {
-                        if(std::real(m_S(i, i)) > 0){sv = std::sqrt(std::real(m_S(i, i)))*svd_scale;}
-                        if(!std::isnan(sv))
+                        if(m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
                         {
-                            if(sv > m_spawning_threshold){++nadd;}
+                            if(std::real(m_S(i, i)) > 0){sv = std::sqrt(std::real(m_S(i, i)))*svd_scale;}
+                            if(!std::isnan(sv))
+                            {
+                                if(sv > m_spawning_threshold){++nadd;}
+                            }
+                        }
+                        else
+                        {
+                            if(std::real(m_S(i, i)) > 0){sv = std::real(m_S(i, i))*svd_scale*svd_scale;}
+                            if(!std::isnan(sv))
+                            {
+                                if(sv > m_spawning_threshold){++nadd;}
+                            }
                         }
                     }
-                    else
-                    {
-                        if(std::real(m_S(i, i)) > 0){sv = std::real(m_S(i, i))*svd_scale*svd_scale;}
-                        if(!std::isnan(sv))
-                        {
-                            if(sv > m_spawning_threshold){++nadd;}
-                        }
-                    }
-                }
 
 
-                if(nadd > max_add){nadd = max_add;}
-                //here we need to compute the eigenstates of the 
+                    if(nadd > max_add){nadd = max_add;}
+                    //here we need to compute the eigenstates of the 
 #ifdef ALLOW_EVAL_BUT_DONT_APPLY
-                if(nadd != 0 && !m_eval_but_dont_apply)
+                    if(nadd != 0 && !m_eval_but_dont_apply)
 #else
-                if(nadd != 0)
+                    if(nadd != 0)
 #endif
-                {
-                    //expand the A2 tensor padding with the right singular vectors
-                    CALL_AND_HANDLE(A2().expand_bond(mode, nadd, buf.temp[0]), "Failed to expand A2 tensor.");
+                    {
+                        //expand the A2 tensor padding with the right singular vectors
+                        CALL_AND_HANDLE(A2().expand_bond(mode, nadd, buf.temp[0]), "Failed to expand A2 tensor.");
 
-                    //expand the r-matrix
-                    CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], nadd), "Failed to expand R matrix.");
+                        //expand the r-matrix
+                        CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], nadd), "Failed to expand R matrix.");
 
-                    //expand the A1 tensor around the index pointing to the root zero padding
-                    CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), nadd, buf.temp[0], m_U), "Failed to expand A1 tensor.");
+                        //expand the A1 tensor around the index pointing to the root zero padding
+                        CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), nadd, buf.temp[0], m_U), "Failed to expand A1 tensor.");
 
-                    //resize the Hamiltonian object stored at the child node to the correct size.  Here we don't care about the values 
-                    //stored in these matrices as they will be updated before they are used for anything.
-                    CALL_AND_HANDLE(h().resize_matrices(r.shape(0), r.shape(1)), "Failed to resize Hamiltonian matrices.");
+                        //resize the Hamiltonian object stored at the child node to the correct size.  Here we don't care about the values 
+                        //stored in these matrices as they will be updated before they are used for anything.
+                        CALL_AND_HANDLE(h().resize_matrices(r.shape(0), r.shape(1)), "Failed to resize Hamiltonian matrices.");
 
-                    subspace_expanded = true;
-                    ++m_twosite_expansions;
+                        subspace_expanded = true;
+                        ++m_twosite_expansions;
+                    }
                 }
             }
             //otherwise we just use random one-site tensor expansion

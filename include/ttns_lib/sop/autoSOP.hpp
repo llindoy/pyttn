@@ -18,7 +18,6 @@
 namespace ttns
 {
 
-//TODO: Need to implement automated mode combination
 template <typename T>
 class autoSOP
 {

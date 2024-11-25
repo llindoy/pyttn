@@ -1,8 +1,8 @@
 ///
 /// @file ntree_node.hpp
 /// @author Lachlan Lindoy
-/// @date 14/08/2018
-/// @version 1.0
+/// @date 14/08/2023
+/// @version 1.1
 /// 
 /// @brief Interfaces for the ntree class used for constructing the topology of the multilayer multiconfiguration time-depedent hartree wavefunction
 /// 
@@ -421,7 +421,6 @@ public:
         }
         q = nullptr;
 
-        size_type ind = m_children.size();
         m_children.insert(m_children.begin(), p);
         return 0;
     }  
@@ -458,8 +457,37 @@ public:
     }
 
 
+
 protected:
-    size_t leaf_indices_internal(std::vector<std::vector<size_type>>& linds, std::vector<size_type>& lcurr, size_t ind) const
+    void index_internal(std::vector<size_type>& ind) const
+    {
+        if(this->is_root())
+        {
+            return;
+        }
+        else
+        {
+            for(size_type i = 0; i < this->m_parent->size(); ++i)
+            {
+                if(this->m_parent->m_children[i] == this)
+                {
+                    ind.push_back(i);
+                }
+            }
+            this->m_parent->index_internal(ind);
+        }
+    }
+
+public:
+    void index(std::vector<size_type>& ind) const
+    {
+        ind.clear();
+        this->index_internal(ind);
+        std::reverse(ind.begin(), ind.end());
+    }
+
+protected:
+    size_type leaf_indices_internal(std::vector<std::vector<size_type>>& linds, std::vector<size_type>& lcurr, size_t ind) const
     {
         if(this->empty())
         {
@@ -468,7 +496,7 @@ protected:
         }
         else
         {
-            for(size_t i = 0; i < this->size(); ++i)
+            for(size_type i = 0; i < this->size(); ++i)
             {
                 std::vector<size_type> lc(lcurr);
                 lc.push_back(i);
@@ -488,6 +516,7 @@ public:
         std::vector<size_type> lcurr;
         this->leaf_indices_internal(linds, lcurr, 0);
     }
+
 protected:
     void remove_child(child_iterator it)
     {

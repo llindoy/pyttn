@@ -40,6 +40,17 @@ void init_ntree_node(py::module &m)
                 }, 
                 py::arg("resize") = true
             )
+        .def("index", &node_type::index)
+        .def(   
+                "index", 
+                [](const node_type& n)
+                {
+                    std::vector<size_t> linds;
+                    n.index(linds);
+                    return linds;
+                }
+            )
+
         .def("parent", &node_type::parent)
         .def("clear", &node_type::clear)
         .def_property
@@ -106,6 +117,14 @@ void init_ntree_node(py::module &m)
         .def(
                 "insert", 
                 static_cast<size_t (node_type::*)(const T&)>(&node_type::insert)
+            )
+        .def(
+                "insert_front", 
+                static_cast<size_t (node_type::*)(const node_type&)>(&node_type::insert_front)
+            )
+        .def(
+                "insert_front", 
+                static_cast<size_t (node_type::*)(const T&)>(&node_type::insert_front)
             )
         .def(
                 "remove", 

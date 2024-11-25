@@ -247,7 +247,7 @@ public:
     {       
         try
         {
-            if(op2.size() == 0){res = 0.0*v;}
+            if(op2.size() == 0 || nterms == 0){res = 0.0*v;}
             else
             {
                 res = 0.0*v;

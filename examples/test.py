@@ -20,10 +20,10 @@ N = 10
 chi = 8
 
 # Vector of dimensions of the local Hilbert space in the physical nodes
-dims = [15 for _ in range(N)]
+dims = [2 for _ in range(N)]
 
 # Vector of dimensions of the basis transformation nodes
-basis_nodes_dims = [10 for _ in range(N)]
+basis_nodes_dims = [2 for _ in range(N)]
 
 # Max number of child nodes for each node. Always larger than 1
 degree = 2
@@ -37,7 +37,7 @@ sysinf = system_modes(N)
 
 # Specify that all modes are bosonic, with Hilbert space dimensions defined above.
 for i in range(N):
-    sysinf[i] = boson_mode(dims[i])
+    sysinf[i] = fermion_mode()
 
 
 # Create TTN and initialise to a random state
@@ -45,7 +45,7 @@ A = ttn(topo)
 A.random()
 
 # Create one-site operator
-op = site_operator(sOP("n",4), sysinf)
+op = product_operator(fOP("n",4), sysinf)
 
 # Create B = n_4 @ A(t), copy of A that will be time evolved
 B = copy.deepcopy(A)
@@ -61,9 +61,13 @@ print("<A|n_4(0)n_4(0)|A>:   ", mel(op, A, B))
 # Create Hamiltonian for time evolution
 H = SOP(N)
 
-H += 2*sOP("n", 4)
-H += 2*sOP("n", 5)
-H += 5*sOP("a", 4)*sOP("adag",5)
+H += 2*fOP("n", 4)
+H += 2*fOP("n", 5)
+H += 2*fOP("adag", 5)
+H += 2*fOP("a", 5)
+H += 5*fOP("a", 4)*fOP("adag",5)
+
+H.jordan_wigner(sysinf)
 
 h = sop_operator(H, A, sysinf)
 

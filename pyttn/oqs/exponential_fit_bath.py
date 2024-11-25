@@ -121,7 +121,7 @@ class ExpFitFermionicBath(ExpFitOQSBath):
 
     def system_information(self):
         ret = system_modes(len(self._composite_modes))
-        for ind, cmode in enumrate(self._composite_modes):
+        for ind, cmode in enumerate(self._composite_modes):
             ret[ind] = [fermion_mode() for x in cmode]
         return ret
 

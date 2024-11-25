@@ -249,6 +249,14 @@ public:
         if(this->empty()){return;}
         m_root->leaf_indices(linds, false);
     }
+
+    void node_indices(std::vector<std::vector<size_type>>& linds) const
+    {
+        linds.resize(this->nleaves());
+        if(this->empty()){return;}
+        m_root->node_indices(linds, false);
+    }
+
 public:
     iterator begin() {  return iterator(m_root);  }
     iterator end() {  return iterator();  }

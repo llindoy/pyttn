@@ -33,7 +33,6 @@ def siam_tree(chi, chiU, degree, bsysf, bsyse):
 
 def observable_tree(obstree, dims):
     Opttn = ttn(obstree, dtype=np.complex128)
-    #setup the Sz tree state
     prod_state = [op.flatten()]
     for i in range(len(dims)):
         state_vec = np.identity(int(np.sqrt(dims[i])), dtype=np.complex128).flatten()
@@ -42,13 +41,20 @@ def observable_tree(obstree, dims):
     return Opttn
 
 
-def bath_parameters(K, nstep, dt, Ef, sigma):
+def bath_parameters(bath, K, nstep, dt, Ef, sigma):
     dkf, zkf = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep), Ef = 0.0, sigma=sigma)
 
     #set up the exp bath object this takes the dk and zk terms.  Truncate the modes and
     #extract the system information object from this.
     expbathf = oqs.ExpFitFermionicBath(dkf, zkf)
     bsysf = expbathf.system_information()
+
+
+    import matplotlib.pyplot as plt
+
+    t=np.linspace(0, dt*(nstep+1), nstep+1)
+
+    plt.plot(t, oqs.FermionicBath.Ctexp(t, dkf, -1.0j*zkf, sigma=sigma))
 
     gkf = np.real(zkf)
     Ekf = np.imag(zkf)
@@ -72,7 +78,7 @@ def setup_system(bsysf, bsyse, use_mode_combination=True, nbmax=8, nhilbmax=1024
     Ne = bsyse.nprimitive_modes()
     N = 2+Ne+Nf
 
-    bsys = combine_system(sysinf, bsys)
+    bsys = combine_system(bsysf, bsyse)
 
     #set the spin up spins
     sysinfu = combine_systems(sysinf, bsys)
@@ -116,10 +122,9 @@ def siam_dynamics(Gamma, W, epsd, deps, U, chi, K, dt, chiU = None, beta = None,
     #set up the open quantum system bath object
     bath = oqs.FermionicBath(V, beta=beta)
    
-    dke, zke = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep), Ef = 0.0, sigma='-')
-    
-    gkf, Ekf, Vkf, Mkf, bsysf = bath_parameters(K, nstep, dt, 0.0, '+')
-    gke, Eke, Vke, Mke, bsyse = bath_parameters(K, nstep, dt, 0.0, '-')
+    gkf, Ekf, Vkf, Mkf, bsysf = bath_parameters(bath, K, nstep, dt, 0.0, '+')
+    gke, Eke, Vke, Mke, bsyse = bath_parameters(bath, K, nstep, dt, 0.0, '-')
+    plt.show()
 
     sysinf, dims, bsysf, bsyse, modes_f_d, modes_f_u, modes_e_d, modes_e_u = setup_system(bsysf, bsyse, use_mode_combination, nbmax, nhilbmax)
 
@@ -130,7 +135,6 @@ def siam_dynamics(Gamma, W, epsd, deps, U, chi, K, dt, chiU = None, beta = None,
     H = SOP(N)
 
     #add on the system liouvillian - here we are using that sz^T = sz and "sx^T=sx"
-
     Lsys = epsd* ( fOP("n", Nn-2) - fOP("n", Nn-1))
     Lsys += (epsd+deps)* ( fOP("n", Nn) - fOP("n", Nn+1))
     Lsys += U* ( fOP("n", Nn-2)*fOP("n", Nn) - fOP("n", Nn-1)*fOP("n", Nn+1))
@@ -279,4 +283,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     nstep = int(args.tmax/args.dt)+1
-    sbm_dynamics(args.alpha, args.wc, args.s, args.eps, args.delta, args.chi, args.L, args.K, args.dt, beta = args.beta, nstep = nstep, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree, Lmin=args.Lmin, use_mode_combination=True, nbmax=args.nbmax, nhilbmax=args.nhilbmax)
+    siam_dynamics(args.alpha, args.wc, args.s, args.eps, args.delta, args.chi, args.L, args.K, args.dt, beta = args.beta, nstep = nstep, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree, use_mode_combination=True, nbmax=args.nbmax, nhilbmax=args.nhilbmax)
