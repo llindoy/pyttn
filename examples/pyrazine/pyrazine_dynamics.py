@@ -69,14 +69,14 @@ def pyrazine_dynamics(N1, N2, N3, N4, N5, nstep, dt, adaptive = True, spawning_t
     #setup the evolution object
     sweepA = None
     if(adaptive):
-        sweepA = tdvp(A, h, krylov_dim = 16, expansion='subspace')
+        sweepA = tdvp(A, h, krylov_dim = 12, expansion='subspace')
         sweepA.spawning_threshold = spawning_threshold
         sweepA.unoccupied_threshold=unoccupied_threshold
         sweepA.minimum_unoccupied=nunoccupied
     else:
         sweep = tdvp(A, h, krylov_dim = 12)
         
-    sweepA.expmv_tol=1e-12
+    #sweepA.expmv_tol=1e-12
     sweepA.dt = dt
     sweepA.coefficient = -1.0j
 

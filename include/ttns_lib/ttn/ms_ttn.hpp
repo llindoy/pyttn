@@ -134,7 +134,7 @@ public:
     void sample_product_state(size_type sind, std::vector<size_t>& state, const std::vector<Rvec>& relval){CALL_AND_RETHROW(this->_sample_product_state(state, relval, sind));}
 
     template <typename U, typename int_type> 
-    void set_state(const std::vector<U>& coeff, const std::vector<std::vector<int_type>>& si)
+    void set_state(const std::vector<U>& coeff, const std::vector<std::vector<int_type>>& si, bool random_unoccupied_initialisation=false)
     {
         ASSERT(coeff.size() == si.size() && coeff.size() == this->nset(), "Cannot set ttnbase to specified state.  Input arrays are not the correct size.");
 
@@ -158,7 +158,7 @@ public:
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
-                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[set_index][i], _rng), "Failed to set state.");
+                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[set_index][i], _rng, random_unoccupied_initialisation), "Failed to set state.");
             }
 
             //and scale them by the coeff array

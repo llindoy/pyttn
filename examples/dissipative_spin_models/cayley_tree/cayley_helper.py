@@ -65,6 +65,25 @@ def get_spin_connectivity(Nl, d=3):
                     inds.append([x,y])
     return inds, topo.size()
 
+def build_system_topology(Nl, ds, chi, chiS,  chiB, nbose, b_mode_dims, degree, d=3):
+    topo = ntree('(1)')
+
+    #build the cayley tree.  
+    if Nl > 0:
+
+        #add the first layer
+        for i in range(d):
+            topo().insert(chi)
+
+    
+        for layer in range(1, Nl):
+            #get all leaves
+            leaf_indices=topo.leaf_indices()
+
+            for li in leaf_indices:
+                for i in range(d-1):
+                    topo.at(li).insert(chi)
+    return topo
 
 def build_topology(Nl, ds, chi, chiS,  chiB, nbose, b_mode_dims, degree, d=3):
     topo = ntree('(1)')

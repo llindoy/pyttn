@@ -215,10 +215,10 @@ public:
 
 public:
     template <typename int_type> 
-    void set_state(const std::vector<int_type>& si){CALL_AND_RETHROW(this->_set_state(si, 0, false));}
+    void set_state(const std::vector<int_type>& si, bool random_unoccupied_initialisation=true){CALL_AND_RETHROW(this->_set_state(si, 0, false, random_unoccupied_initialisation));}
 
     template <typename int_type> 
-    void set_state_purification(const std::vector<int_type>& si){CALL_AND_RETHROW(this->_set_state(si, 0, true));}
+    void set_state_purification(const std::vector<int_type>& si, bool random_initialisation=true){CALL_AND_RETHROW(this->_set_state(si, 0, true, random_initialisation));}
 
     template <typename U, typename be> 
     void set_product(const std::vector<linalg::vector<U, be> >& ps){CALL_AND_RETHROW(this->_set_product(ps));}

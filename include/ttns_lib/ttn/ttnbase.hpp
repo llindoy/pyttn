@@ -315,7 +315,7 @@ public:
 
 protected:
     template <typename int_type> 
-    void _set_state(const std::vector<int_type>& si, size_type set_index = 0, bool use_purification_info = false)
+    void _set_state(const std::vector<int_type>& si, size_type set_index = 0, bool use_purification_info = false, bool random_unoccupied_initialisation=true)
     {
         //if we aren't using the set_state_purification function or we don't have a purification then we just set as usual
         if(!use_purification_info || !m_purification)
@@ -334,7 +334,7 @@ protected:
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
-                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[i], _rng), "Failed to set state.");
+                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[i], _rng, random_unoccupied_initialisation), "Failed to set state.");
             }
         }
         //otherwise we need to do a strided set the correct degrees of freedom and ensure that when we trace over the ancilla we receive the state we aimed
@@ -355,7 +355,7 @@ protected:
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
-                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[i]*(m_dim_sizes_lhd[i]), _rng), "Failed to set state.");
+                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[i]*(m_dim_sizes_lhd[i]), _rng, random_unoccupied_initialisation), "Failed to set state.");
             }
         }
 

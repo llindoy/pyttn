@@ -31,7 +31,7 @@ def plot(fnames, params):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plot density matrix elements output by a heom calculation.')
     parser.add_argument('fname', nargs='+')
-    parser.add_argument('--labels', nargs='+', default = ['a(t)`'])
+    parser.add_argument('--labels', nargs='+', default = ['a(t)'])
 
     args = parser.parse_args()
     plot(args.fname, args.labels)

@@ -242,8 +242,8 @@ if __name__ == "__main__":
 
 
     #integration time parameters
-    parser.add_argument('--dt', type=float, default=0.05)
-    parser.add_argument('--tmax', type=float, default=40)
+    parser.add_argument('--dt', type=float, default=0.2)
+    parser.add_argument('--tmax', type=float, default=100)
 
     #output file name
     parser.add_argument('--fname', type=str, default='xychain.h5')

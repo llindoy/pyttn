@@ -432,15 +432,60 @@ public:
         backend::fill_random_normal(mat.buffer(), mat.size(), rng);
     }
 
-    void set_node_state(size_type i, std::mt19937& rng)
+    void set_node_state(size_type i, std::mt19937& rng, bool random_unoccupied_initialisation=false)
     {
         size_type s1 = this->shape(0);
         size_type s2 = this->shape(1);
 
         linalg::matrix<T, linalg::blas_backend> ct(s2, s1);  ct.fill_zeros();
         ct(0, i) = T(1.0);
+
         using orthog = helper::orthogonal_vector<T, backend>;
-        CALL_AND_RETHROW(orthog::pad_random_vectors(ct, 1, rng));
+        if(random_unoccupied_initialisation)
+        {
+            CALL_AND_RETHROW(orthog::pad_random_vectors(ct, 1, rng));
+        }
+        else
+        {
+            size_type cu = i;
+            size_type cd = i;
+
+            for(size_type j = 1; j < s2; ++j)
+            {
+                //for even numbers first attempt to add states with larger excitations and if we have reached the end add fewer excitations
+                if (j%2 == 0)
+                {
+                    //
+                    if(cu+1 != s1)
+                    {
+                        cu+=1;
+                        ct(j, cu) = T(1.0);
+                    }
+                    else if(cd != 0)
+                    {
+                        cd-=1;
+                        ct(j, cd) = T(1.0);
+                    }
+                    else{RAISE_EXCEPTION("Failed to set node state unable to set unoccupied vectors.");}
+                }
+                //for odd numbers attempt to add states with fewer excitations and if we have reached the end add states with more excitations
+                else
+                {
+                    if(cd != 0)
+                    {
+                        cd-=1;
+                        ct(j, cd) = T(1.0);
+                    }
+                    else if(cu+1 != s1)
+                    {
+                        cu+=1;
+                        ct(j, cu) = T(1.0);
+                    }
+                    else{RAISE_EXCEPTION("Failed to set node state unable to set unoccupied vectors.");}
+                }
+            }
+
+        }
 
         this->as_matrix() = linalg::trans(ct);
     }
@@ -1108,10 +1153,10 @@ public:
     void set_node_random(std::mt19937& rng){m_data.set_random(rng);}
     void set_node_random(size_type /* set_index */, std::mt19937& rng){m_data.set_random(rng);}
 
-    void set_leaf_node_state(size_type /* set_index */, size_type i, std::mt19937& rng)
+    void set_leaf_node_state(size_type /* set_index */, size_type i, std::mt19937& rng, bool random_unoccupied_initialisation=false)
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
-        this->m_data.set_node_state(i, rng);
+        this->m_data.set_node_state(i, rng, random_unoccupied_initialisation);
     }
 
     template <typename U, typename be> 

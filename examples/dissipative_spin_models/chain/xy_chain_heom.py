@@ -15,7 +15,7 @@ from pyttn import oqs, utils
 
 from numba import jit
 
-def build_topology(Ns, ds, chiS, chiB, chi, nbose, b_mode_dims, degree):
+def build_topology(Ns, ds, chi, chiS, chiB, nbose, b_mode_dims, degree):
     lchi = [chiS for i in range(Ns)]
     topo = ntreeBuilder.mps_tree(lchi, chi)
 
@@ -108,6 +108,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
         for i in range(Nb):
             bind = skip+i+2
             H += -1.0j*zk[i]*sOP("n", bind)
+            sf = 1.0
             H += complex(dk[i])*(sOP("sz", skip+0) - sOP("sz", skip+1))*sOP("a", bind)
             if i % 2 == 0:
                 H +=  complex(dk[i])*sOP("sz", skip+0)*sOP("adag", bind)
@@ -161,9 +162,9 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
     #set up the tdvp object
     sweep = None
     if not adaptive:
-        sweep = tdvp(A, h, krylov_dim = 16)
+        sweep = tdvp(A, h, krylov_dim = 32)
     else:
-        sweep = tdvp(A, h, krylov_dim = 16, expansion='subspace')
+        sweep = tdvp(A, h, krylov_dim = 32, expansion='subspace', subspace_neigs=12, subspace_krylov_dim=24)
         sweep.spawning_threshold = spawning_threshold
         sweep.unoccupied_threshold=unoccupied_threshold
         sweep.minimum_unoccupied=nunoccupied
@@ -181,11 +182,12 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
     maxchi[0] = A.maximum_bond_dimension()
 
 
+
     t1 = time.time()
     #perform the dynamics
     renorm = mel(id_ttn, A)
     i=0
-    print((i)*dt, res[Ns//2, i], np.real(renorm), maxchi[i], np.real(mel(A, A)))
+    print((i)*dt, res[Ns//2, i], renorm, maxchi[i], np.real(mel(A, A)))
     norm[i] = np.real(mel(A,A))
 
     tp = 0
@@ -196,6 +198,8 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
         sweep.step(A, h)
         tp = ts[i]
         renorm = mel(id_ttn, A)
+        print(tp,  renorm, np.real(mel(A, A)))
+        print(mel(h, A, id_ttn))
 
     i=1
     for si in range(Ns):
@@ -203,27 +207,28 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
     maxchi[1] = A.maximum_bond_dimension()
     norm[i] = np.real(mel(A,A))
     Rnorm[1]=(1/renorm)
-    print((i)*dt, res[Ns//2, i], np.real(renorm), maxchi[i], np.real(mel(A, A)))
+    print((i)*dt, res[Ns//2, i], renorm, maxchi[i], np.real(mel(A,A)))
     sweep.dt = dt
 
     for i in range(1, nstep):
+        print(mel(h, A, id_ttn))
         sweep.step(A, h)
         renorm = mel(id_ttn, A)
         for si in range(Ns):
             res[si, i+1] = mel(ops[si], A, id_ttn)
         maxchi[i+1] = A.maximum_bond_dimension()
         norm[i+1] = np.real(mel(A,A))
-        Rnorm[i+1]=(1/renorm)
+        Rnorm[i+1]=(renorm)
 
-        print((i+1)*dt, res[Ns//2, i+1], np.real(renorm), maxchi[i+1], np.real(mel(A, A)))
+        print((i+1)*dt, res[Ns//2, i+1], renorm, maxchi[i+1], np.real(mel(A, A)))
 
         t2 = time.time()
         h5 = h5py.File(ofname, 'w')
         h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
         for si in range(Ns):
-            h5.create_dataset('Sz'+str(si), data=np.real(res[si, :]))
-            h5.create_dataset('rSz'+str(si), data=np.real(res[si, :]*Rnorm))
-        h5.create_dataset('rnorm', data=np.real(Rnorm))
+            h5.create_dataset('Sz'+str(si), data=res[si, :])
+            h5.create_dataset('rSz'+str(si), data=res[si, :]/Rnorm)
+        h5.create_dataset('rnorm', data=Rnorm)
         h5.create_dataset('maxchi', data=maxchi)
         h5.create_dataset('norm', data=norm)
         h5.create_dataset('time', data=np.array([t2-t1]))
@@ -233,10 +238,10 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
     h5 = h5py.File(ofname, 'w')
     h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
     for si in range(Ns):
-        h5.create_dataset('Sz'+str(si), data=np.real(res[si, :]))
-        h5.create_dataset('rSz'+str(si), data=np.real(res[si, :]*Rnorm))
+        h5.create_dataset('Sz'+str(si), data=res[si, :])
+        h5.create_dataset('rSz'+str(si), data=res[si, :]/Rnorm)
     h5.create_dataset('maxchi', data=maxchi)
-    h5.create_dataset('rnorm'+str(si), data=np.real(Rnorm))
+    h5.create_dataset('rnorm', data=Rnorm)
     h5.create_dataset('norm', data=norm)
     h5.create_dataset('time', data=np.array([t2-t1]))
     h5.close()
@@ -287,7 +292,7 @@ if __name__ == "__main__":
 
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
-    parser.add_argument('--nunoccupied', type=int, default=1)
+    parser.add_argument('--nunoccupied', type=int, default=0)
     parser.add_argument('--spawning_threshold', type=float, default=1e-7)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 

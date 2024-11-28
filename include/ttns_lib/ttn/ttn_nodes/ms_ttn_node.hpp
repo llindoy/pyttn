@@ -448,10 +448,10 @@ public:
     void set_node_random(std::mt19937& rng){for(size_type i = 0; i < this->nset(); ++i){m_data[i].set_random(rng);}}
     void set_node_random(size_type i, std::mt19937& rng){m_data[i].set_random(rng);}
 
-    void set_leaf_node_state(size_type sind, size_type i, std::mt19937& rng)
+    void set_leaf_node_state(size_type sind, size_type i, std::mt19937& rng, bool random_unoccupied_initialisation=false)
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
-        this->m_data[sind].set_node_state(i, rng);
+        this->m_data[sind].set_node_state(i, rng, random_unoccupied_initialisation);
     }
 
     template <typename U, typename be> 
