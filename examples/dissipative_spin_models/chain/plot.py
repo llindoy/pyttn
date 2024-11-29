@@ -23,6 +23,8 @@ def plot(fnames, params):
 
         for par, label in zip(pars, params):
             try:
+                if(par[10] > 1):
+                    par = 1/par
                 plt.plot(t, 0.5-np.real(par), '-', label=label+'_'+fname)
                 #plt.plot(t, np.real(par)/np.amax(np.real(par)), '-', label=label+'_'+fname)
             except:

@@ -22,7 +22,7 @@ def setup_topology(chi, nbose, mode_dims, degree):
     ntreeBuilder.sanitise(topo)
     return topo
 
-def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut = 20, nstep = 1, Nw = 10.0, geom='star', ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, nbmax=1, nhilbmax=1024):
+def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut = 20, nstep = 1, Nw = 10.0, geom='star', ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024)):
     t = np.arange(nstep+1)*dt
 
     #setup the function for evaluating the exponential cutoff spectral density
@@ -36,6 +36,10 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     #discretise the bath correleation function using the orthonormal polynomial based cutoff 
     g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
 
+    import matplotlib.pyplot as plt
+    plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w))
+    plt.show()
+
     #set up the total Hamiltonian
     N = Nb+1
     H = SOP(N)
@@ -44,23 +48,27 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     H += eps*sOP("sz", 0) + delta*sOP("sx", 0)
 
     #add on the bath and system bath contributions of the bath hamiltonian
-    H, frequencies = oqs.add_bosonic_bath_hamiltonian(H, sOP("sz", 0), g, w, geom=geom, return_frequencies=True)
+    H, frequencies = oqs.unitary.add_bosonic_bath_hamiltonian(H, sOP("sz", 0), g, w, geom=geom, return_frequencies=True)
 
     #set up the local hilbert space dimensions of the bosonic modes
     mode_dims = [min(max(4, int(wc*Ncut/frequencies[i])), nbose) for i in range(Nb)]
 
-    #set up the mode combination informatino
-    mode_comb = utils.ModeCombination(nbmax, nhilbmax)
-    composite_modes = mode_comb(mode_dims, [x+1 for x in range(Nb)])
-    Nbc = len(composite_modes)
+    #set up the local hilbert space dimensions of the bosonic modes
+    bsys = system_modes(Nb)
+    for i in range(Nb):
+        bsys[i] = boson_mode(mode_dims[i])
 
-    #setup the system information object.  Additionally work out the local hilbert space dimensions os that we can set up the system mode informmation
-    sysinf = system_modes(1+Nbc)
-    sysinf[0] = tls_mode()
+    #set up the mode combination informatino
+    if use_mode_combination:
+        mode_comb = utils.ModeCombination(nbmax, nhilbmax)
+        bsys = mode_comb(bsys)
+
+    sysinf = system_modes(1)
+    sysinf[0] = spin_mode(2)
+    sysinf = combine_systems(sysinf, bsys)
     tree_mode_dims = []
-    for ind, cmode in enumerate(composite_modes):
-        sysinf[ind+1] = [boson_mode(mode_dims[x-1]) for x in cmode]
-        tree_mode_dims.append(sysinf[ind+1].lhd())
+    for ind in range(len(bsys)):
+        tree_mode_dims.append(bsys[ind].lhd())
 
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
@@ -73,7 +81,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
 
     #construct and initialise the ttn wavefunction
     A = ttn(topo, capacity, dtype=np.complex128)
-    A.set_state([0 for i in range(Nbc+1)])
+    A.set_state([0 for i in range(len(bsys)+1)])
 
     #set up the Hamiltonian as a sop object
     h = sop_operator(H, A, sysinf)
@@ -178,13 +186,13 @@ if __name__ == "__main__":
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.005)
-    parser.add_argument('--tmax', type=float, default=40)
+    parser.add_argument('--tmax', type=float, default=30)
 
     #output file name
     parser.add_argument('--fname', type=str, default='sbm.h5')
 
     #the minimum number of unoccupied modes for the dynamics
-    parser.add_argument('--subspace', type=bool, default = True)
+    parser.add_argument('--subspace', type=bool, default = False)
     parser.add_argument('--nunoccupied', type=int, default=0)
     parser.add_argument('--spawning_threshold', type=float, default=1e-6)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
