@@ -22,7 +22,7 @@ def setup_topology(chi, nbose, mode_dims, degree):
     ntreeBuilder.sanitise(topo)
     return topo
 
-def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut = 20, nstep = 1, Nw = 10.0, geom='star', ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024)):
+def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut = 20, nstep = 1, Nw = 10.0, geom='star', ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024):
     t = np.arange(nstep+1)*dt
 
     #setup the function for evaluating the exponential cutoff spectral density
@@ -73,7 +73,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
     if adaptive:
-        chi0 = 4
+        chi0 = min(4, chi)
 
     #now build the topology and capacity arrays
     topo = setup_topology(chi0, nbose, tree_mode_dims, degree)
@@ -192,7 +192,7 @@ if __name__ == "__main__":
     parser.add_argument('--fname', type=str, default='sbm.h5')
 
     #the minimum number of unoccupied modes for the dynamics
-    parser.add_argument('--subspace', type=bool, default = False)
+    parser.add_argument('--subspace', type=bool, default = True)
     parser.add_argument('--nunoccupied', type=int, default=0)
     parser.add_argument('--spawning_threshold', type=float, default=1e-6)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)

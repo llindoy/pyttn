@@ -22,10 +22,11 @@ def build_topology(Ns, ds, chi, chiS, chiB, nbose, b_mode_dims, degree):
     leaf_indices=topo.leaf_indices()
     for li in leaf_indices:
         topo.at(li).insert(ds)
-        if degree == 1:
-            ntreeBuilder.mps_subtree(topo.at(li), b_mode_dims, chiB, min(chiB, nbose))
-        else:
-            ntreeBuilder.mlmctdh_subtree(topo.at(li), b_mode_dims, degree, chiB)
+        if(len(b_mode_dims) != 0):
+            if degree == 1:
+                ntreeBuilder.mps_subtree(topo.at(li), b_mode_dims, chiB, min(chiB, nbose))
+            else:
+                ntreeBuilder.mlmctdh_subtree(topo.at(li), b_mode_dims, degree, chiB)
 
     ntreeBuilder.sanitise(topo)
     return topo
@@ -53,38 +54,48 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
     def J(w):
         return 2*np.pi*alpha*w*np.exp(-np.abs(w/wc)**2)
 
-    #set up the open quantum system bath object
-    bath = oqs.BosonicBath(J, beta=beta, wmax=wc*100)
-    dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
-
-    #set up the exp bath object this takes the dk and zk terms.  Truncate the modes and
-    #extract the system information object from this.
-    expbath = oqs.ExpFitBosonicBath(dk, zk)
-    expbath.truncate_modes(utils.EnergyTruncation(15*wc, Lmax=L, Lmin=Lmin))
-    bsys = expbath.system_information()
-
-    dk = expbath.dk
-    zk = expbath.zk
-
-    Nb = bsys.nprimitive_modes()
-    N = (Nb+2)*Ns
-
     #set up the system information object for a single spin
     #setup the system information object
     sysinf = system_modes(1)
     sysinf[0] = [spin_mode(2), spin_mode(2)]
 
-    #now attempt mode combination on the bath modes
-    if use_mode_combination:
-        mode_comb = utils.ModeCombination(nhilbmax, nbmax)
-        bsys = mode_comb(bsys)
+    Nb = 0
+    Nbc = 0
+    if K != 0:
+        #set up the open quantum system bath object
+        bath = oqs.BosonicBath(J, beta=beta, wmax=wc*100)
+        dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
 
-    #extract the bath mode dimensions
-    b_mode_dims = np.zeros(len(bsys), dtype=int)
-    for i in range(len(bsys)):
-        b_mode_dims[i] = bsys[i].lhd()
+        #set up the exp bath object this takes the dk and zk terms.  Truncate the modes and
+        #extract the system information object from this.
+        expbath = oqs.ExpFitBosonicBath(dk, zk)
+        expbath.truncate_modes(utils.EnergyTruncation(15*wc, Lmax=L, Lmin=Lmin))
+        bsys = expbath.system_information()
 
-    sysinf = combine_systems(sysinf, bsys)
+        dk = expbath.dk
+        zk = expbath.zk
+
+        Nb = bsys.nprimitive_modes()
+
+        #now attempt mode combination on the bath modes
+        if use_mode_combination:
+            mode_comb = utils.ModeCombination(nhilbmax, nbmax)
+            bsys = mode_comb(bsys)
+
+            
+        #extract the bath mode dimensions
+        b_mode_dims = np.zeros(len(bsys), dtype=int)
+        for i in range(len(bsys)):
+            b_mode_dims[i] = bsys[i].lhd()
+        Nbc = len(bsys)
+        sysinf = combine_systems(sysinf, bsys)
+    else:
+        b_mode_dims = np.zeros(0)
+
+    N = (Nb+2)*Ns
+
+
+
 
     #set the total system information object to just be a single spin
     sysinfo = copy.deepcopy(sysinf)
@@ -95,7 +106,6 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
 
     #set up the total Hamiltonian
     H = SOP(sysinfo.nprimitive_modes())
-    zktot = np.sum(zk)
 
     #set up the interactions for each spin and its bath
     for si in range(Ns):
@@ -141,9 +151,8 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
 
     A = ttn(topo, capacity, dtype=np.complex128)
 
-    state = [0 for i in range(Ns*(len(bsys)+1))]
-    state[(Ns-1)//2*(len(bsys)+1)]=3
-    print(state)
+    state = [0 for i in range(Ns*(Nbc+1))]
+    state[(Ns-1)//2*(Nbc+1)]=3
     A.set_state(state)
 
     h = sop_operator(H, A, sysinfo)

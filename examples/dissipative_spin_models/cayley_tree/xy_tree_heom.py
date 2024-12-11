@@ -41,40 +41,45 @@ def xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
     def J(w):
         return 2*np.pi*alpha*w*np.exp(-np.abs(w/wc)**2)
 
-    #set up the open quantum system bath object
-    bath = oqs.BosonicBath(J, beta=beta, wmax=wc*100)
-    dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
-
-    #set up the exp bath object this takes the dk and zk terms.  Truncate the modes and
-    #extract the system information object from this.
-    expbath = oqs.ExpFitBosonicBath(dk, zk)
-    expbath.truncate_modes(utils.EnergyTruncation(15*wc, Lmax=L, Lmin=Lmin))
-    bsys = expbath.system_information()
-
-    dk = expbath.dk
-    zk = expbath.zk
-
-    hiterms, Ns = get_spin_connectivity(Nl, d=3)
-
-    Nb = bsys.nprimitive_modes()
-    N = (Nb+2)*Ns
-
     #set up the system information object for a single spin
     #setup the system information object
     sysinf = system_modes(1)
     sysinf[0] = [spin_mode(2), spin_mode(2)]
 
-    #now attempt mode combination on the bath modes
-    if use_mode_combination:
-        mode_comb = utils.ModeCombination(nhilbmax, nbmax)
-        bsys = mode_comb(bsys)
+    Nb = 0
+    Nbc = 0
+    if K != 0:
+        #set up the open quantum system bath object
+        bath = oqs.BosonicBath(J, beta=beta, wmax=wc*10)
+        dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
 
-    #extract the bath mode dimensions
-    b_mode_dims = np.zeros(len(bsys), dtype=int)
-    for i in range(len(bsys)):
-        b_mode_dims[i] = bsys[i].lhd()
+        #set up the exp bath object this takes the dk and zk terms.  Truncate the modes and
+        #extract the system information object from this.
+        expbath = oqs.ExpFitBosonicBath(dk, zk)
+        expbath.truncate_modes(utils.EnergyTruncation(15*wc, Lmax=L, Lmin=Lmin))
+        bsys = expbath.system_information()
 
-    sysinf = combine_systems(sysinf, bsys)
+        Nb = bsys.nprimitive_modes()
+        dk = expbath.dk
+        zk = expbath.zk
+
+        #now attempt mode combination on the bath modes
+        if use_mode_combination:
+            mode_comb = utils.ModeCombination(nhilbmax, nbmax)
+            bsys = mode_comb(bsys)
+
+        Nbc = len(bsys)
+        #extract the bath mode dimensions
+        b_mode_dims = np.zeros(len(bsys), dtype=int)
+        for i in range(len(bsys)):
+            b_mode_dims[i] = bsys[i].lhd()
+        sysinf = combine_systems(sysinf, bsys)
+    else:
+        b_mode_dims = np.zeros(0, dtype=int)
+
+    hiterms, Ns = get_spin_connectivity(Nl, d=3)
+
+    N = (Nb+2)*Ns
 
     #set the total system information object to just be a single spin
     sysinfo = copy.deepcopy(sysinf)
@@ -85,7 +90,6 @@ def xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
 
     #set up the total Hamiltonian
     H = SOP(sysinfo.nprimitive_modes())
-    zktot = np.sum(zk)
 
     #set up the interactions for each spin and its bath
     for si in range(Ns):
@@ -112,15 +116,14 @@ def xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
         H += (1.0-eta)*(sOP("sx", s1)*sOP("sx", s2) - sOP("sx", s1+1)*sOP("sx", s2+1))
         H += (1.0+eta)*(sOP("sy", s1)*sOP("sy", s2) - sOP("sy", s1+1)*sOP("sy", s2+1))
 
-
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
     chiS0 = chiS
     chiB0 = chiB
     if adaptive:
-        chi0 = 16
-        chiS0=16
-        chiB0=16
+        chi0 = 8
+        chiS0 = 8
+        chiB0 = 8
     chi0=min(chi0, chi)
     chiS0=min(chiS0, chiS)
     chiB0=min(chiB0, chiB)
@@ -130,7 +133,7 @@ def xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
 
     A = ttn(topo, capacity, dtype=np.complex128)
 
-    state = [0 for i in range(Ns*(len(bsys)+1))]
+    state = [0 for i in range(Ns*(Nbc+1))]
     state[0]=3
     print(state)
     A.set_state(state)
@@ -181,8 +184,8 @@ def xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
     norm[i] = np.real(mel(A,A))
 
     tp = 0
-    ts = np.logspace(np.log10(dt*1e-5), np.log10(dt), 5)
-    for i in range(5):
+    ts = np.logspace(np.log10(dt*1e-7), np.log10(dt), 10)
+    for i in range(10):
         dti = ts[i]-tp
         print(i, dti)
         sweep.dt = dti
@@ -292,26 +295,27 @@ def run_from_inputs():
 
     args = parser.parse_args()
 
+    nstep = int(args.tmax/args.dt)+1
 
     xychain_dynamics(args.Nl, args.alpha, args.wc, args.eta, args.chi, args.chiS, args.chiB, args.L, args.K, args.dt, beta = args.beta, nstep = nstep, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree, Lmin=args.Lmin, use_mode_combination=True, nbmax=args.nbmax, nhilbmax=args.nhilbmax)
 
 def main():
     Nl = 3
-    alpha =0.32
+    alpha =1e-7
     wc = 4
     eta = 0.04
     L=20
-    K=4
-    dt=0.05
+    K=1
+    dt=0.025
     beta=None
     tmax=10
     nstep = int(tmax/dt)+1
     nunoccupied=0
-    spawning_threshold=1e-6
+    spawning_threshold=1e-4
     unoccupied_threshold=1e-4
     subspace=True
-    degree=2
-    Lmin=4
+    degree=1
+    Lmin=5
     use_mode_combination=True
     nbmax=2
     nhilbmax=1000
@@ -319,11 +323,12 @@ def main():
     chiSs = [4, 8, 12, 16, 20, 24, 32]
 
     for chiS in chiSs:
-        chi = 32
-        chiB=int(1.5*chiS)
-        fname='xytree_heom_'+str(chi)+'_'+str(chiS)+'_'+str(chiB)+'.h5'
+        chi = 64
+        chiS = 4
+        chiB=1#int(1.5*chiS)
+        fname='xytree_heom_b_'+str(chi)+'_'+str(chiS)+'_'+str(chiB)+'.h5'
 
         xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, beta = beta, nstep = nstep, ofname = fname, nunoccupied=nunoccupied, spawning_threshold=spawning_threshold, unoccupied_threshold = unoccupied_threshold, adaptive = subspace, degree = degree, Lmin=Lmin, use_mode_combination=True, nbmax=nbmax, nhilbmax=nhilbmax)
 
 if __name__ == "__main__":
-    main()
+    run_from_inputs()

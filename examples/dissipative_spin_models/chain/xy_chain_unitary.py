@@ -20,10 +20,11 @@ def build_topology(Ns, ds, chi, chiS,  chiB, nbose, b_mode_dims, degree):
     leaf_indices=topo.leaf_indices()
     for li in leaf_indices:
         topo.at(li).insert(ds)
-        if degree == 1:
-            ntreeBuilder.mps_subtree(topo.at(li), b_mode_dims, chiB, min(chiB, nbose))
-        else:
-            ntreeBuilder.mlmctdh_subtree(topo.at(li), b_mode_dims, degree, chiB)
+        if(len(b_mode_dims) != 0):
+            if degree == 1:
+                ntreeBuilder.mps_subtree(topo.at(li), b_mode_dims, chiB, min(chiB, nbose))
+            else:
+                ntreeBuilder.mlmctdh_subtree(topo.at(li), b_mode_dims, degree, chiB)
 
     ntreeBuilder.sanitise(topo)
     return topo
@@ -36,11 +37,20 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_m
     def J(w):
         return 2*np.pi*alpha*w*np.exp(-np.abs(w/wc)**2)
 
-    #set up the open quantum system bath object
-    bath = oqs.BosonicBath(J, beta=beta)
 
-    #discretise the bath correleation function using the orthonormal polynomial based cutoff 
-    g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
+
+    #setup the system information object.  Additionally work out the local hilbert space dimensions os that we can set up the system mode informmation
+    tree_mode_dims = []
+    sysinf = system_modes(1)
+    sysinf[0] = spin_mode(2)
+
+    Nbc = 0
+    if Nb != 0:
+        #set up the open quantum system bath object
+        bath = oqs.BosonicBath(J, beta=beta)
+
+        #discretise the bath correleation function using the orthonormal polynomial based cutoff 
+        g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
 
     #set up the total Hamiltonian
     N = Nb+1
@@ -57,31 +67,33 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_m
             skip2 = (si+1)*(Nb+1)
             H += (1-eta)*sOP("sx", skip)*sOP("sx", skip2) + (1+eta)*sOP("sy", skip)*sOP("sy", skip2) 
 
-
         binds = [skip+1+i for i in range(Nb)]
 
-        #add on the bath and system bath contributions of the bath hamiltonian
-        H, frequencies = oqs.unitary.add_bosonic_bath_hamiltonian(H, sOP("sz", skip), g, w, geom=geom, return_frequencies=True, binds=binds)
+
+        if(Nb != 0):
+            #add on the bath and system bath contributions of the bath hamiltonian
+            H, frequencies = oqs.unitary.add_bosonic_bath_hamiltonian(H, sOP("sz", skip), g, w, geom=geom, return_frequencies=True, binds=binds)
 
     print("hamiltonian string setup")
 
-    #set up the local hilbert space dimensions of the bosonic modes
-    b_mode_dims = [min(max(4, int(wc*20/frequencies[i])), nbose) for i in range(Nb)]
-    bsys = system_modes(Nb)
-    for i in range(Nb):
-        bsys[i] = boson_mode(b_mode_dims[i])
+    if Nb != 0:
+        #set up the local hilbert space dimensions of the bosonic modes
+        b_mode_dims = [min(max(4, int(wc*20/frequencies[i])), nbose) for i in range(Nb)]
+        bsys = system_modes(Nb)
+        for i in range(Nb):
+            bsys[i] = boson_mode(b_mode_dims[i])
 
-    #set up the mode combination informatino
-    mode_comb = utils.ModeCombination(nbmax, nhilbmax)
-    bsys = mode_comb(bsys)
+        #set up the mode combination informatino
+        mode_comb = utils.ModeCombination(nbmax, nhilbmax)
+        bsys = mode_comb(bsys)
+        sysinf = combine_systems(sysinf, bsys)
 
-    #setup the system information object.  Additionally work out the local hilbert space dimensions os that we can set up the system mode informmation
-    sysinf = system_modes(1)
-    sysinf[0] = spin_mode(2)
-    sysinf = combine_systems(sysinf, bsys)
-    tree_mode_dims = []
-    for ind in range(len(bsys)):
-        tree_mode_dims.append(bsys[ind].lhd())
+        for ind in range(len(bsys)):
+            tree_mode_dims.append(bsys[ind].lhd())
+
+        Nbc = len(bsys)
+
+
 
     sysinfo = copy.deepcopy(sysinf)
     #and add on the system information objects for the remaining spins
@@ -115,8 +127,8 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_m
 
     #construct and initialise the ttn wavefunction
     A = ttn(topo, capacity, dtype=np.complex128)
-    state = [0 for i in range(Ns*(len(bsys)+1))]
-    state[(Ns-1)//2*(len(bsys)+1)]=1
+    state = [0 for i in range(Ns*(Nbc+1))]
+    state[(Ns-1)//2*(Nbc+1)]=1
     A.set_state(state)
 
     print("psi0 built")
@@ -242,7 +254,7 @@ if __name__ == "__main__":
 
 
     #integration time parameters
-    parser.add_argument('--dt', type=float, default=0.2)
+    parser.add_argument('--dt', type=float, default=0.05)
     parser.add_argument('--tmax', type=float, default=100)
 
     #output file name

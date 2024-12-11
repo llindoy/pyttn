@@ -24,11 +24,18 @@ def xychain_dynamics(Nl, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_m
     def J(w):
         return 2*np.pi*alpha*w*np.exp(-np.abs(w/wc)**2)
 
-    #set up the open quantum system bath object
-    bath = oqs.BosonicBath(J, beta=beta)
+    #setup the system information object.  Additionally work out the local hilbert space dimensions os that we can set up the system mode informmation
+    tree_mode_dims = []
+    sysinf = system_modes(1)
+    sysinf[0] = spin_mode(2)
 
-    #discretise the bath correleation function using the orthonormal polynomial based cutoff 
-    g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
+    Nbc = 0
+    if Nb != 0:
+        #set up the open quantum system bath object
+        bath = oqs.BosonicBath(J, beta=beta)
+
+        #discretise the bath correleation function using the orthonormal polynomial based cutoff 
+        g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
 
     #set up the total Hamiltonian
     N = Nb+1
@@ -48,8 +55,8 @@ def xychain_dynamics(Nl, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_m
         binds = [skip+1+i for i in range(Nb)]
 
         #add on the bath and system bath contributions of the bath hamiltonian
-        H, frequencies = oqs.unitary.add_bosonic_bath_hamiltonian(H, sOP("sz", skip), g, w, geom=geom, return_frequencies=True, binds=binds)
-    frequencies=w
+        if Nb != 0:
+            H, frequencies = oqs.unitary.add_bosonic_bath_hamiltonian(H, sOP("sz", skip), g, w, geom=geom, return_frequencies=True, binds=binds)
 
     #add on the spin coupling terms
     for ind in hiterms:
@@ -58,25 +65,23 @@ def xychain_dynamics(Nl, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_m
         skip2 = (ind[1])*(Nb+1)
         H += (1-eta)*sOP("sx", skip1)*sOP("sx", skip2) + (1+eta)*sOP("sy", skip1)*sOP("sy", skip2) 
 
+    if Nb != 0:
+        #set up the local hilbert space dimensions of the bosonic modes
+        b_mode_dims = [min(max(4, int(wc*20/frequencies[i])), nbose) for i in range(Nb)]
+        bsys = system_modes(Nb)
+        for i in range(Nb):
+            bsys[i] = boson_mode(b_mode_dims[i])
+
+        #set up the mode combination informatino
+        mode_comb = utils.ModeCombination(nbmax, nhilbmax)
+        bsys = mode_comb(bsys)
+        sysinf = combine_systems(sysinf, bsys)
+
+        for ind in range(len(bsys)):
+            tree_mode_dims.append(bsys[ind].lhd())
+
+        Nbc = len(bsys)
     print("hamiltonian string setup")
-
-    #set up the local hilbert space dimensions of the bosonic modes
-    b_mode_dims = [min(max(4, int(wc*20/frequencies[i])), nbose) for i in range(Nb)]
-    bsys = system_modes(Nb)
-    for i in range(Nb):
-        bsys[i] = boson_mode(b_mode_dims[i])
-
-    #set up the mode combination informatino
-    mode_comb = utils.ModeCombination(nbmax, nhilbmax)
-    bsys = mode_comb(bsys)
-
-    #setup the system information object.  Additionally work out the local hilbert space dimensions os that we can set up the system mode informmation
-    sysinf = system_modes(1)
-    sysinf[0] = spin_mode(2)
-    sysinf = combine_systems(sysinf, bsys)
-    tree_mode_dims = []
-    for ind in range(len(bsys)):
-        tree_mode_dims.append(bsys[ind].lhd())
 
     sysinfo = copy.deepcopy(sysinf)
     #and add on the system information objects for the remaining spins
@@ -111,7 +116,7 @@ def xychain_dynamics(Nl, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_m
 
     #construct and initialise the ttn wavefunction
     A = ttn(topo, capacity, dtype=np.complex128)
-    state = [0 for i in range(Ns*(len(bsys)+1))]
+    state = [0 for i in range(Ns*(Nbc+1))]
     state[0]=1
     A.set_state(state)
 
