@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from cayley_helper import get_spin_connectivity, build_topology
 
 
-def xychain_dynamics(Nl, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_min = None, beta = None, nstep = 1, Nw=6.0, geom='ipchain', ofname='xychain.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024, cayley_degree=3):
+def xychain_dynamics(Nl, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_min = None, beta = None, nstep = 1, Nw=4.0, geom='ipchain', ofname='xychain.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024, cayley_degree=3):
     t = np.arange(nstep+1)*dt
 
     #setup the function for evaluating the exponential cutoff spectral density
@@ -36,6 +36,7 @@ def xychain_dynamics(Nl, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_m
 
         #discretise the bath correleation function using the orthonormal polynomial based cutoff 
         g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
+
 
     #set up the total Hamiltonian
     N = Nb+1
@@ -209,7 +210,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Dynamics of the zero temperature spin boson model with')
 
-    parser.add_argument('--N', type=int, default=80)
+    parser.add_argument('--N', type=int, default=50)
     #number of spins in the system
     parser.add_argument('--Nl', type=int, default=3)
 
