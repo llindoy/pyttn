@@ -42,6 +42,8 @@ def AAA_support_points(w = "linear", wmin=None, wmax = None, Naaa=1000):
             wmax = 1
         if(wmin == None):
             wmin = -1
+
+        print(wmin, wmax, Naaa)
         return np.linspace(wmin, wmax, Naaa)
 
     else:

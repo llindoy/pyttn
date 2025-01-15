@@ -1,3 +1,6 @@
+import os
+os.environ['OMP_NUM_THREADS']='1'
+
 import numpy as np
 import time
 import sys
@@ -6,26 +9,27 @@ import scipy
 import copy
 
 sys.path.append("../../")
-from pyttn import *
+import pyttn
 from pyttn import oqs
+
 
 from numba import jit
 
 
 def siam_tree(chi, chiU, degree, Nbo, Nbe):
-    topo = ntree(str("(1(chiU(2(2))(chiU))(chiU(2(2))(chiU)))").replace('chiU', str(chiU)))
+    topo = pyttn.ntree(str("(1(chiU(2(2))(chiU))(chiU(2(2))(chiU)))").replace('chiU', str(chiU)))
     print(topo)
     if(degree > 1):
-        ntreeBuilder.mlmctdh_subtree(topo()[0][1], [2 for i in range(Nbo)], degree, chi)
-        ntreeBuilder.mlmctdh_subtree(topo()[0][1], [2 for i in range(Nbe)], degree, chi)
-        ntreeBuilder.mlmctdh_subtree(topo()[1][1], [2 for i in range(Nbo)], degree, chi)
-        ntreeBuilder.mlmctdh_subtree(topo()[1][1], [2 for i in range(Nbe)], degree, chi)
+        pyttn.ntreeBuilder.mlmctdh_subtree(topo()[0][1], [2 for i in range(Nbo)], degree, chi)
+        pyttn.ntreeBuilder.mlmctdh_subtree(topo()[0][1], [2 for i in range(Nbe)], degree, chi)
+        pyttn.ntreeBuilder.mlmctdh_subtree(topo()[1][1], [2 for i in range(Nbo)], degree, chi)
+        pyttn.ntreeBuilder.mlmctdh_subtree(topo()[1][1], [2 for i in range(Nbe)], degree, chi)
     else:
-        ntreeBuilder.mps_subtree(topo()[0][1], [2 for i in range(Nbo)], chi, min(chi, 2))
-        ntreeBuilder.mps_subtree(topo()[0][1], [2 for i in range(Nbe)], chi, min(chi, 2))
-        ntreeBuilder.mps_subtree(topo()[1][1], [2 for i in range(Nbo)], chi, min(chi, 2))
-        ntreeBuilder.mps_subtree(topo()[1][1], [2 for i in range(Nbe)], chi, min(chi, 2))
-    ntreeBuilder.sanitise(topo)
+        pyttn.ntreeBuilder.mps_subtree(topo()[0][1], [2 for i in range(Nbo)], chi, min(chi, 2))
+        pyttn.ntreeBuilder.mps_subtree(topo()[0][1], [2 for i in range(Nbe)], chi, min(chi, 2))
+        pyttn.ntreeBuilder.mps_subtree(topo()[1][1], [2 for i in range(Nbo)], chi, min(chi, 2))
+        pyttn.ntreeBuilder.mps_subtree(topo()[1][1], [2 for i in range(Nbe)], chi, min(chi, 2))
+    pyttn.ntreeBuilder.sanitise(topo)
     return topo
 
 def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None, nstep = 1, geom='star', ofname='sbm.h5', degree = 1, adaptive=True, spawning_threshold=1e-5, unoccupied_threshold=1e-4, nunoccupied=0, init_state = 'up'):
@@ -51,7 +55,7 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
 
     #set up the total Hamiltonian
     N = Nb+1
-    H = SOP(2*N)
+    H = pyttn.SOP(2*N)
 
     modes_f_d = [N-1 - (x+1) for x in range(Nbo)]
     modes_f_u = [N+1 + x for x in range(Nbo)]
@@ -68,27 +72,27 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
     #for the system information compared to tree structure - setup the mode ordering so that the down impurity ordering is flipped while the up ordering 
     #is the current order
     mode_ordering = [N - (x+1) for x in range(N)] + [N + x for x in range(N)]
-    sysinf = system_modes(2*N)
+    sysinf = pyttn.system_modes(2*N)
     sysinf.mode_indices = mode_ordering
     for i in range(2*N):
-        sysinf[i] = fermion_mode()
+        sysinf[i] = pyttn.fermion_mode()
 
     #add on the impurity Hamiltonian terms
-    H += epsd*fOP("n", N-1)
-    H += (epsd+deps)*fOP("n", N)    #the up impurity site has an energy of epsd + deps 
-    H += U*fOP("n", N-1)*fOP("n", N)
+    H += epsd*pyttn.fOP("n", N-1)
+    H += (epsd+deps)*pyttn.fOP("n", N)    #the up impurity site has an energy of epsd + deps 
+    H += U*pyttn.fOP("n", N-1)*pyttn.fOP("n", N)
 
     #add on spin down occupied chain
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag", N-1), fOP("c", N-1), gf, wf, geom=geom, binds=modes_f_d)
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag", N-1), fOP("c", N-1), ge, we, geom=geom, binds=modes_e_d)
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag", N), fOP("c", N), gf, wf, geom=geom, binds=modes_f_u)
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag", N), fOP("c", N), ge, we, geom=geom, binds=modes_e_u)
+    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag", N-1), pyttn.fOP("c", N-1), gf, wf, geom=geom, binds=modes_f_d)
+    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag", N-1), pyttn.fOP("c", N-1), ge, we, geom=geom, binds=modes_e_d)
+    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag", N), pyttn.fOP("c", N), gf, wf, geom=geom, binds=modes_f_u)
+    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag", N), pyttn.fOP("c", N), ge, we, geom=geom, binds=modes_e_u)
 
     print(H)
     H.jordan_wigner(sysinf)
     print(H)
 
-    A = ttn(topo, capacity, dtype=np.complex128)
+    A = pyttn.ttn(topo, capacity, dtype=np.complex128)
     state = [0 for i in range(2*N)]
     for i in range(Nbo):
         state[1+i] = 1
@@ -100,31 +104,31 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
     print(state)
     A.set_state(state)
 
-    h = sop_operator(H, A, sysinf, identity_opt=True, compress=True)
+    h = pyttn.sop_operator(H, A, sysinf, identity_opt=True, compress=True)
 
-    mel = matrix_element(A)
+    mel = pyttn.matrix_element(A)
 
     ops = []
     Nu = None
     if Nu is None:
-        op = SOP(2*N)
-        op += fOP("n", N-1)
-        ops.append(sop_operator(op, A, sysinf))
+        op = pyttn.SOP(2*N)
+        op += pyttn.fOP("n", N-1)
+        ops.append(pyttn.sop_operator(op, A, sysinf))
 
-        op = SOP(2*N)
-        op += fOP("n", N)
-        ops.append(sop_operator(op, A, sysinf))
+        op = pyttn.SOP(2*N)
+        op += pyttn.fOP("n", N)
+        ops.append(pyttn.sop_operator(op, A, sysinf))
 
-        op = SOP(2*N)
-        op += fOP("n", N-1)*fOP("n", N)
-        ops.append(sop_operator(op, A, sysinf))
+        op = pyttn.SOP(2*N)
+        op += pyttn.fOP("n", N-1)*pyttn.fOP("n", N)
+        ops.append(pyttn.sop_operator(op, A, sysinf))
     labels = ["n_u", "n_d", "n_u n_d"]
 
     sweep = None
     if not adaptive:
-        sweep = tdvp(A, h, krylov_dim = 12)
+        sweep = pyttn.tdvp(A, h, krylov_dim = 12)
     else:
-        sweep = tdvp(A, h, krylov_dim = 12, subspace_krylov_dim=10, subspace_neigs=2, expansion='subspace')
+        sweep = pyttn.tdvp(A, h, krylov_dim = 12, subspace_krylov_dim=10, subspace_neigs=2, expansion='subspace')
         sweep.spawning_threshold = spawning_threshold
         sweep.unoccupied_threshold=unoccupied_threshold
         sweep.minimum_unoccupied=nunoccupied

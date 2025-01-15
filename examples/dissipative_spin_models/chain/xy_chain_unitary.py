@@ -220,7 +220,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Dynamics of the zero temperature spin boson model with')
 
-    parser.add_argument('--N', type=int, default=300)
+    parser.add_argument('--N', type=int, default=40)
     #number of spins in the system
     parser.add_argument('--Ns', type=int, default=21)
 
@@ -229,11 +229,11 @@ if __name__ == "__main__":
     parser.add_argument('--wc', type = float, default=4)
 
     #number of bath modes
-    parser.add_argument('--geom', type = str, default='star')
+    parser.add_argument('--geom', type = str, default='chain')
 
     #maximum bosonic hilbert space dimension
-    parser.add_argument('--nbose', type=int, default=20)
-    parser.add_argument('--nbose_min', type=int, default=5)
+    parser.add_argument('--nbose', type=int, default=30)
+    parser.add_argument('--nbose_min', type=int, default=6)
 
     #mode combination parameters
     parser.add_argument('--nbmax', type=int, default=4)
@@ -247,15 +247,15 @@ if __name__ == "__main__":
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=32)
+    parser.add_argument('--chi', type=int, default=36)
     parser.add_argument('--chiS', type=int, default=24)
-    parser.add_argument('--chiB', type=int, default=16)
+    parser.add_argument('--chiB', type=int, default=36)
     parser.add_argument('--degree', type=int, default=1)
 
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.05)
-    parser.add_argument('--tmax', type=float, default=100)
+    parser.add_argument('--tmax', type=float, default=5)
 
     #output file name
     parser.add_argument('--fname', type=str, default='xychain.h5')

@@ -1,3 +1,6 @@
+import os
+os.environ['OMP_NUM_THREADS']='1'
+
 import numpy as np
 import time
 import sys
@@ -6,7 +9,7 @@ import scipy
 import copy
 
 sys.path.append("../../")
-from pyttn import *
+import pyttn
 from pyttn import oqs
 
 from numba import jit
@@ -53,40 +56,40 @@ def setup_hamiltonian(epsd, U, Uc, Tc, gf, wf, ge, we):
     modes_e_d = [N-1-Nbo - (x+1) for x in range(Nbe)]
     modes_e_u = [N+1+Nbo + x for x in range(Nbe)]
 
-    H = SOP(4*N)
+    H = pyttn.SOP(4*N)
     #add on the impurity Hamiltonian terms for left dot
-    H += epsd*fOP("n", N-1)
-    H += epsd*fOP("n", N)    #the up impurity site has an energy of epsd + deps 
-    H += U*fOP("n", N-1)*fOP("n", N)
+    H += epsd*pyttn.fOP("n", N-1)
+    H += epsd*pyttn.fOP("n", N)    #the up impurity site has an energy of epsd + deps 
+    H += U*pyttn.fOP("n", N-1)*pyttn.fOP("n", N)
 
     #add on the impurity Hamiltonian terms for right dot
-    H += epsd*fOP("n", N-1+2*N)
-    H += epsd*fOP("n", N+2*N)    #the up impurity site has an energy of epsd + deps 
-    H += U*fOP("n", N-1+2*N)*fOP("n", N+2*N)
+    H += epsd*pyttn.fOP("n", N-1+2*N)
+    H += epsd*pyttn.fOP("n", N+2*N)    #the up impurity site has an energy of epsd + deps 
+    H += U*pyttn.fOP("n", N-1+2*N)*pyttn.fOP("n", N+2*N)
 
     #now add on the interaction terms between the two dots - density density interaction
-    H += Uc*fOP("n", N-1)*fOP("n", 2*N+N-1)
-    H += Uc*fOP("n", N)*fOP("n", 2*N+N-1)
-    H += Uc*fOP("n", N-1)*fOP("n", 2*N+N)
-    H += Uc*fOP("n", N)*fOP("n", 2*N+N)
+    H += Uc*pyttn.fOP("n", N-1)*pyttn.fOP("n", 2*N+N-1)
+    H += Uc*pyttn.fOP("n", N)*pyttn.fOP("n", 2*N+N-1)
+    H += Uc*pyttn.fOP("n", N-1)*pyttn.fOP("n", 2*N+N)
+    H += Uc*pyttn.fOP("n", N)*pyttn.fOP("n", 2*N+N)
 
     #hopping term
-    H += Tc*fOP("adag", N-1)*fOP("a", 2*N+N-1)
-    H += Tc*fOP("adag", 2*N+N-1)*fOP("a", N-1)
-    H += Tc*fOP("adag", N)*fOP("a", 2*N+N)
-    H += Tc*fOP("adag", 2*N+N)*fOP("a", N)
+    H += Tc*pyttn.fOP("adag", N-1)*pyttn.fOP("a", 2*N+N-1)
+    H += Tc*pyttn.fOP("adag", 2*N+N-1)*pyttn.fOP("a", N-1)
+    H += Tc*pyttn.fOP("adag", N)*pyttn.fOP("a", 2*N+N)
+    H += Tc*pyttn.fOP("adag", 2*N+N)*pyttn.fOP("a", N)
 
     #add on spin down occupied chain for left dot
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag", N-1), fOP("c", N-1), gf, wf, geom=geom, binds=modes_f_d)
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag", N-1), fOP("c", N-1), ge, we, geom=geom, binds=modes_e_d)
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag", N), fOP("c", N), gf, wf, geom=geom, binds=modes_f_u)
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag", N), fOP("c", N), ge, we, geom=geom, binds=modes_e_u)
+    H = pyttn.oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag", N-1), pyttn.fOP("c", N-1), gf, wf, geom=geom, binds=modes_f_d)
+    H = pyttn.oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag", N-1), pyttn.fOP("c", N-1), ge, we, geom=geom, binds=modes_e_d)
+    H = pyttn.oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag", N), pyttn.fOP("c", N), gf, wf, geom=geom, binds=modes_f_u)
+    H = pyttn.oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag", N), pyttn.fOP("c", N), ge, we, geom=geom, binds=modes_e_u)
 
     #add on spin down occupied chain for right dot
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag",2*N+N-1), fOP("c", 2*N+N-1), gf, wf, geom=geom, binds=[2*N+i for i in modes_f_d])
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag",2*N+N-1), fOP("c", 2*N+N-1), ge, we, geom=geom, binds=[2*N+i for i in modes_e_d])
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag",2*N+N), fOP("c", N), 2*N+gf, wf, geom=geom, binds=[2*N+i for i in modes_f_u])
-    H = oqs.unitary.add_fermionic_bath_hamiltonian(H, fOP("cdag",2*N+N), fOP("c", N), 2*N+ge, we, geom=geom, binds=[2*N+i for i in modes_e_u])
+    H = pyttn.oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag",2*N+N-1), pyttn.fOP("c", 2*N+N-1), gf, wf, geom=geom, binds=[2*N+i for i in modes_f_d])
+    H = pyttn.oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag",2*N+N-1), pyttn.fOP("c", 2*N+N-1), ge, we, geom=geom, binds=[2*N+i for i in modes_e_d])
+    H = pyttn.oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag",2*N+N), pyttn.fOP("c", N), 2*N+gf, wf, geom=geom, binds=[2*N+i for i in modes_f_u])
+    H = pyttn.oqs.unitary.add_fermionic_bath_hamiltonian(H, pyttn.fOP("cdag",2*N+N), pyttn.fOP("c", N), 2*N+ge, we, geom=geom, binds=[2*N+i for i in modes_e_u])
 
     return H
 
@@ -105,10 +108,10 @@ def dqd_dynamics(Nb, Gamma, W, epsd, U, Tc, Uc, chi, dt, chiU = None, chiD=None,
         return np.where(np.abs(w) <= W, Gamma*np.sqrt(1-(w*w)/(W*W)), 0.0)
 
     #set up the open quantum system bath object
-    bath = oqs.FermionicBath(V, beta=beta)
+    bath = pyttn.oqs.FermionicBath(V, beta=beta)
    
-    gf, wf = bath.discretise(oqs.OrthopolDiscretisation(Nb, *bath.estimate_bounds(wmax=W)), Ef = 0.0, sigma='+')
-    ge, we = bath.discretise(oqs.OrthopolDiscretisation(Nb, *bath.estimate_bounds(wmax=W)), Ef = 0.0, sigma='-')
+    gf, wf = bath.discretise(pyttn.oqs.OrthopolDiscretisation(Nb, *bath.estimate_bounds(wmax=W)), Ef = 0.0, sigma='+')
+    ge, we = bath.discretise(pyttn.oqs.OrthopolDiscretisation(Nb, *bath.estimate_bounds(wmax=W)), Ef = 0.0, sigma='-')
 
     Nbo = gf.shape[0]
     Nbe = ge.shape[0]
@@ -137,10 +140,10 @@ def dqd_dynamics(Nb, Gamma, W, epsd, U, Tc, Uc, chi, dt, chiU = None, chiD=None,
     #for the system information compared to tree structure - setup the mode ordering so that the down impurity ordering is flipped while the up ordering 
     #is the current order
     mode_ordering = [N - (x+1) for x in range(N)] + [N + x for x in range(N)] + [2*N+N - (x+1) for x in range(N)] + [2*N+N + x for x in range(N)]
-    sysinf = system_modes(4*N)
+    sysinf = pyttn.system_modes(4*N)
     sysinf.mode_indices = mode_ordering
     for i in range(4*N):
-        sysinf[i] = fermion_mode()
+        sysinf[i] = pyttn.fermion_mode()
 
     H = setup_hamiltonian(epsd, U, Uc, Tc, gf, wf, ge, we)
 
@@ -161,8 +164,8 @@ def dqd_dynamics(Nb, Gamma, W, epsd, U, Tc, Uc, chi, dt, chiU = None, chiD=None,
     state[2*N+N] = 1
     A.set_state(state)
 
-    h = sop_operator(H, A, sysinf, identity_opt=True, compress=True)
-    mel = matrix_element(A)
+    h = pyttn.sop_operator(H, A, sysinf, identity_opt=True, compress=True)
+    mel = pyttn.matrix_element(A)
 
     #compute the ground state of the system
 
@@ -171,9 +174,9 @@ def dqd_dynamics(Nb, Gamma, W, epsd, U, Tc, Uc, chi, dt, chiU = None, chiD=None,
 
     sweep = None
     if not adaptive:
-        sweep = tdvp(A, h, krylov_dim = 12)
+        sweep = pyttn.tdvp(A, h, krylov_dim = 12)
     else:
-        sweep = tdvp(A, h, krylov_dim = 12, subspace_krylov_dim=10, subspace_neigs=2, expansion='subspace')
+        sweep = pyttn.tdvp(A, h, krylov_dim = 12, subspace_krylov_dim=10, subspace_neigs=2, expansion='subspace')
         sweep.spawning_threshold = spawning_threshold
         sweep.unoccupied_threshold=unoccupied_threshold
         sweep.minimum_unoccupied=nunoccupied

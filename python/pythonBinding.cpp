@@ -41,7 +41,7 @@
 #include "ttns/sop/SOP.hpp"
 #include "ttns/sop/liouville_space.hpp"
 
-//#include "ttns/sop/models/models.hpp"
+#include "ttns/sop/models/models.hpp"
 
 #include "ttns/algorithms/dmrg.hpp"
 #include "ttns/algorithms/tdvp.hpp"
@@ -79,6 +79,10 @@ PYBIND11_MODULE(_pyttn, m)
         Orthogonal polynomials submodule for TTNS library.
         )mydelimiter");
 
+    auto m_models = m.def_submodule("models", R"mydelimiter(
+        Pre-defined models specifying system and Hamiltonian information.
+        )mydelimiter");
+
     //
     //Wrap the required linear algebra types to enable python based instantiation of operators.
     //
@@ -97,9 +101,13 @@ PYBIND11_MODULE(_pyttn, m)
     initialise_sSOP(m);
     initialise_system_info(m);
     initialise_SOP(m);
-    //initialise_models(m);
     initialise_operator_dictionary(m);
     initialise_liouville_space(m);
+
+    //
+    //Wrap the models functionality included in SOP
+    //
+    initialise_models(m_models);
     
     //
     //Wrap core ttns functionality

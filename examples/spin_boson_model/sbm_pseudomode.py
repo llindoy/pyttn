@@ -191,11 +191,11 @@ if __name__ == "__main__":
     parser.add_argument('--s', type = float, default=1)
 
     #number of bath modes
-    parser.add_argument('--K', type=int, default=4)
+    parser.add_argument('--K', type=int, default=6)
 
     #maximum bosonic hilbert space dimension
-    parser.add_argument('--L', type=int, default=20)
-    parser.add_argument('--Lmin', type=int, default=4)
+    parser.add_argument('--L', type=int, default=30)
+    parser.add_argument('--Lmin', type=int, default=6)
 
     #mode combination parameters
     parser.add_argument('--nbmax', type=int, default=1)

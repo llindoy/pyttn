@@ -63,13 +63,13 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin = None,
     Nbc = 0
     if K != 0:
         #set up the open quantum system bath object
-        bath = oqs.BosonicBath(J, beta=beta, wmax=wc*100)
+        bath = oqs.BosonicBath(J, beta=beta, wmax=wc*10)
         dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
 
         #set up the exp bath object this takes the dk and zk terms.  Truncate the modes and
         #extract the system information object from this.
         expbath = oqs.ExpFitBosonicBath(dk, zk)
-        expbath.truncate_modes(utils.EnergyTruncation(15*wc, Lmax=L, Lmin=Lmin))
+        expbath.truncate_modes(utils.EnergyTruncation(10*wc, Lmax=L, Lmin=Lmin))
         bsys = expbath.system_information()
 
         dk = expbath.dk
@@ -271,8 +271,8 @@ if __name__ == "__main__":
     parser.add_argument('--K', type=int, default=6)
 
     #maximum bosonic hilbert space dimension
-    parser.add_argument('--L', type=int, default=25)
-    parser.add_argument('--Lmin', type=int, default=4)
+    parser.add_argument('--L', type=int, default=30)
+    parser.add_argument('--Lmin', type=int, default=6)
 
     #mode combination parameters
     parser.add_argument('--nbmax', type=int, default=2)
@@ -280,21 +280,21 @@ if __name__ == "__main__":
 
 
     #system hamiltonian parameters
-    parser.add_argument('--eta', type = float, default=0.04)
+    parser.add_argument('--eta', type = float, default=0.02)
 
     #bath inverse temperature
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=256)
-    parser.add_argument('--chiS', type=int, default=64)
+    parser.add_argument('--chi', type=int, default=32)
+    parser.add_argument('--chiS', type=int, default=32)
     parser.add_argument('--chiB', type=int, default=32)
     parser.add_argument('--degree', type=int, default=1)
 
 
     #integration time parameters
-    parser.add_argument('--dt', type=float, default=0.05)
-    parser.add_argument('--tmax', type=float, default=10)
+    parser.add_argument('--dt', type=float, default=0.025)
+    parser.add_argument('--tmax', type=float, default=40)
 
     #output file name
     parser.add_argument('--fname', type=str, default='xychain_heom.h5')
@@ -302,7 +302,7 @@ if __name__ == "__main__":
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
     parser.add_argument('--nunoccupied', type=int, default=0)
-    parser.add_argument('--spawning_threshold', type=float, default=1e-7)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-6)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
     args = parser.parse_args()

@@ -1,11 +1,12 @@
+import os
+os.environ['OPENBLAS_NUM_THREADS']="1"
+
 import numpy as np
 import matplotlib.pyplot as plt
 import time
 import sys
 import copy
 import h5py
-import os
-os.environ['OPENBLAS_NUM_THREADS']=1
 
 sys.path.append("../../")
 from pyttn import *

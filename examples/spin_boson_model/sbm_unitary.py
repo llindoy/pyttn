@@ -168,7 +168,7 @@ if __name__ == "__main__":
     parser.add_argument('--N', type=int, default=16)
 
     #geometry to be used for bath dynamics
-    parser.add_argument('--geom', type = str, default='star')
+    parser.add_argument('--geom', type = str, default='chain')
 
     #system hamiltonian parameters
     parser.add_argument('--delta', type = float, default=1)

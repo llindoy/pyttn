@@ -1,9 +1,9 @@
 import numpy as np
 
 def AIM(*args, dtype = np.complex128):
-    from pyttn._pyttn import AIM_complex
+    from pyttn._pyttn.models import AIM_complex
     try:
-        from pyttn._pyttn import AIM_real
+        from pyttn._pyttn.models import AIM_real
         if(dtype == np.complex128):
             return AIM_complex(*args)
         elif(dtype == np.float64):
@@ -16,27 +16,28 @@ def AIM(*args, dtype = np.complex128):
         else:
             raise RuntimeError("Invalid dtype for AIM")
 
-def electronic_structure(*args, dtype = np.complex128):
-    from pyttn._pyttn import electronic_structure_complex
+def electronic_structure(*args, dtype = np.complex128, **kwargs):
+    from pyttn._pyttn.models import electronic_structure_complex
+
     try:
-        from pyttn._pyttn import electronic_structure_real
+        from pyttn._pyttn.models import electronic_structure_real
         if(dtype == np.complex128):
-            return electronic_structure_complex(*args)
+            return electronic_structure_complex(*args, **kwargs)
         elif(dtype == np.float64):
-            return electronic_structure_real(*args)
+            return electronic_structure_real(*args, **kwargs)
         else:
-            raise RuntimeError("Invalid dtype for electronic_structure")
+            raise RuntimeError("Invalid dtype for electronic_structure model")
     except ImportError:
         if(dtype == np.complex128):
-            return electronic_structure_complex(*args)
+            return electronic_structure_complex(*args, **kwargs)
         else:
-            raise RuntimeError("Invalid dtype for electronic_structure")
+            raise RuntimeError("Invalid dtype for electronic_structure model")
 
 
 def TFIM(*args, dtype = np.complex128):
-    from pyttn._pyttn import TFIM_complex
+    from pyttn._pyttn.models import TFIM_complex
     try:
-        from pyttn._pyttn import TFIM_real
+        from pyttn._pyttn.models import TFIM_real
         if(dtype == np.complex128):
             return TFIM_complex(*args)
         elif(dtype == np.float64):
@@ -70,10 +71,10 @@ def init_sb_type(sbt1, sbt2, *args, dtype=None):
                 raise RuntimeError("Invalid dtype for spin boson")
 
 def spin_boson(*args, geom="star", dtype=np.complex128):
-    from pyttn._pyttn import spin_boson_generic_complex, spin_boson_star_complex, spin_boson_chain_complex, spin_boson_chain_real
+    from pyttn._pyttn.models import spin_boson_generic_complex, spin_boson_star_complex, spin_boson_chain_complex, spin_boson_chain_real
 
     try:
-        from pyttn._pyttn import spin_boson_generic_real, spin_boson_star_real, spin_boson_chain_real
+        from pyttn._pyttn.models import spin_boson_generic_real, spin_boson_star_real, spin_boson_chain_real
     except:
         spin_boson_generic_real=None
         spin_boson_star_real=None

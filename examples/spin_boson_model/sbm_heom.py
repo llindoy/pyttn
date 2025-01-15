@@ -35,6 +35,7 @@ def observable_tree(obstree, op, b_mode_dims):
     Opttn.set_product(prod_state)
     return Opttn
 
+
 def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = None, nstep = 1, ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024):
     t = np.arange(nstep+1)*dt
 
@@ -134,12 +135,11 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
 
     #perform the dynamics
     renorm = mel(id_ttn, A)
+    t1 = time.time()
     i=0
     print((i)*dt, res[i], np.real(renorm), maxchi[i], np.real(mel(A, A)))
     for i in range(nstep):
-        t1 = time.time()
         sweep.step(A, h)
-        t2 = time.time()
         renorm = mel(id_ttn, A)
         #A*=(1/renorm)
         res[i+1] = np.real(mel(szop, A, id_ttn))
@@ -153,6 +153,8 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
             h5.create_dataset('Sz', data=res)
             h5.create_dataset('maxchi', data=maxchi)
             h5.close()
+    t2 = time.time()
+    print(t2-t1)
 
     h5 = h5py.File(ofname, 'w')
     h5.create_dataset('t', data=(np.arange(nstep+1)*dt))
@@ -171,11 +173,11 @@ if __name__ == "__main__":
     parser.add_argument('--s', type = float, default=1)
 
     #number of bath modes
-    parser.add_argument('--K', type=int, default=4)
+    parser.add_argument('--K', type=int, default=6)
 
     #maximum bosonic hilbert space dimension
-    parser.add_argument('--L', type=int, default=20)
-    parser.add_argument('--Lmin', type=int, default=4)
+    parser.add_argument('--L', type=int, default=30)
+    parser.add_argument('--Lmin', type=int, default=6)
 
     #mode combination parameters
     parser.add_argument('--nbmax', type=int, default=1)
@@ -197,7 +199,7 @@ if __name__ == "__main__":
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.005)
-    parser.add_argument('--tmax', type=float, default=10)
+    parser.add_argument('--tmax', type=float, default=30)
 
     #output file name
     parser.add_argument('--fname', type=str, default='sbm.h5')

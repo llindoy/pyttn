@@ -55,7 +55,7 @@ class BosonicBath:
         return wmin, wmax
 
     #improve this code to make it all work a bit better
-    def Ct(self, t, epsabs=1.49e-12, epsrel=1.49e-12, limit=2000):
+    def Ct(self, t, epsabs=1.49e-12, epsrel=1.49e-12, limit=2000, epsomega=1e-6):
         """Returns the value of the non-interacting bath correlation function evaluated 
         at the time points t:
         .. math::
@@ -73,8 +73,7 @@ class BosonicBath:
         Ctr = np.zeros(t.shape, dtype=np.complex128)
         Cti = np.zeros(t.shape, dtype=np.complex128)
 
-        print(wmin, wmax)
-        wc = 1e-10
+        wc = epsomega
         #if wmin > wc we don't span zero
         if(wmin >= wc):
             #if wmax is infinite then we do a standard integral 
@@ -99,6 +98,7 @@ class BosonicBath:
                 for ti in range(t.shape[0]):
                     Ctr[ti] += sp.integrate.quad(lambda x : self.Sw(x), wc, wmax, weight='cos', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
                     Cti[ti] += sp.integrate.quad(lambda x : self.Sw(x), wc, wmax, weight='sin', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                    print(ti, Ctr[ti])
 
             #Handle the two regions [wmin, -wc], (-wc, wc)
             if(wmin < -wc):
@@ -108,10 +108,12 @@ class BosonicBath:
                 #otherwise we can make use of the weight function
                 else:
                     for ti in range(t.shape[0]):
-                        Ctr[ti] += sp.integrate.quad(lambda x : self.Sw(x), wmin, wc, weight='cos', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
-                        Cti[ti] += sp.integrate.quad(lambda x : self.Sw(x), wmin, wc, weight='sin', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+                        Ctr[ti] += sp.integrate.quad(lambda x : self.Sw(x), wmin, -wc, weight='cos', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
+                        Cti[ti] += sp.integrate.quad(lambda x : self.Sw(x), wmin, -wc, weight='sin', wvar = t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+
                     Ctr+= sp.integrate.quad_vec(lambda x : self.Sw(x)*np.cos(x*t), -wc, wc, points=[0], epsabs=epsabs, epsrel=epsrel, limit=limit)[0] 
                     Cti+= sp.integrate.quad_vec(lambda x : self.Sw(x)*np.sin(x*t), -wc, wc, points=[0], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
+
             #Handle the regions (wmin, wc)
             else:
                 if(wmin <= 0):
@@ -185,12 +187,13 @@ class BosonicBath:
         dk = None
         zk = None
         if isinstance(fitting_engine, AAADecomposition):
-            if self.wmin is None:
-                fitting_engine.wmin = -self.wmax
-            else:
-                fitting_engine.wmin = self.wmin
             if(fitting_engine.wmax is None):
                 fitting_engine.wmin = 2*self.wmax
+            if(fitting_engine.wmin is None):
+                if self.wmin is None or np.abs(self.wmin) < 1e-12:
+                    fitting_engine.wmin = -2*self.wmax
+                else:
+                    fitting_engine.wmin = 2*self.wmin
             dk, zk, _ = fitting_engine(self.Sw)
 
         elif isinstance(fitting_engine, ESPRITDecomposition):

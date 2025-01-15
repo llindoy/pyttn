@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import sys
+import copy
 sys.path.append("../../")
 
 from pyttn import *
@@ -54,7 +55,11 @@ def system_size_scaling_SOP_vs_hSOP():
         print(nb)
         t = np.random.rand(nb, nb)
         U = np.random.rand(nb, nb, nb, nb)
+        Ut = copy.deepcopy(U)
+        Ut = (Ut.reshape((nb*nb, nb*nb)).T).reshape((nb, nb, nb, nb))
         t = (t + t.T)/2.0
+        U = (U + Ut)/2.0
+        Ub
         m, std = molecular_hamiltonian_test(t, U, chi, 0.001, nstep=1, compress = True)
         timings_hSOP.append(m)
         stdevs_hSOP.append(std)
@@ -64,7 +69,10 @@ def system_size_scaling_SOP_vs_hSOP():
     for nb in Nsys:
         t = np.random.rand(nb, nb)
         U = np.random.rand(nb, nb, nb, nb)
+        Ut = copy.deepcopy(U)
+        Ut = (Ut.reshape((nb*nb, nb*nb)).T).reshape((nb, nb, nb, nb))
         t = (t + t.T)/2.0
+        U = (U + Ut)/2.0
         m, std = molecular_hamiltonian_test(t, U, chi, 0.001, nstep=1, compress = False)
         timings_SOP.append(m)
         stdevs_SOP.append(std)

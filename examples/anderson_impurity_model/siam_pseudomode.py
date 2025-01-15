@@ -134,20 +134,32 @@ def siam_dynamics(Gamma, W, epsd, deps, U, chi, K, dt, chiU = None, beta = None,
     #set up the total Hamiltonian
     H = SOP(N)
 
-    #add on the system liouvillian - here we are using that sz^T = sz and "sx^T=sx"
+    #add on the system liouvillian 
     Lsys = epsd* ( fOP("n", Nn-2) - fOP("n", Nn-1))
     Lsys += (epsd+deps)* ( fOP("n", Nn) - fOP("n", Nn+1))
     Lsys += U* ( fOP("n", Nn-2)*fOP("n", Nn) - fOP("n", Nn-1)*fOP("n", Nn+1))
 
     H += Lsys
-
     #now add on the filled bath terms
+    for i in range(len(gkf)):
+        #spin up terms
+        i1 = modes_f_u[i]
+        i2 = i1+1
+
+        H += 2.0*complex(gkf[i1]))*sOP("a", i1)*sOP("a", i2)`
+
+        #spin down terms
+        i1 = modes_f_u[i]
+        i2 = i1+1
 
     #and the empty bath terms
+    for i in range(len(gke)):
 
     for i in range(len(zk)):
         i1 = 2*(i+1)
         i2 = 2*(i+1)+1
+
+        #now add on the purely bath terms
 
         H += 2.0j*complex(gk[i])*sOP("a", i1)*sOP("a", i2)
         H += -1.0j*(complex(zk[i])*sOP("n", i1)  + complex(np.conj(zk[i]))*sOP("n", i2))

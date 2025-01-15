@@ -44,7 +44,7 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chiS, chi, nbose, dt, nbose_min = N
     #set up the open quantum system bath object
     bath = oqs.BosonicBath(J, beta=beta)
     plt.rcParams.update({'font.size':22})
-    fig, ax = plt.subplots(2, 2, figsize=(3.25*2.5, 3.25*2), sharey=False)
+    fig, ax = plt.subplots(2, 2, figsize=(3.25*2.5, 3.25*2), sharey=False, sharex=True)
     plt.subplots_adjust(wspace=0, hspace=0)
 
     Ctval = bath.Ct(t)
@@ -57,6 +57,7 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chiS, chi, nbose, dt, nbose_min = N
         ax[0, 0].plot(t, oqs.BosonicBath.Ctexp(t, g*g, w), '--', color=colors[i], linewidth=3, label=r'$N_{b}='+str(Nb)+'$')
     ax[0, 0].set_xlim([0, 40])
     ax[0, 0].legend(frameon=False, prop={'size':16}, labelspacing=0)
+    plt.show()
 
     Ks = [1, 2, 4]
 
