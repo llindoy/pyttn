@@ -6,7 +6,7 @@ class system_bath_info:
         self._Hs = Hs
         self._baths = baths
 
-    def system_hamiltonian(self, Hs)
+    def system_hamiltonian(self, Hs):
         self._Hs = Hs
 
     def add_bath(self, bath):
