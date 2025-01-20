@@ -1,4 +1,7 @@
 image: python:3.12.8
+image: 
+  name: pandoc
+  entrypoint: ["/bin/sh", "-c"]
 
 stages:
   - test
