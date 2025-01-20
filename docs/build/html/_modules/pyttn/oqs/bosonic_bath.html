@@ -44,6 +44,9 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../pyttn.html">pyttn package</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">pyTTN Tutorials</a></li>
+</ul>
 
         </div>
       </div>
@@ -81,6 +84,7 @@
 <span class="sd">    functions for computing non-interacting bath correlation functions, as well as</span>
 <span class="sd">    decomposing the correlation function into a linear combination of</span>
 <span class="sd">    complex valued exponentials (expfit) or oscillator terms (discretise)</span>
+
 <span class="sd">    :param Jw: The bath spectral function defining the non-interacting correlation function</span>
 <span class="sd">    :param S: The system operator</span>
 <span class="sd">    :type S: SOP, optional</span>
@@ -104,6 +108,15 @@
 <div class="viewcode-block" id="BosonicBath.find_wmin">
 <a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.find_wmin">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">find_wmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">npoints</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes an estimate of the minimum frequency used for discretising a bath.</span>
+<span class="sd">        Here this is done by taking the maximum frequency and finding the largest value in </span>
+<span class="sd">        the range from [-wmax, 0] that has the same spectral weight as the upper bound.</span>
+
+<span class="sd">        :param wmax: the maximum frequency bound, defaults to self.wmax</span>
+<span class="sd">        :type wmax: float, optional</span>
+<span class="sd">        :return: the maximum and minimum frequency bounds</span>
+<span class="sd">        :rtype: float, float </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
@@ -121,6 +134,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">estimate_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns estimates for the upper and lower bounds of the spectral density to be used for the</span>
 <span class="sd">        discretisation function</span>
+
 <span class="sd">        :param wmax: the maximum frequency bound, defaults to self.wmax</span>
 <span class="sd">        :type wmax: float, optional</span>
 <span class="sd">        :return: the maximum and minimum frequency bounds</span>
@@ -215,6 +229,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">Ctexp</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of the non-interacting bath correlation function evaluated </span>
 <span class="sd">        at the time points t using the results of discretisation or expfit:</span>
+
 <span class="sd">        :param t: time</span>
 <span class="sd">        :type t: np.ndarray</span>
 <span class="sd">        :param dk: the weights of each term in the fit</span>
@@ -234,12 +249,9 @@
 <a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.Sw">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Sw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the non-interacting bath spectral function at w</span>
+
 <span class="sd">        :param w: frequency</span>
 <span class="sd">        :type w: np.ndarray</span>
-<span class="sd">        :param Ef: Fermi Energy</span>
-<span class="sd">        :type Ef: float</span>
-<span class="sd">        :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green&#39;s Function, default to +</span>
-<span class="sd">        :type sigma: str, optional</span>
 <span class="sd">        :return: The bath correlation function</span>
 <span class="sd">        :rtype: np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -253,14 +265,11 @@
 <a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.discretise">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">discretise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">discretisation_engine</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the coupling constants and frequencies associated with a discretised representation of the bath</span>
-<span class="sd">        :param discretisation_energy: The object used to discretise the c</span>
-<span class="sd">        :type w: np.ndarray</span>
-<span class="sd">        :param Ef: Fermi Energy</span>
-<span class="sd">        :type Ef: float</span>
-<span class="sd">        :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green&#39;s Function, default to +</span>
-<span class="sd">        :type sigma: str, optional</span>
-<span class="sd">        :return: The bath correlation function</span>
-<span class="sd">        :rtype: np.ndarray</span>
+
+<span class="sd">        :param discretisation_engine: An object defining how to discretise a continuous bath</span>
+<span class="sd">        :type discretisation_engine: np.ndarray</span>
+<span class="sd">        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`</span>
+<span class="sd">        :rtype: np.ndarray, np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span><span class="w"> </span><span class="nn">.bath_fitting</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrthopolDiscretisation</span><span class="p">,</span> <span class="n">DensityDiscretisation</span>
@@ -276,7 +285,16 @@
 
 <div class="viewcode-block" id="BosonicBath.expfit">
 <a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.expfit">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">expfit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitting_engine</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expfit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitting_engine</span><span class="p">):</span>        
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function</span>
+
+
+<span class="sd">        :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition</span>
+<span class="sd">        :type fitting_engine: np.ndarray</span>
+<span class="sd">        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`</span>
+<span class="sd">        :rtype: np.ndarray, np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="kn">from</span><span class="w"> </span><span class="nn">.bath_fitting</span><span class="w"> </span><span class="kn">import</span> <span class="n">AAADecomposition</span><span class="p">,</span> <span class="n">ESPRITDecomposition</span>
         <span class="n">dk</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">zk</span> <span class="o">=</span> <span class="kc">None</span>

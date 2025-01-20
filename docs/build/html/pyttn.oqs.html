@@ -74,6 +74,9 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">pyTTN Tutorials</a></li>
 </ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">pyTTN Examples</a></li>
+</ul>
 
         </div>
       </div>
@@ -241,16 +244,18 @@
 <p>A class for managing a continuous bosonic gaussian bath.  This provides
 functions for computing non-interacting bath correlation functions, as well as
 decomposing the correlation function into a linear combination of
-complex valued exponentials (expfit) or oscillator terms (discretise)
-:param Jw: The bath spectral function defining the non-interacting correlation function
-:param S: The system operator
-:type S: SOP, optional
-:param beta: The inverse temperature of the bath, defaults to None
-:type beta: float, optional
-:param wmax: the maximum frequency bound, defaults to np.inf
-:type wmax: float, optional
-:param wmin: the minimum frequency bound, defaults to None
-:type wmin: float, optional</p>
+complex valued exponentials (expfit) or oscillator terms (discretise)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Jw</strong> – The bath spectral function defining the non-interacting correlation function</p></li>
+<li><p><strong>S</strong> (<em>SOP</em><em>, </em><em>optional</em>) – The system operator</p></li>
+<li><p><strong>beta</strong> (<em>float</em><em>, </em><em>optional</em>) – The inverse temperature of the bath, defaults to None</p></li>
+<li><p><strong>wmax</strong> (<em>float</em><em>, </em><em>optional</em>) – the maximum frequency bound, defaults to np.inf</p></li>
+<li><p><strong>wmin</strong> (<em>float</em><em>, </em><em>optional</em>) – the minimum frequency bound, defaults to None</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.bosonic_bath.BosonicBath.Ct">
 <span class="sig-name descname"><span class="pre">Ct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsabs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.49e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsrel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.49e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsomega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/bosonic_bath.html#BosonicBath.Ct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bosonic_bath.BosonicBath.Ct" title="Link to this definition"></a></dt>
@@ -275,65 +280,111 @@ defined by:</p>
 <dt class="sig sig-object py" id="pyttn.oqs.bosonic_bath.BosonicBath.Ctexp">
 <span class="sig-name descname"><span class="pre">Ctexp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/bosonic_bath.html#BosonicBath.Ctexp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bosonic_bath.BosonicBath.Ctexp" title="Link to this definition"></a></dt>
 <dd><p>Returns the value of the non-interacting bath correlation function evaluated
-at the time points t using the results of discretisation or expfit:
-:param t: time
-:type t: np.ndarray
-:param dk: the weights of each term in the fit
-:type dk: np.ndarray
-:param zk: the (complex) frequencies of each term in the fit
-:type zk: np.ndarray
-:return: The bath correlation function
-:rtype: np.ndarray</p>
+at the time points t using the results of discretisation or expfit:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>np.ndarray</em>) – time</p></li>
+<li><p><strong>dk</strong> (<em>np.ndarray</em>) – the weights of each term in the fit</p></li>
+<li><p><strong>zk</strong> (<em>np.ndarray</em>) – the (complex) frequencies of each term in the fit</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The bath correlation function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.bosonic_bath.BosonicBath.Sw">
 <span class="sig-name descname"><span class="pre">Sw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/bosonic_bath.html#BosonicBath.Sw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bosonic_bath.BosonicBath.Sw" title="Link to this definition"></a></dt>
-<dd><p>Returns the non-interacting bath spectral function at w
-:param w: frequency
-:type w: np.ndarray
-:param Ef: Fermi Energy
-:type Ef: float
-:param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green’s Function, default to +
-:type sigma: str, optional
-:return: The bath correlation function
-:rtype: np.ndarray</p>
+<dd><p>Returns the non-interacting bath spectral function at w</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>w</strong> (<em>np.ndarray</em>) – frequency</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The bath correlation function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.bosonic_bath.BosonicBath.discretise">
 <span class="sig-name descname"><span class="pre">discretise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discretisation_engine</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/bosonic_bath.html#BosonicBath.discretise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bosonic_bath.BosonicBath.discretise" title="Link to this definition"></a></dt>
-<dd><p>Returns the coupling constants and frequencies associated with a discretised representation of the bath
-:param discretisation_energy: The object used to discretise the c
-:type w: np.ndarray
-:param Ef: Fermi Energy
-:type Ef: float
-:param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green’s Function, default to +
-:type sigma: str, optional
-:return: The bath correlation function
-:rtype: np.ndarray</p>
+<dd><p>Returns the coupling constants and frequencies associated with a discretised representation of the bath</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>discretisation_engine</strong> (<em>np.ndarray</em>) – An object defining how to discretise a continuous bath</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Discrete system bath coupling constants <span class="math notranslate nohighlight">\(g_k`and bath frequencies :math:\)</span>omega_k`</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray, np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.bosonic_bath.BosonicBath.estimate_bounds">
 <span class="sig-name descname"><span class="pre">estimate_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/bosonic_bath.html#BosonicBath.estimate_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bosonic_bath.BosonicBath.estimate_bounds" title="Link to this definition"></a></dt>
 <dd><p>Returns estimates for the upper and lower bounds of the spectral density to be used for the
-discretisation function
-:param wmax: the maximum frequency bound, defaults to self.wmax
-:type wmax: float, optional
-:return: the maximum and minimum frequency bounds
-:rtype: float, float</p>
+discretisation function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wmax</strong> (<em>float</em><em>, </em><em>optional</em>) – the maximum frequency bound, defaults to self.wmax</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the maximum and minimum frequency bounds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float, float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.bosonic_bath.BosonicBath.expfit">
 <span class="sig-name descname"><span class="pre">expfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitting_engine</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/bosonic_bath.html#BosonicBath.expfit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bosonic_bath.BosonicBath.expfit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fitting_engine</strong> (<em>np.ndarray</em>) – An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Discrete system bath coupling constants <span class="math notranslate nohighlight">\(g_k`and bath frequencies :math:\)</span>omega_k`</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray, np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.bosonic_bath.BosonicBath.find_wmin">
 <span class="sig-name descname"><span class="pre">find_wmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">npoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/bosonic_bath.html#BosonicBath.find_wmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bosonic_bath.BosonicBath.find_wmin" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Computes an estimate of the minimum frequency used for discretising a bath.
+Here this is done by taking the maximum frequency and finding the largest value in
+the range from [-wmax, 0] that has the same spectral weight as the upper bound.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>wmax</strong> (<em>float</em><em>, </em><em>optional</em>) – the maximum frequency bound, defaults to self.wmax</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the maximum and minimum frequency bounds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float, float</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -532,16 +583,18 @@ of the form</p>
 <p>A class for managing a continuous fermionic gaussian bath.  This provides
 functions for computing non-interacting bath correlation functions, as well as
 decomposing the correlation function into a linear combination of
-complex valued exponentials (expfit) or oscillator terms (discretise)
-:param Jw: The bath spectral function defining the non-interacting correlation function
-:param beta: The inverse temperature of the bath, defaults to None
-:type beta: float, optional
-:param wmax: the maximum frequency bound, default to np.inf
-:type wmax: float, optional
-:param wmin: the minimum frequency bound, default to np.inf
-:type wmin: float, optional
-:param wtol: a value for determining wmin based on wmax.  See fermionic.bath.estimate_bounds, default to None
-:type wtol: float, optional</p>
+complex valued exponentials (expfit) or oscillator terms (discretise)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Jw</strong> – The bath spectral function defining the non-interacting correlation function</p></li>
+<li><p><strong>beta</strong> (<em>float</em><em>, </em><em>optional</em>) – The inverse temperature of the bath, defaults to None</p></li>
+<li><p><strong>wmax</strong> (<em>float</em><em>, </em><em>optional</em>) – the maximum frequency bound, default to np.inf</p></li>
+<li><p><strong>wmin</strong> (<em>float</em><em>, </em><em>optional</em>) – the minimum frequency bound, default to np.inf</p></li>
+<li><p><strong>wtol</strong> (<em>float</em><em>, </em><em>optional</em>) – a value for determining wmin based on wmax.  See fermionic.bath.estimate_bounds, default to None</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.fermionic_bath.FermionicBath.Ct">
 <span class="sig-name descname"><span class="pre">Ct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsabs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.49e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epsrel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.49e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/fermionic_bath.html#FermionicBath.Ct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.fermionic_bath.FermionicBath.Ct" title="Link to this definition"></a></dt>
@@ -570,68 +623,130 @@ at the time points t:</p>
 <dt class="sig sig-object py" id="pyttn.oqs.fermionic_bath.FermionicBath.Ctexp">
 <span class="sig-name descname"><span class="pre">Ctexp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/fermionic_bath.html#FermionicBath.Ctexp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.fermionic_bath.FermionicBath.Ctexp" title="Link to this definition"></a></dt>
 <dd><p>Returns the value of the non-interacting bath correlation function evaluated
-at the time points t using the results of discretisation or expfit:
-:param t: time
-:type t: np.ndarray
-:param dk: the weights of each term in the fit
-:type dk: np.ndarray
-:param zk: the (complex) frequencies of each term in the fit
-:type zk: np.ndarray
-:param sigma: Whether to compute greater (+) or lesser (-) Green’s Function, default to +
-:type sigma: str, optional
-:return: The bath correlation function
-:rtype: np.ndarray</p>
+at the time points t using the results of discretisation or expfit:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>np.ndarray</em>) – time</p></li>
+<li><p><strong>dk</strong> (<em>np.ndarray</em>) – the weights of each term in the fit</p></li>
+<li><p><strong>zk</strong> (<em>np.ndarray</em>) – the (complex) frequencies of each term in the fit</p></li>
+<li><p><strong>sigma</strong> (<em>str</em><em>, </em><em>optional</em>) – Whether to compute greater (+) or lesser (-) Green’s Function, default to +</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The bath correlation function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.fermionic_bath.FermionicBath.Sw">
 <span class="sig-name descname"><span class="pre">Sw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/fermionic_bath.html#FermionicBath.Sw"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.fermionic_bath.FermionicBath.Sw" title="Link to this definition"></a></dt>
-<dd><p>Returns the non-interacting bath spectral function at w and fermi energy Ef
-:param w: frequency
-:type w: np.ndarray
-:param Ef: Fermi Energy
-:type Ef: float
-:param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green’s Function, default to +
-:type sigma: str, optional
-:return: The bath correlation function
-:rtype: np.ndarray</p>
+<dd><p>Returns the non-interacting bath spectral function at w and fermi energy Ef</p>
+<div class="math notranslate nohighlight">
+\[S^{\sigma}(\omega) = J(\omega) f_{f}(\sigma \omega; \beta)\]</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w</strong> (<em>np.ndarray</em>) – frequency</p></li>
+<li><p><strong>Ef</strong> (<em>float</em>) – Fermi Energy</p></li>
+<li><p><strong>sigma</strong> (<em>str</em><em>, </em><em>optional</em>) – Whether to compute the spectral function associated with the greater (+) or lesser (-) Green’s Function, default to +</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The bath correlation function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.fermionic_bath.FermionicBath.discretise">
 <span class="sig-name descname"><span class="pre">discretise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discretisation_engine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/fermionic_bath.html#FermionicBath.discretise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.fermionic_bath.FermionicBath.discretise" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns the coupling constants and frequencies associated with a discretised representation of the bath</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>discretisation_engine</strong> (<em>np.ndarray</em>) – An object defining how to discretise a continuous bath</p></li>
+<li><p><strong>Ef</strong> (<em>float</em>) – Fermi Energy</p></li>
+<li><p><strong>sigma</strong> (<em>str</em><em>, </em><em>optional</em>) – Whether to compute the spectral function associated with the greater (+) or lesser (-) Green’s Function, default to +</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Discrete system bath coupling constants <span class="math notranslate nohighlight">\(g_k`and bath frequencies :math:\)</span>omega_k`</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray, np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.fermionic_bath.FermionicBath.estimate_bounds">
 <span class="sig-name descname"><span class="pre">estimate_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/fermionic_bath.html#FermionicBath.estimate_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.fermionic_bath.FermionicBath.estimate_bounds" title="Link to this definition"></a></dt>
 <dd><p>Returns estimates for the upper and lower bounds of the spectral density to be used for the
-discretisation function
-:param wmax: the maximum frequency bound, defaults to self.wmax
-:type wmax: float, optional
-:param Ef: Fermi Energy
-:type Ef: float
-:param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green’s Function, default to +
-:type sigma: str, optional
-:return: the maximum and minimum frequency bounds
-:rtype: float, float</p>
+discretisation function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wmax</strong> (<em>float</em><em>, </em><em>optional</em>) – the maximum frequency bound, defaults to self.wmax</p></li>
+<li><p><strong>Ef</strong> (<em>float</em>) – Fermi Energy</p></li>
+<li><p><strong>sigma</strong> (<em>str</em><em>, </em><em>optional</em>) – Whether to compute the spectral function associated with the greater (+) or lesser (-) Green’s Function, default to +</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the maximum and minimum frequency bounds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float, float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.fermionic_bath.FermionicBath.expfit">
 <span class="sig-name descname"><span class="pre">expfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fitting_engine</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'+'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/fermionic_bath.html#FermionicBath.expfit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.fermionic_bath.FermionicBath.expfit" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fitting_engine</strong> (<em>np.ndarray</em>) – An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition</p></li>
+<li><p><strong>Ef</strong> (<em>float</em>) – Fermi Energy</p></li>
+<li><p><strong>sigma</strong> (<em>str</em><em>, </em><em>optional</em>) – Whether to compute the spectral function associated with the greater (+) or lesser (-) Green’s Function, default to +</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Discrete system bath coupling constants <span class="math notranslate nohighlight">\(g_k`and bath frequencies :math:\)</span>omega_k`</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray, np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.oqs.fermionic_bath.FermionicBath.fermi_distrib">
 <span class="sig-name descname"><span class="pre">fermi_distrib</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ef</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/oqs/fermionic_bath.html#FermionicBath.fermi_distrib"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.fermionic_bath.FermionicBath.fermi_distrib" title="Link to this definition"></a></dt>
-<dd><p>Returns the value fermi function at w and fermi energy Ef:
-:param w: frequency
-:type w: np.ndarray
-:param Ef: Fermi Energy
-:type Ef: float
-:return: The bath correlation function
-:rtype: np.ndarray</p>
+<dd><p>Returns the value fermi function at w and fermi energy Ef:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w</strong> (<em>np.ndarray</em>) – frequency</p></li>
+<li><p><strong>Ef</strong> (<em>float</em>) – Fermi Energy</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The bath correlation function</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

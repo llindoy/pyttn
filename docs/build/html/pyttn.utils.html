@@ -53,7 +53,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pyttn.utils package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils.mode_combination">pyttn.utils.mode_combination module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils.orthopolExt">pyttn.utils.orthopolExt module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn-utils-orthopolext-module">pyttn.utils.orthopolExt module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils.truncate">pyttn.utils.truncate module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils.visualise_tree">pyttn.utils.visualise_tree module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils">Module contents</a></li>
@@ -67,6 +67,9 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">pyTTN Tutorials</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">pyTTN Examples</a></li>
 </ul>
 
         </div>
@@ -105,21 +108,67 @@
 <dt class="sig sig-object py" id="pyttn.utils.mode_combination.ModeCombination">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.mode_combination.</span></span><span class="sig-name descname"><span class="pre">ModeCombination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nhilb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/utils/mode_combination.html#ModeCombination"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.mode_combination.ModeCombination" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for automatically combining modes of a system_modes object together to form a new system_modes
+object consisting of composite modes.  The approach implemented within this class involves sweeping from left
+to right and we attempt to combine the next mode into the current mode provided we have not already combined nbmax
+modes together in this mode and the local hilbert space dimension of the composite mode is less than nbmax.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nhilb</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum local Hilbert space dimension to allow during the mode combination process (default:1)</p></li>
+<li><p><strong>nbmax</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum  number of modes to combine(default:1)</p></li>
+<li><p><strong>blocksize</strong> – An optional blocksize argument.  For a blocksize of X, the current mode will contain a multiple of X modes and the</p></li>
+</ul>
+</dd>
+</dl>
+<p>new mode to add will contain X modes provided we have not reached the end of the chain(default:1)
+:type blocksize: int, optional</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.utils.mode_combination.ModeCombination.mode_combination_array">
 <span class="sig-name descname"><span class="pre">mode_combination_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode_inds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/utils/mode_combination.html#ModeCombination.mode_combination_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.mode_combination.ModeCombination.mode_combination_array" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Perform the mode combination process on a array of mode dimensions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode_dims</strong> (<em>list</em><em> or </em><em>np.ndarray</em>) – the mode dimensions</p></li>
+<li><p><strong>mode_inds</strong> (<em>list</em><em> or </em><em>np.ndarray</em><em>, </em><em>optional</em>) – the index labels of each of the modes (defaults to None) in which case we assume the modes are labelled [x for x in range(len(mode_dims))]</p></li>
+<li><p><strong>blocksize</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – An optional blocksize argument, used to ignore the globally set blocksize (default is None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.utils.mode_combination.ModeCombination.mode_combination_system">
 <span class="sig-name descname"><span class="pre">mode_combination_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/utils/mode_combination.html#ModeCombination.mode_combination_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.mode_combination.ModeCombination.mode_combination_system" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Perform the mode combination process on a system_modes object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> – the system_modes object defining all mode data</p></li>
+<li><p><strong>blocksize</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – An optional blocksize argument, used to ignore the globally set blocksize (default is None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
 </section>
-<section id="module-pyttn.utils.orthopolExt">
-<span id="pyttn-utils-orthopolext-module"></span><h2>pyttn.utils.orthopolExt module<a class="headerlink" href="#module-pyttn.utils.orthopolExt" title="Link to this heading"></a></h2>
+<section id="pyttn-utils-orthopolext-module">
+<h2>pyttn.utils.orthopolExt module<a class="headerlink" href="#pyttn-utils-orthopolext-module" title="Link to this heading"></a></h2>
 </section>
 <section id="module-pyttn.utils.truncate">
 <span id="pyttn-utils-truncate-module"></span><h2>pyttn.utils.truncate module<a class="headerlink" href="#module-pyttn.utils.truncate" title="Link to this heading"></a></h2>
@@ -151,8 +200,21 @@
 <span id="pyttn-utils-visualise-tree-module"></span><h2>pyttn.utils.visualise_tree module<a class="headerlink" href="#module-pyttn.utils.visualise_tree" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyttn.utils.visualise_tree.visualise_tree">
-<span class="sig-prename descclassname"><span class="pre">pyttn.utils.visualise_tree.</span></span><span class="sig-name descname"><span class="pre">visualise_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linewidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/utils/visualise_tree.html#visualise_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.visualise_tree.visualise_tree" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.visualise_tree.</span></span><span class="sig-name descname"><span class="pre">visualise_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linewidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyttn/utils/visualise_tree.html#visualise_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.visualise_tree.visualise_tree" title="Link to this definition"></a></dt>
+<dd><p>A function for plotting an ntree object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> (<em>ntree</em>) – The tree to be visualised</p></li>
+<li><p><strong>prog</strong> (<em>Matplotlib Axes object</em><em>, </em><em>optional</em>) – The visualisation function used with graphviz_layout (default: “dot”)</p></li>
+<li><p><strong>ax</strong> – Draw the tree in specified Matplotlib axes</p></li>
+<li><p><strong>node_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The node size used for visualisation (default: 500)</p></li>
+<li><p><strong>linewidth</strong> (<em>int</em><em>, </em><em>optional</em>) – The width of edges connecting nodes (default: 3)</p></li>
+<li><p><strong>add_labels</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to include the node labels (default: True)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-pyttn.utils">

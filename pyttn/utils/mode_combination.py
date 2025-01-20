@@ -4,14 +4,38 @@ import numpy as np
 from pyttn import system_modes
 
 
-class ModeCombination:
+class ModeCombination:    
+    """A class for automatically combining modes of a system_modes object together to form a new system_modes 
+    object consisting of composite modes.  The approach implemented within this class involves sweeping from left
+    to right and we attempt to combine the next mode into the current mode provided we have not already combined nbmax
+    modes together in this mode and the local hilbert space dimension of the composite mode is less than nbmax.   
+
+    :param nhilb: The maximum local Hilbert space dimension to allow during the mode combination process (default:1)
+    :type nhilb: int, optional
+    :param nbmax: The maximum  number of modes to combine(default:1)
+    :type nbmax: int, optional
+    :param blocksize: An optional blocksize argument.  For a blocksize of X, the current mode will contain a multiple of X modes and the 
+    new mode to add will contain X modes provided we have not reached the end of the chain(default:1)
+    :type blocksize: int, optional
+    """
     def __init__(self, nhilb = 1, nbmax = 1, blocksize=1):
         self.nbmax = nbmax
         self.nhilb = nhilb
         self.blocksize = blocksize
 
 
-    def mode_combination_array(self, mode_dims, mode_inds=None, _blocksize=None):
+    def mode_combination_array(self, mode_dims, mode_inds=None, _blocksize=None):    
+        """Perform the mode combination process on a array of mode dimensions.     
+
+        :param mode_dims: the mode dimensions
+        :type mode_dims: list or np.ndarray
+        :param mode_inds: the index labels of each of the modes (defaults to None) in which case we assume the modes are labelled [x for x in range(len(mode_dims))]
+        :type mode_inds: list or np.ndarray, optional
+        :param blocksize: An optional blocksize argument, used to ignore the globally set blocksize (default is None)
+        :type blocksize: int or None, optional
+        :returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode
+        :rtype: list of list
+        """
         if not isinstance(mode_inds, (np.ndarray, list)):
             if mode_inds is None:
                 mode_inds = [x for x in range(len(mode_dims))]
@@ -71,6 +95,15 @@ class ModeCombination:
         return composite_modes
 
     def mode_combination_system(self, system, _blocksize=None):
+        """Perform the mode combination process on a system_modes object.     
+
+        :param system: the system_modes object defining all mode data
+        :type mode_dims: system_modes
+        :param blocksize: An optional blocksize argument, used to ignore the globally set blocksize (default is None)
+        :type blocksize: int or None, optional
+        :returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode
+        :rtype: list of list
+        """
         #extract the composite mode dimensions from the system
         mode_dims = [system[i].lhd() for i in range(len(system))]
 
@@ -86,4 +119,13 @@ class ModeCombination:
         return composite_system
 
     def __call__(self, system, _blocksize = None):
+        """Perform the mode combination process on a system_modes object.     
+
+        :param system: the system_modes object defining all mode data
+        :type mode_dims: system_modes
+        :param blocksize: An optional blocksize argument, used to ignore the globally set blocksize (default is None)
+        :type blocksize: int or None, optional
+        :returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode
+        :rtype: list of list
+        """
         return self.mode_combination_system(system, _blocksize=_blocksize)

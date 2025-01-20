@@ -10,6 +10,7 @@ class FermionicBath:
     functions for computing non-interacting bath correlation functions, as well as
     decomposing the correlation function into a linear combination of
     complex valued exponentials (expfit) or oscillator terms (discretise)
+
     :param Jw: The bath spectral function defining the non-interacting correlation function
     :param beta: The inverse temperature of the bath, defaults to None
     :type beta: float, optional 
@@ -67,6 +68,7 @@ class FermionicBath:
     def Ctexp(t, dk, zk, sigma='+'):
         """Returns the value of the non-interacting bath correlation function evaluated 
         at the time points t using the results of discretisation or expfit:
+
         :param t: time
         :type t: np.ndarray
         :param dk: the weights of each term in the fit
@@ -89,6 +91,7 @@ class FermionicBath:
 
     def fermi_distrib(self, w, Ef):        
         """Returns the value fermi function at w and fermi energy Ef:
+
         :param w: frequency
         :type w: np.ndarray
         :param Ef: Fermi Energy
@@ -113,6 +116,11 @@ class FermionicBath:
 
     def Sw(self, w, Ef = 0, sigma = '+'):
         """Returns the non-interacting bath spectral function at w and fermi energy Ef
+
+        .. math::
+            S^{\\sigma}(\\omega) = J(\\omega) f_{f}(\\sigma \\omega; \\beta)
+
+
         :param w: frequency
         :type w: np.ndarray
         :param Ef: Fermi Energy
@@ -130,6 +138,7 @@ class FermionicBath:
     def estimate_bounds(self, wmax=None, Ef = 0, sigma = '+'): 
         """Returns estimates for the upper and lower bounds of the spectral density to be used for the
         discretisation function
+
         :param wmax: the maximum frequency bound, defaults to self.wmax
         :type wmax: float, optional
         :param Ef: Fermi Energy
@@ -163,6 +172,17 @@ class FermionicBath:
         return wmin, wmax
 
     def discretise(self, discretisation_engine, Ef = 0, sigma = '+'):
+        """Returns the coupling constants and frequencies associated with a discretised representation of the bath
+
+        :param discretisation_engine: An object defining how to discretise a continuous bath
+        :type discretisation_engine: np.ndarray
+        :param Ef: Fermi Energy
+        :type Ef: float
+        :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green's Function, default to +
+        :type sigma: str, optional
+        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`
+        :rtype: np.ndarray, np.ndarray
+        """
         from .bath_fitting import OrthopolDiscretisation, DensityDiscretisation
         wmin, wmax = self.estimate_bounds(Ef=Ef, sigma = sigma)
         if(discretisation_engine.wmin is None):
@@ -172,6 +192,17 @@ class FermionicBath:
         return discretisation_engine(lambda x : self.Sw(x, Ef=Ef, sigma=sigma))
 
     def expfit(self, fitting_engine, Ef = 0, sigma = '+'):
+        """Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
+
+        :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition
+        :type fitting_engine: np.ndarray
+        :param Ef: Fermi Energy
+        :type Ef: float
+        :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green's Function, default to +
+        :type sigma: str, optional
+        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`
+        :rtype: np.ndarray, np.ndarray
+        """
         from .bath_fitting import AAADecomposition, ESPRITDecomposition
         dk = None
         zk = None

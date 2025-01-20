@@ -26,6 +26,13 @@ Tutorials
 
    tutorials
 
+Examples
+=========
+.. toctree::
+   :maxdepth: 2
+
+   examples
+
 
 Indices and Tables
 ==================
