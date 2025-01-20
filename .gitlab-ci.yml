@@ -1,0 +1,27 @@
+image: python:3.12.8
+
+test:
+  stage: test
+  script:
+  - pip install -U sphinx
+  - pip install -U nbsphinx
+  - pip install -U nbsphinx-link
+  - pip install -U sphinx-rtd-theme
+  - sphinx-build -b html docs docs/build/public
+  rules:
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+    
+pages:
+  stage: deploy
+  script:
+  - pip install -U sphinx
+  - pip install -U nbsphinx
+  - pip install -U nbsphinx-link
+  - pip install -U sphinx-rtd-theme
+  - sphinx-build -b html docs docs/build/public
+  artifacts:
+    paths:
+    - docs/build/public
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+

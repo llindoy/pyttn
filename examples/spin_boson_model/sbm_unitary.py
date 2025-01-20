@@ -39,6 +39,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     import matplotlib.pyplot as plt
     plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w))
     plt.show()
+    exit()
 
     #set up the total Hamiltonian
     N = Nb+1

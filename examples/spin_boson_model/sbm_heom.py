@@ -48,14 +48,12 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
     bath = oqs.BosonicBath(J, beta=beta)
     dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
 
-    #set up the exp bath object this takes the dk and zk terms.  Truncate the modes and
-    #extract the system information object from this.
+    dk = expbath.dk
+    zk = expbath.zk
+
     expbath = oqs.ExpFitBosonicBath(dk, zk)
     expbath.truncate_modes(utils.EnergyTruncation(10*wc, Lmax=L, Lmin=Lmin))
     bsys = expbath.system_information()
-
-    dk = expbath.dk
-    zk = expbath.zk
 
     Nb = bsys.nprimitive_modes()
     N = Nb+2
@@ -199,7 +197,7 @@ if __name__ == "__main__":
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.005)
-    parser.add_argument('--tmax', type=float, default=30)
+    parser.add_argument('--tmax', type=float, default=10)
 
     #output file name
     parser.add_argument('--fname', type=str, default='sbm.h5')

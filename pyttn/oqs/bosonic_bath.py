@@ -56,10 +56,12 @@ class BosonicBath:
 
     #improve this code to make it all work a bit better
     def Ct(self, t, epsabs=1.49e-12, epsrel=1.49e-12, limit=2000, epsomega=1e-6):
-        """Returns the value of the non-interacting bath correlation function evaluated 
-        at the time points t:
+        """Returns the value of the non-interacting bath correlation function evaluated at the time points t, 
+        defined by:
+
         .. math::
-            C^{\\sigma}(t) = \\frac{1}{pi}\int_{wmin}^{wmax} J(\\omega) f_B(\\beta\\omega) exp(- i \\omega t)
+            C(t) = \\frac{1}{\\pi}\int_{\\omega_{\\mathrm{min}}}^{\\omega_{\\mathrm{max}}} J(\\omega) f_B(\\beta\\omega) \\exp(- i \\omega t)
+        
         :param t: time
         :type t: np.ndarray
         :return: The bath correlation function
@@ -148,8 +150,7 @@ class BosonicBath:
         :type w: np.ndarray
         :param Ef: Fermi Energy
         :type Ef: float
-        :param sigma: Whether to compute the spectral function associated with the
-            greater (+) or lesser (-) Green's Function, default to +
+        :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green's Function, default to +
         :type sigma: str, optional
         :return: The bath correlation function
         :rtype: np.ndarray
@@ -165,8 +166,7 @@ class BosonicBath:
         :type w: np.ndarray
         :param Ef: Fermi Energy
         :type Ef: float
-        :param sigma: Whether to compute the spectral function associated with the
-            greater (+) or lesser (-) Green's Function, default to +
+        :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green's Function, default to +
         :type sigma: str, optional
         :return: The bath correlation function
         :rtype: np.ndarray
