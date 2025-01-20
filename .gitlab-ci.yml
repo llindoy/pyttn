@@ -1,7 +1,4 @@
 image: python:latest
-image: 
-  name: pandoc/core
-  entrypoint: ["/bin/sh", "-c"]
 
 stages:
   - test
@@ -14,6 +11,7 @@ test:
   - python -m pip install -U nbsphinx
   - python -m pip install -U nbsphinx-link
   - python -m pip install -U sphinx-rtd-theme
+  - python -m pip install -U pandoc
   - sphinx-build -b html docs/source docs/build/public
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
