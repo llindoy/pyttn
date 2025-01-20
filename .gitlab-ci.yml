@@ -1,6 +1,6 @@
 image: python:3.12.8
 image: 
-  name: pandoc
+  name: pandoc/core
   entrypoint: ["/bin/sh", "-c"]
 
 stages:
