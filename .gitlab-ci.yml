@@ -1,8 +1,8 @@
 image: python:3.12.8
 
 stages:
-  -test
-  -deploy
+  - test
+  - deploy
 
 test:
   stage: test
@@ -15,7 +15,7 @@ test:
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
     
-pages:
+deploy-pages:
   stage: deploy
   script:
   - mkdir .public
