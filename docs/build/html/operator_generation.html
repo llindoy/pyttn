@@ -1,0 +1,1693 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operator generation with PyTTN &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Operations with Tree Tensor Networks" href="ttn_operations.html" />
+    <link rel="prev" title="Tree topologies with PyTTN" href="tree_topologies.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pyttn.html">pyttn package</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="tutorials.html">pyTTN Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tree_topologies.html">Tree topologies with PyTTN</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Operator generation with PyTTN</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Contents">Contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Defining-operators">Defining operators</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Specifying-mode-types">Specifying mode types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Basic-operator-definition">Basic operator definition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Advanced-operator-definition">Advanced operator definition</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Spin-operators">Spin operators</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Example-Hamiltonian:-transverse-field-Ising-model">Example Hamiltonian: transverse-field Ising model</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Fermionic-operators">Fermionic operators</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Example-Hamiltonian:-1-dimensional-Kitaev-chain">Example Hamiltonian: 1-dimensional Kitaev chain</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Two-Level-System-operators">Two-Level System operators</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Example-Hamiltonian:-Rabi-oscillations-&amp;-time-dependent-coefficients">Example Hamiltonian: Rabi oscillations &amp; time-dependent coefficients</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Bosonic-operators">Bosonic operators</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Example-Hamiltonian:-1-dimensional-Bose-Hubbard-model">Example Hamiltonian: 1-dimensional Bose-Hubbard model</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Constructing-a-Tree-Tensor-Network-Operator">Constructing a Tree Tensor Network Operator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Custom-operators-&amp;-generic-modes">Custom operators &amp; generic modes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Global-operators">Global operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Mode-combination">Mode combination</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ttn_operations.html">Operations with Tree Tensor Networks</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tutorials.html">pyTTN Tutorials</a></li>
+      <li class="breadcrumb-item active">Operator generation with PyTTN</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/operator_generation.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Operator-generation-with-PyTTN">
+<h1>Operator generation with PyTTN<a class="headerlink" href="#Operator-generation-with-PyTTN" title="Link to this heading"></a></h1>
+<p>Import libraries</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">jit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+<p>Import PyTTN dependencies</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1"># Function to visualise tree diagrams</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualise_tree</span>
+</pre></div>
+</div>
+</div>
+<section id="Contents">
+<h2>Contents<a class="headerlink" href="#Contents" title="Link to this heading"></a></h2>
+<ol class="arabic">
+<li><p><a class="reference internal" href="#Defining-operators"><span class="std std-ref">Defining operators</span></a></p>
+<p>1.a <a class="reference internal" href="#Specifying-mode-types"><span class="std std-ref">Specifying mode types</span></a></p>
+<p>1.b <a class="reference internal" href="#Basic-operator-definition"><span class="std std-ref">Basic operator definition</span></a></p>
+<p>1.c <a class="reference internal" href="#Advanced-operator-definition"><span class="std std-ref">Advanced operator definition</span></a></p>
+</li>
+<li><p><a class="reference internal" href="#Spin-operators"><span class="std std-ref">Spin operators</span></a></p>
+<ul class="simple">
+<li><p>Example Hamiltonian: 1-D transverse-field Ising model</p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#Fermionic-operators"><span class="std std-ref">Fermionic operators</span></a></p>
+<ul class="simple">
+<li><p>Example Hamiltonian: 1-D Kitaev chain</p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#Two-Level-System-operators"><span class="std std-ref">Two-level system operators</span></a></p>
+<ul class="simple">
+<li><p>Example Hamiltonian: Rabi oscillations &amp; time-dependent coefficients</p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#Bosonic-operators"><span class="std std-ref">Bosonic operators</span></a></p>
+<ul class="simple">
+<li><p>Example Hamiltonian: 1-D Bose-Hubbard model</p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#Constructing-a-Tree-Tensor-Network-Operator"><span class="std std-ref">Constructing a Tree Tensor Network Operator</span></a></p></li>
+<li><p>Custom operators &amp; generic modes</p></li>
+<li><p><a class="reference internal" href="#Global-operators"><span class="std std-ref">Global operators</span></a></p></li>
+<li><p><a class="reference internal" href="#Mode-combination"><span class="std std-ref">Mode combination</span></a></p></li>
+</ol>
+</section>
+<section id="Defining-operators">
+<h2>Defining operators<a class="headerlink" href="#Defining-operators" title="Link to this heading"></a></h2>
+<section id="Specifying-mode-types">
+<h3>Specifying mode types<a class="headerlink" href="#Specifying-mode-types" title="Link to this heading"></a></h3>
+<p>To initialise the system, the physical modes are created through the function <code class="docutils literal notranslate"><span class="pre">system_modes</span></code>. The information about the modes of the system is stored in the variable <code class="docutils literal notranslate"><span class="pre">sysinf</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of modes</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># Initialise system information variable as a set of N modes</span>
+<span class="n">sysinf</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>After creating the modes, one needs to specify the type of each mode. PyTTN accepts five different modes:</p>
+<ul class="simple">
+<li><p><em>d</em>-dimensional spin systems</p></li>
+<li><p>Two-level systems</p></li>
+<li><p>Bosons</p></li>
+<li><p>Fermions</p></li>
+<li><p>User-defined generic modes</p></li>
+</ul>
+<p>The code will store the information about the modes and automatically understand e.g. if a certain <span class="math notranslate nohighlight">\(\hat{a}^{\dagger}\)</span> is a bosonic or fermionic creation operator depending on which mode it acts on.</p>
+<p>As an example below, we will set each mode to be of a different kind. The dimension of the Hilbert space of the spin, bosonic, and generic mode are set in the argument of the function.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sysinf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">spin_mode</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">sysinf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">boson_mode</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">sysinf</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">fermion_mode</span><span class="p">()</span>
+<span class="n">sysinf</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">tls_mode</span><span class="p">()</span>
+<span class="n">sysinf</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_mode</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>There is more information on each type of mode and their predefined operators in the sections below.</p>
+</section>
+<section id="Basic-operator-definition">
+<h3>Basic operator definition<a class="headerlink" href="#Basic-operator-definition" title="Link to this heading"></a></h3>
+<p>Once the information about the modes is specified, one can start applying operators that act on these modes.</p>
+<p>A <strong>site operator</strong> is initialised as a <code class="docutils literal notranslate"><span class="pre">sOP</span></code> object (which stands for <em>“site OPerator”</em>). The <code class="docutils literal notranslate"><span class="pre">sOP()</span></code> function takes two arguments: the first one, a string label selecting which operator to apply; the second one, the physical index of the degree of freedom in which the operator acts.</p>
+<p>For example, to apply a Pauli <span class="math notranslate nohighlight">\(\hat{\sigma}_x\)</span> on the two-level system at mode <code class="docutils literal notranslate"><span class="pre">3</span></code>, one would write:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.sOP at 0x7c0db4111530&gt;
+</pre></div></div>
+</div>
+<p>Similarly, to apply a bosonic creation operator <span class="math notranslate nohighlight">\(\hat{a}^{\dagger}\)</span> on site <code class="docutils literal notranslate"><span class="pre">1</span></code>, one would write:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.sOP at 0x7c0dabf7dc70&gt;
+</pre></div></div>
+</div>
+<p>A fermionic operator is defined in the same way. Since the type of mode is defined in <code class="docutils literal notranslate"><span class="pre">sysinf</span></code>, the code will automatically determine if <code class="docutils literal notranslate"><span class="pre">&quot;a&quot;</span></code> refers to a bosonic or fermionic annihilation operator <span class="math notranslate nohighlight">\(\hat{a}\)</span>. Below is an example of the annihilation operator acting on the bosonic mode on site <code class="docutils literal notranslate"><span class="pre">1</span></code>, and on the fermionic mode on site <code class="docutils literal notranslate"><span class="pre">2</span></code>.</p>
+<p>To avoid coding confusion with bosonic operators, it is possible to define fermionic modes using the function <code class="docutils literal notranslate"><span class="pre">fOP</span></code>, which stands for <em>“fermionic OPerator”</em>. This option is purely redundant since the information about the modes is stored on <code class="docutils literal notranslate"><span class="pre">sysinf</span></code>, but can provide a useful visual clue about the nature of the modes when coding.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Bosonic annihilation operator (acts on mode 1: a boson)</span>
+<span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Fermionic annihilation operator (acts on mode 2: a fermion)</span>
+<span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Exactly the same fermionic annihilation operator</span>
+<span class="n">fOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.sOP at 0x7c0da95ec730&gt;
+</pre></div></div>
+</div>
+<p>The site operators <code class="docutils literal notranslate"><span class="pre">sOP</span></code> can be multiplied normally using <code class="docutils literal notranslate"><span class="pre">*</span></code> to create composite operators that act on several modes. The resulting operator is a <code class="docutils literal notranslate"><span class="pre">sPOP</span></code> object—a <em>“site Product of OPerators”</em>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">fOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.sPOP at 0x7c0da8b0e770&gt;
+</pre></div></div>
+</div>
+<p>A <code class="docutils literal notranslate"><span class="pre">sPOP</span></code> can also be created directly from a list of operators. This can be useful when defining operators acting on many modes.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Imagine a set of 20 modes</span>
+<span class="n">M</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="c1"># Define a list containing number operators acting on each mode</span>
+<span class="n">ops</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+    <span class="n">ops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
+
+<span class="c1"># The product of all those number operators: n_1 * n_2 * n_3 * ...</span>
+<span class="n">sPOP</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.sPOP at 0x7c0da8b1bd70&gt;
+</pre></div></div>
+</div>
+<p>To add site operators <code class="docutils literal notranslate"><span class="pre">sOP</span></code> (and products of site operators <code class="docutils literal notranslate"><span class="pre">sPOP</span></code>) together, one defines a <code class="docutils literal notranslate"><span class="pre">SOP</span></code> object. This is very useful when defining Hamiltonians and other nontrivial operators.</p>
+<p>To allocate memory efficiently, the <code class="docutils literal notranslate"><span class="pre">SOP</span></code> object needs to be initialised with a defined number of modes. The <code class="docutils literal notranslate"><span class="pre">sOP</span></code> and <code class="docutils literal notranslate"><span class="pre">sPOP</span></code> operators are then added using <code class="docutils literal notranslate"><span class="pre">+=</span></code>. They can be added alone, multiplied to each other, and multiplied to coefficients.</p>
+<p>The resulting operator can be printed as a string for easy visualisation.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise a SOP object with N modes</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Adding site operators to SOP in different ways</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">fOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.5</span> <span class="o">+</span> <span class="mi">3</span><span class="n">j</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">sPOP</span><span class="p">([</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">)])</span>
+
+<span class="c1"># Print SOP as string of operators</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((0,0) + 0 functions)
++((1,0) + 0 functions) x_3 y_3 z_3
+((-1.5,3) + 0 functions) n_1 x_3
+((-0.5,0) + 0 functions) x_0 fermi_a_2
++((1,0) + 0 functions) y_0 adag_1
++((1,0) + 0 functions) z_0
+
+</pre></div></div>
+</div>
+</section>
+<section id="Advanced-operator-definition">
+<h3>Advanced operator definition<a class="headerlink" href="#Advanced-operator-definition" title="Link to this heading"></a></h3>
+<p>The above sections should be enough to understand most of this tutorial. However, there are some more relevant features that could be useful for the advanced user. This section will cover:</p>
+<ul class="simple">
+<li><p>The <em>string N-Body Operator</em> and the <code class="docutils literal notranslate"><span class="pre">coefficient</span></code>class</p></li>
+<li><p>Time-dependent coefficients</p></li>
+<li><p>Product of Hamiltonians</p></li>
+</ul>
+<p><strong>The string N-Body Operator and the ``coefficient`` class</strong></p>
+<p>In the section above explained the <code class="docutils literal notranslate"><span class="pre">sPOP</span></code> (<em>string Product of OPerators</em>) was introduced as the product of site operators <code class="docutils literal notranslate"><span class="pre">sOP</span></code>. Indeed, if one multiplies two <code class="docutils literal notranslate"><span class="pre">sOP</span></code> together, the resulting object is a <code class="docutils literal notranslate"><span class="pre">sPOP</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">fOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.sPOP at 0x7c0da8b0a2b0&gt;
+</pre></div></div>
+</div>
+<p>However, multiplying a scalar times a string of site operators does not result in a <code class="docutils literal notranslate"><span class="pre">sPOP</span></code>, but rather a slightly different object called <code class="docutils literal notranslate"><span class="pre">sNBO</span></code>: a <em>string N-Body Operator</em>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="mf">0.5</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">fOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.sNBO_complex at 0x7c0da9530ef0&gt;
+</pre></div></div>
+</div>
+<p>This is related to how PyTTN processes coefficients. Every coefficient that multiplies a <em>site OPerator</em> <code class="docutils literal notranslate"><span class="pre">sOP</span></code> or a <em>site Product of OPerators</em> <code class="docutils literal notranslate"><span class="pre">sPOP</span></code> is processed as a <code class="docutils literal notranslate"><span class="pre">coefficient</span></code> object. A <code class="docutils literal notranslate"><span class="pre">sNBO</span></code> is simply a <code class="docutils literal notranslate"><span class="pre">sPOP</span></code> multiplied by a <code class="docutils literal notranslate"><span class="pre">coefficient</span></code> type object.</p>
+<p>When a scalar multiplies a site operator, this processing is done internally, and the user does not need to worry about initialising the scalar as a <code class="docutils literal notranslate"><span class="pre">coefficient</span></code>. However, when the coefficient is a function, it needs to be initialised explicitly as a <code class="docutils literal notranslate"><span class="pre">coefficient</span></code> object using the <code class="docutils literal notranslate"><span class="pre">coeff()</span></code> function.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coeff</span><span class="p">(</span><span class="mf">0.5</span><span class="o">+</span><span class="mi">1</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">fOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.sNBO_complex at 0x7c0da8b09970&gt;
+</pre></div></div>
+</div>
+<p><strong>Time-dependent coefficients</strong></p>
+<p>The possibility of using callable functions as coefficients allows for the use of time-dependent coefficients.</p>
+<p>Any function that is callable as <code class="docutils literal notranslate"><span class="pre">__call__(t:float)</span> <span class="pre">-&gt;</span> <span class="pre">float</span> <span class="pre">/</span> <span class="pre">complex</span></code> can be configured as a <code class="docutils literal notranslate"><span class="pre">coefficient</span></code> object. This means a time-dependent coefficient could be as simple as this:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coeff</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t</span><span class="p">))</span> <span class="o">*</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.sNBO_complex at 0x7c0da95ecab0&gt;
+</pre></div></div>
+</div>
+<p>or a much more elaborate callable object:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">transf</span><span class="p">:</span>
+    <span class="c1"># Initialise internal parameters</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">t0</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">e0</span><span class="p">:</span><span class="nb">float</span><span class="p">,</span> <span class="n">U0</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">,</span> <span class="n">conj</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conj</span> <span class="o">=</span> <span class="n">conj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">t0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">e</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">e0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">U0</span><span class="p">)</span>
+
+    <span class="c1"># Update to the coefficient value</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ti</span><span class="p">):</span>
+        <span class="n">evol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span><span class="o">@</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="n">j</span><span class="o">*</span><span class="n">ti</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">*</span> <span class="n">evol</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conj</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">val</span>
+
+<span class="c1"># Set value of parameters</span>
+<span class="n">t0</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="c1"># Apply time-dependent coefficient</span>
+<span class="n">coeff</span><span class="p">(</span><span class="n">transf</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">conj</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span> <span class="o">*</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.sNBO_complex at 0x7c0dc01f70f0&gt;
+</pre></div></div>
+</div>
+<p>Note: when calculating dynamics of time-dependent Hamiltonians using TDVP, it is important to set the parameter <code class="docutils literal notranslate"><span class="pre">sweep.use_time_dependent_hamiltonian</span> <span class="pre">=</span> <span class="pre">True</span></code>. When turned off, the time evolution will be calculated using the Hamiltonian at <span class="math notranslate nohighlight">\(t=0\)</span>.</p>
+<p><strong>Product of Hamiltonians</strong></p>
+<p>The section <a class="reference internal" href="#Basic-operator-definition"><span class="std std-ref">above</span></a> explained how to define <em>site operators</em> <code class="docutils literal notranslate"><span class="pre">sOP</span></code>; how to multiply them to obtain <em>site product of operators</em> <code class="docutils literal notranslate"><span class="pre">sPOP</span></code>; and how to add several <code class="docutils literal notranslate"><span class="pre">sOP</span></code> and <code class="docutils literal notranslate"><span class="pre">sPOP</span></code> together to generate <em>sums of operators</em> <code class="docutils literal notranslate"><span class="pre">SOP</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">SOP</span></code> objects are used to construct Hamiltonians, and encode the information about its site operators in the most efficient way—that is also the reason why a <code class="docutils literal notranslate"><span class="pre">SOP</span></code> needs to be initialised for a specific number of modes.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise Hamiltonian as SOP (&quot;Sum of OPerators&quot;) object with N modes</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Add terms to the Hamiltonian</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Print as string of operators</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((0,0) + 0 functions)
++((1,0) + 0 functions) z_1
++((1,0) + 0 functions) x_0
+
+</pre></div></div>
+</div>
+<p>However, these memory restrictions also mean that it is not possible to multiply two <code class="docutils literal notranslate"><span class="pre">SOP</span></code> and obtain a new <code class="docutils literal notranslate"><span class="pre">SOP</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">H2</span> <span class="o">=</span> <span class="n">H</span><span class="o">*</span><span class="n">H</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">TypeError</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[17], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> H2 <span style="color: rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">H</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">H</span>
+
+<span class="ansi-red-fg">TypeError</span>: unsupported operand type(s) for *: &#39;pyttn._pyttn.SOP_complex&#39; and &#39;pyttn._pyttn.SOP_complex&#39;
+</pre></div></div>
+</div>
+<p>For that purpose, one may use a simpler class: <code class="docutils literal notranslate"><span class="pre">sSOP</span></code>, a <em>string Sum of OPerators</em>. A <code class="docutils literal notranslate"><span class="pre">sSOP</span></code> simply combines site operators <code class="docutils literal notranslate"><span class="pre">sOP</span></code> and <code class="docutils literal notranslate"><span class="pre">sPOP</span></code> to create complex operators, without regard for memory allocation. It is how <code class="docutils literal notranslate"><span class="pre">SOP</span></code> processes site operators internally before allocating memory efficiently. It is not created for a fixed number of modes, and can be multiplied times other <code class="docutils literal notranslate"><span class="pre">sSOP</span></code> to create new <code class="docutils literal notranslate"><span class="pre">sSOP</span></code>.</p>
+<p>Because it is not as optimised, its use is discouraged when not needed. For the same reason, a <code class="docutils literal notranslate"><span class="pre">sSOP</span></code> cannot be used to construct a Tree Tensor Network Operator, and instead must be converted to a <code class="docutils literal notranslate"><span class="pre">SOP</span></code> for that purpose.</p>
+<p>Besides the differences in memory allocation, sums of operators using <code class="docutils literal notranslate"><span class="pre">sSOP</span></code> work exactly like with <code class="docutils literal notranslate"><span class="pre">SOP</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise Hamiltonian as sSOP (&quot;string Sum of OPerators&quot;)</span>
+<span class="c1"># without a set number of modes</span>
+<span class="n">Hsop</span> <span class="o">=</span> <span class="n">sSOP</span><span class="p">()</span>
+
+<span class="c1"># Add terms to the Hamiltonian</span>
+<span class="n">Hsop</span> <span class="o">+=</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">Hsop</span> <span class="o">+=</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Print as string of operators</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Hsop</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
++((1,0) + 0 functions) x_0
++((1,0) + 0 functions) z_1
+
+</pre></div></div>
+</div>
+<p>And it can be observed that <code class="docutils literal notranslate"><span class="pre">sSOP</span></code> objects can be multiplied by other <code class="docutils literal notranslate"><span class="pre">sSOP</span></code> objects:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Hsop2</span> <span class="o">=</span> <span class="n">Hsop</span><span class="o">*</span><span class="n">Hsop</span>
+
+<span class="c1"># Print as string of operators</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Hsop2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
++((1,0) + 0 functions) x_0 x_0
++((1,0) + 0 functions) x_0 z_1
++((1,0) + 0 functions) z_1 x_0
++((1,0) + 0 functions) z_1 z_1
+
+</pre></div></div>
+</div>
+<p>The resulting Hamiltonian is also a <code class="docutils literal notranslate"><span class="pre">sPOP</span></code>. To construct a Tree Tensor Network Operator from it, it is necessary to transform it to a <code class="docutils literal notranslate"><span class="pre">SOP</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise Hamiltonian as SOP object</span>
+<span class="n">H2</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Add elements of sSOP to SOP</span>
+<span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">Hsop2</span><span class="p">:</span>
+    <span class="n">H2</span> <span class="o">+=</span> <span class="n">el</span>
+
+<span class="c1"># Print as string of operators</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">H2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((0,0) + 0 functions)
++((1,0) + 0 functions) z_1 z_1
++((2,0) + 0 functions) x_0 z_1
++((1,0) + 0 functions) x_0 x_0
+
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Spin-operators">
+<h2>Spin operators<a class="headerlink" href="#Spin-operators" title="Link to this heading"></a></h2>
+<p>The <em>d</em>-dimensional spin modes have several predefined operators that commonly appear in spin systems. Below is a list of these operators and the labels that can be used to call them.</p>
+<ul class="simple">
+<li><p>Raising operator <span class="math notranslate nohighlight">\(\hat{S}^+\)</span>: <code class="docutils literal notranslate"><span class="pre">s+</span></code>, <code class="docutils literal notranslate"><span class="pre">sp</span></code>.</p></li>
+<li><p>Lowering operator <span class="math notranslate nohighlight">\(\hat{S}^-\)</span>: <code class="docutils literal notranslate"><span class="pre">s-</span></code>,<code class="docutils literal notranslate"><span class="pre">sm</span></code>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\hat{S}^x = \frac{1}{2}(\hat{S}^+ + \hat{S}^-)\)</span>: <code class="docutils literal notranslate"><span class="pre">sx</span></code>, <code class="docutils literal notranslate"><span class="pre">x</span></code>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\hat{S}^y = \frac{-i}{2}(\hat{S}^+ - \hat{S}^-)\)</span>: <code class="docutils literal notranslate"><span class="pre">sy</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(\hat{S}^z = \frac{-i}{\hbar}[\hat{S}^x, \hat{S}^y]\)</span>: <code class="docutils literal notranslate"><span class="pre">sz</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code>.</p></li>
+</ul>
+<p>The dimension of the spin operators is automatically adapted to the dimension set in the <code class="docutils literal notranslate"><span class="pre">spin_mode</span></code>.</p>
+<p>One can also define other custom operators—more information on this in the section Custom operators &amp; generic modes.</p>
+<section id="Example-Hamiltonian:-transverse-field-Ising-model">
+<h3>Example Hamiltonian: transverse-field Ising model<a class="headerlink" href="#Example-Hamiltonian:-transverse-field-Ising-model" title="Link to this heading"></a></h3>
+<p>As an example of a spin system, we construct the 1-dimensional transverse-field Ising model.</p>
+<p>The Hamiltonian of the model is: <span class="math notranslate nohighlight">\(\hat{H} = -J \sum_{j=1}^{N-1} \hat{S}^z_j \hat{S}^z_{j+1} - h \sum_j^N \hat{S}^x_j\)</span></p>
+<p>To construct the Hamiltonian of the system, the first step is to initialise the modes:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define number of modes</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Initialise system information variable as a set of N modes</span>
+<span class="n">sysinf</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Specify that each mode is a 2-dimensional spin</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">sysinf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">spin_mode</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Then, one can specify the parameters of the Hamiltonian:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">J</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">h</span> <span class="o">=</span> <span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<p>And construct the Hamiltonian:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise H as SOP object (&quot;Sum of OPerators&quot;)</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Add terms of Hamiltonian</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">H</span> <span class="o">+=</span> <span class="o">-</span><span class="n">J</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">H</span> <span class="o">+=</span> <span class="o">-</span><span class="n">h</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="o">-</span><span class="n">h</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">,</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Print Hamiltonian as string of operators</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((0,0) + 0 functions)
+((-4,0) + 0 functions) sz_8 sz_9
+((-2,0) + 0 functions) sx_9
+((-2,0) + 0 functions) sx_8
+((-2,0) + 0 functions) sx_7
+((-2,0) + 0 functions) sx_6
+((-4,0) + 0 functions) sz_0 sz_1
+((-2,0) + 0 functions) sx_5
+((-2,0) + 0 functions) sx_0
+((-4,0) + 0 functions) sz_1 sz_2
+((-2,0) + 0 functions) sx_1
+((-2,0) + 0 functions) sx_2
+((-4,0) + 0 functions) sz_3 sz_4
+((-2,0) + 0 functions) sx_3
+((-4,0) + 0 functions) sz_7 sz_8
+((-4,0) + 0 functions) sz_4 sz_5
+((-2,0) + 0 functions) sx_4
+((-4,0) + 0 functions) sz_5 sz_6
+((-4,0) + 0 functions) sz_2 sz_3
+((-4,0) + 0 functions) sz_6 sz_7
+
+</pre></div></div>
+</div>
+<p>Once the Hamiltonian is constructed in this form, it can be initialised as a Tree Tensor Network Operator, aware of the topology of the network and able to interact as an operator with a Tree Tensor Network. This is explained step by step in the section <a class="reference internal" href="#Constructing-a-Tree-Tensor-Network-Operator"><span class="std std-ref">Constructing a Tree Tensor Network Operator</span></a>.</p>
+</section>
+</section>
+<section id="Fermionic-operators">
+<h2>Fermionic operators<a class="headerlink" href="#Fermionic-operators" title="Link to this heading"></a></h2>
+<p>The predefined operators for fermionic modes are listed below. They can be called with any of the labels indicated, undistinguishably.</p>
+<ul class="simple">
+<li><p>Annihilation operator <span class="math notranslate nohighlight">\(\hat{a}\)</span>: <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">f</span></code>.</p></li>
+<li><p>Creation operator <span class="math notranslate nohighlight">\(\hat{a}^{\dagger}\)</span>: <code class="docutils literal notranslate"><span class="pre">adag</span></code>, <code class="docutils literal notranslate"><span class="pre">ad</span></code>, <code class="docutils literal notranslate"><span class="pre">cdag</span></code>, <code class="docutils literal notranslate"><span class="pre">cd</span></code>, <code class="docutils literal notranslate"><span class="pre">fdag</span></code>, <code class="docutils literal notranslate"><span class="pre">fd</span></code>.</p></li>
+<li><p>Number operator <span class="math notranslate nohighlight">\(\hat{n} = \hat{a}^{\dagger}\hat{a}\)</span>: <code class="docutils literal notranslate"><span class="pre">n</span></code>, <code class="docutils literal notranslate"><span class="pre">adaga</span></code>, <code class="docutils literal notranslate"><span class="pre">ada</span></code>, <code class="docutils literal notranslate"><span class="pre">cdagc</span></code>, <code class="docutils literal notranslate"><span class="pre">cdc</span></code>, <code class="docutils literal notranslate"><span class="pre">fdagf</span></code>, <code class="docutils literal notranslate"><span class="pre">fdf</span></code>.</p></li>
+<li><p>Vacancy operator <span class="math notranslate nohighlight">\(\hat{v} = \mathbb{\hat{I}} - \hat{n} = \hat{a}\hat{a}^{\dagger}\)</span>: <code class="docutils literal notranslate"><span class="pre">v</span></code>.</p></li>
+</ul>
+<p>One can also define other custom operators—more information on this in the section Custom operators &amp; generic modes.</p>
+<p>Fermionic operators are particular because they obey anti-commutation relations. In order to be implemented in a tensor network, they need to be mapped to operators that the tensor network can handle effectively. The Jordan-Wigner maps are commonly used for this purpose: they map the fermionic creation and annihilation operators to spin operators. In PyTTN, this transformation is done internally, so the user does not have to worry about applying Jordan-Wigner maps to the predefined fermionic
+operators. This should, however, be considered when defining custom operators.</p>
+<section id="Example-Hamiltonian:-1-dimensional-Kitaev-chain">
+<h3>Example Hamiltonian: 1-dimensional Kitaev chain<a class="headerlink" href="#Example-Hamiltonian:-1-dimensional-Kitaev-chain" title="Link to this heading"></a></h3>
+<p>As an example of a fermionic system, we construct the 1-dimensional Kitaev chain.</p>
+<p>The Hamiltonian of the model is: <span class="math notranslate nohighlight">\(\hat{H} = -\mu \sum_{j=1}^{N} \hat{a}^{\dagger}_j \hat{a}_j - t \sum_{j=1}^{N-1} \left( \hat{a}^{\dagger}_j \hat{a}_{j+1} + \hat{a}^{\dagger}_{j+1} \hat{a}_j \right) + \Delta \left( \hat{a}^{\dagger}_{j} \hat{a}^{\dagger}_{j+1} + \hat{a}_j \hat{a}_{j+1} \right)\)</span>.</p>
+<p>To construct the Hamiltonian of the system, the first step is to initialise the modes:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define number of modes</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Initialise system information variable as a set of N modes</span>
+<span class="n">sysinf</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Specify that each mode is a fermion</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">sysinf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">fermion_mode</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>One can then specify the parameters of the Hamiltonian:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mu</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="n">t</span> <span class="o">=</span> <span class="mf">2.</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="mi">10</span>
+</pre></div>
+</div>
+</div>
+<p>And construct the Hamiltonian:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise H as SOP object (&quot;Sum of OPerators&quot;)</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Add terms of Hamiltonian</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">H</span> <span class="o">+=</span> <span class="o">-</span><span class="n">t</span><span class="o">*</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;fdag&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;fdag&quot;</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
+    <span class="n">H</span> <span class="o">+=</span> <span class="n">delta</span><span class="o">*</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;fdag&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;fdag&quot;</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;f&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">H</span> <span class="o">+=</span> <span class="o">-</span><span class="n">mu</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+
+<span class="c1"># Print Hamiltonian as string of operators</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((0,0) + 0 functions)
+((-1.5,0) + 0 functions) n_9
+((-1.5,0) + 0 functions) n_8
+((-1.5,0) + 0 functions) n_7
+((-1.5,0) + 0 functions) n_4
+((-1.5,0) + 0 functions) n_1
++((10,0) + 0 functions) fdag_8 fdag_9
+((-1.5,0) + 0 functions) n_5
+((-2,0) + 0 functions) f_8 fdag_9
++((10,0) + 0 functions) f_7 f_8
++((10,0) + 0 functions) fdag_7 fdag_8
+((-2,0) + 0 functions) f_7 fdag_8
+((-2,0) + 0 functions) f_2 fdag_3
++((10,0) + 0 functions) f_6 f_7
+((-2,0) + 0 functions) fdag_7 f_8
++((10,0) + 0 functions) fdag_1 fdag_2
+((-1.5,0) + 0 functions) n_6
+((-2,0) + 0 functions) fdag_1 f_2
++((10,0) + 0 functions) fdag_2 fdag_3
++((10,0) + 0 functions) f_5 f_6
++((10,0) + 0 functions) f_0 f_1
+((-1.5,0) + 0 functions) n_2
++((10,0) + 0 functions) f_2 f_3
+((-2,0) + 0 functions) fdag_2 f_3
++((10,0) + 0 functions) f_4 f_5
+((-1.5,0) + 0 functions) n_0
++((10,0) + 0 functions) f_8 f_9
+((-2,0) + 0 functions) f_0 fdag_1
+((-2,0) + 0 functions) f_1 fdag_2
+((-2,0) + 0 functions) fdag_8 f_9
+((-2,0) + 0 functions) f_6 fdag_7
++((10,0) + 0 functions) fdag_6 fdag_7
+((-2,0) + 0 functions) fdag_0 f_1
+((-2,0) + 0 functions) f_3 fdag_4
++((10,0) + 0 functions) fdag_3 fdag_4
++((10,0) + 0 functions) fdag_0 fdag_1
++((10,0) + 0 functions) fdag_5 fdag_6
+((-2,0) + 0 functions) fdag_6 f_7
+((-1.5,0) + 0 functions) n_3
+((-2,0) + 0 functions) fdag_4 f_5
+((-2,0) + 0 functions) fdag_5 f_6
+((-2,0) + 0 functions) fdag_3 f_4
+((-2,0) + 0 functions) f_4 fdag_5
++((10,0) + 0 functions) f_3 f_4
++((10,0) + 0 functions) fdag_4 fdag_5
++((10,0) + 0 functions) f_1 f_2
+((-2,0) + 0 functions) f_5 fdag_6
+
+</pre></div></div>
+</div>
+<p>Once the Hamiltonian is constructed in this form, it can be initialised as a Tree Tensor Network Operator, aware of the topology of the network and able to interact as an operator with a Tree Tensor Network. This is explained step by step in the section <a class="reference internal" href="#Constructing-a-Tree-Tensor-Network-Operator"><span class="std std-ref">Constructing a Tree Tensor Network Operator</span></a>.</p>
+</section>
+</section>
+<section id="Two-Level-System-operators">
+<h2>Two-Level System operators<a class="headerlink" href="#Two-Level-System-operators" title="Link to this heading"></a></h2>
+<p>Two-level-system modes are similar to 2-dimensional spin modes. Rather than using the spin operators, their operations are given by Pauli matrices—one must be careful with the scaling factor between the 2-dimensional <span class="math notranslate nohighlight">\(\hat{S}_+\)</span> and the Pauli matrix <span class="math notranslate nohighlight">\(\hat{\sigma}_x\)</span>.</p>
+<p>The predefined operators for two-level systems are listed below, along with the labels that can be used to call them.</p>
+<ul class="simple">
+<li><p>Pauli <span class="math notranslate nohighlight">\(\hat{\sigma}^x\)</span>: <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">sigmax</span></code>.</p></li>
+<li><p>Pauli <span class="math notranslate nohighlight">\(\hat{\sigma}^y\)</span>: <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">sigmay</span></code>.</p></li>
+<li><p>Pauli <span class="math notranslate nohighlight">\(\hat{\sigma}^z\)</span>: <code class="docutils literal notranslate"><span class="pre">z</span></code>, <code class="docutils literal notranslate"><span class="pre">sigmaz</span></code>.</p></li>
+<li><p>Raising operator <span class="math notranslate nohighlight">\(\hat{\sigma}^+ = \hat{\sigma}^x + i\hat{\sigma}^y\)</span>: <code class="docutils literal notranslate"><span class="pre">s+</span></code>, <code class="docutils literal notranslate"><span class="pre">sigma+</span></code>, <code class="docutils literal notranslate"><span class="pre">sp</span></code>, <code class="docutils literal notranslate"><span class="pre">sigmap</span></code>.</p></li>
+<li><p>Lowering operator <span class="math notranslate nohighlight">\(\hat{\sigma}^- = \hat{\sigma}^x - i\hat{\sigma}^y\)</span>: <code class="docutils literal notranslate"><span class="pre">s-</span></code>,<code class="docutils literal notranslate"><span class="pre">sigma-</span></code>, <code class="docutils literal notranslate"><span class="pre">sm</span></code>, <code class="docutils literal notranslate"><span class="pre">sigmam</span></code>.</p></li>
+</ul>
+<p>One can also define other custom operators—more information on this in the section Custom operators &amp; generic modes.</p>
+<section id="Example-Hamiltonian:-Rabi-oscillations-&amp;-time-dependent-coefficients">
+<h3>Example Hamiltonian: Rabi oscillations &amp; time-dependent coefficients<a class="headerlink" href="#Example-Hamiltonian:-Rabi-oscillations-&-time-dependent-coefficients" title="Link to this heading"></a></h3>
+<p>As an example of a two-level system Hamiltonian, we model the dynamics of a two-level atom undergoing Rabi oscillations.</p>
+<p>The Hamiltonian of the system is: <span class="math notranslate nohighlight">\(\hat{H} = \frac{\hbar \omega_0}{2} \hat{\sigma}^z + \hbar \Omega \text{cos}(\omega t) \hat{\sigma}^x\)</span>.</p>
+<p>To construct the Hamiltonian of the system, the first step is to initialise the modes:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define number of modes</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># Initialise system information variable as a set of N modes</span>
+<span class="n">sysinf</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Specify that each mode is a 2-dimensional spin</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">sysinf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">tls_mode</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>One can then specify the parameters of the Hamiltonian:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_0</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">w</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">Rabi_freq</span> <span class="o">=</span> <span class="mi">5</span>
+</pre></div>
+</div>
+</div>
+<p>And the final step is to construct the Hamiltonian. This Hamiltonian has time-dependent coefficients, which makes it different to the example Hamiltonian above. To construct it, recall <a class="reference internal" href="#Advanced-operator-definition"><span class="std std-ref">how coefficients are processed in PyTTN</span></a>:</p>
+<blockquote>
+<div><p>Every coefficient that multiplies a <em>site OPerator</em> <code class="docutils literal notranslate"><span class="pre">sOP</span></code> or a <em>site Product of OPerators</em> <code class="docutils literal notranslate"><span class="pre">sPOP</span></code> is processed as a <code class="docutils literal notranslate"><span class="pre">coefficient</span></code> object. When a scalar multiplies a site operator, this processing is done internally, and the user does not need to worry about initialising the scalar as a <code class="docutils literal notranslate"><span class="pre">coefficient</span></code>. However, when the coefficient is a time-dependent function, it needs to be initialised as a <code class="docutils literal notranslate"><span class="pre">coefficient</span></code> object using the <code class="docutils literal notranslate"><span class="pre">coeff()</span></code> function. Any function that is callable as
+<code class="docutils literal notranslate"><span class="pre">__call__(t:float)</span> <span class="pre">-&gt;</span> <span class="pre">float</span> <span class="pre">/</span> <span class="pre">complex</span></code> can be configured as a <code class="docutils literal notranslate"><span class="pre">coefficient</span></code> object.</p>
+</div></blockquote>
+<p>Note: when calculating dynamics of time-dependent Hamiltonians using TDVP, it is important to set the parameter <code class="docutils literal notranslate"><span class="pre">sweep.use_time_dependent_hamiltonian</span> <span class="pre">=</span> <span class="pre">True</span></code>. When turned off, the time evolution will be calculated using the <span class="math notranslate nohighlight">\(t=0\)</span> Hamiltonian.</p>
+<p>Therefore, the Hamiltonian of a two-level atom under Rabi oscillations can be constructed as follows:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise H as SOP object (&quot;Sum of OPerators&quot;)</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Add terms of Hamiltonian</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">w_0</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">Rabi_freq</span><span class="o">*</span><span class="n">coeff</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">t</span><span class="p">))</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Print Hamiltonian as string of operators</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((0,0) + 0 functions)
++((0,0) + 1 functions) x_0
++((0.5,0) + 0 functions) z_0
+
+</pre></div></div>
+</div>
+<p>Once the Hamiltonian is constructed in this form, it can be initialised as a Tree Tensor Network Operator, aware of the topology of the network and able to interact as an operator with a Tree Tensor Network. This is explained step by step in the section <a class="reference internal" href="#Constructing-a-Tree-Tensor-Network-Operator"><span class="std std-ref">Constructing a Tree Tensor Network Operator</span></a>.</p>
+</section>
+</section>
+<section id="Bosonic-operators">
+<h2>Bosonic operators<a class="headerlink" href="#Bosonic-operators" title="Link to this heading"></a></h2>
+<p>The predefined operators for bosonic modes are listed below. They can be called with any of the labels indicated, undistinguishably.</p>
+<ul class="simple">
+<li><p>Annihilation operator <span class="math notranslate nohighlight">\(\hat{a}\)</span>: <code class="docutils literal notranslate"><span class="pre">a</span></code>, <code class="docutils literal notranslate"><span class="pre">c</span></code>, <code class="docutils literal notranslate"><span class="pre">b</span></code>.</p></li>
+<li><p>Creation operator <span class="math notranslate nohighlight">\(\hat{a}^{\dagger}\)</span>: <code class="docutils literal notranslate"><span class="pre">adag</span></code>, <code class="docutils literal notranslate"><span class="pre">ad</span></code>, <code class="docutils literal notranslate"><span class="pre">cdag</span></code>, <code class="docutils literal notranslate"><span class="pre">cd</span></code>, <code class="docutils literal notranslate"><span class="pre">bdag</span></code>, <code class="docutils literal notranslate"><span class="pre">bd</span></code>.</p></li>
+<li><p>Number operator <span class="math notranslate nohighlight">\(\hat{n} = \hat{a}^{\dagger}\hat{a}\)</span>: <code class="docutils literal notranslate"><span class="pre">n</span></code>, <code class="docutils literal notranslate"><span class="pre">adaga</span></code>, <code class="docutils literal notranslate"><span class="pre">ada</span></code>, <code class="docutils literal notranslate"><span class="pre">cdagc</span></code>, <code class="docutils literal notranslate"><span class="pre">cdc</span></code>, <code class="docutils literal notranslate"><span class="pre">bdagb</span></code>, <code class="docutils literal notranslate"><span class="pre">bdb</span></code>.</p></li>
+<li><p>Position operator <span class="math notranslate nohighlight">\(\hat{x} = \frac{1}{\sqrt{2}} \left( \hat{a}^{\dagger} + \hat{a} \right)\)</span>: <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">q</span></code>.</p></li>
+<li><p>Momentum operator <span class="math notranslate nohighlight">\(\hat{p} = \frac{i}{\sqrt{2}} \left( \hat{a}^{\dagger} - \hat{a} \right)\)</span>: <code class="docutils literal notranslate"><span class="pre">p</span></code>.</p></li>
+</ul>
+<p>The dimension of the bosonic operators is automatically adapted to the dimension set in the <code class="docutils literal notranslate"><span class="pre">boson_mode</span></code>.</p>
+<p>One can also define other custom operators—more information on this in the section Custom operators &amp; generic modes.</p>
+<section id="Example-Hamiltonian:-1-dimensional-Bose-Hubbard-model">
+<h3>Example Hamiltonian: 1-dimensional Bose-Hubbard model<a class="headerlink" href="#Example-Hamiltonian:-1-dimensional-Bose-Hubbard-model" title="Link to this heading"></a></h3>
+<p>As an example of a bosonic system, we construct the Hamiltonian of the 1-dimensional Bose-Hubbard model.</p>
+<p>The Hamiltonian of the system is: <span class="math notranslate nohighlight">\(\hat{H} = -t \sum_{j=1}^{N-1} \left( \hat{a}^{\dagger}_j \hat{a}_{j+1} + \hat{a}_{j} \hat{a}^{\dagger}_{j+1} \right) + \frac{U}{2} \sum_j \hat{n}_j(\hat{n}_j - 1) - \mu \sum_j \hat{n}_j\)</span>.</p>
+<p>To construct the Hamiltonian of the system, the first step is to initialise the modes:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define number of modes</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Initialise system information variable</span>
+<span class="n">sysinf</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Specify that each mode is a boson, with a Hilbert space of 15 energy levels</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">sysinf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">boson_mode</span><span class="p">(</span><span class="mi">15</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>One can then specify the parameters of the Hamiltonian:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">U</span> <span class="o">=</span> <span class="mf">5.</span>
+<span class="n">mu</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.5</span>
+</pre></div>
+</div>
+</div>
+<p>And construct the Hamiltonian:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise H as SOP object (&quot;Sum of OPerators&quot;)</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Add terms of Hamiltonian</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">H</span> <span class="o">+=</span> <span class="o">-</span><span class="n">t</span><span class="o">*</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;bdag&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;bdag&quot;</span><span class="p">,</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">H</span> <span class="o">+=</span> <span class="o">-</span><span class="n">mu</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">H</span> <span class="o">+=</span> <span class="n">U</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">)</span><span class="o">-</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">))</span>
+
+<span class="c1"># Print Hamiltonian as string of operators</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((0,0) + 0 functions)
++((2.5,0) + 0 functions) n_9 n_9
+((-1,0) + 0 functions) n_9
++((2.5,0) + 0 functions) n_8 n_8
+((-1,0) + 0 functions) n_8
++((2.5,0) + 0 functions) n_7 n_7
++((2.5,0) + 0 functions) n_6 n_6
+((-1,0) + 0 functions) n_7
++((2.5,0) + 0 functions) n_5 n_5
+((-0.2,0) + 0 functions) b_5 bdag_6
+((-0.2,0) + 0 functions) b_3 bdag_4
++((2.5,0) + 0 functions) n_0 n_0
+((-0.2,0) + 0 functions) b_7 bdag_8
+((-0.2,0) + 0 functions) b_2 bdag_3
+((-0.2,0) + 0 functions) bdag_6 b_7
+((-0.2,0) + 0 functions) bdag_5 b_6
+((-1,0) + 0 functions) n_6
+((-0.2,0) + 0 functions) bdag_1 b_2
+((-0.2,0) + 0 functions) bdag_4 b_5
+((-1,0) + 0 functions) n_3
+((-0.2,0) + 0 functions) bdag_3 b_4
+((-0.2,0) + 0 functions) b_4 bdag_5
+((-1,0) + 0 functions) n_0
+((-0.2,0) + 0 functions) b_0 bdag_1
+((-0.2,0) + 0 functions) b_1 bdag_2
+((-0.2,0) + 0 functions) bdag_0 b_1
+((-0.2,0) + 0 functions) b_6 bdag_7
+((-0.2,0) + 0 functions) bdag_8 b_9
++((2.5,0) + 0 functions) n_2 n_2
+((-1,0) + 0 functions) n_1
+((-0.2,0) + 0 functions) bdag_7 b_8
++((2.5,0) + 0 functions) n_1 n_1
+((-0.2,0) + 0 functions) b_8 bdag_9
+((-1,0) + 0 functions) n_5
++((2.5,0) + 0 functions) n_3 n_3
+((-1,0) + 0 functions) n_4
+((-1,0) + 0 functions) n_2
+((-0.2,0) + 0 functions) bdag_2 b_3
++((2.5,0) + 0 functions) n_4 n_4
+
+</pre></div></div>
+</div>
+<p>Once the Hamiltonian is constructed in this form, it can be initialised as a Tree Tensor Network Operator, aware of the topology of the network and able to interact as an operator with a Tree Tensor Network. This is explained step by step in the section <a class="reference internal" href="#Constructing-a-Tree-Tensor-Network-Operator"><span class="std std-ref">Constructing a Tree Tensor Network Operator</span></a>.</p>
+</section>
+</section>
+<section id="Constructing-a-Tree-Tensor-Network-Operator">
+<h2>Constructing a Tree Tensor Network Operator<a class="headerlink" href="#Constructing-a-Tree-Tensor-Network-Operator" title="Link to this heading"></a></h2>
+<p>The examples above have combined site operators to construct Hamiltonians that act on the modes specified in <code class="docutils literal notranslate"><span class="pre">sysinf</span></code>. However, the Hamiltonian in that form cannot be applied to a Tree Tensor Network: a <code class="docutils literal notranslate"><span class="pre">SOP</span></code> object is not aware of the topology of the network, and thus cannot act as an operator on the TTN.</p>
+<p>Thus in order to initialise the Hamiltonian as a Tree Tensor Network Operator (a TTNO), it will be necessary to define a network topology <code class="docutils literal notranslate"><span class="pre">topo</span></code>, and create the Tree Tensor Network that the TTNO will act on.</p>
+<p>In this example we will write a binary (degree = 2) ML-MCTDH tree. For a detailed explanation of how to construct the tree topology, read <a class="reference internal" href="tree_topologies.html"><span class="doc">tree_topologies.ipynb</span></a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Specify parameters of the tree</span>
+<span class="n">chi</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+<span class="n">degree</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># Create tree topology</span>
+<span class="n">topo</span> <span class="o">=</span> <span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">mlmctdh_tree</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">chi</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ntree : (1(8(8(8(8(2))(8(2)))(8(2)))(8(8(2))(8(2))))(8(8(8(8(2))(8(2)))(8(2)))(8(8(2))(8(2)))));
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/operator_generation_95_1.png" src="_images/operator_generation_95_1.png" />
+</div>
+</div>
+<p>The Tree Tensor Network is created using the <code class="docutils literal notranslate"><span class="pre">ttn</span></code> function. To be created, the TTN only needs to know the topology of the network, previously defined in <code class="docutils literal notranslate"><span class="pre">topo</span></code>. For simplicity, in the example below it is initialised to a random value.</p>
+<p>The function that creates a Tree Tensor Network Operator is <code class="docutils literal notranslate"><span class="pre">sop_operator</span></code>. It takes three arguments:</p>
+<ul class="simple">
+<li><p>the Hamiltonian defined as a combination of site operators.</p></li>
+<li><p>the Tree Tensor Network (which internally has the information about the network topology in <code class="docutils literal notranslate"><span class="pre">topo</span></code>).</p></li>
+<li><p>the information about the physical modes and their dimensionality, stored in the variable <code class="docutils literal notranslate"><span class="pre">sysinf</span></code>.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create tree tensor network, initialise to random value</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Initialise Hamiltonian as a TTNO (Tree Tensor Network Operator)</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">sop_operator</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The Hamiltonian in <code class="docutils literal notranslate"><span class="pre">h</span></code> is a Tree Tensor Network Operator, ready to be used in tensor network algorithms.</p>
+</section>
+<section id="Custom-operators-&amp;-generic-modes">
+<h2>Custom operators &amp; generic modes<a class="headerlink" href="#Custom-operators-&-generic-modes" title="Link to this heading"></a></h2>
+<p>The beginning of this tutorial listed the five types of modes that can be declared in <code class="docutils literal notranslate"><span class="pre">sysinf</span></code>: <span class="math notranslate nohighlight">\(d\)</span>-dimensional spin, two-level system, boson, fermion, and generic. The sections above have explored the first four types of modes; this section looks at the fifth type, generic modes.</p>
+<p>Generic modes are <span class="math notranslate nohighlight">\(d\)</span>-dimensional modes whose operators are defined by the user, usually by their matrix representation. Generic modes have no predefined operators and can be of any dimension set by the user.</p>
+<p>In the example below we define a system of 2 modes: a 2-dimensional generic mode and a two-level system.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[54]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define number of modes</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># Initialise system information variable</span>
+<span class="n">sysinf</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Specify type of modes. It is important to specify the dimension of the generic mode</span>
+<span class="n">sysinf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">generic_mode</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">sysinf</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tls_mode</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>The user-defined operators are stored in an operator dictionary, created with the function <code class="docutils literal notranslate"><span class="pre">operator_dictionary</span></code>. For efficient use of memory, it must be created for a specific number of modes.</p>
+<p>To create an operator, the first step is to define a complex matrix with the same dimension as the generic mode. The function <code class="docutils literal notranslate"><span class="pre">site_operator</span></code> creates the operator from its matrix representation. It is important to specify that the argument of the function is a matrix by setting the option <code class="docutils literal notranslate"><span class="pre">&quot;optype=matrix&quot;</span></code>.</p>
+<p>Finally, the newly-created operator is added to the operator dictionary. In this step, it is important to specify the mode on which the operator acts, and the string label that will be used to call the operator.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[55]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create custom operator dictionary for N modes</span>
+<span class="n">opdict</span> <span class="o">=</span> <span class="n">operator_dictionary</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+
+<span class="c1">## Define custom operator on generic mode</span>
+
+<span class="c1"># Create matrix of an operator</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+<span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+<span class="c1"># Define operator acting on mode 0 from matrix v</span>
+<span class="n">op</span> <span class="o">=</span>  <span class="n">site_operator</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">optype</span><span class="o">=</span><span class="s2">&quot;matrix&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Add created operator to the dictionary, specifying that it acts on mode 0</span>
+<span class="c1"># and assigning the label &quot;|0&gt;&lt;0|&quot; to it</span>
+<span class="n">opdict</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;|0&gt;&lt;0|&quot;</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+
+
+<span class="c1">## Define another custom operator on generic mode</span>
+
+<span class="c1"># Create matrix of an operator</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+<span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+<span class="c1"># Define operator acting on mode 0 from matrix v</span>
+<span class="n">op</span> <span class="o">=</span>  <span class="n">site_operator</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">optype</span><span class="o">=</span><span class="s2">&quot;matrix&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Add created operator to the dictionary, specifying that it acts on mode 0</span>
+<span class="c1"># and assigning the label &quot;|1&gt;&lt;1|&quot; to it</span>
+<span class="n">opdict</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;|1&gt;&lt;1|&quot;</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+
+
+<span class="c1"># View custom operator dictionary</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">opdict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+mode: 0
+|1&gt;&lt;1| dense matrix operator:
+[[0+0i, 0+0i],
+[0+0i, 1+0i]]
+
+
+|0&gt;&lt;0| dense matrix operator:
+[[1+0i, 0+0i],
+[0+0i, 0+0i]]
+
+
+mode: 1
+
+</pre></div></div>
+</div>
+<p>The user-defined operators can be called using their labels, exactly as all the predefined operators:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;|0&gt;&lt;0|&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[56]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.sOP at 0x7c0d6fe13c70&gt;
+</pre></div></div>
+</div>
+<p>Significantly, the user can also define custom operators for other modes, so they are not restricted to the set of predefined operators. Custom operators are defined just like operators of generic modes—one must only remember to specify the correct mode that the operator acts on. Custom operators can be stored in the same operator dictionary as operators of generic modes. Below is an example of a user-defined <code class="docutils literal notranslate"><span class="pre">&quot;Hadamard&quot;</span></code> operator that acts on mode <code class="docutils literal notranslate"><span class="pre">1</span></code>, a two-level system.</p>
+<p>If a custom operator is assigned the same label as a predefined operator of the mode it acts on, it overwrites that operator. For example, the code below defines a <code class="docutils literal notranslate"><span class="pre">&quot;z&quot;</span></code> operator for the two-level system that conflicts with the predefined <span class="math notranslate nohighlight">\(\hat{\sigma}^z\)</span> operator, which can also be called with the <code class="docutils literal notranslate"><span class="pre">&quot;z&quot;</span></code> label. In this situation, the code will always apply the user-defined operator over the predefined one.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[57]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## Define custom operator on two-level system mode</span>
+
+<span class="c1"># Create matrix of an operator</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+<span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Define operator acting on mode 1 from matrix v</span>
+<span class="n">op</span> <span class="o">=</span>  <span class="n">site_operator</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">optype</span><span class="o">=</span><span class="s2">&quot;matrix&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Add created operator to the dictionary, specifying that it acts on mode 1</span>
+<span class="c1"># and assigning the label &quot;Hadamard&quot; to it</span>
+<span class="n">opdict</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Hadamard&quot;</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+
+
+<span class="c1">## Overwrite existing &quot;z&quot; operator on generic mode</span>
+
+<span class="c1"># Create matrix of an operator</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+<span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+
+<span class="c1"># Define operator acting on mode 1 from matrix v</span>
+<span class="n">op</span> <span class="o">=</span>  <span class="n">site_operator</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">optype</span><span class="o">=</span><span class="s2">&quot;matrix&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Add created operator to the dictionary, specifying that it acts on mode 1</span>
+<span class="c1"># and assigning the label &quot;z&quot; to it</span>
+<span class="n">opdict</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">opdict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+mode: 0
+|1&gt;&lt;1| dense matrix operator:
+[[0+0i, 0+0i],
+[0+0i, 1+0i]]
+
+
+|0&gt;&lt;0| dense matrix operator:
+[[1+0i, 0+0i],
+[0+0i, 0+0i]]
+
+
+mode: 1
+z dense matrix operator:
+[[1+0i, 0+0i],
+[0+0i, -1+0i]]
+
+
+Hadamard dense matrix operator:
+[[0.707107+0i, 0.707107+0i],
+[0.707107+0i, -0.707107+0i]]
+
+
+
+</pre></div></div>
+</div>
+<p>The user-defined operators can be used to construct Hamiltonians exactly as predefined operators:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[58]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise H as SOP object (&quot;Sum of OPerators&quot;)</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Add terms of Hamiltonian</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;|0&gt;&lt;0|&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;|1&gt;&lt;1|&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;Hadamard&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Print Hamiltonian as string of operators</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((0,0) + 0 functions)
++((1,0) + 0 functions) z_1
++((1,0) + 0 functions) Hadamard_1
++((1,0) + 0 functions) |1&gt;&lt;1|_0
++((1,0) + 0 functions) |0&gt;&lt;0|_0
+
+</pre></div></div>
+</div>
+<p>There is one important change one has to remember when defining custom operators. When defining the Tree Tensor Network Operator as <a class="reference internal" href="#Constructing-a-Tree-Tensor-Network-Operator"><span class="std std-ref">above</span></a> using the function <code class="docutils literal notranslate"><span class="pre">sop_operator</span></code>, the code takes the matrix representation of all the operators and constructs an operator aware of the topology of the Tree Tensor Network, that can be contracted with the TTN and used in tensor network algorithms.</p>
+<p>To use the matrix representation of the user-defined operators, the function <code class="docutils literal notranslate"><span class="pre">sop_operator</span></code> takes the operator dictionary as an optional fourth argument.</p>
+<p>The code below constructs the network topology and the Tree Tensor Network using the code in the section <a class="reference internal" href="#Constructing-a-Tree-Tensor-Network-Operator"><span class="std std-ref">above</span></a>—both are necessary to initialise the Hamiltonian as a Tree Tensor Network Operator.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[59]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Specify parameters of the tree</span>
+<span class="n">chi</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+<span class="n">degree</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># Create tree topology</span>
+<span class="n">topo</span> <span class="o">=</span> <span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">mlmctdh_tree</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">chi</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Create tree tensor network, initialise to random value</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ntree : (1(8(2))(8(2)));
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/operator_generation_111_1.png" src="_images/operator_generation_111_1.png" />
+</div>
+</div>
+<p>Having created the Tree Tensor Network with the network topology in <code class="docutils literal notranslate"><span class="pre">topo</span></code>, the Tree Tensor Network Operator of the Hamiltonian can be created. The function <code class="docutils literal notranslate"><span class="pre">sop_operator</span></code> takes now four arguments:</p>
+<ul class="simple">
+<li><p>the Hamiltonian defined as a combination of site operators.</p></li>
+<li><p>the Tree Tensor Network (which internally has the information about the network topology in <code class="docutils literal notranslate"><span class="pre">topo</span></code>).</p></li>
+<li><p>the information about the physical modes and their dimensionality, stored in the variable <code class="docutils literal notranslate"><span class="pre">sysinf</span></code>.</p></li>
+<li><p>(optional, but needed for user-defined operators) the dictionary of user-defined operators and the modes they act on.</p></li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[60]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h</span> <span class="o">=</span> <span class="n">sop_operator</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="n">opdict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Global-operators">
+<h2>Global operators<a class="headerlink" href="#Global-operators" title="Link to this heading"></a></h2>
+<p>Besides creating TTNOs from Hamiltonians, one may also want to create simple operators to apply to the state, or calculate expectation values and matrix elements. This is much simpler than creating TTNOs <a class="reference internal" href="#Constructing-a-Tree-Tensor-Network-Operator"><span class="std std-ref">as described above</span></a>, and can be done in a single step.</p>
+<p>Consider the system above, with one generic mode and one two-level system, and the custom operators defined there:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[61]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">sysinf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+( generic mode (2) ) ( tls mode (2) )
+</pre></div></div>
+</div>
+<p>To create a one-site operator, one only needs the site operator <code class="docutils literal notranslate"><span class="pre">sOP</span></code> object and the information about the modes contained in <code class="docutils literal notranslate"><span class="pre">sysinf</span></code>.</p>
+<p>The function <code class="docutils literal notranslate"><span class="pre">site_operator</span></code> combines them to create an operator that can be directly used to perform operations with the TTN:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[62]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">site_operator</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[62]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.ops.site_operator_complex at 0x7c0da8b73130&gt;
+</pre></div></div>
+</div>
+<p>If the operator used is user-defined, it is also necessary to include the operator dictionary that stores the definitions of the operators:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># User-defined operator on generic mode at site 0</span>
+<span class="n">site_operator</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;|0&gt;&lt;0|&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">,</span> <span class="n">opdict</span><span class="p">)</span>
+
+<span class="c1"># User defined operator on two-level system mode at site 1</span>
+<span class="n">site_operator</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;Hadamard&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">,</span> <span class="n">opdict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[63]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;pyttn._pyttn.ops.site_operator_complex at 0x7c0da8b1a270&gt;
+</pre></div></div>
+</div>
+<p>A simple many-body operator can also be created from a site product of operators <code class="docutils literal notranslate"><span class="pre">sPOP</span></code> using the function <code class="docutils literal notranslate"><span class="pre">product_operator</span></code>. Again, when using user-defined operators, it is necessary to include the operator dictionary:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[65]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Vector of site operators</span>
+<span class="n">ops</span> <span class="o">=</span> <span class="p">[</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;|1&gt;&lt;1|&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)]</span>
+
+<span class="n">sPOP</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+
+<span class="c1"># Create product operator from sPOP</span>
+<span class="n">product_operator</span><span class="p">(</span><span class="n">sPOP</span><span class="p">(</span><span class="n">ops</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">,</span> <span class="n">opdict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/dra3/shared/code/_libraries/pyttn/include/ttns_lib/operators/site_operators/../../sop/operator_dictionaries/default_operator_dictionaries.hpp:237:No default mode dictionary for generic mode types.
+/home/dra3/shared/code/_libraries/pyttn/include/ttns_lib/operators/product_operator.hpp:167:Failed to query operator from dictionary.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">RuntimeError</span>                              Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[65], line 7</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> sPOP(ops)
+<span class="ansi-green-intense-fg ansi-bold">      6</span> <span style="color: rgb(95,135,135)"># Create product operator from sPOP</span>
+<span class="ansi-green-fg">----&gt; 7</span> <span class="ansi-yellow-bg">product_operator</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">sPOP</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">ops</span><span class="ansi-yellow-bg">)</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">sysinf</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">opdict</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/.local/lib/python3.10/site-packages/pyttn/ttns/operators/productOperatorExt.py:14</span>, in <span class="ansi-cyan-fg">product_operator</span><span class="ansi-blue-fg">(h, sysinf, dtype, *args, **kwargs)</span>
+<span class="ansi-green-intense-fg ansi-bold">     12</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">product_operator</span>(h, sysinf, dtype <span style="color: rgb(98,98,98)">=</span> np<span style="color: rgb(98,98,98)">.</span>complex128, <span style="color: rgb(98,98,98)">*</span>args, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwargs):
+<span class="ansi-green-intense-fg ansi-bold">     13</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">if</span>(dtype <span style="color: rgb(98,98,98)">==</span> np<span style="color: rgb(98,98,98)">.</span>complex128 <span class="ansi-bold" style="color: rgb(175,0,255)">or</span> product_operator_real <span class="ansi-bold" style="color: rgb(175,0,255)">is</span> <span class="ansi-bold" style="color: rgb(0,135,0)">None</span>):
+<span class="ansi-green-fg">---&gt; 14</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> <span class="ansi-yellow-bg">product_operator_complex</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">h</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">sysinf</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     15</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">else</span>:
+<span class="ansi-green-intense-fg ansi-bold">     16</span>         <span class="ansi-bold" style="color: rgb(0,135,0)">return</span> product_operator_real(h, sysinf, <span style="color: rgb(98,98,98)">*</span>args, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwargs)
+
+<span class="ansi-red-fg">RuntimeError</span>: /home/dra3/shared/code/_libraries/pyttn/include/ttns_lib/operators/product_operator.hpp:67:Failed to construct sop operator.
+</pre></div></div>
+</div>
+<p>One may realise that these operators are created without including <code class="docutils literal notranslate"><span class="pre">topo</span></code>, the information about the topology of the network. This is because <code class="docutils literal notranslate"><span class="pre">topo</span></code> is already contained in the TTN, and thus when the operators are applied to the TTN they automatically take the information about the network to perform the calculation:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[46]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define one-body operator</span>
+<span class="n">op</span> <span class="o">=</span> <span class="n">site_operator</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">)</span>
+
+<span class="c1"># Apply to TTN defined in previous section</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">apply_one_body_operator</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>There is a detailed explanation on performing operations with TTNs in the corresponding tutorial.</p>
+</section>
+<section id="Mode-combination">
+<h2>Mode combination<a class="headerlink" href="#Mode-combination" title="Link to this heading"></a></h2>
+<p>Another powerful feature of PyTTN is the possibility to define composite modes, that is, modes that encode more than one degree of freedom per site.</p>
+<p>This is very useful to study the entanglement structure between subsystems of a system with many degrees of freedom. The modes that interact strongly, forming a subsystem, can be grouped together to define a composite mode. Composite modes can then be addressed globally as a single effective degree of freedom in the TTN.</p>
+<p>The physical modes can still be addressed individually when defining site operators and Hamiltonians. Essentially, nothing changes between using mode combination and not using it when building the Hamiltonian or any other operator. The advantage is that, by using a reduced number of modes in the tensor network, the entanglement between subsystems (i.e. between the composite modes) is described more efficiently.</p>
+<p>The example below shows a list of dimensions corresponding to 10 physical modes. They are easily combined into composite modes using nested lists. The modes that are combined have to be adjacent: only modes next to each other in the network can form a composite mode—this is to avoid closed loops in the network topology.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[47]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Vector with the dimensions of the modes</span>
+<span class="n">modes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+
+<span class="c1"># Grouping adjacent modes into composite modes</span>
+<span class="n">composite_modes</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]]</span>
+
+<span class="c1"># Number of composite modes</span>
+<span class="n">Nm</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">composite_modes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>When defining the system information, the composite modes are defined as a list of physical modes. In the example below, the physical modes are bosons with a number of energy levels specified in the vector <code class="docutils literal notranslate"><span class="pre">modes</span></code> above. The first composite mode will be a list containing two bosonic modes with dimensions <code class="docutils literal notranslate"><span class="pre">40</span></code> and <code class="docutils literal notranslate"><span class="pre">32</span></code>, respectively, and so on.</p>
+<p>The dimension of the composite modes is calculated as the product of the dimension of the physical modes, using the function <code class="docutils literal notranslate"><span class="pre">lhd()</span></code>—which stands for <em>local Hilbert dimension</em>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[48]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Vector to store dimensions of composite modes</span>
+<span class="n">comp_modes_dims</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Initialise system information variable</span>
+<span class="n">sysinf</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="n">Nm</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">comb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">composite_modes</span><span class="p">):</span>
+    <span class="c1"># Define each composite mode as a list of adjacent bosonic modes,</span>
+    <span class="c1"># whose dimensions are defined in the vector &#39;modes&#39;</span>
+    <span class="n">sysinf</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">boson_mode</span><span class="p">(</span><span class="n">modes</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">comb</span><span class="p">]</span>
+
+    <span class="c1"># Store the Local Hilbert Dimension (LHD) of the composite modes</span>
+    <span class="n">comp_modes_dims</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sysinf</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">lhd</span><span class="p">())</span>
+
+<span class="c1"># Print dimensions of composite modes</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">comp_modes_dims</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[1280, 1920, 768, 192]
+</pre></div></div>
+</div>
+<p>The topology of the network is adapted to contain only the composite modes. In the example below, note that the resulting network only has 4 leaves instead of the 10 that would correspond to the physical degrees of freedom. In systems with a large number of degrees of freedom, mode combination can mean a drastic reduction in the size of the network.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[49]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Seed  of the tree diagram</span>
+<span class="n">topo</span> <span class="o">=</span> <span class="n">ntree</span><span class="p">(</span><span class="s2">&quot;(1(2(4)(4))(2(4)(4)))&quot;</span><span class="p">)</span>
+
+<span class="c1"># Insert a new node, with the dimension of a composite mode,</span>
+<span class="c1"># at the end of each basis node</span>
+<span class="n">topo</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">comp_modes_dims</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">topo</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">comp_modes_dims</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">comp_modes_dims</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">comp_modes_dims</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/operator_generation_132_0.png" src="_images/operator_generation_132_0.png" />
+</div>
+</div>
+<p>The physical modes are still addressed individually when creating Hamiltonians and other operators.</p>
+<p>As an example, let’s set up a Hamiltonian for the 10 bosonic modes, with couplings between those modes that form each composite mode:</p>
+<p><span class="math notranslate nohighlight">\(\hat{H} = \sum_j^N \varepsilon_j \hat{n}_j + \delta_0 \left( \hat{n}_0 \hat{n}_1 + \hat{a}^{\dagger}_0 \hat{a}^{}_1 \right) + \delta_1 \left( \hat{n}_2 \hat{n}_3 \hat{n}_4 + \hat{a}^{}_2 \hat{a}^{\dagger}_3 \hat{a}^{}_4 \right) + \delta_2 \left( \hat{n}_5 \hat{n}_6 \hat{n}_7 + \hat{a}^{}_5 \hat{a}^{\dagger}_6 \hat{a}^{}_7 \right) + \delta_3 \left( \hat{n}_8 \hat{n}_9 + \hat{a}^{\dagger}_8 \hat{a}^{}_9 \right)\)</span>.</p>
+<p>We will initialise the coeficients <span class="math notranslate nohighlight">\(\varepsilon_j\)</span> and <span class="math notranslate nohighlight">\(\delta_j\)</span> randomly:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[50]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of physical modes</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modes</span><span class="p">)</span>
+
+<span class="c1"># Parameters of the Hamiltonian</span>
+<span class="n">eps</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nm</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<p>And set up the Hamiltonian:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[51]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise H as SOP object (&quot;Sum of OPerators&quot;)</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Add terms of Hamiltonian</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">H</span> <span class="o">+=</span> <span class="n">eps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="n">i</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nm</span><span class="p">):</span>
+    <span class="n">H</span> <span class="o">+=</span> <span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">sPOP</span><span class="p">([</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="n">index</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">composite_modes</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">delta</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">delta</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">delta</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">delta</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">9</span><span class="p">)</span>
+
+<span class="c1"># Print Hamiltonian as string of operators</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+((0,0) + 0 functions)
+((-1.01613,0) + 0 functions) adag_8 a_9
++((2.56232,0) + 0 functions) a_2 adag_3 a_4
++((0.23181,0) + 0 functions) adag_0 a_1
+((-1.01613,0) + 0 functions) n_8 n_9
+((-1.65192,0) + 0 functions) n_0
+((-0.119867,0) + 0 functions) n_1
++((0.23181,0) + 0 functions) n_0 n_1
++((0.50398,0) + 0 functions) n_2
++((1.303,0) + 0 functions) a_5 adag_6 a_7
+((-0.549903,0) + 0 functions) n_3
++((0.0993687,0) + 0 functions) n_6
+((-0.293038,0) + 0 functions) n_4
++((2.56232,0) + 0 functions) n_2 n_3 n_4
++((0.421831,0) + 0 functions) n_5
+((-0.919764,0) + 0 functions) n_7
++((1.01174,0) + 0 functions) n_8
++((0.23023,0) + 0 functions) n_9
++((1.303,0) + 0 functions) n_5 n_6 n_7
+
+</pre></div></div>
+</div>
+<p>With this, the final step is to create the TTN and initialise the Tree Tensor Network Operator using the function <code class="docutils literal notranslate"><span class="pre">sop_operator</span></code>. The TTNO is aware of the topology of the network, and the nature of the composite modes.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[52]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create tree tensor network, initialise to random value</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Initialise Hamiltonian as a TTNO (Tree Tensor Network Operator)</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">sop_operator</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tree_topologies.html" class="btn btn-neutral float-left" title="Tree topologies with PyTTN" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ttn_operations.html" class="btn btn-neutral float-right" title="Operations with Tree Tensor Networks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

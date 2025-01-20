@@ -36,3 +36,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+
+#Don't ignore the documentation
+!docs/build/

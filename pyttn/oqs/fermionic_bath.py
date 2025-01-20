@@ -32,8 +32,10 @@ class FermionicBath:
     def Ct(self, t, Ef = 0, sigma = '+', epsabs=1.49e-12, epsrel=1.49e-12, limit=2000):
         """Returns the value of the non-interacting bath correlation function evaluated 
         at the time points t:
+
         .. math::
             C^{\\sigma}(t) = \\frac{1}{pi}\int_{wmin}^{wmax} J(\\omega) f_F(\\sigma\\beta(\\omega - Ef)) exp(\\sigma i \\omega t)
+
         :param t: time
         :type t: np.ndarray
         :param Ef: The fermi energy, default to 0
@@ -115,8 +117,7 @@ class FermionicBath:
         :type w: np.ndarray
         :param Ef: Fermi Energy
         :type Ef: float
-        :param sigma: Whether to compute the spectral function associated with the
-            greater (+) or lesser (-) Green's Function, default to +
+        :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green's Function, default to +
         :type sigma: str, optional
         :return: The bath correlation function
         :rtype: np.ndarray
@@ -133,8 +134,7 @@ class FermionicBath:
         :type wmax: float, optional
         :param Ef: Fermi Energy
         :type Ef: float
-        :param sigma: Whether to compute the spectral function associated with the
-            greater (+) or lesser (-) Green's Function, default to +
+        :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green's Function, default to +
         :type sigma: str, optional
         :return: the maximum and minimum frequency bounds
         :rtype: float, float 

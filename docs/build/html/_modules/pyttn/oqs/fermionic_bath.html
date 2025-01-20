@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyttn.oqs.fermionic_bath &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyttn.html">pyttn package</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">pyTTN Tutorials</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyttn.oqs.fermionic_bath</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyttn.oqs.fermionic_bath</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">jit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">orthopol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.bath_fitting.aaa_bath_fitting</span><span class="w"> </span><span class="kn">import</span> <span class="n">AAADecomposition</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.bath_fitting.ESPRIT_bath_fitting</span><span class="w"> </span><span class="kn">import</span> <span class="n">ESPRITDecomposition</span>
+
+<div class="viewcode-block" id="FermionicBath">
+<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.fermionic_bath.FermionicBath">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FermionicBath</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for managing a continuous fermionic gaussian bath.  This provides</span>
+<span class="sd">    functions for computing non-interacting bath correlation functions, as well as</span>
+<span class="sd">    decomposing the correlation function into a linear combination of</span>
+<span class="sd">    complex valued exponentials (expfit) or oscillator terms (discretise)</span>
+<span class="sd">    :param Jw: The bath spectral function defining the non-interacting correlation function</span>
+<span class="sd">    :param beta: The inverse temperature of the bath, defaults to None</span>
+<span class="sd">    :type beta: float, optional </span>
+<span class="sd">    :param wmax: the maximum frequency bound, default to np.inf</span>
+<span class="sd">    :type wmax: float, optional</span>
+<span class="sd">    :param wmin: the minimum frequency bound, default to np.inf</span>
+<span class="sd">    :type wmin: float, optional</span>
+<span class="sd">    :param wtol: a value for determining wmin based on wmax.  See fermionic.bath.estimate_bounds, default to None</span>
+<span class="sd">    :type wtol: float, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Jw</span><span class="p">,</span> <span class="n">Sp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Sm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wmax</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">wmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wtol</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Jw</span> <span class="o">=</span> <span class="n">Jw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Sp</span> <span class="o">=</span> <span class="n">Sp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Sm</span> <span class="o">=</span> <span class="n">Sm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmin</span> <span class="o">=</span> <span class="n">wmin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmax</span> <span class="o">=</span> <span class="n">wmax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wtol</span><span class="o">=</span><span class="n">wtol</span>
+
+<div class="viewcode-block" id="FermionicBath.Ct">
+<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.fermionic_bath.FermionicBath.Ct">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Ct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">Ef</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">epsabs</span><span class="o">=</span><span class="mf">1.49e-12</span><span class="p">,</span> <span class="n">epsrel</span><span class="o">=</span><span class="mf">1.49e-12</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">2000</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of the non-interacting bath correlation function evaluated </span>
+<span class="sd">        at the time points t:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            C^{\\sigma}(t) = \\frac{1}{pi}\int_{wmin}^{wmax} J(\\omega) f_F(\\sigma\\beta(\\omega - Ef)) exp(\\sigma i \\omega t)</span>
+
+<span class="sd">        :param t: time</span>
+<span class="sd">        :type t: np.ndarray</span>
+<span class="sd">        :param Ef: The fermi energy, default to 0</span>
+<span class="sd">        :type Ef: float, optional</span>
+<span class="sd">        :param sigma: Whether to compute greater (+) or lesser (-) Green&#39;s Function, default to +</span>
+<span class="sd">        :type sigma: str, optional</span>
+<span class="sd">        :return: The bath correlation function</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_bounds</span><span class="p">(</span><span class="n">Ef</span><span class="o">=</span><span class="n">Ef</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">)</span>
+        <span class="n">Ct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+        <span class="n">coeff</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">sigma</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="n">coeff</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">wmax</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="ow">or</span> <span class="n">wmin</span> <span class="o">==</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">):</span>
+            <span class="n">ctr</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">integrate</span><span class="o">.</span><span class="n">quad_vec</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Ef</span><span class="o">=</span><span class="n">Ef</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">t</span><span class="p">),</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">epsabs</span><span class="o">=</span><span class="n">epsabs</span><span class="p">,</span> <span class="n">epsrel</span><span class="o">=</span><span class="n">epsrel</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> 
+            <span class="n">cti</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">integrate</span><span class="o">.</span><span class="n">quad_vec</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Ef</span><span class="o">=</span><span class="n">Ef</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">t</span><span class="p">),</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">epsabs</span><span class="o">=</span><span class="n">epsabs</span><span class="p">,</span> <span class="n">epsrel</span><span class="o">=</span><span class="n">epsrel</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">Ct</span> <span class="o">=</span> <span class="n">ctr</span> <span class="o">+</span> <span class="n">coeff</span><span class="o">*</span><span class="mf">1.0</span><span class="n">j</span><span class="o">*</span><span class="n">cti</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ti</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">ctr</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">integrate</span><span class="o">.</span><span class="n">quad</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Ef</span><span class="o">=</span><span class="n">Ef</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">),</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;cos&#39;</span><span class="p">,</span> <span class="n">wvar</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">ti</span><span class="p">],</span> <span class="n">epsabs</span><span class="o">=</span><span class="n">epsabs</span><span class="p">,</span> <span class="n">epsrel</span><span class="o">=</span><span class="n">epsrel</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> 
+                <span class="n">cti</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">integrate</span><span class="o">.</span><span class="n">quad</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Ef</span><span class="o">=</span><span class="n">Ef</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">),</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;sin&#39;</span><span class="p">,</span> <span class="n">wvar</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="n">ti</span><span class="p">],</span> <span class="n">epsabs</span><span class="o">=</span><span class="n">epsabs</span><span class="p">,</span> <span class="n">epsrel</span><span class="o">=</span><span class="n">epsrel</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">Ct</span><span class="p">[</span><span class="n">ti</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctr</span> <span class="o">+</span> <span class="n">coeff</span><span class="o">*</span><span class="mf">1.0</span><span class="n">j</span><span class="o">*</span><span class="n">cti</span>
+        <span class="k">return</span> <span class="n">Ct</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span></div>
+
+
+
+<div class="viewcode-block" id="FermionicBath.Ctexp">
+<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.fermionic_bath.FermionicBath.Ctexp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Ctexp</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of the non-interacting bath correlation function evaluated </span>
+<span class="sd">        at the time points t using the results of discretisation or expfit:</span>
+<span class="sd">        :param t: time</span>
+<span class="sd">        :type t: np.ndarray</span>
+<span class="sd">        :param dk: the weights of each term in the fit</span>
+<span class="sd">        :type dk: np.ndarray</span>
+<span class="sd">        :param zk: the (complex) frequencies of each term in the fit</span>
+<span class="sd">        :type zk: np.ndarray</span>
+<span class="sd">        :param sigma: Whether to compute greater (+) or lesser (-) Green&#39;s Function, default to +</span>
+<span class="sd">        :type sigma: str, optional</span>
+<span class="sd">        :return: The bath correlation function</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">coeff</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">sigma</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="n">coeff</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dk</span><span class="p">)):</span>
+            <span class="n">ret</span> <span class="o">+=</span> <span class="n">dk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">coeff</span><span class="o">*</span><span class="mf">1.0</span><span class="n">j</span><span class="o">*</span><span class="n">zk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="FermionicBath.fermi_distrib">
+<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.fermionic_bath.FermionicBath.fermi_distrib">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fermi_distrib</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">Ef</span><span class="p">):</span>        
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value fermi function at w and fermi energy Ef:</span>
+<span class="sd">        :param w: frequency</span>
+<span class="sd">        :type w: np.ndarray</span>
+<span class="sd">        :param Ef: Fermi Energy</span>
+<span class="sd">        :type Ef: float</span>
+<span class="sd">        :return: The bath correlation function</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">w</span> <span class="o">&lt;=</span> <span class="n">Ef</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="mf">0.0</span><span class="o">*</span><span class="n">w</span>
+                <span class="n">res</span><span class="p">[</span><span class="n">w</span> <span class="o">&lt;</span> <span class="n">Ef</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">*</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">w</span><span class="o">&lt;</span><span class="n">Ef</span><span class="p">]</span><span class="o">-</span><span class="n">Ef</span><span class="p">)))</span>
+                <span class="n">res</span><span class="p">[</span><span class="n">w</span> <span class="o">&gt;=</span> <span class="n">Ef</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">*</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">w</span><span class="o">&gt;=</span><span class="n">Ef</span><span class="p">]</span><span class="o">-</span><span class="n">Ef</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">*</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">w</span><span class="o">&gt;=</span><span class="n">Ef</span><span class="p">]</span><span class="o">-</span><span class="n">Ef</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">w</span> <span class="o">&lt;</span> <span class="n">Ef</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">*</span><span class="p">(</span><span class="n">w</span><span class="o">-</span><span class="n">Ef</span><span class="p">)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">*</span><span class="p">(</span><span class="n">w</span><span class="o">-</span><span class="n">Ef</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">*</span><span class="p">(</span><span class="n">w</span><span class="o">-</span><span class="n">Ef</span><span class="p">)))</span>
+
+            <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="FermionicBath.Sw">
+<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.fermionic_bath.FermionicBath.Sw">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Sw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">Ef</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the non-interacting bath spectral function at w and fermi energy Ef</span>
+<span class="sd">        :param w: frequency</span>
+<span class="sd">        :type w: np.ndarray</span>
+<span class="sd">        :param Ef: Fermi Energy</span>
+<span class="sd">        :type Ef: float</span>
+<span class="sd">        :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green&#39;s Function, default to +</span>
+<span class="sd">        :type sigma: str, optional</span>
+<span class="sd">        :return: The bath correlation function</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">sigma</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Jw</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">fermi_distrib</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">Ef</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Jw</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">fermi_distrib</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">Ef</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="FermionicBath.estimate_bounds">
+<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.fermionic_bath.FermionicBath.estimate_bounds">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">estimate_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Ef</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns estimates for the upper and lower bounds of the spectral density to be used for the</span>
+<span class="sd">        discretisation function</span>
+<span class="sd">        :param wmax: the maximum frequency bound, defaults to self.wmax</span>
+<span class="sd">        :type wmax: float, optional</span>
+<span class="sd">        :param Ef: Fermi Energy</span>
+<span class="sd">        :type Ef: float</span>
+<span class="sd">        :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green&#39;s Function, default to +</span>
+<span class="sd">        :type sigma: str, optional</span>
+<span class="sd">        :return: the maximum and minimum frequency bounds</span>
+<span class="sd">        :rtype: float, float </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">wmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">wmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wmax</span>
+        <span class="n">wmin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wmin</span>
+        <span class="n">wtol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wtol</span>
+        <span class="n">wmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">wmax</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">sigma</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span><span class="p">):</span>
+                <span class="n">wmin</span> <span class="o">=</span> <span class="o">-</span><span class="n">wmax</span>
+                <span class="n">wmax</span> <span class="o">=</span> <span class="n">Ef</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">wmin</span> <span class="o">=</span> <span class="n">Ef</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">wtol</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">wmin</span> <span class="o">=</span> <span class="o">-</span><span class="n">wmax</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">sigma</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span><span class="p">):</span>
+                    <span class="n">wmin</span> <span class="o">=</span> <span class="o">-</span><span class="n">wmax</span>
+                    <span class="n">wmax</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">wmax</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">wtol</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">Ef</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">wmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">wmax</span><span class="p">,</span> <span class="p">(</span><span class="n">Ef</span><span class="o">-</span><span class="mf">1.0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">beta</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">wtol</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span></div>
+
+
+<div class="viewcode-block" id="FermionicBath.discretise">
+<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.fermionic_bath.FermionicBath.discretise">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">discretise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">discretisation_engine</span><span class="p">,</span> <span class="n">Ef</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.bath_fitting</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrthopolDiscretisation</span><span class="p">,</span> <span class="n">DensityDiscretisation</span>
+        <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_bounds</span><span class="p">(</span><span class="n">Ef</span><span class="o">=</span><span class="n">Ef</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">)</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">discretisation_engine</span><span class="o">.</span><span class="n">wmin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">discretisation_engine</span><span class="o">.</span><span class="n">wmin</span> <span class="o">=</span> <span class="n">wmin</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">discretisation_engine</span><span class="o">.</span><span class="n">wmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">discretisation_engine</span><span class="o">.</span><span class="n">wmin</span> <span class="o">=</span> <span class="n">wmax</span>
+        <span class="k">return</span> <span class="n">discretisation_engine</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Ef</span><span class="o">=</span><span class="n">Ef</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="FermionicBath.expfit">
+<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.fermionic_bath.FermionicBath.expfit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">expfit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitting_engine</span><span class="p">,</span> <span class="n">Ef</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.bath_fitting</span><span class="w"> </span><span class="kn">import</span> <span class="n">AAADecomposition</span><span class="p">,</span> <span class="n">ESPRITDecomposition</span>
+        <span class="n">dk</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">zk</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fitting_engine</span><span class="p">,</span> <span class="n">AAADecomposition</span><span class="p">):</span>
+            <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimate_bounds</span><span class="p">(</span><span class="n">Ef</span><span class="o">=</span><span class="n">Ef</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">)</span>
+            <span class="n">wav</span> <span class="o">=</span> <span class="p">(</span><span class="n">wmax</span><span class="o">-</span><span class="n">wmin</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">fitting_engine</span><span class="o">.</span><span class="n">wmin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">fitting_engine</span><span class="o">.</span><span class="n">wmin</span> <span class="o">=</span> <span class="n">wav</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">wav</span> <span class="o">-</span> <span class="n">wmin</span><span class="p">)</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">fitting_engine</span><span class="o">.</span><span class="n">wmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">fitting_engine</span><span class="o">.</span><span class="n">wmin</span> <span class="o">=</span> <span class="n">wav</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">wmax</span><span class="o">-</span><span class="n">wav</span><span class="p">)</span>
+            <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">fitting_engine</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Sw</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Ef</span><span class="o">=</span><span class="n">Ef</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fitting_engine</span><span class="p">,</span> <span class="n">ESPRITDecomposition</span><span class="p">):</span>
+            <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">fitting_engine</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Ct</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Ef</span><span class="o">=</span><span class="n">Ef</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span></div>
+</div>
+
+            
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

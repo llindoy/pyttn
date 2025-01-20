@@ -51,9 +51,6 @@ class BosonicBathFit:
     #    #    raise RuntimeError("Failed to save bosonic bath fit.  Invalid file type"):
 
 
-
-
-
 def bath_fitting_quality(bath, expbath, t):
     if isinstance(bath, FermionicBath) and isinstance(expbath, ExpFitFermionicBath):
         return FermionicBathFit(bath, expbath, t)

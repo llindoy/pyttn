@@ -1,5 +1,10 @@
 import numpy as np
 
+
+class TruncationBase:
+    def __init__(self):
+        return 
+
 class DepthTruncation:
     def __init__(self, Lmax = 2):
         self.Lmax = Lmax
