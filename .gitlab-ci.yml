@@ -7,7 +7,7 @@ test:
   - pip install -U nbsphinx
   - pip install -U nbsphinx-link
   - pip install -U sphinx-rtd-theme
-  - sphinx-build -b html docs docs/build/public
+  - sphinx-build -b html docs/source docs/build/public
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
     
@@ -18,7 +18,7 @@ pages:
   - pip install -U nbsphinx
   - pip install -U nbsphinx-link
   - pip install -U sphinx-rtd-theme
-  - sphinx-build -b html docs docs/build/public
+  - sphinx-build -b html docs/source docs/build/public
   artifacts:
     paths:
     - docs/build/public
