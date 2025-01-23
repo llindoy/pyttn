@@ -33,16 +33,11 @@ documentation for details.
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: pyTTN API:
 
-   pyttn </pyttn/index>
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Python Bindings Reference:
-
-   ttnpp </ttnpp/ttnpp>
+   API Outline </pyttn/API Outline> 
+   API Documents </pyttn/index>
 
 
 Indices and Tables

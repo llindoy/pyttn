@@ -16,7 +16,7 @@ def ttn(*args, dtype = np.complex128, **kwargs):
     :param \*\*kwargs: Additional keyword arguments that are based to the ttn object constructor
 
     :returns: The Tree Tensor Network State object
-    :rtype: ttn_real or ttn_complex
+    :rtype: ttn_dtype (dtype=complex or real)
     """
 
     from pyttn.ttnpp import ttn_complex
@@ -76,7 +76,7 @@ def multiset_ttn(*args, dtype = np.complex128, **kwargs):
     :param \*\*kwargs: Additional keyword arguments that are based to the ttn object constructor
 
     :returns: The Multiset Tree Tensor Network State object
-    :rtype: ms_ttn_real or ms_ttn_complex
+    :rtype: ms_ttn_dtype (dtype=complex or real)
     """
 
     from pyttn.ttnpp import ms_ttn_complex
@@ -136,7 +136,7 @@ def ms_ttn(*args, dtype=np.complex128, **kwargs):
     :param \*\*kwargs: Additional keyword arguments that are based to the ttn object constructor
 
     :returns: The Multiset Tree Tensor Network State object
-    :rtype: ms_ttn_real or ms_ttn_complex
+    :rtype: ms_ttn_dtype (dtype=complex or real)
     """
 
     return multiset_ttn(*args, dtype=dtype, **kwargs)
