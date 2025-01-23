@@ -212,7 +212,10 @@ public:
     
     void insert(const value_type& data = value_type())  
     {
-        clear();
+        if(!empty())
+        {
+            RAISE_EXCEPTION("Failed to insert element as root into ntree.  It is not empty.");
+        }
         m_root = create_node();
         m_root->m_data = data;
         m_root->m_parent = nullptr;

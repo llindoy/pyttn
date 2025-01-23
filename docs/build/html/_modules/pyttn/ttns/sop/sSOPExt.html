@@ -40,9 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -70,13 +86,26 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyttn.ttns.sop.sSOPExt</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">fermion_operator</span><span class="p">,</span> <span class="n">fOP</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">sOP</span><span class="p">,</span> <span class="n">sPOP</span><span class="p">,</span> <span class="n">sNBO_real</span><span class="p">,</span> <span class="n">sNBO_complex</span><span class="p">,</span> <span class="n">sSOP_real</span><span class="p">,</span> <span class="n">sSOP_complex</span><span class="p">,</span> <span class="n">coeff_real</span><span class="p">,</span> <span class="n">coeff_complex</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">fermion_operator</span><span class="p">,</span> <span class="n">fOP</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">sOP</span><span class="p">,</span> <span class="n">sPOP</span><span class="p">,</span> <span class="n">sNBO_real</span><span class="p">,</span> <span class="n">sNBO_complex</span><span class="p">,</span> <span class="n">sSOP_real</span><span class="p">,</span> <span class="n">sSOP_complex</span><span class="p">,</span> <span class="n">coeff_real</span><span class="p">,</span> <span class="n">coeff_complex</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <div class="viewcode-block" id="coeff">
-<a class="viewcode-back" href="../../../../pyttn.ttns.sop.html#pyttn.ttns.sop.sSOPExt.coeff">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">coeff</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.coeff">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">coeff</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function for constructing the coeff type for Hamiltonian specification</span>
+
+<span class="sd">    :param coeff: A variable list for specifying the coefficient.  Valid options are</span>
+
+<span class="sd">        - Default construct the coefficient</span>
+<span class="sd">        - value (dtype) - Set the coefficient to a constant value</span>
+<span class="sd">        - func (callable) - set the coefficient to a time-dependent value</span>
+<span class="sd">    :param dtype: The internal variable type for the product operator.</span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+
+<span class="sd">    :returns: The coefficient object</span>
+<span class="sd">    :rtype: coeff_real or coeff_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">coeff_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
     <span class="k">elif</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
@@ -87,8 +116,27 @@
 
 
 <div class="viewcode-block" id="sNBO">
-<a class="viewcode-back" href="../../../../pyttn.ttns.sop.html#pyttn.ttns.sop.sSOPExt.sNBO">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.sNBO">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sNBO</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function for constructing an n-body operator string</span>
+
+<span class="sd">    :param \*args: A variable list for specifying the coefficient.  Valid options are</span>
+
+<span class="sd">        -  Default construct the sNBO</span>
+<span class="sd">        - op (sOP) - Construct NBO from single site operator</span>
+<span class="sd">        - pop (sPOP) - Construct NBO from product operator</span>
+<span class="sd">        - arg (dtype), op (sOP) - Construct NBO as a product of a constant and a single site operator</span>
+<span class="sd">        - arg (dtype), pop (sPOP) - Construct NBO as a product of a constant and a product operator</span>
+<span class="sd">        - arg (coeff), op (sOP) - Construct NBO as a product of a coefficient and a single site operator</span>
+<span class="sd">        - arg (coeff), pop (sPOP) - Construct NBO as a product of a coefficient and a product operator</span>
+<span class="sd">        - nbo (sNBO) - Construct NBO from another NBO</span>
+
+<span class="sd">    :param dtype: The internal variable type for the n-body operator string.</span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+
+<span class="sd">    :returns: The n-body operator object</span>
+<span class="sd">    :rtype: sNBO_real or sNBO_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">sNBO_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
     <span class="k">elif</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
@@ -99,8 +147,25 @@
 
 
 <div class="viewcode-block" id="sSOP">
-<a class="viewcode-back" href="../../../../pyttn.ttns.sop.html#pyttn.ttns.sop.sSOPExt.sSOP">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.sSOP">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sSOP</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function for constructing a sum-of-product string operator</span>
+
+<span class="sd">    :param \*args: A variable list for specifying the coefficient.  Valid options are</span>
+
+<span class="sd">        -  Default construct the sSOP</span>
+<span class="sd">        - op (str) - Construct the sSOP from a string defining a sOP</span>
+<span class="sd">        - op (sOP) - Construct sSOP from single site operator</span>
+<span class="sd">        - pop (sPOP) - Construct sSOP from product operator</span>
+<span class="sd">        - nbo (sNBO) - Construct sSOP from an sNBO</span>
+<span class="sd">        - sop (sSOP) - Construct sSOP from another sSOP</span>
+
+<span class="sd">    :param dtype: The internal variable type for the sum-of-product string operator.</span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+
+<span class="sd">    :returns: The sum-of-product string operator</span>
+<span class="sd">    :rtype: sSOP_real or sSOP_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">sSOP_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
     <span class="k">elif</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
@@ -110,29 +175,17 @@
 
 
 
-<div class="viewcode-block" id="is_sOP">
-<a class="viewcode-back" href="../../../../pyttn.ttns.sop.html#pyttn.ttns.sop.sSOPExt.is_sOP">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">is_sOP</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sOP</span><span class="p">)</span></div>
+<span class="k">def</span><span class="w"> </span><span class="nf">__is_sOP</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sOP</span><span class="p">)</span>
 
+<span class="k">def</span><span class="w"> </span><span class="nf">__is_sPOP</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sPOP</span><span class="p">)</span>
 
-<div class="viewcode-block" id="is_sPOP">
-<a class="viewcode-back" href="../../../../pyttn.ttns.sop.html#pyttn.ttns.sop.sSOPExt.is_sPOP">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">is_sPOP</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sPOP</span><span class="p">)</span></div>
+<span class="k">def</span><span class="w"> </span><span class="nf">__is_sNBO</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sNBO_complex</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sNBO_real</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="is_sNBO">
-<a class="viewcode-back" href="../../../../pyttn.ttns.sop.html#pyttn.ttns.sop.sSOPExt.is_sNBO">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">is_sNBO</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sNBO_complex</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sNBO_real</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="is_sSOP">
-<a class="viewcode-back" href="../../../../pyttn.ttns.sop.html#pyttn.ttns.sop.sSOPExt.is_sSOP">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">is_sSOP</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sSOP_complex</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sSOP_real</span><span class="p">)</span></div>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">__is_sSOP</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sSOP_complex</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">sSOP_real</span><span class="p">)</span>
 </pre></div>
 
            </div>

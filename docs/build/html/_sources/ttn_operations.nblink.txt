@@ -1,3 +1,0 @@
-{
-  "path": "../../tutorials/ttn_operations.ipynb"
-}

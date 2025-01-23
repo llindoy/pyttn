@@ -40,9 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -75,11 +91,30 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <div class="viewcode-block" id="site_operator">
-<a class="viewcode-back" href="../../../../pyttn.ttns.operators.html#pyttn.ttns.operators.siteOperatorsExt.site_operator">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.site_operator">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">site_operator</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">mode</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">optype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn.ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">site_operator_complex</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for constructing a one site operator.</span>
+
+<span class="sd">    :param \*args: Variable length list of arguments. There are several valid options for the \*args parameters.  If the optype variable is None the allowed options are</span>
+
+<span class="sd">        - site_op (site_operator_real or site_operato_complex) - Construct a new site_operator object from the existing object</span>
+<span class="sd">        - op (sOP), sysinf (system_modes) - Construct a new site_operator from the string operator and system information</span>
+<span class="sd">        - op (sOP), sysinf (system_modes), opdict (operator_dictionary_real or operator_dictionary_complex) -  Construct a new site_operator from the string operator, system information and used defined operator dictionary.</span>
+
+<span class="sd">        Otherwise, if the optype variable has been set then the valid arguments are determined by the specified optype see opsExt.py for details.</span>
+
+<span class="sd">    :param mode: The mode the site operator is acting on. (Default: None)</span>
+<span class="sd">    :type mode: int or None, optional</span>
+<span class="sd">    :param optype: The type of the operator to be constructed. (Default: None)</span>
+<span class="sd">    :type optype: {&#39;identity&#39;, &#39;matrix&#39;, &#39;sparse_matrix&#39;, &#39;diagonal_matrix&#39;} or None, optional</span>
+<span class="sd">    :param dtype: The dtype to use for the site operator.  (Default: np.complex128) </span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+<span class="sd">    :param \*\*kwargs: Additional keyword arguments. To construct the site_operator object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">site_operator_complex</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn.ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">site_operator_real</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">site_operator_real</span>
     <span class="k">except</span><span class="p">:</span>
         <span class="n">site_operator_real</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="kc">None</span>

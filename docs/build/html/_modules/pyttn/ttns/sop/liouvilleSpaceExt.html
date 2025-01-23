@@ -40,9 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -70,15 +86,21 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyttn.ttns.sop.liouvilleSpaceExt</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">liouville_space</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">liouville_space</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.SOPExt</span><span class="w"> </span><span class="kn">import</span> <span class="n">SOP</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.opdictExt</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <div class="viewcode-block" id="liouville_space_superoperator">
-<a class="viewcode-back" href="../../../../pyttn.ttns.sop.html#pyttn.ttns.sop.liouvilleSpaceExt.liouville_space_superoperator">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.liouville_space_superoperator">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">liouville_space_superoperator</span><span class="p">(</span><span class="n">Op</span><span class="p">,</span> <span class="n">sys</span><span class="p">,</span> <span class="n">optype</span><span class="p">,</span> <span class="n">opdict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Lopdict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function for taking a Hilbert space operator and system information object and constructing a Liouville space operator</span>
+<span class="sd">    object rdependent on the argument optype.  Here we support the automatic generation of 4 different types of Liouville space operator</span>
+<span class="sd">    these are left acting operators, right acting operators, commutator operators and anticommutator operators.</span>
+
+<span class="sd">    To Do: Add parameters</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Lop</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">is_SOP</span><span class="p">(</span><span class="n">Op</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">__is_SOP</span><span class="p">(</span><span class="n">Op</span><span class="p">):</span>
         <span class="n">Lop</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">nprimitive_modes</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">otype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">Op</span><span class="p">)</span>

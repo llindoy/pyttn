@@ -1,3 +1,5 @@
 from .ttns import *
-#from .linalg import *
-#from .utils  import *
+from .ttns import __all__ as allfiles
+
+__all__ = allfiles
+

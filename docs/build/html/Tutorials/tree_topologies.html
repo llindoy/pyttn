@@ -1,0 +1,508 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tree topologies with PyTTN &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Operator generation with PyTTN" href="operator_generation.html" />
+    <link rel="prev" title="pyTTN Tutorials" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tree topologies with PyTTN</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Matrix-Product-States">Matrix Product States</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Visualising-Tensor-Networks">Visualising Tensor Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Sanitise-tree-diagrams">Sanitise tree diagrams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ML-MCTDH-ansatz">ML-MCTDH ansatz</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Custom-tree-building">Custom tree building</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Adding-MPS-subtrees">Adding MPS subtrees</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Adding-ML-MCTDH-subtrees">Adding ML-MCTDH subtrees</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="operator_generation.html">Operator generation with PyTTN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ttn_operations.html">Operations with Tree Tensor Networks</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ttnpp/ttnpp.html">ttnpp</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">pyTTN Tutorials</a></li>
+      <li class="breadcrumb-item active">Tree topologies with PyTTN</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/Tutorials/tree_topologies.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Tree-topologies-with-PyTTN">
+<h1>Tree topologies with PyTTN<a class="headerlink" href="#Tree-topologies-with-PyTTN" title="Link to this heading"></a></h1>
+<p>Import libraries</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">jit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+<p>Import PyTTN dependencies</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1"># Function to visualise tree diagrams</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualise_tree</span>
+</pre></div>
+</div>
+</div>
+<section id="Matrix-Product-States">
+<h2>Matrix Product States<a class="headerlink" href="#Matrix-Product-States" title="Link to this heading"></a></h2>
+<p>Matrix product states (MPS) are quantum states of many particles written in the form</p>
+<p><span class="math notranslate nohighlight">\(|\Psi\rangle = \sum_{\sigma_1,...,\sigma_L} A^{\sigma_1}A^{\sigma_2}...A^{\sigma_L-1}A^{\sigma_L} |\sigma_1,...,\sigma_L\rangle\)</span></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of sites in MPS</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Maximum bond dimension</span>
+<span class="n">chi</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># Vector of dimensions of the local Hilbert space in the physical nodes</span>
+<span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<p>Tree tensor networks are created using the <code class="docutils literal notranslate"><span class="pre">ntreeBuilder</span></code>. Its function <code class="docutils literal notranslate"><span class="pre">mps_tree</span></code> creates an MPS with maximum virtual-bond dimension <code class="docutils literal notranslate"><span class="pre">chi</span></code>, and with the physical dimensions specified in <code class="docutils literal notranslate"><span class="pre">dims</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">topo</span> <span class="o">=</span> <span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">mps_tree</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span><span class="n">chi</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Visualising-Tensor-Networks">
+<h2>Visualising Tensor Networks<a class="headerlink" href="#Visualising-Tensor-Networks" title="Link to this heading"></a></h2>
+<p>The function <code class="docutils literal notranslate"><span class="pre">visualise_tree</span></code> plots the tree diagram of the tensor network. It works along with <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Creating a figure is not needed here, but it is important</span>
+<span class="c1"># to remember it inside .py scripts</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_12_0.png" src="../_images/Tutorials_tree_topologies_12_0.png" />
+</div>
+</div>
+<p>The MPS is represented as a tree diagram in which the leaves (the nodes without children) represent the physical nodes, while the parent nodes form the “skeleton” of the MPS.</p>
+<p>The numbers in each node represent the dimension of the bond above it (note that since tree tensor networks are loop free, every node will have just one parent node). For leaf nodes, this number indicates the dimension of the physical index of the MPS, and therefore the dimension of the Hilbert space of the degree of freedom they encode. In the code above, the physical dimensions are given by the vector <code class="docutils literal notranslate"><span class="pre">dim</span></code>. For the “skeleton” nodes, that number specifies the dimension of the virtual bonds
+connecting the site tensors of the MPS. The bond dimension is initialised to its maximum value <code class="docutils literal notranslate"><span class="pre">chi</span></code>. The node at the top of the tree is the root and has dimension 1—a scalar.</p>
+</section>
+<section id="Sanitise-tree-diagrams">
+<h2>Sanitise tree diagrams<a class="headerlink" href="#Sanitise-tree-diagrams" title="Link to this heading"></a></h2>
+<p>The tensor network diagram can be optimised in a few ways to make calculations more efficient.</p>
+<p>When working with large physical Hilbert spaces (i.e. large dimensions in the leaf nodes), it can be useful to work in a reduced-dimensional basis. To implement this transformation, the code inserts an extra node between the bond nodes (the ones that give shape to the MPS) and the physical nodes (the leaves). These basis nodes define a time-dependent local basis of a reduced dimension for the physical nodes. They are implemented as an attribute of <code class="docutils literal notranslate"><span class="pre">ntreeBuilder</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">insert_basis_nodes</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_16_0.png" src="../_images/Tutorials_tree_topologies_16_0.png" />
+</div>
+</div>
+<p>Another useful optimisation is to contract <em>bond</em> matrices that are connected to only two tensors. This is important for algorithms with adaptive bond dimension, since allowing for bond matrices as site tensors would stop the adaptation of the bond dimension from working.</p>
+<p>The function <code class="docutils literal notranslate"><span class="pre">collapse_bond_matrices</span></code> contracts any bond matrix and tensors that are not physical or local-transformation nodes.</p>
+<p>In the tensor network above, this happens to the root node, which is contracted with the node to its right. That node becomes the new root of the tree, and again will have dimension 1.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">collapse_bond_matrices</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_18_0.png" src="../_images/Tutorials_tree_topologies_18_0.png" />
+</div>
+</div>
+<p>One last useful optimisation is to make sure that bond dimensions being used are not larger than using a full basis for the degrees of freedom. This reduces the bond dimension in some bonds from its maximum value (to which it was initialised) to the effective bond dimension they encode.</p>
+<p>In the example below, this reduces the dimension of the last two bonds of the MPS from 8 to 4 and 2.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">sanitise_bond_dimensions</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_20_0.png" src="../_images/Tutorials_tree_topologies_20_0.png" />
+</div>
+</div>
+<p>All this processing of the tree diagram can be done at the same time with the function <code class="docutils literal notranslate"><span class="pre">sanitise</span></code> of <code class="docutils literal notranslate"><span class="pre">ntreeBuilder</span></code>—this is how it will be done for the rest of this tutorial.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">sanitise</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_22_0.png" src="../_images/Tutorials_tree_topologies_22_0.png" />
+</div>
+</div>
+</section>
+<section id="ML-MCTDH-ansatz">
+<h2>ML-MCTDH ansatz<a class="headerlink" href="#ML-MCTDH-ansatz" title="Link to this heading"></a></h2>
+<p>Beyond Matrix Product States, the ML-MCTDH ansatz (short for Multi-Layer Multi-Configuration Time-Dependent Hartree ansatz) is a powerful method to simulate quantum many-body systems. The wavefunction is represented in a tree structure with several layers for the different levels of complexity.</p>
+<p>The ML-MCTDH tree is constructed using the <code class="docutils literal notranslate"><span class="pre">mlmctdh_tree</span></code> function of <code class="docutils literal notranslate"><span class="pre">ntreeBuilder</span></code>. As with MPS, <code class="docutils literal notranslate"><span class="pre">chi</span></code> sets the maximum bond dimension, and <code class="docutils literal notranslate"><span class="pre">dims</span></code> specifies the dimensions of the physical bonds.</p>
+<p>The parameter <code class="docutils literal notranslate"><span class="pre">degree</span></code> set the maximum number of children that a node can have. Depending on it, the tree will be binary, ternary, etc. The degree of the tree controls its depth by determining the number of layers needed to construct the number of physical degrees of freedom set by <code class="docutils literal notranslate"><span class="pre">dims</span></code>.</p>
+<p>The nodes are ordered according to a <em>pre-order depth-first traversal</em> labelling of the nodes. In practice, this means that the left-most node is the first physical degree of freedom, and increasing towards the right.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Always larger than 1. Max number of child nodes for each node</span>
+<span class="n">degree</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">topo</span> <span class="o">=</span> <span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">mlmctdh_tree</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">chi</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_25_0.png" src="../_images/Tutorials_tree_topologies_25_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Always larger than 1. Max number of child nodes for each node</span>
+<span class="n">degree</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">topo</span> <span class="o">=</span> <span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">mlmctdh_tree</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">chi</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_26_0.png" src="../_images/Tutorials_tree_topologies_26_0.png" />
+</div>
+</div>
+</section>
+<section id="Custom-tree-building">
+<h2>Custom tree building<a class="headerlink" href="#Custom-tree-building" title="Link to this heading"></a></h2>
+<p>One may wish to create a tree with a topology different to an MPS or the ML-MCTDH ansatz. The function <code class="docutils literal notranslate"><span class="pre">ntree</span></code> can be used for that purpose, by writing the desired tree topology in parentheses notation.</p>
+<p>In this notation, each pair of parentheses encloses a subtree, where the root node is followed by its child nodes inside parentheses. For example, the notation <code class="docutils literal notranslate"><span class="pre">(1(2)(3))</span></code> describes a tree with root node <code class="docutils literal notranslate"><span class="pre">1</span></code>, and two child nodes, <code class="docutils literal notranslate"><span class="pre">2</span></code> and <code class="docutils literal notranslate"><span class="pre">3</span></code>. Nested parentheses represent deeper levels of the tree: in the tree <code class="docutils literal notranslate"><span class="pre">(1(2(4)(5))(3))</span></code>, the node 2 has two child nodes itself, <code class="docutils literal notranslate"><span class="pre">4</span></code> and <code class="docutils literal notranslate"><span class="pre">5</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">topo</span> <span class="o">=</span> <span class="n">ntree</span><span class="p">(</span><span class="s2">&quot;(1(2(2))(2))&quot;</span><span class="p">)</span>
+
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_29_0.png" src="../_images/Tutorials_tree_topologies_29_0.png" />
+</div>
+</div>
+<p>To store and visualise the tree topology, the diagram can be printed in parentheses notation.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ntree : (1(2(2))(2));
+
+</pre></div></div>
+</div>
+</section>
+<section id="Adding-MPS-subtrees">
+<h2>Adding MPS subtrees<a class="headerlink" href="#Adding-MPS-subtrees" title="Link to this heading"></a></h2>
+<p>A useful possibility of <code class="docutils literal notranslate"><span class="pre">ntreeBuilder</span></code> is to append MPS chains to custom trees. This is done with the function <code class="docutils literal notranslate"><span class="pre">mps_subtree</span></code>. It defines an MPS with maximum bond dimension <code class="docutils literal notranslate"><span class="pre">chi</span></code> and physical Hilbert-space dimensions <code class="docutils literal notranslate"><span class="pre">dims</span></code>.</p>
+<p>The MPS is attached to the node specified in the first argument of the function—in the example below, <code class="docutils literal notranslate"><span class="pre">topo()[1]</span></code>. In general, <code class="docutils literal notranslate"><span class="pre">topo()</span></code> specifies the root node of the tree. Nodes are ordered from left to right, so <code class="docutils literal notranslate"><span class="pre">topo()[0]</span></code> specifies the left child of the root node and <code class="docutils literal notranslate"><span class="pre">topo()[1]</span></code> specifies the right child node. The child of the left node could be selected as <code class="docutils literal notranslate"><span class="pre">topo()[0][0]</span></code>, and so on.</p>
+<p>The last parameter of <code class="docutils literal notranslate"><span class="pre">mps_subtree</span></code>, if included, sets the dimension of the basis nodes, that implement a local Hilbert-space transformation between the physical nodes and the “skeleton” of the MPS. When omitted, the <code class="docutils literal notranslate"><span class="pre">sanitise</span></code> function will insert them automatically.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">mps_subtree</span><span class="p">(</span><span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dims</span><span class="p">,</span> <span class="n">chi</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagrams</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_34_0.png" src="../_images/Tutorials_tree_topologies_34_0.png" />
+</div>
+</div>
+<p>Again, sanitising the tree is an important step to optimise the tree for internal processing. The <code class="docutils literal notranslate"><span class="pre">sanitise</span></code> function runs the three sanitation steps simultaneously.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">sanitise</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_36_0.png" src="../_images/Tutorials_tree_topologies_36_0.png" />
+</div>
+</div>
+</section>
+<section id="Adding-ML-MCTDH-subtrees">
+<h2>Adding ML-MCTDH subtrees<a class="headerlink" href="#Adding-ML-MCTDH-subtrees" title="Link to this heading"></a></h2>
+<p>Instead of appending an MPS to the tree, one can instead append an ML-MCTDH tree. This is done with the function <code class="docutils literal notranslate"><span class="pre">mlmctdh_subtree</span></code>. It defines an ML-MCTDH tree of a specific <code class="docutils literal notranslate"><span class="pre">degree</span></code> with maximum bond dimension <code class="docutils literal notranslate"><span class="pre">chi</span></code> and physical Hilbert-space dimensions <code class="docutils literal notranslate"><span class="pre">dims</span></code>.</p>
+<p>As with the MPS subtree, the ML-MCTDH subtree is attached to the node addressed in the first argument of the function. In the example below, it will be attached to the second child (<code class="docutils literal notranslate"><span class="pre">[1]</span></code>) of the root node (<code class="docutils literal notranslate"><span class="pre">topo()</span></code>), that is, <code class="docutils literal notranslate"><span class="pre">topo()[1]</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">degree</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">mlmctdh_subtree</span><span class="p">(</span><span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span> <span class="n">dims</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">chi</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_39_0.png" src="../_images/Tutorials_tree_topologies_39_0.png" />
+</div>
+</div>
+<p>Again, sanitising the tree is an important step to optimise the tree for internal processing. The <code class="docutils literal notranslate"><span class="pre">sanitise</span></code> function runs the three sanitation steps simultaneously.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">sanitise</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_tree_topologies_41_0.png" src="../_images/Tutorials_tree_topologies_41_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="pyTTN Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="operator_generation.html" class="btn btn-neutral float-right" title="Operator generation with PyTTN" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

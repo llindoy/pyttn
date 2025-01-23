@@ -1,0 +1,540 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyttn.oqs.bath_fitting package &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyttn.oqs.heom package" href="pyttn.oqs.heom.html" />
+    <link rel="prev" title="pyttn.oqs package" href="pyttn.oqs.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">pyttn</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pyttn.linalg.html">pyttn.linalg package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyttn.models.html">pyttn.models package</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="pyttn.oqs.html">pyttn.oqs package</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="pyttn.oqs.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyttn.oqs.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyttn.oqs.html#module-pyttn.oqs.bathFitInfo">pyttn.oqs.bathFitInfo module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyttn.oqs.html#module-pyttn.oqs.bosonic_bath">pyttn.oqs.bosonic_bath module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyttn.oqs.html#module-pyttn.oqs.exponential_fit_bath">pyttn.oqs.exponential_fit_bath module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyttn.oqs.html#module-pyttn.oqs.fermionic_bath">pyttn.oqs.fermionic_bath module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyttn.oqs.html#module-pyttn.oqs">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyttn.utils.html">pyttn.utils package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../ttnpp/ttnpp.html">pyttn.ttnpp</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#module-pyttn">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ttnpp/ttnpp.html">ttnpp</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">pyTTN package</a></li>
+          <li class="breadcrumb-item"><a href="pyttn.oqs.html">pyttn.oqs package</a></li>
+      <li class="breadcrumb-item active">pyttn.oqs.bath_fitting package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/pyttn/pyttn.oqs.bath_fitting.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pyttn-oqs-bath-fitting-package">
+<h1>pyttn.oqs.bath_fitting package<a class="headerlink" href="#pyttn-oqs-bath-fitting-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-pyttn.oqs.bath_fitting.ESPRIT">
+<span id="pyttn-oqs-bath-fitting-esprit-module"></span><h2>pyttn.oqs.bath_fitting.ESPRIT module<a class="headerlink" href="#module-pyttn.oqs.bath_fitting.ESPRIT" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.ESPRIT.ESPRIT">
+<span class="sig-prename descclassname"><span class="pre">pyttn.oqs.bath_fitting.ESPRIT.</span></span><span class="sig-name descname"><span class="pre">ESPRIT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/ESPRIT.html#ESPRIT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.ESPRIT.ESPRIT" title="Link to this definition"></a></dt>
+<dd><p>Implementation of the Estimation of Signal Parameters via Rotational Invariant Techniques (ESPRIT)
+method for decomposing a signal into the form</p>
+<ol class="upperalpha simple">
+<li><p>Paulraj, R. Roy, and T. Kailath, Proceedings of the IEEE 74, 1044 (1986).</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Ct</strong> (<em>np.ndarray</em>) – An array containing the values to be fit</p></li>
+<li><p><strong>K</strong> (<em>np.ndarray</em>) – The set of support points used for interpolating the function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>w(np.ndarray) - The weights in the decomposition</p></li>
+<li><p>nu(np.ndarray) - The exponents in the decomposition</p></li>
+<li><p>Ctfit(np.ndarray) - The function fit at the same points as the original Ct</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.ESPRIT.ESPRIT_frequencies">
+<span class="sig-prename descclassname"><span class="pre">pyttn.oqs.bath_fitting.ESPRIT.</span></span><span class="sig-name descname"><span class="pre">ESPRIT_frequencies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/ESPRIT.html#ESPRIT_frequencies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.ESPRIT.ESPRIT_frequencies" title="Link to this definition"></a></dt>
+<dd><p>Extract the frequencies to be used in the ESPRIT algorithm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Ct</strong> (<em>np.ndarray</em>) – An array containing the values to be fit</p></li>
+<li><p><strong>K</strong> (<em>np.ndarray</em>) – The set of support points used for interpolating the function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>expnu(np.ndarray) - The exponential of the frequencies to be used in the ESPRIT decomposition</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyttn.oqs.bath_fitting.ESPRIT_bath_fitting">
+<span id="pyttn-oqs-bath-fitting-esprit-bath-fitting-module"></span><h2>pyttn.oqs.bath_fitting.ESPRIT_bath_fitting module<a class="headerlink" href="#module-pyttn.oqs.bath_fitting.ESPRIT_bath_fitting" title="Link to this heading"></a></h2>
+</section>
+<section id="module-pyttn.oqs.bath_fitting.aaa">
+<span id="pyttn-oqs-bath-fitting-aaa-module"></span><h2>pyttn.oqs.bath_fitting.aaa module<a class="headerlink" href="#module-pyttn.oqs.bath_fitting.aaa" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.aaa.AAA_algorithm">
+<span class="sig-prename descclassname"><span class="pre">pyttn.oqs.bath_fitting.aaa.</span></span><span class="sig-name descname"><span class="pre">AAA_algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-13</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/aaa.html#AAA_algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.aaa.AAA_algorithm" title="Link to this definition"></a></dt>
+<dd><p>Implementation of the adaptive Antoulas-Anderson (AAA) algorithm for rational approximation
+Y. Nakatsukasa, O. Sète, and L. N. Trefethen, SIAM Journal on Scientific Computing 40, A1494 (2018).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>F</strong> (<em>callable</em>) – The function to be fit</p></li>
+<li><p><strong>Z</strong> (<em>np.ndarray</em>) – The set of support points used for interpolating the function</p></li>
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – The convergence tolerance for the AAA algorithm. (default: 1e-13)</p></li>
+<li><p><strong>nmax</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of poles to use in the AAA fit. (default: 100)</p></li>
+<li><p><strong>*args</strong> – Variable length argument list to be passed to the F function</p></li>
+<li><p><strong>**kwargs</strong> – Arbitrary keyword arguments to be passed to the F function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>func - A function defining the rational function approximation</p></li>
+<li><p>poles(np.ndarray) - The poles of the rational function</p></li>
+<li><p>residues(np.ndarray) - The residues of the rational function decomposition</p></li>
+<li><p>zeros(np.ndarray) - The zeros of the rational function</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pyttn.oqs.bath_fitting.bath_discretisation">
+<span id="pyttn-oqs-bath-fitting-bath-discretisation-module"></span><h2>pyttn.oqs.bath_fitting.bath_discretisation module<a class="headerlink" href="#module-pyttn.oqs.bath_fitting.bath_discretisation" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.bath_discretisation.BathDiscretisation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.oqs.bath_fitting.bath_discretisation.</span></span><span class="sig-name descname"><span class="pre">BathDiscretisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wmax</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/bath_discretisation.html#BathDiscretisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.bath_discretisation.BathDiscretisation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for bath discretisations</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Nb</strong> (<em>int</em>) – The number of discrete points to find</p></li>
+<li><p><strong>wmin</strong> (<em>float</em>) – The minimum allowed frequency.</p></li>
+<li><p><strong>wmax</strong> (<em>float</em>) – The maximum allowed frequency.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.bath_discretisation.DensityDiscretisation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.oqs.bath_fitting.bath_discretisation.</span></span><span class="sig-name descname"><span class="pre">DensityDiscretisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nquad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ftol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">niters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wcut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/bath_discretisation.html#DensityDiscretisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.bath_discretisation.DensityDiscretisation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyttn.oqs.bath_fitting.bath_discretisation.BathDiscretisation" title="pyttn.oqs.bath_fitting.bath_discretisation.BathDiscretisation"><code class="xref py py-class docutils literal notranslate"><span class="pre">BathDiscretisation</span></code></a></p>
+<p>A class wrapping the density based discretisation approach.  Selects frequencies from a density of frequencies <span class="math notranslate nohighlight">\(\rho(\omega)\)</span>
+according to the expression</p>
+<div class="math notranslate nohighlight">
+\[\int_{\omega_{\mathrm{min}}}^{\omega_k} \rho(\omega)\mathrm{d} \omega = k,\]</div>
+<p>with coupling constants then determined by</p>
+<div class="math notranslate nohighlight">
+\[g_k^2 = \frac{1}{\pi} \frac{S(\omega_k)}{\rho(\omega_k)}.\]</div>
+<p>Constructor arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Nb</strong> (<em>int</em>) – The number of discrete points to find</p></li>
+<li><p><strong>wmin</strong> (<em>float</em>) – The minimum allowed frequency.</p></li>
+<li><p><strong>wmax</strong> (<em>float</em>) – The maximum allowed frequency.</p></li>
+<li><p><strong>rho</strong> (<em>callable</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The density of frequencies to use in the discretisation process. (Default: None)</p></li>
+<li><p><strong>atol</strong> (<em>float</em><em>, </em><em>optional</em>) – Absolute tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 0)</p></li>
+<li><p><strong>rtol</strong> (<em>float</em><em>, </em><em>optional</em>) – Relative tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 1e-10)</p></li>
+<li><p><strong>nquad</strong> (<em>int</em><em>, </em><em>optional</em>) – The degree of the gauss-Legendre polynomial based quadrature scheme used in the evaluation of integrals.  (Default: 100)</p></li>
+<li><p><strong>wtol</strong> (<em>float</em><em>, </em><em>optional</em>) – Frequency tolerance used in Newton’s method step for finding frequencies.  (Default: 1e-10)</p></li>
+<li><p><strong>ftol</strong> (<em>float</em><em>, </em><em>optional</em>) – Error tolerance used in Newton’s method step for finding frequencies.  (Default: 1e-10)</p></li>
+<li><p><strong>niters</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of Newton’s method iterations used to find frequencies.  (Default: 100)</p></li>
+<li><p><strong>wcut</strong> (<em>float</em><em>, </em><em>optional</em>) – A lower bound on the frequency to cutoff the 1/w.  (Default: 1e-8)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Callable arguments:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>callable</em>) – The spectral density function to be decomposed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g (np.ndarray) - The coupling constants of the discrete bath modes</p></li>
+<li><p>w (np.ndarray) - The frequencies of the discrete bath modes</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.bath_discretisation.DensityDiscretisation.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/bath_discretisation.html#DensityDiscretisation.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.bath_discretisation.DensityDiscretisation.__call__" title="Link to this definition"></a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.oqs.bath_fitting.bath_discretisation.</span></span><span class="sig-name descname"><span class="pre">OrthopolDiscretisation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moment_scaling</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minbound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxbound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e+25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moment_scaling_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nquad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/bath_discretisation.html#OrthopolDiscretisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class wrapping the orthonormal polynomial based discretisation scheme.  This scheme constructs a set of orthonormal polynomials
+satisfying the orthogonality constraint</p>
+<div class="math notranslate nohighlight">
+\[\int_{\omega_{\mathrm{min}}}^{\omega_\mathrm{max}} S(\omega) \pi_i(\omega) \pi_j(\omega) \mathrm{d}\omega = \delta_{ij}.\]</div>
+<p>The coupling constants and frequencies are then obtained from the weights and nodes, respectively, of the Gaussian quadrature rule associated
+with these orthonormal polynomials.</p>
+<p>Constructor arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Nb</strong> (<em>int</em>) – The number of discrete points to find</p></li>
+<li><p><strong>wmin</strong> (<em>float</em>) – The minimum allowed frequency.</p></li>
+<li><p><strong>wmax</strong> (<em>float</em>) – The maximum allowed frequency.</p></li>
+<li><p><strong>moment_scaling</strong> (<em>float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – A parameter to scale the frequency coordinate by in order to avoid over/underflows. (Default: None)</p></li>
+<li><p><strong>atol</strong> (<em>float</em><em>, </em><em>optional</em>) – Absolute tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 0)</p></li>
+<li><p><strong>rtol</strong> (<em>float</em><em>, </em><em>optional</em>) – Relative tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 1e-10)</p></li>
+<li><p><strong>minbound</strong> (<em>float</em><em>, </em><em>optional</em>) – A parameter for early bailout of the moment scaling step due to underflows. (Default: 1e-25)</p></li>
+<li><p><strong>maxbound</strong> (<em>float</em><em>, </em><em>optional</em>) – A parameter for early bailout of the moment scaling step due to overflows. (Default: 1e-25)</p></li>
+<li><p><strong>moment_scaling_steps</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of iterations of moment scaling to perform. (Default: 4)</p></li>
+<li><p><strong>nquad</strong> (<em>int</em><em>, </em><em>optional</em>) – The degree of the gauss-Legendre polynomial based quadrature scheme used in the evaluation of integrals.  (Default: 100)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Callable arguments:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>callable</em>) – The spectral density function to be decomposed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>g (np.ndarray) - The coupling constants of the discrete bath modes</p></li>
+<li><p>w (np.ndarray) - The frequencies of the discrete bath m</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/bath_discretisation.html#OrthopolDiscretisation.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation.__call__" title="Link to this definition"></a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation.find_moment_scaling_factor">
+<span class="sig-name descname"><span class="pre">find_moment_scaling_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minbound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxbound</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e+30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nsteps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nquad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/bath_discretisation.html#OrthopolDiscretisation.find_moment_scaling_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation.find_moment_scaling_factor" title="Link to this definition"></a></dt>
+<dd><p>Finds a constant to scale the frequency axis by in order to ensure well defined scaling of the modified moments as we go to very high moments.
+here this is done by computing the modified moments up to varying orders (with early termination if the values leave some min and max bounds)
+and fitting the resultant decay or growth to an exponential function.  Based on this fitting we extract a constant that aims to minimise the
+decay or growth, and repeats this process with growing orders (up to the maximum order we need for the discretisation) until it reaches a
+point that the moment decay does not leave the early termination bounds.  This may not always be optimal if the Nsteps variable is too large
+and in this case either try reducing Nsteps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>S</strong> (<em>callable</em>) – The spectral density function to be decomposed.</p></li>
+<li><p><strong>wmin</strong> (<em>float</em>) – The minimum allowed frequency.</p></li>
+<li><p><strong>wmax</strong> (<em>float</em>) – The maximum allowed frequency.</p></li>
+<li><p><strong>Nb</strong> (<em>int</em>) – The number of discrete points to find</p></li>
+<li><p><strong>atol</strong> (<em>float</em><em>, </em><em>optional</em>) – Absolute tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 0)</p></li>
+<li><p><strong>rtol</strong> (<em>float</em><em>, </em><em>optional</em>) – Relative tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 1e-10)</p></li>
+<li><p><strong>minbound</strong> (<em>float</em><em>, </em><em>optional</em>) – A parameter for early bailout of the moment scaling step due to underflows. (Default: 1e-25)</p></li>
+<li><p><strong>maxbound</strong> (<em>float</em><em>, </em><em>optional</em>) – A parameter for early bailout of the moment scaling step due to overflows. (Default: 1e-25)</p></li>
+<li><p><strong>Nsteps</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of iterations of moment scaling to perform. (Default: 4)</p></li>
+<li><p><strong>nquad</strong> (<em>int</em><em>, </em><em>optional</em>) – The degree of the gauss-Legendre polynomial based quadrature scheme used in the evaluation of integrals.  (Default: 100)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pyttn.oqs.bath_fitting.expfit">
+<span id="pyttn-oqs-bath-fitting-expfit-module"></span><h2>pyttn.oqs.bath_fitting.expfit module<a class="headerlink" href="#module-pyttn.oqs.bath_fitting.expfit" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.expfit.AAADecomposition">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.oqs.bath_fitting.expfit.</span></span><span class="sig-name descname"><span class="pre">AAADecomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aaa_nmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/expfit.html#AAADecomposition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.expfit.AAADecomposition" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class providing an easy to use interface for applying the AAA based rational function
+decomposition to approximate a bath spectral density.  This class includes tools used for
+automatic generation of support points, as well as manually specified support points to
+allow for both easy general use and flexibility when handling more complex spectral densities.</p>
+<p>Constructor arguments:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – The tolerance used within the AAA algorithm. (Default: 1e-4)</p></li>
+<li><p><strong>w</strong> (<em>str</em><em> or </em><em>np.ndarray</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – Either the support points or a key word used to generate the support points.  For details see the AAA_support_points function.  (Default: “linear”)</p></li>
+<li><p><strong>aaa_nmax</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of poles to allow within the AAA algorithm. (Default:500)</p></li>
+<li><p><strong>coeff</strong> (<em>float</em><em>, </em><em>optional</em>) – A coefficient to go in front of the frequency terms. (Default: 1)</p></li>
+<li><p><strong>**kwargs</strong> – Keyword arguments to pass to AAA_support_points</p></li>
+</ul>
+</dd>
+</dl>
+<p>Callable arguments:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>callable</em>) – The spectral density function to be decomposed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>dk (np.ndarray) - The coefficients in the sum-of-exponential decomposition of the bath correlation function</p></li>
+<li><p>zk (np.ndarray) - The exponents in the sum-of-exponential decomposition of the bath correlation function</p></li>
+<li><p>func (callable) - The AAA rational function fit of the spectral density</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.expfit.AAADecomposition.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/expfit.html#AAADecomposition.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.expfit.AAADecomposition.__call__" title="Link to this definition"></a></dt>
+<dd><p>Perform the AAA decomposition on the function S.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>S</strong> (<em>callable</em>) – The spectral density function to be decomposed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>dk (np.ndarray) - The coefficients in the sum-of-exponential decomposition of the bath correlation function</p></li>
+<li><p>zk (np.ndarray) - The exponents in the sum-of-exponential decomposition of the bath correlation function</p></li>
+<li><p>func (callable) - The AAA rational function fit of the spectral density</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.expfit.AAA_support_points">
+<span class="sig-prename descclassname"><span class="pre">pyttn.oqs.bath_fitting.expfit.</span></span><span class="sig-name descname"><span class="pre">AAA_support_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Naaa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/expfit.html#AAA_support_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.expfit.AAA_support_points" title="Link to this definition"></a></dt>
+<dd><p>A function for automatically generating support points to be used within the AAA algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>w</strong> (<em>str</em><em> or </em><em>np.ndarray</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <p>Either the support points orr a key word used to generate the support points. (Default: “linear”) This parameter can be either a</p>
+<ul>
+<li><p>list/np.ndarray: In this case the function simply returns these points as the support points ignoring all other inputs</p></li>
+<li><p>str: In this case the function generates points according to a rule using the user specified wmin, wmax, Naaa. Possible options for this argument are</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>linear: Use a linear set of grid points between wmin and wmax</p></li>
+<li><p>softm: Use a softmspace (interpolates between linear and logarithmic) for positive frequencies and a mirrored set of points for negative frequencies</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</p></li>
+<li><p><strong>wmin</strong> (<em>float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The minimum allowed frequency. (Default: None)</p></li>
+<li><p><strong>wmax</strong> (<em>float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The maximum allowed frequency. (Default: None)</p></li>
+<li><p><strong>Naaa</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The number of support points used by the AAA algorithm. (Default: 1000)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.expfit.ESPRITDecomposition">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.oqs.bath_fitting.expfit.</span></span><span class="sig-name descname"><span class="pre">ESPRITDecomposition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">K</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/expfit.html#ESPRITDecomposition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.expfit.ESPRITDecomposition" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyttn.oqs.bath_fitting.expfit.ExpFitDecomposition" title="pyttn.oqs.bath_fitting.expfit.ExpFitDecomposition"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExpFitDecomposition</span></code></a></p>
+<p>A class providing an easy to use interface for applying the ESPRIT decomposition to
+construct a sum-of-exponential approximation for a bath correlation function</p>
+<p>Constructor arguments:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>K</strong> (<em>int</em>) – The number of terms in the sum-of-exponential decomposition</p></li>
+<li><p><strong>t</strong> (<em>str</em><em> or </em><em>np.ndarray</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – Either the support points orr a key word used to generate the support points.  For details see the ESPRIT_support_points function.  (Default: “linear”)</p></li>
+<li><p><strong>**kwargs</strong> – Keyword arguments to pass to ESPRIT_support_points</p></li>
+</ul>
+</dd>
+</dl>
+<p>Callable arguments:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Ct</strong> (<em>callable</em>) – The non-interacting bath correlation function to be decomposed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>dk (np.ndarray) - The coefficients in the sum-of-exponential decomposition of the bath correlation function</p></li>
+<li><p>zk (np.ndarray) - The exponents in the sum-of-exponential decomposition of the bath correlation function</p></li>
+<li><p>Ctres (callable) - The ESPRIT fit of the bath correlation function</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.expfit.ESPRITDecomposition.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ct</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/expfit.html#ESPRITDecomposition.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.expfit.ESPRITDecomposition.__call__" title="Link to this definition"></a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.expfit.ESPRIT_support_points">
+<span class="sig-prename descclassname"><span class="pre">pyttn.oqs.bath_fitting.expfit.</span></span><span class="sig-name descname"><span class="pre">ESPRIT_support_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Nt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/expfit.html#ESPRIT_support_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.expfit.ESPRIT_support_points" title="Link to this definition"></a></dt>
+<dd><p>A function for automatically generating support points to be used within the ESPRIT algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>t</strong> (<em>str</em><em> or </em><em>np.ndarray</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – <p>Either the support points or a key word used to generate the support points. (Default: “linear”) This parameter can be either a</p>
+<ul>
+<li><p>list/np.ndarray: In this case the function simply returns these points as the support points ignoring all other inputs</p></li>
+<li><p>str: In this case the function generates points according to a rule using the user specified tmax, and Nt. Possible options for this argument are</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>linear: Use a linear set of grid points between wmin and wmax</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</p></li>
+<li><p><strong>tmax</strong> (<em>float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The maximum allowed time. (Default: None)</p></li>
+<li><p><strong>Nt</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – The number of time points to use with the ESPRIT algorithm. (Default: 1000)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.oqs.bath_fitting.expfit.ExpFitDecomposition">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.oqs.bath_fitting.expfit.</span></span><span class="sig-name descname"><span class="pre">ExpFitDecomposition</span></span><a class="reference internal" href="../_modules/pyttn/oqs/bath_fitting/expfit.html#ExpFitDecomposition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.oqs.bath_fitting.expfit.ExpFitDecomposition" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for exponential fit decompositions</p>
+</dd></dl>
+
+</section>
+<section id="module-pyttn.oqs.bath_fitting">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyttn.oqs.bath_fitting" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyttn.oqs.html" class="btn btn-neutral float-left" title="pyttn.oqs package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyttn.oqs.heom.html" class="btn btn-neutral float-right" title="pyttn.oqs.heom package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -40,12 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Introduction/index.html">Introduction</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">pyTTN Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -81,7 +94,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">system_modes</span><span class="p">,</span> <span class="n">boson_mode</span><span class="p">,</span> <span class="n">fermion_mode</span>
 
 <div class="viewcode-block" id="ExpFitOQSBath">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitOQSBath">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitOQSBath">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExpFitOQSBath</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The base class for handling a bath representing an exponential fit to a bath correlation function</span>
 <span class="sd">    of the form</span>
@@ -147,7 +160,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="ExpFitOQSBath.is_fermionic">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitOQSBath.is_fermionic">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitOQSBath.is_fermionic">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_fermionic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether or not the bath is fermionic</span>
 <span class="sd">        :rtype: bool </span>
@@ -172,7 +185,7 @@
 
 
 <div class="viewcode-block" id="ExpFitBosonicBath">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExpFitBosonicBath</span><span class="p">(</span><span class="n">ExpFitOQSBath</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for handling a bosonic bath representing an exponential fit to a bath correlation function</span>
 <span class="sd">    of the form</span>
@@ -194,20 +207,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">truncate_modes</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ExpFitBosonicBath.truncate_modes">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.truncate_modes">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.truncate_modes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">truncate_modes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">truncation</span> <span class="o">=</span> <span class="n">DepthTruncation</span><span class="p">(</span><span class="mi">8</span><span class="p">)):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes</span>
 <span class="sd">        using the truncation rule defined in the truncation object.</span>
 
-<span class="sd">        :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent </span>
-<span class="sd">        local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(8))</span>
+<span class="sd">        :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(8))</span>
 <span class="sd">        :type truncation: TruncationBase, optional</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span> <span class="o">=</span> <span class="n">truncation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zk</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ExpFitBosonicBath.Ct">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.Ct">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.Ct">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Ct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of the non-interacting bath correlation function evaluated at the time points t, </span>
 <span class="sd">        defined by:</span>
@@ -227,14 +240,14 @@
 
 
 <div class="viewcode-block" id="ExpFitBosonicBath.system_information">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.system_information">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.system_information">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">system_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.</span>
 
 <span class="sd">        :return: Bath system information</span>
 <span class="sd">        :rtype: system_modes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zk</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zk</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to compute system information object.  The bath object has not not been truncated.&quot;</span><span class="p">);</span>
 
 
@@ -244,8 +257,11 @@
         <span class="k">return</span> <span class="n">ret</span></div>
 
 
+<div class="viewcode-block" id="ExpFitBosonicBath.__str__">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.__str__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s1">&#39;bosonic bath: </span><span class="se">\n</span><span class="s1"> &#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> </span><span class="se">\\</span><span class="s1">alpha &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ck</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> </span><span class="se">\\</span><span class="s1">nu &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wk</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> modes &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> composite &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="p">)</span></div>
+</div>
 
 
 
@@ -259,7 +275,7 @@
 
 <span class="c1">#This is currently completely incorrect.  We need to set this up to split this into filled and unfilled baths</span>
 <div class="viewcode-block" id="ExpFitFermionicBath">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExpFitFermionicBath</span><span class="p">(</span><span class="n">ExpFitOQSBath</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for handling a fermionic bath representing an exponential fit to a bath correlation function</span>
 <span class="sd">    of the form</span>
@@ -275,13 +291,14 @@
 <span class="sd">    :type combine_real: bool, optional</span>
 <span class="sd">    :param tol: The tolerance used to determine if a mode is a real frequency mode (default 1e-12)</span>
 <span class="sd">    :type tol: float, optional</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">combine_real</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">):</span>
         <span class="n">ExpFitOQSBath</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">fermionic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">combine_real</span><span class="o">=</span><span class="n">combine_real</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">truncate_modes</span><span class="p">()</span>
 
 <div class="viewcode-block" id="ExpFitFermionicBath.Ct">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath.Ct">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath.Ct">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Ct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of the non-interacting bath correlation function evaluated at the time points t, </span>
 <span class="sd">        defined by:</span>
@@ -293,6 +310,7 @@
 <span class="sd">        :type t: np.ndarray</span>
 <span class="sd">        :return: The bath correlation function</span>
 <span class="sd">        :rtype: np.ndarray</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ck</span><span class="p">)):</span>
@@ -301,28 +319,32 @@
 
 
 <div class="viewcode-block" id="ExpFitFermionicBath.truncate_modes">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath.truncate_modes">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath.truncate_modes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">truncate_modes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">truncation</span> <span class="o">=</span> <span class="n">DepthTruncation</span><span class="p">(</span><span class="mi">2</span><span class="p">)):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes</span>
 <span class="sd">        using the truncation rule defined in the truncation object.</span>
 
-<span class="sd">        :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent </span>
-<span class="sd">        local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(2))</span>
+<span class="sd">        :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(2))</span>
 <span class="sd">        :type truncation: TruncationBase, optional</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span> <span class="o">=</span> <span class="n">truncation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zk</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="ExpFitFermionicBath.__str__">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath.__str__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;fermionic bath: &#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> </span><span class="se">\\</span><span class="s1">alpha &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ck</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> </span><span class="se">\\</span><span class="s1">nu &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wk</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> modes &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> composite &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;fermionic bath: &#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> </span><span class="se">\\</span><span class="s1">alpha &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ck</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> </span><span class="se">\\</span><span class="s1">nu &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wk</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> modes &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> composite &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="ExpFitFermionicBath.system_information">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath.system_information">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath.system_information">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">system_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.</span>
 
 <span class="sd">        :return: Bath system information</span>
 <span class="sd">        :rtype: system_modes</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">cmode</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="p">):</span>

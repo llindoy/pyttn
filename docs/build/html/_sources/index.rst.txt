@@ -3,35 +3,46 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-pyTTN documentation
-===================
+pyTTN: An Open Source Toolbox for Quantum Dynamics Simulations Using Tree Tensor Networks
+=========================================================================================
 
-An Open Source Toolbox for Quantum Dynamics Simulations Using Tree Tensor Networks.
+
 Add your content using ``reStructuredText`` syntax. See the
 `reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
 documentation for details.
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Introduction:
+
+   Introduction </Introduction/index>
+
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Tutorials:
 
-   pyttn
+   Tutorials </Tutorials/index>
 
 
-Tutorials
-=========
 .. toctree::
    :maxdepth: 2
+   :caption: Examples:
 
-   tutorials
+   Examples </Examples/index>
 
-Examples
-=========
+
 .. toctree::
    :maxdepth: 2
+   :caption: pyTTN API:
 
-   examples
+   pyttn </pyttn/index>
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Python Bindings Reference:
+
+   ttnpp </ttnpp/ttnpp>
 
 
 Indices and Tables

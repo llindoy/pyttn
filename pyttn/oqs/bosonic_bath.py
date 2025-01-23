@@ -75,6 +75,14 @@ class BosonicBath:
         
         :param t: time
         :type t: np.ndarray
+        :param epsabs: absolute error tolerance.  (Default: 1.49e-12)
+        :type epsabs: float or int, optional
+        :param epsrel: relative error tolerance.  (Default: 1.49e-12)
+        :type epsrel: float or int, optional
+        :param limit: Upper bound on the number of subintervals used in the integration scheme used to evaluate the correlation function.  (Default: 2000)
+        :type limit: float or int, optional
+        :param epsomega: A bound used to split the integral to avoid singularities at zero that may occur due to the bose function.  (Default: 1e-6)
+        :type epsomega: float or int, optional
         :return: The bath correlation function
         :rtype: np.ndarray
         """
@@ -191,10 +199,9 @@ class BosonicBath:
     def expfit(self, fitting_engine):        
         """Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
 
-
         :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition
         :type fitting_engine: np.ndarray
-        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`
+        :return: Discrete system bath coupling constants :math:`g_k` and bath frequencies :math:`\omega_k`
         :rtype: np.ndarray, np.ndarray
         """
 

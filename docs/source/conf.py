@@ -20,15 +20,22 @@ release = '0.1'
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'nbsphinx',
-    'nbsphinx_link'
+    'nbsphinx_link', 
+    'sphinx_toolbox.more_autodoc.overloads'
     ]
+
+autosummary_generate=True
+autoclass_content='both'
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints']
+
+python_apigen_modules = {"pyttn.ttnpp": "api"}
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

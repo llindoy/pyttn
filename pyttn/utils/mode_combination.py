@@ -3,20 +3,29 @@ import numpy as np
 
 from pyttn import system_modes
 
-
 class ModeCombination:    
     """A class for automatically combining modes of a system_modes object together to form a new system_modes 
     object consisting of composite modes.  The approach implemented within this class involves sweeping from left
     to right and we attempt to combine the next mode into the current mode provided we have not already combined nbmax
     modes together in this mode and the local hilbert space dimension of the composite mode is less than nbmax.   
 
+    Constructor arguments
+
     :param nhilb: The maximum local Hilbert space dimension to allow during the mode combination process (default:1)
     :type nhilb: int, optional
     :param nbmax: The maximum  number of modes to combine(default:1)
     :type nbmax: int, optional
-    :param blocksize: An optional blocksize argument.  For a blocksize of X, the current mode will contain a multiple of X modes and the 
-    new mode to add will contain X modes provided we have not reached the end of the chain(default:1)
+    :param blocksize: An optional blocksize argument.  For a blocksize of X, the current mode will contain a multiple of X modes and the new mode to add will contain X modes provided we have not reached the end of the chain(default:1)
     :type blocksize: int, optional
+
+
+    Callable arguments
+    :param system: the system_modes object defining all mode data
+    :type mode_dims: system_modes
+    :param blocksize: An optional blocksize argument, used to ignore the globally set blocksize (default is None)
+    :type blocksize: int or None, optional
+    :returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode
+    :rtype: list of list
     """
     def __init__(self, nhilb = 1, nbmax = 1, blocksize=1):
         self.nbmax = nbmax

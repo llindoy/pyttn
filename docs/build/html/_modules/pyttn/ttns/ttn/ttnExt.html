@@ -40,9 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -73,12 +89,30 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <div class="viewcode-block" id="ttn">
-<a class="viewcode-back" href="../../../../pyttn.ttns.ttn.html#pyttn.ttns.ttn.ttnExt.ttn">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">ttn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_complex</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for constructing a tree tensor network state operator</span>
+
+<span class="sd">    :param \*args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
+
+<span class="sd">        - Default construct TTN object</span>
+<span class="sd">        - ttn (ttn_dtype) - Copy construct TTN object</span>
+<span class="sd">        - slice (ms_ttn_slice_dtype) - Construct TTN object from slice of multiset ttn</span>
+<span class="sd">        - tree (ntree) - Construct TTN from an Ntree object</span>
+<span class="sd">        - string (str) - Construct TTN from an string defining an Ntree object </span>
+
+<span class="sd">    :param dtype: The dtype to use for the site operator.  (Default: np.complex128) </span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+<span class="sd">    :param \*\*kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
+
+<span class="sd">    :returns: The Tree Tensor Network State object</span>
+<span class="sd">    :rtype: ttn_real or ttn_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_complex</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_real</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_real</span>
         <span class="k">if</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ttn_complex</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">ttn_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -119,12 +153,29 @@
 
 
 <div class="viewcode-block" id="multiset_ttn">
-<a class="viewcode-back" href="../../../../pyttn.ttns.ttn.html#pyttn.ttns.ttn.ttnExt.multiset_ttn">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.multiset_ttn">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">multiset_ttn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">ms_ttn_complex</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for constructing a multiset tree tensor network state operator</span>
+
+<span class="sd">    :param \*args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
+
+<span class="sd">        - Default construct a multiset TTN object</span>
+<span class="sd">        - msttn (ms_ttn_dtype) - Copy construct a multiset TTN object</span>
+<span class="sd">        - tree (ntree), nset (int) - Construct a multiset TTN from an Ntree object and the number of set variables</span>
+<span class="sd">        - string (str), nset (int) - Construct multiset TTN from an string defining an Ntree object and the number of set variables</span>
+
+<span class="sd">    :param dtype: The dtype to use for the site operator.  (Default: np.complex128) </span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+<span class="sd">    :param \*\*kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
+
+<span class="sd">    :returns: The Multiset Tree Tensor Network State object</span>
+<span class="sd">    :rtype: ms_ttn_real or ms_ttn_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">ms_ttn_complex</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">ms_ttn_real</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">ms_ttn_real</span>
         <span class="k">if</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ms_ttn_complex</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">ms_ttn_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -165,8 +216,25 @@
 
 
 <div class="viewcode-block" id="ms_ttn">
-<a class="viewcode-back" href="../../../../pyttn.ttns.ttn.html#pyttn.ttns.ttn.ttnExt.ms_ttn">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ms_ttn">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">ms_ttn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for constructing a multiset tree tensor network state operator</span>
+
+<span class="sd">    :param \*args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
+
+<span class="sd">        - Default construct a multiset TTN object</span>
+<span class="sd">        - msttn (ms_ttn_dtype) - Copy construct a multiset TTN object</span>
+<span class="sd">        - tree (ntree), nset (int) - Construct a multiset TTN from an Ntree object and the number of set variables</span>
+<span class="sd">        - string (str), nset (int) - Construct multiset TTN from an string defining an Ntree object and the number of set variables</span>
+
+<span class="sd">    :param dtype: The dtype to use for the site operator.  (Default: np.complex128) </span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+<span class="sd">    :param \*\*kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
+
+<span class="sd">    :returns: The Multiset Tree Tensor Network State object</span>
+<span class="sd">    :rtype: ms_ttn_real or ms_ttn_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">return</span> <span class="n">multiset_ttn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 </pre></div>

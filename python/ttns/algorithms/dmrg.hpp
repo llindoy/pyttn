@@ -33,53 +33,102 @@ void init_dmrg_core(py::module& m, const std::string& label)
     py::class_<dmrg>(m, label.c_str())
         .def(py::init<>())
         .def(py::init<const _ttn&, const _sop&, size_type, size_type>(),
-                  py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("num_threads")=1)
-        .def("assign", [](dmrg& self, const dmrg& o){self=o;}, R"mydelimiter(
+                  py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("num_threads")=1, R"mydelim(
+            Construct a new one-site DMRG object initialising all buffers needed to perform DMRG on a Tree Tensor Netwok A, with Hamiltonian H.
+
+            :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            :type krylov_dim: int, optional
+            :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+            :type numthreads: int, optional
+          )mydelim")
+        .def("assign", [](dmrg& self, const dmrg& o){self=o;}, R"mydelim(
             Assign the DMRG object from another DMRG object
-          )mydelimiter")
+          )mydelim")
         .def("__copy__",[](const dmrg& o){return dmrg(o);})
         .def("__deepcopy__", [](const dmrg& o, py::dict){return dmrg(o);}, py::arg("memo"))
-        .def("initialise", &dmrg::initialise, py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("num_threads")=1)
-        .def("E", &dmrg::E)
+        .def("initialise", &dmrg::initialise, py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("num_threads")=1, R"mydelim(
+            Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Netwok A, with Hamiltonian H.
+
+            :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            :type krylov_dim: int, optional
+            :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+            :type numthreads: int, optional
+          )mydelim")
+        .def("E", &dmrg::E, "Returns the current energy computed through the last DMRG sweep.")
         .def_property
             (
                 "restarts", 
                 static_cast<const size_type& (dmrg::*)() const>(&dmrg::restarts),
-                [](dmrg& o, const size_type& i){o.restarts() = i;}
+                [](dmrg& o, const size_type& i){o.restarts() = i;},
+                "The number of restarts to use in the krylov subspace eigensolver."
             )
         .def_property
             (
                 "eigensolver_tol", 
                 static_cast<const real_type& (dmrg::*)() const>(&dmrg::eigensolver_tol),
-                [](dmrg& o, const real_type& i){o.eigensolver_tol() = i;}
+                [](dmrg& o, const real_type& i){o.eigensolver_tol() = i;},
+                "The absolute tolerance of the krylov subspace eigensolver"
             )
         .def_property
             (
                 "eigensolver_reltol", 
                 static_cast<const real_type& (dmrg::*)() const>(&dmrg::eigensolver_reltol),
-                [](dmrg& o, const real_type& i){o.eigensolver_reltol() = i;}
+                [](dmrg& o, const real_type& i){o.eigensolver_reltol() = i;},
+                "The relative tolerance of the krylov subspace eigensolver"
             )
-        .def("clear", &dmrg::clear)
-        .def("step", &dmrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false, R"mydelimiter(
+        .def("clear", &dmrg::clear, "Clear all internal buffers of the DMRG object.")
+        .def("step", &dmrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false, R"mydelim(
             Performs a single step of the single site DMRG algorithm
-            :param Psi: The input tree tensor network state.  This object is modified inplace by the DMRG algorithm
-            :param SOP: The sum of product operator representation of the Hamiltonian 
-            :param update_env: Whether or not to force an update of the environment object.
-          )mydelimiter")
-        .def("__call__", &dmrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false, R"mydelimiter(
-            Performs a single step of the single site DMRG algorithm
-            :param Psi: The input tree tensor network state.  This object is modified inplace by the DMRG algorithm
-            :param SOP: The sum of product operator representation of the Hamiltonian 
-            :param update_env: Whether or not to force an update of the environment object.
-          )mydelimiter")
-        .def("prepare_environment", &dmrg::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false)
-        .doc() = R"mydelimiter(
-                  A class implementing the single site DMRG algorithm on trees.
-                  :param Psi: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
-                  :param SOP: The sum of product operator representation of the Hamiltonian
-                  :param krylov_dim: The krylov subspace dimension used for the internal optimisation step
-                  :param num_threads: The number of threads used for updating schemes.
-                 )mydelimiter";
+
+            :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+            :type update_env: bool, optional
+          )mydelim")
+        .def("__call__", &dmrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
+        .def("prepare_environment", &dmrg::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false, R"mydelim(
+            Update all Single Particle Function environment tensors to prepare the system for performing a DMRG sweep. 
+
+            :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+            :type update_env: bool, optional
+          )mydelim")
+        .doc() = R"mydelim(
+            A class implementing the one site DMRG algorithm on trees.
+
+            Construct arguments
+
+            :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            :type krylov_dim: int, optional
+            :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+            :type numthreads: int, optional
+
+            Callable arguments
+
+            :param A: Tree Tensor Network that the DMRG algorithm will act on
+            :type A: ttn_complex
+            :param h: The Hamiltonian sop operator object
+            :type h: sop_operator_complex
+            :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+            :type update_env: bool, optional
+          )mydelim";
     //utils::eigenvalue_target& mode(){return m_eigensolver.mode();}
     //const utils::eigenvalue_target& mode() const{return m_eigensolver.mode();}
 }
@@ -99,94 +148,185 @@ void init_dmrg_adaptive(py::module& m, const std::string& label)
 
     //wrapper for the sPOP type 
     py::class_<admrg>(m, label.c_str())
-        .def(py::init<>())
+        .def(py::init<>(), R"mydelim(
+            Default construct for adaptive one-site dmrg object.
+            )mydelim")
         .def(py::init<const _ttn&, const _sop&, size_type, size_type, size_type, size_type>(),
-                  py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("subspace_krylov_dim")=4, py::arg("subspace_neigs")=2, py::arg("num_threads")=1)
+                  py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("subspace_krylov_dim")=6, py::arg("subspace_neigs")=2, py::arg("num_threads")=1,  R"mydelim(
+            Construct a new adaptive one-site DMRG object initialising all buffers needed to perform DMRG on a Tree Tensor Netwok A, with Hamiltonian H.
+
+            :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            :type krylov_dim: int, optional
+            :param subspace_krylov_dim: The subspace expansion based krylov subspace dimension. This is only used if expansion="subspace". (Default: 6)
+            :type subspace_krylov_dim: int, optional
+            :param subspace_neigs: The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
+            :type subspace_neigs: int, optional
+            :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+            :type numthreads: int, optional
+            )mydelim")
         .def("assign", [](admrg& self, const admrg& o){self=o;})
         .def("__copy__",[](const admrg& o){return admrg(o);})
         .def("__deepcopy__", [](const admrg& o, py::dict){return admrg(o);}, py::arg("memo"))
-        .def("initialise", &admrg::initialise, py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("subspace_krylov_dim")=4, py::arg("subspace_neigs")=2, py::arg("num_threads")=1)
-        .def("E", &admrg::E)
+        .def("initialise", &admrg::initialise, py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("subspace_krylov_dim")=4, py::arg("subspace_neigs")=2, py::arg("num_threads")=1, R"mydelim(
+            Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Netwok A, with Hamiltonian H.
+
+            :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            :type krylov_dim: int, optional
+            :param subspace_krylov_dim: The subspace expansion based krylov subspace dimension. This is only used if expansion="subspace". (Default: 6)
+            :type subspace_krylov_dim: int, optional
+            :param subspace_neigs: The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
+            :type subspace_neigs: int, optional
+            :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+            :type numthreads: int, optional
+            )mydelim")
+        .def("E", &admrg::E, "Returns the current energy computed through the last DMRG sweep.")
         .def_property
             (
                 "restarts", 
                 static_cast<const size_type& (admrg::*)() const>(&admrg::restarts),
-                [](admrg& o, const size_type& i){o.restarts() = i;}
+                [](admrg& o, const size_type& i){o.restarts() = i;},
+                "The number of restarts to use in the krylov subspace eigensolver."
             )
         .def_property
             (
                 "eigensolver_tol", 
                 static_cast<const real_type& (admrg::*)() const>(&admrg::eigensolver_tol),
-                [](admrg& o, const real_type& i){o.eigensolver_tol() = i;}
+                [](admrg& o, const real_type& i){o.eigensolver_tol() = i;},
+                "The absolute tolerance of the krylov subspace eigensolver"
             )
         .def_property
             (
                 "eigensolver_reltol", 
                 static_cast<const real_type& (admrg::*)() const>(&admrg::eigensolver_reltol),
-                [](admrg& o, const real_type& i){o.eigensolver_reltol() = i;}
+                [](admrg& o, const real_type& i){o.eigensolver_reltol() = i;},
+                "The relative tolerance of the krylov subspace eigensolver"
             )
         .def_property
             (
                 "subspace_eigensolver_tol", 
                 static_cast<const real_type& (admrg::*)() const>(&admrg::subspace_eigensolver_tol),
-                [](admrg& o, const real_type& i){o.subspace_eigensolver_tol() = i;}
+                [](admrg& o, const real_type& i){o.subspace_eigensolver_tol() = i;},
+                "The absolute tolerance of the krylov subspace eigensolver used for subspace expansion"
             )
         .def_property
             (
                 "subspace_eigensolver_reltol", 
                 static_cast<const real_type& (admrg::*)() const>(&admrg::subspace_eigensolver_reltol),
-                [](admrg& o, const real_type& i){o.subspace_eigensolver_reltol() = i;}
+                [](admrg& o, const real_type& i){o.subspace_eigensolver_reltol() = i;},
+                "The relative tolerance of the krylov subspace eigensolver used for subspace expansion"
             )
         .def_property
             (
                 "spawning_threshold", 
                 static_cast<const real_type& (admrg::*)() const>(&admrg::spawning_threshold),
-                [](admrg& o, const real_type& i){o.spawning_threshold() = i;}
+                [](admrg& o, const real_type& i){o.spawning_threshold() = i;},
+                "The singular value threshold variable used to determine whether or not to spawn a new basis vector"
             )
         .def_property
             (
                 "unoccupied_threshold", 
                 static_cast<const real_type& (admrg::*)() const>(&admrg::unoccupied_threshold),
-                [](admrg& o, const real_type& i){o.unoccupied_threshold() = i;}
+                [](admrg& o, const real_type& i){o.unoccupied_threshold() = i;},
+                "The variable used to determine whether or not to spawn a new basis vector based on the variables being occupied"
             )
         .def_property
             (
                 "subspace_weighting_factor", 
                 static_cast<const real_type& (admrg::*)() const>(&admrg::subspace_weighting_factor),
-                [](admrg& o, const real_type& i){o.subspace_weighting_factor() = i;}
+                [](admrg& o, const real_type& i){o.subspace_weighting_factor() = i;},
+                "A coefficient used to weight the importance of the second order contributions.  Taken as 1 for the DMRG algorithm"
             )
         .def_property
             (
                 "only_apply_when_no_unoccupied", 
                 static_cast<const bool& (admrg::*)() const>(&admrg::only_apply_when_no_unoccupied),
-                [](admrg& o, bool i){o.only_apply_when_no_unoccupied() = i;}
+                [](admrg& o, bool i){o.only_apply_when_no_unoccupied() = i;},
+                "A flag to set whether or not to apply the subspace expansion scheme at all times or only when there are no unoccupied vectors"
             )
         .def_property
             (
                 "eval_but_dont_apply", 
                 static_cast<const bool& (admrg::*)() const>(&admrg::eval_but_dont_apply),
-                [](admrg& o, bool i){o.eval_but_dont_apply() = i;}
+                [](admrg& o, bool i){o.eval_but_dont_apply() = i;},
+                "A flag to set whether to evaluate the metric for subspace expansion but not to apply the results. This should only be used for timing executation of the subspace expansion scheme."
             )
         .def_property
             (
                 "minimum_unoccupied", 
                 static_cast<const size_type& (admrg::*)() const>(&admrg::minimum_unoccupied),
-                [](admrg& o, const size_type& i){o.minimum_unoccupied() = i;}
+                [](admrg& o, const size_type& i){o.minimum_unoccupied() = i;},
+                "The minimum number of unoccupied variables required at each subspace expansion step.  If fewer are detected, additional vectors will be added to reach this limit."
             )
         .def_property
             (
                 "maximum_bond_dimension", 
                 static_cast<const size_type& (admrg::*)() const>(&admrg::maximum_bond_dimension),
-                [](admrg& o, const size_type& i){o.maximum_bond_dimension() = i;}
+                [](admrg& o, const size_type& i){o.maximum_bond_dimension() = i;},
+                "The maximum bond dimension we can expand to through a subspace expansion step."
             )
+        .def("neigenvalues", &admrg::neigenvalues, "Returns the number of eigenvalues that will be evaluated through the subspace expansion step." )
 
-        .def("neigenvalues", &admrg::neigenvalues)
+        .def("clear", &admrg::clear, "Clear all internal buffers of the DMRG object.")
+        .def("step", &admrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false, R"mydelim(
+            Performs a single step of the single site DMRG algorithm
 
-        .def("clear", &admrg::clear)
-        .def("step", &admrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
+            :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+            :type update_env: bool, optional
+          )mydelim")
+
         .def("__call__", &admrg::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
-        .def("prepare_environment", &admrg::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false)
-        .doc() = "A class implementing the adaptive single site DMRG algorithm on trees.";
+        .def("prepare_environment", &admrg::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false, R"mydelim(
+            Update all Single Particle Function environment tensors to prepare the system for performing a DMRG sweep. 
+
+            :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+            :type update_env: bool, optional
+          )mydelim")
+
+        .doc() = R"mydelim(
+              A class implementing the adaptive one site DMRG algorithm on trees.
+
+              Constructor arguments
+
+              :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+              :type A: ttn_complex
+              :param H: The Hamiltonian sop operator object
+              :type H: sop_operator_complex
+              :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+              :type krylov_dim: int, optional
+              :param subspace_krylov_dim: The subspace expansion based krylov subspace dimension. This is only used if expansion="subspace". (Default: 6)
+              :type subspace_krylov_dim: int, optional
+              :param subspace_neigs: The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
+              :type subspace_neigs: int, optional
+              :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+              :type numthreads: int, optional
+
+              Callable arguments
+
+              :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+              :type A: ttn_complex
+              :param h: The Hamiltonian sop operator object
+              :type h: sop_operator_complex
+              :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+              :type update_env: bool, optional
+            )mydelim";
+
+
 
     //orthogonality::truncation_mode& truncation_mode() {return m_ss_expand.truncation_mode();}
     //const orthogonality::truncation_mode& truncation_mode() const {return m_ss_expand.truncation_mode();}

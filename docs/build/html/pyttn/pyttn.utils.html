@@ -1,0 +1,575 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyttn.utils package &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ttnpp module" href="../ttnpp/ttnpp.html" />
+    <link rel="prev" title="pyttn.oqs.unitary package" href="pyttn.oqs.unitary.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">pyttn</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pyttn.linalg.html">pyttn.linalg package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyttn.models.html">pyttn.models package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyttn.oqs.html">pyttn.oqs package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pyttn.utils package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../ttnpp/ttnpp.html">pyttn.ttnpp</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#module-pyttn">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ttnpp/ttnpp.html">ttnpp</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">pyTTN package</a></li>
+      <li class="breadcrumb-item active">pyttn.utils package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/pyttn/pyttn.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pyttn-utils-package">
+<h1>pyttn.utils package<a class="headerlink" href="#pyttn-utils-package" title="Link to this heading"></a></h1>
+<section id="module-pyttn.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyttn.utils" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.utils.DepthTruncation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">DepthTruncation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#DepthTruncation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.DepthTruncation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyttn.utils.TruncationBase" title="pyttn.utils.truncate.TruncationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TruncationBase</span></code></a></p>
+<p>A class for truncating system modes to a fixed number of levels</p>
+<p>Constructor arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Lmax</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of states to include in the local Hilbert space (default:2)</p>
+</dd>
+</dl>
+<p>Callable arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gk</strong> (<em>np.ndarray</em>) – The interaction strength</p></li>
+<li><p><strong>wk</strong> (<em>np.ndarray</em>) – The mode frequency</p></li>
+<li><p><strong>is_fermion</strong> (<em>bool</em>) – Whether or not the modes to be truncated are fermionic</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing the local Hilbert space dimension of each mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.DepthTruncation.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_fermion</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#DepthTruncation.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.DepthTruncation.__call__" title="Link to this definition"></a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.utils.EnergyTruncation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">EnergyTruncation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ecut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'abs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#EnergyTruncation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.EnergyTruncation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyttn.utils.TruncationBase" title="pyttn.utils.truncate.TruncationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TruncationBase</span></code></a></p>
+<p>A class for truncating system modes to a fixed number of levels</p>
+<p>Constructor arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ecut</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum energy to include in the problem (defaul: 0)</p></li>
+<li><p><strong>Lmax</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of states to include in the local Hilbert space (default:2)</p></li>
+<li><p><strong>Lmin</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum number of states to include in the local Hilbert space (default:1)</p></li>
+<li><p><strong>func</strong> (<em>{&quot;abs&quot;</em><em>, </em><em>&quot;real&quot;}</em><em>, </em><em>optional</em>) – Whether to use the absolute value or real part of the frequency. (default: “abs”)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Callable arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gk</strong> (<em>np.ndarray</em>) – The interaction strength</p></li>
+<li><p><strong>wk</strong> (<em>np.ndarray</em>) – The mode frequency</p></li>
+<li><p><strong>is_fermion</strong> (<em>bool</em>) – Whether or not the modes to be truncated are fermionic</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing the local Hilbert space dimension of each mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.EnergyTruncation.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_fermion</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#EnergyTruncation.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.EnergyTruncation.__call__" title="Link to this definition"></a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.EnergyTruncation.truncate_bosonic">
+<span class="sig-name descname"><span class="pre">truncate_bosonic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#EnergyTruncation.truncate_bosonic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.EnergyTruncation.truncate_bosonic" title="Link to this definition"></a></dt>
+<dd><p>Truncate a bosonic mode using coupling constants and frequencies</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gk</strong> (<em>np.ndarray</em>) – The interaction strength</p></li>
+<li><p><strong>wk</strong> (<em>np.ndarray</em>) – The mode frequency</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing the local Hilbert space dimension of each mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.utils.ModeCombination">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">ModeCombination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nhilb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/mode_combination.html#ModeCombination"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.ModeCombination" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for automatically combining modes of a system_modes object together to form a new system_modes
+object consisting of composite modes.  The approach implemented within this class involves sweeping from left
+to right and we attempt to combine the next mode into the current mode provided we have not already combined nbmax
+modes together in this mode and the local hilbert space dimension of the composite mode is less than nbmax.</p>
+<p>Constructor arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nhilb</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum local Hilbert space dimension to allow during the mode combination process (default:1)</p></li>
+<li><p><strong>nbmax</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum  number of modes to combine(default:1)</p></li>
+<li><p><strong>blocksize</strong> (<em>int</em><em>, </em><em>optional</em>) – An optional blocksize argument.  For a blocksize of X, the current mode will contain a multiple of X modes and the new mode to add will contain X modes provided we have not reached the end of the chain(default:1)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Callable arguments
+:param system: the system_modes object defining all mode data
+:type mode_dims: system_modes
+:param blocksize: An optional blocksize argument, used to ignore the globally set blocksize (default is None)
+:type blocksize: int or None, optional
+:returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode
+:rtype: list of list</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.ModeCombination.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/mode_combination.html#ModeCombination.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.ModeCombination.__call__" title="Link to this definition"></a></dt>
+<dd><p>Perform the mode combination process on a system_modes object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> – the system_modes object defining all mode data</p></li>
+<li><p><strong>blocksize</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – An optional blocksize argument, used to ignore the globally set blocksize (default is None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.ModeCombination.mode_combination_array">
+<span class="sig-name descname"><span class="pre">mode_combination_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode_inds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/mode_combination.html#ModeCombination.mode_combination_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.ModeCombination.mode_combination_array" title="Link to this definition"></a></dt>
+<dd><p>Perform the mode combination process on a array of mode dimensions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode_dims</strong> (<em>list</em><em> or </em><em>np.ndarray</em>) – the mode dimensions</p></li>
+<li><p><strong>mode_inds</strong> (<em>list</em><em> or </em><em>np.ndarray</em><em>, </em><em>optional</em>) – the index labels of each of the modes (defaults to None) in which case we assume the modes are labelled [x for x in range(len(mode_dims))]</p></li>
+<li><p><strong>blocksize</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – An optional blocksize argument, used to ignore the globally set blocksize (default is None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.ModeCombination.mode_combination_system">
+<span class="sig-name descname"><span class="pre">mode_combination_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/mode_combination.html#ModeCombination.mode_combination_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.ModeCombination.mode_combination_system" title="Link to this definition"></a></dt>
+<dd><p>Perform the mode combination process on a system_modes object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> – the system_modes object defining all mode data</p></li>
+<li><p><strong>blocksize</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – An optional blocksize argument, used to ignore the globally set blocksize (default is None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.utils.TruncationBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">TruncationBase</span></span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#TruncationBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.TruncationBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for local Hilbert space mode decomposition</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.associated_laguerre_polynomial">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">associated_laguerre_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.associated_laguerre_polynomial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.chebyshev_fourth_kind_polynomial">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">chebyshev_fourth_kind_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.chebyshev_fourth_kind_polynomial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.chebyshev_polynomial">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">chebyshev_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.chebyshev_polynomial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.chebyshev_second_kind_polynomial">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">chebyshev_second_kind_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.chebyshev_second_kind_polynomial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.chebyshev_third_kind_polynomial">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">chebyshev_third_kind_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.chebyshev_third_kind_polynomial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.gegenbauer_polynomial">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">gegenbauer_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.gegenbauer_polynomial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.hermite_polynomial">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">hermite_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.hermite_polynomial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.jacobi_polynomial">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">jacobi_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.jacobi_polynomial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.laguerre_polynomial">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">laguerre_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.laguerre_polynomial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.legendre_polynomial">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">legendre_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.legendre_polynomial" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.nonclassical_polynomial">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">nonclassical_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.utils.nonclassical_polynomial" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>nonclassical_polynomial(arg0: pyttn.ttnpp.utils.orthopol, arg1: pyttn.ttnpp.linalg.vector_real, scale_factor: float = 1.0) -&gt; pyttn.ttnpp.utils.orthopol</p></li>
+<li><p>nonclassical_polynomial(arg0: pyttn.ttnpp.utils.orthopol, arg1: Buffer, scale_factor: float = 1.0) -&gt; pyttn.ttnpp.utils.orthopol</p></li>
+<li><p>nonclassical_polynomial(arg0: pyttn.ttnpp.utils.orthopol, arg1: int, arg2: Callable[[float], float], rel_tol: float = 1e-12, tol: float = 1e-14, scale_factor: float = 1.0, quadrature_order: int = 100, max_order: int = 100) -&gt; pyttn.ttnpp.utils.orthopol</p></li>
+<li><p>nonclassical_polynomial(arg0: pyttn.ttnpp.utils.orthopol, arg1: float, arg2: float, arg3: int, arg4: Callable[[float], float], rel_tol: float = 1e-12, tol: float = 1e-14, scale_factor: float = 1.0, quadrature_order: int = 100, max_order: int = 100) -&gt; pyttn.ttnpp.utils.orthopol</p></li>
+<li><p>nonclassical_polynomial(arg0: list[float], arg1: list[float]) -&gt; pyttn.ttnpp.utils.orthopol</p></li>
+<li><p>nonclassical_polynomial(arg0: pyttn.ttnpp.linalg.vector_real, arg1: pyttn.ttnpp.linalg.vector_real) -&gt; pyttn.ttnpp.utils.orthopol</p></li>
+<li><p>nonclassical_polynomial(arg0: Buffer, arg1: Buffer) -&gt; pyttn.ttnpp.utils.orthopol</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">orthopol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.utils.orthopol" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>__init__(self: pyttn.ttnpp.utils.orthopol) -&gt; None</p></li>
+<li><p>__init__(self: pyttn.ttnpp.utils.orthopol, arg0: int, arg1: float, arg2: float) -&gt; None</p></li>
+<li><p>__init__(self: pyttn.ttnpp.utils.orthopol, arg0: int, arg1: float, arg2: float, arg3: float) -&gt; None</p></li>
+<li><p>__init__(self: pyttn.ttnpp.utils.orthopol, arg0: pyttn.ttnpp.utils.orthopol) -&gt; None</p></li>
+</ol>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.Nmax">
+<span class="sig-name descname"><span class="pre">Nmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.Nmax" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.__call__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.__copy__">
+<span class="sig-name descname"><span class="pre">__copy__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.orthopol.__copy__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.__deepcopy__">
+<span class="sig-name descname"><span class="pre">__deepcopy__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">memo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></span><a class="headerlink" href="#pyttn.utils.orthopol.__deepcopy__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.alpha">
+<span class="sig-name descname"><span class="pre">alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.alpha" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.assign">
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.assign" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.beta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.clear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.compute_nodes_and_weights">
+<span class="sig-name descname"><span class="pre">compute_nodes_and_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.utils.orthopol.compute_nodes_and_weights" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>compute_nodes_and_weights(self: pyttn.ttnpp.utils.orthopol, arg0: int, normalisation: float = 1.0) -&gt; None</p></li>
+<li><p>compute_nodes_and_weights(self: pyttn.ttnpp.utils.orthopol, normalisation: float = 1.0) -&gt; None</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.monic">
+<span class="sig-name descname"><span class="pre">monic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.monic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.nodes">
+<span class="sig-name descname"><span class="pre">nodes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.vector_real" title="pyttn.ttnpp.linalg.vector_real"><span class="pre">pyttn.ttnpp.linalg.vector_real</span></a></span></span><a class="headerlink" href="#pyttn.utils.orthopol.nodes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.npoints">
+<span class="sig-name descname"><span class="pre">npoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.npoints" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.pi0">
+<span class="sig-name descname"><span class="pre">pi0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.pi0" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.resize">
+<span class="sig-name descname"><span class="pre">resize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.resize" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.scale" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.set_alpha">
+<span class="sig-name descname"><span class="pre">set_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.set_alpha" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.set_beta">
+<span class="sig-name descname"><span class="pre">set_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.set_beta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.set_domain">
+<span class="sig-name descname"><span class="pre">set_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.set_domain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.set_nodes_and_weights">
+<span class="sig-name descname"><span class="pre">set_nodes_and_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.utils.orthopol.set_nodes_and_weights" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>set_nodes_and_weights(self: pyttn.ttnpp.utils.orthopol, arg0: list[float], arg1: list[float]) -&gt; None</p></li>
+<li><p>set_nodes_and_weights(self: pyttn.ttnpp.utils.orthopol, arg0: pyttn.ttnpp.linalg.vector_real, arg1: pyttn.ttnpp.linalg.vector_real) -&gt; None</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.set_recurrence_relation">
+<span class="sig-name descname"><span class="pre">set_recurrence_relation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.utils.orthopol.set_recurrence_relation" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>set_recurrence_relation(self: pyttn.ttnpp.utils.orthopol, arg0: list[float], arg1: list[float]) -&gt; None</p></li>
+<li><p>set_recurrence_relation(self: pyttn.ttnpp.utils.orthopol, arg0: pyttn.ttnpp.linalg.vector_real, arg1: pyttn.ttnpp.linalg.vector_real) -&gt; None</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.set_weight_function_integral">
+<span class="sig-name descname"><span class="pre">set_weight_function_integral</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.set_weight_function_integral" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.shift">
+<span class="sig-name descname"><span class="pre">shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.shift" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.size">
+<span class="sig-name descname"><span class="pre">size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.vector_real" title="pyttn.ttnpp.linalg.vector_real"><span class="pre">pyttn.ttnpp.linalg.vector_real</span></a></span></span><a class="headerlink" href="#pyttn.utils.orthopol.weights" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.xmax">
+<span class="sig-name descname"><span class="pre">xmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.xmax" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.orthopol.xmin">
+<span class="sig-name descname"><span class="pre">xmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.xmin" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.visualise_tree">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">visualise_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linewidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/visualise_tree.html#visualise_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.visualise_tree" title="Link to this definition"></a></dt>
+<dd><p>A function for plotting an ntree object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> (<a class="reference internal" href="index.html#pyttn.ntree" title="pyttn.ntree"><em>ntree</em></a>) – The tree to be visualised</p></li>
+<li><p><strong>prog</strong> (<em>Matplotlib Axes object</em><em>, </em><em>optional</em>) – The visualisation function used with graphviz_layout (default: “dot”)</p></li>
+<li><p><strong>ax</strong> – Draw the tree in specified Matplotlib axes</p></li>
+<li><p><strong>node_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The node size used for visualisation (default: 500)</p></li>
+<li><p><strong>linewidth</strong> (<em>int</em><em>, </em><em>optional</em>) – The width of edges connecting nodes (default: 3)</p></li>
+<li><p><strong>add_labels</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to include the node labels (default: True)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyttn.oqs.unitary.html" class="btn btn-neutral float-left" title="pyttn.oqs.unitary package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../ttnpp/ttnpp.html" class="btn btn-neutral float-right" title="ttnpp module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

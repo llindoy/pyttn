@@ -40,12 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Introduction/index.html">Introduction</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">pyTTN Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -77,28 +90,80 @@
 
 
 <div class="viewcode-block" id="TruncationBase">
-<a class="viewcode-back" href="../../../pyttn.utils.html#pyttn.utils.truncate.TruncationBase">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.TruncationBase">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TruncationBase</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for local Hilbert space mode decomposition</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> </div>
 
 
 <div class="viewcode-block" id="DepthTruncation">
-<a class="viewcode-back" href="../../../pyttn.utils.html#pyttn.utils.truncate.DepthTruncation">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DepthTruncation</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.DepthTruncation">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DepthTruncation</span><span class="p">(</span><span class="n">TruncationBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for truncating system modes to a fixed number of levels   </span>
+
+<span class="sd">    Constructor arguments</span>
+
+<span class="sd">    :param Lmax: The number of states to include in the local Hilbert space (default:2)</span>
+<span class="sd">    :type Lmax: int, optional</span>
+
+
+<span class="sd">    Callable arguments</span>
+
+<span class="sd">    :param gk: The interaction strength</span>
+<span class="sd">    :type gk: np.ndarray</span>
+<span class="sd">    :param wk: The mode frequency</span>
+<span class="sd">    :type wk: np.ndarray</span>
+<span class="sd">    :param is_fermion: Whether or not the modes to be truncated are fermionic</span>
+<span class="sd">    :type is_fermion: bool</span>
+
+<span class="sd">    :returns: A list containing the local Hilbert space dimension of each mode</span>
+<span class="sd">    :rtype: list </span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Lmax</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lmax</span> <span class="o">=</span> <span class="n">Lmax</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ck</span><span class="p">,</span> <span class="n">wk</span><span class="p">,</span> <span class="n">is_fermion</span><span class="p">):</span>
+<div class="viewcode-block" id="DepthTruncation.__call__">
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.DepthTruncation.__call__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gk</span><span class="p">,</span> <span class="n">wk</span><span class="p">,</span> <span class="n">is_fermion</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">is_fermion</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wk</span><span class="p">))]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Lmax</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wk</span><span class="p">))]</span></div>
+</div>
 
 
 <div class="viewcode-block" id="EnergyTruncation">
-<a class="viewcode-back" href="../../../pyttn.utils.html#pyttn.utils.truncate.EnergyTruncation">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EnergyTruncation</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.EnergyTruncation">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnergyTruncation</span><span class="p">(</span><span class="n">TruncationBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for truncating system modes to a fixed number of levels   </span>
+
+<span class="sd">    Constructor arguments</span>
+
+<span class="sd">    :param ecut: The maximum energy to include in the problem (defaul: 0)</span>
+<span class="sd">    :type ecut: float, optional</span>
+<span class="sd">    :param Lmax: The maximum number of states to include in the local Hilbert space (default:2)</span>
+<span class="sd">    :type Lmax: int, optional</span>
+<span class="sd">    :param Lmin: The minimum number of states to include in the local Hilbert space (default:1)</span>
+<span class="sd">    :type Lmin: int, optional</span>
+<span class="sd">    :param func: Whether to use the absolute value or real part of the frequency. (default: &quot;abs&quot;)</span>
+<span class="sd">    :type func: {&quot;abs&quot;, &quot;real&quot;}, optional</span>
+
+
+<span class="sd">    Callable arguments</span>
+
+<span class="sd">    :param gk: The interaction strength</span>
+<span class="sd">    :type gk: np.ndarray</span>
+<span class="sd">    :param wk: The mode frequency</span>
+<span class="sd">    :type wk: np.ndarray</span>
+<span class="sd">    :param is_fermion: Whether or not the modes to be truncated are fermionic</span>
+<span class="sd">    :type is_fermion: bool</span>
+
+<span class="sd">    :returns: A list containing the local Hilbert space dimension of each mode</span>
+<span class="sd">    :rtype: list </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ecut</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Lmax</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Lmin</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="s1">&#39;abs&#39;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ecut</span> <span class="o">=</span> <span class="n">ecut</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lmax</span> <span class="o">=</span> <span class="n">Lmax</span>
@@ -106,8 +171,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
 
 <div class="viewcode-block" id="EnergyTruncation.truncate_bosonic">
-<a class="viewcode-back" href="../../../pyttn.utils.html#pyttn.utils.truncate.EnergyTruncation.truncate_bosonic">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_bosonic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ck</span><span class="p">,</span> <span class="n">wk</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.EnergyTruncation.truncate_bosonic">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_bosonic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gk</span><span class="p">,</span> <span class="n">wk</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Truncate a bosonic mode using coupling constants and frequencies   </span>
+
+<span class="sd">        :param gk: The interaction strength</span>
+<span class="sd">        :type gk: np.ndarray</span>
+<span class="sd">        :param wk: The mode frequency</span>
+<span class="sd">        :type wk: np.ndarray</span>
+
+<span class="sd">        :returns: A list containing the local Hilbert space dimension of each mode</span>
+<span class="sd">        :rtype: list </span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_wk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">wk</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">==</span> <span class="s1">&#39;abs&#39;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wk</span><span class="p">)):</span>
@@ -130,11 +205,14 @@
         <span class="k">return</span> <span class="n">Nb</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ck</span><span class="p">,</span> <span class="n">wk</span><span class="p">,</span> <span class="n">is_fermion</span><span class="p">):</span>
+<div class="viewcode-block" id="EnergyTruncation.__call__">
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.EnergyTruncation.__call__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gk</span><span class="p">,</span> <span class="n">wk</span><span class="p">,</span> <span class="n">is_fermion</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">is_fermion</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wk</span><span class="p">))]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">truncate_bosonic</span><span class="p">(</span><span class="n">ck</span><span class="p">,</span> <span class="n">wk</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">truncate_bosonic</span><span class="p">(</span><span class="n">gk</span><span class="p">,</span> <span class="n">wk</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 

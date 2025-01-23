@@ -40,12 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Introduction/index.html">Introduction</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">pyTTN Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -78,22 +91,31 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">system_modes</span>
 
-
 <div class="viewcode-block" id="ModeCombination">
-<a class="viewcode-back" href="../../../pyttn.utils.html#pyttn.utils.mode_combination.ModeCombination">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.ModeCombination">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ModeCombination</span><span class="p">:</span>    
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for automatically combining modes of a system_modes object together to form a new system_modes </span>
 <span class="sd">    object consisting of composite modes.  The approach implemented within this class involves sweeping from left</span>
 <span class="sd">    to right and we attempt to combine the next mode into the current mode provided we have not already combined nbmax</span>
 <span class="sd">    modes together in this mode and the local hilbert space dimension of the composite mode is less than nbmax.   </span>
 
+<span class="sd">    Constructor arguments</span>
+
 <span class="sd">    :param nhilb: The maximum local Hilbert space dimension to allow during the mode combination process (default:1)</span>
 <span class="sd">    :type nhilb: int, optional</span>
 <span class="sd">    :param nbmax: The maximum  number of modes to combine(default:1)</span>
 <span class="sd">    :type nbmax: int, optional</span>
-<span class="sd">    :param blocksize: An optional blocksize argument.  For a blocksize of X, the current mode will contain a multiple of X modes and the </span>
-<span class="sd">    new mode to add will contain X modes provided we have not reached the end of the chain(default:1)</span>
+<span class="sd">    :param blocksize: An optional blocksize argument.  For a blocksize of X, the current mode will contain a multiple of X modes and the new mode to add will contain X modes provided we have not reached the end of the chain(default:1)</span>
 <span class="sd">    :type blocksize: int, optional</span>
+
+
+<span class="sd">    Callable arguments</span>
+<span class="sd">    :param system: the system_modes object defining all mode data</span>
+<span class="sd">    :type mode_dims: system_modes</span>
+<span class="sd">    :param blocksize: An optional blocksize argument, used to ignore the globally set blocksize (default is None)</span>
+<span class="sd">    :type blocksize: int or None, optional</span>
+<span class="sd">    :returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode</span>
+<span class="sd">    :rtype: list of list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nhilb</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nbmax</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">blocksize</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nbmax</span> <span class="o">=</span> <span class="n">nbmax</span>
@@ -102,7 +124,7 @@
 
 
 <div class="viewcode-block" id="ModeCombination.mode_combination_array">
-<a class="viewcode-back" href="../../../pyttn.utils.html#pyttn.utils.mode_combination.ModeCombination.mode_combination_array">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.ModeCombination.mode_combination_array">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">mode_combination_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode_dims</span><span class="p">,</span> <span class="n">mode_inds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_blocksize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>    
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform the mode combination process on a array of mode dimensions.     </span>
 
@@ -175,7 +197,7 @@
 
 
 <div class="viewcode-block" id="ModeCombination.mode_combination_system">
-<a class="viewcode-back" href="../../../pyttn.utils.html#pyttn.utils.mode_combination.ModeCombination.mode_combination_system">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.ModeCombination.mode_combination_system">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">mode_combination_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">_blocksize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform the mode combination process on a system_modes object.     </span>
 
@@ -201,6 +223,8 @@
         <span class="k">return</span> <span class="n">composite_system</span></div>
 
 
+<div class="viewcode-block" id="ModeCombination.__call__">
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.ModeCombination.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">_blocksize</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform the mode combination process on a system_modes object.     </span>
 
@@ -212,6 +236,7 @@
 <span class="sd">        :rtype: list of list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode_combination_system</span><span class="p">(</span><span class="n">system</span><span class="p">,</span> <span class="n">_blocksize</span><span class="o">=</span><span class="n">_blocksize</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 

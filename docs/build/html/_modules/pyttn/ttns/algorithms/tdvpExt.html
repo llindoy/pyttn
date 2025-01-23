@@ -40,9 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -70,30 +86,55 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyttn.ttns.algorithms.tdvpExt</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">one_site_tdvp_complex</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">,</span> <span class="n">sop_operator_complex</span><span class="p">,</span> <span class="n">adaptive_one_site_tdvp_complex</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiset_one_site_tdvp_complex</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">one_site_tdvp_complex</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">,</span> <span class="n">sop_operator_complex</span><span class="p">,</span> <span class="n">adaptive_one_site_tdvp_complex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiset_one_site_tdvp_complex</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <div class="viewcode-block" id="single_set_tdvp">
-<a class="viewcode-back" href="../../../../pyttn.ttns.algorithms.html#pyttn.ttns.algorithms.tdvpExt.single_set_tdvp">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">single_set_tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">nkrylov_step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">subspace_krylov_dim</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="n">subspace_neigs</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">numthreads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">):</span>
-    
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">sop_operator_complex</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.single_set_tdvp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">single_set_tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing single set TDVP calculations</span>
+
+<span class="sd">    :param A: Tree Tensor Network that the DMRG algorithm will act on</span>
+<span class="sd">    :type A: ttn_complex</span>
+<span class="sd">    :param H: The Hamiltonian sop operator object</span>
+<span class="sd">    :type H: sop_operator_complex</span>
+<span class="sd">    :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion (&#39;onesite&#39;) or energy variance based (&#39;subspace&#39;).  (Default: &#39;onesite&#39;)</span>
+<span class="sd">    :type expansion: {&#39;onesite&#39;, &#39;subspace&#39;}, optional</span>
+<span class="sd">    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_tdvp_complex</span>
+
+<span class="sd">    :returns: The TDVP evaluation object</span>
+<span class="sd">    :rtype: one_site_tdvp_complex or adaptive_one_site_tdvp_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">sop_operator_complex</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;onesite&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span><span class="p">,</span> <span class="n">nkrylov_step</span><span class="p">,</span> <span class="n">numthreads</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;subspace&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">adaptive_one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span><span class="p">,</span> <span class="n">nkrylov_step</span><span class="p">,</span> <span class="n">subspace_krylov_dim</span><span class="p">,</span> <span class="n">subspace_neigs</span><span class="p">,</span> <span class="n">numthreads</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">adaptive_one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid input types for single set tdvp.&quot;</span><span class="p">)</span></div>
 
         
 
 <div class="viewcode-block" id="multiset_tdvp">
-<a class="viewcode-back" href="../../../../pyttn.ttns.algorithms.html#pyttn.ttns.algorithms.tdvpExt.multiset_tdvp">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">multiset_tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">nkrylov_step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">subspace_krylov_dim</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="n">subspace_neigs</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">numthreads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.multiset_tdvp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">multiset_tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing multiset tdvp calculations</span>
+
+<span class="sd">    :param A: Tree Tensor Network that the TDVP algorithm will act on</span>
+<span class="sd">    :type A: ttn_complex</span>
+<span class="sd">    :param H: The Hamiltonian sop operator object</span>
+<span class="sd">    :type H: sop_operator_complex</span>
+<span class="sd">    :param expansion: A string determining the type of bond dimension expansion to be used.  (Default: &#39;onesite&#39;)</span>
+<span class="sd">    :type expansion: {&#39;onesite&#39;}, optional</span>
+<span class="sd">    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see multiset_one_site_dmrg_complex </span>
+
+<span class="sd">    :returns: The TDVP evaluation object</span>
+<span class="sd">    :rtype: multiset_one_site_tdvp_complex </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;onesite&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">multiset_one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span><span class="p">,</span> <span class="n">nkrylov_step</span><span class="p">,</span> <span class="n">numthreads</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">multiset_one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;subspace&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;subspace expansion algorithm has not yet been implemented for multiset TTNs.&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -101,12 +142,26 @@
 
 
 <div class="viewcode-block" id="tdvp">
-<a class="viewcode-back" href="../../../../pyttn.ttns.algorithms.html#pyttn.ttns.algorithms.tdvpExt.tdvp">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">nkrylov_step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">subspace_krylov_dim</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span> <span class="n">subspace_neigs</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">numthreads</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">):</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">sop_operator_complex</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">single_set_tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span> <span class="o">=</span> <span class="n">krylov_dim</span><span class="p">,</span> <span class="n">nkrylov_step</span> <span class="o">=</span> <span class="n">nkrylov_step</span><span class="p">,</span> <span class="n">subspace_krylov_dim</span><span class="o">=</span><span class="n">subspace_krylov_dim</span><span class="p">,</span> <span class="n">subspace_neigs</span><span class="o">=</span><span class="n">subspace_neigs</span><span class="p">,</span><span class="n">numthreads</span> <span class="o">=</span> <span class="n">numthreads</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="n">expansion</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">multiset_tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span> <span class="o">=</span> <span class="n">krylov_dim</span><span class="p">,</span> <span class="n">nkrylov_step</span> <span class="o">=</span> <span class="n">nkrylov_step</span><span class="p">,</span> <span class="n">subspace_krylov_dim</span><span class="o">=</span><span class="n">subspace_krylov_dim</span><span class="p">,</span> <span class="n">subspace_neigs</span><span class="o">=</span><span class="n">subspace_neigs</span><span class="p">,</span><span class="n">numthreads</span> <span class="o">=</span> <span class="n">numthreads</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="n">expansion</span><span class="p">)</span>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.tdvp">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing either single or multi set tdvp calculations. </span>
+<span class="sd">    Which type to construct is determined by the types of the input A and h matrices.</span>
+
+<span class="sd">    :param A: Tree Tensor Network that the DMRG algorithm will act on</span>
+<span class="sd">    :type A: ttn_complex or ms_ttn_complex</span>
+<span class="sd">    :param H: The Hamiltonian sop operator object</span>
+<span class="sd">    :type H: sop_operator_complex</span>
+<span class="sd">    :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion (&#39;onesite&#39;) or energy variance based (&#39;subspace&#39;).  (Default: &#39;onesite&#39;)</span>
+<span class="sd">    :type expansion: {&#39;onesite&#39;, &#39;subspace&#39;}, optional</span>
+<span class="sd">    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_tdvp_complex or adaptive_one_site_tdvp_complex</span>
+
+<span class="sd">    :returns: The TDVP evaluation object</span>
+<span class="sd">    :rtype: one_site_tdvp_complex or adaptive_one_site_tdvp_complex or multiset_one_site_tdvp_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">sop_operator_complex</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">single_set_tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="n">expansion</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">multiset_tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="n">expansion</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid input types for tdvp.&quot;</span><span class="p">)</span></div>
 

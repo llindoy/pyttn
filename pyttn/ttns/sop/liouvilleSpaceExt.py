@@ -1,10 +1,16 @@
-from pyttn._pyttn import liouville_space
+from pyttn.ttnpp import liouville_space
 from .SOPExt import SOP
 from .opdictExt import *
 
 def liouville_space_superoperator(Op, sys, optype, opdict=None, Lopdict=None, coeff=1.0):
+    """A function for taking a Hilbert space operator and system information object and constructing a Liouville space operator
+    object rdependent on the argument optype.  Here we support the automatic generation of 4 different types of Liouville space operator
+    these are left acting operators, right acting operators, commutator operators and anticommutator operators.
+
+    To Do: Add parameters
+    """
     Lop = None
-    if is_SOP(Op):
+    if __is_SOP(Op):
         Lop = SOP(sys.nprimitive_modes()*2)
     else:
         otype = type(Op)

@@ -48,12 +48,12 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
     bath = oqs.BosonicBath(J, beta=beta)
     dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
 
-    dk = expbath.dk
-    zk = expbath.zk
-
     expbath = oqs.ExpFitBosonicBath(dk, zk)
     expbath.truncate_modes(utils.EnergyTruncation(10*wc, Lmax=L, Lmin=Lmin))
     bsys = expbath.system_information()
+
+    dk = expbath.dk
+    zk = expbath.zk
 
     Nb = bsys.nprimitive_modes()
     N = Nb+2

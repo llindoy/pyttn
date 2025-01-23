@@ -40,9 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -72,9 +88,9 @@
   <h1>Source code for pyttn.ttns.operators.productOperatorExt</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">product_operator_complex</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">,</span> <span class="n">SOP_complex</span><span class="p">,</span> <span class="n">system_modes</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">product_operator_complex</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">,</span> <span class="n">SOP_complex</span><span class="p">,</span> <span class="n">system_modes</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">product_operator_real</span><span class="p">,</span> <span class="n">ttn_real</span><span class="p">,</span> <span class="n">SOP_real</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">product_operator_real</span><span class="p">,</span> <span class="n">ttn_real</span><span class="p">,</span> <span class="n">SOP_real</span>
 
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">product_operator_real</span> <span class="o">=</span> <span class="kc">None</span>
@@ -82,10 +98,20 @@
     <span class="n">SOP_real</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="product_operator">
-<a class="viewcode-back" href="../../../../pyttn.ttns.operators.html#pyttn.ttns.operators.productOperatorExt.product_operator">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.product_operator">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">product_operator</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function for constructing a product_operator</span>
+
+<span class="sd">    :param h: The product operator representation of the Hamiltonian</span>
+<span class="sd">    :type h: sOP or sPOP or sNBO_real or sNBO_complex</span>
+<span class="sd">    :param sysinf: The composition of the system defining the default dictionary to be considered for each node</span>
+<span class="sd">    :type sysinf: system_modes</span>
+<span class="sd">    :type \*args: Variable length list of arguments. See product_operator_real/product_operator_complex for options</span>
+<span class="sd">    :param dtype: The internal variable type for the product operator.(Default: np.complex128) </span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+<span class="sd">    :type \*\*kwargs: Additional keyword arguments. See product_operator_real/product_operator_complex for options</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span> <span class="ow">or</span> <span class="n">product_operator_real</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">product_operator_complex</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">product_operator_real</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>

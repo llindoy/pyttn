@@ -36,7 +36,7 @@ def bosonic_bath_properties(dk, zk, L, Lmin = None, combine_real=False, tol=1e-1
             counter = counter+1
 
         #otherwise we add on separate modes for forward and backward paths
-        else
+    else:
             #handle the forward path object
             ds.append(nb)
             nuk.append(zk[i])

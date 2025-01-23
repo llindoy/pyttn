@@ -1,6 +1,8 @@
 import numpy as np
 import copy
 
+
+"""
 from .chain_map import chain_map
 from pyttn import sOP, coeff
 
@@ -98,3 +100,4 @@ def add_bosonic_bath_hamiltonian(H, Sp, g, w, Sm = None, binds = None, geom='sta
     else:
         raise RuntimeError("Cannot add bath Hamiltonian geometry not recognised.")
 
+"""

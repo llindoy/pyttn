@@ -114,9 +114,9 @@ class ExpFitBosonicBath(ExpFitOQSBath):
         """Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
-        :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent 
-        local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(8))
+        :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(8))
         :type truncation: TruncationBase, optional
+
         """
         self._mode_dims = truncation(self._dk, self._zk, False)
 
@@ -143,7 +143,7 @@ class ExpFitBosonicBath(ExpFitOQSBath):
         :return: Bath system information
         :rtype: system_modes
         """
-        if not len(self._mode_dims[x]) == len(self._zk):
+        if not len(self._mode_dims) == len(self._zk):
             raise RuntimeError("Failed to compute system information object.  The bath object has not not been truncated.");
 
 
@@ -180,6 +180,7 @@ class ExpFitFermionicBath(ExpFitOQSBath):
     :type combine_real: bool, optional
     :param tol: The tolerance used to determine if a mode is a real frequency mode (default 1e-12)
     :type tol: float, optional
+
     """
     def __init__(self, dk, zk, combine_real=False, tol=1e-12):
         ExpFitOQSBath.__init__(self, dk, zk, fermionic=True, combine_real=combine_real, tol=tol)
@@ -196,6 +197,7 @@ class ExpFitFermionicBath(ExpFitOQSBath):
         :type t: np.ndarray
         :return: The bath correlation function
         :rtype: np.ndarray
+
         """
         ret = np.zeros(t.shape, dtype=np.complex128)
         for k in range(len(self._ck)):
@@ -206,9 +208,9 @@ class ExpFitFermionicBath(ExpFitOQSBath):
         """Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
-        :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent 
-        local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(2))
+        :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(2))
         :type truncation: TruncationBase, optional
+
         """
         self._mode_dims = truncation(self._dk, self._zk, True)
 
@@ -220,6 +222,7 @@ class ExpFitFermionicBath(ExpFitOQSBath):
 
         :return: Bath system information
         :rtype: system_modes
+
         """
         ret = system_modes(len(self._composite_modes))
         for ind, cmode in enumerate(self._composite_modes):

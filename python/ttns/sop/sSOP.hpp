@@ -27,7 +27,7 @@ void init_sSOP(py::module& m)
         .def(py::init<const std::string&, size_t>())
         .def(py::init<const std::string&, size_t, bool>())
         .def(py::init<const sOP&>())
-        .def("clear", &sOP::clear)
+        .def("clear", &sOP::clear, "Clear the sOPs mode and label information.")
         .def("assign", [](sOP& self, const sOP& o){self=o;})
         .def("__copy__",[](const sOP& o){return sOP(o);})
         .def("__deepcopy__", [](const sOP& o, py::dict){return sOP(o);}, py::arg("memo"))
@@ -35,13 +35,15 @@ void init_sSOP(py::module& m)
             (
                 "op", 
                 static_cast<const std::string& (sOP::*)() const>(&sOP::op),
-                [](sOP& o, const std::string& i){o.op() = i;}
+                [](sOP& o, const std::string& i){o.op() = i;},
+                "The label of the operator"
             )
         .def_property
             (
                 "mode", 
                 static_cast<const size_t& (sOP::*)() const>(&sOP::mode),
-                [](sOP& o, const size_t& i){o.mode() = i;}
+                [](sOP& o, const size_t& i){o.mode() = i;},
+                "The mode the operator acts on"
             )
 
         .def("__str__", [](const sOP& o){return static_cast<std::string>(o);})
@@ -51,17 +53,50 @@ void init_sSOP(py::module& m)
         .def("__add__", [](const sOP& a, const sNBO<real_type>& b){return a+b;})
         .def("__add__", [](const sOP& a, const sNBO<complex_type>& b){return a+b;})
         .def("__add__", [](const sOP& a, const sSOP<real_type>&  b){return a+b;})
-        .def("__add__", [](const sOP& a, const sSOP<complex_type>& b){return a+b;})
+        .def("__add__", [](const sOP& a, const sSOP<complex_type>& b){return a+b;}, R"mydelim(
+              Functions for adding an sOP object from the left to any other spin operator to form a sSOP_real or sSOP_complex
+              depending on the dtype used.  
+
+              :Parameters:  - **a** (:class:`sOP`) - The left term in the expression
+                            - **b** (class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex` or :class:`sSOP_real` or :class:`sSOP_complex`) - The right term in the expression
+
+              :returns: The result of the sum
+              :rtype: :class:`sSOP_real` or :class:`sSOP_complex`
+
+
+              )mydelim")
 
         .def("__sub__", [](const sOP& a, const sOP& b){return a-b;})
         .def("__sub__", [](const sOP& a, const sPOP& b){return a-b;})
         .def("__sub__", [](const sOP& a, const sNBO<real_type>& b){return a-b;})
         .def("__sub__", [](const sOP& a, const sNBO<complex_type>& b){return a-b;})
         .def("__sub__", [](const sOP& a, const sSOP<real_type>& b){return a-b;})
-        .def("__sub__", [](const sOP& a, const sSOP<complex_type>& b){return a-b;})
+        .def("__sub__", [](const sOP& a, const sSOP<complex_type>& b){return a-b;}, R"mydelim(
+              Functions for subtracting a string operator from an sOP object to form a sSOP_real or sSOP_complex
+              depending on the dtype used.  
+
+
+              :Parameters:  - **a** (:class:`sOP`) - The left term in the expression sOP
+                            - **b** (class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex` or :class:`sSOP_real` or :class:`sSOP_complex`) - The right term in the expression
+
+              :returns: The result of a-b
+              :rtype: :class:`sSOP_real` or :class:`sSOP_complex`
+
+
+
+              )mydelim")
 
         .def("__div__", [](const sOP& a, const real_type& b){return a*(1.0/b);})
-        .def("__div__", [](const sOP& a, const complex_type& b){return a*(1.0/b);})
+        .def("__div__", [](const sOP& a, const complex_type& b){return a*(1.0/b);}, R"mydelim(
+              Functions for dividing a sOP by a scalar .
+
+              :Parameters:  - **a** (:class:`sOP`) - The left term in the expression
+                            - **b** (float or complex ) - The scalar to divide the sOP by
+
+              :returns: The result of a/b
+              :rtype: :class:`sNBO_real` or :class:`sNBO_complex`
+
+              )mydelim")
 
         .def("__mul__", [](const sOP& a, const coeff<real_type>& b){return a*b;})
         .def("__mul__", [](const sOP& a, const coeff<complex_type>& b){return a*b;})
@@ -70,19 +105,115 @@ void init_sSOP(py::module& m)
         .def("__mul__", [](const sOP& a, const sOP& b){return a*b;})
         .def("__mul__", [](const sOP& a, const sPOP& b){return a*b;})
         .def("__mul__", [](const sOP& a, const sNBO<real_type>& b){return a*b;})
-        .def("__mul__", [](const sOP& a, const sNBO<complex_type>& b){return a*b;})
+        .def("__mul__", [](const sOP& a, const sNBO<complex_type>& b){return a*b;}, R"mydelim(
+              Functions for multiplying a sOP by a scalar or another expression.
+
+              :Parameters:  - **a** (:class:`sOP`) - The left term in the expression
+                            - **b** (float or complex or :class:`coeff_real` or :class:`coeff_complex` or :class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex`) - The term to multiply sOP by
+              :type b: 
+
+              :returns: The result of a*b
+              :rtype: :class:`sNBO_real` or :class:`sNBO_complex`
+
+              )mydelim")
+
+
         .def("__mul__", [](const sOP& a, const sSOP<real_type>& b){return a*b;})
-        .def("__mul__", [](const sOP& a, const sSOP<complex_type>& b){return a*b;})
+        .def("__mul__", [](const sOP& a, const sSOP<complex_type>& b){return a*b;}, R"mydelim(
+              Functions for multiplying a sOP by a sSOP.
+
+              :Parameters:  - **a** (:class:`sOP`) - The left term in the expression
+                            - **b** (:class:`sSOP_real` or :class:`sSOP_complex`) - The term to multiply sOP by
+
+              :Returns: The result of a*b
+              :Return Type: :class:`sSOP_real` or :class:`sSOP_complex`
+
+              )mydelim")
 
         .def("__rmul__", [](const sOP& a, const coeff<real_type>& b){return a*b;})
         .def("__rmul__", [](const sOP& a, const coeff<complex_type>& b){return a*b;})
         .def("__rmul__", [](const sOP& a, const real_type& b){return a*b;})
-        .def("__rmul__", [](const sOP& a, const complex_type& b){return a*b;});
+        .def("__rmul__", [](const sOP& a, const complex_type& b){return a*b;}, R"mydelim(
+              Functions for multiplying a sOP by a scalar from the right.
+
+              :Parameters:  - **a** (:class:`sOP`) - The sOP
+                            - **b** (float or complex or :class:`coeff_real` or :class:`coeff_complex`) - The term to multiply sOP by
+
+              :Returns: The result of b*a
+              :Return Type: :class:`sNBO_real` or :class:`sNBO_complex`
+
+              )mydelim")
+        .doc() = R"mydelim(
+            The single site operator used for the string operator handling functionality of pyTTN.  This class allows for definition of 
+            a string label for an operator and the mode that the operator acts upon. In addition to allowing for arbitrary string labels
+            with the combination of user defined operator dictionaries.  This code supports several automatic dictionaries depending on
+            the type of mode considered.  These are
+
+            :Fermion Modes:
+              - Annihilation operator :math:`\hat{c}` :  {"c", "a", "f"}
+              - Creation operator :math:`\hat{c}^\dagger` :  {"cdag", "adag", "fdag", "cd", "ad", "fd"}
+              - Number operator :math:`\hat{c}^\dagger\hat{c}` :  {"n", "cdagc", "adaga", "fdagf", "cdc", "ada", "fdf"}
+              - Vacancy operator :math:`1-\hat{c}^\dagger\hat{c}` :  "v"
+
+            :Bosonic Modes:
+              - Annihilation operator :math:`\hat{c}` :  {"c", "a", "b"}
+              - Creation operator :math:`\hat{c}^\dagger` :  {"cdag", "adag", "bdag", "cd", "ad", "bd"}
+              - Number operator :math:`\hat{c}^\dagger\hat{c}` :  {"n", "cdagc", "adaga", "bdagb", "cdc", "ada", "bdb"}
+              - Position operator :math:`hat{q}` : {"q", "x"}
+              - Momentum opeartor :math:`hat{p}` : "p"
+
+            :Spin Modes for arbitrary spin S:
+              - :math:`\hat{S}_x` : {"sx", "x"}
+              - :math:`\hat{S}_y` : {"sy", "y"}
+              - :math:`\hat{S}_z` : {"sz", "z"}
+              - :math:`\hat{S}_+` : {"s+", "sp"}
+              - :math:`\hat{S}_-` : {"s-", "sm"}
+
+            :Two Level System Modes:
+              - :math:`\hat{\sigma}_x` : {"sx", "x", "sigmax"}
+              - :math:`\hat{\sigma}_y` : {"sy", "y", "sigmay"}
+              - :math:`\hat{\sigma}_z` : {"sz", "z", "sigmaz"}
+              - :math:`\hat{\sigma}_+` : {"s+", "sp", "sigma+", "sigmap"}
+              - :math:`\hat{\sigma}_-` : {"s-", "sm", "sigma-", "sigmam"}
+        )mydelim";
 
 
 
-    m.def("fermion_operator", &fermion_operator);
-    m.def("fOP", &fermion_operator);
+    m.def("fermion_operator", &fermion_operator, R"mydelim(
+      Create a new site operator string where the operator is a Fermionic operator.
+
+      :param arg0: The operator label associated with this operator.   
+      :type arg0: str
+      :param arg1: The mode this operator acts upon.
+      :type arg1: int
+
+      For fermionic systems the following operator are supported:
+        - Annihilation operator :math:`\hat{c}` :  {"c", "a", "f"}
+        - Creation operator :math:`\hat{c}^\dagger` :  {"cdag", "adag", "fdag", "cd", "ad", "fd"}
+        - Number operator :math:`\hat{c}^\dagger\hat{c}` :  {"n", "cdagc", "adaga", "fdagf", "cdc", "ada", "fdf"}
+        - Vacancy operator :math:`1-\hat{c}^\dagger\hat{c}` :  {"v"}
+
+      :returns: fermionic mode data object
+      :rtype: mode_data
+      )mydelim");
+
+    m.def("fOP", &fermion_operator, R"mydelim(
+      Create a new site operator string where the operator is a Fermionic operator.
+
+      :param arg0: The operator label associated with this operator.   
+      :type arg0: str
+      :param arg1: The mode this operator acts upon.
+      :type arg1: int
+
+      For fermionic systems the following operator are supported:
+        - Annihilation operator :math:`\hat{c}` :  {"c", "a", "f"}
+        - Creation operator :math:`\hat{c}^\dagger` :  {"cdag", "adag", "fdag", "cd", "ad", "fd"}
+        - Number operator :math:`\hat{c}^\dagger\hat{c}` :  {"n", "cdagc", "adaga", "fdagf", "cdc", "ada", "fdf"}
+        - Vacancy operator :math:`1-\hat{c}^\dagger\hat{c}` :  {"v"}
+
+      :returns: fermionic mode data object
+      :rtype: mode_data
+      )mydelim");
 
     //wrapper for the sPOP type 
     py::class_<sPOP>(m, "sPOP")
@@ -93,16 +224,33 @@ void init_sSOP(py::module& m)
         .def("assign", [](sPOP& self, const sPOP& o){self=o;})
         .def("__copy__",[](const sPOP& o){return sPOP(o);})
         .def("__deepcopy__", [](const sPOP& o, py::dict){return sPOP(o);}, py::arg("memo"))
-        .def("clear", &sPOP::clear)
-        .def("insert_front", &sPOP::append)
-        .def("insert_back", &sPOP::prepend)
-        .def("size", &sPOP::size)
-        .def("nmodes", &sPOP::nmodes)
+        .def("clear", &sPOP::clear, "empty the internal buffer storing the sOPs in the sPOP")
+        .def("insert_front", &sPOP::append, R"mydelim(
+
+            :param o: Insert a sOP object at the front of this product.
+            :type o: sOP
+        )mydelim")
+        .def("insert_back", &sPOP::prepend, R"mydelim(
+
+            :param o: Insert a sOP object at the back of this product.
+            :type o: sOP
+        )mydelim")
+        .def("size", &sPOP::size, R"mydelim(
+
+            :returns: The number of individual sOP terms in this product.
+            :rtype: int
+        )mydelim")
+        .def("nmodes", &sPOP::nmodes, R"mydelim(
+
+            :returns: The number of modes that this sPOP acts on
+            :rtype: int
+        )mydelim")
         .def_property
             (
                 "ops", 
                 static_cast<const std::list<sOP>& (sPOP::*)() const>(&sPOP::ops),
-                [](sPOP& o, const std::list<sOP>& i){o.ops() = i;}
+                [](sPOP& o, const std::list<sOP>& i){o.ops() = i;},
+                "A list of the individual sOP objects forming the sPOP."
             )
 
         .def(
@@ -112,24 +260,58 @@ void init_sSOP(py::module& m)
             )
         .def("__str__", [](const sPOP& o){return static_cast<std::string>(o);})
         .def("__imul__", [](sPOP& a, const sPOP& b){return a*=b;})
-        .def("__imul__", [](sPOP& a, const sOP& b){return a*=b;})
+        .def("__imul__", [](sPOP& a, const sOP& b){return a*=b;}, R"mydelim(
+              Inplace multiplication of a sPOP with a sPOP or sOP
+
+              :Parameters:  - **b** (class:`sOP` or :class:`sPOP`) - The right term in the expression
+
+              )mydelim")
 
         .def("__add__", [](const sPOP& a, const sOP& b){return a+b;})
         .def("__add__", [](const sPOP& a, const sPOP& b){return a+b;})
         .def("__add__", [](const sPOP& a, const sNBO<real_type>& b){return a+b;})
         .def("__add__", [](const sPOP& a, const sNBO<complex_type>& b){return a+b;})
         .def("__add__", [](const sPOP& a, const sSOP<real_type>&  b){return a+b;})
-        .def("__add__", [](const sPOP& a, const sSOP<complex_type>& b){return a+b;})
+        .def("__add__", [](const sPOP& a, const sSOP<complex_type>& b){return a+b;}, R"mydelim(
+              Functions for adding an sPOP object from the left to any other spin operator to form a sSOP_real or sSOP_complex
+              depending on the dtype used.  
+
+              :Parameters:  - **a** (:class:`sPOP`) - The sPOP
+                            - **b** (class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex` or :class:`sSOP_real` or :class:`sSOP_complex`) - The right term in the expression
+
+              :returns: The result of the sum
+              :rtype: :class:`sSOP_real` or :class:`sSOP_complex`
+
+              )mydelim")
 
         .def("__sub__", [](const sPOP& a, const sOP& b){return a-b;})
         .def("__sub__", [](const sPOP& a, const sPOP& b){return a-b;})
         .def("__sub__", [](const sPOP& a, const sNBO<real_type>& b){return a-b;})
         .def("__sub__", [](const sPOP& a, const sNBO<complex_type>& b){return a-b;})
         .def("__sub__", [](const sPOP& a, const sSOP<real_type>& b){return a-b;})
-        .def("__sub__", [](const sPOP& a, const sSOP<complex_type>& b){return a-b;})
+        .def("__sub__", [](const sPOP& a, const sSOP<complex_type>& b){return a-b;}, R"mydelim(
+              Functions for subtracting a string operator from an sPOP object to form a sSOP_real or sSOP_complex
+              depending on the dtype used.  
+
+              :Parameters:  - **a** (:class:`sPOP`) - The sPOP
+                            - **b** (class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex` or :class:`sSOP_real` or :class:`sSOP_complex`) - The right term in the expression
+
+              :returns: The result of a-b
+              :rtype: :class:`sSOP_real` or :class:`sSOP_complex`
+
+              )mydelim")
 
         .def("__div__", [](const sOP& a, const real_type& b){return a*(1.0/b);})
-        .def("__div__", [](const sOP& a, const complex_type& b){return a*(1.0/b);})
+        .def("__div__", [](const sOP& a, const complex_type& b){return a*(1.0/b);}, R"mydelim(
+              Functions for dividing a sPOP by a scalar .
+
+              :Parameters:  - **a** (:class:`sPOP`) - The sPOP
+                            - **b** (float or complex ) - The scalar to divide the sPOP by
+
+              :returns: The result of a/b
+              :rtype: :class:`sNBO_real` or :class:`sNBO_complex`
+
+              )mydelim")
 
         .def("__mul__", [](const sPOP& a, const coeff<real_type>& b){return a*b;})
         .def("__mul__", [](const sPOP& a, const coeff<complex_type>& b){return a*b;})
@@ -138,14 +320,46 @@ void init_sSOP(py::module& m)
         .def("__mul__", [](const sPOP& a, const sOP& b){return a*b;})
         .def("__mul__", [](const sPOP& a, const sPOP& b){return a*b;})
         .def("__mul__", [](const sPOP& a, const sNBO<real_type>& b){return a*b;})
-        .def("__mul__", [](const sPOP& a, const sNBO<complex_type>& b){return a*b;})
+        .def("__mul__", [](const sPOP& a, const sNBO<complex_type>& b){return a*b;}, R"mydelim(
+              Functions for multiplying a sPOP by a scalar or another expression.
+
+              :Parameters:  - **a** (:class:`sPOP`) - The sPOP
+                            - **b** (float or complex or :class:`coeff_real` or :class:`coeff_complex` or :class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex`) - The term to multiply sPOP by
+              :type b: 
+
+              :returns: The result of a*b
+              :rtype: :class:`sNBO_real` or :class:`sNBO_complex`
+
+              )mydelim")
         .def("__mul__", [](const sPOP& a, const sSOP<real_type>& b){return a*b;})
-        .def("__mul__", [](const sPOP& a, const sSOP<complex_type>& b){return a*b;})
+        .def("__mul__", [](const sPOP& a, const sSOP<complex_type>& b){return a*b;}, R"mydelim(
+              Functions for multiplying a sPOP by a sSOP.
+
+              :Parameters:  - **a** (:class:`sPOP`) - The sPOP
+                            - **b** (:class:`sSOP_real` or :class:`sSOP_complex`) - The term to multiply sPOP by
+
+              :Returns: The result of a*b
+              :Return Type: :class:`sSOP_real` or :class:`sSOP_complex`
+
+              )mydelim")
 
         .def("__rmul__", [](const sPOP& a, const coeff<real_type>& b){return a*b;})
         .def("__rmul__", [](const sPOP& a, const coeff<complex_type>& b){return a*b;})
         .def("__rmul__", [](const sPOP& a, const real_type& b){return a*b;})
-        .def("__rmul__", [](const sPOP& a, const complex_type& b){return a*b;});
+        .def("__rmul__", [](const sPOP& a, const complex_type& b){return a*b;}, R"mydelim(
+              Functions for multiplying a sPOP by a scalar from the right.
+
+              :Parameters:  - **a** (:class:`sPOP`) - The sPOP
+                            - **b** (float or complex or :class:`coeff_real` or :class:`coeff_complex`) - The term to multiply sPOP by
+
+              :Returns: The result of b*a
+              :Return Type: :class:`sNBO_real` or :class:`sNBO_complex`
+
+              )mydelim")
+        .doc() = R"mydelim(
+            A product of sOP operators. This function handles the fact that in general sOP operators do not commute.
+
+        )mydelim";
 
     {
         using coef = coeff<real_type>;
@@ -169,13 +383,16 @@ void init_sSOP(py::module& m)
 
             .def("__str__", [](const coef& o){std::ostringstream oss; oss << o; return oss.str();})
             .def("__iadd__", [](coef& a, const real_type& b){return a+=b;})
+            .def("__iadd__", [](coef& a, const coef& b){return a+=b;})
+
             .def("__isub__", [](coef& a, const real_type& b){return a-=b;})
+            .def("__isub__", [](coef& a, const coef& b){return a-=b;})
+
             .def("__imul__", [](coef& a, const real_type& b){return a*=b;})
+            .def("__imul__", [](coef& a, const coef& b){return a*=b;})
+
             .def("__idiv__", [](coef& a, const real_type& b){return a/=b;})
 
-            .def("__iadd__", [](coef& a, const coef& b){return a+=b;})
-            .def("__isub__", [](coef& a, const coef& b){return a-=b;})
-            .def("__imul__", [](coef& a, const coef& b){return a*=b;})
 
             .def("__div__", [](const coef& a, const real_type& b){return a/b;})
             .def("__div__", [](const coef& a, const complex_type& b){return a/b;})

@@ -40,9 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -73,11 +89,20 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <div class="viewcode-block" id="operator_dictionary">
-<a class="viewcode-back" href="../../../../pyttn.ttns.sop.html#pyttn.ttns.sop.opdictExt.operator_dictionary">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.operator_dictionary">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">operator_dictionary</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">operator_dictionary_complex</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for constructing a user defined operator dictionary.</span>
+
+<span class="sd">    :param \*args: Variable length list of arguments. </span>
+<span class="sd">    :param dtype: The dtype to use for the site operator.  (Default: np.complex128) </span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+
+<span class="sd">    :returns: The operator dictionary object</span>
+<span class="sd">    :rtype: operator_dictionary_real or operator_dictionary_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">operator_dictionary_complex</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">operator_dictionary_real</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">operator_dictionary_real</span>
         <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">operator_dictionary_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">elif</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
@@ -93,17 +118,14 @@
 
 
 
-<div class="viewcode-block" id="is_operator_dictionary">
-<a class="viewcode-back" href="../../../../pyttn.ttns.sop.html#pyttn.ttns.sop.opdictExt.is_operator_dictionary">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">is_operator_dictionary</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">operator_dictionary_complex</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__is_operator_dictionary</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">operator_dictionary_complex</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn._pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">operator_dictionary_real</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">operator_dictionary_real</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">operator_dictionary_complex</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">operator_dictionary_real</span><span class="p">)</span>
 
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">operator_dictionary_complex</span><span class="p">)</span></div>
-
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">operator_dictionary_complex</span><span class="p">)</span>
 </pre></div>
 
            </div>

@@ -118,8 +118,34 @@ void init_SOP(py::module &m, const std::string& label)
         .def("__rsub__", [](_SOP& b, const sNBO<real_type>& a){return a-b;})
         .def("__rsub__", [](_SOP& b, const sNBO<T>& a){return a-b;})
         .def("__rsub__", [](_SOP& b, const sSOP<real_type>& a){return a-b;})
-        .def("__rsub__", [](_SOP& b, const sSOP<T>& a){return a-b;});
+        .def("__rsub__", [](_SOP& b, const sSOP<T>& a){return a-b;})
+        .doc() = R"mydelim(
+            A class for storing a compact representation of a sum-of-product string operators.  This class requires
+            knowledge of the total number of degrees of freedom.
 
+            Construct arguments
+
+            :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            :type krylov_dim: int, optional
+            :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+            :type numthreads: int, optional
+
+            Callable arguments
+
+            :param A: Tree Tensor Network that the DMRG algorithm will act on
+            :type A: ttn_complex
+            :param h: The Hamiltonian sop operator object
+            :type h: sop_operator_complex
+            :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+            :type update_env: bool, optional
+          )mydelim";
+
+
+      
 
     //wrapper for the sPOP type 
     py::class_<_msSOP>(m, (std::string("multiset_")+label).c_str())

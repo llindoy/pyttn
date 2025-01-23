@@ -40,9 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -70,18 +86,77 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyttn.oqs.bath_fitting.bath_discretisation</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">orthopol_discretisation</span><span class="p">,</span> <span class="n">density_discretisation</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">orthopol_discretisation</span><span class="p">,</span> <span class="n">density_discretisation</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">jit</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+<div class="viewcode-block" id="BathDiscretisation">
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.BathDiscretisation">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BathDiscretisation</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for bath discretisations</span>
 
-<div class="viewcode-block" id="DensityDiscretisation">
-<a class="viewcode-back" href="../../../../pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.DensityDiscretisation">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DensityDiscretisation</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">Nb</span><span class="p">,</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">nquad</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">wtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">wcut</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+<span class="sd">    :param Nb: The number of discrete points to find</span>
+<span class="sd">    :type Nb: int</span>
+<span class="sd">    :param wmin: The minimum allowed frequency.</span>
+<span class="sd">    :type wmin: float</span>
+<span class="sd">    :param wmax: The maximum allowed frequency.</span>
+<span class="sd">    :type wmax: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Nb</span><span class="p">,</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Nb</span> <span class="o">=</span> <span class="n">Nb</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wmin</span> <span class="o">=</span> <span class="n">wmin</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">wmax</span> <span class="o">=</span> <span class="n">wmax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmax</span> <span class="o">=</span> <span class="n">wmax</span></div>
+
+
+<div class="viewcode-block" id="DensityDiscretisation">
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.DensityDiscretisation">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DensityDiscretisation</span><span class="p">(</span><span class="n">BathDiscretisation</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class wrapping the density based discretisation approach.  Selects frequencies from a density of frequencies :math:`\\rho(\\omega)`</span>
+<span class="sd">    according to the expression</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \\int_{\\omega_{\\mathrm{min}}}^{\\omega_k} \\rho(\omega)\\mathrm{d} \\omega = k, </span>
+
+<span class="sd">    with coupling constants then determined by</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">        g_k^2 = \\frac{1}{\pi} \\frac{S(\\omega_k)}{\\rho(\\omega_k)}. </span>
+<span class="sd">        </span>
+<span class="sd">    Constructor arguments</span>
+
+<span class="sd">    :param Nb: The number of discrete points to find</span>
+<span class="sd">    :type Nb: int</span>
+<span class="sd">    :param wmin: The minimum allowed frequency.</span>
+<span class="sd">    :type wmin: float</span>
+<span class="sd">    :param wmax: The maximum allowed frequency.</span>
+<span class="sd">    :type wmax: float</span>
+<span class="sd">    :param rho: The density of frequencies to use in the discretisation process. (Default: None)</span>
+<span class="sd">    :type rho: callable or None, optional</span>
+<span class="sd">    :param atol: Absolute tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 0)</span>
+<span class="sd">    :type atol: float, optional </span>
+<span class="sd">    :param rtol: Relative tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 1e-10)</span>
+<span class="sd">    :type rtol: float, optional </span>
+<span class="sd">    :param nquad: The degree of the gauss-Legendre polynomial based quadrature scheme used in the evaluation of integrals.  (Default: 100)</span>
+<span class="sd">    :type nquad: int, optional </span>
+<span class="sd">    :param wtol: Frequency tolerance used in Newton&#39;s method step for finding frequencies.  (Default: 1e-10)</span>
+<span class="sd">    :type wtol: float, optional </span>
+<span class="sd">    :param ftol: Error tolerance used in Newton&#39;s method step for finding frequencies.  (Default: 1e-10)</span>
+<span class="sd">    :type ftol: float, optional </span>
+<span class="sd">    :param niters: The maximum number of Newton&#39;s method iterations used to find frequencies.  (Default: 100)</span>
+<span class="sd">    :type niters: int, optional </span>
+<span class="sd">    :param wcut: A lower bound on the frequency to cutoff the 1/w.  (Default: 1e-8)</span>
+<span class="sd">    :type wcut: float, optional</span>
+
+<span class="sd">    Callable arguments:</span>
+
+<span class="sd">    :param S: The spectral density function to be decomposed.</span>
+<span class="sd">    :type S: callable</span>
+<span class="sd">    :returns:</span>
+<span class="sd">        - g (np.ndarray) - The coupling constants of the discrete bath modes</span>
+<span class="sd">        - w (np.ndarray) - The frequencies of the discrete bath modes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">Nb</span><span class="p">,</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">nquad</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">wtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">wcut</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">):</span>
+        <span class="n">BathDiscretisation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Nb</span><span class="p">,</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rho</span><span class="o">=</span><span class="n">rho</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wcut</span> <span class="o">=</span> <span class="n">wcut</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="o">=</span><span class="n">atol</span>
@@ -94,6 +169,8 @@
     <span class="c1">#discretise a bosonic bath using the density algorithm.  Here we allow for specification of the density of frequencies (rho), if this isn&#39;t specified we use a density of frequencies</span>
     <span class="c1">#that is given by S(w)/w for np.abs(w) &gt; 1e-12 and S(w)/1e-12 for np.abs(w) &lt; 1e-12. </span>
     <span class="c1">#this currently doesn&#39;t seem to work</span>
+<div class="viewcode-block" id="DensityDiscretisation.__call__">
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.DensityDiscretisation.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
         <span class="n">g</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">w</span> <span class="o">=</span> <span class="kc">None</span>
@@ -109,16 +186,55 @@
             <span class="n">g</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">density_discretisation</span><span class="o">.</span><span class="n">discretise</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wmin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wmax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nb</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span> <span class="n">nquad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nquad</span><span class="p">,</span> <span class="n">wtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wtol</span><span class="p">,</span> <span class="n">ftol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ftol</span><span class="p">,</span> <span class="n">niters</span><span class="o">=</span><span class="n">niters</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">w</span><span class="p">)</span></div>
+</div>
 
 
 
 <div class="viewcode-block" id="OrthopolDiscretisation">
-<a class="viewcode-back" href="../../../../pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OrthopolDiscretisation</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class wrapping the orthonormal polynomial based discretisation scheme.  This scheme constructs a set of orthonormal polynomials</span>
+<span class="sd">    satisfying the orthogonality constraint</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        \\int_{\\omega_{\\mathrm{min}}}^{\\omega_\\mathrm{max}} S(\\omega) \\pi_i(\\omega) \\pi_j(\\omega) \\mathrm{d}\\omega = \\delta_{ij}.</span>
+
+<span class="sd">    The coupling constants and frequencies are then obtained from the weights and nodes, respectively, of the Gaussian quadrature rule associated</span>
+<span class="sd">    with these orthonormal polynomials.</span>
+
+<span class="sd">    Constructor arguments</span>
+
+<span class="sd">    :param Nb: The number of discrete points to find</span>
+<span class="sd">    :type Nb: int</span>
+<span class="sd">    :param wmin: The minimum allowed frequency.</span>
+<span class="sd">    :type wmin: float</span>
+<span class="sd">    :param wmax: The maximum allowed frequency.</span>
+<span class="sd">    :type wmax: float</span>
+<span class="sd">    :param moment_scaling: A parameter to scale the frequency coordinate by in order to avoid over/underflows. (Default: None)</span>
+<span class="sd">    :type moment_scaling: float or None, optional</span>
+<span class="sd">    :param atol: Absolute tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 0)</span>
+<span class="sd">    :type atol: float, optional </span>
+<span class="sd">    :param rtol: Relative tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 1e-10)</span>
+<span class="sd">    :type rtol: float, optional </span>
+<span class="sd">    :param minbound: A parameter for early bailout of the moment scaling step due to underflows. (Default: 1e-25)</span>
+<span class="sd">    :type minbound: float, optional</span>
+<span class="sd">    :param maxbound: A parameter for early bailout of the moment scaling step due to overflows. (Default: 1e-25)</span>
+<span class="sd">    :type maxbound: float, optional</span>
+<span class="sd">    :param moment_scaling_steps: The number of iterations of moment scaling to perform. (Default: 4)</span>
+<span class="sd">    :type moment_scaling_steps: int, optional</span>
+<span class="sd">    :param nquad: The degree of the gauss-Legendre polynomial based quadrature scheme used in the evaluation of integrals.  (Default: 100)</span>
+<span class="sd">    :type nquad: int, optional </span>
+
+<span class="sd">    Callable arguments:</span>
+
+<span class="sd">    :param S: The spectral density function to be decomposed.</span>
+<span class="sd">    :type S: callable</span>
+<span class="sd">    :returns:</span>
+<span class="sd">        - g (np.ndarray) - The coupling constants of the discrete bath modes</span>
+<span class="sd">        - w (np.ndarray) - The frequencies of the discrete bath m</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Nb</span><span class="p">,</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">moment_scaling</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">minbound</span><span class="o">=</span><span class="mf">1e-25</span><span class="p">,</span> <span class="n">maxbound</span><span class="o">=</span><span class="mf">1e25</span><span class="p">,</span> <span class="n">moment_scaling_steps</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">nquad</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Nb</span> <span class="o">=</span> <span class="n">Nb</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">wmin</span> <span class="o">=</span> <span class="n">wmin</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">wmax</span><span class="o">=</span><span class="n">wmax</span>
+        <span class="n">BathDiscretisation</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Nb</span><span class="p">,</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">moment_scaling</span><span class="o">=</span><span class="n">moment_scaling</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="o">=</span><span class="n">atol</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span>
@@ -127,15 +243,38 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">moment_scaling_steps</span><span class="o">=</span><span class="n">moment_scaling_steps</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nquad</span><span class="o">=</span><span class="n">nquad</span>
 
-    <span class="c1">#find a constant to scale the frequency axis by in order to ensure well defined scaling of the modified moments as we go to very high moments.</span>
-    <span class="c1">#here this is done by computing the modified moments up to varying orders (with early termination if the values leave some min and max bounds)</span>
-    <span class="c1">#and fitting the resultant decay or growth to an exponential function.  Based on this fitting we extract a constant that aims to minimise the </span>
-    <span class="c1">#decay or growth, and repeats this process with growing orders (up to the maximum order we need for the discretisation) until it reaches a</span>
-    <span class="c1">#point that the moment decay does not leave the early termination bounds.  This may not always be optimal if the Nsteps variable is too large</span>
-    <span class="c1">#and in this case either try reducing Nsteps.</span>
 <div class="viewcode-block" id="OrthopolDiscretisation.find_moment_scaling_factor">
-<a class="viewcode-back" href="../../../../pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation.find_moment_scaling_factor">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">find_moment_scaling_factor</span><span class="p">(</span><span class="n">Sw</span><span class="p">,</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">Nb</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">minbound</span><span class="o">=</span><span class="mf">1e-30</span><span class="p">,</span> <span class="n">maxbound</span><span class="o">=</span><span class="mf">1e30</span><span class="p">,</span> <span class="n">Nsteps</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">nquad</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation.find_moment_scaling_factor">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_moment_scaling_factor</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">Nb</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">minbound</span><span class="o">=</span><span class="mf">1e-30</span><span class="p">,</span> <span class="n">maxbound</span><span class="o">=</span><span class="mf">1e30</span><span class="p">,</span> <span class="n">Nsteps</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">nquad</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Finds a constant to scale the frequency axis by in order to ensure well defined scaling of the modified moments as we go to very high moments.</span>
+<span class="sd">        here this is done by computing the modified moments up to varying orders (with early termination if the values leave some min and max bounds)</span>
+<span class="sd">        and fitting the resultant decay or growth to an exponential function.  Based on this fitting we extract a constant that aims to minimise the </span>
+<span class="sd">        decay or growth, and repeats this process with growing orders (up to the maximum order we need for the discretisation) until it reaches a</span>
+<span class="sd">        point that the moment decay does not leave the early termination bounds.  This may not always be optimal if the Nsteps variable is too large</span>
+<span class="sd">        and in this case either try reducing Nsteps.</span>
+
+<span class="sd">        :param S: The spectral density function to be decomposed.</span>
+<span class="sd">        :type S: callable</span>
+<span class="sd">        :param wmin: The minimum allowed frequency.</span>
+<span class="sd">        :type wmin: float</span>
+<span class="sd">        :param wmax: The maximum allowed frequency.</span>
+<span class="sd">        :type wmax: float</span>
+<span class="sd">        :param Nb: The number of discrete points to find</span>
+<span class="sd">        :type Nb: int</span>
+<span class="sd">        :param atol: Absolute tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 0)</span>
+<span class="sd">        :type atol: float, optional </span>
+<span class="sd">        :param rtol: Relative tolerance to use in the evaluation of integrals within the discretisation process.  (Default: 1e-10)</span>
+<span class="sd">        :type rtol: float, optional </span>
+<span class="sd">        :param minbound: A parameter for early bailout of the moment scaling step due to underflows. (Default: 1e-25)</span>
+<span class="sd">        :type minbound: float, optional</span>
+<span class="sd">        :param maxbound: A parameter for early bailout of the moment scaling step due to overflows. (Default: 1e-25)</span>
+<span class="sd">        :type maxbound: float, optional</span>
+<span class="sd">        :param Nsteps: The number of iterations of moment scaling to perform. (Default: 4)</span>
+<span class="sd">        :type Nsteps: int, optional</span>
+<span class="sd">        :param nquad: The degree of the gauss-Legendre polynomial based quadrature scheme used in the evaluation of integrals.  (Default: 100)</span>
+<span class="sd">        :type nquad: int, optional </span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">Nbs</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Nsteps</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">Nb</span><span class="o">//</span><span class="p">(</span><span class="n">Nsteps</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
         <span class="n">ms</span><span class="o">=</span><span class="mi">1</span>
         <span class="k">for</span> <span class="n">Nbi</span> <span class="ow">in</span> <span class="n">Nbs</span><span class="p">:</span>
@@ -149,6 +288,8 @@
         <span class="k">return</span> <span class="n">ms</span></div>
 
 
+<div class="viewcode-block" id="OrthopolDiscretisation.__call__">
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
         <span class="n">g</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">w</span> <span class="o">=</span> <span class="kc">None</span>
@@ -158,7 +299,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">moment_scaling</span> <span class="o">=</span> <span class="n">OrthopolDiscretisation</span><span class="o">.</span><span class="n">find_moment_scaling_factor</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wmin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wmax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nb</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span> <span class="n">minbound</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">minbound</span><span class="p">,</span> <span class="n">maxbound</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">maxbound</span><span class="p">,</span> <span class="n">Nsteps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">moment_scaling_steps</span><span class="p">,</span> <span class="n">nquad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nquad</span><span class="p">)</span>
 
         <span class="n">g</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">orthopol_discretisation</span><span class="o">.</span><span class="n">discretise</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wmin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wmax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Nb</span><span class="p">,</span> <span class="n">moment_scaling</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">moment_scaling</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">atol</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rtol</span><span class="p">,</span> <span class="n">nquad</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nquad</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">w</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">quadnp</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">w</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 

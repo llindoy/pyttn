@@ -1,1 +1,6 @@
-from .matrixElementExt import *
+from .matrixElementExt import matrix_element
+
+
+__all__ = [
+        "matrix_element"
+        ]

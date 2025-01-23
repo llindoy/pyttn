@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.12)
-project(_pyttn)
+project(ttnpp)
 
 include(CheckIPOSupported)
 
@@ -134,27 +134,27 @@ add_definitions(-DPYBIND11)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 message(STATUS "${PYTHON_BINDINGS_SRC}")
-pybind11_add_module(_pyttn ${PYTHON_BINDINGS_SRC})
-target_include_directories(_pyttn PUBLIC ${TTNS_INCLUDE_DIRECTORIES})
-target_link_libraries(_pyttn PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 
+pybind11_add_module(ttnpp ${PYTHON_BINDINGS_SRC})
+target_include_directories(ttnpp PUBLIC ${TTNS_INCLUDE_DIRECTORIES})
+target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 
 
 
 add_library(restore_default_visibility INTERFACE)
 target_compile_options(restore_default_visibility INTERFACE -fvisibility=default)
-target_link_libraries(_pyttn PRIVATE restore_default_visibility)
+target_link_libraries(ttnpp PRIVATE restore_default_visibility)
 
-#set_target_properties(_pyttn PROPERTIES
+#set_target_properties(ttnpp PROPERTIES
 #        VISIBILITY_INLINES_HIDDEN ON)
 check_ipo_supported(RESULT ipo)
 if(ipo)
-set_property(TARGET _pyttn PROPERTY VISIBILITY_INLINES_HIDDEN TRUE)
+set_property(TARGET ttnpp PROPERTY VISIBILITY_INLINES_HIDDEN TRUE)
 endif()
 if(EVAL_BUT_DONT_APPLY)
-  target_compile_definitions(_pyttn PUBLIC ALLOW_EVAL_BUT_DONT_APPLY=0)
+  target_compile_definitions(ttnpp PUBLIC ALLOW_EVAL_BUT_DONT_APPLY=0)
 endif()
 
 install(
-    TARGETS _pyttn
+    TARGETS ttnpp
     DESTINATION ${CMAKE_INSTALL_PREFIX}
 )
 

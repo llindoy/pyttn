@@ -40,9 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -73,11 +89,30 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
 
-<span class="c1">#This will be left as future updates.</span>
 <span class="c1">#Here we have not made use of any of the knowledge of the form of the A matrix</span>
+<span class="c1">#This will be left as future updates.</span>
 <div class="viewcode-block" id="ESPRIT">
-<a class="viewcode-back" href="../../../../pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.ESPRIT.ESPRIT">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.ESPRIT.ESPRIT">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">ESPRIT</span><span class="p">(</span><span class="n">Ct</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Implementation of the Estimation of Signal Parameters via Rotational Invariant Techniques (ESPRIT)</span>
+<span class="sd">    method for decomposing a signal into the form </span>
+
+<span class="sd">    .. math:</span>
+<span class="sd">        C(t) \\approx \sum_{k=1}^K w_k \\exp(-\\nu t)</span>
+
+<span class="sd">    A. Paulraj, R. Roy, and T. Kailath, Proceedings of the IEEE 74, 1044 (1986).</span>
+
+<span class="sd">    :param Ct: An array containing the values to be fit</span>
+<span class="sd">    :type Ct: np.ndarray</span>
+<span class="sd">    :param K: The set of support points used for interpolating the function</span>
+<span class="sd">    :type K: np.ndarray</span>
+
+<span class="sd">    :returns:</span>
+<span class="sd">        - w(np.ndarray) - The weights in the decomposition</span>
+<span class="sd">        - nu(np.ndarray) - The exponents in the decomposition</span>
+<span class="sd">        - Ctfit(np.ndarray) - The function fit at the same points as the original Ct</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="c1">#extract the frequencies in the signal using ESPRIT</span>
     <span class="n">expnu</span> <span class="o">=</span> <span class="n">ESPRIT_frequencies</span><span class="p">(</span><span class="n">Ct</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
 
@@ -96,8 +131,18 @@
 <span class="c1">#This will seriously limit the number of points in Ct that can be efficiently </span>
 <span class="c1">#fit using this approach.</span>
 <div class="viewcode-block" id="ESPRIT_frequencies">
-<a class="viewcode-back" href="../../../../pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.ESPRIT.ESPRIT_frequencies">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.ESPRIT.ESPRIT_frequencies">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">ESPRIT_frequencies</span><span class="p">(</span><span class="n">Ct</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract the frequencies to be used in the ESPRIT algorithm </span>
+
+<span class="sd">    :param Ct: An array containing the values to be fit</span>
+<span class="sd">    :type Ct: np.ndarray</span>
+<span class="sd">    :param K: The set of support points used for interpolating the function</span>
+<span class="sd">    :type K: np.ndarray</span>
+
+<span class="sd">    :returns:</span>
+<span class="sd">        - expnu(np.ndarray) - The exponential of the frequencies to be used in the ESPRIT decomposition</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ndata</span> <span class="o">=</span> <span class="n">Ct</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">T</span> <span class="o">=</span> <span class="p">(</span><span class="n">ndata</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
     <span class="c1">#Form a hankel matrix from the vector of Cts.  This gives us </span>

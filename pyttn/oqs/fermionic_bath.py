@@ -2,8 +2,6 @@ import numpy as np
 from numba import jit
 import scipy as sp
 from pyttn.utils import orthopol
-from .bath_fitting.aaa_bath_fitting import AAADecomposition
-from .bath_fitting.ESPRIT_bath_fitting import ESPRITDecomposition
 
 class FermionicBath:
     """A class for managing a continuous fermionic gaussian bath.  This provides

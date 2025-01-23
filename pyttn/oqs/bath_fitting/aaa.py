@@ -4,25 +4,51 @@ from scipy import linalg as splinalg
 from scipy.integrate import quad, quad_vec
 
 
-
-
-
-def residue_integrand(theta, r, rs, poles):
+def __residue_integrand(theta, r, rs, poles):
     zvs = rs*np.exp(1.0j*theta)
     vals = r(poles+zvs)*zvs
     return vals
 
-def compute_residues_integ(r,  poles, tol):
+def __compute_residues_integ(r,  poles, tol):
+    """Compute the poles and residues given the baryocentric representation of a rational function
+
+    :param r: The rational function object
+    :type r: callable
+    :params poles: The poles of the rational funcction
+    :type poles: np.ndarray
+    :param tol: Integration tolerance for computing residues
+    :type tol: float
+
+    :returns: The residue associated with each pole
+    :rtype: np.ndarray
+    """
     #find the distance between pole i and the nearest pole to it - this ensures that we can evaluate the pole using
     vals = np.abs([xs - poles[np.argpartition(np.abs(poles - xs), 1)[1]] for xs in poles])/10.0
     rs = vals
 
-    res = quad_vec(lambda x : residue_integrand(x, r, rs, poles), 0, 2.0*np.pi, epsrel = tol)[0]
+    res = quad_vec(lambda x : __residue_integrand(x, r, rs, poles), 0, 2.0*np.pi, epsrel = tol)[0]
     return res
 
 #def compute_residues_rational(zeros, poles):
+def __prz(r, z, f, w, tol):
+    """Compute the poles and residues given the baryocentric representation of a rational function
 
-def prz(r, z, f, w, tol):
+    :param r: The rational function object
+    :type r: callable
+    :params z: Support points
+    :type z: np.ndarray
+    :params f: The data values
+    :type f: np.ndarray
+    :params w: The weights of the baryocentric approximation
+    :type w: np.ndarray
+    :param tol: Integration tolerance for computing residues
+    :type tol: float
+
+    :returns: 
+        - poles(np.ndarray) - The poles of the rational function
+        - residues(np.ndarray) - The residues of the rational function decomposition
+        - zeros(np.ndarray) - The zeros of the rational function
+    """
 
     m = w.shape[0]
     
@@ -43,22 +69,61 @@ def prz(r, z, f, w, tol):
     zeros = splinalg.eigvals(M, B)
     zeros = zeros[~np.isinf(zeros)]
 
-    res = compute_residues_integ(r, poles, tol)
+    res = __compute_residues_integ(r, poles, tol)
     
     return poles, res, zeros
 
 #function for evaluating the baryocentric form of the rational function approximation of another function
-def evaluate_function(z, Z, f, w):
+def __evaluate_function(z, Z, f, w):
+    """Evaluate the baryocentric form of the rational function approximation
+
+    .. math:
+        r(z) = \\frac{\\sum_{j=1}^N \\frac{w_j f_j}{z-Z_j}}{\\sum_{j=1}^N \\frac{w_j}{z-Z_j}}
+
+    :params z: The point at which to evaluate the function
+    :type z: np.ndarray
+    :params Z: Support points
+    :type Z: np.ndarray
+    :params f: The data values
+    :type f: np.ndarray
+    :params w: The weights of the baryocentric approximation
+    :type w: np.ndarray
+
+    :returns: The value of the approximation at the points z
+    :rtype: np.ndarray
+    """
     ZZ, zz = np.meshgrid(Z, z)
     CC = 1.0/(zz-ZZ)
     r = (CC@(w*f))/(CC@w)
     return r
 
-def AAA_algorithm(F, Z, tol=1e-13, nmax = 100, *args):
+def AAA_algorithm(F, Z, tol=1e-13, nmax = 100, *args, **kwargs):
+    """Implementation of the adaptive Antoulas-Anderson (AAA) algorithm for rational approximation
+    Y. Nakatsukasa, O. Sète, and L. N. Trefethen, SIAM Journal on Scientific Computing 40, A1494 (2018).
+
+    :param F: The function to be fit
+    :type F: callable
+    :param Z: The set of support points used for interpolating the function
+    :type Z: np.ndarray
+    :param tol: The convergence tolerance for the AAA algorithm. (default: 1e-13)
+    :type tol: float, optional
+    :param nmax: The maximum number of poles to use in the AAA fit. (default: 100)
+    :type nmax: int, optional
+    :param \*args: Variable length argument list to be passed to the F function
+    :param \*\*kwargs: Arbitrary keyword arguments to be passed to the F function
+
+    :returns:
+        - func - A function defining the rational function approximation
+        - poles(np.ndarray) - The poles of the rational function
+        - residues(np.ndarray) - The residues of the rational function decomposition
+        - zeros(np.ndarray) - The zeros of the rational function
+
+    """
+    
     M = Z.shape[0]
 
     #evaluate the function at the sample points
-    Fz = np.array(F(Z, *args), dtype=np.complex128)
+    Fz = np.array(F(Z, *args, **kwargs), dtype=np.complex128)
     Z = np.array(Z, dtype=np.complex128)
     Z0 = Z
     F0 = Fz
@@ -99,14 +164,11 @@ def AAA_algorithm(F, Z, tol=1e-13, nmax = 100, *args):
     f1 = np.array(f, dtype = np.complex128)
     w1 = np.array(w, dtype = np.complex128) 
 
-    func = lambda x : evaluate_function(x, z1, f1, w1)
-    poles,residues, zeros = prz(func, z, f, w, tol)
+    func = lambda x : __evaluate_function(x, z1, f1, w1)
+    poles,residues, zeros = __prz(func, z, f, w, tol)
     
     return func, poles, residues, zeros
 
 
-def C(dk, zk, t):
-    Z, T = np.meshgrid(zk, t)
-    return np.exp(-Z*T)@dk
 
 

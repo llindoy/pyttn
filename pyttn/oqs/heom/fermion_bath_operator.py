@@ -1,6 +1,7 @@
 import numpy as np
 import copy
 
+"""
 from .chain_map import chain_map
 from pyttn import fOP, coeff
 
@@ -86,3 +87,4 @@ def add_fermionic_bath_hamiltonian(H, Sp, Sm, g, w, binds = None, geom='star', r
     else:
         raise RuntimeError("Cannot add bath Hamiltonian geometry not recognised.")
 
+"""

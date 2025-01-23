@@ -40,12 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Introduction/index.html">Introduction</a></li>
 </ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">pyTTN Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -78,7 +91,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 
 <div class="viewcode-block" id="BosonicBath">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BosonicBath</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for managing a continuous bosonic gaussian bath.  This provides</span>
 <span class="sd">    functions for computing non-interacting bath correlation functions, as well as</span>
@@ -106,7 +119,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">wmax</span> <span class="o">=</span> <span class="n">wmax</span>
 
 <div class="viewcode-block" id="BosonicBath.find_wmin">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.find_wmin">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.find_wmin">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">find_wmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">npoints</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes an estimate of the minimum frequency used for discretising a bath.</span>
 <span class="sd">        Here this is done by taking the maximum frequency and finding the largest value in </span>
@@ -130,7 +143,7 @@
 
 
 <div class="viewcode-block" id="BosonicBath.estimate_bounds">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.estimate_bounds">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.estimate_bounds">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">estimate_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns estimates for the upper and lower bounds of the spectral density to be used for the</span>
 <span class="sd">        discretisation function</span>
@@ -150,7 +163,7 @@
 
     <span class="c1">#improve this code to make it all work a bit better</span>
 <div class="viewcode-block" id="BosonicBath.Ct">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.Ct">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.Ct">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Ct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">epsabs</span><span class="o">=</span><span class="mf">1.49e-12</span><span class="p">,</span> <span class="n">epsrel</span><span class="o">=</span><span class="mf">1.49e-12</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">epsomega</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of the non-interacting bath correlation function evaluated at the time points t, </span>
 <span class="sd">        defined by:</span>
@@ -160,6 +173,14 @@
 <span class="sd">        </span>
 <span class="sd">        :param t: time</span>
 <span class="sd">        :type t: np.ndarray</span>
+<span class="sd">        :param epsabs: absolute error tolerance.  (Default: 1.49e-12)</span>
+<span class="sd">        :type epsabs: float or int, optional</span>
+<span class="sd">        :param epsrel: relative error tolerance.  (Default: 1.49e-12)</span>
+<span class="sd">        :type epsrel: float or int, optional</span>
+<span class="sd">        :param limit: Upper bound on the number of subintervals used in the integration scheme used to evaluate the correlation function.  (Default: 2000)</span>
+<span class="sd">        :type limit: float or int, optional</span>
+<span class="sd">        :param epsomega: A bound used to split the integral to avoid singularities at zero that may occur due to the bose function.  (Default: 1e-6)</span>
+<span class="sd">        :type epsomega: float or int, optional</span>
 <span class="sd">        :return: The bath correlation function</span>
 <span class="sd">        :rtype: np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -225,7 +246,7 @@
 
 
 <div class="viewcode-block" id="BosonicBath.Ctexp">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.Ctexp">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.Ctexp">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Ctexp</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of the non-interacting bath correlation function evaluated </span>
 <span class="sd">        at the time points t using the results of discretisation or expfit:</span>
@@ -246,7 +267,7 @@
 
 
 <div class="viewcode-block" id="BosonicBath.Sw">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.Sw">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.Sw">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">Sw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the non-interacting bath spectral function at w</span>
 
@@ -262,7 +283,7 @@
 
 
 <div class="viewcode-block" id="BosonicBath.discretise">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.discretise">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.discretise">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">discretise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">discretisation_engine</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the coupling constants and frequencies associated with a discretised representation of the bath</span>
 
@@ -284,14 +305,13 @@
 
 
 <div class="viewcode-block" id="BosonicBath.expfit">
-<a class="viewcode-back" href="../../../pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.expfit">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.bosonic_bath.BosonicBath.expfit">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">expfit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fitting_engine</span><span class="p">):</span>        
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function</span>
 
-
 <span class="sd">        :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition</span>
 <span class="sd">        :type fitting_engine: np.ndarray</span>
-<span class="sd">        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`</span>
+<span class="sd">        :return: Discrete system bath coupling constants :math:`g_k` and bath frequencies :math:`\omega_k`</span>
 <span class="sd">        :rtype: np.ndarray, np.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 

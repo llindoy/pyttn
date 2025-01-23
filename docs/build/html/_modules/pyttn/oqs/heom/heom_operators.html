@@ -40,9 +40,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn.html">pyttn package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -74,19 +90,19 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 
 <div class="viewcode-block" id="commutator">
-<a class="viewcode-back" href="../../../../pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.commutator">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.commutator">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">commutator</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="anti_commutator">
-<a class="viewcode-back" href="../../../../pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.anti_commutator">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.anti_commutator">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">anti_commutator</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">L</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="bkp">
-<a class="viewcode-back" href="../../../../pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.bkp">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.bkp">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">bkp</span><span class="p">(</span><span class="n">nbose</span><span class="p">,</span> <span class="n">dk</span><span class="p">):</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1">#b1 = np.zeros((nbose-1), dtype=np.complex128)</span>
@@ -103,7 +119,7 @@
     <span class="c1">#return sp.sparse.csr_matrix(b1, (row, col), shape=(nbose, nbose))</span>
 
 <div class="viewcode-block" id="bkm">
-<a class="viewcode-back" href="../../../../pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.bkm">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.bkm">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">bkm</span><span class="p">(</span><span class="n">nbose</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">mind</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1">#b1 = np.zeros((nbose-1), dtype=np.complex128)</span>
@@ -124,26 +140,26 @@
     <span class="c1">#return sp.sparse.csr_matrix(b1, (row, col), shape=(nbose, nbose))</span>
 
 <div class="viewcode-block" id="Sl">
-<a class="viewcode-back" href="../../../../pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.Sl">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.Sl">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">Sl</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span></div>
 
 
 <div class="viewcode-block" id="Sr">
-<a class="viewcode-back" href="../../../../pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.Sr">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.Sr">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">Sr</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">S</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Sp">
-<a class="viewcode-back" href="../../../../pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.Sp">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.Sp">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">Sp</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
     <span class="n">Scomm</span> <span class="o">=</span> <span class="n">commutator</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">Scomm</span></div>
 
 
 <div class="viewcode-block" id="Sm">
-<a class="viewcode-back" href="../../../../pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.Sm">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.Sm">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">Sm</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">mind</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
     <span class="n">Sop</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="n">mind</span><span class="p">:</span>
@@ -155,14 +171,14 @@
 
 
 <div class="viewcode-block" id="nop">
-<a class="viewcode-back" href="../../../../pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.nop">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.nop">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">nop</span><span class="p">(</span><span class="n">nbose</span><span class="p">,</span> <span class="n">zk</span><span class="p">):</span>
     <span class="n">ns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nbose</span><span class="p">)</span>
     <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">ns</span><span class="p">)</span><span class="o">*</span><span class="n">zk</span></div>
 
 
 <div class="viewcode-block" id="compute_dimensions">
-<a class="viewcode-back" href="../../../../pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.compute_dimensions">[docs]</a>
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.compute_dimensions">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_dimensions</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">Lmin</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">dk</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">int</span><span class="p">)</span>
     <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>

@@ -1,3 +1,2 @@
 from .bath_discretisation import OrthopolDiscretisation, DensityDiscretisation
-from .aaa_bath_fitting import AAADecomposition
-from .ESPRIT_bath_fitting import ESPRITDecomposition
+from .expfit import AAADecomposition, ESPRITDecomposition

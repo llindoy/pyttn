@@ -55,22 +55,10 @@ namespace py = pybind11;
 template <typename... Args>
 using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
 
-PYBIND11_MODULE(_pyttn, m)
+PYBIND11_MODULE(ttnpp, m)
 {
     m.doc()=R"mydelimiter(
       Python wrapping of the TTNS_LIB library for performing calculations on tree tensor network states
-      -----------------------------
-
-      .. currentmodule:: _pyttn
-
-      .. autosummary::
-          :toctree: _generate
-              :maxdepth: 2
-              :caption: Contents:
-
-              one_site_dmrg_real
-              one_site_dmrg_complex
-
       )mydelimiter";
     auto m_linalg = m.def_submodule("linalg",R"mydelimiter(
         Linear algebra submodule for TTNS library."

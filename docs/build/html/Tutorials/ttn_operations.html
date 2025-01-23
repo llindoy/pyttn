@@ -1,0 +1,949 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operations with Tree Tensor Networks &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyTTN Examples" href="../Examples/index.html" />
+    <link rel="prev" title="Operator generation with PyTTN" href="operator_generation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tree_topologies.html">Tree topologies with PyTTN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="operator_generation.html">Operator generation with PyTTN</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Operations with Tree Tensor Networks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Preparation">Preparation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Prepare-Tree-Tensor-Network">Prepare Tree Tensor Network</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#Set-initial-state-of-TTN">Set initial state of TTN</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Applying-operators-to-states">Applying operators to states</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Calculating-overlap-of-two-Tree-Tensor-Networks">Calculating overlap of two Tree Tensor Networks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Expectation-values-and-matrix-elements">Expectation values and matrix elements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Normalise">Normalise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Orthogonality">Orthogonality</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pyttn/index.html">pyttn</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ttnpp/ttnpp.html">ttnpp</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">pyTTN Tutorials</a></li>
+      <li class="breadcrumb-item active">Operations with Tree Tensor Networks</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/Tutorials/ttn_operations.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Operations-with-Tree-Tensor-Networks">
+<h1>Operations with Tree Tensor Networks<a class="headerlink" href="#Operations-with-Tree-Tensor-Networks" title="Link to this heading"></a></h1>
+<p>Import libraries</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numba</span><span class="w"> </span><span class="kn">import</span> <span class="n">jit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+<p>Import PyTTN dependencies</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1"># Function to visualise tree diagrams</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualise_tree</span>
+</pre></div>
+</div>
+</div>
+<section id="Preparation">
+<h2>Preparation<a class="headerlink" href="#Preparation" title="Link to this heading"></a></h2>
+<section id="Prepare-Tree-Tensor-Network">
+<h3>Prepare Tree Tensor Network<a class="headerlink" href="#Prepare-Tree-Tensor-Network" title="Link to this heading"></a></h3>
+<p>To prepare a Tree Tensor Network, it is necessary to set up the topology of the tree. There is a detailed guide on how to do this in the tutorial <a class="reference internal" href="tree_topologies.html"><span class="doc">tree_generation.ipynb</span></a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Number of physical degrees of freedom</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># Maximum bond dimension</span>
+<span class="n">chi</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># Vector of dimensions of the local Hilbert space in the physical nodes</span>
+<span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="mi">15</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+
+<span class="c1"># Vector of dimensions of the basis transformation nodes</span>
+<span class="n">basis_nodes_dims</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)]</span>
+
+<span class="c1"># Max number of child nodes for each node. Always larger than 1</span>
+<span class="n">degree</span> <span class="o">=</span> <span class="mi">2</span>
+
+
+<span class="c1"># Set up the tree topology</span>
+<span class="n">topo</span> <span class="o">=</span> <span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">mlmctdh_tree</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">degree</span><span class="p">,</span> <span class="n">chi</span><span class="p">,</span> <span class="n">basis_nodes_dims</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Plot tree diagram</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ntree : (1(8(8(8(10(15))(10(15)))(10(15)))(8(10(15))(10(15))))(8(8(8(10(15))(10(15)))(10(15)))(8(10(15))(10(15)))));
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_ttn_operations_8_1.png" src="../_images/Tutorials_ttn_operations_8_1.png" />
+</div>
+</div>
+<p>And from it, create the Tree Tensor Network:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Set-initial-state-of-TTN">
+<h2>Set initial state of TTN<a class="headerlink" href="#Set-initial-state-of-TTN" title="Link to this heading"></a></h2>
+<p>There are several pre-defined functions to set the initial value of the Tree Tensor Network. A useful one is to initialise it to a random state.</p>
+<p>One can create different random state with different seeds. The function <code class="docutils literal notranslate"><span class="pre">set_seed()</span></code> takes an integer which is used as the seed of the random number generator.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create Tree Tensor Network</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Initialise to a random state</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Initialise to a random state with a different seed</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<p>Another alternative is to initialise the TTN to a specific Fock state on each physical site. This can be done with the function <code class="docutils literal notranslate"><span class="pre">set_state()</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create Tree Tensor Network</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Set wavefunction to the |0&gt; state on all sites</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_state</span><span class="p">([</span><span class="mi">0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
+
+<span class="c1"># Set wavefunction to the |1&gt; state on all sites</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_state</span><span class="p">([</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<p>The function <code class="docutils literal notranslate"><span class="pre">zero()</span></code> sets all tensors in the network to be zero tensors.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create Tensor Network</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Set all tensors to be zero tensors</span>
+<span class="n">A</span><span class="o">.</span><span class="n">zero</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Applying-operators-to-states">
+<h2>Applying operators to states<a class="headerlink" href="#Applying-operators-to-states" title="Link to this heading"></a></h2>
+<p>Creating one-site operators only requires the site operator <code class="docutils literal notranslate"><span class="pre">sOP</span></code> object and the information about the modes contained in <code class="docutils literal notranslate"><span class="pre">sysinf</span></code>. The function <code class="docutils literal notranslate"><span class="pre">site_operator</span></code> combines them to create an operator that can be directly used to perform operations with the TTN.</p>
+<p>A simple many-body operator can also be created from a site product of operators <code class="docutils literal notranslate"><span class="pre">sPOP</span></code> using the function <code class="docutils literal notranslate"><span class="pre">product_operator</span></code>. For more information on the different kidns of operators and how to generate them, read the <a class="reference internal" href="operator_generation.html"><span class="doc">tutorial on operator generation</span></a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise system information variable</span>
+<span class="n">sysinf</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Specify that all modes are bosonic, with Hilbert space dimensions defined above.</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">sysinf</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">boson_mode</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<p>There are several simple ways of applying single-site operators to states. They are all completely equivalent:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Create single-site operator</span>
+<span class="n">adag_2</span> <span class="o">=</span> <span class="n">site_operator</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">)</span>
+
+
+<span class="c1"># Apply site operator to TTN in equivalent ways</span>
+<span class="n">A</span><span class="o">.</span><span class="n">apply_one_body_operator</span><span class="p">(</span><span class="n">adag_2</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">apply_operator</span><span class="p">(</span><span class="n">adag_2</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">adag_2</span> <span class="o">@</span> <span class="n">A</span>
+<span class="n">A</span> <span class="o">@=</span> <span class="n">adag_2</span>
+</pre></div>
+</div>
+</div>
+<p>Simple many-body operators are applied to states in a similar way. There are also several equivalent ways:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Create many-body operator</span>
+<span class="n">adag_3_a_5_adag_8</span> <span class="o">=</span> <span class="n">product_operator</span><span class="p">(</span><span class="n">sPOP</span><span class="p">([</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">8</span><span class="p">)]),</span> <span class="n">sysinf</span><span class="p">)</span>
+
+
+<span class="c1"># Apply product operator to TTN in equivalent ways</span>
+<span class="n">A</span><span class="o">.</span><span class="n">apply_product_operator</span><span class="p">(</span><span class="n">adag_3_a_5_adag_8</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">apply_operator</span><span class="p">(</span><span class="n">adag_3_a_5_adag_8</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">adag_3_a_5_adag_8</span> <span class="o">@</span> <span class="n">A</span>
+<span class="n">A</span> <span class="o">@=</span> <span class="n">adag_3_a_5_adag_8</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Calculating-overlap-of-two-Tree-Tensor-Networks">
+<h2>Calculating overlap of two Tree Tensor Networks<a class="headerlink" href="#Calculating-overlap-of-two-Tree-Tensor-Networks" title="Link to this heading"></a></h2>
+<p>PyTTN supports calculations of overlaps <span class="math notranslate nohighlight">\(\langle A | B \rangle\)</span> between two different Tree Tensor Networks, of expectation values of operators <span class="math notranslate nohighlight">\(\langle A | \hat{O} | A \rangle\)</span>, and matrix elements of operators <span class="math notranslate nohighlight">\(\langle A | \hat{O} | B \rangle\)</span>. At the core of these calculations is the <code class="docutils literal notranslate"><span class="pre">matrix_element</span></code> engine, which can be used to perform all of them.</p>
+<p>When the <code class="docutils literal notranslate"><span class="pre">matrix_element</span></code> engine is initialised without an argument, it automatically adapts to the dimension of the TTN. The engine can also be initialised by passing a TTN in its arguments, to allocate memory efficiently.</p>
+<p>The simplest calculation that can be performed with the <code class="docutils literal notranslate"><span class="pre">matrix_element</span></code> engine is the overlap of a TTN with itself. This can be useful to calculate norms:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Initialise engine to evaluate matrix elements</span>
+<span class="n">mel</span> <span class="o">=</span> <span class="n">matrix_element</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># Calculate overlap of the TTN with itself</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;A|A&gt;: &quot;</span><span class="p">,</span> <span class="n">mel</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;A|A&gt;:  0.9999999999999987
+</pre></div></div>
+</div>
+<p>The result is more interesting when the TTN is not normalised. As an example below, a creation operator is applied to the TTN in a random state, which leaves the TTN un-normalised.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Create operator and apply to TTN: obtain un-normalised state</span>
+<span class="n">op</span> <span class="o">=</span> <span class="n">site_operator</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">@=</span> <span class="n">op</span>
+
+
+<span class="c1"># Initialise engine to calculate matrix elements</span>
+<span class="n">mel</span> <span class="o">=</span> <span class="n">matrix_element</span><span class="p">()</span>
+
+<span class="c1"># Calculate overlap of the un-normalised TTN with itself</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;A|A&gt;: &quot;</span><span class="p">,</span> <span class="n">mel</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Norm of A: &quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mel</span><span class="p">(</span><span class="n">A</span><span class="p">)))</span>
+
+<span class="c1"># Calculate norm of TTN in an equivalent way</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Norm of A: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">norm</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;A|A&gt;:  6.997953726931835
+Norm of A:  2.6453645735383686
+Norm of A:  2.6453645735383717
+</pre></div></div>
+</div>
+<p>The overlap of two Tree Tensor Networks can be calculated in a similar way: by initialising the <code class="docutils literal notranslate"><span class="pre">matrix_element</span></code> engine, and passing the two TTNs as its arguments.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to a random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Create TTN and initialise to a different random state</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">B</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">B</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+
+<span class="c1"># Initialise engine to calculate matrix elements</span>
+<span class="n">mel</span> <span class="o">=</span> <span class="n">matrix_element</span><span class="p">()</span>
+
+<span class="c1"># Calculate overlap between the two TTNs</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;A|B&gt;: &quot;</span><span class="p">,</span> <span class="n">mel</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">B</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;A|B&gt;:  (1.3539685750389325e-06+9.834812078553482e-08j)
+</pre></div></div>
+</div>
+<p>This can be used to calculate overlap of a Tree Tensor Network with itself at two different points in time. To set up this calculation, the code below creates a copy <code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">=</span> <span class="pre">A(t)</span></code> of the TTN <code class="docutils literal notranslate"><span class="pre">A</span></code> and time-evolves it under the Hamiltonian <span class="math notranslate nohighlight">\(\hat{H} = 2\hat{n}_4 + 2\hat{n}_5 + 5\hat{a}_4\hat{a}^{\dagger}_5 + 5\hat{a}^{\dagger}_4\hat{a}_5\)</span>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to a random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Create B = A(t), copy of A that will be time evolved</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1"># Calculate matrix element</span>
+<span class="n">mel</span> <span class="o">=</span> <span class="n">matrix_element</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;A|A(0)&gt;:   &quot;</span><span class="p">,</span> <span class="n">mel</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">))</span>
+
+
+
+<span class="c1"># Create Hamiltonian for time evolution</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">5</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">5</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">h</span> <span class="o">=</span> <span class="n">sop_operator</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">)</span>
+
+
+
+<span class="c1"># Initialise time-evolution engine</span>
+<span class="n">sweep</span> <span class="o">=</span> <span class="n">tdvp</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;subspace&#39;</span><span class="p">)</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">coefficient</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="n">j</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">1e-2</span>
+
+<span class="c1"># Perform time evolution</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">sweep</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;A|A(</span><span class="si">%i</span><span class="s2">*dt)&gt;:&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">mel</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;A|A(0)&gt;:    (0.9999999999999987+2.6491034834717048e-17j)
+&lt;A|A(1*dt)&gt;: (0.9533050864900996-0.2740090073340111j)
+&lt;A|A(2*dt)&gt;: (0.8203205344723291-0.513786949418633j)
+&lt;A|A(3*dt)&gt;: (0.6209626814343896-0.6910492332618607j)
+&lt;A|A(4*dt)&gt;: (0.38414409918809245-0.7881484185642619j)
+&lt;A|A(5*dt)&gt;: (0.1423717695647399-0.8005673906615218j)
+&lt;A|A(6*dt)&gt;: (-0.07405797648097887-0.7367834472700195j)
+&lt;A|A(7*dt)&gt;: (-0.24204584543516205-0.6156704944454915j)
+&lt;A|A(8*dt)&gt;: (-0.3488809991449438-0.4621417783450052j)
+&lt;A|A(9*dt)&gt;: (-0.3931215753038885-0.30207892060448055j)
+</pre></div></div>
+</div>
+</section>
+<section id="Expectation-values-and-matrix-elements">
+<h2>Expectation values and matrix elements<a class="headerlink" href="#Expectation-values-and-matrix-elements" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">matrix_element</span></code> engine can also be used to calculate expectation values of operators <span class="math notranslate nohighlight">\(\langle A | \hat{O} | A \rangle\)</span> and matrix elements of operators <span class="math notranslate nohighlight">\(\langle A | \hat{O} | B \rangle\)</span>. The operators <span class="math notranslate nohighlight">\(\hat{O}\)</span> may be one-body or many-body operators, and they must be initialised as Tree Tensor Network Operators before being used to calculate the expectation values. For a detailed explanation on how to set up operators, read the <a class="reference internal" href="operator_generation.html"><span class="doc">tutorial on operator
+generation</span></a>.</p>
+<p>The expectation value of a one-body operator <span class="math notranslate nohighlight">\(\hat{a}_3\)</span>, acting on index <code class="docutils literal notranslate"><span class="pre">3</span></code>, can be calculated as below:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to a random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Create one-body operator</span>
+<span class="n">op</span> <span class="o">=</span> <span class="n">site_operator</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">)</span>
+
+<span class="c1"># Calculate expectation value</span>
+<span class="n">mel</span> <span class="o">=</span> <span class="n">matrix_element</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;A|a_3|A&gt;: &quot;</span><span class="p">,</span> <span class="n">mel</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">A</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;A|a_3|A&gt;:  (-0.08586731958481071+0.22671799369628992j)
+</pre></div></div>
+</div>
+<p>The same procedure can be followed to calculate the expectation value <span class="math notranslate nohighlight">\(\langle A | \hat{H} | A \rangle\)</span> of a complex many-body operator, like the Hamiltonian <span class="math notranslate nohighlight">\(\hat{H} = 2\hat{n}_4 + 2\hat{n}_5 + 5\hat{a}_4\hat{a}^{\dagger}_5 + 5\hat{a}^{\dagger}_4\hat{a}_5\)</span>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to a random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Create Hamiltonian as SOP object</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># Add terms to Hamiltonian</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">5</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">5</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># Initialise Hamiltonian as TTNO</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">sop_operator</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">)</span>
+
+<span class="c1"># Calculate expectation value</span>
+<span class="n">mel</span> <span class="o">=</span> <span class="n">matrix_element</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;A|H|A&gt;: &quot;</span><span class="p">,</span> <span class="n">mel</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;A|H|A&gt;:  (27.99220747158732-2.1575623232461538e-17j)
+</pre></div></div>
+</div>
+<p>A similar procedure can be followed to calculate matrix elements <span class="math notranslate nohighlight">\(\langle A | \hat{O} | B \rangle\)</span> of operators <span class="math notranslate nohighlight">\(\hat{O}\)</span>. For example, in the Fock basis, the matrix element <span class="math notranslate nohighlight">\(\,\)</span> <span class="math notranslate nohighlight">\(_4\langle 1 | \hat{a}_4 | 2 \rangle_4 = \sqrt{2}\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to a random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_state</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># Create TTN and initialise to a different random state</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">B</span><span class="o">.</span><span class="n">set_state</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># Create one-site operator</span>
+<span class="n">op</span> <span class="o">=</span> <span class="n">site_operator</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">)</span>
+
+<span class="c1"># Calculate matrix element</span>
+<span class="n">mel</span> <span class="o">=</span> <span class="n">matrix_element</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;A|a_4|B&gt;: &quot;</span><span class="p">,</span> <span class="n">mel</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;A|a_4|B&gt;:  (1.4142135623730951+0j)
+</pre></div></div>
+</div>
+<p>And it is similarly easy to calculate a 2-point correlator <span class="math notranslate nohighlight">\(\langle A | \hat{O}(0) \hat{O}(t) | A \rangle\)</span>. For this calculation, the state <span class="math notranslate nohighlight">\(|B(t)\rangle = \hat{O}(t) |A\rangle\)</span> is time-evolved under the Hamiltonian <span class="math notranslate nohighlight">\(\hat{H} = 2\hat{n}_4 + 2\hat{n}_5 + 5\hat{a}_4\hat{a}^{\dagger}_5 + 5\hat{a}^{\dagger}_4\hat{a}_5\)</span>, and the resulting state is used to calculate the matrix element <span class="math notranslate nohighlight">\(\langle A | \hat{O}(0) | B(t) \rangle = \langle A | \hat{O}(0) \hat{O}(t) | A \rangle\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to a random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Create one-site operator</span>
+<span class="n">op</span> <span class="o">=</span> <span class="n">site_operator</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">)</span>
+
+<span class="c1"># Create B = n_4(t) @ A, that will be time evolved</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">@=</span> <span class="n">op</span>
+
+<span class="c1"># Calculate matrix element</span>
+<span class="n">mel</span> <span class="o">=</span> <span class="n">matrix_element</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;A|n_4(0)n_4(0)|A&gt;:   &quot;</span><span class="p">,</span> <span class="n">mel</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">))</span>
+
+
+
+<span class="c1"># Create Hamiltonian for time evolution</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">5</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="mi">5</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">h</span> <span class="o">=</span> <span class="n">sop_operator</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">)</span>
+
+
+
+<span class="c1"># Initialise time-evolution engine</span>
+<span class="n">sweep</span> <span class="o">=</span> <span class="n">tdvp</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;subspace&#39;</span><span class="p">)</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">coefficient</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="n">j</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="mf">1e-2</span>
+
+<span class="c1"># Perform time evolution</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">sweep</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&lt;A|n_4(0)n_4(</span><span class="si">%i</span><span class="s2">*dt)|A&gt;:&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">,</span> <span class="n">mel</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;A|n_4(0)n_4(0)|A&gt;:    (68.80090496984144+7.237266341775239e-15j)
+&lt;A|n_4(0)n_4(1*dt)|A&gt;: (64.07180712482264-23.57635459067501j)
+&lt;A|n_4(0)n_4(2*dt)|A&gt;: (50.81558770085837-43.208768951927475j)
+&lt;A|n_4(0)n_4(3*dt)|A&gt;: (31.602345995750532-55.8250115163906j)
+&lt;A|n_4(0)n_4(4*dt)|A&gt;: (10.021440279690015-59.8730541193612j)
+&lt;A|n_4(0)n_4(5*dt)|A&gt;: (-10.164379705835163-55.57662309464913j)
+&lt;A|n_4(0)n_4(6*dt)|A&gt;: (-25.859034713949093-44.7451581703391j)
+&lt;A|n_4(0)n_4(7*dt)|A&gt;: (-35.24693096200696-30.212638182529115j)
+&lt;A|n_4(0)n_4(8*dt)|A&gt;: (-38.03499294452412-15.079694355173832j)
+&lt;A|n_4(0)n_4(9*dt)|A&gt;: (-35.29137980561083-1.9770369561290584j)
+</pre></div></div>
+</div>
+</section>
+<section id="Normalise">
+<h2>Normalise<a class="headerlink" href="#Normalise" title="Link to this heading"></a></h2>
+<p>The function <code class="docutils literal notranslate"><span class="pre">norm()</span></code> calculates the norm of the Tree Tensor Network:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to a random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Calculate norm of TTN</span>
+<span class="n">A</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.9999999999999993
+</pre></div></div>
+</div>
+<p>An un-normalised Tree Tensor Network can be normalised using a single function. As an example, let us prepare an un-normalised TTN:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create one-body operator and apply it to TTN</span>
+<span class="n">op</span> <span class="o">=</span> <span class="n">site_operator</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">apply_one_body_operator</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+
+<span class="c1"># Calculate norm of TTN</span>
+<span class="n">A</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.5904489953387655
+</pre></div></div>
+</div>
+<p>And normalise it using the function <code class="docutils literal notranslate"><span class="pre">normalise()</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="o">.</span><span class="n">normalise</span><span class="p">()</span>
+
+<span class="c1"># Calculate norm of TTN</span>
+<span class="n">A</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.9999999999999997
+</pre></div></div>
+</div>
+</section>
+<section id="Orthogonality">
+<h2>Orthogonality<a class="headerlink" href="#Orthogonality" title="Link to this heading"></a></h2>
+<p>pyTTN is designed to handle internally operations affecting the orthogonality centre of the network. However, there are several functionalities to control the orthogonality centre that may be useful for the advanced user.</p>
+<p>For the following discussion, it will be useful to recall the tree diagram:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create TTN and initialise to random state</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Optimise tree diagram</span>
+<span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">sanitise</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Plot diagram of TTN topology</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_ttn_operations_52_0.png" src="../_images/Tutorials_ttn_operations_52_0.png" />
+</div>
+</div>
+<p>In the tree diagram above, the nodes with bond dimension <code class="docutils literal notranslate"><span class="pre">8</span></code> are internal nodes of the TTN; the nodes with Hilbert-space dimension <code class="docutils literal notranslate"><span class="pre">15</span></code> are “physical nodes”, encoding the degrees of freedom of the problem; and the nodes with dimension <code class="docutils literal notranslate"><span class="pre">10</span></code> are local Hilbert-space rotations. The node with dimension <code class="docutils literal notranslate"><span class="pre">1</span></code> is the root of the tree—for more information on the topoogy of the network, read the <a class="reference internal" href="tree_topologies.html"><span class="doc">tutorial on generating tree topologies</span></a>.</p>
+<p>pyTTN uses <em>pre-order depth-first</em> ordering, a method of visiting all the nodes of the tree by exploring as far as possible along a branch (<em>depth-first</em>) before backtracking, starting from the root (<em>pre-order</em>). The branches are visited from left to right.</p>
+<p>The nodes of the network are indexed according to this ordering, although ignoring the local basis-rotation nodes. This is because those can be contracted to the leaf nodes without altering the topology of the network. Note that the index of the node in the network is not the same as the index corresponding to the physical degree of freedom. The physical index is the one specified when applying operators to the Tree Tensor Network.</p>
+<p>The function <code class="docutils literal notranslate"><span class="pre">orthogonality_centre()</span></code> indicates the index of the TTN where the orthogonality centre is. The network is orthogonalised when the orthogonality centre is at the root node, with index <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+18
+</pre></div></div>
+</div>
+<p>The function <code class="docutils literal notranslate"><span class="pre">is_orthogonalised()</span></code> is a Boolean test of the orthogonality of the TTN:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="o">.</span><span class="n">is_orthogonalised</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+True
+</pre></div></div>
+</div>
+<p>When an operator acts on the TTN, the orthogonality centre is shifted to the index upon which the operator acts.</p>
+<p>Note that the operator is created specifying a physical index (in this case, leaf node <code class="docutils literal notranslate"><span class="pre">3</span></code>), which corresponds to a different network index (in this case, network node <code class="docutils literal notranslate"><span class="pre">7</span></code>). The reader can convince themself of this by counting the nodes in <em>pre-order depth-first</em> ordering, remembering to ignore the local basis rotation nodes, starting from the root node <code class="docutils literal notranslate"><span class="pre">0</span></code>, and finding that the network node <code class="docutils literal notranslate"><span class="pre">7</span></code> is the same as the physical node <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">op</span> <span class="o">=</span> <span class="n">site_operator</span><span class="p">(</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;adag&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">apply_one_body_operator</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+
+<span class="c1"># Orthogonality information</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Is orthogonalised: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">is_orthogonalised</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Orthogonality centre:  7
+Is orthogonalised:  False
+</pre></div></div>
+</div>
+<p>The function <code class="docutils literal notranslate"><span class="pre">orthogonalise</span></code> sets the orthogonality centre back at the root of the tree.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="o">.</span><span class="n">orthogonalise</span><span class="p">()</span>
+
+<span class="c1"># Orthogonality information</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Is orthogonalised: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">is_orthogonalised</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Orthogonality centre:  0
+Is orthogonalised:  True
+</pre></div></div>
+</div>
+<p>The user can set the orthogonality centre manually in several ways.</p>
+<p>The function <code class="docutils literal notranslate"><span class="pre">set_orthogonality_centre()</span></code> moves the orthogonality centre to the node indicated in its argument. This can be specified in two ways: by indicating a network index, or by indicating the path to a network node. Both ways are exemplified below.</p>
+<p>The path to a node is a vector containing the index of the branch that one has to follow from the root node <code class="docutils literal notranslate"><span class="pre">0</span></code> to arrive at a specified node. For instance, the path <code class="docutils literal notranslate"><span class="pre">[0,0,1]</span></code> specifies the physical node <code class="docutils literal notranslate"><span class="pre">1</span></code>, which can be found by starting at the root and moving to its left-most branch, then again to its left-most branch, and finally taking the right branch to arrive at the leaf node <code class="docutils literal notranslate"><span class="pre">topo()[0][0][1]</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+
+<span class="c1"># Set orthogonality centre at site 2</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_orthogonality_centre</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+
+<span class="c1"># Set orthogonality centre at site 7</span>
+<span class="c1"># topo()[1][0]</span>
+<span class="n">A</span><span class="o">.</span><span class="n">orthogonalise</span><span class="p">()</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_orthogonality_centre</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Orthogonality centre:  0
+Orthogonality centre:  2
+Orthogonality centre:  7
+</pre></div></div>
+</div>
+<p>The function <code class="docutils literal notranslate"><span class="pre">shift_orthogonality_centre()</span></code> moves the orthogonality centre in the tree relative to its current position. Its argument indicates the direction in which the orthogonality centre shifts, by specifying the branch along which to move. The parent branch of a node is <code class="docutils literal notranslate"><span class="pre">0</span></code>, and the child branches are numbered from left to right.</p>
+<p>Below is an example of shifting the orthogonality centre. To follow its displacement, it is useful to look at the tree diagram.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot diagram of TTN topology</span>
+<span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+
+<span class="c1"># Set orthogonality centre at node 6</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_orthogonality_centre</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+
+<span class="c1"># Move orthogonality centre to node 7</span>
+<span class="n">A</span><span class="o">.</span><span class="n">shift_orthogonality_centre</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+
+<span class="c1"># Move orthogonality centre back to node 6</span>
+<span class="n">A</span><span class="o">.</span><span class="n">shift_orthogonality_centre</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+
+<span class="c1"># Move orthogonality centre to node 0</span>
+<span class="n">A</span><span class="o">.</span><span class="n">shift_orthogonality_centre</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+
+<span class="c1"># Move orthogonality centre to node 1</span>
+<span class="n">A</span><span class="o">.</span><span class="n">shift_orthogonality_centre</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+
+<span class="c1"># Move orthogonality centre to node 2</span>
+<span class="n">A</span><span class="o">.</span><span class="n">shift_orthogonality_centre</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+
+<span class="c1"># Set orthogonality centre at node 1</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_orthogonality_centre</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+
+<span class="c1"># Move orthogonality centre to node 6</span>
+<span class="n">A</span><span class="o">.</span><span class="n">shift_orthogonality_centre</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Orthogonality centre: &quot;</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">orthogonality_centre</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Orthogonality centre:  6
+Orthogonality centre:  7
+Orthogonality centre:  6
+Orthogonality centre:  0
+Orthogonality centre:  1
+Orthogonality centre:  2
+Orthogonality centre:  0
+Orthogonality centre:  6
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Tutorials_ttn_operations_64_1.png" src="../_images/Tutorials_ttn_operations_64_1.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="operator_generation.html" class="btn btn-neutral float-left" title="Operator generation with PyTTN" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../Examples/index.html" class="btn btn-neutral float-right" title="pyTTN Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
