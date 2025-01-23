@@ -25,12 +25,10 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.mathjax',
     'nbsphinx',
-    'nbsphinx_link', 
-    'sphinx_toolbox.more_autodoc.overloads'
+    'nbsphinx_link'
     ]
 
 autosummary_generate=True
-autoclass_content='both'
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints']

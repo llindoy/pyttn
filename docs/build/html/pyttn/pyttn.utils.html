@@ -57,12 +57,17 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">pyttn</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Documents</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="index.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pyttn.linalg.html">pyttn.linalg package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyttn.models.html">pyttn.models package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyttn.oqs.html">pyttn.oqs package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pyttn.utils package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils.mode_combination">pyttn.utils.mode_combination module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils.truncate">pyttn.utils.truncate module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils.visualise_tree">pyttn.utils.visualise_tree module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils">Module contents</a></li>
 </ul>
 </li>
@@ -72,10 +77,6 @@
 <li class="toctree-l2"><a class="reference internal" href="index.html#module-pyttn">Module contents</a></li>
 </ul>
 </li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../ttnpp/ttnpp.html">ttnpp</a></li>
 </ul>
 
         </div>
@@ -105,12 +106,232 @@
              
   <section id="pyttn-utils-package">
 <h1>pyttn.utils package<a class="headerlink" href="#pyttn-utils-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-pyttn.utils.mode_combination">
+<span id="pyttn-utils-mode-combination-module"></span><h2>pyttn.utils.mode_combination module<a class="headerlink" href="#module-pyttn.utils.mode_combination" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.utils.mode_combination.ModeCombination">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.mode_combination.</span></span><span class="sig-name descname"><span class="pre">ModeCombination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nhilb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/mode_combination.html#ModeCombination"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.mode_combination.ModeCombination" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for automatically combining modes of a system_modes object together to form a new system_modes
+object consisting of composite modes.  The approach implemented within this class involves sweeping from left
+to right and we attempt to combine the next mode into the current mode provided we have not already combined nbmax
+modes together in this mode and the local hilbert space dimension of the composite mode is less than nbmax.</p>
+<p>Constructor arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nhilb</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum local Hilbert space dimension to allow during the mode combination process (default:1)</p></li>
+<li><p><strong>nbmax</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum  number of modes to combine(default:1)</p></li>
+<li><p><strong>blocksize</strong> (<em>int</em><em>, </em><em>optional</em>) – An optional blocksize argument.  For a blocksize of X, the current mode will contain a multiple of X modes and the new mode to add will contain X modes provided we have not reached the end of the chain(default:1)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Callable arguments
+:param system: the system_modes object defining all mode data
+:type mode_dims: system_modes
+:param blocksize: An optional blocksize argument, used to ignore the globally set blocksize (default is None)
+:type blocksize: int or None, optional
+:returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode
+:rtype: list of list</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.mode_combination.ModeCombination.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/mode_combination.html#ModeCombination.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.mode_combination.ModeCombination.__call__" title="Link to this definition"></a></dt>
+<dd><p>Perform the mode combination process on a system_modes object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> – the system_modes object defining all mode data</p></li>
+<li><p><strong>blocksize</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – An optional blocksize argument, used to ignore the globally set blocksize (default is None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.mode_combination.ModeCombination.mode_combination_array">
+<span class="sig-name descname"><span class="pre">mode_combination_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode_inds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/mode_combination.html#ModeCombination.mode_combination_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.mode_combination.ModeCombination.mode_combination_array" title="Link to this definition"></a></dt>
+<dd><p>Perform the mode combination process on a array of mode dimensions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode_dims</strong> (<em>list</em><em> or </em><em>np.ndarray</em>) – the mode dimensions</p></li>
+<li><p><strong>mode_inds</strong> (<em>list</em><em> or </em><em>np.ndarray</em><em>, </em><em>optional</em>) – the index labels of each of the modes (defaults to None) in which case we assume the modes are labelled [x for x in range(len(mode_dims))]</p></li>
+<li><p><strong>blocksize</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – An optional blocksize argument, used to ignore the globally set blocksize (default is None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.mode_combination.ModeCombination.mode_combination_system">
+<span class="sig-name descname"><span class="pre">mode_combination_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_blocksize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/mode_combination.html#ModeCombination.mode_combination_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.mode_combination.ModeCombination.mode_combination_system" title="Link to this definition"></a></dt>
+<dd><p>Perform the mode combination process on a system_modes object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>system</strong> – the system_modes object defining all mode data</p></li>
+<li><p><strong>blocksize</strong> (<em>int</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – An optional blocksize argument, used to ignore the globally set blocksize (default is None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pyttn.utils.truncate">
+<span id="pyttn-utils-truncate-module"></span><h2>pyttn.utils.truncate module<a class="headerlink" href="#module-pyttn.utils.truncate" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.utils.truncate.DepthTruncation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.truncate.</span></span><span class="sig-name descname"><span class="pre">DepthTruncation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#DepthTruncation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.truncate.DepthTruncation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyttn.utils.truncate.TruncationBase" title="pyttn.utils.truncate.TruncationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TruncationBase</span></code></a></p>
+<p>A class for truncating system modes to a fixed number of levels</p>
+<p>Constructor arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Lmax</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of states to include in the local Hilbert space (default:2)</p>
+</dd>
+</dl>
+<p>Callable arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gk</strong> (<em>np.ndarray</em>) – The interaction strength</p></li>
+<li><p><strong>wk</strong> (<em>np.ndarray</em>) – The mode frequency</p></li>
+<li><p><strong>is_fermion</strong> (<em>bool</em>) – Whether or not the modes to be truncated are fermionic</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing the local Hilbert space dimension of each mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.truncate.DepthTruncation.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_fermion</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#DepthTruncation.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.truncate.DepthTruncation.__call__" title="Link to this definition"></a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.utils.truncate.EnergyTruncation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.truncate.</span></span><span class="sig-name descname"><span class="pre">EnergyTruncation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ecut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'abs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#EnergyTruncation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.truncate.EnergyTruncation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyttn.utils.truncate.TruncationBase" title="pyttn.utils.truncate.TruncationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TruncationBase</span></code></a></p>
+<p>A class for truncating system modes to a fixed number of levels</p>
+<p>Constructor arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ecut</strong> (<em>float</em><em>, </em><em>optional</em>) – The maximum energy to include in the problem (defaul: 0)</p></li>
+<li><p><strong>Lmax</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum number of states to include in the local Hilbert space (default:2)</p></li>
+<li><p><strong>Lmin</strong> (<em>int</em><em>, </em><em>optional</em>) – The minimum number of states to include in the local Hilbert space (default:1)</p></li>
+<li><p><strong>func</strong> (<em>{&quot;abs&quot;</em><em>, </em><em>&quot;real&quot;}</em><em>, </em><em>optional</em>) – Whether to use the absolute value or real part of the frequency. (default: “abs”)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Callable arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gk</strong> (<em>np.ndarray</em>) – The interaction strength</p></li>
+<li><p><strong>wk</strong> (<em>np.ndarray</em>) – The mode frequency</p></li>
+<li><p><strong>is_fermion</strong> (<em>bool</em>) – Whether or not the modes to be truncated are fermionic</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing the local Hilbert space dimension of each mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.truncate.EnergyTruncation.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_fermion</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#EnergyTruncation.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.truncate.EnergyTruncation.__call__" title="Link to this definition"></a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.utils.truncate.EnergyTruncation.truncate_bosonic">
+<span class="sig-name descname"><span class="pre">truncate_bosonic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gk</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#EnergyTruncation.truncate_bosonic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.truncate.EnergyTruncation.truncate_bosonic" title="Link to this definition"></a></dt>
+<dd><p>Truncate a bosonic mode using coupling constants and frequencies</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gk</strong> (<em>np.ndarray</em>) – The interaction strength</p></li>
+<li><p><strong>wk</strong> (<em>np.ndarray</em>) – The mode frequency</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing the local Hilbert space dimension of each mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.utils.truncate.TruncationBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.truncate.</span></span><span class="sig-name descname"><span class="pre">TruncationBase</span></span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#TruncationBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.truncate.TruncationBase" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for local Hilbert space mode decomposition</p>
+</dd></dl>
+
+</section>
+<section id="module-pyttn.utils.visualise_tree">
+<span id="pyttn-utils-visualise-tree-module"></span><h2>pyttn.utils.visualise_tree module<a class="headerlink" href="#module-pyttn.utils.visualise_tree" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyttn.utils.visualise_tree.visualise_tree">
+<span class="sig-prename descclassname"><span class="pre">pyttn.utils.visualise_tree.</span></span><span class="sig-name descname"><span class="pre">visualise_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prog</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linewidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/visualise_tree.html#visualise_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.visualise_tree.visualise_tree" title="Link to this definition"></a></dt>
+<dd><p>A function for plotting an ntree object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tree</strong> (<a class="reference internal" href="index.html#pyttn.ntree" title="pyttn.ntree"><em>ntree</em></a>) – The tree to be visualised</p></li>
+<li><p><strong>prog</strong> (<em>Matplotlib Axes object</em><em>, </em><em>optional</em>) – The visualisation function used with graphviz_layout (default: “dot”)</p></li>
+<li><p><strong>ax</strong> – Draw the tree in specified Matplotlib axes</p></li>
+<li><p><strong>node_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The node size used for visualisation (default: 500)</p></li>
+<li><p><strong>linewidth</strong> (<em>int</em><em>, </em><em>optional</em>) – The width of edges connecting nodes (default: 3)</p></li>
+<li><p><strong>add_labels</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to include the node labels (default: True)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="module-pyttn.utils">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyttn.utils" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyttn.utils.DepthTruncation">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">DepthTruncation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Lmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#DepthTruncation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.DepthTruncation" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyttn.utils.TruncationBase" title="pyttn.utils.truncate.TruncationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TruncationBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#pyttn.utils.truncate.TruncationBase" title="pyttn.utils.truncate.TruncationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TruncationBase</span></code></a></p>
 <p>A class for truncating system modes to a fixed number of levels</p>
 <p>Constructor arguments</p>
 <dl class="field-list simple">
@@ -145,7 +366,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="pyttn.utils.EnergyTruncation">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">EnergyTruncation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ecut</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'abs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/utils/truncate.html#EnergyTruncation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.utils.EnergyTruncation" title="Link to this definition"></a></dt>
-<dd><p>Bases: <a class="reference internal" href="#pyttn.utils.TruncationBase" title="pyttn.utils.truncate.TruncationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TruncationBase</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#pyttn.utils.truncate.TruncationBase" title="pyttn.utils.truncate.TruncationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TruncationBase</span></code></a></p>
 <p>A class for truncating system modes to a fixed number of levels</p>
 <p>Constructor arguments</p>
 <dl class="field-list simple">
@@ -364,15 +585,8 @@ modes together in this mode and the local hilbert space dimension of the composi
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyttn.utils.orthopol">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">orthopol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.utils.orthopol" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.utils.</span></span><span class="sig-name descname"><span class="pre">orthopol</span></span><a class="headerlink" href="#pyttn.utils.orthopol" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
-<p>Overloaded function.</p>
-<ol class="arabic simple">
-<li><p>__init__(self: pyttn.ttnpp.utils.orthopol) -&gt; None</p></li>
-<li><p>__init__(self: pyttn.ttnpp.utils.orthopol, arg0: int, arg1: float, arg2: float) -&gt; None</p></li>
-<li><p>__init__(self: pyttn.ttnpp.utils.orthopol, arg0: int, arg1: float, arg2: float, arg3: float) -&gt; None</p></li>
-<li><p>__init__(self: pyttn.ttnpp.utils.orthopol, arg0: pyttn.ttnpp.utils.orthopol) -&gt; None</p></li>
-</ol>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.utils.orthopol.Nmax">
 <span class="sig-name descname"><span class="pre">Nmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol" title="pyttn.ttnpp.utils.orthopol"><span class="pre">pyttn.ttnpp.utils.orthopol</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyttn.utils.orthopol.Nmax" title="Link to this definition"></a></dt>

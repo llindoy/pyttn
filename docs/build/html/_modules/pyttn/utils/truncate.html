@@ -54,11 +54,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/index.html">pyttn</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../ttnpp/ttnpp.html">ttnpp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/index.html">API Documents</a></li>
 </ul>
 
         </div>
@@ -90,7 +87,7 @@
 
 
 <div class="viewcode-block" id="TruncationBase">
-<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.TruncationBase">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.truncate.TruncationBase">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TruncationBase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for local Hilbert space mode decomposition</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -99,7 +96,7 @@
 
 
 <div class="viewcode-block" id="DepthTruncation">
-<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.DepthTruncation">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.truncate.DepthTruncation">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DepthTruncation</span><span class="p">(</span><span class="n">TruncationBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for truncating system modes to a fixed number of levels   </span>
 
@@ -125,7 +122,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">Lmax</span> <span class="o">=</span> <span class="n">Lmax</span>
 
 <div class="viewcode-block" id="DepthTruncation.__call__">
-<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.DepthTruncation.__call__">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.truncate.DepthTruncation.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gk</span><span class="p">,</span> <span class="n">wk</span><span class="p">,</span> <span class="n">is_fermion</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">is_fermion</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wk</span><span class="p">))]</span>
@@ -135,7 +132,7 @@
 
 
 <div class="viewcode-block" id="EnergyTruncation">
-<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.EnergyTruncation">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.truncate.EnergyTruncation">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">EnergyTruncation</span><span class="p">(</span><span class="n">TruncationBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for truncating system modes to a fixed number of levels   </span>
 
@@ -171,7 +168,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">func</span> <span class="o">=</span> <span class="n">func</span>
 
 <div class="viewcode-block" id="EnergyTruncation.truncate_bosonic">
-<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.EnergyTruncation.truncate_bosonic">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.truncate.EnergyTruncation.truncate_bosonic">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">truncate_bosonic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gk</span><span class="p">,</span> <span class="n">wk</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Truncate a bosonic mode using coupling constants and frequencies   </span>
 
@@ -206,7 +203,7 @@
 
 
 <div class="viewcode-block" id="EnergyTruncation.__call__">
-<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.EnergyTruncation.__call__">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.truncate.EnergyTruncation.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gk</span><span class="p">,</span> <span class="n">wk</span><span class="p">,</span> <span class="n">is_fermion</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">is_fermion</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wk</span><span class="p">))]</span>

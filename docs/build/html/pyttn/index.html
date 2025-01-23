@@ -23,7 +23,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pyttn.linalg package" href="pyttn.linalg.html" />
-    <link rel="prev" title="Spin Boson Model Dynamics" href="../Examples/spin_boson.html" /> 
+    <link rel="prev" title="pyTTN package" href="API%20Outline.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -59,7 +59,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">pyttn</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Documents</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pyttn.linalg.html">pyttn.linalg package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyttn.models.html">pyttn.models package</a></li>
@@ -103,6 +104,47 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#pyttn.ms_ttn"><code class="docutils literal notranslate"><span class="pre">ms_ttn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyttn.ms_ttn_dtype"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.__getitem__"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.__idiv__"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.__idiv__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.__imul__"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.__imul__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.__iter__"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.__iter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.__len__"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.__len__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.__setitem__"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.__setitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.assign"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.assign()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.bond_dimensions"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.bond_dimensions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.clear"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.complex_dtype"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.complex_dtype</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.conj"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.conj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.dim"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.dim()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.force_set_orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.force_set_orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.has_orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.has_orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.is_orthogonalised"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.is_orthogonalised()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.is_purification"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.is_purification()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.mode_dimensions"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.mode_dimensions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.nelem"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.nelem()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.nmodes"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.nmodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.norm"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.norm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.normalise"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.normalise()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.nset"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.nset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.nsites"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.nsites()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.ntensors"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.ntensors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.nthreads"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.nthreads</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.orthogonalise"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.orthogonalise()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.random"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.random()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.reset_orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.reset_orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.resize"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.resize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.set_orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.set_orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.set_seed"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.set_seed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.set_state"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.set_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.shift_orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.shift_orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.site_tensor"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.site_tensor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.slice"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.slice()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.truncate"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.truncate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ms_ttn_dtype.zero"><code class="docutils literal notranslate"><span class="pre">ms_ttn_dtype.zero()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#pyttn.multiset_SOP"><code class="docutils literal notranslate"><span class="pre">multiset_SOP()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyttn.multiset_dmrg"><code class="docutils literal notranslate"><span class="pre">multiset_dmrg()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyttn.multiset_sop_operator"><code class="docutils literal notranslate"><span class="pre">multiset_sop_operator()</span></code></a></li>
@@ -250,14 +292,66 @@
 <li class="toctree-l3"><a class="reference internal" href="#pyttn.tdvp"><code class="docutils literal notranslate"><span class="pre">tdvp()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyttn.tls_mode"><code class="docutils literal notranslate"><span class="pre">tls_mode()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pyttn.ttn"><code class="docutils literal notranslate"><span class="pre">ttn()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyttn.ttn_dtype"><code class="docutils literal notranslate"><span class="pre">ttn_dtype</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.__getitem__"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.__getitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.__idiv__"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.__idiv__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.__imatmul__"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.__imatmul__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.__imul__"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.__imul__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.__iter__"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.__iter__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.__len__"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.__len__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.__rmatmul__"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.__rmatmul__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.__setitem__"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.__setitem__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.apply_one_body_operator"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.apply_one_body_operator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.apply_operator"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.apply_operator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.apply_product_operator"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.apply_product_operator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.assign"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.assign()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.bond_dimensions"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.bond_dimensions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.bond_entropy"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.bond_entropy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.clear"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.clear()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.collapse"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.collapse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.collapse_basis"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.collapse_basis()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.complex_dtype"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.complex_dtype</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.compute_maximum_bond_entropy"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.compute_maximum_bond_entropy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.conj"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.conj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.dim"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.dim()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.force_set_orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.force_set_orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.has_orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.has_orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.is_orthogonalised"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.is_orthogonalised()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.is_purification"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.is_purification()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.maximum_bond_dimension"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.maximum_bond_dimension()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.maximum_bond_entropy"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.maximum_bond_entropy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.measure_without_collapse"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.measure_without_collapse()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.minimum_bond_dimension"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.minimum_bond_dimension()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.mode_dimensions"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.mode_dimensions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.nelem"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.nelem()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.nmodes"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.nmodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.norm"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.norm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.normalise"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.normalise()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.nset"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.nset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.nsites"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.nsites()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.ntensors"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.ntensors()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.orthogonalise"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.orthogonalise()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.random"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.random()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.reset_orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.reset_orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.resize"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.resize()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.sample_product"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.sample_product()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.set_identity_purification"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.set_identity_purification()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.set_orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.set_orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.set_product"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.set_product()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.set_seed"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.set_seed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.set_site_tensor"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.set_site_tensor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.set_state"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.set_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.shift_orthogonality_centre"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.shift_orthogonality_centre()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.site_tensor"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.site_tensor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.truncate"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.truncate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn.ttn_dtype.zero"><code class="docutils literal notranslate"><span class="pre">ttn_dtype.zero()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../ttnpp/ttnpp.html">ttnpp</a></li>
+</li>
 </ul>
 
         </div>
@@ -292,10 +386,15 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pyttn.linalg.html">pyttn.linalg package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyttn.linalg.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyttn.linalg.html#module-pyttn.linalg.sparseMatrixExt">pyttn.linalg.sparseMatrixExt module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyttn.linalg.html#module-pyttn.linalg.tensorExt">pyttn.linalg.tensorExt module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyttn.linalg.html#module-pyttn.linalg">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pyttn.models.html">pyttn.models package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyttn.models.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyttn.models.html#module-pyttn.models.modelsExt">pyttn.models.modelsExt module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyttn.models.html#module-pyttn.models">Module contents</a></li>
 </ul>
 </li>
@@ -310,6 +409,10 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pyttn.utils.html">pyttn.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyttn.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyttn.utils.html#module-pyttn.utils.mode_combination">pyttn.utils.mode_combination module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyttn.utils.html#module-pyttn.utils.truncate">pyttn.utils.truncate module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyttn.utils.html#module-pyttn.utils.visualise_tree">pyttn.utils.visualise_tree module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyttn.utils.html#module-pyttn.utils">Module contents</a></li>
 </ul>
 </li>
@@ -566,80 +669,22 @@ object with the required dtype.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyttn.mode_data">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">mode_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.mode_data" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">mode_data</span></span><a class="headerlink" href="#pyttn.mode_data" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A class for handling information about composite modes used to represent the system information.
 This class stores a set of primitive_mode_data defining each individual mode that forms this composite,
-and provides several helper functions for determining the properties of the underlying modes.  This
-functions support several overloaded constructors.</p>
-<p>Overloaded function.</p>
-<ol class="arabic simple">
-<li><p>__init__(self: pyttn.ttnpp.mode_data) -&gt; None</p></li>
-</ol>
-<p>Default construct an empty mode data object.</p>
-<ol class="arabic" start="2">
-<li><p>__init__(self: pyttn.ttnpp.mode_data, arg0: int) -&gt; None</p>
-<blockquote>
-<div><p>Construct a mode data object consisting of a single generic primitive mode with a given local Hilbert space dimension</p>
+and provides several helper functions for determining the properties of the underlying modes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>d</strong> (int) - Local Hilbert space dimension</p></li>
-</ul>
+<dd class="field-odd"><p><strong>*args</strong> (<em>[</em><em>Arguments</em><em> (</em><em>variable number and type</em><em>)</em><em>]</em>) – A variable length list of arguments. Valid options are
+- none - in this case we call the default constructor of the mode_data objcet.
+- <strong>d</strong> (int) - Construct a mode_data object with a generic_mode mode_type with a Local Hilbert space dimension of d
+- <strong>d</strong> (int),  <strong>type</strong> (<a class="reference internal" href="#pyttn.mode_type" title="pyttn.mode_type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_type</span></code></a>) -  Construct a mode_data object with a type mode_type with a Local Hilbert space dimension of d
+- <strong>other</strong> (<a class="reference internal" href="#pyttn.mode_data" title="pyttn.mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_data</span></code></a>) - Copy constructs a mode_data object from another mode_data object
+- <strong>other</strong> (<a class="reference internal" href="#pyttn.primitive_mode_data" title="pyttn.primitive_mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">primitive_mode_data</span></code></a>) - Constructs a mode_data object containing a single primitive_mode_data object
+- <strong>other</strong> (list[<a class="reference internal" href="#pyttn.primitive_mode_data" title="pyttn.primitive_mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">primitive_mode_data</span></code></a>]) - Constructs a mode_data object containing a list of primitive_mode_data object</p>
 </dd>
 </dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.mode_data, arg0: int, arg1: pyttn.ttnpp.mode_type) -&gt; None</p>
-<blockquote>
-<div><p>Construct a mode data object consisting of a single mode primitive mode with a given local Hilbert space dimension</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>d</strong> (int) - Local Hilbert space dimension</p></li>
-<li><p><strong>type</strong> (<a class="reference internal" href="#pyttn.mode_type" title="pyttn.mode_type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_type</span></code></a>) - The type of mode to construct</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.mode_data, arg0: pyttn.ttnpp.mode_data) -&gt; None</p>
-<blockquote>
-<div><p>Construct a mode data object from another mode data object</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="#pyttn.mode_data" title="pyttn.mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_data</span></code></a>) - The mode data object to construct from</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.mode_data, arg0: pyttn.ttnpp.primitive_mode_data) -&gt; None</p>
-<blockquote>
-<div><p>Construct a mode data object consisting of a single primitive mode</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference internal" href="#pyttn.primitive_mode_data" title="pyttn.primitive_mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">primitive_mode_data</span></code></a>) - The value of the primitive mode to use</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.mode_data, arg0: list[pyttn.ttnpp.primitive_mode_data]) -&gt; None</p>
-<blockquote>
-<div><p>Construct a mode data object from a vector of primitive_mode_data objects</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (list[<a class="reference internal" href="#pyttn.primitive_mode_data" title="pyttn.primitive_mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">primitive_mode_data</span></code></a>]) - A list of primitive mode data objects that form the composite mode</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ol>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.mode_data.__copy__">
 <span class="sig-name descname"><span class="pre">__copy__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.mode_data" title="pyttn.ttnpp.mode_data"><span class="pre">pyttn.ttnpp.mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.mode_data" title="pyttn.ttnpp.mode_data"><span class="pre">pyttn.ttnpp.mode_data</span></a></span></span><a class="headerlink" href="#pyttn.mode_data.__copy__" title="Link to this definition"></a></dt>
@@ -777,7 +822,7 @@ by taking each mode and appending a dual space operator following this mode of t
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyttn.mode_type">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">mode_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.mode_type" title="pyttn.ttnpp.mode_type"><span class="pre">pyttn.ttnpp.mode_type</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.mode_type" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">mode_type</span></span><a class="headerlink" href="#pyttn.mode_type" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>The type of a mode</p>
 <p>Members:</p>
@@ -858,9 +903,529 @@ by taking each mode and appending a dual space operator following this mode of t
 <dd class="field-even"><p>The Multiset Tree Tensor Network State object</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ms_ttn_real or <a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex" title="pyttn.ttnpp.ms_ttn_complex">ms_ttn_complex</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#pyttn.ms_ttn_dtype" title="pyttn.ms_ttn_dtype">ms_ttn_dtype</a> (dtype=complex or real)</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">ms_ttn_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.complex128'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class defining the general interface for the pybind11 wrappers generated for the multiset ttn object.  These wrapper classes are
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ttn_complex</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">ttn_real</span></code> (with the real variant only present if the pybind11 wrapper has been built with support
+for real valued multiset TTNs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>[</em><em>Arguments</em><em> (</em><em>variable number and type</em><em>)</em><em>]</em>) – <p>A variable length list of arguments. Valid options are</p>
+<ul>
+<li><p>none - in this case we call the default constructor of the multiset ttn class to construct an empty ttn.</p></li>
+<li><p><strong>A</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ms_ttn_complex</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">ms_ttn_real</span></code>) - Construct the multiset ttn object from another multiset multiset ttn object potentially converting the dtype</p></li>
+<li><p><strong>topology</strong> (<a class="reference internal" href="#pyttn.ntree" title="pyttn.ntree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ntree</span></code></a> or str), <strong>nset</strong> (int) - Construct a ms multiset ttn from a ntree object defining the topology and bond dimensions of the ms multiset ttn and a variable specifying the number of sets</p></li>
+<li><p><strong>topology</strong> (<a class="reference internal" href="#pyttn.ntree" title="pyttn.ntree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ntree</span></code></a> or str), <strong>capacity</strong> (<a class="reference internal" href="#pyttn.ntree" title="pyttn.ntree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ntree</span></code></a> or str ), <strong>nset</strong> (int) - Construct a multiset ttn from an ntree object defining the topology, a capacity defining the maximum bond dimensions, and a variable specifying the number of set</p></li>
+</ul>
+</p></li>
+<li><p><strong>dtype</strong> (<em>{numpy.float64</em><em>, </em><em>numpy.complex128}</em><em>, </em><em>optional</em>) – Data type of the multiset TTNs elements.  This argument will be ignored if the first *args element is a ms_ttn_complex in which case the dtype is inferred from these objects. (Default: np.complex128)</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em><em>(</em><em>Arguments</em><em> (</em><em>variable number and type</em><em>)</em><em>)</em>) – <p>A dictionary containing optional input arguments.</p>
+<ul>
+<li><p><strong>purification</strong> (bool) - Whether or not this state should represent a purification of a state.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.__getitem__" title="Link to this definition"></a></dt>
+<dd><p>Access tensor data at node i</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> (<em>int</em>) – Index of the node to access data from</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tensor data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ms_ttn_data_dtype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.__idiv__">
+<span class="sig-name descname"><span class="pre">__idiv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.__idiv__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.__idiv__" title="Link to this definition"></a></dt>
+<dd><p>Inplace division of the multiset TTN object by a scalar</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>b</strong> (<em>number</em>) – Scalar value to divide multiset TTN by</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.__imul__">
+<span class="sig-name descname"><span class="pre">__imul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.__imul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.__imul__" title="Link to this definition"></a></dt>
+<dd><p>Inplace multiplication of the multiset TTN object by a scalar</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>b</strong> (<em>number</em>) – Scalar value to multiply multiset TTN by</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.__iter__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Iterator object over nodes in multiset TTN</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>iterator</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.__len__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of modes in the multiset TTN</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.__setitem__">
+<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.__setitem__" title="Link to this definition"></a></dt>
+<dd><p>Sets the value of a site tensor in the tensor network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em>) – Index of the node to set</p></li>
+<li><p><strong>v</strong> (<em>ms_ttn_data_dtype</em>) – The new value of the node data object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.assign">
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.assign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.assign" title="Link to this definition"></a></dt>
+<dd><p>Assign the value of this multiset ttn from another ttn</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>o</strong> (<a class="reference internal" href="#pyttn.ms_ttn_dtype" title="pyttn.ms_ttn_dtype"><em>ms_ttn_dtype</em></a><em> or </em><em>ms_ttn_real</em>) – The other multiset ttn object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.bond_dimensions">
+<span class="sig-name descname"><span class="pre">bond_dimensions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.bond_dimensions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.bond_dimensions" title="Link to this definition"></a></dt>
+<dd><p>Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>All bond dimensions in the network</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict([int, int], list[int])</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.clear" title="Link to this definition"></a></dt>
+<dd><p>Clear and deallocate all internal buffers of the multiset TTN</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.complex_dtype">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">complex_dtype</span></span><a class="headerlink" href="#pyttn.ms_ttn_dtype.complex_dtype" title="Link to this definition"></a></dt>
+<dd><p>Return the data type stored in the multiset ttn</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>{np.complex128 or np.float64}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.conj">
+<span class="sig-name descname"><span class="pre">conj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.conj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.conj" title="Link to this definition"></a></dt>
+<dd><p>Take the complex conjugate of the multiset TTN.  Here this is evaluated lazily</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.dim">
+<span class="sig-name descname"><span class="pre">dim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.dim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.dim" title="Link to this definition"></a></dt>
+<dd><p>Returns the local Hilbert space dimension of mode i</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> (<em>int</em>) – The index of the mode</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>local Hilbert space dimension of mode i</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.force_set_orthogonality_centre">
+<span class="sig-name descname"><span class="pre">force_set_orthogonality_centre</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.force_set_orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.force_set_orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><p>Sets the orthogonality centre of the tensor network to index i but does not modify the tensor to ensure that this is a
+valid orthogonality centre</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.has_orthogonality_centre">
+<span class="sig-name descname"><span class="pre">has_orthogonality_centre</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.has_orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.has_orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether or not the multiset TTN has an active orthogonality centre</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.is_orthogonalised">
+<span class="sig-name descname"><span class="pre">is_orthogonalised</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.is_orthogonalised"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.is_orthogonalised" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether or not the multiset TTN has an orthogonality centre at the root</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.is_purification">
+<span class="sig-name descname"><span class="pre">is_purification</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.is_purification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.is_purification" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether or not the state represents a purification</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.mode_dimensions">
+<span class="sig-name descname"><span class="pre">mode_dimensions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.mode_dimensions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.mode_dimensions" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of local Hilbert space dimensions</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.nelem">
+<span class="sig-name descname"><span class="pre">nelem</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.nelem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.nelem" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The total number of elements in all tensors of the network.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.nmodes">
+<span class="sig-name descname"><span class="pre">nmodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.nmodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.nmodes" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of modes in the multiset TTN</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.norm">
+<span class="sig-name descname"><span class="pre">norm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.norm" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The 2-norm of the multiset TTN</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.normalise">
+<span class="sig-name descname"><span class="pre">normalise</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.normalise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.normalise" title="Link to this definition"></a></dt>
+<dd><p>Ensures the multiset TTN is a normalised to one and returns the previous value of the norm of the tensor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The previous 2-norm of the multiset TTN</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.nset">
+<span class="sig-name descname"><span class="pre">nset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.nset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.nset" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of set variables for the multiset TTN.  Here it is one</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.nsites">
+<span class="sig-name descname"><span class="pre">nsites</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.nsites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.nsites" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The total number of tensors in the tensor network</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.ntensors">
+<span class="sig-name descname"><span class="pre">ntensors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.ntensors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.ntensors" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The total number of tensors in the tensor network</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.nthreads">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nthreads</span></span><a class="headerlink" href="#pyttn.ms_ttn_dtype.nthreads" title="Link to this definition"></a></dt>
+<dd><p>Stores the number of threads that can be used to attempt to parallelise updates over the set variables</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>{np.complex128 or np.float64}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.orthogonalise">
+<span class="sig-name descname"><span class="pre">orthogonalise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.orthogonalise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.orthogonalise" title="Link to this definition"></a></dt>
+<dd><p>Shifts the orthogonality centre to the root node of the multiset TTN</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to force a full reorthogonalisation of the multiset TTN regardless of whether or not it believes it has an orthogonality centre</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.orthogonality_centre">
+<span class="sig-name descname"><span class="pre">orthogonality_centre</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The index of the current orthogonality centre</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.random">
+<span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.random" title="Link to this definition"></a></dt>
+<dd><p>Sample the coefficients in the multiset TTN randomly from a normal distribution</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.reset_orthogonality_centre">
+<span class="sig-name descname"><span class="pre">reset_orthogonality_centre</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.reset_orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.reset_orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><p>Resets the orthogonality centre of the multiset TTN to the root node of the tree.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.resize">
+<span class="sig-name descname"><span class="pre">resize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">purification</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.resize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.resize" title="Link to this definition"></a></dt>
+<dd><p>Resize the multiset TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>[</em><em>Arguments</em><em> (</em><em>variable number and type</em><em>)</em><em>]</em>) – <p>A variable length list of arguments. Valid options are</p>
+<ul>
+<li><p><strong>topology</strong> (<a class="reference internal" href="#pyttn.ntree" title="pyttn.ntree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ntree</span></code></a> or str) - Construct a multiset ttn from a ntree object defining the topology and bond dimensions of the ttn</p></li>
+<li><p><strong>topology</strong> (<a class="reference internal" href="#pyttn.ntree" title="pyttn.ntree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ntree</span></code></a> or str), <strong>capacity</strong> (ntree or str ) - Construct a multiset ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions</p></li>
+</ul>
+</p></li>
+<li><p><strong>nset</strong> (<em>int</em>) – The number of set variables to use for the ms_ttn</p></li>
+<li><p><strong>purification</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not the buffers should be resized to store a purification of the requested state size.  (Default: False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.set_orthogonality_centre">
+<span class="sig-name descname"><span class="pre">set_orthogonality_centre</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.set_orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.set_orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><p>Sets the orthogonality centre of the tensor network to index i either introducing an orthogonality centre if there is none
+or simply shifting the orthogonality centre from its current location to the required location</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre</p></li>
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – A truncation tolerance for the singular values to discard weight.  (Default: 0)</p></li>
+<li><p><strong>nchi</strong> (<em>int</em><em>, </em><em>optional</em>) – A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.set_seed">
+<span class="sig-name descname"><span class="pre">set_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.set_seed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.set_seed" title="Link to this definition"></a></dt>
+<dd><p>Set the value of the random number generate seed used for internal operations requiring random sampling</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seed</strong> (<em>int</em>) – The new value of the seed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.set_state">
+<span class="sig-name descname"><span class="pre">set_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_unoccupied_initialisation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.set_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.set_state" title="Link to this definition"></a></dt>
+<dd><p>Set the coefficients in the multiset TTN so that it represents a user specified product state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>[</em><em>Arguments</em><em> (</em><em>variable number and type</em><em>)</em><em>]</em>) – <p>A variable length list of arguments. Valid options are</p>
+<ul>
+<li><p><strong>set_index</strong> (int), <strong>state</strong> (list[int]) - For setting the state to be a product state vector acting on a specific set index</p></li>
+<li><p><strong>coeff</strong> (list[dtype]), <strong>state</strong> (list[list[int]]) - For setting the system to be the state <span class="math notranslate nohighlight">\(\sum_i c_i \|i\rangle \bigotimes \mathrm{state}_i\)</span></p></li>
+</ul>
+</p></li>
+<li><p><strong>random_unoccupied_initialisation</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to set all other elements of the multiset TTN not determining the product state to random values or not. (Default: False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.shift_orthogonality_centre">
+<span class="sig-name descname"><span class="pre">shift_orthogonality_centre</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.shift_orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.shift_orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><p>Shift the orthogonality centre down the ith bond of the current orthogonality centre with possible truncation.
+Where for all nodes but the root 0 corresponds to the parent of the current orthogonality centre and its children are then 1-nchild
+For the root i just indexes the children</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre</p></li>
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – A truncation tolerance for the singular values to discard weight.  (Default: 0)</p></li>
+<li><p><strong>nchi</strong> (<em>int</em><em>, </em><em>optional</em>) – A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.site_tensor">
+<span class="sig-name descname"><span class="pre">site_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.site_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.site_tensor" title="Link to this definition"></a></dt>
+<dd><p>Access tensor data at node i</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> (<em>int</em>) – Index of the node to access data from</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tensor data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ms_ttn_data_dtype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.slice">
+<span class="sig-name descname"><span class="pre">slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.slice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.slice" title="Link to this definition"></a></dt>
+<dd><p>Returns a slice object that allows for easy accessing of the multiset ttn correspond to a single set variable i</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> (<em>int</em>) – The set index of the slice</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A slice of the multiset multiset ttn used for accessing the tensor network associated with a single system state</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ms_ttn_slice_dtype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.truncate">
+<span class="sig-name descname"><span class="pre">truncate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.truncate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.truncate" title="Link to this definition"></a></dt>
+<dd><p>Ensures the tensor network is in an orthogonalised form.  Then performs an euler tour truncating each bond according to the user
+specified tol and nchi parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – A truncation tolerance for the singular values to discard weight.  (Default: 0)</p></li>
+<li><p><strong>nchi</strong> (<em>int</em><em>, </em><em>optional</em>) – A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ms_ttn_dtype.zero">
+<span class="sig-name descname"><span class="pre">zero</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ms_ttn_interface.html#ms_ttn_dtype.zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ms_ttn_dtype.zero" title="Link to this definition"></a></dt>
+<dd><p>Set all coefficients in the multiset TTN to zero</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py function">
@@ -970,73 +1535,20 @@ by taking each mode and appending a dual space operator following this mode of t
 <dd class="field-even"><p>The Multiset Tree Tensor Network State object</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ms_ttn_real or <a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex" title="pyttn.ttnpp.ms_ttn_complex">ms_ttn_complex</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#pyttn.ms_ttn_dtype" title="pyttn.ms_ttn_dtype">ms_ttn_dtype</a> (dtype=complex or real)</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyttn.ntree">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">ntree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ntree" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">ntree</span></span><a class="headerlink" href="#pyttn.ntree" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A class for handling a generic tree structure that stores an integer at each node.  Within pyTTN this class
 is used to represent the topology of the tree tensor network, with the integers stored at a node corresponding
 to the number of single-particle functions (basis functions) associated with this node.  Alternatively, this
 can be viewed as the bond-dimension connecting the node with its parent.  In the current version we require the root node
 to have a value of 1, which corresponds to a topology representing a single state.</p>
-<p>Overloaded function.</p>
-<ol class="arabic simple">
-<li><p>__init__(self: pyttn.ttnpp.ntree) -&gt; None</p></li>
-</ol>
-<p>Default construct an empty ntree.</p>
-<ol class="arabic" start="2">
-<li><p>__init__(self: pyttn.ttnpp.ntree, arg0: pyttn.ttnpp.ntree) -&gt; None</p>
-<blockquote>
-<div><p>Copy construct an ntree from another ntree object</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>tree</strong> (<a class="reference internal" href="#pyttn.ntree" title="pyttn.ntree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ntree</span></code></a>) - Input ntree to construct a copy of</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.ntree, arg0: str) -&gt; None</p>
-<blockquote>
-<div><p>Copy construct an ntree from a string representation of a tree.  Here we use a set of nested parentheses to represent
-a tree e.g.:</p>
-<p>(1(2(3)(4))(5(6)(7))</p>
-<p>corresponds to the tree</p>
-<blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><blockquote>
-<div><p>1</p>
-</div></blockquote>
-<p>x x</p>
-</div></blockquote>
-<p>x   x</p>
-</div></blockquote>
-<p>2     5</p>
-</div></blockquote>
-<p>x x   x x</p>
-</div></blockquote>
-<p>x   x x   x</p>
-</div></blockquote>
-<p>3    4 6    7</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>tree</strong> (str) - A string representation of a tree</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ol>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ntree.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ntree.__call__" title="Link to this definition"></a></dt>
@@ -1944,9 +2456,8 @@ Here the tree also automatically includes local optimised bases with the number 
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyttn.ntreeNode">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">ntreeNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.ntreeNode" title="pyttn.ttnpp.ntreeNode"><span class="pre">pyttn.ttnpp.ntreeNode</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ntreeNode" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">ntreeNode</span></span><a class="headerlink" href="#pyttn.ntreeNode" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
-<p>Construct an empty ntree node object.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ntreeNode.__getitem__">
 <span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.ntreeNode" title="pyttn.ttnpp.ntreeNode"><span class="pre">pyttn.ttnpp.ntreeNode</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.ntreeNode" title="pyttn.ttnpp.ntreeNode"><span class="pre">pyttn.ttnpp.ntreeNode</span></a></span></span><a class="headerlink" href="#pyttn.ntreeNode.__getitem__" title="Link to this definition"></a></dt>
@@ -2164,71 +2675,40 @@ Here the tree also automatically includes local optimised bases with the number 
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyttn.primitive_mode_data">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">primitive_mode_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.primitive_mode_data" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">primitive_mode_data</span></span><a class="headerlink" href="#pyttn.primitive_mode_data" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A class for handling information about the primitive modes making up a system</p>
-<p>Overloaded function.</p>
-<ol class="arabic simple">
-<li><p>__init__(self: pyttn.ttnpp.primitive_mode_data) -&gt; None</p></li>
-</ol>
-<p>Constructs an empty primitive_mode_data object</p>
-<ol class="arabic" start="2">
-<li><p>__init__(self: pyttn.ttnpp.primitive_mode_data, arg0: int) -&gt; None</p>
-<blockquote>
-<div><p>Constructs a primitive_mode_data object with a generic_mode mode_type of a given dimensionality</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>d</strong> (int) - Local Hilbert space dimension of mode</p></li>
+<dd class="field-odd"><p><strong>*args</strong> (<em>[</em><em>Arguments</em><em> (</em><em>variable number and type</em><em>)</em><em>]</em>) – <p>A variable length list of arguments. Valid options are</p>
+<ul class="simple">
+<li><p>none - in this case we call the default constructor of the primitive_mode_data objcet.</p></li>
+<li><p><strong>d</strong> (int) - Construct a primitive_mode_data object with a generic_mode mode_type with a Local Hilbert space dimension of d</p></li>
+<li><p><strong>d</strong> (int),  <strong>type</strong> (<a class="reference internal" href="#pyttn.mode_type" title="pyttn.mode_type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_type</span></code></a>) -  Construct a primitive_mode_data object with a type mode_type with a Local Hilbert space dimension of d</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="#pyttn.primitive_mode_data" title="pyttn.primitive_mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">primitive_mode_data</span></code></a>) - Copy constructs a primitive_mode_data object from another primitive_mode_data object</p></li>
 </ul>
+</p>
 </dd>
 </dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.primitive_mode_data, arg0: int, arg1: pyttn.ttnpp.mode_type) -&gt; None</p>
-<blockquote>
-<div><p>Constructs a primitive_mode_data object with a given mode_type of a given dimensionality</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>d</strong> (int) - Local Hilbert space dimension of mode</p></li>
-<li><p><strong>type</strong> (<a class="reference internal" href="#pyttn.mode_type" title="pyttn.mode_type"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_type</span></code></a>) - The type of the mode</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.primitive_mode_data, arg0: pyttn.ttnpp.primitive_mode_data) -&gt; None</p>
-<blockquote>
-<div><p>Copy constructs a primitive_mode_data object from another primitive_mode_data object</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>other</strong> (<a class="reference internal" href="#pyttn.primitive_mode_data" title="pyttn.primitive_mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">primitive_mode_data</span></code></a>) - The other primitive mode data type</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ol>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.primitive_mode_data.__copy__">
-<span class="sig-name descname"><span class="pre">__copy__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></span><a class="headerlink" href="#pyttn.primitive_mode_data.__copy__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__copy__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.primitive_mode_data.__copy__" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.primitive_mode_data.__deepcopy__">
-<span class="sig-name descname"><span class="pre">__deepcopy__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">memo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></span><a class="headerlink" href="#pyttn.primitive_mode_data.__deepcopy__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__deepcopy__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.primitive_mode_data.__deepcopy__" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.primitive_mode_data.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.primitive_mode_data.__str__" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.primitive_mode_data.__str__" title="Link to this definition"></a></dt>
+<dd><p>Return str(self).</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.primitive_mode_data.assign">
-<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.primitive_mode_data.assign" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.primitive_mode_data.assign" title="Link to this definition"></a></dt>
 <dd><p>Assign the value of the primitive_mode_data object from another primitive_mode_data object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2239,7 +2719,7 @@ Here the tree also automatically includes local optimised bases with the number 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.primitive_mode_data.fermionic">
-<span class="sig-name descname"><span class="pre">fermionic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.primitive_mode_data.fermionic" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fermionic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.primitive_mode_data.fermionic" title="Link to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>whether the mode is fermionic</p>
@@ -2334,7 +2814,7 @@ Here the tree also automatically includes local optimised bases with the number 
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyttn.sOP">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">sOP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.sOP" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">sOP</span></span><a class="headerlink" href="#pyttn.sOP" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>The single site operator used for the string operator handling functionality of pyTTN.  This class allows for definition of
 a string label for an operator and the mode that the operator acts upon. In addition to allowing for arbitrary string labels
@@ -2377,13 +2857,6 @@ the type of mode considered.  These are</p>
 </ul>
 </dd>
 </dl>
-<p>Overloaded function.</p>
-<ol class="arabic simple">
-<li><p>__init__(self: pyttn.ttnpp.sOP) -&gt; None</p></li>
-<li><p>__init__(self: pyttn.ttnpp.sOP, arg0: str, arg1: int) -&gt; None</p></li>
-<li><p>__init__(self: pyttn.ttnpp.sOP, arg0: str, arg1: int, arg2: bool) -&gt; None</p></li>
-<li><p>__init__(self: pyttn.ttnpp.sOP, arg0: pyttn.ttnpp.sOP) -&gt; None</p></li>
-</ol>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.sOP.__add__">
 <span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.sOP.__add__" title="Link to this definition"></a></dt>
@@ -2473,7 +2946,7 @@ depending on the dtype used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>a</strong> (<a class="reference internal" href="#pyttn.sPOP" title="pyttn.sPOP"><code class="xref py py-class docutils literal notranslate"><span class="pre">sPOP</span></code></a>) - The left term in the expression</p></li>
+<li><p><strong>a</strong> (<a class="reference internal" href="#pyttn.sOP" title="pyttn.sOP"><code class="xref py py-class docutils literal notranslate"><span class="pre">sOP</span></code></a>) - The left term in the expression</p></li>
 <li><p><strong>b</strong> (float or complex or <code class="xref py py-class docutils literal notranslate"><span class="pre">coeff_real</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">coeff_complex</span></code> or <a class="reference internal" href="#pyttn.sOP" title="pyttn.sOP"><code class="xref py py-class docutils literal notranslate"><span class="pre">sOP</span></code></a> or <a class="reference internal" href="#pyttn.sPOP" title="pyttn.sPOP"><code class="xref py py-class docutils literal notranslate"><span class="pre">sPOP</span></code></a> or <code class="xref py py-class docutils literal notranslate"><span class="pre">sNBO_real</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">sNBO_complex</span></code>) - The term to multiply sOP by</p></li>
 </ul>
 </dd>
@@ -2606,16 +3079,9 @@ depending on the dtype used.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyttn.sPOP">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">sPOP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.sPOP" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">sPOP</span></span><a class="headerlink" href="#pyttn.sPOP" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A product of sOP operators. This function handles the fact that in general sOP operators do not commute.</p>
-<p>Overloaded function.</p>
-<ol class="arabic simple">
-<li><p>__init__(self: pyttn.ttnpp.sPOP) -&gt; None</p></li>
-<li><p>__init__(self: pyttn.ttnpp.sPOP, arg0: pyttn.ttnpp.sOP) -&gt; None</p></li>
-<li><p>__init__(self: pyttn.ttnpp.sPOP, arg0: list[pyttn.ttnpp.sOP]) -&gt; None</p></li>
-<li><p>__init__(self: pyttn.ttnpp.sPOP, arg0: pyttn.ttnpp.sPOP) -&gt; None</p></li>
-</ol>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.sPOP.__add__">
 <span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.sPOP.__add__" title="Link to this definition"></a></dt>
@@ -3059,118 +3525,27 @@ depending on the dtype used.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="pyttn.system_modes">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">system_modes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.system_modes" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">system_modes</span></span><a class="headerlink" href="#pyttn.system_modes" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A class for handling the specification of all modes in the system.  This stores a list of each composite mode and an
 optional user supplied ordering of the modes</p>
-<p>Overloaded function.</p>
-<ol class="arabic simple">
-<li><p>__init__(self: pyttn.ttnpp.system_modes) -&gt; None</p></li>
-</ol>
-<p>Construct an empty system_modes object.</p>
-<ol class="arabic" start="2">
-<li><p>__init__(self: pyttn.ttnpp.system_modes, arg0: int) -&gt; None</p>
-<blockquote>
-<div><p>Construct a system_modes object containing N modes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>N</strong> (int) - The number of modes defining the system</p></li>
+<dd class="field-odd"><p><strong>*args</strong> (<em>[</em><em>Arguments</em><em> (</em><em>variable number and type</em><em>)</em><em>]</em>) – <p>A variable length list of arguments. Valid options are</p>
+<ul class="simple">
+<li><p>none - in this case we call the default constructor of the system_modes object.</p></li>
+<li><p><strong>N</strong> (int) - Construct a system_modes object containing N modes</p></li>
+<li><p><strong>N</strong> (int), <strong>d</strong> (int) -  Construct a system_modes object containing N modes, where each mode is a generic mode of sizes d</p></li>
+<li><p><strong>N</strong> (int), <strong>d</strong> (int), <strong>ordering</strong> (list[int]) -  Construct a system_modes object containing N modes, where each mode is a generic mode of sizes d.  Additionally provide a user defined ordering of the modes</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="#pyttn.system_modes" title="pyttn.system_modes"><code class="xref py py-class docutils literal notranslate"><span class="pre">system_modes</span></code></a>) - Copy constructs a system_modes object from another system_modes object</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="#pyttn.primitive_mode_data" title="pyttn.primitive_mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">primitive_mode_data</span></code></a>) - Constructs a system_modes object containing a single primitive mode</p></li>
+<li><p><strong>other</strong> (<a class="reference internal" href="#pyttn.mode_data" title="pyttn.mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_data</span></code></a>) - Construct a system_modes object containing a single composite mode</p></li>
+<li><p><strong>other</strong> (list[<a class="reference internal" href="#pyttn.mode_data" title="pyttn.mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_data</span></code></a>]) - Constructs a system_modes object from a list of composite modes</p></li>
+<li><p><strong>other</strong> (list[<a class="reference internal" href="#pyttn.mode_data" title="pyttn.mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_data</span></code></a>]), <strong>ordering</strong> (list[int]) - Constructs a system_modes object from a list of composite modes.  Additionally provide a user defined ordering of the modes</p></li>
 </ul>
+</p>
 </dd>
 </dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.system_modes, arg0: int, arg1: int) -&gt; None</p>
-<blockquote>
-<div><p>Construct a system_modes object containing N modes, where each mode is a generic mode of sizes d</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>N</strong> (int) - The number of modes defining the system</p></li>
-<li><p><strong>d</strong> (int) - The local Hilbert space dimension of the modes</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.system_modes, arg0: int, arg1: int, arg2: list[int]) -&gt; None</p>
-<blockquote>
-<div><p>Construct a system_modes object containing N modes, where each mode is a generic mode of sizes d.  Additionally
-provide a user defined ordering of the modes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>N</strong> (int) - The number of modes defining the system</p></li>
-<li><p><strong>d</strong> (int) - The local Hilbert space dimension of the modes</p></li>
-<li><p><strong>ordering</strong> (list[int]) - The ordering of modes</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.system_modes, arg0: pyttn.ttnpp.system_modes) -&gt; None</p>
-<blockquote>
-<div><p>Copy construct the system mode from another system mode</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>other</strong> (<a class="reference internal" href="#pyttn.system_modes" title="pyttn.system_modes"><code class="xref py py-class docutils literal notranslate"><span class="pre">system_modes</span></code></a>) - The other system_modes object</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.system_modes, arg0: pyttn.ttnpp.primitive_mode_data) -&gt; None</p>
-<blockquote>
-<div><p>Construt a system containing one primitive mode</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong> (<a class="reference internal" href="#pyttn.primitive_mode_data" title="pyttn.primitive_mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">primitive_mode_data</span></code></a>) - The single primitive mode information</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.system_modes, arg0: pyttn.ttnpp.mode_data) -&gt; None</p>
-<blockquote>
-<div><p>Construct a system containing one composite mode</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong> (<a class="reference internal" href="#pyttn.mode_data" title="pyttn.mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_data</span></code></a>) - The single composite mode information</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.system_modes, arg0: list[pyttn.ttnpp.mode_data]) -&gt; None</p>
-<blockquote>
-<div><p>Construct a system from a vector of modes</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong> (list[<a class="reference internal" href="#pyttn.mode_data" title="pyttn.mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_data</span></code></a>]) - The list of composite mode information</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-<li><p>__init__(self: pyttn.ttnpp.system_modes, arg0: list[pyttn.ttnpp.mode_data], arg1: list[int]) -&gt; None</p>
-<blockquote>
-<div><p>Construct a system from a vector of modes and user defined mode ordering</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong> (list[<a class="reference internal" href="#pyttn.mode_data" title="pyttn.mode_data"><code class="xref py py-class docutils literal notranslate"><span class="pre">mode_data</span></code></a>]) - The list of composite mode information</p></li>
-<li><p><strong>ordering</strong> (list[int]) - The ordering of modes</p></li>
-</ul>
-</dd>
-</dl>
-</div></blockquote>
-</li>
-</ol>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.system_modes.__copy__">
 <span class="sig-name descname"><span class="pre">__copy__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.system_modes" title="pyttn.ttnpp.system_modes"><span class="pre">pyttn.ttnpp.system_modes</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.system_modes" title="pyttn.ttnpp.system_modes"><span class="pre">pyttn.ttnpp.system_modes</span></a></span></span><a class="headerlink" href="#pyttn.system_modes.__copy__" title="Link to this definition"></a></dt>
@@ -3550,9 +3925,743 @@ Which type to construct is determined by the types of the input A and h matrices
 <dd class="field-even"><p>The Tree Tensor Network State object</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ttn_real or <a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex">ttn_complex</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#pyttn.ttn_dtype" title="pyttn.ttn_dtype">ttn_dtype</a> (dtype=complex or real)</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.</span></span><span class="sig-name descname"><span class="pre">ttn_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.complex128'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class defining the general interface for the pybind11 wrappers generated for the ttn object.  These wrapper classes are
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ttn_complex</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">ttn_real</span></code> (with the real variant only present if the pybind11 wrapper has been built with support
+for real valued TTNs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>[</em><em>Arguments</em><em> (</em><em>variable number and type</em><em>)</em><em>]</em>) – <p>A variable length list of arguments. Valid options are</p>
+<ul>
+<li><p>none - in this case we call the default constructor of the ttn class to construct an empty ttn.</p></li>
+<li><p><strong>A</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ms_ttn_slice_complex</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">ms_ttn_slice_real</span></code>) - Construct a ttn to represent a single slice of a multiset TTN</p></li>
+<li><p><strong>A</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ttn_complex</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">ttn_real</span></code>) - Construct the ttn object from another ttn object potentially converting the dtype</p></li>
+<li><p><strong>topology</strong> (<a class="reference internal" href="#pyttn.ntree" title="pyttn.ntree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ntree</span></code></a> or str) - Construct a ttn from a ntree object defining the topology and bond dimensions of the ttn</p></li>
+<li><p><strong>topology</strong> (<a class="reference internal" href="#pyttn.ntree" title="pyttn.ntree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ntree</span></code></a> or str), <strong>capacity</strong> (<a class="reference internal" href="#pyttn.ntree" title="pyttn.ntree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ntree</span></code></a> or str ) - Construct a ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions</p></li>
+</ul>
+</p></li>
+<li><p><strong>dtype</strong> (<em>{numpy.float64</em><em>, </em><em>numpy.complex128}</em><em>, </em><em>optional</em>) – Data type of the TTNs elements.  This argument will be ignored if the first *args element is a ttn_complex or ms_ttn_slice_complex in which case the dtype is inferred from these objects. (Default: np.complex128)</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em><em>(</em><em>Arguments</em><em> (</em><em>variable number and type</em><em>)</em><em>)</em>) – <p>A dictionary containing optional input arguments.</p>
+<ul>
+<li><p><strong>purification</strong> (bool) - Whether or not this state should represent a purification of a state.</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.__getitem__" title="Link to this definition"></a></dt>
+<dd><p>Access tensor data at node i</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> (<em>int</em>) – Index of the node to access data from</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tensor data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ttn_data_dtype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.__idiv__">
+<span class="sig-name descname"><span class="pre">__idiv__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.__idiv__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.__idiv__" title="Link to this definition"></a></dt>
+<dd><p>Inplace division of the TTN object by a scalar</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>b</strong> (<em>number</em>) – Scalar value to divide TTN by</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.__imatmul__">
+<span class="sig-name descname"><span class="pre">__imatmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.__imatmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.__imatmul__" title="Link to this definition"></a></dt>
+<dd><p>Apply an operator to the TTN updating its value.  Shifting the orthogonality centre to the leaf nodes that will be updated by this operator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>op</strong> (<em>site_operator_dtype</em><em> or </em><em>product_operator_dtype</em><em> or </em><em>sop_opertor_dtype</em>) – The product operator to apply to the system</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.__imul__">
+<span class="sig-name descname"><span class="pre">__imul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.__imul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.__imul__" title="Link to this definition"></a></dt>
+<dd><p>Inplace multiplication of the TTN object by a scalar</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>b</strong> (<em>number</em>) – Scalar value to multiply TTN by</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.__iter__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Iterator object over nodes in TTN</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>iterator</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.__len__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of modes in the TTN</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.__rmatmul__">
+<span class="sig-name descname"><span class="pre">__rmatmul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.__rmatmul__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.__rmatmul__" title="Link to this definition"></a></dt>
+<dd><p>Apply an operator to the TTN updating its value, returning the result as a new TTN</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttn_dtype" title="pyttn.ttn_dtype"><em>ttn_dtype</em></a>) – The ttn to apply the operator to</p></li>
+<li><p><strong>op</strong> (<em>site_operator_dtype</em><em> or </em><em>product_operator_dtype</em><em> or </em><em>sop_opertor_dtype</em>) – The product operator to apply to the system</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The result of op&#64;A</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyttn.ttn_dtype" title="pyttn.ttn_dtype">ttn_dtype</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.__setitem__">
+<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.__setitem__" title="Link to this definition"></a></dt>
+<dd><p>Sets the value of a site tensor in the tensor network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em>) – Index of the node to set</p></li>
+<li><p><strong>v</strong> (<em>ttn_data_dtype</em>) – The new value of the node data object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.apply_one_body_operator">
+<span class="sig-name descname"><span class="pre">apply_one_body_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_orthogonality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.apply_one_body_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.apply_one_body_operator" title="Link to this definition"></a></dt>
+<dd><p>Apply a one-body operator to the TTN updating its value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>[</em><em>Arguments</em><em> (</em><em>variable number and type</em><em>)</em><em>]</em>) – <p>A variable length list of arguments. Valid options are</p>
+<ul>
+<li><p><strong>op</strong> (linalg.matrix or np.ndarray or site_operator_dtype), <strong>mode</strong> (int) -  Apply the operator op to mode mode</p></li>
+<li><p><strong>op</strong> (site_operator_dtype) - Apply the operator op to the mode specified by op</p></li>
+</ul>
+</p></li>
+<li><p><strong>shift_orthogonality</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to shift the orthogonality centre of the TTN to the leaf node that will be updated by this one-body operator.  (Default: True)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.apply_operator">
+<span class="sig-name descname"><span class="pre">apply_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_orthogonality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.apply_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.apply_operator" title="Link to this definition"></a></dt>
+<dd><p>Apply a product of one-body operator to the TTN updating its value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op</strong> (<em>site_operator_dtype</em><em> or </em><em>product_operator_dtype</em>) – The product operator to apply to the system</p></li>
+<li><p><strong>shift_orthogonality</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to shift the orthogonality centre of the TTN to the leaf node that will be updated by this one-body operator.  (Default: True)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.apply_product_operator">
+<span class="sig-name descname"><span class="pre">apply_product_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_orthogonality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.apply_product_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.apply_product_operator" title="Link to this definition"></a></dt>
+<dd><p>Apply a product of one-body operator to the TTN updating its value</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op</strong> (<em>product_operator_dtype</em>) – The product operator to apply to the system</p></li>
+<li><p><strong>shift_orthogonality</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to shift the orthogonality centre of the TTN to the leaf node that will be updated by this one-body operator.  (Default: True)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.assign">
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.assign"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.assign" title="Link to this definition"></a></dt>
+<dd><p>Assign the value of this ttn from another ttn</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>o</strong> (<a class="reference internal" href="#pyttn.ttn_dtype" title="pyttn.ttn_dtype"><em>ttn_dtype</em></a><em> or </em><em>ttn_real</em>) – The other ttn object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.bond_dimensions">
+<span class="sig-name descname"><span class="pre">bond_dimensions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.bond_dimensions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.bond_dimensions" title="Link to this definition"></a></dt>
+<dd><p>Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>All bond dimensions in the network</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict([int, int], int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.bond_entropy">
+<span class="sig-name descname"><span class="pre">bond_entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.bond_entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.bond_entropy" title="Link to this definition"></a></dt>
+<dd><p>Returns the SvN across the ith bond of the current orthogonality centre.
+Where for all nodes but the root 0 corresponds to the parent of the current orthogonality centre and its children are then 1-nchild,
+For the root i just indexes the children</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The bond entropy</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.clear" title="Link to this definition"></a></dt>
+<dd><p>Clear and deallocate all internal buffers of the TTN</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.collapse">
+<span class="sig-name descname"><span class="pre">collapse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">truncate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.collapse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.collapse" title="Link to this definition"></a></dt>
+<dd><p>Perform a projective measurement across all modes in the TTN</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>truncate</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to truncate the state following collapse as it is a product state. (Default: True)</p></li>
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – A truncation tolerance for the singular values to discard weight.  (Default: 0)</p></li>
+<li><p><strong>nchi</strong> (<em>int</em><em>, </em><em>optional</em>) – A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The probability of this collapse event occurint</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.collapse_basis">
+<span class="sig-name descname"><span class="pre">collapse_basis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">truncate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.collapse_basis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.collapse_basis" title="Link to this definition"></a></dt>
+<dd><p>Perform a projective measurement across all modes in the TTN applying a basis transformation U_i to each mode i before doing so</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>U</strong> (<em>list</em><em>[</em><em>np.ndarray</em><em>] or </em><em>list</em><em>[</em><em>linalg.matrix</em><em>]</em>) – A list of basis transformations to apply to the state before performing the projective measurement</p></li>
+<li><p><strong>truncate</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to truncate the state following collapse as it is a product state. (Default: True)</p></li>
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – A truncation tolerance for the singular values to discard weight.  (Default: 0)</p></li>
+<li><p><strong>nchi</strong> (<em>int</em><em>, </em><em>optional</em>) – A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The probability of this collapse event occurint</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.complex_dtype">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">complex_dtype</span></span><a class="headerlink" href="#pyttn.ttn_dtype.complex_dtype" title="Link to this definition"></a></dt>
+<dd><p>Return the data type stored in the ttn</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dtype</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>{np.complex128 or np.float64}</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.compute_maximum_bond_entropy">
+<span class="sig-name descname"><span class="pre">compute_maximum_bond_entropy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.compute_maximum_bond_entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.compute_maximum_bond_entropy" title="Link to this definition"></a></dt>
+<dd><p>Computes the maximum SvN across any bond in the tensor network and returns the results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The maximum bond entropy in the tensor network</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.conj">
+<span class="sig-name descname"><span class="pre">conj</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.conj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.conj" title="Link to this definition"></a></dt>
+<dd><p>Take the complex conjugate of the TTN.  Here this is evaluated lazily</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.dim">
+<span class="sig-name descname"><span class="pre">dim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.dim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.dim" title="Link to this definition"></a></dt>
+<dd><p>Returns the local Hilbert space dimension of mode i</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> (<em>int</em>) – The index of the mode</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>local Hilbert space dimension of mode i</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.force_set_orthogonality_centre">
+<span class="sig-name descname"><span class="pre">force_set_orthogonality_centre</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.force_set_orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.force_set_orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><p>Sets the orthogonality centre of the tensor network to index i but does not modify the tensor to ensure that this is a
+valid orthogonality centre</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.has_orthogonality_centre">
+<span class="sig-name descname"><span class="pre">has_orthogonality_centre</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.has_orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.has_orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether or not the TTN has an active orthogonality centre</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.is_orthogonalised">
+<span class="sig-name descname"><span class="pre">is_orthogonalised</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.is_orthogonalised"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.is_orthogonalised" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether or not the TTN has an orthogonality centre at the root</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.is_purification">
+<span class="sig-name descname"><span class="pre">is_purification</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.is_purification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.is_purification" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether or not the state represents a purification</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.maximum_bond_dimension">
+<span class="sig-name descname"><span class="pre">maximum_bond_dimension</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.maximum_bond_dimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.maximum_bond_dimension" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The maximum bond dimension</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.maximum_bond_entropy">
+<span class="sig-name descname"><span class="pre">maximum_bond_entropy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.maximum_bond_entropy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.maximum_bond_entropy" title="Link to this definition"></a></dt>
+<dd><p>Returns the previously computed maximum SvN across any bond in the tensor network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The maximum bond entropy in the tensor network</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.measure_without_collapse">
+<span class="sig-name descname"><span class="pre">measure_without_collapse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.measure_without_collapse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.measure_without_collapse" title="Link to this definition"></a></dt>
+<dd><p>Evaluate the probablity of observing each state following a projective measurement applied to mode i without performing the collapse</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> (<em>int</em>) – The physical mode to perform the projective measurement on</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The probability of observing each basis state following the projective measurement</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.minimum_bond_dimension">
+<span class="sig-name descname"><span class="pre">minimum_bond_dimension</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.minimum_bond_dimension"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.minimum_bond_dimension" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The minimum bond dimension</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.mode_dimensions">
+<span class="sig-name descname"><span class="pre">mode_dimensions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.mode_dimensions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.mode_dimensions" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of local Hilbert space dimensions</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.nelem">
+<span class="sig-name descname"><span class="pre">nelem</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.nelem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.nelem" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The total number of elements in all tensors of the network.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.nmodes">
+<span class="sig-name descname"><span class="pre">nmodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.nmodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.nmodes" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of modes in the TTN</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.norm">
+<span class="sig-name descname"><span class="pre">norm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.norm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.norm" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The 2-norm of the TTN</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.normalise">
+<span class="sig-name descname"><span class="pre">normalise</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.normalise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.normalise" title="Link to this definition"></a></dt>
+<dd><p>Ensures the TTN is a normalised to one and returns the previous value of the norm of the tensor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The previous 2-norm of the TTN</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.nset">
+<span class="sig-name descname"><span class="pre">nset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.nset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.nset" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The number of set variables for the TTN.  Here it is one</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.nsites">
+<span class="sig-name descname"><span class="pre">nsites</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.nsites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.nsites" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The total number of tensors in the tensor network</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.ntensors">
+<span class="sig-name descname"><span class="pre">ntensors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.ntensors"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.ntensors" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The total number of tensors in the tensor network</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.orthogonalise">
+<span class="sig-name descname"><span class="pre">orthogonalise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.orthogonalise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.orthogonalise" title="Link to this definition"></a></dt>
+<dd><p>Shifts the orthogonality centre to the root node of the TTN</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>force</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to force a full reorthogonalisation of the TTN regardless of whether or not it believes it has an orthogonality centre</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.orthogonality_centre">
+<span class="sig-name descname"><span class="pre">orthogonality_centre</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The index of the current orthogonality centre</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.random">
+<span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.random" title="Link to this definition"></a></dt>
+<dd><p>Sample the coefficients in the TTN randomly from a normal distribution</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.reset_orthogonality_centre">
+<span class="sig-name descname"><span class="pre">reset_orthogonality_centre</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.reset_orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.reset_orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><p>Resets the orthogonality centre of the TTN to the root node of the tree.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.resize">
+<span class="sig-name descname"><span class="pre">resize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">purification</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.resize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.resize" title="Link to this definition"></a></dt>
+<dd><p>Resize the TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*args</strong> (<em>[</em><em>Arguments</em><em> (</em><em>variable number and type</em><em>)</em><em>]</em>) – <p>A variable length list of arguments. Valid options are</p>
+<ul>
+<li><p><strong>topology</strong> (<a class="reference internal" href="#pyttn.ntree" title="pyttn.ntree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ntree</span></code></a> or str) - Construct a ttn from a ntree object defining the topology and bond dimensions of the ttn</p></li>
+<li><p><strong>topology</strong> (<a class="reference internal" href="#pyttn.ntree" title="pyttn.ntree"><code class="xref py py-class docutils literal notranslate"><span class="pre">ntree</span></code></a> or str), <strong>capacity</strong> (ntree or str ) - Construct a ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions</p></li>
+</ul>
+</p></li>
+<li><p><strong>purification</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not the buffers should be resized to store a purification of the requested state size.  (Default: False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.sample_product">
+<span class="sig-name descname"><span class="pre">sample_product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.sample_product"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.sample_product" title="Link to this definition"></a></dt>
+<dd><p>Sample a direct product of occupation states from a set of probabilities of observing each mode in a given state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>dtype</em><em>]</em><em>]</em>) – A list containing a set of vectors corresponding to the probabilities of observing each occupation state</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.set_identity_purification">
+<span class="sig-name descname"><span class="pre">set_identity_purification</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.set_identity_purification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.set_identity_purification" title="Link to this definition"></a></dt>
+<dd><p>Sets the state of the TTN to a purification state representing the identity</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.set_orthogonality_centre">
+<span class="sig-name descname"><span class="pre">set_orthogonality_centre</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.set_orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.set_orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><p>Sets the orthogonality centre of the tensor network to index i either introducing an orthogonality centre if there is none
+or simply shifting the orthogonality centre from its current location to the required location</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre</p></li>
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – A truncation tolerance for the singular values to discard weight.  (Default: 0)</p></li>
+<li><p><strong>nchi</strong> (<em>int</em><em>, </em><em>optional</em>) – A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.set_product">
+<span class="sig-name descname"><span class="pre">set_product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.set_product"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.set_product" title="Link to this definition"></a></dt>
+<dd><p>Set the coefficients in the TTN so that it represents a product of a set of one body states</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>state</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>dtype</em><em>]</em><em>]</em>) – A list containing a set of vectors corresponding to the individual product states</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.set_seed">
+<span class="sig-name descname"><span class="pre">set_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.set_seed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.set_seed" title="Link to this definition"></a></dt>
+<dd><p>Set the value of the random number generate seed used for internal operations requiring random sampling</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seed</strong> (<em>int</em>) – The new value of the seed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.set_site_tensor">
+<span class="sig-name descname"><span class="pre">set_site_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.set_site_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.set_site_tensor" title="Link to this definition"></a></dt>
+<dd><p>Sets the value of a site tensor in the tensor network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em>) – Index of the node to set</p></li>
+<li><p><strong>v</strong> (<em>ttn_data_dtype</em>) – The new value of the node data object</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.set_state">
+<span class="sig-name descname"><span class="pre">set_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_unoccupied_initialisation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.set_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.set_state" title="Link to this definition"></a></dt>
+<dd><p>Set the coefficients in the TTN so that it represents a user specified product state</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) – The occupation number state to set the TTN to</p></li>
+<li><p><strong>random_unoccupied_initialisation</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to set all other elements of the TTN not determining the product state to random values or not. (Default: False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.shift_orthogonality_centre">
+<span class="sig-name descname"><span class="pre">shift_orthogonality_centre</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.shift_orthogonality_centre"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.shift_orthogonality_centre" title="Link to this definition"></a></dt>
+<dd><p>Shift the orthogonality centre down the ith bond of the current orthogonality centre with possible truncation.
+Where for all nodes but the root 0 corresponds to the parent of the current orthogonality centre and its children are then 1-nchild
+For the root i just indexes the children</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre</p></li>
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – A truncation tolerance for the singular values to discard weight.  (Default: 0)</p></li>
+<li><p><strong>nchi</strong> (<em>int</em><em>, </em><em>optional</em>) – A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.site_tensor">
+<span class="sig-name descname"><span class="pre">site_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.site_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.site_tensor" title="Link to this definition"></a></dt>
+<dd><p>Access tensor data at node i</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>i</strong> (<em>int</em>) – Index of the node to access data from</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tensor data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray or linalg.matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.truncate">
+<span class="sig-name descname"><span class="pre">truncate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nchi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.truncate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.truncate" title="Link to this definition"></a></dt>
+<dd><p>Ensures the tensor network is in an orthogonalised form.  Then performs an euler tour truncating each bond according to the user
+specified tol and nchi parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tol</strong> (<em>float</em><em>, </em><em>optional</em>) – A truncation tolerance for the singular values to discard weight.  (Default: 0)</p></li>
+<li><p><strong>nchi</strong> (<em>int</em><em>, </em><em>optional</em>) – A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttn_dtype.zero">
+<span class="sig-name descname"><span class="pre">zero</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/ttns/ttn/ttn_interface.html#ttn_dtype.zero"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.ttn_dtype.zero" title="Link to this definition"></a></dt>
+<dd><p>Set all coefficients in the TTN to zero</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -3562,7 +4671,7 @@ Which type to construct is determined by the types of the input A and h matrices
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../Examples/spin_boson.html" class="btn btn-neutral float-left" title="Spin Boson Model Dynamics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="API%20Outline.html" class="btn btn-neutral float-left" title="pyTTN package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="pyttn.linalg.html" class="btn btn-neutral float-right" title="pyttn.linalg package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

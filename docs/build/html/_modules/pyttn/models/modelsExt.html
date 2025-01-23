@@ -54,11 +54,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/index.html">pyttn</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../ttnpp/ttnpp.html">ttnpp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/index.html">API Documents</a></li>
 </ul>
 
         </div>
@@ -89,7 +86,7 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <div class="viewcode-block" id="AIM">
-<a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.AIM">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.modelsExt.AIM">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">AIM</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">AIM_complex</span>
     <span class="k">try</span><span class="p">:</span>
@@ -108,7 +105,7 @@
 
 
 <div class="viewcode-block" id="electronic_structure">
-<a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.electronic_structure">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.modelsExt.electronic_structure">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">electronic_structure</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">electronic_structure_complex</span>
 
@@ -129,7 +126,7 @@
 
 
 <div class="viewcode-block" id="TFIM">
-<a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.TFIM">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.modelsExt.TFIM">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">TFIM</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">TFIM_complex</span>
     <span class="k">try</span><span class="p">:</span>
@@ -168,7 +165,7 @@
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for spin boson&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="spin_boson">
-<a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.spin_boson">[docs]</a>
+<a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.modelsExt.spin_boson">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">spin_boson</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">geom</span><span class="o">=</span><span class="s2">&quot;star&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">spin_boson_generic_complex</span><span class="p">,</span> <span class="n">spin_boson_star_complex</span><span class="p">,</span> <span class="n">spin_boson_chain_complex</span><span class="p">,</span> <span class="n">spin_boson_chain_real</span>
 

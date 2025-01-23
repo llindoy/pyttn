@@ -1,6 +1,6 @@
 #build the rst file from the pyttn source files
-sphinx-apidoc -o docs/source/pyttn pyttn -f
-sphinx-apidoc -o docs/source/ttnpp python -f
+sphinx-apidoc -o docs/source/pyttn pyttn 
+sphinx-apidoc -o docs/source/ttnpp python 
 
 # sphinx-apidoc doesn't allow setting maxdepth on subpackages
 sed -i "s/:maxdepth:.*/:maxdepth: 2/g" docs/source/pyttn/*.rst

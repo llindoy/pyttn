@@ -54,11 +54,8 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="pyttn/index.html">pyttn</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Python Bindings Reference:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="ttnpp/ttnpp.html">ttnpp</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyttn/API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyttn/index.html">API Documents</a></li>
 </ul>
 
         </div>
@@ -186,9 +183,15 @@
 </li>
         <li><a href="pyttn/pyttn.utils.html#pyttn.utils.EnergyTruncation.__call__">(pyttn.utils.EnergyTruncation method)</a>
 </li>
+        <li><a href="pyttn/pyttn.utils.html#pyttn.utils.mode_combination.ModeCombination.__call__">(pyttn.utils.mode_combination.ModeCombination method)</a>
+</li>
         <li><a href="pyttn/pyttn.utils.html#pyttn.utils.ModeCombination.__call__">(pyttn.utils.ModeCombination method)</a>
 </li>
         <li><a href="pyttn/pyttn.utils.html#pyttn.utils.orthopol.__call__">(pyttn.utils.orthopol method)</a>
+</li>
+        <li><a href="pyttn/pyttn.utils.html#pyttn.utils.truncate.DepthTruncation.__call__">(pyttn.utils.truncate.DepthTruncation method)</a>
+</li>
+        <li><a href="pyttn/pyttn.utils.html#pyttn.utils.truncate.EnergyTruncation.__call__">(pyttn.utils.truncate.EnergyTruncation method)</a>
 </li>
       </ul></li>
       <li><a href="pyttn/index.html#pyttn.mode_data.__copy__">__copy__() (pyttn.mode_data method)</a>
@@ -361,12 +364,16 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.sSOP_real.__div__">(pyttn.ttnpp.sSOP_real method)</a>
 </li>
       </ul></li>
-      <li><a href="pyttn/index.html#pyttn.ntree.__getitem__">__getitem__() (pyttn.ntree method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.__getitem__">__getitem__() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ntree.__getitem__">(pyttn.ntree method)</a>
+</li>
         <li><a href="pyttn/index.html#pyttn.ntreeNode.__getitem__">(pyttn.ntreeNode method)</a>
 </li>
         <li><a href="pyttn/index.html#pyttn.system_modes.__getitem__">(pyttn.system_modes method)</a>
+</li>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.__getitem__">(pyttn.ttn_dtype method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.__getitem__">(pyttn.ttnpp.ms_ttn_complex method)</a>
 </li>
@@ -401,11 +408,13 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.sSOP_real.__iadd__">(pyttn.ttnpp.sSOP_real method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.coeff_complex.__idiv__">__idiv__() (pyttn.ttnpp.coeff_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.__idiv__">__idiv__() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.__idiv__">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.coeff_complex.__idiv__">(pyttn.ttnpp.coeff_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.coeff_real.__idiv__">(pyttn.ttnpp.coeff_real method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.__idiv__">(pyttn.ttnpp.ms_ttn_complex method)</a>
@@ -415,9 +424,17 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.__idiv__">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="pyttn/index.html#pyttn.sPOP.__imul__">__imul__() (pyttn.sPOP method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.__imatmul__">__imatmul__() (pyttn.ttn_dtype method)</a>
+</li>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.__imul__">__imul__() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.sPOP.__imul__">(pyttn.sPOP method)</a>
+</li>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.__imul__">(pyttn.ttn_dtype method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.coeff_complex.__imul__">(pyttn.ttnpp.coeff_complex method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.coeff_real.__imul__">(pyttn.ttnpp.coeff_real method)</a>
@@ -447,10 +464,14 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.SOP_complex.__isub__">(pyttn.ttnpp.SOP_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="pyttn/index.html#pyttn.ntree.__iter__">__iter__() (pyttn.ntree method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.__iter__">__iter__() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ntree.__iter__">(pyttn.ntree method)</a>
+</li>
         <li><a href="pyttn/index.html#pyttn.sPOP.__iter__">(pyttn.sPOP method)</a>
+</li>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.__iter__">(pyttn.ttn_dtype method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.__iter__">(pyttn.ttnpp.ms_ttn_complex method)</a>
 </li>
@@ -473,10 +494,14 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_node_complex.__iter__">(pyttn.ttnpp.ttn_node_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="pyttn/index.html#pyttn.ntree.__len__">__len__() (pyttn.ntree method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.__len__">__len__() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ntree.__len__">(pyttn.ntree method)</a>
+</li>
         <li><a href="pyttn/index.html#pyttn.system_modes.__len__">(pyttn.system_modes method)</a>
+</li>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.__len__">(pyttn.ttn_dtype method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.__len__">(pyttn.ttnpp.ms_ttn_complex method)</a>
 </li>
@@ -523,6 +548,8 @@
       </ul></li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.SOP_complex.__radd__">__radd__() (pyttn.ttnpp.SOP_complex method)</a>
 </li>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.__rmatmul__">__rmatmul__() (pyttn.ttn_dtype method)</a>
+</li>
       <li><a href="pyttn/index.html#pyttn.sOP.__rmul__">__rmul__() (pyttn.sOP method)</a>
 
       <ul>
@@ -547,9 +574,13 @@
       </ul></li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.SOP_complex.__rsub__">__rsub__() (pyttn.ttnpp.SOP_complex method)</a>
 </li>
-      <li><a href="pyttn/index.html#pyttn.system_modes.__setitem__">__setitem__() (pyttn.system_modes method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.__setitem__">__setitem__() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.system_modes.__setitem__">(pyttn.system_modes method)</a>
+</li>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.__setitem__">(pyttn.ttn_dtype method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.__setitem__">(pyttn.ttnpp.ms_ttn_complex method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.multiset_SOP_complex.__setitem__">(pyttn.ttnpp.multiset_SOP_complex method)</a>
@@ -724,7 +755,11 @@
       <li><a href="pyttn/pyttn.oqs.unitary.html#pyttn.oqs.unitary.bosonic_bath_hamiltonian.add_star_bath_hamiltonian">add_star_bath_hamiltonian() (in module pyttn.oqs.unitary.bosonic_bath_hamiltonian)</a>
 </li>
       <li><a href="pyttn/pyttn.models.html#pyttn.models.AIM">AIM() (in module pyttn.models)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.models.html#pyttn.models.modelsExt.AIM">(in module pyttn.models.modelsExt)</a>
 </li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.AIM_complex">AIM_complex (class in pyttn.ttnpp.models)</a>
 </li>
       <li><a href="ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol.alpha">alpha() (pyttn.ttnpp.utils.orthopol method)</a>
@@ -749,12 +784,24 @@
       </ul></li>
       <li><a href="ttnpp/ttnpp.ops.html#pyttn.ttnpp.ops.site_operator_complex.apply">apply() (pyttn.ttnpp.ops.site_operator_complex method)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.apply_one_body_operator">apply_one_body_operator() (pyttn.ttnpp.ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.apply_one_body_operator">apply_one_body_operator() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.apply_one_body_operator">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.apply_operator">apply_operator() (pyttn.ttnpp.ttn_complex method)</a>
+      </ul></li>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.apply_operator">apply_operator() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.apply_operator">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.apply_product_operator">apply_product_operator() (pyttn.ttnpp.ttn_complex method)</a>
+      </ul></li>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.apply_product_operator">apply_product_operator() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.apply_product_operator">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.apply_sop_to_ttn">apply_sop_to_ttn() (in module pyttn.ttnpp)</a>
 </li>
       <li><a href="pyttn/index.html#pyttn.system_modes.as_combined_mode">as_combined_mode() (pyttn.system_modes method)</a>
@@ -774,6 +821,8 @@
       <li><a href="pyttn/index.html#pyttn.mode_data.assign">assign() (pyttn.mode_data method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.assign">(pyttn.ms_ttn_dtype method)</a>
+</li>
         <li><a href="pyttn/index.html#pyttn.ntree.assign">(pyttn.ntree method)</a>
 </li>
         <li><a href="pyttn/index.html#pyttn.primitive_mode_data.assign">(pyttn.primitive_mode_data method)</a>
@@ -783,6 +832,8 @@
         <li><a href="pyttn/index.html#pyttn.sPOP.assign">(pyttn.sPOP method)</a>
 </li>
         <li><a href="pyttn/index.html#pyttn.system_modes.assign">(pyttn.system_modes method)</a>
+</li>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.assign">(pyttn.ttn_dtype method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.adaptive_one_site_dmrg_complex.assign">(pyttn.ttnpp.adaptive_one_site_dmrg_complex method)</a>
 </li>
@@ -899,18 +950,26 @@
 </li>
       <li><a href="pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.bkm">bkm() (in module pyttn.oqs.heom.heom_operators)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.bkp">bkp() (in module pyttn.oqs.heom.heom_operators)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.bond_dimensions">bond_dimensions() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.bond_dimensions">bond_dimensions() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.bond_dimensions">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.bond_dimensions">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.bond_dimensions">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.bond_entropy">bond_entropy() (pyttn.ttnpp.ttn_complex method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.bond_entropy">bond_entropy() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.bond_entropy">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
+      </ul></li>
       <li><a href="pyttn/index.html#pyttn.mode_type.boson_mode">boson_mode (pyttn.mode_type attribute)</a>
 
       <ul>
@@ -961,9 +1020,11 @@
         <li><a href="pyttn/pyttn.utils.html#pyttn.utils.chebyshev_third_kind_polynomial">(in module pyttn.utils)</a>
 </li>
       </ul></li>
-      <li><a href="pyttn/index.html#pyttn.ntree.clear">clear() (pyttn.ntree method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.clear">clear() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ntree.clear">(pyttn.ntree method)</a>
+</li>
         <li><a href="pyttn/index.html#pyttn.ntreeNode.clear">(pyttn.ntreeNode method)</a>
 </li>
         <li><a href="pyttn/index.html#pyttn.sOP.clear">(pyttn.sOP method)</a>
@@ -971,6 +1032,8 @@
         <li><a href="pyttn/index.html#pyttn.sPOP.clear">(pyttn.sPOP method)</a>
 </li>
         <li><a href="pyttn/index.html#pyttn.system_modes.clear">(pyttn.system_modes method)</a>
+</li>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.clear">(pyttn.ttn_dtype method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.adaptive_one_site_dmrg_complex.clear">(pyttn.ttnpp.adaptive_one_site_dmrg_complex method)</a>
 </li>
@@ -1059,12 +1122,20 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.subspace_two_site_cost_tdvp_complex.coefficient">(pyttn.ttnpp.subspace_two_site_cost_tdvp_complex property)</a>
 </li>
       </ul></li>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.collapse">collapse() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.collapse">(pyttn.ttnpp.ttn_complex method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.collapse">collapse() (pyttn.ttnpp.ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.collapse_basis">collapse_basis() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.collapse_basis">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.collapse_basis">collapse_basis() (pyttn.ttnpp.ttn_complex method)</a>
-</li>
+      </ul></li>
       <li><a href="pyttn/index.html#pyttn.ntreeBuilder.collapse_bond_matrices">collapse_bond_matrices() (pyttn.ntreeBuilder static method)</a>
 
       <ul>
@@ -1081,6 +1152,12 @@
 </li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.liouville_space.commutator_superoperator">commutator_superoperator() (pyttn.ttnpp.liouville_space static method)</a>
 </li>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.complex_dtype">complex_dtype (pyttn.ms_ttn_dtype property)</a>
+
+      <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.complex_dtype">(pyttn.ttn_dtype property)</a>
+</li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.csr_matrix_complex.complex_dtype">complex_dtype() (pyttn.ttnpp.linalg.csr_matrix_complex method)</a>
 
       <ul>
@@ -1131,17 +1208,25 @@
       </ul></li>
       <li><a href="pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.compute_dimensions">compute_dimensions() (in module pyttn.oqs.heom.heom_operators)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.compute_maximum_bond_entropy">compute_maximum_bond_entropy() (pyttn.ttnpp.ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.compute_maximum_bond_entropy">compute_maximum_bond_entropy() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.compute_maximum_bond_entropy">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol.compute_nodes_and_weights">compute_nodes_and_weights() (pyttn.ttnpp.utils.orthopol method)</a>
 
       <ul>
         <li><a href="pyttn/pyttn.utils.html#pyttn.utils.orthopol.compute_nodes_and_weights">(pyttn.utils.orthopol method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.conj">conj() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.conj">conj() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.conj">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.conj">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_node_complex.conj">(pyttn.ttnpp.ms_ttn_node_complex method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.conj">(pyttn.ttnpp.ttn_complex method)</a>
@@ -1206,7 +1291,11 @@
       <li><a href="pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.DensityDiscretisation">DensityDiscretisation (class in pyttn.oqs.bath_fitting.bath_discretisation)</a>
 </li>
       <li><a href="pyttn/pyttn.utils.html#pyttn.utils.DepthTruncation">DepthTruncation (class in pyttn.utils)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.utils.html#pyttn.utils.truncate.DepthTruncation">(class in pyttn.utils.truncate)</a>
 </li>
+      </ul></li>
       <li><a href="pyttn/index.html#pyttn.ntree.dfs">dfs() (pyttn.ntree method)</a>
 
       <ul>
@@ -1221,9 +1310,13 @@
       </ul></li>
       <li><a href="ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.diagonal_matrix_real">diagonal_matrix_real (class in pyttn.ttnpp.linalg)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.dim">dim() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.dim">dim() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.dim">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.dim">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.dim">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_data_complex.dim">(pyttn.ttnpp.ttn_data_complex method)</a>
@@ -1292,7 +1385,11 @@
 </li>
       </ul></li>
       <li><a href="pyttn/pyttn.models.html#pyttn.models.electronic_structure">electronic_structure() (in module pyttn.models)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.models.html#pyttn.models.modelsExt.electronic_structure">(in module pyttn.models.modelsExt)</a>
 </li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.electronic_structure_complex">electronic_structure_complex (class in pyttn.ttnpp.models)</a>
 </li>
       <li><a href="pyttn/index.html#pyttn.ntree.empty">empty() (pyttn.ntree method)</a>
@@ -1306,17 +1403,21 @@
 </li>
       </ul></li>
       <li><a href="pyttn/pyttn.utils.html#pyttn.utils.EnergyTruncation">EnergyTruncation (class in pyttn.utils)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.utils.html#pyttn.utils.truncate.EnergyTruncation">(class in pyttn.utils.truncate)</a>
 </li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.spin_boson_base_complex.eps">eps (pyttn.ttnpp.models.spin_boson_base_complex property)</a>
 </li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.sop_operator_complex.Eshift">Eshift (pyttn.ttnpp.sop_operator_complex property)</a>
 </li>
       <li><a href="pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.ESPRIT.ESPRIT">ESPRIT() (in module pyttn.oqs.bath_fitting.ESPRIT)</a>
 </li>
-      <li><a href="pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.ESPRIT.ESPRIT_frequencies">ESPRIT_frequencies() (in module pyttn.oqs.bath_fitting.ESPRIT)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.ESPRIT.ESPRIT_frequencies">ESPRIT_frequencies() (in module pyttn.oqs.bath_fitting.ESPRIT)</a>
+</li>
       <li><a href="pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.expfit.ESPRIT_support_points">ESPRIT_support_points() (in module pyttn.oqs.bath_fitting.expfit)</a>
 </li>
       <li><a href="pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.expfit.ESPRITDecomposition">ESPRITDecomposition (class in pyttn.oqs.bath_fitting.expfit)</a>
@@ -1401,10 +1502,10 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.primitive_mode_data.fermionic">(pyttn.ttnpp.primitive_mode_data method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyttn/pyttn.oqs.html#pyttn.oqs.fermionic_bath.FermionicBath">FermionicBath (class in pyttn.oqs.fermionic_bath)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyttn/pyttn.oqs.html#pyttn.oqs.bathFitInfo.FermionicBathFit">FermionicBathFit (class in pyttn.oqs.bathFitInfo)</a>
 </li>
       <li><a href="pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation.find_moment_scaling_factor">find_moment_scaling_factor() (pyttn.oqs.bath_fitting.bath_discretisation.OrthopolDiscretisation method)</a>
@@ -1417,9 +1518,13 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.fOP">(in module pyttn.ttnpp)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.force_set_orthogonality_centre">force_set_orthogonality_centre() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.force_set_orthogonality_centre">force_set_orthogonality_centre() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.force_set_orthogonality_centre">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.force_set_orthogonality_centre">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.force_set_orthogonality_centre">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -1469,9 +1574,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.model_complex.hamiltonian">hamiltonian() (pyttn.ttnpp.models.model_complex method)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.has_orthogonality_centre">has_orthogonality_centre() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.has_orthogonality_centre">has_orthogonality_centre() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.has_orthogonality_centre">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.has_orthogonality_centre">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.has_orthogonality_centre">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -1567,8 +1676,6 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ntreeBuilder.insert_basis_nodes">(pyttn.ttnpp.ntreeBuilder static method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyttn/index.html#pyttn.ntreeNode.insert_front">insert_front() (pyttn.ntreeNode method)</a>
 
       <ul>
@@ -1583,6 +1690,8 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.sPOP.insert_front">(pyttn.ttnpp.sPOP method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitOQSBath.is_fermionic">is_fermionic() (pyttn.oqs.exponential_fit_bath.ExpFitOQSBath method)</a>
 </li>
       <li><a href="ttnpp/ttnpp.ops.html#pyttn.ttnpp.ops.primitive_complex.is_identity">is_identity() (pyttn.ttnpp.ops.primitive_complex method)</a>
@@ -1601,9 +1710,13 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_node_complex.is_leaf">(pyttn.ttnpp.ttn_node_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.is_orthogonalised">is_orthogonalised() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.is_orthogonalised">is_orthogonalised() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.is_orthogonalised">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.is_orthogonalised">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.is_orthogonalised">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_data_complex.is_orthogonalised">(pyttn.ttnpp.ttn_data_complex method)</a>
@@ -1615,9 +1728,13 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.coeff_real.is_positive">(pyttn.ttnpp.coeff_real method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.is_purification">is_purification() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.is_purification">is_purification() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.is_purification">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.is_purification">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.is_purification">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -1782,6 +1899,8 @@
       <li><a href="pyttn/pyttn.linalg.html#pyttn.linalg.matrix">matrix() (in module pyttn.linalg)</a>
 
       <ul>
+        <li><a href="pyttn/pyttn.linalg.html#pyttn.linalg.tensorExt.matrix">(in module pyttn.linalg.tensorExt)</a>
+</li>
         <li><a href="ttnpp/ttnpp.ops.html#pyttn.ttnpp.ops.diagonal_matrix_complex.matrix">(pyttn.ttnpp.ops.diagonal_matrix_complex method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.ops.html#pyttn.ttnpp.ops.matrix_complex.matrix">(pyttn.ttnpp.ops.matrix_complex method)</a>
@@ -1817,14 +1936,30 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.subspace_two_site_cost_tdvp_complex.maximum_bond_dimension">(pyttn.ttnpp.subspace_two_site_cost_tdvp_complex property)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.maximum_bond_dimension">maximum_bond_dimension() (pyttn.ttnpp.ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.maximum_bond_dimension">maximum_bond_dimension() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.maximum_bond_dimension">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.maximum_bond_entropy">maximum_bond_entropy() (pyttn.ttnpp.ttn_complex method)</a>
+      </ul></li>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.maximum_bond_entropy">maximum_bond_entropy() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.maximum_bond_entropy">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.measure_without_collapse">measure_without_collapse() (pyttn.ttnpp.ttn_complex method)</a>
+      </ul></li>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.measure_without_collapse">measure_without_collapse() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.measure_without_collapse">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.minimum_bond_dimension">minimum_bond_dimension() (pyttn.ttnpp.ttn_complex method)</a>
+      </ul></li>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.minimum_bond_dimension">minimum_bond_dimension() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.minimum_bond_dimension">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.adaptive_one_site_dmrg_complex.minimum_unoccupied">minimum_unoccupied (pyttn.ttnpp.adaptive_one_site_dmrg_complex property)</a>
 
       <ul>
@@ -1859,10 +1994,18 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.system_modes.mode">(pyttn.ttnpp.system_modes method)</a>
 </li>
       </ul></li>
-      <li><a href="pyttn/pyttn.utils.html#pyttn.utils.ModeCombination.mode_combination_array">mode_combination_array() (pyttn.utils.ModeCombination method)</a>
+      <li><a href="pyttn/pyttn.utils.html#pyttn.utils.mode_combination.ModeCombination.mode_combination_array">mode_combination_array() (pyttn.utils.mode_combination.ModeCombination method)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.utils.html#pyttn.utils.ModeCombination.mode_combination_array">(pyttn.utils.ModeCombination method)</a>
 </li>
-      <li><a href="pyttn/pyttn.utils.html#pyttn.utils.ModeCombination.mode_combination_system">mode_combination_system() (pyttn.utils.ModeCombination method)</a>
+      </ul></li>
+      <li><a href="pyttn/pyttn.utils.html#pyttn.utils.mode_combination.ModeCombination.mode_combination_system">mode_combination_system() (pyttn.utils.mode_combination.ModeCombination method)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.utils.html#pyttn.utils.ModeCombination.mode_combination_system">(pyttn.utils.ModeCombination method)</a>
 </li>
+      </ul></li>
       <li><a href="pyttn/index.html#pyttn.mode_data">mode_data (class in pyttn)</a>
 
       <ul>
@@ -1871,9 +2014,13 @@
       </ul></li>
       <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.spin_boson_base_complex.mode_dim">mode_dim() (pyttn.ttnpp.models.spin_boson_base_complex method)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.mode_dimensions">mode_dimensions() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.mode_dimensions">mode_dimensions() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.mode_dimensions">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.mode_dimensions">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.mode_dimensions">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -1902,11 +2049,15 @@
 </li>
       </ul></li>
       <li><a href="pyttn/pyttn.utils.html#pyttn.utils.ModeCombination">ModeCombination (class in pyttn.utils)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.utils.html#pyttn.utils.mode_combination.ModeCombination">(class in pyttn.utils.mode_combination)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.model_complex">model_complex (class in pyttn.ttnpp.models)</a>
-</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.model_complex">model_complex (class in pyttn.ttnpp.models)</a>
+</li>
       <li>
     module
 
@@ -1915,7 +2066,13 @@
 </li>
         <li><a href="pyttn/pyttn.linalg.html#module-pyttn.linalg">pyttn.linalg</a>
 </li>
+        <li><a href="pyttn/pyttn.linalg.html#module-pyttn.linalg.sparseMatrixExt">pyttn.linalg.sparseMatrixExt</a>
+</li>
+        <li><a href="pyttn/pyttn.linalg.html#module-pyttn.linalg.tensorExt">pyttn.linalg.tensorExt</a>
+</li>
         <li><a href="pyttn/pyttn.models.html#module-pyttn.models">pyttn.models</a>
+</li>
+        <li><a href="pyttn/pyttn.models.html#module-pyttn.models.modelsExt">pyttn.models.modelsExt</a>
 </li>
         <li><a href="pyttn/pyttn.oqs.html#module-pyttn.oqs">pyttn.oqs</a>
 </li>
@@ -1969,6 +2126,12 @@
 </li>
         <li><a href="pyttn/pyttn.utils.html#module-pyttn.utils">pyttn.utils</a>
 </li>
+        <li><a href="pyttn/pyttn.utils.html#module-pyttn.utils.mode_combination">pyttn.utils.mode_combination</a>
+</li>
+        <li><a href="pyttn/pyttn.utils.html#module-pyttn.utils.truncate">pyttn.utils.truncate</a>
+</li>
+        <li><a href="pyttn/pyttn.utils.html#module-pyttn.utils.visualise_tree">pyttn.utils.visualise_tree</a>
+</li>
       </ul></li>
       <li><a href="ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol_discretisation.moments">moments() (pyttn.ttnpp.utils.orthopol_discretisation static method)</a>
 </li>
@@ -1993,6 +2156,8 @@
       <li><a href="pyttn/index.html#pyttn.ms_ttn">ms_ttn() (in module pyttn)</a>
 </li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex">ms_ttn_complex (class in pyttn.ttnpp)</a>
+</li>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype">ms_ttn_dtype (class in pyttn)</a>
 </li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_node_complex">ms_ttn_node_complex (class in pyttn.ttnpp)</a>
 </li>
@@ -2032,6 +2197,12 @@
       </ul></li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.adaptive_one_site_dmrg_complex.neigenvalues">neigenvalues() (pyttn.ttnpp.adaptive_one_site_dmrg_complex method)</a>
 </li>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.nelem">nelem() (pyttn.ms_ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.nelem">(pyttn.ttn_dtype method)</a>
+</li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.nelems">nelems() (pyttn.ttnpp.ms_ttn_complex method)</a>
 
       <ul>
@@ -2056,10 +2227,14 @@
         <li><a href="pyttn/pyttn.utils.html#pyttn.utils.orthopol.Nmax">(pyttn.utils.orthopol method)</a>
 </li>
       </ul></li>
-      <li><a href="pyttn/index.html#pyttn.sPOP.nmodes">nmodes() (pyttn.sPOP method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.nmodes">nmodes() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.sPOP.nmodes">(pyttn.sPOP method)</a>
+</li>
         <li><a href="pyttn/index.html#pyttn.system_modes.nmodes">(pyttn.system_modes method)</a>
+</li>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.nmodes">(pyttn.ttn_dtype method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.nmodes">(pyttn.ttnpp.ms_ttn_complex method)</a>
 </li>
@@ -2100,8 +2275,6 @@
         <li><a href="pyttn/pyttn.utils.html#pyttn.utils.orthopol.nodes">(pyttn.utils.orthopol method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.nonclassical_polynomial">nonclassical_polynomial() (in module pyttn.ttnpp.utils)</a>
 
       <ul>
@@ -2110,15 +2283,25 @@
       </ul></li>
       <li><a href="pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.nop">nop() (in module pyttn.oqs.heom.heom_operators)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.norm">norm() (pyttn.ttnpp.ms_ttn_complex method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.norm">norm() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.norm">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.norm">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.norm">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.normalise">normalise() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.normalise">normalise() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.normalise">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.normalise">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.normalise">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -2134,9 +2317,13 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.system_modes.nprimitive_modes">(pyttn.ttnpp.system_modes method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.nset">nset() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.nset">nset() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.nset">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.nset">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_slice_complex.nset">(pyttn.ttnpp.ms_ttn_slice_complex method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.multiset_SOP_complex.nset">(pyttn.ttnpp.multiset_SOP_complex method)</a>
@@ -2148,15 +2335,23 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_data_complex.nset">(pyttn.ttnpp.ttn_data_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.nsites">nsites() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.nsites">nsites() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.nsites">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.nsites">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.nsites">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.ntensors">ntensors() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.ntensors">ntensors() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.ntensors">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.ntensors">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.ntensors">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -2172,8 +2367,12 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.sSOP_real.nterms">(pyttn.ttnpp.sSOP_real method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.nthreads">nthreads (pyttn.ttnpp.ms_ttn_complex property)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.nthreads">nthreads (pyttn.ms_ttn_dtype property)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.nthreads">(pyttn.ttnpp.ms_ttn_complex property)</a>
 </li>
+      </ul></li>
       <li><a href="pyttn/index.html#pyttn.ntree">ntree (class in pyttn)</a>
 
       <ul>
@@ -2226,8 +2425,6 @@
 </li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.operator_dictionary_real">operator_dictionary_real (class in pyttn.ttnpp)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyttn/index.html#pyttn.sPOP.ops">ops (pyttn.sPOP property)</a>
 
       <ul>
@@ -2238,15 +2435,25 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.sPOP.ops">(pyttn.ttnpp.sPOP property)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.orthogonalise">orthogonalise() (pyttn.ttnpp.ms_ttn_complex method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.orthogonalise">orthogonalise() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.orthogonalise">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.orthogonalise">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.orthogonalise">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.orthogonality_centre">orthogonality_centre() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.orthogonality_centre">orthogonality_centre() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.orthogonality_centre">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.orthogonality_centre">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.orthogonality_centre">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -2347,10 +2554,31 @@
 </li>
       </ul></li>
       <li>
+    pyttn.linalg.sparseMatrixExt
+
+      <ul>
+        <li><a href="pyttn/pyttn.linalg.html#module-pyttn.linalg.sparseMatrixExt">module</a>
+</li>
+      </ul></li>
+      <li>
+    pyttn.linalg.tensorExt
+
+      <ul>
+        <li><a href="pyttn/pyttn.linalg.html#module-pyttn.linalg.tensorExt">module</a>
+</li>
+      </ul></li>
+      <li>
     pyttn.models
 
       <ul>
         <li><a href="pyttn/pyttn.models.html#module-pyttn.models">module</a>
+</li>
+      </ul></li>
+      <li>
+    pyttn.models.modelsExt
+
+      <ul>
+        <li><a href="pyttn/pyttn.models.html#module-pyttn.models.modelsExt">module</a>
 </li>
       </ul></li>
       <li>
@@ -2537,6 +2765,27 @@
         <li><a href="pyttn/pyttn.utils.html#module-pyttn.utils">module</a>
 </li>
       </ul></li>
+      <li>
+    pyttn.utils.mode_combination
+
+      <ul>
+        <li><a href="pyttn/pyttn.utils.html#module-pyttn.utils.mode_combination">module</a>
+</li>
+      </ul></li>
+      <li>
+    pyttn.utils.truncate
+
+      <ul>
+        <li><a href="pyttn/pyttn.utils.html#module-pyttn.utils.truncate">module</a>
+</li>
+      </ul></li>
+      <li>
+    pyttn.utils.visualise_tree
+
+      <ul>
+        <li><a href="pyttn/pyttn.utils.html#module-pyttn.utils.visualise_tree">module</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -2555,9 +2804,13 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.random">random() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.random">random() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.random">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.random">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.random">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -2579,15 +2832,23 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.sSOP_real.reserve">(pyttn.ttnpp.sSOP_real method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.reset_orthogonality_centre">reset_orthogonality_centre() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.reset_orthogonality_centre">reset_orthogonality_centre() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.reset_orthogonality_centre">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.reset_orthogonality_centre">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.reset_orthogonality_centre">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="pyttn/index.html#pyttn.system_modes.resize">resize() (pyttn.system_modes method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.resize">resize() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.system_modes.resize">(pyttn.system_modes method)</a>
+</li>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.resize">(pyttn.ttn_dtype method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.matrix_element_complex.resize">(pyttn.ttnpp.matrix_element_complex method)</a>
 </li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.resize">(pyttn.ttnpp.ms_ttn_complex method)</a>
@@ -2639,6 +2900,8 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.sample_product">sample_product() (pyttn.ttn_dtype method)</a>
+</li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.sample_product_state">sample_product_state() (pyttn.ttnpp.ttn_complex method)</a>
 </li>
       <li><a href="pyttn/index.html#pyttn.ntreeBuilder.sanitise">sanitise() (pyttn.ntreeBuilder static method)</a>
@@ -2681,8 +2944,12 @@
         <li><a href="pyttn/pyttn.utils.html#pyttn.utils.orthopol.set_domain">(pyttn.utils.orthopol method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.set_identity_purification">set_identity_purification() (pyttn.ttnpp.ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.set_identity_purification">set_identity_purification() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.set_identity_purification">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.multiset_SOP_complex.set_is_fermion_mode">set_is_fermion_mode() (pyttn.ttnpp.multiset_SOP_complex method)</a>
 
       <ul>
@@ -2699,9 +2966,13 @@
       </ul></li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.SOP_complex.set_operator_dictionary">set_operator_dictionary() (pyttn.ttnpp.SOP_complex method)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.set_orthogonality_centre">set_orthogonality_centre() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.set_orthogonality_centre">set_orthogonality_centre() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.set_orthogonality_centre">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.set_orthogonality_centre">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.set_orthogonality_centre">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -2711,25 +2982,41 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.system_modes.set_primitive_mode">(pyttn.ttnpp.system_modes method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.set_product">set_product() (pyttn.ttnpp.ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.set_product">set_product() (pyttn.ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.set_product">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.utils.html#pyttn.ttnpp.utils.orthopol.set_recurrence_relation">set_recurrence_relation() (pyttn.ttnpp.utils.orthopol method)</a>
 
       <ul>
         <li><a href="pyttn/pyttn.utils.html#pyttn.utils.orthopol.set_recurrence_relation">(pyttn.utils.orthopol method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.set_seed">set_seed() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.set_seed">set_seed() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.set_seed">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.set_seed">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.set_seed">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.set_site_tensor">set_site_tensor() (pyttn.ttnpp.ttn_complex method)</a>
-</li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.set_state">set_state() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype.set_site_tensor">set_site_tensor() (pyttn.ttn_dtype method)</a>
 
       <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.set_site_tensor">(pyttn.ttnpp.ttn_complex method)</a>
+</li>
+      </ul></li>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.set_state">set_state() (pyttn.ms_ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.set_state">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.set_state">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.set_state">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -2753,9 +3040,13 @@
         <li><a href="pyttn/pyttn.utils.html#pyttn.utils.orthopol.shift">(pyttn.utils.orthopol method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.shift_orthogonality_centre">shift_orthogonality_centre() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.shift_orthogonality_centre">shift_orthogonality_centre() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.shift_orthogonality_centre">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.shift_orthogonality_centre">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.shift_orthogonality_centre">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -2773,9 +3064,13 @@
 </li>
       <li><a href="ttnpp/ttnpp.ops.html#pyttn.ttnpp.ops.site_operator_complex">site_operator_complex (class in pyttn.ttnpp.ops)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.site_tensor">site_tensor() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.site_tensor">site_tensor() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.site_tensor">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.site_tensor">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.site_tensor">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
@@ -2805,8 +3100,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.Sl">Sl() (in module pyttn.oqs.heom.heom_operators)</a>
 </li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.slice">slice() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.slice">slice() (pyttn.ms_ttn_dtype method)</a>
+
+      <ul>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.slice">(pyttn.ttnpp.ms_ttn_complex method)</a>
 </li>
+      </ul></li>
       <li><a href="pyttn/pyttn.oqs.heom.html#pyttn.oqs.heom.heom_operators.Sm">Sm() (in module pyttn.oqs.heom.heom_operators)</a>
 </li>
       <li><a href="pyttn/index.html#pyttn.sNBO">sNBO() (in module pyttn)</a>
@@ -2842,7 +3141,11 @@
 </li>
       </ul></li>
       <li><a href="pyttn/pyttn.models.html#pyttn.models.spin_boson">spin_boson() (in module pyttn.models)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.models.html#pyttn.models.modelsExt.spin_boson">(in module pyttn.models.modelsExt)</a>
 </li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.spin_boson_base_complex">spin_boson_base_complex (class in pyttn.ttnpp.models)</a>
 </li>
       <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.spin_boson_chain_complex">spin_boson_chain_complex (class in pyttn.ttnpp.models)</a>
@@ -2976,7 +3279,11 @@
       <li><a href="pyttn/index.html#pyttn.tdvp">tdvp() (in module pyttn)</a>
 </li>
       <li><a href="pyttn/pyttn.linalg.html#pyttn.linalg.tensor">tensor() (in module pyttn.linalg)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.linalg.html#pyttn.linalg.tensorExt.tensor">(in module pyttn.linalg.tensorExt)</a>
 </li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.tensor_3_complex">tensor_3_complex (class in pyttn.ttnpp.linalg)</a>
 </li>
       <li><a href="ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.tensor_3_real">tensor_3_real (class in pyttn.ttnpp.linalg)</a>
@@ -2992,17 +3299,21 @@
 </li>
       </ul></li>
       <li><a href="pyttn/pyttn.models.html#pyttn.models.TFIM">TFIM() (in module pyttn.models)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.models.html#pyttn.models.modelsExt.TFIM">(in module pyttn.models.modelsExt)</a>
 </li>
+      </ul></li>
       <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.TFIM_complex">TFIM_complex (class in pyttn.ttnpp.models)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.AIM_complex.Tij">Tij() (pyttn.ttnpp.models.AIM_complex method)</a>
 
       <ul>
         <li><a href="ttnpp/ttnpp.models.html#pyttn.ttnpp.models.electronic_structure_complex.Tij">(pyttn.ttnpp.models.electronic_structure_complex method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pyttn/index.html#pyttn.mode_type.tls_mode">tls_mode (pyttn.mode_type attribute)</a>
 
       <ul>
@@ -3021,14 +3332,22 @@
         <li><a href="ttnpp/ttnpp.ops.html#pyttn.ttnpp.ops.site_operator_complex.transpose">(pyttn.ttnpp.ops.site_operator_complex method)</a>
 </li>
       </ul></li>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.truncate">truncate() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.truncate">truncate() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.truncate">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.truncate">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.truncate">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>
       <li><a href="pyttn/pyttn.utils.html#pyttn.utils.EnergyTruncation.truncate_bosonic">truncate_bosonic() (pyttn.utils.EnergyTruncation method)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.utils.html#pyttn.utils.truncate.EnergyTruncation.truncate_bosonic">(pyttn.utils.truncate.EnergyTruncation method)</a>
 </li>
+      </ul></li>
       <li><a href="pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.truncate_modes">truncate_modes() (pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath method)</a>
 
       <ul>
@@ -3036,12 +3355,18 @@
 </li>
       </ul></li>
       <li><a href="pyttn/pyttn.utils.html#pyttn.utils.TruncationBase">TruncationBase (class in pyttn.utils)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.utils.html#pyttn.utils.truncate.TruncationBase">(class in pyttn.utils.truncate)</a>
 </li>
+      </ul></li>
       <li><a href="pyttn/index.html#pyttn.ttn">ttn() (in module pyttn)</a>
 </li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex">ttn_complex (class in pyttn.ttnpp)</a>
 </li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_data_complex">ttn_data_complex (class in pyttn.ttnpp)</a>
+</li>
+      <li><a href="pyttn/index.html#pyttn.ttn_dtype">ttn_dtype (class in pyttn)</a>
 </li>
       <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_node_complex">ttn_node_complex (class in pyttn.ttnpp)</a>
 </li>
@@ -3111,16 +3436,24 @@
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ntreeNode.value">(pyttn.ttnpp.ntreeNode property)</a>
 </li>
       </ul></li>
+      <li><a href="pyttn/pyttn.linalg.html#pyttn.linalg.vector">vector() (in module pyttn.linalg)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.linalg.html#pyttn.linalg.tensorExt.vector">(in module pyttn.linalg.tensorExt)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pyttn/pyttn.linalg.html#pyttn.linalg.vector">vector() (in module pyttn.linalg)</a>
-</li>
       <li><a href="ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.vector_complex">vector_complex (class in pyttn.ttnpp.linalg)</a>
 </li>
       <li><a href="ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.vector_real">vector_real (class in pyttn.ttnpp.linalg)</a>
 </li>
       <li><a href="pyttn/pyttn.utils.html#pyttn.utils.visualise_tree">visualise_tree() (in module pyttn.utils)</a>
+
+      <ul>
+        <li><a href="pyttn/pyttn.utils.html#pyttn.utils.visualise_tree.visualise_tree">(in module pyttn.utils.visualise_tree)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -3163,9 +3496,13 @@
 <h2 id="Z">Z</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.zero">zero() (pyttn.ttnpp.ms_ttn_complex method)</a>
+      <li><a href="pyttn/index.html#pyttn.ms_ttn_dtype.zero">zero() (pyttn.ms_ttn_dtype method)</a>
 
       <ul>
+        <li><a href="pyttn/index.html#pyttn.ttn_dtype.zero">(pyttn.ttn_dtype method)</a>
+</li>
+        <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ms_ttn_complex.zero">(pyttn.ttnpp.ms_ttn_complex method)</a>
+</li>
         <li><a href="ttnpp/ttnpp.html#pyttn.ttnpp.ttn_complex.zero">(pyttn.ttnpp.ttn_complex method)</a>
 </li>
       </ul></li>

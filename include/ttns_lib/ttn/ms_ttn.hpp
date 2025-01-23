@@ -170,7 +170,7 @@ public:
     }
 
     template <typename V, typename U, typename be> 
-    void set_product(const std::vector<U>& coeff, const std::vector<linalg::vector<V, be> >& ps)
+    void set_product(const std::vector<U>& coeff, const std::vector<std::vector<linalg::vector<V, be> > >& ps)
     {
         ASSERT(coeff.size() == ps.size() && coeff.size() == this->nset(), "Cannot set ttnbase to specified state.  Input arrays are not the correct size.");
 

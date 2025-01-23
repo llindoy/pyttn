@@ -79,6 +79,15 @@ inline void init_system_info(py::module &m)
         )mydelim")
         .doc() = R"mydelim(
           A class for handling information about the primitive modes making up a system
+
+          :param \*args: A variable length list of arguments. Valid options are
+              
+              - none - in this case we call the default constructor of the primitive_mode_data objcet.
+              - **d** (int) - Construct a primitive_mode_data object with a generic_mode mode_type with a Local Hilbert space dimension of d
+              - **d** (int),  **type** (:class:`mode_type`) -  Construct a primitive_mode_data object with a type mode_type with a Local Hilbert space dimension of d
+              - **other** (:class:`primitive_mode_data`) - Copy constructs a primitive_mode_data object from another primitive_mode_data object
+
+          :type \*args: [Arguments (variable number and type)]
         )mydelim";
 
 
@@ -167,8 +176,17 @@ inline void init_system_info(py::module &m)
         .doc() = R"mydelim(
           A class for handling information about composite modes used to represent the system information. 
           This class stores a set of primitive_mode_data defining each individual mode that forms this composite,
-          and provides several helper functions for determining the properties of the underlying modes.  This
-          functions support several overloaded constructors.
+          and provides several helper functions for determining the properties of the underlying modes. 
+
+          :param \*args: A variable length list of arguments. Valid options are
+            - none - in this case we call the default constructor of the mode_data objcet.
+            - **d** (int) - Construct a mode_data object with a generic_mode mode_type with a Local Hilbert space dimension of d
+            - **d** (int),  **type** (:class:`mode_type`) -  Construct a mode_data object with a type mode_type with a Local Hilbert space dimension of d
+            - **other** (:class:`mode_data`) - Copy constructs a mode_data object from another mode_data object
+            - **other** (:class:`primitive_mode_data`) - Constructs a mode_data object containing a single primitive_mode_data object
+            - **other** (list[:class:`primitive_mode_data`]) - Constructs a mode_data object containing a list of primitive_mode_data object
+
+          :type \*args: [Arguments (variable number and type)]
         )mydelim";
 
     m.def("fermion_mode", &fermion_mode, R"mydelim(
@@ -439,6 +457,20 @@ inline void init_system_info(py::module &m)
         .doc() = R"mydelim(
           A class for handling the specification of all modes in the system.  This stores a list of each composite mode and an
           optional user supplied ordering of the modes
+
+          :param \*args: A variable length list of arguments. Valid options are
+              
+              - none - in this case we call the default constructor of the system_modes object.
+              - **N** (int) - Construct a system_modes object containing N modes
+              - **N** (int), **d** (int) -  Construct a system_modes object containing N modes, where each mode is a generic mode of sizes d
+              - **N** (int), **d** (int), **ordering** (list[int]) -  Construct a system_modes object containing N modes, where each mode is a generic mode of sizes d.  Additionally provide a user defined ordering of the modes
+              - **other** (:class:`system_modes`) - Copy constructs a system_modes object from another system_modes object
+              - **other** (:class:`primitive_mode_data`) - Constructs a system_modes object containing a single primitive mode
+              - **other** (:class:`mode_data`) - Construct a system_modes object containing a single composite mode
+              - **other** (list[:class:`mode_data`]) - Constructs a system_modes object from a list of composite modes
+              - **other** (list[:class:`mode_data`]), **ordering** (list[int]) - Constructs a system_modes object from a list of composite modes.  Additionally provide a user defined ordering of the modes
+
+          :type \*args: [Arguments (variable number and type)]
         )mydelim";
 
 
