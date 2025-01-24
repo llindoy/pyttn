@@ -51,7 +51,7 @@ $ python3 -m pip install .
 
 
 ## C++ Interface 
-## Dependencies
+### Dependencies
 External Libraries:
 - Required: [Pybind11](https://github.com/pybind/pybind11) Python bindings
             [Catch2](https://github.com/catchorg/Catch2) C++ Unit Tests
@@ -66,7 +66,7 @@ If the required libraries are not found it will attempt to pull them from github
 
 When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
 
-# Compile Instructions
+### Compile Instructions
 This code requires cmake version 3.11 in order to compile. From the pyTTN base directory (${pyTTN_ROOT_DIR}) run:
 ```console
 mkdir build
