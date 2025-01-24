@@ -4,13 +4,16 @@
 
 [**An Open Source Toolbox for Quantum Dynamics Simulations Using Tree Tensor Networks.**]()
 
+<!--
 [![ArXiv]()
 [![Documentation Status]()
 [![DOI]()
 [![Tests status]()]()
 [![Codecov]()
+-->
 
 <!-- TABLE OF CONTENTS -->
+
 ##Table of Contents
 [About The Project](#about-the-project)
 [Getting Started](#getting-started)
