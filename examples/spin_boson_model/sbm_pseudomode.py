@@ -90,11 +90,6 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
         i1 = 2*(i+1)
         i2 = 2*(i+1)+1
 
-        #H += 2.0j*complex(gk[i])*sOP("a", i1)*sOP("a", i2)
-        #H += -1.0j*(complex(zk[i])*sOP("n", i1)  + complex(np.conj(zk[i]))*sOP("n", i2))
-        #H += 2.0j*(complex(np.conj(Mk[i]))*sOP("sz", 0)*sOP("a", i2) + complex(Mk[i])*sOP("sz", 1)*sOP("a", i1))
-        #H += (Vk[i]-1.0j*Mk[i])*sOP("sz", 0)*sOP("adag", i1) - (Vk[i]+1.0j*Mk[i])*sOP("sz", 1)*sOP("adag", i2)
-        #H += (Vk[i]-1.0j*Mk[i])*sOP("sz", 0)*sOP("a", i1) - (Vk[i]+1.0j*Mk[i])*sOP("sz", 1)*sOP("a", i2)
         H += complex(Ek[i])*(sOP("n", i1)-sOP("n", i2))
         H += 2.0j*complex(gk[i])*(sOP("a", i1)*sOP("a", i2)-0.5*(sOP("n", i1)+sOP("n", i2)))
         H += complex(Vk[i])*(sOP("sz", 0)*(sOP("adag", i1)+sOP("a", i1)) - sOP("sz", 1)*(sOP("adag", i2)+sOP("a", i2)))
@@ -201,7 +196,6 @@ if __name__ == "__main__":
     parser.add_argument('--nbmax', type=int, default=1)
     parser.add_argument('--nhilbmax', type=int, default=1000)
 
-
     #system hamiltonian parameters
     parser.add_argument('--delta', type = float, default=0.5)
     parser.add_argument('--eps', type = float, default=0)
@@ -213,19 +207,17 @@ if __name__ == "__main__":
     parser.add_argument('--chi', type=int, default=64)
     parser.add_argument('--degree', type=int, default=1)
 
-    
-
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.005)
-    parser.add_argument('--tmax', type=float, default=10)
+    parser.add_argument('--tmax', type=float, default=40)
 
     #output file name
-    parser.add_argument('--fname', type=str, default='sbm.h5')
+    parser.add_argument('--fname', type=str, default='sbm_pseudomode.h5')
 
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
     parser.add_argument('--nunoccupied', type=int, default=0)
-    parser.add_argument('--spawning_threshold', type=float, default=1e-7)
+    parser.add_argument('--spawning_threshold', type=float, default=5e-7)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
     args = parser.parse_args()

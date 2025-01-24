@@ -100,8 +100,6 @@
 <span class="sd">        - **topology** (:class:`ntree` or str), **capacity** (:class:`ntree` or str ), **nset** (int) - Construct a multiset ttn from an ntree object defining the topology, a capacity defining the maximum bond dimensions, and a variable specifying the number of set</span>
 
 <span class="sd">    :type \*args: [Arguments (variable number and type)]</span>
-<span class="sd">    :param dtype: Data type of the multiset TTNs elements.  This argument will be ignored if the first \*args element is a ms_ttn_complex in which case the dtype is inferred from these objects. (Default: np.complex128)</span>
-<span class="sd">    :type dtype: {numpy.float64, numpy.complex128}, optional</span>
 <span class="sd">    :param \*\*kwargs: A dictionary containing optional input arguments.</span>
 
 <span class="sd">        - **purification** (bool) - Whether or not this state should represent a purification of a state.</span>
@@ -133,7 +131,7 @@
 <div class="viewcode-block" id="ms_ttn_dtype.assign">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ms_ttn_dtype.assign">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign the value of this multiset ttn from another ttn</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign the value of this multiset ttn from another multiset ttn</span>
 
 <span class="sd">        :param o: The other multiset ttn object</span>
 <span class="sd">        :type o: ms_ttn_dtype or ms_ttn_real</span>
@@ -149,7 +147,7 @@
 <span class="sd">        :param i: The set index of the slice</span>
 <span class="sd">        :type i: int</span>
 
-<span class="sd">        :return: A slice of the multiset multiset ttn used for accessing the tensor network associated with a single system state</span>
+<span class="sd">        :return: A slice of the multiset ttn used for accessing the tensor network associated with a single system state</span>
 <span class="sd">        :rtype: ms_ttn_slice_dtype</span>
 <span class="sd">            </span>
 <span class="sd">        &quot;&quot;&quot;</span></div>

@@ -14,8 +14,6 @@ class ttn_dtype:
         - **topology** (:class:`ntree` or str), **capacity** (:class:`ntree` or str ) - Construct a ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions
 
     :type \*args: [Arguments (variable number and type)]
-    :param dtype: Data type of the TTNs elements.  This argument will be ignored if the first \*args element is a ttn_complex or ms_ttn_slice_complex in which case the dtype is inferred from these objects. (Default: np.complex128)
-    :type dtype: {numpy.float64, numpy.complex128}, optional
     :param \*\*kwargs: A dictionary containing optional input arguments.
 
         - **purification** (bool) - Whether or not this state should represent a purification of a state.

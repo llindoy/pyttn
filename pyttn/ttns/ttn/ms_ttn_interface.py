@@ -13,8 +13,6 @@ class ms_ttn_dtype:
         - **topology** (:class:`ntree` or str), **capacity** (:class:`ntree` or str ), **nset** (int) - Construct a multiset ttn from an ntree object defining the topology, a capacity defining the maximum bond dimensions, and a variable specifying the number of set
 
     :type \*args: [Arguments (variable number and type)]
-    :param dtype: Data type of the multiset TTNs elements.  This argument will be ignored if the first \*args element is a ms_ttn_complex in which case the dtype is inferred from these objects. (Default: np.complex128)
-    :type dtype: {numpy.float64, numpy.complex128}, optional
     :param \*\*kwargs: A dictionary containing optional input arguments.
 
         - **purification** (bool) - Whether or not this state should represent a purification of a state.
@@ -44,7 +42,7 @@ class ms_ttn_dtype:
 
 
     def assign(self, o):
-        """Assign the value of this multiset ttn from another ttn
+        """Assign the value of this multiset ttn from another multiset ttn
 
         :param o: The other multiset ttn object
         :type o: ms_ttn_dtype or ms_ttn_real
@@ -57,7 +55,7 @@ class ms_ttn_dtype:
         :param i: The set index of the slice
         :type i: int
 
-        :return: A slice of the multiset multiset ttn used for accessing the tensor network associated with a single system state
+        :return: A slice of the multiset ttn used for accessing the tensor network associated with a single system state
         :rtype: ms_ttn_slice_dtype
             
         """
