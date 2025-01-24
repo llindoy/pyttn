@@ -44,17 +44,17 @@ The core Tree Tensor Network Library (ttnpp) has been developed in C++ with pyTT
 # Getting Started
 
 ## Prerequisites
-The core C++ library relies and Pybind11](https://github.com/pybind/pybind11) make use of the [CMake](https://cmake.org/) build system and require Version 3.11 or onwards.
+The core C++ library relies and [Pybind11](https://github.com/pybind/pybind11) make use of the [CMake](https://cmake.org/) build system and require Version 3.11 or onwards.
 
 
 ### Dependencies
 The core C++ library (ttnpp) and the python wrapper (pyTTN) have the following key dependencies.  
 
 External Libraries:
-- Required: [Pybind11](https://github.com/pybind/pybind11) Python bindings
-            [Catch2](https://github.com/catchorg/Catch2) C++ Unit Tests
-            [BLAS](https://netlib.org/blas/) linear algebra
-            [Lapack](https://netlib.org/lapack/) linear algebra
+- [Pybind11](https://github.com/pybind/pybind11) Python bindings
+- [Catch2](https://github.com/catchorg/Catch2) C++ Unit Tests
+- [BLAS](https://netlib.org/blas/) linear algebra
+- [Lapack](https://netlib.org/lapack/) linear algebra
 
 The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${PyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from github.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
 
