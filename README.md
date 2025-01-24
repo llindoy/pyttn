@@ -18,7 +18,7 @@
 
 <!-- TABLE OF CONTENTS -->
 
-#Table of Contents
+# Table of Contents
 
 - [About The Project](#about-the-project)
 - [Getting Started](#getting-started)
@@ -40,7 +40,7 @@ pyTTN implements a range of numerically exact methods (methods that are systemat
 
 # Getting Started
 
-##Prerequisites
+## Prerequisites
 
 You can install pyTTN using pip like this:
 ```
@@ -48,7 +48,7 @@ $ cd ${pyTTN_ROOT_DIR}
 $ python3 -m pip install .
 ```
 
-##Installation
+## Installation
 
 # Tutorials
 
