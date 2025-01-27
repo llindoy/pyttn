@@ -1,10 +1,7 @@
 import numpy as np
 import sys
 
-sys.path.append("../../")
-from pyttn import *
-from pyttn._pyttn import operator_dictionary_complex
-
+from pyttn import operator_dictionary, SOP, sOP, site_operator
 
 #convert from eV to hartree
 eV = 0.0367493049512081
@@ -41,6 +38,7 @@ def B2u():
 
 def B3u():
     return ['v16b', 'v11']
+
 
 def G1():
     return Ag()
@@ -219,7 +217,7 @@ def cij():
     ]
 
 
-def hamiltonian(mode_dims):
+def hamiltonian():
     N = len(modes())
     H = SOP(N)
     omegas = w()
@@ -228,7 +226,7 @@ def hamiltonian(mode_dims):
     delta = 0.8460/2.0*eV
 
     #set up the system operator dictionary
-    opdict = operator_dictionary_complex(N)
+    opdict = operator_dictionary(N)
     for i in range(2):
         v = np.zeros( (2,2), dtype=np.complex128)
         v[i, i] = 1.0;
@@ -276,6 +274,6 @@ def hamiltonian(mode_dims):
         for i, vi in enumerate(gi):
             for j, vj in enumerate(gj):
                 H += Cij[i, j]*sOP("sx", 0)*sOP("q", mode_index(vi))*sOP("q", mode_index(vj))
-
     return H, opdict
+
 

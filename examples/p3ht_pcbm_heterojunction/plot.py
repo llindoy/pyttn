@@ -23,8 +23,8 @@ def plot(fnames, params):
 
         for par, label in zip(pars, params):
             try:
-                #plt.plot(t, np.real(par), '-', label=label+'_'+fname)
-                plt.plot(t, np.real(par)/np.amax(np.real(par)), '-', label=label+'_'+fname)
+                plt.plot(t, np.abs(par), '-', label=label+'_'+fname)
+                #plt.plot(t, np.real(par)/np.amax(np.real(par)), '-', label=label+'_'+fname)
             except:
                 print("Failed to plot: "+label)
         c+=1
@@ -37,7 +37,7 @@ def plot(fnames, params):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plot density matrix elements output by a heom calculation.')
     parser.add_argument('fname', nargs='+')
-    parser.add_argument('--labels', nargs='+', default = ['Sz'])
+    parser.add_argument('--labels', nargs='+', default = ['|LE0><LE0|'])
 
     args = parser.parse_args()
     plot(args.fname, args.labels)

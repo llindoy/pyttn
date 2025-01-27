@@ -37,7 +37,7 @@ pyTTN implements a range of numerically exact methods (methods that are systemat
 - Dynamics of quantum systems coupled to a single or multiple bosonic or fermionic environment
 - Interacting chains and trees of open quantum systems
 
-The core Tree Tensor Network Library (ttnpp) has been developed in C++ with pyTTN using a pybind11 based python wrapper to expose the core functionality to python.  The core ttnpp library is a header only C++ library and it is straightforward to compile pure C++ programs using this library.  For details see [TTNPP Library Compilation](#ttnpp-library-compilation).
+The core Tree Tensor Network Library (ttnpp) has been developed in C++ with pyTTN using a pybind11 based python wrapper to expose the core functionality to python.  The core ttnpp library is a header only C++ library and it is straightforward to compile pure C++ programs using this library.  For details see [TTNPP Library](#ttnpp-library-compilation).
 
 -------------------------------------------------------------------------------
 
@@ -66,9 +66,11 @@ $ cd ${pyTTN_ROOT_DIR}
 $ python3 -m pip install .
 ```
 
+## Using the Software
+Example python scripts showing the use of pyTTN for a range of application are provided in the ${PyTTN_ROOT_DIR}/examples.  These examples included
 
-## TTNPP Library Compilation
-It is possible to compile pure C++ programs that make use of the core C++ library and currently a cmake script has been provided that can conditionally compile against 
+## TTNPP Library
+It is possible to compile pure C++ programs that make use of the core C++ library (ttnpp) and currently a cmake script has been provided that can conditionally compile against 
 
 ### Compile Instructions
 This code requires cmake version 3.11 in order to compile. From the pyTTN base directory (${pyTTN_ROOT_DIR}) run:
@@ -82,12 +84,9 @@ make install
 
 This will build all .cpp files in the ${pyTTN_ROOT_DIR}/src folder.  Typical installation times are $\lesssim$ 2 minutes.
 
-## Running the Software
-Example python scripts for running the software are provided in ${PyTTN_ROOT_DIR}/examples
-
 # Tutorials
 
-The pyTTn repository contains several 
+The pyTTN repository contains several 
 
 
 

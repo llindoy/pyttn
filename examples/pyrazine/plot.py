@@ -4,6 +4,8 @@ import h5py
 import argparse
 
 def plot(fnames, params):
+    #colors = ['k', 'r','b']
+    c = 0
     for fname in fnames:
         pars = []
         t = None
@@ -22,8 +24,12 @@ def plot(fnames, params):
         for par, label in zip(pars, params):
             try:
                 plt.plot(t, np.abs(par), '-', label=label+'_'+fname)
+                #plt.plot(t, np.real(par)/np.amax(np.real(par)), '-', label=label+'_'+fname)
             except:
                 print("Failed to plot: "+label)
+        c+=1
+        c = c%3
+    #plt.ylim([0, 1])
     plt.legend(frameon=False)
     plt.show()
 

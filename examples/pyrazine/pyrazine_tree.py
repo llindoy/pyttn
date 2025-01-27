@@ -1,9 +1,24 @@
-import sys
-sys.path.append("../../")
-from pyttn import *
 
-#build the tree structure 
+
 def build_topology_mode_combination(N1, N2, N3, N4, N5, m):
+    from pyttn import ntree, ntreeBuilder
+    """ Construct the pyrazine ML-MCTDH tree structure used in O. Vendrell and H.-D. Meyer, J. Chem. Phys. 134, 044135 (2011).
+    This structure makes use of mode combination to treat a set of 8 composite vibrational modes rather than the full 24 modes 
+    in the full tree structure.   
+
+    :param N1: Bond dimension N1
+    :type N1: int
+    :param N2: Bond dimension N2
+    :type N2: int
+    :param N3: Bond dimension N3
+    :type N3: int
+    :param N4: Bond dimension N4
+    :type N4: int
+    :param N5: Bond dimension N5
+    :type N5: int
+    :param m: A list containing the 8 local Hilbert space dimensions of the composite vibrational modes
+    :type m: list[int]
+    """
     topo = ntree()
     topo.insert(1)
     #add electronic degrees of freedom
@@ -44,6 +59,7 @@ def build_topology_mode_combination(N1, N2, N3, N4, N5, m):
 
     topo()[1][1][1].insert(N5)
     topo()[1][1][1][2].insert(m[7])
+    ntreeBuilder.sanitise(topo)
     return topo
 
 
