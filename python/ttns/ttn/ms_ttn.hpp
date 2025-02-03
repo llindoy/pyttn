@@ -16,18 +16,21 @@
 
 namespace py=pybind11;
 
-template <typename T>
+template <typename T, typename backend>
 void init_msttn(py::module &m, const std::string& label)
 {
     using namespace ttns;
-    using _msttn = ms_ttn<T, linalg::blas_backend>;
-    //using const_msttn_slice = multiset_ttn_slice<T, linalg::blas_backend, true>;
-    using _msttn_slice = multiset_ttn_slice<T, linalg::blas_backend, false>;
+    using _msttn = ms_ttn<T, backend>;
+    //using const_msttn_slice = multiset_ttn_slice<T, backend, true>;
+    using _msttn_slice = multiset_ttn_slice<T, backend, false>;
     using _msttn_node = typename _msttn::node_type;
-    using _msttn_node_data = multiset_node_data<T, linalg::blas_backend>;
+    using _msttn_node_data = multiset_node_data<T, backend>;
     using real_type = typename linalg::get_real_type<T>::type;
-    using size_type = typename linalg::blas_backend::size_type;
-    //using siteop = site_operator<T, linalg::blas_backend>;
+    using size_type = typename backend::size_type;
+    using _msttn_slice_real = multiset_ttn_slice<real_type, backend, false>;
+    //using siteop = site_operator<T, backend>;
+    
+    //using conv = linalg::pybuffer_converter<backend>;
 
     py::class_<_msttn_node>(m, (std::string("ms_ttn_node_")+label).c_str())
         .def(py::init())
@@ -50,7 +53,7 @@ void init_msttn(py::module &m, const std::string& label)
     //    .def(py::init<csobj_type, size_type>())
     //    .def(py::init<const _msttn_slice&>())
     //    //.def("assign", &_msttn_slice::operator=)
-    //    //.def("assign", &_msttn::template operator=<real_type, linalg::blas_backend> )
+    //    //.def("assign", &_msttn::template operator=<real_type, backend> )
     //    .def("nset", &_msttn_slice::nset);
 
     using sobj_type = typename _msttn_slice::obj_type;
@@ -58,7 +61,10 @@ void init_msttn(py::module &m, const std::string& label)
         .def(py::init<sobj_type, size_type>())
         .def(py::init<const _msttn_slice&>())
         //.def("assign", &_msttn_slice::operator=)
-        //.def("assign", &_msttn::template operator=<real_type, linalg::blas_backend> )
+        .def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const ttn<real_type, backend>&)>(&_msttn_slice::template operator=<real_type, backend>))
+        .def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const ttn<T, backend>&)>(&_msttn_slice::template operator=<T, backend>))
+        .def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice_real&)>(&_msttn_slice::template operator=<real_type, backend>))
+        .def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice&)>(&_msttn_slice::template operator=<T, backend>))
         .def("nset", &_msttn_slice::nset);
 
 
@@ -66,7 +72,7 @@ void init_msttn(py::module &m, const std::string& label)
     //expose the ttn node class.  This is our core tensor network object.
     py::class_<_msttn>(m, (std::string("ms_ttn_")+label).c_str())
         .def(py::init<const _msttn&>())
-        .def(py::init<const ms_ttn<real_type, linalg::blas_backend>&>())
+        .def(py::init<const ms_ttn<real_type, backend>&>())
 
         .def(py::init<const ntree<size_t>&, size_t, bool>(), py::arg(), py::arg(), py::arg("purification") = false)
         .def(py::init<const ntree<size_t>&, const ntree<size_t>&, size_t, bool>(), py::arg(), py::arg(), py::arg(), py::arg("purification") = false)
@@ -75,11 +81,16 @@ void init_msttn(py::module &m, const std::string& label)
 
         .def("complex_dtype", [](const _msttn&){return !std::is_same<T, real_type>::value;})
         .def("assign", [](_msttn& o, const _msttn& i){o=i;})
-        //.def("assign", &_msttn::template operator=<real_type, linalg::blas_backend> )
+        //.def("assign", &_msttn::template operator=<real_type, backend> )
         .def("__copy__", [](const _msttn& o){return _msttn(o);})
         .def("__deepcopy__", [](const _msttn& o, py::dict){return _msttn(o);}, py::arg("memo"))
 
         .def("slice", static_cast<_msttn_slice(_msttn::*)(size_t)>(&_msttn::slice))
+
+        .def("assign_slice", static_cast<void (_msttn::*)(size_type, const ttn<real_type, backend>&)>(&_msttn::template set_slice<real_type, backend>))
+        .def("assign_slice", static_cast<void (_msttn::*)(size_type, const ttn<T, backend>&)>(&_msttn::template set_slice<T, backend>))
+        .def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice_real&)>(&_msttn::template set_slice<real_type, backend>))
+        .def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice&)>(&_msttn::template set_slice<T, backend>))
 
         .def("bond_dimensions", &_msttn::bond_dimensions)
         .def("bond_dimensions", [](const _msttn& o){typename _msttn::hrank_info res;  o.bond_dimensions(res);   return res;})
@@ -100,14 +111,14 @@ void init_msttn(py::module &m, const std::string& label)
         .def("set_state_purification", &_msttn::template set_state<int>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
         .def("set_state_purification", &_msttn::template set_state<size_t>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
 
-        //.def("set_product", &_msttn::template set_product<real_type, linalg::blas_backend>)
-        //.def("set_product", &_msttn::template set_product<T, linalg::blas_backend>)
+        //.def("set_product", &_msttn::template set_product<real_type, backend>)
+        //.def("set_product", &_msttn::template set_product<T, backend>)
         //.def("set_product", [](_msttn& self, std::vector<py::buffer>& ps)
         //                    {
         //                        std::vector<linalg::vector<T>> _ps(ps.size());
         //                        for(size_t i = 0; i < ps.size(); ++i)
         //                        {
-        //                            copy_pybuffer_to_tensor(ps[i], _ps[i]);
+        //                            conv::copy_to_tensor(ps[i], _ps[i]);
         //                        }
         //                        self.set_product(_ps);
         //                    }
@@ -224,7 +235,7 @@ void init_msttn(py::module &m, const std::string& label)
         //        "set_site_tensor",
         //        [](_msttn& self, size_t i, py::buffer& mat)
         //        {
-        //            CALL_AND_HANDLE(copy_pybuffer_to_tensor(mat, self.site_tensor(i).as_matrix()), "Failed to set site tensor.");
+        //            CALL_AND_HANDLE(conv::copy_to_tensor(mat, self.site_tensor(i).as_matrix()), "Failed to set site tensor.");
         //        }
         //    )
 
@@ -264,7 +275,7 @@ void init_msttn(py::module &m, const std::string& label)
         //            std::vector<linalg::matrix<T>> Uop(U.size());
         //            for(size_t i = 0; i < U.size(); ++i)
         //            {
-        //                copy_pybuffer_to_tensor(U[i], Uop[i]);
+        //                conv::copy_to_tensor(U[i], Uop[i]);
         //            }
         //            std::vector<size_t> state;
         //            real_type p = o.collapse_basis(Uop, state, truncate, tol, nchi); 
@@ -293,7 +304,7 @@ void init_msttn(py::module &m, const std::string& label)
         //        [](_msttn& o, py::buffer& op, size_t index, bool shift_orthogonality)
         //        {
         //            linalg::matrix<T> mt;
-        //            copy_pybuffer_to_tensor(op, mt);
+        //            conv::copy_to_tensor(op, mt);
         //            CALL_AND_RETHROW(return o.apply_one_body_operator(mt, index, shift_orthogonality));
         //        },
         //        py::arg(), py::arg(), py::arg("shift_orthogonality") = true
@@ -315,7 +326,17 @@ void init_msttn(py::module &m, const std::string& label)
         ;
 }
 
-void initialise_msttn(py::module& m);
+template <typename backend>
+void initialise_msttn(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
+
+#ifdef BUILD_REAL_TTN
+    init_msttn<real_type, backend>(m, "real");
+#endif
+    init_msttn<complex_type, backend>(m, "complex");
+}
 
 #endif  //PYTHON_BINDING_TTN_HPP
 

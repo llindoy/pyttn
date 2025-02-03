@@ -14,19 +14,19 @@
 
 namespace py=pybind11;
 
-template <typename T>
+template <typename T, typename backend>
 void init_matrix_element(py::module &m, const std::string& label)
 {
     using namespace ttns;
 
 
-    using siteop = site_operator<T, linalg::blas_backend>;
-    using prodop = product_operator<T, linalg::blas_backend>;
-    using matel = matrix_element<T, linalg::blas_backend>;
-    using _ttn = ttn<T, linalg::blas_backend>;
-    using _msttn = ms_ttn<T, linalg::blas_backend>;
-    using sop_op = sop_operator<T, linalg::blas_backend>;
-    using ms_sop_op = multiset_sop_operator<T, linalg::blas_backend>;
+    using siteop = site_operator<T, backend>;
+    using prodop = product_operator<T, backend>;
+    using matel = matrix_element<T, backend>;
+    using _ttn = ttn<T, backend>;
+    using _msttn = ms_ttn<T, backend>;
+    using sop_op = sop_operator<T, backend>;
+    using ms_sop_op = multiset_sop_operator<T, backend>;
 
     py::class_<matel>(m, (std::string("matrix_element_")+label).c_str())
         .def(py::init())
@@ -130,8 +130,17 @@ void init_matrix_element(py::module &m, const std::string& label)
         //inline std::vector<T>& operator()(std::vector<std::vector<site_operator<T, backend>>& ops, const std::vector<size_type>& modes, const state_type& bra, const state_type& ket, std::vector<T>& res)
 }
 
-void initialise_matrix_element(py::module& m);
+template <typename backend>
+void initialise_matrix_element(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
 
+#ifdef BUILD_REAL_TTN
+    init_matrix_element<real_type, backend>(m, "real");
+#endif
+    init_matrix_element<complex_type, backend>(m, "complex");
+}
 #endif  //PYTHON_BINDING_TTNS_MATRIX_ELEMENTS_HPP
 
 

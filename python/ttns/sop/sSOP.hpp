@@ -734,8 +734,8 @@ void init_sSOP(py::module& m)
 
             .def("__rmul__", [](const _SOP& a, const coeff<real_type>& b){return a*b;})
             .def("__rmul__", [](const _SOP& a, const coeff<complex_type>& b){return a*b;})
-            .def("__rmul__", [](const _SOP& a, const real_type& b){return a*b;})
-            .def("__rmul__", [](const _SOP& a, const complex_type& b){return a*b;});
+            .def("__rmul__", [](const _SOP& a, const real_type& b){return b*a;})
+            .def("__rmul__", [](const _SOP& a, const complex_type& b){return b*a;});
     }
     {
         using _SOP = sSOP<complex_type>;

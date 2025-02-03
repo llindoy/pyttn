@@ -15,91 +15,110 @@ namespace py=pybind11;
 
 namespace linalg
 {
-template<typename T, size_t D>
-void convert_pybuffer_to_tensor(const py::buffer& b, linalg::tensor<T, D>& t)
+
+template <typename backend>
+class pybuffer_converter
 {
-    py::buffer_info info = b.request();
-    if(info.format != py::format_descriptor<T>::format())
+public:
+    template<typename T, size_t D>
+    static void convert_to_tensor(const py::buffer& b, linalg::tensor<T, D, backend>& t)
     {
-        RAISE_EXCEPTION("Incompatible format for arrays assignment. Incorrect scalar type.");
+        py::buffer_info info = b.request();
+        if(info.format != py::format_descriptor<T>::format())
+        {
+            RAISE_EXCEPTION("Incompatible format for arrays assignment. Incorrect scalar type.");
+        }
+        if(info.ndim != D)
+        {
+            RAISE_EXCEPTION("Incompatible format for arrays assignment. Incorrect dimension.");
+        }
+        using ttype = linalg::tensor<T, D>;
+        using size_type = typename ttype::size_type;
+        
+        typename ttype::shape_type shape;
+        typename ttype::shape_type stride;
+        
+        for(size_type i = 0; i < D; ++i)
+        {
+            shape[i] = info.shape[i];
+            stride[i] = static_cast<size_type>(info.strides[i])/sizeof(T);
+        }
+        t.resize(shape);
+        t.set_buffer(static_cast<T*>(info.ptr), shape, stride);
     }
-    if(info.ndim != D)
+
+    template<typename T, size_t D>
+    static void copy_to_tensor(const py::buffer& b, linalg::tensor<T, D, backend>& t)
     {
-        RAISE_EXCEPTION("Incompatible format for arrays assignment. Incorrect dimension.");
+        py::buffer_info info = b.request();
+
+        using real_type = typename get_real_type<T>::type;
+
+        if(info.format == py::format_descriptor<T>::format())
+        {
+            convert_to_tensor(b, t);
+        }
+        else if(info.format == py::format_descriptor<real_type>::format())
+        {
+            linalg::tensor<real_type, D> temp;
+            convert_to_tensor(b, temp);
+            t = temp;
+        }
+        else
+        {
+            RAISE_EXCEPTION("Incompatible format for arrays assignment. Incorrect scalar type.");
+        }
     }
-    using ttype = linalg::tensor<T, D>;
-    using size_type = typename ttype::size_type;
-    
-    typename ttype::shape_type shape;
-    typename ttype::shape_type stride;
-    
-    for(size_type i = 0; i < D; ++i)
+
+    template<typename T>
+    static void convert_to_diagonal_matrix(const py::buffer& b, diagonal_matrix<T, backend>& t)
     {
-        shape[i] = info.shape[i];
-        stride[i] = static_cast<size_type>(info.strides[i])/sizeof(T);
+        py::buffer_info info = b.request();
+        if(info.ndim != 1)
+        {
+            RAISE_EXCEPTION("Incompatible format for arrays assignment. Incorrect dimension.");
+        }
+        t.resize(info.shape[0], info.shape[0]);
+        t.set_buffer(static_cast<T*>(info.ptr), info.shape[0]);
     }
-    t.resize(shape);
-    t.set_buffer(static_cast<T*>(info.ptr), shape, stride);
+
+    template<typename T>
+    static void copy_to_diagonal_matrix(const py::buffer& b, diagonal_matrix<T, backend>& t)
+    {
+        py::buffer_info info = b.request();
+
+        using real_type = typename get_real_type<T>::type;
+        if(info.format == py::format_descriptor<T>::format())
+        {
+            convert_to_diagonal_matrix(b, t);
+        }
+        else if(info.format == py::format_descriptor<real_type>::format())
+        {
+            diagonal_matrix<real_type> temp;
+            convert_to_diagonal_matrix(b, temp);
+            t=temp;
+        }
+        else
+        {
+            RAISE_EXCEPTION("Incompatible format for arrays assignment. Incorrect dimension.");
+        }
+    }
+};
+
+
 }
 
-template<typename T, size_t D>
-void copy_pybuffer_to_tensor(const py::buffer& b, linalg::tensor<T, D>& t)
+#ifdef __NVCC__
+template <typename backend> class other_backend;
+template <> class other_backend<linalg::blas_backend>
 {
-    py::buffer_info info = b.request();
+    using type = linalg::cuda_backend;
+};
 
-    using real_type = typename get_real_type<T>::type;
-
-    if(info.format == py::format_descriptor<T>::format())
-    {
-        convert_pybuffer_to_tensor(b, t);
-    }
-    else if(info.format == py::format_descriptor<real_type>::format())
-    {
-        linalg::tensor<real_type, D> temp;
-        convert_pybuffer_to_tensor(b, temp);
-        t = temp;
-    }
-    else
-    {
-        RAISE_EXCEPTION("Incompatible format for arrays assignment. Incorrect scalar type.");
-    }
-}
-
-
-template<typename T>
-void convert_pybuffer_to_diagonal_matrix(const py::buffer& b, diagonal_matrix<T>& t)
+template <> class other_backend<linalg::cuda_backend>
 {
-    py::buffer_info info = b.request();
-    if(info.ndim != 1)
-    {
-        RAISE_EXCEPTION("Incompatible format for arrays assignment. Incorrect dimension.");
-    }
-    t.resize(info.shape[0], info.shape[0]);
-    t.set_buffer(static_cast<T*>(info.ptr), info.shape[0]);
-}
-template<typename T>
-void copy_pybuffer_to_diagonal_matrix(const py::buffer& b, diagonal_matrix<T>& t)
-{
-    py::buffer_info info = b.request();
-
-    using real_type = typename get_real_type<T>::type;
-    if(info.format == py::format_descriptor<T>::format())
-    {
-        convert_pybuffer_to_diagonal_matrix(b, t);
-    }
-    else if(info.format == py::format_descriptor<real_type>::format())
-    {
-        diagonal_matrix<real_type> temp;
-        convert_pybuffer_to_diagonal_matrix(b, temp);
-        t=temp;
-    }
-    else
-    {
-        RAISE_EXCEPTION("Incompatible format for arrays assignment. Incorrect dimension.");
-    }
-}
-
-}
-
+    using type = linalg::blas_backend;
+};
+#endif
 
 #endif

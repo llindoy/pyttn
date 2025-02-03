@@ -25,7 +25,7 @@ def single_set_dmrg(A, H, expansion='onesite', **kwargs):
     else:
         raise RuntimeError("Invalid input types for dmrg.")
 
-def multiset_dmrg(A, H, expansion='onesite', **kwarg):
+def multiset_dmrg(A, H, expansion='onesite', **kwargs):
     """A factory method for constructing an object used for performing multiset dmrg calculations
 
     :param A: Tree Tensor Network that the DMRG algorithm will act on
@@ -66,7 +66,7 @@ def dmrg(A, H, expansion='onesite', **kwargs):
 
     if isinstance(A, ttn_complex) and isinstance(H, sop_operator_complex):
         return single_set_dmrg(A, H, expansion=expansion, **kwargs)
-    elif isinstance(A, ms_ttn_complex) and isinstance(h, multiset_sop_operator_complex):
+    elif isinstance(A, ms_ttn_complex) and isinstance(H, multiset_sop_operator_complex):
         return multiset_dmrg(A, H, expansion=expansion, **kwargs)
     else:
         raise RuntimeError("Invalid input types for dmrg.")

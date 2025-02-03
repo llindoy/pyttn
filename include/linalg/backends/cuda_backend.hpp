@@ -858,8 +858,8 @@ private:
     }
 
 public:
-    template <typename T, typename arr2> 
-    static inline void tensor_transpose(const T* in, const std::vector<size_type>& inds, const arr2& dims, T* out)
+    template <typename T, typename arr1, typename arr2> 
+    static inline void tensor_transpose(const T* in, const std::vector<size_type>& inds, const arr1& dims, const arr2& stride, T* out)
     {
         RAISE_EXCEPTION("CUDA GENERIC TENSOR TRANSPOSE NOT IMPLEMENTED.");
     }

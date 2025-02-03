@@ -1138,7 +1138,8 @@ public:
     }
 
 public:
-    static inline void index_to_inds(size_type index, const std::vector<size_type>& strides, std::vector<size_type>& inds)
+    template <typename arr2> 
+    static inline void index_to_inds(size_type index, const arr2& strides, std::vector<size_type>& inds)
     {
         for(size_type i = 0; i < inds.size(); ++i)
         {
@@ -1147,7 +1148,8 @@ public:
         }
     }
 
-    static inline size_type inds_to_index(const std::vector<size_type>& inds, const std::vector<size_type>& order, const std::vector<size_type>& strides)
+    template <typename arr2> 
+    static inline size_type inds_to_index(const std::vector<size_type>& inds, const std::vector<size_type>& order, const arr2& strides)
     {
         size_type ind = 0;
         for(size_type i = 0; i < inds.size(); ++i)
@@ -1157,17 +1159,14 @@ public:
         return ind;
     }
 
-    template <typename T, typename arr2> 
-    static inline void tensor_transpose(const T* in, const std::vector<size_type>& inds, const arr2& dims, T* out)
+    template <typename T, typename arr1, typename arr2> 
+    static inline void tensor_transpose(const T* in, const std::vector<size_type>& inds, const arr1& dims, const arr2& stride, T* out)
     {
         size_type N = inds.size();
-        std::vector<size_type> stride(N);
         std::vector<size_type> permuted_stride(N);
-        stride[N - 1] = 1;
         permuted_stride[N - 1] = 1;
         for(size_type i = 1; i < N; ++i)
         {
-            stride[N-(i+1)] = stride[N-i]*dims[N-i];
             permuted_stride[N-(i+1)] = permuted_stride[N-i]*dims[inds[N-i]];
         }
 

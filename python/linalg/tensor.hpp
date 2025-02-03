@@ -15,19 +15,20 @@
 
 namespace py=pybind11;
 
-template <typename T, size_t D>
+template <typename T, size_t D, typename backend>
 void init_tensor(py::module &m, const std::string& label)
 {
     using namespace linalg;
-    using ttype = tensor<T, D, linalg::blas_backend>;
+    using ttype = tensor<T, D, backend>;
     using real_type = typename linalg::get_real_type<T>::type;
 
+    using conv = pybuffer_converter<backend>;
     //expose the ttn node class.  This is our core tensor network object.
     py::class_<ttype>(m, (label).c_str(), py::buffer_protocol())
         .def(py::init([](py::buffer &b)
             {
                 ttype tens;
-                CALL_AND_RETHROW(copy_pybuffer_to_tensor(b, tens));
+                CALL_AND_RETHROW(conv::copy_to_tensor(b, tens));
                 return tens;
             }
         ))
@@ -57,7 +58,21 @@ void init_tensor(py::module &m, const std::string& label)
 }
 
 
-void initialise_tensors(py::module& m);
+template <typename backend>
+void initialise_tensors(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
+    init_tensor<real_type, 1, backend>(m, "vector_real");     
+    init_tensor<real_type, 2, backend>(m, "matrix_real");     
+    init_tensor<real_type, 3, backend>(m, "tensor_3_real");     
+    init_tensor<real_type, 4, backend>(m, "tensor_4_real");     
+
+    init_tensor<complex_type, 1, backend>(m, "vector_complex");     
+    init_tensor<complex_type, 2, backend>(m, "matrix_complex");     
+    init_tensor<complex_type, 3, backend>(m, "tensor_3_complex");     
+    init_tensor<complex_type, 4, backend>(m, "tensor_4_complex");     
+}
 
 
 #endif  //PYTHON_BINDING_LINALG_TENSOR_HPP

@@ -9,6 +9,7 @@
 #include "ttn_nodes/ttn_node.hpp"
 
 #include "ttnbase.hpp"
+#include "ttn.hpp"
 
 namespace ttns
 {
@@ -124,6 +125,63 @@ public:
     }
 
 public:
+    template <typename U, typename be>
+    void set_slice(size_type sind, const ttn<U, be>& o)
+    {
+        ASSERT(has_same_structure(o, *this), "Cannot assign ms_ttn slice unless it has the correct structure.");
+        ASSERT(o.mode_dimensions() == this->mode_dimensions(), "Cannot assign ms_ttn slice if the dimensions are not the same.");
+
+        bool all_fit = true;
+        //first check to see if the current structure can fit the assigned structure.  If it can then we don't have any problems
+        for(auto z : common::zip(*this, o))
+        {
+            if(!std::get<0>(z)()[sind].can_fit_node(std::get<1>(z)())){all_fit = false;}
+        }
+
+        for(auto z : common::zip(*this, o))
+        {
+            CALL_AND_HANDLE(std::get<0>(z)()[sind] = std::get<1>(z)(), "Failed when assigning slice index.");
+        }
+        if(!all_fit){this->reset_orthogonality();}
+
+        if(this->has_orthogonality_centre() )
+        {
+            if(!(o.has_orthogonality_centre() && o.orthogonality_centre() == this->orthogonality_centre()))
+            {
+                this->reset_orthogonality_centre();
+            }
+        }
+    }
+
+    template <typename U, typename be, bool C2>
+    void set_slice(size_type sind, const multiset_ttn_slice<U, be, C2>& o)
+    {
+        ASSERT(has_same_structure(o.obj(), *this), "Cannot assign ms_ttn slice unless it has the correct structure.");
+        ASSERT(o.obj().mode_dimensions() == this->mode_dimensions(), "Cannot assign ms_ttn slice if the dimensions are not the same.");
+
+        bool all_fit = true;
+        //first check to see if the current structure can fit the assigned structure.  If it can then we don't have any problems
+        for(auto z : common::zip(*this, o.obj()))
+        {
+            if(!std::get<0>(z)()[sind].can_fit_node(std::get<1>(z)()[o.slice_index()])){all_fit = false;}
+        }
+
+        for(auto z : common::zip(*this, o.obj()))
+        {
+            CALL_AND_HANDLE(std::get<0>(z)()[sind] = std::get<1>(z)()[o.slice_index()], "Failed when assigning slice index.");
+        }
+        if(!all_fit){this->reset_orthogonality();}
+
+        if(this->has_orthogonality_centre() )
+        {
+            if(!(o.obj().has_orthogonality_centre() && o.obj().orthogonality_centre() == this->orthogonality_centre()))
+            {
+                this->reset_orthogonality_centre();
+            }
+        }
+    }
+
+
     template <typename int_type> 
     void set_state(size_type sind, const std::vector<int_type>& si){CALL_AND_RETHROW(this->_set_state(si, sind));}
 

@@ -13,13 +13,13 @@
 
 namespace py=pybind11;
 
-template <typename T>
+template <typename T, typename backend>
 void init_product_operator(py::module &m, const std::string& label)
 {
     using namespace ttns;
 
-    using opdict = operator_dictionary<T, linalg::blas_backend>;
-    using pop = product_operator<T, linalg::blas_backend>;
+    using opdict = operator_dictionary<T, backend>;
+    using pop = product_operator<T, backend>;
     using real_type = typename linalg::get_real_type<T>::type;
 
     //the base primitive operator type
@@ -114,7 +114,17 @@ void init_product_operator(py::module &m, const std::string& label)
         .def("__str__", [](const pop& o){std::ostringstream oss; oss << o; return oss.str();});
 }
 
-void initialise_product_operator(py::module& m);
+template <typename backend>
+void initialise_product_operator(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
+
+#ifdef BUILD_REAL_TTN
+    init_product_operator<real_type, backend>(m, "real");
+#endif
+    init_product_operator<complex_type, backend>(m, "complex");
+}
 
 
 #endif

@@ -74,8 +74,8 @@ PYBIND11_MODULE(ttnpp, m)
     //
     //Wrap the required linear algebra types to enable python based instantiation of operators.
     //
-    initialise_tensors<linalg::blas_backend>(m_linalg);
-    initialise_sparse_matrices<linalg::blas_backend>(m_linalg);
+    initialise_tensors(m_linalg);
+    initialise_sparse_matrices(m_linalg);
 
     //
     //Wrap the required utils functions
@@ -89,8 +89,8 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_sSOP(m);
     initialise_system_info(m);
     initialise_SOP(m);
-    initialise_operator_dictionary<linalg::blas_backend>(m);
-    initialise_liouville_space<linalg::blas_backend>(m);
+    initialise_operator_dictionary(m);
+    initialise_liouville_space(m);
 
     //
     //Wrap the models functionality included in SOP
@@ -101,24 +101,24 @@ PYBIND11_MODULE(ttnpp, m)
     //Wrap core ttns functionality
     //
     initialise_ntree(m);
-    initialise_ttn<linalg::blas_backend>(m);
-    initialise_msttn<linalg::blas_backend>(m);
+    initialise_ttn(m);
+    initialise_msttn(m);
 
-    initialise_matrix_element<linalg::blas_backend>(m);
+    initialise_matrix_element(m);
     //
     //Wrap operator classes
     //
     auto m_ops = m.def_submodule("ops", "Operator submodule for TTNS library.");
-    initialise_site_operators<linalg::blas_backend>(m_ops);
-    initialise_product_operator<linalg::blas_backend>(m);
-    initialise_sop_operator<linalg::blas_backend>(m);
+    initialise_site_operators(m_ops);
+    initialise_product_operator(m);
+    initialise_sop_operator(m);
 
 
     //
     //Wrap the core algorithms for operating on ttns
     //
-    initialise_dmrg<linalg::blas_backend>(m);
-    initialise_tdvp<linalg::blas_backend>(m);
+    initialise_dmrg(m);
+    initialise_tdvp(m);
 }
 
 

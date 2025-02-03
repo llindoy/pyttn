@@ -434,8 +434,8 @@ protected:
         }
     }
 
-
 protected:
+    /* 
     void shift_dangling_bond_up(linalg::tensor<T, 3, backend>& Top, linalg::tensor<T, 4, backend>& temp, linalg::tensor<T, 4, backend>& temp2, size_type curr, size_type prev, real_type tol = real_type(0), size_type nchi=0)
     {
         //get the parent tensor as a rank 3 tensor with the bond connecting the curr and prev sites separated off
@@ -535,7 +535,7 @@ protected:
     {
         CALL_AND_HANDLE(this->set_orthogonality_centre(i1), "Failed to apply one body operator.  Failed to shift orthogonality centre.");
     }
-
+    */
 public:
     ttn& apply_product_operator(product_operator<T, backend>& op, bool shift_orthogonality = true)
     {
@@ -704,8 +704,7 @@ public:
         return pitot;
     }
 
-
-    real_type collapse_basis(std::vector<linalg::matrix<T>>& U, std::vector<size_t>& state, bool truncate=false, real_type tol = real_type(0), size_type nchi = 0)
+    real_type collapse_basis(std::vector<linalg::matrix<T, backend>>& U, std::vector<size_t>& state, bool truncate=false, real_type tol = real_type(0), size_type nchi = 0)
     {
         ASSERT(U.size() == m_nleaves, "Failed to collapse in user specified basis.  Basis transformation vectors are not compatible with ");
         state.resize(m_nleaves);

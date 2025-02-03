@@ -57,7 +57,7 @@ public:
     typename std::enable_if<is_dense<array_type>::value, void>::type applicative(array_type& res) const
     {
         ASSERT(res.buffer() != m_arr.buffer(), "Inplace generic tensor reordering is not supported.");
-        CALL_AND_HANDLE(backend_type::tensor_transpose(m_arr.buffer(), m_order, m_arr.shape(), res.buffer()), "Failed to compute tensor transpose.");
+        CALL_AND_HANDLE(backend_type::tensor_transpose(m_arr.buffer(), m_order, m_arr.shape(), m_arr.stride(), res.buffer()), "Failed to compute tensor transpose.");
     }
 };
 

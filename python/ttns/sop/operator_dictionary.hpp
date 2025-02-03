@@ -14,12 +14,12 @@
 
 namespace py=pybind11;
 
-template <typename T>
+template <typename T, typename backend>
 void init_operator_dictionary(py::module &m, const std::string& label)
 {
     using namespace ttns;
 
-    using opdict = operator_dictionary<T, linalg::blas_backend>;
+    using opdict = operator_dictionary<T, backend>;
     using dict_type = typename opdict::dict_type;
     using elem_type = typename opdict::elem_type;
     //the base primitive operator type
@@ -63,9 +63,15 @@ void init_operator_dictionary(py::module &m, const std::string& label)
         });
 }
 
-
-void initialise_operator_dictionary(py::module& m);
-
+template <typename backend>
+void initialise_operator_dictionary(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
+  
+    init_operator_dictionary<real_type, backend>(m, "real");
+    init_operator_dictionary<complex_type, backend>(m, "complex");
+}
 #endif  //PYTHON_BINDING_TTNS_OPERATOR_DICTIONARY_HPP
 
 

@@ -13,6 +13,7 @@
 #include "cublas_wrapper.hpp"
 #include "cusolver_wrapper.hpp"
 #include "cusparse_wrapper.hpp"
+#include "cutensor_wrapper.hpp"
 
 static inline void cuda_safe_call(cudaError_t err){if(err != cudaSuccess){RAISE_EXCEPTION_STR(cudaGetErrorName(err));}}
 
@@ -65,6 +66,7 @@ protected:
     cusparseHandle_t m_cusparse_handle;
     cublasHandle_t m_cublas_handle;
     cusolverDnHandle_t m_cusolver_dn_handle;
+    cutensorHandle_t m_cutensor_handle;
 
     friend std::ostream& operator<<(std::ostream& out, const cuda_environment& s);
 public:
@@ -88,6 +90,7 @@ public:
         m_cublas_handle = std::move(other.m_cublas_handle); other.m_cublas_handle = 0;
         m_cusolver_dn_handle = std::move(other.m_cusolver_dn_handle); other.m_cusolver_dn_handle = 0;
         m_cusparse_handle = std::move(other.m_cusparse_handle); other.m_cusparse_handle = 0;
+        m_cutensor_handle = std::move(other.m_cutensor_handle); other.m_cutensor_handle = 0;
         return *this;
     }
 
@@ -114,6 +117,7 @@ public:
         CALL_AND_HANDLE(cublas_safe_call(cublasCreate(&m_cublas_handle)), "Failed to initialise cuda_environment object.  Error when setting up cublas_handle object.");
         CALL_AND_HANDLE(cusparse_safe_call(cusparseCreate(&m_cusparse_handle)), "Failed to initialise cuda_environment object.  Error when setting up the cusparse_handle object.");
         CALL_AND_HANDLE(cusolver_safe_call(cusolverDnCreate(&m_cusolver_dn_handle)), "Failed to initialise cuda_environment object.  Error when setting up cusolver_dn_handle object.");
+        CALL_AND_HANDLE(cutensor_safe_call(cutensorCreate(&m_cutensor_handle)), "Failed to initialise cuda_environment object.  Error when setting up cutensor_handle object.");
         m_initialised = true;
     }
 
@@ -126,6 +130,7 @@ public:
             CALL_AND_HANDLE(cublas_safe_call(cublasDestroy(m_cublas_handle)), "Failed to destroy cuda_environment object.  Error when destroying cublas_handle object.");
             CALL_AND_HANDLE(cusolver_safe_call(cusolverDnDestroy(m_cusolver_dn_handle)), "Failed to destroy cuda_environment object.  Error when destroying cusolver_dn_handle object.");
             CALL_AND_HANDLE(cusparse_safe_call(cusparseDestroy(m_cusparse_handle)), "Failed to destroy cuda_environment object.  Error when destroying cusparse_handle object.");
+            CALL_AND_HANDLE(cutensor_safe_call(cutensorDestroy(m_cutensor_handle)), "Failed to initialise cuda_environment object.  Error when destroying cutensor_handle object.");
         }
     }   
 
@@ -182,6 +187,12 @@ public:
     {
         ASSERT(m_initialised, "Failed to acces the cuda_environment object's cusparse handle.  The cuda_environment has not been initialised.");
         return m_cusparse_handle;
+    }
+
+    const cusparseHandle_t& cutensor_handle() const
+    {
+        ASSERT(m_initialised, "Failed to acces the cuda_environment object's cutensor handle.  The cuda_environment has not been initialised.");
+        return m_cutensor_handle;
     }
 
     void set_device() const

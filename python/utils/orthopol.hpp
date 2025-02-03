@@ -22,6 +22,7 @@ void init_orthopol(py::module &m)
     using namespace utils;
 
     using _orthopol = orthopol<T>;
+    using conv = linalg::pybuffer_converter<linalg::blas_backend>;
     //wrapper for the orthopol manager class 
     py::class_<_orthopol>(m, "orthopol")
         .def(py::init())
@@ -79,13 +80,15 @@ void init_orthopol(py::module &m)
               },
               py::arg(), py::arg(), py::arg("scale_factor") = T(1.0)
           );
+
+
     m.def(
               "nonclassical_polynomial", 
               [](const orthopol<T>& orthref, const py::buffer& modified_moments, T scale_factor = 1)
               {
                   orthopol<T> orth; 
                   linalg::vector<T> mom;
-                  copy_pybuffer_to_tensor(modified_moments, mom);
+                  conv::copy_to_tensor(modified_moments, mom);
                   nonclassical_polynomial<T>(orth, orthref, mom, scale_factor);
                   return orth;
               },
@@ -137,8 +140,8 @@ void init_orthopol(py::module &m)
               {
                   orthopol<T> orth; 
                   linalg::vector<T> x, w;
-                  copy_pybuffer_to_tensor(_x, x);
-                  copy_pybuffer_to_tensor(_w, w);
+                  conv::copy_to_tensor(_x, x);
+                  conv::copy_to_tensor(_w, w);
                   nonclassical_polynomial<T>(orth, x, w);
                   return orth;
               }

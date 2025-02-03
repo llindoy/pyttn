@@ -15,27 +15,29 @@
 
 namespace py=pybind11;
 
-template <typename T>
+template <typename T, typename backend>
 void init_site_operators(py::module &m, const std::string& label)
 {
     using namespace ttns;
-    using prim = ops::primitive<T, linalg::blas_backend>;
-    using ident = ops::identity<T, linalg::blas_backend>;
-    using dmat = ops::dense_matrix_operator<T, linalg::blas_backend>;
-    using spmat = ops::sparse_matrix_operator<T, linalg::blas_backend>;
-    using diagmat = ops::diagonal_matrix_operator<T, linalg::blas_backend>;
+    using prim = ops::primitive<T, backend>;
+    using ident = ops::identity<T, backend>;
+    using dmat = ops::dense_matrix_operator<T, backend>;
+    using spmat = ops::sparse_matrix_operator<T, backend>;
+    using diagmat = ops::diagonal_matrix_operator<T, backend>;
 
     using size_type = typename prim::size_type;
     using real_type = typename prim::real_type;
 
-    using matrix_type = linalg::matrix<T, linalg::blas_backend>;
+    using matrix_type = linalg::matrix<T, backend>;
     using matrix_ref = typename prim::matrix_ref;
     using const_matrix_ref = typename prim::const_matrix_ref;
     using vector_ref = typename prim::vector_ref;
     using const_vector_ref = typename prim::const_vector_ref;
 
-    using siteop = site_operator<T, linalg::blas_backend>;
-    using opdict = operator_dictionary<T, linalg::blas_backend>;
+    using conv = linalg::pybuffer_converter<backend>;
+
+    using siteop = site_operator<T, backend>;
+    using opdict = operator_dictionary<T, backend>;
     //the base primitive operator type
     py::class_<siteop>(m, (std::string("site_operator_")+label).c_str())
         .def(py::init())
@@ -126,8 +128,8 @@ void init_site_operators(py::module &m, const std::string& label)
         .def(py::init<matrix_type>())
         .def(py::init([](py::buffer& b)
                 {
-                    linalg::matrix<T, linalg::blas_backend> mat;
-                    copy_pybuffer_to_tensor(b, mat);
+                    linalg::matrix<T, backend> mat;
+                    conv::copy_to_tensor(b, mat);
                     return dmat(mat);
                 }
             )
@@ -136,7 +138,7 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("matrix", &dmat::mat);
 
     //a csr matrix representation of an operator
-    using csr_type = linalg::csr_matrix<T, linalg::blas_backend>;
+    using csr_type = linalg::csr_matrix<T, backend>;
     using index_type = typename csr_type::index_type;
     py::class_<spmat, prim>(m, (std::string("sparse_matrix_")+label).c_str())
         .def(py::init())
@@ -146,14 +148,14 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("matrix", &spmat::mat);
 
     //a diagonal matrix representation of an operator
-    using diag_type = linalg::diagonal_matrix<T, linalg::blas_backend>;
+    using diag_type = linalg::diagonal_matrix<T, backend>;
     py::class_<diagmat, prim>(m, (std::string("diagonal_matrix_")+label).c_str())
         .def(py::init())
         .def(py::init<const diag_type&>())        
         .def(py::init([](py::buffer& b)
                 {
                     diag_type mat;
-                    copy_pybuffer_to_diagonal_matrix(b, mat);
+                    conv::copy_to_diagonal_matrix(b, mat);
                     return diagmat(mat);
                 }
             )
@@ -168,7 +170,17 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("matrix", &diagmat::mat);
 }
 
-void initialise_site_operators(py::module& m);
+template <typename backend>
+void initialise_site_operators(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
+
+#ifdef BUILD_REAL_TTN
+    init_site_operators<real_type, backend>(m, "real");
+#endif
+    init_site_operators<complex_type, backend>(m, "complex");
+}
 
 #endif  //PYTHON_BINDING_TTNS_SITE_OPERATORS_HPP
 

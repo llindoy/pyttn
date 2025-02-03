@@ -17,11 +17,10 @@
 namespace py=pybind11;
 
 
-template <typename T, template <typename, typename> class ttn_class>
+template <typename T, template <typename, typename> class ttn_class, typename backend>
 void init_tdvp_core(py::module& m, const std::string& label)
 {
     using namespace ttns;
-    using backend = linalg::blas_backend;
 
     using tdvp = _one_site_tdvp<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -82,11 +81,10 @@ void init_tdvp_core(py::module& m, const std::string& label)
 }
 
 
-template <typename T, template <typename, typename> class ttn_class>
+template <typename T, template <typename, typename> class ttn_class, typename backend>
 void init_tdvp_adaptive(py::module& m, const std::string& label)
 {
     using namespace ttns;
-    using backend = linalg::blas_backend;
 
     using atdvp = _adaptive_one_site_tdvp<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -200,11 +198,10 @@ void init_tdvp_adaptive(py::module& m, const std::string& label)
 }
 
 
-template <typename T, template <typename, typename> class ttn_class>
+template <typename T, template <typename, typename> class ttn_class, typename backend>
 void init_tdvp_adaptive_ts_cost(py::module& m, const std::string& label)
 {
     using namespace ttns;
-    using backend = linalg::blas_backend;
 
     using atdvp = _subspace_two_site_cost_tdvp<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -305,16 +302,26 @@ void init_tdvp_adaptive_ts_cost(py::module& m, const std::string& label)
         .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false);
 }
 
-template <typename T>
+template <typename T, typename backend>
 void init_tdvp(py::module &m, const std::string& label)
 {
-    init_tdvp_core<T, ttns::ttn>(m, (std::string("one_site_tdvp_")+label));
-    init_tdvp_adaptive<T, ttns::ttn>(m, (std::string("adaptive_one_site_tdvp_")+label));
-    init_tdvp_adaptive_ts_cost<T, ttns::ttn>(m, (std::string("subspace_two_site_cost_tdvp_")+label));
-    init_tdvp_core<T, ttns::ms_ttn>(m, (std::string("multiset_one_site_tdvp_")+label));
+    init_tdvp_core<T, ttns::ttn, backend>(m, (std::string("one_site_tdvp_")+label));
+    init_tdvp_adaptive<T, ttns::ttn, backend>(m, (std::string("adaptive_one_site_tdvp_")+label));
+    init_tdvp_adaptive_ts_cost<T, ttns::ttn, backend>(m, (std::string("subspace_two_site_cost_tdvp_")+label));
+    init_tdvp_core<T, ttns::ms_ttn, backend>(m, (std::string("multiset_one_site_tdvp_")+label));
 }
 
-void initialise_tdvp(py::module& m);
+template <typename backend>
+void initialise_tdvp(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
+  
+#ifdef BUILD_REAL_TTN
+    //init_tdvp<real_type, backend>(m, "real");
+#endif
+    init_tdvp<complex_type, backend>(m, "complex");
+}
 
 
 #endif

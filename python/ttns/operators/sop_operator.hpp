@@ -15,18 +15,18 @@
 
 namespace py=pybind11;
 
-template <typename T>
+template <typename T, typename backend>
 void init_sop_operator(py::module &m, const std::string& label)
 {
     using namespace ttns;
 
     using real_type = typename linalg::get_real_type<T>::type;
-    using ttn_type = ttn<T, linalg::blas_backend>;
-    using opdict = operator_dictionary<T, linalg::blas_backend>;
-    using _sop = sop_operator<T, linalg::blas_backend>;
+    using ttn_type = ttn<T, backend>;
+    using opdict = operator_dictionary<T, backend>;
+    using _sop = sop_operator<T, backend>;
 
-    using ms_ttn_type = ms_ttn<T, linalg::blas_backend>;
-    using _mssop = multiset_sop_operator<T, linalg::blas_backend>;
+    using ms_ttn_type = ms_ttn<T, backend>;
+    using _mssop = multiset_sop_operator<T, backend>;
 
     //the base primitive operator type
     py::class_<_sop>(m, (std::string("sop_operator_")+label).c_str())
@@ -98,8 +98,17 @@ void init_sop_operator(py::module &m, const std::string& label)
         .def("nmodes", &_mssop::nmodes);
 }
 
-void initialise_sop_operator(py::module& m);
+template <typename backend>
+void initialise_sop_operator(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
 
+#ifdef BUILD_REAL_TTN
+    init_sop_operator<real_type, backend>(m, "real");
+#endif
+    init_sop_operator<complex_type, backend>(m, "complex");
+}
 #endif  //PYTHON_BINDING_TTNS_SOP_OPERATOR_HPP
 
 

@@ -153,7 +153,7 @@ public:
     inline self_type& set_buffer(const value_type* src, size_type size)
     {
         ASSERT(m_totsize == size, "Failed to copy buffer from input buffer.  The two objects do not have the same size.");
-        CALL_AND_HANDLE(memtransfer<backend_type>::copy(src, size, m_buffer),"Copy assignment operator failed.  Error when copying the buffer.");
+        CALL_AND_HANDLE(memtransfer<blas_backend>::copy(src, size, m_buffer),"Copy assignment operator failed.  Error when copying the buffer.");
         return *this;
     }
 
@@ -171,11 +171,11 @@ public:
         }
         if(strides_equal)
         {
-            CALL_AND_HANDLE(memtransfer<backend_type>::copy(src, m_totsize, m_buffer),"Copy assignment operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(memtransfer<blas_backend>::copy(src, m_totsize, m_buffer),"Copy assignment operator failed.  Error when copying the buffer.");
         }
         else
         {
-            memtransfer<backend_type>::template copy_noncontiguous<value_type, rank>(src, m_shape, strides, m_buffer, m_stride);
+            memtransfer<blas_backend>::template copy_noncontiguous<value_type, rank>(src, m_shape, strides, m_buffer, m_stride);
         }
         return *this;
     }

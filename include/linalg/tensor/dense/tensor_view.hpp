@@ -246,6 +246,7 @@ public:
     inline const size_type& size() const{ return m_totsize;}
     inline const size_type& nelems() const {return m_totsize;}
     inline const shape_type& shape() const{ return m_shape;}
+    inline const shape_type& stride() const{ return m_stride;}
 
     inline const size_type& size(size_type i) const{    ASSERT(i < rank, "Unable to access tensor size element.  Index out of bounds.");  return m_shape[i];}
     inline const size_type& dims(size_type i) const{    ASSERT(i < rank, "Unable to access tensor size element.  Index out of bounds.");  return m_shape[i];}

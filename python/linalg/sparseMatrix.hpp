@@ -15,11 +15,11 @@
 
 namespace py=pybind11;
 
-template <typename T>
+template <typename T, typename backend>
 void init_csr_matrix(py::module &m, const std::string& label)
 {
     using namespace linalg;
-    using ttype = csr_matrix<T, linalg::blas_backend>;
+    using ttype = csr_matrix<T, backend>;
     using index_type = typename ttype::index_type;
     using coo_type = std::vector<std::tuple<index_type, index_type, T>>;
     using real_type = typename linalg::get_real_type<T>::type;
@@ -32,18 +32,19 @@ void init_csr_matrix(py::module &m, const std::string& label)
         .def("__str__", [](const ttype& o){std::stringstream oss;   oss << o; return oss.str();});
 }
 
-template <typename T>
+template <typename T, typename backend>
 void init_diagonal_matrix(py::module& m, const std::string& label)
 {
     using namespace linalg;
-    using ttype = diagonal_matrix<T, linalg::blas_backend>;
+    using ttype = diagonal_matrix<T, backend>;
     using real_type = typename linalg::get_real_type<T>::type;
 
+    using conv = pybuffer_converter<backend>;
     py::class_<ttype>(m, (label).c_str(), py::buffer_protocol())
         .def(py::init([](py::buffer &b)
             {
                 ttype tens;
-                copy_pybuffer_to_diagonal_matrix(b, tens);
+                conv::copy_to_diagonal_matrix(b, tens);
                 return tens;
             }
         ))
@@ -73,7 +74,16 @@ void init_diagonal_matrix(py::module& m, const std::string& label)
 }
 
 
-void initialise_sparse_matrices(py::module& m);
+template <typename backend>
+void initialise_sparse_matrices(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
+    init_csr_matrix<real_type, backend>(m, "csr_matrix_real");
+    init_csr_matrix<complex_type, backend>(m, "csr_matrix_complex");
+    init_diagonal_matrix<real_type, backend>(m, "diagonal_matrix_real");
+    init_diagonal_matrix<complex_type, backend>(m, "diagonal_matrix_complex");
+}
 
 #endif  //PYTHON_BINDING_LINALG_SPARSE_MATRIX_HPP
 

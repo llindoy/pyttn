@@ -18,17 +18,22 @@
 
 namespace py=pybind11;
 
-template <typename T>
+template <typename T, typename backend>
 void init_ttn(py::module &m, const std::string& label)
 {
     using namespace ttns;
-    using _ttn = ttn<T, linalg::blas_backend>;
+    using _ttn = ttn<T, backend>;
     using _ttn_node = typename _ttn::node_type;
-    using _ttn_node_data = ttn_node_data<T, linalg::blas_backend>;
+    using _ttn_node_data = ttn_node_data<T, backend>;
     using real_type = typename linalg::get_real_type<T>::type;
-    using siteop = site_operator<T, linalg::blas_backend>;
-    using prodop = product_operator<T, linalg::blas_backend>;
-    using sop = sop_operator<T, linalg::blas_backend>;
+    using siteop = site_operator<T, backend>;
+    using prodop = product_operator<T, backend>;
+    using sop = sop_operator<T, backend>;
+
+    using conv = linalg::pybuffer_converter<backend>;
+#ifdef __NVCC__
+    using otherbackend = typename other_backend<backend>::type;
+#endif
 
     py::class_<_ttn_node_data>(m, (std::string("ttn_data_")+label).c_str())
         .def(py::init())
@@ -57,17 +62,20 @@ void init_ttn(py::module &m, const std::string& label)
         .def("clear", &_ttn_node_data::clear)
         .def("__str__", [](const _ttn_node_data& o){std::ostringstream oss; oss << o; return oss.str();})
 
-        .def("set_matrix", [](_ttn_node_data& i, const linalg::matrix<T>& mat){i.as_matrix() = mat;})
-        .def("set_matrix", [](_ttn_node_data& i, py::buffer& mat){copy_pybuffer_to_tensor(mat, i.as_matrix());})
+        .def("set_matrix", [](_ttn_node_data& i, const linalg::matrix<T, backend>& mat){i.as_matrix() = mat;})
+#ifdef __NVCC__
+        .def("set_matrix", [](_ttn_node_data& i, const linalg::matrix<T, otherbackend>& mat){i.as_matrix() = mat;})
+#endif
+        .def("set_matrix", [](_ttn_node_data& i, py::buffer& mat){conv::copy_to_tensor(mat, i.as_matrix());})
         //allow for setting of the elements
         .def(
                 "as_matrix", 
-                static_cast<const linalg::matrix<T>& (_ttn_node_data::*)() const>(&_ttn_node_data::as_matrix),
+                static_cast<const linalg::matrix<T, backend>& (_ttn_node_data::*)() const>(&_ttn_node_data::as_matrix),
                 py::return_value_policy::reference
             )
         .def(
                 "as_matrix", 
-                static_cast<linalg::matrix<T>& (_ttn_node_data::*)()>(&_ttn_node_data::as_matrix),
+                static_cast<linalg::matrix<T, backend>& (_ttn_node_data::*)()>(&_ttn_node_data::as_matrix),
                 py::return_value_policy::reference
             );
 
@@ -91,12 +99,12 @@ void init_ttn(py::module &m, const std::string& label)
     py::class_<_ttn>(m, (std::string("ttn_")+label).c_str())
         .def(py::init())
         .def(py::init<const _ttn&>())
-        .def(py::init<const ttn<real_type, linalg::blas_backend>&>())
+        .def(py::init<const ttn<real_type, backend>&>())
 
-        .def(py::init<const multiset_ttn_slice<real_type, linalg::blas_backend, true>&>())
-        .def(py::init<const multiset_ttn_slice<T, linalg::blas_backend, true>&>())
-        .def(py::init<const multiset_ttn_slice<real_type, linalg::blas_backend, false>&>())
-        .def(py::init<const multiset_ttn_slice<T, linalg::blas_backend, false>&>())
+        .def(py::init<const multiset_ttn_slice<real_type, backend, true>&>())
+        .def(py::init<const multiset_ttn_slice<T, backend, true>&>())
+        .def(py::init<const multiset_ttn_slice<real_type, backend, false>&>())
+        .def(py::init<const multiset_ttn_slice<T, backend, false>&>())
 
         .def(py::init<const ntree<size_t>&, bool>(), py::arg(), py::arg("purification") = false)
         .def(py::init<const ntree<size_t>&, const ntree<size_t>&, bool>(), py::arg(), py::arg(), py::arg("purification") = false)
@@ -105,12 +113,12 @@ void init_ttn(py::module &m, const std::string& label)
 
         .def("complex_dtype", [](const _ttn&){return !std::is_same<T, real_type>::value;}, "For details see :class:`pyttn.ttn_dtype`")
 
-        .def("assign", &_ttn::template operator=<T, linalg::blas_backend, true>)
-        .def("assign", &_ttn::template operator=<T, linalg::blas_backend, false>)
-        .def("assign", &_ttn::template operator=<real_type, linalg::blas_backend, true>)
-        .def("assign", &_ttn::template operator=<real_type, linalg::blas_backend, false>, "For details see :meth:`pyttn.ttn_dtype.assign`")
+        .def("assign", &_ttn::template operator=<T, backend, true>)
+        .def("assign", &_ttn::template operator=<T, backend, false>)
+        .def("assign", &_ttn::template operator=<real_type, backend, true>)
+        .def("assign", &_ttn::template operator=<real_type, backend, false>, "For details see :meth:`pyttn.ttn_dtype.assign`")
         .def("assign", [](_ttn& o, const _ttn& i){o=i;})
-        .def("assign", [](_ttn& o, const ttn<real_type, linalg::blas_backend>& i){o=i;})
+        .def("assign", [](_ttn& o, const ttn<real_type, backend>& i){o=i;})
         .def("__copy__", [](const _ttn& o){return _ttn(o);})
         .def("__deepcopy__", [](const _ttn& o, py::dict){return _ttn(o);}, py::arg("memo"))
 
@@ -131,14 +139,14 @@ void init_ttn(py::module &m, const std::string& label)
         .def("set_state_purification", &_ttn::template set_state<int>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
         .def("set_state_purification", &_ttn::template set_state<size_t>, py::arg(), py::arg("random_unoccupied_initialisation")=false, "For details see :meth:`pyttn.ttn_dtype.set_state_purification`")
 
-        .def("set_product", &_ttn::template set_product<real_type, linalg::blas_backend>)
-        .def("set_product", &_ttn::template set_product<T, linalg::blas_backend>)
+        .def("set_product", &_ttn::template set_product<real_type, backend>)
+        .def("set_product", &_ttn::template set_product<T, backend>)
         .def("set_product", [](_ttn& self, std::vector<py::buffer>& ps)
                             {
                                 std::vector<linalg::vector<T>> _ps(ps.size());
                                 for(size_t i = 0; i < ps.size(); ++i)
                                 {
-                                    copy_pybuffer_to_tensor(ps[i], _ps[i]);
+                                    conv::copy_to_tensor(ps[i], _ps[i]);
                                 }
                                 self.set_product(_ps);
                             }, "For details see :meth:`pyttn.ttn_dtype.set_product`"
@@ -238,9 +246,18 @@ void init_ttn(py::module &m, const std::string& label)
                 static_cast<const _ttn_node_data& (_ttn::*)(size_t) const>(&_ttn::site_tensor),
                 py::return_value_policy::reference, "For details see :meth:`pyttn.ttn_dtype.site_tensor`"
             )
+#ifdef __NVCC__
         .def(
                 "set_site_tensor",
-                [](_ttn& self, size_t i, const linalg::matrix<T>& mat)
+                [](_ttn& self, size_t i, const linalg::matrix<T, otherbackend>& mat)
+                {
+                    CALL_AND_HANDLE(self.site_tensor(i).as_matrix() = mat, "Failed to set site tensor.");
+                }
+            )        
+#endif
+        .def(
+                "set_site_tensor",
+                [](_ttn& self, size_t i, const linalg::matrix<T, backend>& mat)
                 {
                     CALL_AND_HANDLE(self.site_tensor(i).as_matrix() = mat, "Failed to set site tensor.");
                 }
@@ -249,7 +266,7 @@ void init_ttn(py::module &m, const std::string& label)
                 "set_site_tensor",
                 [](_ttn& self, size_t i, py::buffer& mat)
                 {
-                    CALL_AND_HANDLE(copy_pybuffer_to_tensor(mat, self.site_tensor(i).as_matrix()), "Failed to set site tensor.");
+                    CALL_AND_HANDLE(conv::copy_to_tensor(mat, self.site_tensor(i).as_matrix()), "Failed to set site tensor.");
                 }, "For details see :meth:`pyttn.ttn_dtype.set_site_tensor`"
             )
 
@@ -271,9 +288,27 @@ void init_ttn(py::module &m, const std::string& label)
         //            return p0;
         //        }
         //    )
+        //
+#ifdef __NVCC__
         .def(
                 "collapse_basis", 
-                [](_ttn& o, std::vector<linalg::matrix<T>>& U, bool truncate=true, real_type tol=real_type(0), size_t nchi=0)
+                [](_ttn& o, std::vector<linalg::matrix<T, otherbackend>>& U, bool truncate=true, real_type tol=real_type(0), size_t nchi=0)
+                {
+                    std::vector<linalg::matrix<T, backend>> Uop(U.size());
+                    for(size_t i = 0; i < U.size(); ++i)
+                    {
+                        Uop[i] = U[i];
+                    }
+                    std::vector<size_t> state;
+                    real_type p = o.collapse_basis(U, state, truncate, tol, nchi); 
+                    return std::make_pair(p, state);
+                }, 
+                py::arg(), py::arg("truncate")=true, py::arg("tol") = real_type(0), py::arg("nchi") = 0
+            )
+#endif
+        .def(
+                "collapse_basis", 
+                [](_ttn& o, std::vector<linalg::matrix<T, backend>>& U, bool truncate=true, real_type tol=real_type(0), size_t nchi=0)
                 {
                     std::vector<size_t> state;
                     real_type p = o.collapse_basis(U, state, truncate, tol, nchi); 
@@ -285,10 +320,10 @@ void init_ttn(py::module &m, const std::string& label)
                 "collapse_basis", 
                 [](_ttn& o, std::vector<py::buffer>& U, bool truncate=true, real_type tol=real_type(0), size_t nchi=0)
                 {
-                    std::vector<linalg::matrix<T>> Uop(U.size());
+                    std::vector<linalg::matrix<T, backend>> Uop(U.size());
                     for(size_t i = 0; i < U.size(); ++i)
                     {
-                        copy_pybuffer_to_tensor(U[i], Uop[i]);
+                        conv::copy_to_tensor(U[i], Uop[i]);
                     }
                     std::vector<size_t> state;
                     real_type p = o.collapse_basis(Uop, state, truncate, tol, nchi); 
@@ -309,15 +344,15 @@ void init_ttn(py::module &m, const std::string& label)
 
         .def(
                 "apply_one_body_operator", 
-                [](_ttn& o, const linalg::matrix<T>& op, size_t index, bool shift_orthogonality){CALL_AND_RETHROW(return o.apply_one_body_operator(op, index, shift_orthogonality));},
+                [](_ttn& o, const linalg::matrix<T, backend>& op, size_t index, bool shift_orthogonality){CALL_AND_RETHROW(return o.apply_one_body_operator(op, index, shift_orthogonality));},
                 py::arg(), py::arg(), py::arg("shift_orthogonality") = true
             )
         .def(
                 "apply_one_body_operator", 
                 [](_ttn& o, py::buffer& op, size_t index, bool shift_orthogonality)
                 {
-                    linalg::matrix<T> mt;
-                    copy_pybuffer_to_tensor(op, mt);
+                    linalg::matrix<T, backend> mt;
+                    conv::copy_to_tensor(op, mt);
                     CALL_AND_RETHROW(return o.apply_one_body_operator(mt, index, shift_orthogonality));
                 },
                 py::arg(), py::arg(), py::arg("shift_orthogonality") = true
@@ -367,7 +402,7 @@ void init_ttn(py::module &m, const std::string& label)
                 [](_ttn& o, sop& op)
                 {
                     _ttn i;
-                    using contr = sop_ttn_contraction_engine<T, linalg::blas_backend>;
+                    using contr = sop_ttn_contraction_engine<T, backend>;
                     CALL_AND_RETHROW(contr::sop_ttn_contraction(op, o, i));
                     o = i;
                     return o;
@@ -394,7 +429,7 @@ void init_ttn(py::module &m, const std::string& label)
                 [](const _ttn& o, sop& op)
                 {
                     _ttn i;
-                    using contr = sop_ttn_contraction_engine<T, linalg::blas_backend>;
+                    using contr = sop_ttn_contraction_engine<T, backend>;
                     CALL_AND_RETHROW(contr::sop_ttn_contraction(op, o, i));
                     return i;
                 }, "For details see :meth:`pyttn.ttn_dtype.__rmatmul__`"
@@ -405,11 +440,21 @@ void init_ttn(py::module &m, const std::string& label)
         ;
 
       
-    m.def("apply_sop_to_ttn", &sop_ttn_contraction_engine<T, linalg::blas_backend>::sop_ttn_contraction, py::arg(), py::arg(), py::arg(), py::arg("coeff")=T(1), py::arg("cutoff")=real_type(1e-12));
+    m.def("apply_sop_to_ttn", &sop_ttn_contraction_engine<T, backend>::sop_ttn_contraction, py::arg(), py::arg(), py::arg(), py::arg("coeff")=T(1), py::arg("cutoff")=real_type(1e-12));
 
 }
 
-void initialise_ttn(py::module& m);
+template <typename backend>
+void initialise_ttn(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
+
+#ifdef BUILD_REAL_TTN
+    init_ttn<real_type, backend>(m, "real");
+#endif
+    init_ttn<complex_type, backend>(m, "complex");
+}
 
 #endif  //PYTHON_BINDING_TTN_HPP
 

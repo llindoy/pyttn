@@ -17,11 +17,10 @@
 namespace py=pybind11;
 
 
-template <typename T, template <typename, typename> class ttn_class>
+template <typename T, template <typename, typename> class ttn_class, typename backend>
 void init_dmrg_core(py::module& m, const std::string& label)
 {
     using namespace ttns;
-    using backend = linalg::blas_backend;
 
     using dmrg = _one_site_dmrg<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -133,11 +132,10 @@ void init_dmrg_core(py::module& m, const std::string& label)
     //const utils::eigenvalue_target& mode() const{return m_eigensolver.mode();}
 }
 
-template <typename T, template <typename, typename> class ttn_class>
+template <typename T, template <typename, typename> class ttn_class, typename backend>
 void init_dmrg_adaptive(py::module& m, const std::string& label)
 {
     using namespace ttns;
-    using backend = linalg::blas_backend;
 
     using admrg = _adaptive_one_site_dmrg<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -333,16 +331,25 @@ void init_dmrg_adaptive(py::module& m, const std::string& label)
 
 }
 
-template <typename T>
+template <typename T, typename backend>
 void init_dmrg(py::module &m, const std::string& label)
 {
-    init_dmrg_core<T, ttns::ttn>(m, (std::string("one_site_dmrg_")+label));
-    init_dmrg_adaptive<T, ttns::ttn>(m, (std::string("adaptive_one_site_dmrg_")+label));
-    init_dmrg_core<T, ttns::ms_ttn>(m, (std::string("multiset_one_site_dmrg_")+label));
+    init_dmrg_core<T, ttns::ttn, backend>(m, (std::string("one_site_dmrg_")+label));
+    init_dmrg_adaptive<T, ttns::ttn, backend>(m, (std::string("adaptive_one_site_dmrg_")+label));
+    init_dmrg_core<T, ttns::ms_ttn, backend>(m, (std::string("multiset_one_site_dmrg_")+label));
 }
 
-void initialise_dmrg(py::module& m);
-
+template <typename backend>
+void initialise_dmrg(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
+  
+#ifdef BUILD_REAL_TTN
+    //init_dmrg<real_type, backend>(m, "real");
+#endif
+    init_dmrg<complex_type, backend>(m, "complex");
+}
 
 
 #endif
