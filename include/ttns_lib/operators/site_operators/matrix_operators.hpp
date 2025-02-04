@@ -537,7 +537,7 @@ protected:
         CALL_AND_HANDLE(cusparse_safe_call(cusparseCreateDnMat(&desc, static_cast<int64_t>(m.shape(1)), static_cast<int64_t>(m.shape(0)), static_cast<int64_t>(m.shape(1)), m.buffer(), linalg::cuda_type<T>::type_enum(), CUSPARSE_ORDER_COL)), "Failed to create dense matrix descriptor.");
     }
 
-    void create_sparse_descriptor(cusparseSpMatDescr_t& desc, csr_matrix<T, backend>& m)
+    void create_sparse_descriptor(cusparseSpMatDescr_t& desc, linalg::csr_matrix<T, backend>& m)
     {
         CALL_AND_HANDLE(cusparse_safe_call(cusparseCreateCsr(&desc, static_cast<int64_t>(m.shape(1)), static_cast<int64_t>(m.shape(0)), static_cast<int64_t>(m.nnz()), m.rowptr(), m.colind(), m.buffer(), CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I, CUSPARSE_INDEX_BASE_ZERO, linalg::cuda_type<T>::type_enum())), "Failed to create sparse matrix descriptor.");
     }

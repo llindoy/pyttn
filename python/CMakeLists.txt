@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.12)
+cmake_minimum_required(VERSION 3.12)
 project(ttnpp)
 
 include(CheckIPOSupported)
@@ -33,7 +33,36 @@ if(BUILD_REAL_TTN)
   add_definitions(-DBUILD_REAL_TTN)
 endif()
 
-set(PYTHON_BINDINGS_SRC pythonBinding.cpp 
+
+include(CheckLanguage)
+check_language(CUDA)
+
+#attempt to set up cuda if the user has requested it and cuda is installed
+if(USE_CUDA AND CMAKE_CUDA_COMPILER)
+    enable_language(CUDA)
+    find_package(CUDAToolkit REQUIRED)
+
+    set(PYTHON_BINDINGS_SRC pythonBinding.cu 
+          linalg/tensor.cu linalg/sparseMatrix.cu linalg/cuda_backend.cu
+          )
+
+    if(COMPILER_SET)
+    else()
+        set(CMAKE_CUDA_FLAGS "-Xptxas -O3 -g --extended-lambda ${CMAKE_CUDA_FLAGS}")
+
+        if(USE_OPENMP)
+            set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -fopenmp")
+        endif()
+
+        if(NOT DEFINED CMAKE_CUDA_STANDARD)
+            set(CMAKE_CUDA_STANDARD 17)
+            set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+        endif()
+
+        set(LINALG_LIBS ${LINALG_LIBS} ${LLVM_LIBRARIES} ${CLANG_LIBS} ${CLANG_CLANG_LIBS} ${CUDA_cusparse_LIBRARY})
+    endif()
+else()
+    set(PYTHON_BINDINGS_SRC pythonBinding.cpp 
           utils/orthopol.cpp utils/discretisation.cpp
           linalg/sparseMatrix.cpp linalg/tensor.cpp 
           ttns/observables/matrix_element.cpp 
@@ -44,74 +73,75 @@ set(PYTHON_BINDINGS_SRC pythonBinding.cpp
           )
 
 
-if(COMPILER_SET)
-else()
-    if(MSVC)
-        message(FATAL_ERROR "Request MSVC compiler.  I don't know how this works so exiting.")
+    if(COMPILER_SET)
     else()
-        set(CMAKE_CXX_FLAGS "-O3 -g -Wall -Wextra -Wshadow -pedantic -Wold-style-cast")
-        option(WITH_WERROR "Compile with '-Werror' C++ compiler flag" ON)
-        if(WITH_WERROR)
-            #set(CMAKE_CXX_FLAGS "-Werror ${CMAKE_CXX_FLAGS}")
-        endif(WITH_WERROR)
+        if(MSVC)
+            message(FATAL_ERROR "Request MSVC compiler.  I don't know how this works so exiting.")
+        else()
+            set(CMAKE_CXX_FLAGS "-O3 -g -Wall -Wextra -Wshadow -pedantic -Wold-style-cast")
+            option(WITH_WERROR "Compile with '-Werror' C++ compiler flag" ON)
+            if(WITH_WERROR)
+                #set(CMAKE_CXX_FLAGS "-Werror ${CMAKE_CXX_FLAGS}")
+            endif(WITH_WERROR)
 
-        #additional compilation flags for GNU compilers
-        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcx-fortran-rules -march=native -mtune=native")
-            if(USE_OPENMP)
-                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+            #additional compilation flags for GNU compilers
+            if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+                SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcx-fortran-rules -march=native -mtune=native")
+                if(USE_OPENMP)
+                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+                endif()
+            #additional compilation flags for inteal compilers
+            elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+                SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -qopt-report=3 -O3 -xHost -restrict")
+                message(STATUS "using intel compiler.")
+                if(USE_OPENMP)
+                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -openmp")
+                endif()
+
+            elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM")
+                SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -qopt-report=3 ")
+                if(USE_OPENMP)
+                    message(STATUS "Using Openmp")
+                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -openmp")
+                endif()
+
+            elseif ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") )
+                find_package(LLVM REQUIRED)
+                find_package(Clang REQUIRED)
+
+                set(LINALG_LIBS ${LINALG_LIBS} ${LLVM_LIBRARIES} ${CLANG_LIBS} ${CLANG_CLANG_LIBS})
+                
+
+                #if we are using clang then find threads
+                set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+                set(CMAKE_HAVE_THREADS_LIBRARY 1)
+                set(CMAKE_USE_WIN32_THREADS_INIT 0)
+                set(CMAKE_USE_PTHREADS_INIT 1)
+                set(THREADS_PREFER_PTHREAD_FLAG ON)
+
+                set(CMAKE_CXX_FLAGS "-stdlib=libc++ ${CMAKE_CXX_FLAGS}")
+                set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ ")
+
+
+                if(USE_OPENMP)
+                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp=libomp")
+                endif()
             endif()
-        #additional compilation flags for inteal compilers
-        elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -qopt-report=3 -O3 -xHost -restrict")
-            message(STATUS "using intel compiler.")
-            if(USE_OPENMP)
-                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -openmp")
-            endif()
-
-        elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -qopt-report=3 ")
-            if(USE_OPENMP)
-                message(STATUS "Using Openmp")
-                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -openmp")
-            endif()
-
-        elseif ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") )
-            find_package(LLVM REQUIRED)
-            find_package(Clang REQUIRED)
-
-            set(LINALG_LIBS ${LINALG_LIBS} ${LLVM_LIBRARIES} ${CLANG_LIBS} ${CLANG_CLANG_LIBS})
             
 
-            #if we are using clang then find threads
-            set(CMAKE_THREAD_LIBS_INIT "-lpthread")
-            set(CMAKE_HAVE_THREADS_LIBRARY 1)
-            set(CMAKE_USE_WIN32_THREADS_INIT 0)
-            set(CMAKE_USE_PTHREADS_INIT 1)
-            set(THREADS_PREFER_PTHREAD_FLAG ON)
+            if(CMAKE_VERSION VERSION_LESS 3.1)
+                set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS}")
+            else()
+              if(NOT DEFINED CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD STREQUAL "98")
+                set(CMAKE_CXX_STANDARD 17)
+              endif()
 
-            set(CMAKE_CXX_FLAGS "-stdlib=libc++ ${CMAKE_CXX_FLAGS}")
-            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ ")
+              if(CMAKE_CXX_STANDARD GREATER 17)
+                cmake_minimum_required(VERSION 3.8)
+              endif()
 
-
-            if(USE_OPENMP)
-                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp=libomp")
+              set(CMAKE_CXX_STANDARD_REQUIRED ON)
             endif()
-        endif()
-        
-
-        if(CMAKE_VERSION VERSION_LESS 3.1)
-            set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS}")
-        else()
-          if(NOT DEFINED CMAKE_CXX_STANDARD OR CMAKE_CXX_STANDARD STREQUAL "98")
-            set(CMAKE_CXX_STANDARD 17)
-          endif()
-
-          if(CMAKE_CXX_STANDARD GREATER 17)
-            cmake_minimum_required(VERSION 3.8)
-          endif()
-
-          set(CMAKE_CXX_STANDARD_REQUIRED ON)
         endif()
     endif()
 endif()
@@ -132,11 +162,18 @@ if(NOT pybind11_POPULATED)
 endif()
 add_definitions(-DPYBIND11)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+message(STATUS "CUDA FLAGS: ${CMAKE_CUDA_FLAGS}")
 
 message(STATUS "${PYTHON_BINDINGS_SRC}")
 pybind11_add_module(ttnpp ${PYTHON_BINDINGS_SRC})
 target_include_directories(ttnpp PUBLIC ${TTNS_INCLUDE_DIRECTORIES})
-target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 
+
+if(USE_CUDA AND CMAKE_CUDA_COMPILER)
+    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver) 
+    set_target_properties(ttnpp PROPERTIES CUDA_ARCHITECTURES "86")
+else()
+    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 
+endif()
 
 
 add_library(restore_default_visibility INTERFACE)

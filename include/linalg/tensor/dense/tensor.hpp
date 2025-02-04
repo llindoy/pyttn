@@ -100,6 +100,7 @@ public:
     {
         src.m_buffer = nullptr; src.m_totsize = 0; src.m_totcapacity = 0; for(size_type i=0; i<rank; ++i){src.m_shape[i] = 0;src.m_stride[i] = 0;}
     }
+
     template <typename Container, typename = other_move_constructable_type<Container, self_type>> 
     tensor_base(Container&& src) : tensor_base(){CALL_AND_HANDLE(move_assign_impl(std::forward<Container>(src)), "Failed to move construct tensor object from expression.");}
     ~tensor_base(){try{if(m_buffer != nullptr){allocator::deallocate(m_buffer);} m_buffer = nullptr;}catch(...){}}

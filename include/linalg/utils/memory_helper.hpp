@@ -120,6 +120,7 @@ namespace internal
 class cuda_transfer
 {
 public:
+    using size_type = cuda_backend::size_type;
     template <typename T, typename size_type>
     static inline void copy(const T* const src, size_type n, T* const dest, cudaMemcpyKind type)
     {
@@ -157,22 +158,22 @@ public:
     template <typename T> static inline void copy(const T* const src, size_type n, T* const dest){CALL_AND_HANDLE(internal::cuda_transfer::copy(src, n, dest, cudaMemcpyHostToDevice), "Failed to perform host to device memory transfer.");}
     template <typename T> static inline void copy(const T* const src, size_type n, T* const dest, cudaStream_t stream){CALL_AND_HANDLE(internal::cuda_transfer::copy(src, n, dest, cudaMemcpyHostToDevice, stream), "Failed to perform asynchronous host to device memory transfer.");}
 
-    template <size_t D>
-    static inline void copy_noncontiguous(const T* const src, const std::array<size_t, D>& strides, size_type n, T* const dest, cudaMemcpyKind type)
+    template <typename T, size_t D>
+    static inline void copy_noncontiguous(const T* const src, const std::array<size_t, D>& strides, size_type n, T* const dest)
     {
-        RAISE_EXCEPTION("Noncontiguous copy not supported by cuda transfer.");
+        CALL_AND_RETHROW(internal::cuda_transfer::copy_noncontiguous(src, strides, n, dest, cudaMemcpyHostToDevice));
     }
 
     template <typename T, size_t D> 
-    static inline void copy_noncontiguous(const T* const src, const std::array<size_type, D>& size, const std::array<size_type, D>& s_strides, T* dest, const std::array<size_type, D>& d_strides, cudaMemcpyKind type)
+    static inline void copy_noncontiguous(const T* const src, const std::array<size_type, D>& size, const std::array<size_type, D>& s_strides, T* dest, const std::array<size_type, D>& d_strides)
     {
-        RAISE_EXCEPTION("Noncontiguous copy not supported by cuda transfer.");
+        CALL_AND_RETHROW(internal::cuda_transfer::copy_noncontiguous(src, size, s_strides, dest, d_strides, cudaMemcpyHostToDevice));
     }
 
     template <typename T, size_t D> 
-    static inline void copy_noncontiguous(const T* const src, const std::array<size_type, D>& size, const std::array<size_type, D>& s_strides, T* dest, const std::array<size_type, D>& d_strides, cudaMemcpyKind type, cudaStream_t stream)
+    static inline void copy_noncontiguous(const T* const src, const std::array<size_type, D>& size, const std::array<size_type, D>& s_strides, T* dest, const std::array<size_type, D>& d_strides, cudaStream_t stream)
     {
-        RAISE_EXCEPTION("Noncontiguous copy not supported by cuda transfer.");
+        CALL_AND_RETHROW(internal::cuda_transfer::copy_noncontiguous(src, size, s_strides, dest, d_strides, cudaMemcpyHostToDevice, stream));
     }
 };
 
@@ -196,15 +197,15 @@ public:
     template <typename T> static inline void copy(const T* const src, size_type n, T* const dest, cudaStream_t stream){CALL_AND_HANDLE(internal::cuda_transfer::copy(src, n, dest, cudaMemcpyDeviceToDevice, stream), "Failed to perform asynchronous device to device memory transfer.");}
 
     template <typename T, size_t D> 
-    static inline void copy_noncontiguous(const T* const src, const std::array<size_type, D>& size, const std::array<size_type, D>& s_strides, T* dest, const std::array<size_type, D>& d_strides, cudaMemcpyKind type)
+    static inline void copy_noncontiguous(const T* const src, const std::array<size_type, D>& size, const std::array<size_type, D>& s_strides, T* dest, const std::array<size_type, D>& d_strides)
     {
-        RAISE_EXCEPTION("Noncontiguous copy not supported by cuda transfer.");
+        CALL_AND_RETHROW(internal::cuda_transfer::copy_noncontiguous(src, size, s_strides, dest, d_strides, cudaMemcpyDeviceToDevice));
     }
 
     template <typename T, size_t D> 
-    static inline void copy_noncontiguous(const T* const src, const std::array<size_type, D>& size, const std::array<size_type, D>& s_strides, T* dest, const std::array<size_type, D>& d_strides, cudaMemcpyKind type, cudaStream_t stream)
+    static inline void copy_noncontiguous(const T* const src, const std::array<size_type, D>& size, const std::array<size_type, D>& s_strides, T* dest, const std::array<size_type, D>& d_strides, cudaStream_t stream)
     {
-        RAISE_EXCEPTION("Noncontiguous copy not supported by cuda transfer.");
+        CALL_AND_RETHROW(internal::cuda_transfer::copy_noncontiguous(src, size, s_strides, dest, d_strides, cudaMemcpyDeviceToDevice, stream));
     }
 };
 

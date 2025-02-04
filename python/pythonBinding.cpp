@@ -74,8 +74,8 @@ PYBIND11_MODULE(ttnpp, m)
     //
     //Wrap the required linear algebra types to enable python based instantiation of operators.
     //
-    initialise_tensors<linalg::blas_backend>(m_linalg);
-    initialise_sparse_matrices<linalg::blas_backend>(m_linalg);
+    initialise_tensors<real_type>(m_linalg);
+    initialise_sparse_matrices<real_type, linalg::blas_backend>(m_linalg);
 
     //
     //Wrap the required utils functions

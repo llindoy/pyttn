@@ -20,12 +20,14 @@
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 
-#include "utils/orthopol.hpp"
-#include "utils/discretisation.hpp"
+//#include "utils/orthopol.hpp"
+//#include "utils/discretisation.hpp"
 
 #include "linalg/tensor.hpp"
 #include "linalg/sparseMatrix.hpp"
+#include "linalg/cuda_backend.hpp"
 
+/*
 #include "ttns/ttn/ntree.hpp"
 #include "ttns/ttn/ttn.hpp"
 #include "ttns/ttn/ms_ttn.hpp"
@@ -45,7 +47,7 @@
 
 #include "ttns/algorithms/dmrg.hpp"
 #include "ttns/algorithms/tdvp.hpp"
-
+*/
 //using namespace ttns;
 namespace py = pybind11;
 
@@ -71,54 +73,31 @@ PYBIND11_MODULE(ttnpp, m)
         Pre-defined models specifying system and Hamiltonian information.
         )mydelimiter");
 
+
+    auto m_linalg_gpu = m.def_submodule("linalg_gpu",R"mydelimiter(
+        Linear algebra submodule for TTNS library."
+        )mydelimiter");
+    auto m_orthopol_gpu = m.def_submodule("utils_gpu", R"mydelimiter(
+        Orthogonal polynomials submodule for TTNS library.
+        )mydelimiter");
+
+    auto m_models_gpu = m.def_submodule("models_gpu", R"mydelimiter(
+        Pre-defined models specifying system and Hamiltonian information.
+        )mydelimiter");
+
     //
     //Wrap the required linear algebra types to enable python based instantiation of operators.
     //
-    initialise_tensors(m_linalg);
-    initialise_sparse_matrices(m_linalg);
+    //The CPU implementations
+    initialise_tensors<double>(m_linalg);
+    initialise_sparse_matrices<double>(m_linalg);
 
-    //
-    //Wrap the required utils functions
-    //
-    initialise_orthopol(m_orthopol);
-    initialise_discretisation(m_orthopol);
-    
-    //
-    //Wrap the sOP functionality
-    //
-    initialise_sSOP(m);
-    initialise_system_info(m);
-    initialise_SOP(m);
-    initialise_operator_dictionary(m);
-    initialise_liouville_space(m);
+    //the GPU implementations
+    initialise_tensors_cuda<double>(m_linalg_gpu);
+    initialise_sparse_matrices_cuda<double>(m_linalg);
 
-    //
-    //Wrap the models functionality included in SOP
-    //
-    initialise_models(m_models);
-    
-    //
-    //Wrap core ttns functionality
-    //
-    initialise_ntree(m);
-    initialise_ttn(m);
-    initialise_msttn(m);
-
-    initialise_matrix_element(m);
-    //
-    //Wrap operator classes
-    //
-    auto m_ops = m.def_submodule("ops", "Operator submodule for TTNS library.");
-    initialise_site_operators(m_ops);
-    initialise_product_operator(m);
-    initialise_sop_operator(m);
-
-
-    //
-    //Wrap the core algorithms for operating on ttns
-    //
-    initialise_dmrg(m);
-    initialise_tdvp(m);
+    //initialise the cuda environment objects
+    initialise_cuda_backend(m_linalg_gpu);
 }
 
 

@@ -57,7 +57,7 @@ public:
     }
 
     type obj(){return m_obj;}
-    const type obj() const {return m_obj;}
+    const ms_ttn<T, backend>& obj() const {return m_obj;}
 protected:
     type m_obj;
 };

@@ -23,7 +23,7 @@
     #define linalg_restrict
 #endif
 #ifdef __NVCC__
-#include <thrust/complex.h>
+#include <cuda/std/complex>
 #else
 #include <complex>
 #endif
@@ -32,7 +32,7 @@ namespace linalg
 {
 
 #ifdef __NVCC__
-template <typename T> using complex = thrust::complex<T>;
+template <typename T> using complex = cuda::std::complex<T>;
 #else
 template <typename T> using complex = std::complex<T>;
 #endif
@@ -78,9 +78,9 @@ template <typename T> struct is_number :
 
 #ifdef __NVCC__
 template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type abs(const T& t){return std::abs(t);}
-template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value &&  is_complex<T>::value, typename get_real_type<T>::type>::type abs(const T& t){return thrust::abs(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value &&  is_complex<T>::value, typename get_real_type<T>::type>::type abs(const T& t){return cuda::std::abs(t);}
 template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type conj(const T& t){return t;}
-template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value &&  is_complex<T>::value, T>::type conj(const T& t){return thrust::conj(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value &&  is_complex<T>::value, T>::type conj(const T& t){return cuda::std::conj(t);}
 template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type real(const T& t){return t;}
 template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value &&  is_complex<T>::value, typename get_real_type<T>::type>::type real(const T& t){return t.real();}
 template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type imag(const T& /* t */){return T(0.0);}
@@ -88,8 +88,8 @@ template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::
 template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type norm(const T& t){return t*t;}
 template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value &&  is_complex<T>::value, typename get_real_type<T>::type>::type norm(const T& t){return t.norm();}
 template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type arg(const T& /* t */){return T(0.0);}
-template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value &&  is_complex<T>::value, typename get_real_type<T>::type>::type arg(const T& t){return thrust::arg(t);}
-template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, complex<T>>::type polar(const T& r, const T& theta){return thrust::polar(r, theta);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value &&  is_complex<T>::value, typename get_real_type<T>::type>::type arg(const T& t){return cuda::std::arg(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, complex<T>>::type polar(const T& r, const T& theta){return cuda::std::polar(r, theta);}
 #else
 template <typename T> typename get_real_type<T>::type abs(const T& t){return std::abs(t);}
 template <typename T> typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type conj(const T& t){return t;}

@@ -259,6 +259,8 @@ public:
     template <typename srcbck> using memtransfer = memory::transfer<srcbck, backend_type>;
 
     using coo_type = std::vector<std::tuple<index_type, index_type, value_type>>;
+    template <typename U> friend class csr_matrix_base;
+
 protected:
     pointer m_vals;                                     ///< The 1-dimensional array used to store the values present in the matrix
     topology_type m_topo;
