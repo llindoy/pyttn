@@ -8,6 +8,7 @@
 #include <cusparse_v2.h>
 #include <cuda_runtime.h>
 
+#include "cublas_wrapper.hpp"
 
 //detect if the cuda runtime version is less than or equal to 10.0 in which case we still have the older version of 
 //cusparse and it is necessary to define some of the helper functions included in later version.  We will additionally
@@ -46,6 +47,49 @@ namespace linalg
 {
 namespace cusparse
 {
+
+using size_type = std::size_t;
+using index_type = int32_t;
+static inline void cuda_safe_call(cudaError_t err){if(err != cudaSuccess){RAISE_EXCEPTION_STR(cudaGetErrorName(err));}}
+
+cusparseOperation_t convert_operation(cublasOperation_t op)
+{
+    if(op == CUBLAS_OP_N){return CUSPARSE_OPERATION_NON_TRANSPOSE;}
+    else if(op == CUBLAS_OP_T){return CUSPARSE_OPERATION_TRANSPOSE;}
+    else if(op == CUBLAS_OP_C){return CUSPARSE_OPERATION_CONJUGATE_TRANSPOSE;}
+    else{return static_cast<cusparseOperation_t>('I');}
+}
+
+template <typename T>
+static inline void spmm(cusparseHandle_t handle, cusparseOperation_t opA, cusparseOperation_t opB, size_type m, size_type n, size_type k, T alpha, const T* A, const index_type* rowptr, const index_type* colind, const T* B, size_type ldb, T beta, T* C, size_type ldc)
+{
+    cusparseConstSpMatDescr_t matA;
+    cusparseConstDnMatDescr_t matB;
+    cusparseDnMatDescr_t matC;
+    cusparseIndexType_t offset_type = cusparse_index<index_type>::type_enum();
+    cudaDataType value_type = cuda_type<T>::type_enum();
+
+    //construct the sparse matrix descriptor
+    cusparse_safe_call(cusparseCreateConstCsr(&matA, m, k, rowptr[m], static_cast<const void*>(rowptr), static_cast<const void*>(colind), static_cast<const void*>(A), offset_type, offset_type, CUSPARSE_INDEX_BASE_ZERO, value_type));
+
+    //construct the dense matrix descriptors
+    cusparse_safe_call(cusparseCreateConstDnMat(&matB, k, n, ldb, static_cast<const void*>(B), value_type, CUSPARSE_ORDER_ROW));
+    cusparse_safe_call(cusparseCreateDnMat(&matC, m, n, ldc, static_cast<void*>(C), value_type, CUSPARSE_ORDER_ROW));
+
+    void * buffer;
+    size_t bufferSize=0;
+
+    // allocate an external buffer if needed
+    cusparse_safe_call( cusparseSpMM_bufferSize(handle, opA, opB, &alpha, matA, matB, &beta, matC, value_type, CUSPARSE_SPMM_ALG_DEFAULT, &bufferSize) );
+    cuda_safe_call( cudaMalloc(&buffer, bufferSize) );
+
+    cusparse_safe_call( cusparseSpMM(handle, opA, opB, &alpha, matA, matB, &beta, matC, value_type, CUSPARSE_SPMM_ALG_DEFAULT, buffer) );
+
+    cusparse_safe_call(cusparseDestroySpMat(matA));
+    cusparse_safe_call(cusparseDestroyDnMat(matB));
+    cusparse_safe_call(cusparseDestroyDnMat(matC));
+    cuda_safe_call(cudaFree(buffer));
+}
 
 
 }   //namespace cusparse

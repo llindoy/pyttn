@@ -66,7 +66,6 @@ void init_operator_dictionary(py::module &m, const std::string& label)
 template <typename real_type, typename backend>
 void initialise_operator_dictionary(py::module& m)
 {
-    using real_type = double;
     using complex_type = linalg::complex<real_type>;
   
     init_operator_dictionary<real_type, backend>(m, "real");

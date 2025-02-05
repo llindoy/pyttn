@@ -20,9 +20,12 @@
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 
+#include "pyttn_typedef.hpp"
+
 #include "utils/orthopol.hpp"
 #include "utils/discretisation.hpp"
 
+#include "linalg/backend.hpp"
 #include "linalg/tensor.hpp"
 #include "linalg/sparseMatrix.hpp"
 
@@ -74,23 +77,23 @@ PYBIND11_MODULE(ttnpp, m)
     //
     //Wrap the required linear algebra types to enable python based instantiation of operators.
     //
-    initialise_tensors<real_type>(m_linalg);
-    initialise_sparse_matrices<real_type, linalg::blas_backend>(m_linalg);
+    initialise_tensors<pyttn_real_type>(m_linalg);
+    initialise_sparse_matrices<pyttn_real_type>(m_linalg);
     initialise_blas_backend(m_linalg);
 
     //
     //Wrap the required utils functions
     //
-    initialise_orthopol(m_orthopol);
-    initialise_discretisation(m_orthopol);
+    initialise_orthopol<pyttn_real_type>(m_orthopol);
+    initialise_discretisation<pyttn_real_type>(m_orthopol);
     
     //
     //Wrap the sOP functionality
     //
-    initialise_sSOP(m);
+    initialise_sSOP<pyttn_real_type>(m);
     initialise_system_info(m);
-    initialise_SOP(m);
-    initialise_operator_dictionary<linalg::blas_backend>(m);
+    initialise_SOP<pyttn_real_type>(m);
+    initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
     initialise_liouville_space<linalg::blas_backend>(m);
 
     //

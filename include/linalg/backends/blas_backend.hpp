@@ -510,13 +510,13 @@ public:
 
 public:
     template <typename T>
-    static inline void csrmm(transform_type opres, transform_type opA, transform_type opB, size_type m, size_type n, T alpha, const T* A, const int* rowptr, const int* colind, const T* B, size_type ldb, T beta, T* C, size_type ldc)
+    static inline void csrmm(bool opres, transform_type opA, transform_type opB, size_type m, size_type n, size_type /*k*/, T alpha, const T* A, const int* rowptr, const int* colind, const T* B, size_type ldb, T beta, T* C, size_type ldc)
     {   
         csrmm_kernel_selector<5, 5>(opres, opA, opB, m, n, alpha, A, rowptr, colind, B, ldb, beta, C, ldc, [](const T& a){return a;}, [](const T& a){return a;});
     }
 
     template <typename T>
-    static inline void csrmm(transform_type opres, transform_type opA, transform_type opB, size_type m, size_type n, complex<T> alpha, const complex<T>* A, const int* rowptr, const int* colind, const complex<T>* B, size_type ldb, complex<T> beta, complex<T>* C, size_type ldc)
+    static inline void csrmm(bool opres, transform_type opA, transform_type opB, size_type m, size_type n, size_type /*k*/, complex<T> alpha, const complex<T>* A, const int* rowptr, const int* colind, const complex<T>* B, size_type ldb, complex<T> beta, complex<T>* C, size_type ldc)
     {   
         csrmm_kernel_selector<4, 4>(opres, opA, opB, m, n, alpha, A, rowptr, colind, B, ldb, beta, C, ldc, [](const complex<T>& a){return conj(a);}, [](const complex<T>& a){return a;});
     }

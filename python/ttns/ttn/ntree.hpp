@@ -166,7 +166,7 @@ void init_ntree_node(py::module &m)
                 static_cast<void (node_type::*)(size_t)>(&node_type::remove)
             );
 
-};
+}
 
 template <typename T>
 void init_ntree(py::module &m)

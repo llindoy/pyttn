@@ -29,7 +29,7 @@
 #include "utils/orthopol.hpp"
 #include "utils/discretisation.hpp"
 
-//#include "ttns/sop/operator_dictionary.hpp"
+#include "ttns/sop/operator_dictionary.hpp"
 #include "ttns/sop/sSOP.hpp"
 #include "ttns/sop/system_information.hpp"
 #include "ttns/sop/SOP.hpp"
@@ -122,6 +122,14 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_sSOP<pyttn_real_type>(m);
     initialise_system_info(m);
     initialise_SOP<pyttn_real_type>(m);
+    initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
+
+    #ifdef PYTTN_BUILD_CUDA
+    //the GPU implementations
+    initialise_operator_dictionary<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+
+#endif
+
 }
 
 

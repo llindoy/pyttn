@@ -39,6 +39,20 @@ public:
     static inline cudaDataType_t type_enum(){return CUDA_C_64F;}
 };
 
+
+template <typename T> class cusparse_index;
+
+template <> class cusparse_index<int32_t>
+{
+public:
+    static inline cusparseIndexType_t type_enum(){return CUSPARSE_INDEX_32I;}
+};
+
+template <> class cusparse_index<int64_t>
+{
+public:
+    static inline cusparseIndexType_t type_enum(){return CUSPARSE_INDEX_64I;}
+};
 }
 
 #endif

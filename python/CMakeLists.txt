@@ -48,7 +48,7 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
     set(PYTHON_BINDINGS_SRC pyttn.cpp 
           linalg/tensor.cpp linalg/sparseMatrix.cpp linalg/backend.cpp
           utils/orthopol.cpp utils/discretisation.cpp
-          ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp #ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
+          ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp #ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
           )
     set_source_files_properties(${PYTHON_BINDINGS_SRC} PROPERTIES LANGUAGE CUDA)
     if(COMPILER_SET)

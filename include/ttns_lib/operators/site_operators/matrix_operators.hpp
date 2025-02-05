@@ -145,16 +145,46 @@ public:
 #endif
 };
 
-//A class for wrapping the multiplication by a sparse matrix.  This stores the matrix in csr form to make it easy to perform all of the required operations.
-template <typename T, typename backend = linalg::blas_backend>
-class sparse_matrix_operator;
 
-//blas specialisation of the sparse matrix operator.
-template <typename T> 
-class sparse_matrix_operator<T, linalg::blas_backend> : public primitive<T, linalg::blas_backend>
+template <typename T, typename backend>
+class csr_matrix_rank_3_op;
+
+template <typename T>
+class csr_matrix_rank_3_op<T, linalg::blas_backend>
 {
 public:
-    using backend = linalg::blas_backend;
+    template <typename At1, typename At2>
+    static inline void apply(const linalg::csr_matrix<T, linalg::blas_backend>& m_operator, const At1& A, At2& HA)
+    {
+        for(size_t i = 0; i < A.shape(0); ++i)
+        {
+            CALL_AND_HANDLE(HA[i] = m_operator*A[i], "Failed to apply sparse matrix operator.");
+        }
+    }
+};
+
+#ifdef PYTTN_BUILD_CUDA
+template <typename T>
+class csr_matrix_rank_3_op<T, linalg::cuda_backend>
+{
+public:
+    template <typename At1, typename At2>
+    static inline void apply(const linalg::csr_matrix<T, linalg::cuda_backend>& m_operator, const At1& A, At2& HA)
+    {
+        CALL_AND_HANDLE
+        (
+            linalg::cuda_backend::async_for(0, A.shape(0), [&A, &HA, &m_operator](size_t i){CALL_AND_HANDLE(HA[i] = m_operator*A[i], "Failed to apply sparse matrix operator.");}),
+            "Error when applying rank 3 applicative."
+        );
+    }
+};
+#endif
+
+//A class for wrapping the multiplication by a sparse matrix.  This stores the matrix in csr form to make it easy to perform all of the required operations.
+template <typename T, typename backend = linalg::blas_backend> 
+class sparse_matrix_operator : public primitive<T, backend>
+{
+public:
     using base_type = primitive<T, backend>;
 
     //use the parent class type aliases
@@ -230,11 +260,9 @@ protected:
     template <typename At1, typename At2>
     void apply_rank_3(const At1& A, At2& HA)
     {
+        using applicative = csr_matrix_rank_3_op<T, backend>;
         ASSERT(this->size() == A.shape(1), "Failed to apply rank 3 contraction.");
-        for(size_t i = 0; i < A.shape(0); ++i)
-        {
-            CALL_AND_HANDLE(HA[i] = m_operator*A[i], "Failed to apply sparse matrix operator.");
-        }
+        CALL_AND_HANDLE(applicative::apply(m_operator, A, HA), "Failed to apply rank 3 contraction.");
     }
 
 public:
@@ -287,6 +315,8 @@ public:
 #endif
 };
 
+
+/*
 #ifdef PYTTN_BUILD_CUDA
 
 template <typename T> 
@@ -388,7 +418,7 @@ public:
 
     bool is_resizable() const final{return false;}
 
-    void resize(size_type /*n*/){ASSERT(false, "This shouldn't be called.");}
+    void resize(size_type ){ASSERT(false, "This shouldn't be called.");}
 
     std::shared_ptr<base_type> clone() const{return std::make_shared<sparse_matrix_operator>(m_operator);}
     std::shared_ptr<base_type> transpose() const {RAISE_EXCEPTION("Transpose of cuda sparse matrices currently not supported.");}
@@ -396,20 +426,20 @@ public:
     const linalg::csr_matrix<T, backend>& mat()const{return m_operator;}
 
     void apply(const resview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
-    void apply(const resview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
+    void apply(const resview& A, resview& HA, real_type , real_type ) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}  
     void apply(const matview& A, resview& HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));} 
-    void apply(const matview& A, resview& HA, real_type /* t */, real_type /* dt */) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const matview& A, resview& HA, real_type, real_type ) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
   
     void apply(const_matrix_ref A, matrix_ref HA) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
-    void apply(const_matrix_ref A, matrix_ref HA, real_type /*t*/, real_type /*dt*/) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
+    void apply(const_matrix_ref A, matrix_ref HA, real_type , real_type ) final{CALL_AND_RETHROW(apply_rank_2(A, HA));}
     void apply(const_vector_ref A, vector_ref HA) final{RAISE_EXCEPTION("Sparse matrix vector product is not implemented for CUDA.");}
-    void apply(const_vector_ref A, vector_ref HA, real_type /*t*/, real_type /*dt*/) final{RAISE_EXCEPTION("Sparse matrix vector product is not implemented for CUDA.");}
+    void apply(const_vector_ref A, vector_ref HA, real_type , real_type) final{RAISE_EXCEPTION("Sparse matrix vector product is not implemented for CUDA.");}
 
     //functions for applying the operator to rank 3 tensor views
     void apply(const restensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
-    void apply(const restensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final  {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const restensview& A, restensview& HA, real_type , real_type) final  {CALL_AND_RETHROW(apply_rank_3(A, HA));}
     void apply(const tensview& A, restensview& HA) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
-    void apply(const tensview& A, restensview& HA, real_type /* t */, real_type /* dt */) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
+    void apply(const tensview& A, restensview& HA, real_type, real_type ) final {CALL_AND_RETHROW(apply_rank_3(A, HA));}
 
 protected:
     template <typename At1, typename At2>
@@ -418,7 +448,7 @@ protected:
         RAISE_EXCEPTION("CSR TENSOR MULTIPLICATION NOT SUPPORTED FOR CUDA MATRICES.");
     }
     template <typename Atype, typename Rtype>
-    void apply_rank_2(const Atype& a, Rtype& HA)
+    void apply_rank_2(const Atype& A, Rtype& HA)
     {
         ASSERT
         (
@@ -446,7 +476,7 @@ protected:
             m_temp_init = true;
         }
 
-        CALL_AND_HANDLE(HA = trans(A), "Evaluate the transpose of A so we can compute the csr matrix product");
+        CALL_AND_HANDLE(HA = linalg::trans(A), "Evaluate the transpose of A so we can compute the csr matrix product");
         //now we set up the matrix description for the input A matrix
         cusparseDnMatDescr_t Ad;
         CALL_AND_HANDLE(create_dense_descriptor(Ad, HA), "Failed to create new cusparse dense descriptor.");
@@ -573,7 +603,7 @@ public:
 #endif
 };
 #endif
-
+*/
 
 template <typename T, typename backend = linalg::blas_backend> 
 class diagonal_matrix_operator : public primitive<T, backend>

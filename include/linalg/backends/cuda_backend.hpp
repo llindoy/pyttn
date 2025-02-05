@@ -135,9 +135,9 @@ public:
     {
         try
         {
-            int nDevices;
+            int_type nDevices;
             cudaGetDeviceCount(&nDevices);
-            for (int i = 0; i < nDevices; i++) 
+            for (int_type i = 0; i < nDevices; i++) 
             {
                 cudaDeviceProp prop;
                 cudaGetDeviceProperties(&prop, i);
@@ -149,7 +149,7 @@ public:
         catch(const std::exception& ex)
         {
             std::cerr << ex.what() << std::endl;
-            RAISE_EXCEPTION("Failed to print cuda_backend device properties.");
+            RAISE_EXCEPTION("Failed to print_type cuda_backend device properties.");
         }
     }
 
@@ -197,7 +197,7 @@ public:
     }
 
     template <typename T> 
-    static inline typename std::enable_if<is_valid_value_type<T>::value, void>::type vector_scalar_product(int N, T A, const T* X, int INCX, T* Y, int INCY)
+    static inline typename std::enable_if<is_valid_value_type<T>::value, void>::type vector_scalar_product(int_type N, T A, const T* X, int_type INCX, T* Y, int_type INCY)
     {
         ASSERT(environment().is_initialised(), "cuda backend vector_scalar_product call failed.  The cuda environment has not yet been initialised.");
         size_type nthreads = environment().maximum_dimensions_threads_per_block()[0];
@@ -207,7 +207,7 @@ public:
     }
 
     template <typename T> 
-    static inline typename std::enable_if<is_valid_value_type<T>::value, T>::type trace(int N, const T* X, int INCX)
+    static inline typename std::enable_if<is_valid_value_type<T>::value, T>::type trace(int_type N, const T* X, int_type INCX)
     {
         ASSERT(environment().is_initialised(), "cuda backend vector_scalar_product call failed.  The cuda environment has not yet been initialised.");
         size_type nthreads = environment().maximum_dimensions_threads_per_block()[0];
@@ -218,7 +218,7 @@ public:
 
     //valid blas routines
     template <typename T>
-    static inline typename std::enable_if<is_valid_value_type<T>::value, void>::type axpy(int N, T A, const T* X, int INCX, T* Y, int INCY)
+    static inline typename std::enable_if<is_valid_value_type<T>::value, void>::type axpy(int_type N, T A, const T* X, int_type INCX, T* Y, int_type INCY)
     {
         ASSERT(environment().is_initialised(), "cuda backend axpy call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(set_cublas_stream(), "axpy call Failed.");
@@ -226,7 +226,7 @@ public:
     }
 
     template <typename T>
-    static inline typename std::enable_if<is_valid_value_type<T>::value, void>::type scal(int N, T A, T* X, int INCX)
+    static inline typename std::enable_if<is_valid_value_type<T>::value, void>::type scal(int_type N, T A, T* X, int_type INCX)
     {
         ASSERT(environment().is_initialised(), "cuda backend Scal call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(set_cublas_stream(), "scal call Failed.");
@@ -234,7 +234,7 @@ public:
     }
 
     template <typename T>
-    static inline typename std::enable_if<is_valid_value_type<T>::value, T>::type dot(bool conj, int N, const T* X, int INCX, const T* Y, int INCY)
+    static inline typename std::enable_if<is_valid_value_type<T>::value, T>::type dot(bool conj, int_type N, const T* X, int_type INCX, const T* Y, int_type INCY)
     {
         ASSERT(environment().is_initialised(), "cuda backend dot call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(set_cublas_stream(), "dot call Failed.");
@@ -243,7 +243,7 @@ public:
 
     template <typename T> 
     static inline typename std::enable_if<is_valid_value_type<T>::value, void>::type
-    gemm(transform_type TRANSA, transform_type TRANSB, int M, int N, int K, T ALPHA, const T* A, int LDA, const T* B, int LDB, T BETA, T* C, int LDC)
+    gemm(transform_type TRANSA, transform_type TRANSB, int_type M, int_type N, int_type K, T ALPHA, const T* A, int_type LDA, const T* B, int_type LDB, T BETA, T* C, int_type LDC)
     {
         ASSERT(environment().is_initialised(), "cuda backend gemm call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(set_cublas_stream(), "gemm call Failed.");
@@ -253,7 +253,7 @@ public:
 
     template <typename T> 
     static inline typename std::enable_if<is_valid_value_type<T>::value, void>::type
-    gemv(transform_type trans, int m, int n, T alpha, const T* A, int lda, const T* x, int incx, T beta, T* y, int incy)
+    gemv(transform_type trans, int_type m, int_type n, T alpha, const T* A, int_type lda, const T* x, int_type incx, T beta, T* y, int_type incy)
     {
         ASSERT(environment().is_initialised(), "cuda backend gemv call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(set_cublas_stream(), "gemv call Failed.");
@@ -264,7 +264,7 @@ public:
     //batched_gemm
     template <typename T> 
     static inline typename std::enable_if<is_valid_value_type<T>::value, void>::type
-    batched_gemm(transform_type opA, transform_type opB, int m, int n, int k, T alpha, const T* A, int lda, long long int strideA, const T* B, int ldb, long long int strideB, T beta, T* C, int ldc, long long int strideC, int batchCount)
+    batched_gemm(transform_type opA, transform_type opB, int_type m, int_type n, int_type k, T alpha, const T* A, int_type lda, long long int strideA, const T* B, int_type ldb, long long int strideB, T beta, T* C, int_type ldc, long long int strideC, int_type batchCount)
     {   
         ASSERT(environment().is_initialised(), "cuda backend batched_gemm call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(set_cublas_stream(), "batched_gemm call Failed.");
@@ -273,9 +273,9 @@ public:
 
     //outer contraction of rank 3 tensors
     template <typename T> 
-    static inline void outer_contract(transform_type opA, transform_type opB, int m, int n, int k, T alpha, const T* A, 
-                                int lda, long long int strideA, const T* B, int ldb, long long int strideB, T beta, T* C, int ldc, 
-                                long long int strideC, int batchCount, T* res)
+    static inline void outer_contract(transform_type opA, transform_type opB, int_type m, int_type n, int_type k, T alpha, const T* A, 
+                                int_type lda, long long int strideA, const T* B, int_type ldb, long long int strideB, T beta, T* C, int_type ldc, 
+                                long long int strideC, int_type batchCount, T* res)
     {   
         ASSERT(environment().is_initialised(), "cuda backend outer_contract call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(set_cublas_stream(), "outer_contract call Failed.");
@@ -289,7 +289,7 @@ public:
 
         //now we set up the gemv call to contract over k.  To do this we do C_{ij} = \sum_k A_{kij} v_k where v_k = 1.  This can be 
         //performed using a gemv call.  
-        T a(1.0);   transform_type op = op_n;   int incx = 1;   int incy = 1;   int mv = m*n;   int nv = batchCount;    int ldav = mv;
+        T a(1.0);   transform_type op = op_n;   int_type incx = 1;   int_type incy = 1;   int_type mv = m*n;   int_type nv = batchCount;    int_type ldav = mv;
         CALL_AND_HANDLE(gemv(op, mv, nv, a, C, ldav, std::get<0>(_ones), incx, beta, res, incy), "Failed to compute contraction of outer indices of two rank three tensor.  Failed to compute the contraction over the first index.");
     }
 
@@ -297,7 +297,7 @@ public:
 public:
     //sparse matrix vector operations
     template <typename T1, typename T2, typename T3, typename T4, typename T5>
-    static inline void dgmv(bool conjA, bool conjB, int m, int n, T1 alpha, const T2* A, int inca, const T3* X, int incx, T4 beta, T5* Y, int incy)
+    static inline void dgmv(bool conjA, bool conjB, int_type m, int_type n, T1 alpha, const T2* A, int_type inca, const T3* X, int_type incx, T4 beta, T5* Y, int_type incy)
     {   
         ASSERT(environment().is_initialised(), "cuda backend dgmv call failed.  The cuda environment has not yet been initialised.");
         dgmv_kernel_selector(conjA, conjB, m, n, alpha, A, inca, X, incx, beta, Y, incy);
@@ -313,7 +313,7 @@ public:
 
 public:
     template <typename T1, typename T2, typename T3, typename T4, typename T5>
-    static inline void dgmv_kernel_selector(bool conjA, bool conjB, size_type m, size_type n, T1 alpha, const T2* A, int inca, const T3* X, int incx, T4 beta, T5* Y, int incy)
+    static inline void dgmv_kernel_selector(bool conjA, bool conjB, size_type m, size_type n, T1 alpha, const T2* A, int_type inca, const T3* X, int_type incx, T4 beta, T5* Y, int_type incy)
     {
         size_type nthreads = environment().maximum_dimensions_threads_per_block()[0];
         dim3 dg((m+nthreads-1)/nthreads);  dim3 db(nthreads);
@@ -448,6 +448,46 @@ public:
 
 public:
     template <typename T>
+    static inline void csrmv(transform_type opA, bool /* conjB */, int_type m, int_type /*n*/, T alpha, const T* A, const int* rowptr, const int* colind, const T* X, int_type incx, T beta, T* Y, int_type incy)
+    {
+        RAISE_EXCEPTION("CSRMV currently not supported for cuda backend.");
+        ASSERT(opA == op_c || opA == op_n, "Failed to compute csrmv.  Transposed csr matrices are currently not supported.");
+        //eblas_kernels::csrmv::eval(m, alpha, A, rowptr, colind, X, incx, beta, Y, incy, [](const T& a){return a;}, [](const T& a){return a;});
+    }
+
+    template <typename T>
+    static inline void csrmv(transform_type opA, bool conjB, int_type m, int_type /*n*/, complex<T> alpha, const complex<T>* A, const int* rowptr, const int* colind, const complex<T>* X, int_type incx, complex<T> beta, complex<T>* Y, int_type incy)
+    {
+        ASSERT(opA == op_c || opA == op_n, "Failed to compute csrmv.  Transposed csr matrices are currently not supported.");
+        RAISE_EXCEPTION("CSRMV currently not supported for cuda backend.");
+
+        /*
+        if(opA == op_c)
+        {
+            if(conjB){eblas_kernels::csrmv::eval(m, alpha, A, rowptr, colind, X, incx, beta, Y, incy, [](const complex<T>& a){return conj(a);}, [](const complex<T>& a){return conj(a);});}
+            else{eblas_kernels::csrmv::eval(m, alpha, A, rowptr, colind, X, incx, beta, Y, incy, [](const complex<T>& a){return conj(a);}, [](const complex<T>& a){return a;});}            
+        }
+        else
+        {
+            if(conjB){eblas_kernels::csrmv::eval(m, alpha, A, rowptr, colind, X, incx, beta, Y, incy, [](const complex<T>& a){return a;}, [](const complex<T>& a){return conj(a);});}
+            else{eblas_kernels::csrmv::eval(m, alpha, A, rowptr, colind, X, incx, beta, Y, incy, [](const complex<T>& a){return a;}, [](const complex<T>& a){return a;});}
+        }*/
+    }
+
+public:
+    template <typename T>
+    static inline void csrmm(bool opres, transform_type opA, transform_type opB, size_type m, size_type n, size_type k, T alpha, const T* A, const int* rowptr, const int* colind, const T* B, size_type ldb, T beta, T* C, size_type ldc)
+    {   
+        ASSERT(!opres, "cuda backend does not support csrmm with transposed results.");
+
+        auto _opA = cusparse::convert_operation(opA);
+        auto _opB = cusparse::convert_operation(opB);
+
+        CALL_AND_HANDLE(cusparse::spmm(environment().cusparse_handle(), _opA, _opB, m, n, k, alpha, A, rowptr, colind, B, ldb, beta, C, ldc), "Failed to compute csr matrix - matrix multiplication.");
+    }
+
+public:
+    template <typename T>
     static inline void complex_conjugate(size_type /*size*/, const T* const /*X*/, T* const /*Y*/){}
 
     template <typename T>
@@ -521,7 +561,7 @@ public:
     }
 public: 
     template <typename T>
-    static inline void transpose(bool conj, int m, int n, const T& alpha, const T* in, const T& beta, T* out)
+    static inline void transpose(bool conj, int_type m, int_type n, const T& alpha, const T* in, const T& beta, T* out)
     {
         ASSERT(environment().is_initialised(), "cuda backend transpose call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(set_cublas_stream(), "transpose call Failed.");
@@ -778,14 +818,14 @@ public:
 
 public:
     template <typename T> 
-    static void heev(cusolverEigMode_t jobz, cublasFillMode_t uplo, int n, T* A, int lda, typename get_real_type<T>::type* W, T* work, int lwork, int* devinfo)
+    static void heev(cusolverEigMode_t jobz, cublasFillMode_t uplo, int_type n, T* A, int_type lda, typename get_real_type<T>::type* W, T* work, int_type lwork, int* devinfo)
     {
         ASSERT(environment().is_initialised(), "cuda backend heev call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(cusolver::heev(environment().cusolver_dn_handle(), jobz, uplo, n, A, lda, W, work, lwork, devinfo), "cuda backend heev call failed.  Error when calling heev.");
     }
 
     template <typename T> 
-    static void heev_buffersize(cusolverEigMode_t jobz, cublasFillMode_t uplo, int n, T* A, int lda, typename get_real_type<T>::type* W, int* lwork)
+    static void heev_buffersize(cusolverEigMode_t jobz, cublasFillMode_t uplo, int_type n, T* A, int_type lda, typename get_real_type<T>::type* W, int* lwork)
     {
         ASSERT(environment().is_initialised(), "cuda backend heev call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(cusolver::heev_buffersize(environment().cusolver_dn_handle(), jobz, uplo, n, A, lda, W, lwork), "cuda backend heev_buffersize call failed.  Error when calling determining the workspace buffer size.");
@@ -793,14 +833,14 @@ public:
 
 public:
     template <typename T>
-    static void getrf(int m, int n, T* A, int lda, T* work, int* ipiv, int* devinfo)
+    static void getrf(int_type m, int_type n, T* A, int_type lda, T* work, int* ipiv, int* devinfo)
     {
         ASSERT(environment().is_initialised(), "cuda backend getrf call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(cusolver::getrf(environment().cusolver_dn_handle(), m, n, A, lda, work, ipiv, devinfo), "cuda backend getrf call failed.  Error when calling getrf.");
     }
 
     template <typename T>
-    static void getrf_buffersize(int m, int n, T* A, int lda, int* lwork)
+    static void getrf_buffersize(int_type m, int_type n, T* A, int_type lda, int* lwork)
     {
         ASSERT(environment().is_initialised(), "cuda backend getrf call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(cusolver::getrf_buffersize(environment().cusolver_dn_handle(), m, n, A, lda, lwork), "cuda backend getrf_buffersize call failed.  Error when determining the workspace buffer size.");
@@ -808,28 +848,28 @@ public:
 
 public:
     template <typename T> 
-    static void gesvd(const char jobu, const char jobv, const int m, const int n, T* A, const int lda, typename get_real_type<T>::type* S, T* U, const int ldu, T* VT, const int ldvt, T* work, const int lwork, typename get_real_type<T>::type* rwork, int* devinfo)
+    static void gesvd(const char jobu, const char jobv, const int_type m, const int_type n, T* A, const int_type lda, typename get_real_type<T>::type* S, T* U, const int_type ldu, T* VT, const int_type ldvt, T* work, const int_type lwork, typename get_real_type<T>::type* rwork, int* devinfo)
     {
         ASSERT(environment().is_initialised(), "cuda backend heev call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(cusolver::gesvd(environment().cusolver_dn_handle(), jobu, jobv, m, n, A, lda, S, U, ldu, VT, ldvt, work, lwork, rwork, devinfo), "cuda backend gesvd call failed.  Error when calling gesvd.");
     }
 
     template <typename T> 
-    static void gesvd_buffersize(int m, int n, int& lwork)
+    static void gesvd_buffersize(int_type m, int_type n, int& lwork)
     {
         ASSERT(environment().is_initialised(), "cuda backend heev call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(cusolver::gesvd_params<T>::buffersize(environment().cusolver_dn_handle(), m, n, lwork), "cuda backend gesvd_buffersize call failed.  Error when calling determining the workspace buffer size.");
     }
 
     template <typename T> 
-    static void gesvdj_buffersize(cusolverEigMode_t jobz, const int econ, const int m, const int n, T* A, const int lda, typename get_real_type<T>::type* S, T* U, const int ldu, T* VT, const int ldvt, int& lwork, gesvdjInfo_t params)
+    static void gesvdj_buffersize(cusolverEigMode_t jobz, const int_type econ, const int_type m, const int_type n, T* A, const int_type lda, typename get_real_type<T>::type* S, T* U, const int_type ldu, T* VT, const int_type ldvt, int& lwork, gesvdjInfo_t params)
     {
         ASSERT(environment().is_initialised(), "cuda backend heev call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(cusolver::gesvdj_buffersize(environment().cusolver_dn_handle(), jobz, econ, m, n, A, lda, S, U, ldu, VT, ldvt, lwork, params), "cuda backend gesvd_buffersize call failed.  Error when calling determining the workspace buffer size.");
     }
 
     template <typename T> 
-    static void gesvdj(cusolverEigMode_t jobz, const int econ, const int m, const int n, T* A, const int lda, typename get_real_type<T>::type* S, T* U, const int ldu, T* VT, const int ldvt, T* work, const int lwork, int* devinfo, gesvdjInfo_t params)
+    static void gesvdj(cusolverEigMode_t jobz, const int_type econ, const int_type m, const int_type n, T* A, const int_type lda, typename get_real_type<T>::type* S, T* U, const int_type ldu, T* VT, const int_type ldvt, T* work, const int_type lwork, int* devinfo, gesvdjInfo_t params)
     {
         ASSERT(environment().is_initialised(), "cuda backend heev call failed.  The cuda environment has not yet been initialised.");
         CALL_AND_HANDLE(cusolver::gesvdj(environment().cusolver_dn_handle(), jobz, econ, m, n, A, lda, S, U, ldu, VT, ldvt, work, lwork, devinfo, params), "cuda backend gesvd call failed.  Error when calling gesvd.");
