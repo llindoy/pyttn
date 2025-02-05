@@ -5,6 +5,7 @@
 
 #include "cuda_utils.hpp"
 
+#include <cublas_v2.h>
 #include <cusparse_v2.h>
 #include <cuda_runtime.h>
 
@@ -52,7 +53,7 @@ using size_type = std::size_t;
 using index_type = int32_t;
 static inline void cuda_safe_call(cudaError_t err){if(err != cudaSuccess){RAISE_EXCEPTION_STR(cudaGetErrorName(err));}}
 
-cusparseOperation_t convert_operation(cublasOperation_t op)
+inline cusparseOperation_t convert_operation(cublasOperation_t op)
 {
     if(op == CUBLAS_OP_N){return CUSPARSE_OPERATION_NON_TRANSPOSE;}
     else if(op == CUBLAS_OP_T){return CUSPARSE_OPERATION_TRANSPOSE;}
