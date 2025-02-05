@@ -1,7 +1,7 @@
 #ifndef LINALG_CUDA_UTILS_HPP
 #define LINALG_CUDA_UTILS_HPP
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 #include <cusparse_v2.h>
 #include <cuComplex.h>
 #include <cuda_runtime.h>

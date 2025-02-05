@@ -14,7 +14,7 @@
 #include <tuple>
 #include <utility>
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 #include <thrust/equal.h>
 
 namespace linalg

@@ -122,7 +122,7 @@ public:
     }
 };  //matrix_matrix_product
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename sparse_type, typename dense_type>
 class matrix_matrix_product<sparse_type, dense_type, 
             typename std::enable_if<is_dense_matrix<dense_type>::value && 

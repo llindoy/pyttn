@@ -36,7 +36,7 @@ void init_tensor_cpu(py::module &m, const std::string& label)
             }
         ))
         .def(py::init<const ttype&>())
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
         .def(py::init<const tensor<T, D, linalg::cuda_backend>&>())
 #endif
         .def_buffer([](ttype& mi) -> py::buffer_info 
@@ -78,7 +78,7 @@ template <typename real_type> void initialise_tensors(py::module& m)
     init_tensor_cpu<complex_type, 4>(m, "tensor_4_complex");     
 }
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 
 template <typename T, size_t D>
 void init_tensor_gpu(py::module &m, const std::string& label)

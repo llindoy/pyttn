@@ -87,7 +87,7 @@ public:
 };  //diagonal_matrix<T, blas_backend>
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename T> 
 class diagonal_matrix<T, cuda_backend> : public diagonal_matrix_base<diagonal_matrix<T, cuda_backend> >
 {
@@ -123,6 +123,16 @@ std::ostream& operator<<(std::ostream& out, const diagonal_matrix<T, blas_backen
     for(size_type i=0; i<mat.nnz(); ++i){out << i << " " << i << " " << mat.m_vals[i] << std::endl;}
     return out;
 }
+
+#ifdef PYTTN_BUILD_CUDA
+template <typename T>
+std::ostream& operator<<(std::ostream& out, const diagonal_matrix<T, cuda_backend>& _mat)
+{
+    diagonal_matrix<T, blas_backend> mat (_mat);
+    out << mat;
+    return out;
+}
+#endif
 
 }   //namespace linalg
 

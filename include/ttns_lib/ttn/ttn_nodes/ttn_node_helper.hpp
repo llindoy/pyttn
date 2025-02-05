@@ -131,7 +131,7 @@ public:
     }
 };
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename T>
 class orthogonal_vector<T, linalg::cuda_backend>
 {

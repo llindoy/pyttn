@@ -159,7 +159,7 @@ protected:
 }   //namespace linalg
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 #include <thrust/reduce.h>
 #include <thrust/functional.h>
 #include <thrust/device_ptr.h>
@@ -207,7 +207,7 @@ public:
     {
         ASSERT(m.shape(0) == m.shape(1), "Failed to compute linear_solver.  The input matrix is not square.");
         ASSERT(B.shape(0) == m.shape(0), "Failed to compute linear_solver.  The input vector is not compatible with the input matrix.");
-        CALL_AND_HANDLE(cuda_backend::getrs(cuda_backend::op_t, m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+        CALL_AND_HANDLE(cuda_backend::getrf(cuda_backend::op_t, m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
         m_cpu_info = m_gpu_info;
         ASSERT(m_cpu_info[0] == 0, "Invalid return code from getrs.");
     }
@@ -220,7 +220,7 @@ public:
         CALL_AND_HANDLE(resize(m.shape(0), true), "Failed to compute linear_solver.  Failed to resize the temporary buffers.");
         CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
         CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
-        CALL_AND_HANDLE(cuda_backend::getrs(cuda_backend::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+        CALL_AND_HANDLE(cuda_backend::getrf(cuda_backend::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
     }
 
     template <typename mat_type, typename vec_type>
@@ -234,13 +234,13 @@ public:
             CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
             CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
 
-            CALL_AND_HANDLE(cuda_backend::getrs(cuda_backend::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+            CALL_AND_HANDLE(cuda_backend::getrf(cuda_backend::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
         }
         else
         {
             CALL_AND_HANDLE(m_lu(m, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
             //now we compute the linear_solver from the LU decomposition
-            CALL_AND_HANDLE(cuda_backend::getrs(cuda_backend::op_t, m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+            CALL_AND_HANDLE(cuda_backend::getrf(cuda_backend::op_t, m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
         }
     }
 
@@ -254,7 +254,7 @@ public:
         CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
         CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
         X = B;
-        CALL_AND_HANDLE(cuda_backend::getrs(cuda_backend::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), X.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+        CALL_AND_HANDLE(cuda_backend::getrf(cuda_backend::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), X.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
     }
 
 
@@ -270,14 +270,14 @@ public:
             CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
             CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
             X = B;
-            CALL_AND_HANDLE(cuda_backend::getrs(cuda_backend::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), X.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+            CALL_AND_HANDLE(cuda_backend::getrf(cuda_backend::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), X.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
         }
         else
         {
             CALL_AND_HANDLE(m_lu(m, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
             //now we compute the linear_solver from the LU decomposition
             X = B;
-            CALL_AND_HANDLE(cuda_backend::getrs(cuda_backend::op_t, m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), X.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+            CALL_AND_HANDLE(cuda_backend::getrf(cuda_backend::op_t, m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), X.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
         }
     }
 

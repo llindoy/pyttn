@@ -63,7 +63,7 @@ struct hermitian_eigensolver_helper<complex<T>, blas_backend>
 
 };
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename T>
 struct hermitian_eigensolver_helper<T, cuda_backend>
 {

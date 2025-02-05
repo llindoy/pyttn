@@ -287,7 +287,7 @@ public:
 #endif
 };
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 
 template <typename T> 
 class sparse_matrix_operator<T, linalg::cuda_backend> : public primitive<T, linalg::cuda_backend>

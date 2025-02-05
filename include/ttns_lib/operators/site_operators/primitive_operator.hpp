@@ -212,7 +212,7 @@ public:
 
 
 #ifdef CEREAL_LIBRARY_FOUND
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 #define SERIALIZE_CUDA_TYPES 
 #endif
 TTNS_REGISTER_SERIALIZATION(ttns::ops::identity, ttns::ops::primitive)

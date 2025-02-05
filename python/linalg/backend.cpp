@@ -1,15 +1,38 @@
-#include "cuda_backend.hpp"
+#include "backend.hpp"
 
 #include <linalg/linalg.hpp>
 #include <sstream>
 
+
+void initialise_blas_backend(py::module& m)
+{
+    using namespace linalg;
+
+    using size_type = blas_backend::size_type;
+
+    //expose the ttn node class.  This is our core tensor network object.
+    py::class_<blas_backend>(m, "backend")
+        .def_static("initialise", [](size_type nthreads, bool batch_par){blas_backend::initialise(nthreads, batch_par);}, py::arg("nthreads")=1, py::arg("batch_par")=false, R"mydelim(
+            Initialise blas backend passing user defined arguments
+
+            :param nthreads: The number of threads to use for linear algebra operations (Default: 1)
+            :type nthreads: int, optional
+            :param batch_par: Whether or not to parallelise batched gemm operationrs (Default: false)
+            :type bath_par: bool, optional
+            )mydelim")
+        .def_static("destroy", &blas_backend::destroy, R"mydelim(
+            Clear the blas_backend object.   Free any resources allocated.
+            )mydelim");
+}
+
+#ifdef PYTTN_BUILD_CUDA
 void initialise_cuda_backend(py::module& m)
 {
     using namespace linalg;
 
     using size_type = cuda_backend::size_type;
 
-    py::class_<cuda_environment>(m, "cuda_environment")
+    py::class_<cuda_environment>(m, "environment")
         .def(py::init(), "Default construct an empty cuda environment.")
         .def(py::init<int, int>(), R"mydelim(
             Construct a cuda environment specifying the device id and number of streams
@@ -56,7 +79,7 @@ void initialise_cuda_backend(py::module& m)
             )mydelim");
 
     //expose the ttn node class.  This is our core tensor network object.
-    py::class_<cuda_backend>(m, "cuda_backend")
+    py::class_<cuda_backend>(m, "backend")
         .def_static("environment", &cuda_backend::environment, py::return_value_policy::reference, R"mydelim(
             Access the cuda environment parameters bound to the backend object.
             )mydelim")
@@ -82,4 +105,4 @@ void initialise_cuda_backend(py::module& m)
             :rtype: str
             )mydelim");
 }
-
+#endif

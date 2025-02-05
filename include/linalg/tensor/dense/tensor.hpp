@@ -751,7 +751,7 @@ public:
     inline const_reference at(size_type i) const{ASSERT(internal::compare_bounds(i, m_totsize), "Failed to access element. Index out of bounds.");  return m_buffer[i]; }
 };
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 ///////////////////////////////////////////////////////////////////////////////////////
 // D dimensional implementation of the general tensor object for use with the cuda   //
 //                                     backend                                       //
@@ -820,7 +820,7 @@ public:
     __host__ __device__ const_pointer data()const{return m_buffer;}
 };
 
-#endif  //__NVCC__
+#endif  //PYTTN_BUILD_CUDA
 
 }   //namespace linalg
 
@@ -828,16 +828,6 @@ public:
 
 namespace linalg
 {
-
-#ifdef __NVCC__
-template <typename array_type, typename = typename std::enable_if<is_dense_tensor<array_type>::value && std::is_same<cuda_backend, typename traits<array_type>::backend_type>::value, void>::type> 
-std::ostream& operator<<(std::ostream& os, const array_type& t)
-{
-    os << "shape: ["; for(size_t i=0; i < t.rank; ++i){os << t.shape(i) << (i+1 == t.rank ? "]": ", ");}
-    os << "cuda buffer" << std::endl;
-    return os;
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //            ostream operators for the D dimensional blas tensor objects            //
@@ -950,6 +940,19 @@ typename std::enable_if<(traits<array_type>::rank > 3) && is_complex<typename tr
     os << std::endl << "data : ["; for(size_t i=0; i<t.size(); ++i){os << t(i).real() << (t(i).imag() < 0.0 ? "-" : "+") << abs(t(i).imag()) << "i" << (i+1 == t.size() ? "]": ", ");}
     return os;
 }
+
+#ifdef PYTTN_BUILD_CUDA
+template <typename array_type, typename = typename std::enable_if<is_dense_tensor<array_type>::value && std::is_same<cuda_backend, typename traits<array_type>::backend_type>::value, void>::type> 
+std::ostream& operator<<(std::ostream& os, const array_type& t)
+{
+    tensor<typename array_type::value_type, traits<array_type>::rank, blas_backend> _t(t);
+    os << _t;
+    return os;
+    //os << "shape: ["; for(size_t i=0; i < t.rank; ++i){os << t.shape(i) << (i+1 == t.rank ? "]": ", ");}
+    //os << "cuda buffer" << std::endl;
+    //return os;
+}
+#endif
 
 }
 

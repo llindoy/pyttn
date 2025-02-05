@@ -145,7 +145,7 @@ public:
 
 }
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename backend> class other_backend;
 template <> class other_backend<linalg::blas_backend>
 {

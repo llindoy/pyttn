@@ -17,7 +17,7 @@ target_include_directories(ttns_lib INTERFACE
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 
 #compiler flags
-option(USE_CUDA "Compile with cuda" OFF)
+option(PYTTN_BUILD_CUDA "Compile with cuda" OFF)
 option(USE_OPENMP "Compile with openmp" OFF)
 option(USE_GEMM3M "Compile with openmp" OFF)
 option(BUILD_TESTS "Build Tests" OFF)

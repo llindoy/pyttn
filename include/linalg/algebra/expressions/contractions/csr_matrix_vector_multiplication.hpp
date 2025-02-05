@@ -88,7 +88,7 @@ public:
     }
 };  //matrix_vector_product
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 //cuda csr matrix dense vector product
 template <typename sparse_type, typename dense_type>
 class matrix_vector_product<sparse_type, dense_type, 

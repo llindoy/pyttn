@@ -76,6 +76,7 @@ PYBIND11_MODULE(ttnpp, m)
     //
     initialise_tensors<real_type>(m_linalg);
     initialise_sparse_matrices<real_type, linalg::blas_backend>(m_linalg);
+    initialise_blas_backend(m_linalg);
 
     //
     //Wrap the required utils functions
@@ -112,7 +113,6 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_site_operators<linalg::blas_backend>(m_ops);
     initialise_product_operator<linalg::blas_backend>(m);
     initialise_sop_operator<linalg::blas_backend>(m);
-
 
     //
     //Wrap the core algorithms for operating on ttns

@@ -13,6 +13,10 @@
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 
+void initialise_blas_backend(py::module& m);
+
+#ifdef PYTTN_BUILD_CUDA
 void initialise_cuda_backend(py::module& m);
+#endif
 
 #endif //PYTHON_BINDING_LINALG_CUDA_BACKEND_HPP

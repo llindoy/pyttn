@@ -95,7 +95,7 @@ public:
 };  //class filler<blas_backend>
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename T>
 class allocator<T, cuda_backend>
 {

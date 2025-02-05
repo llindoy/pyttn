@@ -39,19 +39,24 @@ check_language(CUDA)
 
 #attempt to set up cuda if the user has requested it and cuda is installed
 if(USE_CUDA AND CMAKE_CUDA_COMPILER)
+    add_definitions(-DPYTTN_BUILD_CUDA)
     enable_language(CUDA)
     find_package(CUDAToolkit REQUIRED)
+    find_package(Thrust REQUIRED)
+    thrust_create_target(Thrust)
 
-    set(PYTHON_BINDINGS_SRC pythonBinding.cu 
-          linalg/tensor.cu linalg/sparseMatrix.cu linalg/cuda_backend.cu
+    set(PYTHON_BINDINGS_SRC pyttn.cpp 
+          linalg/tensor.cpp linalg/sparseMatrix.cpp linalg/backend.cpp
+          utils/orthopol.cpp utils/discretisation.cpp
+          ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp #ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
           )
-
+    set_source_files_properties(${PYTHON_BINDINGS_SRC} PROPERTIES LANGUAGE CUDA)
     if(COMPILER_SET)
     else()
-        set(CMAKE_CUDA_FLAGS "-Xptxas -O3 -g --extended-lambda ${CMAKE_CUDA_FLAGS}")
+        set(CMAKE_CUDA_FLAGS " -x cu -Xptxas -O3 -g --extended-lambda ${CMAKE_CUDA_FLAGS}")
 
         if(USE_OPENMP)
-            set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -fopenmp")
+            set(CMAKE_CUDA_FLAGS "-x cu ${CMAKE_CUDA_FLAGS} -fopenmp")
         endif()
 
         if(NOT DEFINED CMAKE_CUDA_STANDARD)
@@ -64,7 +69,7 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
 else()
     set(PYTHON_BINDINGS_SRC pythonBinding.cpp 
           utils/orthopol.cpp utils/discretisation.cpp
-          linalg/sparseMatrix.cpp linalg/tensor.cpp 
+          linalg/sparseMatrix.cpp linalg/tensor.cpp linalg/backend.cpp
           ttns/observables/matrix_element.cpp 
           ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp
           ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
@@ -146,14 +151,23 @@ else()
     endif()
 endif()
 
-set(CMAKE_BUILD_PARALLEL_LEVEL 4)
+set(CMAKE_BUILD_PARALLEL_LEVEL 8)
 set(PYBIND11_ROOT_DIR ${CMAKE_SOURCE_DIR}/external/Pybind11)
+
 include(FetchContent)
-FetchContent_Declare(
-    pybind11
-    GIT_REPOSITORY "https://github.com/pybind/pybind11.git"
-    SOURCE_DIR ${PYBIND11_ROOT_DIR}
-)
+if(NOT EXISTS ${PYBIND11_ROOT_DIR})
+    FetchContent_Declare(
+        pybind11
+        GIT_REPOSITORY "https://github.com/pybind/pybind11.git"
+        SOURCE_DIR ${PYBIND11_ROOT_DIR}
+    )
+
+else()
+    message(STATUS "${PYBIND11_ROOT_DIR}")
+    FetchContent_Declare(
+        pybind11 SOURCE_DIR ${PYBIND11_ROOT_DIR}
+    )
+endif()
 
 FetchContent_GetProperties(pybind11)
 if(NOT pybind11_POPULATED)
@@ -161,15 +175,15 @@ if(NOT pybind11_POPULATED)
     add_subdirectory(${pybind11_SOURCE_DIR} ${pybind11_BINARY_DIR})
 endif()
 add_definitions(-DPYBIND11)
+
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-message(STATUS "CUDA FLAGS: ${CMAKE_CUDA_FLAGS}")
 
 message(STATUS "${PYTHON_BINDINGS_SRC}")
 pybind11_add_module(ttnpp ${PYTHON_BINDINGS_SRC})
 target_include_directories(ttnpp PUBLIC ${TTNS_INCLUDE_DIRECTORIES})
 
 if(USE_CUDA AND CMAKE_CUDA_COMPILER)
-    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver) 
+    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver Thrust) 
     set_target_properties(ttnpp PROPERTIES CUDA_ARCHITECTURES "86")
 else()
     target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 

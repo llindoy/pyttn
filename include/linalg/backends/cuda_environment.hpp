@@ -2,7 +2,7 @@
 #define LINALG_BACKENDS_CUDA_ENVIRONMENT_HPP
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 #include <vector>
 #include <tuple>
 #include <utility>

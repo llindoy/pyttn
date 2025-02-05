@@ -63,7 +63,7 @@ void init_operator_dictionary(py::module &m, const std::string& label)
         });
 }
 
-template <typename backend>
+template <typename real_type, typename backend>
 void initialise_operator_dictionary(py::module& m)
 {
     using real_type = double;
