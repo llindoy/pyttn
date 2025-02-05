@@ -16,12 +16,10 @@
 
 namespace py=pybind11;
 
-template <typename backend>
+template <typename real_type, typename backend>
 void initialise_liouville_space(py::module& m)
 {
     using namespace ttns;
-
-    using real_type = double;
     using complex_type = linalg::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN

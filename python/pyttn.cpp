@@ -33,10 +33,13 @@
 #include "ttns/sop/sSOP.hpp"
 #include "ttns/sop/system_information.hpp"
 #include "ttns/sop/SOP.hpp"
-//#include "ttns/sop/liouville_space.hpp"
+#include "ttns/sop/liouville_space.hpp"
+
+#include "ttns/sop/models/models.hpp"
+
+#include "ttns/ttn/ntree.hpp"
 
 /*
-#include "ttns/ttn/ntree.hpp"
 #include "ttns/ttn/ttn.hpp"
 #include "ttns/ttn/ms_ttn.hpp"
 #include "ttns/operators/siteOperators.hpp"
@@ -44,10 +47,6 @@
 #include "ttns/operators/product_operator.hpp"
 
 #include "ttns/observables/matrix_element.hpp"
-
-
-
-#include "ttns/sop/models/models.hpp"
 
 #include "ttns/algorithms/dmrg.hpp"
 #include "ttns/algorithms/tdvp.hpp"
@@ -123,12 +122,25 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_system_info(m);
     initialise_SOP<pyttn_real_type>(m);
     initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_liouville_space<pyttn_real_type, linalg::blas_backend>(m);
 
-    #ifdef PYTTN_BUILD_CUDA
+    //
+    //Wrap the models functionality included in SOP
+    //
+    initialise_models<pyttn_real_type>(m_models);
+
+#ifdef PYTTN_BUILD_CUDA
     //the GPU implementations
     initialise_operator_dictionary<pyttn_real_type, linalg::cuda_backend>(m_cuda);
-
+    initialise_liouville_space<pyttn_real_type, linalg::cuda_backend>(m_cuda);
 #endif
+
+    //
+    //Wrap core ttns functionality
+    //
+    initialise_ntree(m);
+    //initialise_ttn<linalg::blas_backend>(m);
+    //initialise_msttn<linalg::blas_backend>(m);
 
 }
 

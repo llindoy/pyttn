@@ -90,6 +90,24 @@ template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::
 template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type arg(const T& /* t */){return T(0.0);}
 template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value &&  is_complex<T>::value, typename get_real_type<T>::type>::type arg(const T& t){return thrust::arg(t);}
 template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, complex<T>>::type polar(const T& r, const T& theta){return thrust::polar(r, theta);}
+
+
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type exp(const T& t){return std::exp(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && is_complex<T>::value, T>::type exp(const T& t){return thrust::exp(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type cosh(const T& t){return std::cosh(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && is_complex<T>::value, T>::type cosh(const T& t){return thrust::cosh(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type sinh(const T& t){return std::sinh(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && is_complex<T>::value, T>::type sinh(const T& t){return thrust::sinh(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type tanh(const T& t){return std::tanh(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && is_complex<T>::value, T>::type tanh(const T& t){return thrust::tanh(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type cos(const T& t){return std::cos(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && is_complex<T>::value, T>::type cos(const T& t){return thrust::cos(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type sin(const T& t){return std::sin(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && is_complex<T>::value, T>::type sin(const T& t){return thrust::sin(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type tan(const T& t){return std::tan(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && is_complex<T>::value, T>::type tan(const T& t){return thrust::tan(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type sqrt(const T& t){return std::sqrt(t);}
+template <typename T> __host__ __device__ typename std::enable_if<is_number<T>::value && is_complex<T>::value, T>::type sqrt(const T& t){return thrust::sqrt(t);}
 #else
 template <typename T> typename get_real_type<T>::type abs(const T& t){return std::abs(t);}
 template <typename T> typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type conj(const T& t){return t;}
@@ -103,6 +121,15 @@ template <typename T> typename std::enable_if<is_number<T>::value &&  is_complex
 template <typename T> typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type arg(const T& /* t */){return T(0.0);}
 template <typename T> typename std::enable_if<is_number<T>::value &&  is_complex<T>::value, typename get_real_type<T>::type>::type arg(const T& t){return std::arg(t);}
 template <typename T> typename std::enable_if<is_number<T>::value && !is_complex<T>::value, complex<T>>::type polar(const T& r, const T& theta){return std::polar(r, theta);}
+template <typename T> T exp(const T& t){return std::exp(t);}
+template <typename T> T cosh(const T& t){return std::cosh(t);}
+template <typename T> T sinh(const T& t){return std::sinh(t);}
+template <typename T> T tanh(const T& t){return std::tanh(t);}
+template <typename T> T cos(const T& t){return std::cos(t);}
+template <typename T> T sin(const T& t){return std::sin(t);}
+template <typename T> T tan(const T& t){return std::tan(t);}
+template <typename T> T sqrt(const T& t){return std::sqrt(t);}
+
 #endif
 
 
