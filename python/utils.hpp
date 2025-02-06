@@ -17,22 +17,11 @@ namespace linalg
 {
 
 template <typename T>
-class numpy_converter;
-
-template <>
-class numpy_converter<float>
+class numpy_converter
 {
-public:
-    using type = float;
+    public:
+    using type = T;
 };
-
-template <>
-class numpy_converter<double>
-{
-public:
-    using type = double;
-};
-
 
 template <>
 class numpy_converter<complex<float>>
@@ -47,6 +36,35 @@ class numpy_converter<complex<double>>
 public:
     using type = std::complex<double>;
 };
+
+template <typename T> 
+void pybuffer_to_vector(const py::buffer& b, std::vector<T>& res)
+{
+    using _T = typename numpy_converter<T>::type;
+    using real_type = typename get_real_type<T>::type;
+
+
+    py::buffer_info info = b.request();
+    if(info.format == py::format_descriptor<_T>::format())
+    {
+        T* ptr = static_cast<T*>(info.ptr);
+        res = std::vector<T>(ptr, ptr+info.size);
+    }
+    else if(info.format == py::format_descriptor<real_type>::format())
+    {
+        res.resize(info.size);
+        real_type* ptr = static_cast<real_type*>(info.ptr);
+
+        for(size_t i = 0; i < info.size; ++i)
+        {
+            res[i] = ptr[i];
+        }
+    }
+    else
+    {
+        RAISE_EXCEPTION("Failed to convert pybuffer to vector.")
+    }
+}
 
 
 template <typename backend>

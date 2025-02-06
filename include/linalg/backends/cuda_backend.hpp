@@ -448,42 +448,34 @@ public:
 
 public:
     template <typename T>
-    static inline void csrmv(transform_type opA, bool /* conjB */, int_type m, int_type /*n*/, T alpha, const T* A, const int* rowptr, const int* colind, const T* X, int_type incx, T beta, T* Y, int_type incy)
+    static inline void csrmv(transform_type opA, bool /*conjB*/, int_type m, int_type n, size_type nnz, T alpha, const T* A, const int* rowptr, const int* colind, const T* X, int_type incx, T beta, T* Y, int_type incy)
     {
-        RAISE_EXCEPTION("CSRMV currently not supported for cuda backend.");
-        ASSERT(opA == op_c || opA == op_n, "Failed to compute csrmv.  Transposed csr matrices are currently not supported.");
-        //eblas_kernels::csrmv::eval(m, alpha, A, rowptr, colind, X, incx, beta, Y, incy, [](const T& a){return a;}, [](const T& a){return a;});
+        ASSERT(incx == 1 && incy == 1, "Failed to compute csrmv.  cuda spmv only supports contiguous vectors.");
+        auto _opA = cusparse::convert_operation(opA);
+
+        CALL_AND_HANDLE(cusparse::spmv(environment().cusparse_handle(), _opA, m, n, nnz, alpha, A, rowptr, colind, X, beta, Y), "Failed to compute csr matrix - matrix multiplication.");
     }
 
     template <typename T>
-    static inline void csrmv(transform_type opA, bool conjB, int_type m, int_type /*n*/, complex<T> alpha, const complex<T>* A, const int* rowptr, const int* colind, const complex<T>* X, int_type incx, complex<T> beta, complex<T>* Y, int_type incy)
+    static inline void csrmv(transform_type opA, bool conjB, int_type m, int_type n, size_type nnz, complex<T> alpha, const complex<T>* A, const int* rowptr, const int* colind, const complex<T>* X, int_type incx, complex<T> beta, complex<T>* Y, int_type incy)
     {
-        ASSERT(opA == op_c || opA == op_n, "Failed to compute csrmv.  Transposed csr matrices are currently not supported.");
-        RAISE_EXCEPTION("CSRMV currently not supported for cuda backend.");
+        ASSERT(!conjB, "Failed to compute csrmv.  cuda spmv does not support conjugated vectors.");
+        ASSERT(incx == 1 && incy == 1, "Failed to compute csrmv.  cuda spmv only supports contiguous vectors.");
+        auto _opA = cusparse::convert_operation(opA);
 
-        /*
-        if(opA == op_c)
-        {
-            if(conjB){eblas_kernels::csrmv::eval(m, alpha, A, rowptr, colind, X, incx, beta, Y, incy, [](const complex<T>& a){return conj(a);}, [](const complex<T>& a){return conj(a);});}
-            else{eblas_kernels::csrmv::eval(m, alpha, A, rowptr, colind, X, incx, beta, Y, incy, [](const complex<T>& a){return conj(a);}, [](const complex<T>& a){return a;});}            
-        }
-        else
-        {
-            if(conjB){eblas_kernels::csrmv::eval(m, alpha, A, rowptr, colind, X, incx, beta, Y, incy, [](const complex<T>& a){return a;}, [](const complex<T>& a){return conj(a);});}
-            else{eblas_kernels::csrmv::eval(m, alpha, A, rowptr, colind, X, incx, beta, Y, incy, [](const complex<T>& a){return a;}, [](const complex<T>& a){return a;});}
-        }*/
+        CALL_AND_HANDLE(cusparse::spmv(environment().cusparse_handle(), _opA, m, n, nnz, alpha, A, rowptr, colind, X, beta, Y), "Failed to compute csr matrix - matrix multiplication.");
     }
 
 public:
     template <typename T>
-    static inline void csrmm(bool opres, transform_type opA, transform_type opB, size_type m, size_type n, size_type k, T alpha, const T* A, const int* rowptr, const int* colind, const T* B, size_type ldb, T beta, T* C, size_type ldc)
+    static inline void csrmm(bool opres, transform_type opA, transform_type opB, size_type m, size_type n, size_type k, size_type nnz, T alpha, const T* A, const int* rowptr, const int* colind, const T* B, size_type ldb, T beta, T* C, size_type ldc)
     {   
         ASSERT(!opres, "cuda backend does not support csrmm with transposed results.");
 
         auto _opA = cusparse::convert_operation(opA);
         auto _opB = cusparse::convert_operation(opB);
 
-        CALL_AND_HANDLE(cusparse::spmm(environment().cusparse_handle(), _opA, _opB, m, n, k, alpha, A, rowptr, colind, B, ldb, beta, C, ldc), "Failed to compute csr matrix - matrix multiplication.");
+        CALL_AND_HANDLE(cusparse::spmm(environment().cusparse_handle(), _opA, _opB, m, n, k, nnz, alpha, A, rowptr, colind, B, ldb, beta, C, ldc), "Failed to compute csr matrix - matrix multiplication.");
     }
 
 public:

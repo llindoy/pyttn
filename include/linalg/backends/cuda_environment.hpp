@@ -15,8 +15,6 @@
 #include "cusparse_wrapper.hpp"
 //#include "cutensor_wrapper.hpp"
 
-static inline void cuda_safe_call(cudaError_t err){if(err != cudaSuccess){RAISE_EXCEPTION_STR(cudaGetErrorName(err));}}
-
 inline std::ostream& operator<<(std::ostream& out, const cudaDeviceProp& prop)
 {
     out << "\tDevice Name: " << prop.name << std::endl;

@@ -43,7 +43,6 @@ public:
         for(size_type i = 0; i < m_order.size(); ++i)
         {
             ASSERT(order[i] < irank, "Failed to compute tensor transpose, index out of bounds.");
-            ASSERT(order[i] >= 0, "Failed to compute tensor transpose, negative index identified.");
             m_order[i] = order[i];
             this->m_shape[i] = m_arr.shape(m_order[i]);
         }

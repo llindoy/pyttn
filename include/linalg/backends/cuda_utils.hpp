@@ -6,6 +6,8 @@
 #include <cuComplex.h>
 #include <cuda_runtime.h>
 
+static inline void cuda_safe_call(cudaError_t err){if(err != cudaSuccess){RAISE_EXCEPTION_STR(cudaGetErrorName(err));}}
+
 namespace linalg
 {
 template <typename T> class cuda_type;

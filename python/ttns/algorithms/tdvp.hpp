@@ -32,51 +32,100 @@ void init_tdvp_core(py::module& m, const std::string& label)
     py::class_<tdvp>(m, label.c_str())
         .def(py::init<>())
         .def(py::init<const _ttn&, const _sop&, size_type, size_type, size_type>(),
-                  py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("nstep")=1, py::arg("num_threads")=1)
+                  py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("nstep")=1, py::arg("num_threads")=1, R"mydelim(
+            Construct a new one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.
+
+            :Parameters:    - **A** (:class:`ttn_complex`) - The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+                            - **H** (:class:`sop_operator_complex`) - The Hamiltonian sop operator object
+                            - **krylov_dim** (int, optional) - The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+                            - **nstep** (int, optional): The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)
+                            - **num_threads** (int, optional) - The number of openmp threads to be used by the solver. (Default: 1)
+          )mydelim")
         .def("assign", [](tdvp& self, const tdvp& o){self=o;})
         .def("__copy__",[](const tdvp& o){return tdvp(o);})
         .def("__deepcopy__", [](const tdvp& o, py::dict){return tdvp(o);}, py::arg("memo"))
-        .def("initialise", &tdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("nstep")=1, py::arg("num_threads")=1)
+        .def("initialise", &tdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim")=16, py::arg("nstep")=1, py::arg("num_threads")=1, R"mydelim(
+            Initialise one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.
+
+            :Parameters:    - **A** (:class:`ttn_complex`) - The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+                            - **H** (:class:`sop_operator_complex`) - The Hamiltonian sop operator object
+                            - **krylov_dim** (int, optional) - The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+                            - **nstep** (int, optional): The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)
+                            - **num_threads** (int, optional) - The number of openmp threads to be used by the solver. (Default: 1)
+          )mydelim")
         .def_property
             (
                 "coefficient", 
                 static_cast<const T& (tdvp::*)() const>(&tdvp::coefficient),
-                [](tdvp& o, const T& i){o.coefficient() = i;}
+                [](tdvp& o, const T& i){o.coefficient() = i;},
+                "A coefficient used to scale the timestep."
             )
         .def_property
             (
                 "t", 
                 static_cast<const real_type& (tdvp::*)() const>(&tdvp::t),
-                [](tdvp& o, const real_type& i){o.t() = i;}
+                [](tdvp& o, const real_type& i){o.t() = i;},
+                "The current time point reached by the integrator."
             )
         .def_property
             (
                 "dt", 
                 static_cast<const real_type& (tdvp::*)() const>(&tdvp::dt),
-                [](tdvp& o, const real_type& i){o.dt() = i;}
+                [](tdvp& o, const real_type& i){o.dt() = i;},
+                "The timestep used for integration of the dynamics."
             )
         .def_property
             (
                 "expmv_tol", 
                 static_cast<const real_type& (tdvp::*)() const>(&tdvp::expmv_tol),
-                [](tdvp& o, const real_type& i){o.expmv_tol() = i;}
+                [](tdvp& o, const real_type& i){o.expmv_tol() = i;},
+                "The tolerance used for the krylov subspace matrix exponential"
             )
         .def_property
             (
                 "krylov_steps", 
                 static_cast<const size_type& (tdvp::*)() const>(&tdvp::krylov_steps),
-                [](tdvp& o, const size_type& i){o.krylov_steps() = i;}
+                [](tdvp& o, const size_type& i){o.krylov_steps() = i;},
+                "The number of internal substeps used by the krylov subspace integrator for each real step."
             )
         .def_property
             (
                 "use_time_dependent_hamiltonian",
                 static_cast<const bool& (tdvp::*)() const>(&tdvp::use_time_dependent_hamiltonian),
-                [](tdvp& o, const bool& i){o.use_time_dependent_hamiltonian() = i;}
+                [](tdvp& o, const bool& i){o.use_time_dependent_hamiltonian() = i;},
+                "Whether or not to update the time variable of the Hamiltonian object throughout integration."
             )
-        .def("clear", &tdvp::clear)
-        .def("step", &tdvp::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
-        .def("__call__", &tdvp::operator(), py::arg(), py::arg(), py::arg("update_env") = false)
-        .def("prepare_environment", &tdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false);
+        .def("clear", &tdvp::clear, "Clear all internal buffers of the TDVP object.")
+        .def("step", &tdvp::operator(), py::arg(), py::arg(), py::arg("update_env") = false, R"mydelim(
+            Performs a single step of the single site TDVP algorithm
+
+            :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+            :type update_env: bool, optional
+          )mydelim")
+        .def("__call__", &tdvp::operator(), py::arg(), py::arg(), py::arg("update_env") = false, R"mydelim(
+            Performs a single step of the single site TDVP algorithm
+
+            :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+            :type update_env: bool, optional
+          )mydelim")
+        .def("prepare_environment", &tdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false, R"mydelim(
+            Update all Single Particle Function environment tensors to prepare the system for performing a TDVP sweep. 
+
+            :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param attempt_expansion: Whether or not to attempt subspace expansion throughout the update scheme.  (Default: False)
+            :type attempt_expansion: bool, optional
+          )mydelim");
 
 }
 

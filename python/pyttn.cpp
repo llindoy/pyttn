@@ -25,7 +25,9 @@
 #include "linalg/tensor.hpp"
 #include "linalg/sparseMatrix.hpp"
 #include "linalg/backend.hpp"
+#include "linalg/orthogonal_vector_gen.hpp"
 
+/*
 #include "utils/orthopol.hpp"
 #include "utils/discretisation.hpp"
 
@@ -38,9 +40,8 @@
 #include "ttns/sop/models/models.hpp"
 
 #include "ttns/ttn/ntree.hpp"
-
-/*
 #include "ttns/ttn/ttn.hpp"
+
 #include "ttns/ttn/ms_ttn.hpp"
 #include "ttns/operators/siteOperators.hpp"
 #include "ttns/operators/sop_operator.hpp"
@@ -96,6 +97,7 @@ PYBIND11_MODULE(ttnpp, m)
     //The CPU implementations
     initialise_tensors<pyttn_real_type>(m_linalg);
     initialise_sparse_matrices<pyttn_real_type>(m_linalg);
+    //initialise_orthogonal_vector<pyttn_real_type, linalg::blas_backend>(m_linalg);
 
     //initialise the blas backend objects
     initialise_blas_backend(m_linalg);
@@ -104,6 +106,7 @@ PYBIND11_MODULE(ttnpp, m)
     //the GPU implementations
     initialise_tensors_cuda<pyttn_real_type>(m_linalg_gpu);
     initialise_sparse_matrices_cuda<pyttn_real_type>(m_linalg_gpu);
+    //initialise_orthogonal_vector<pyttn_real_type, linalg::cuda_backend>(m_linalg_gpu);
 
     //initialise the cuda environment objects
     initialise_cuda_backend(m_linalg_gpu);
@@ -112,36 +115,39 @@ PYBIND11_MODULE(ttnpp, m)
     //
     //Wrap the required utils functions
     //
-    initialise_orthopol<pyttn_real_type>(m_orthopol);
-    initialise_discretisation<pyttn_real_type>(m_orthopol);
+    //initialise_orthopol<pyttn_real_type>(m_orthopol);
+    //initialise_discretisation<pyttn_real_type>(m_orthopol);
 
     //
     //Wrap the sOP functionality
     //
-    initialise_sSOP<pyttn_real_type>(m);
-    initialise_system_info(m);
-    initialise_SOP<pyttn_real_type>(m);
-    initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
-    initialise_liouville_space<pyttn_real_type, linalg::blas_backend>(m);
+    //initialise_sSOP<pyttn_real_type>(m);
+    //initialise_system_info(m);
+    //initialise_SOP<pyttn_real_type>(m);
+    //initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
+    //initialise_liouville_space<pyttn_real_type, linalg::blas_backend>(m);
 
     //
     //Wrap the models functionality included in SOP
     //
-    initialise_models<pyttn_real_type>(m_models);
+    //initialise_models<pyttn_real_type>(m_models);
 
 #ifdef PYTTN_BUILD_CUDA
     //the GPU implementations
-    initialise_operator_dictionary<pyttn_real_type, linalg::cuda_backend>(m_cuda);
-    initialise_liouville_space<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    //initialise_operator_dictionary<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    //initialise_liouville_space<pyttn_real_type, linalg::cuda_backend>(m_cuda);
 #endif
 
     //
     //Wrap core ttns functionality
     //
-    initialise_ntree(m);
-    //initialise_ttn<linalg::blas_backend>(m);
+    //initialise_ntree(m);
+    //initialise_ttn<pyttn_real_type, linalg::blas_backend>(m);
     //initialise_msttn<linalg::blas_backend>(m);
 
+#ifdef PYTTN_BUILD_CUDA
+    //initialise_ttn<pyttn_real_type, linalg::cuda_backend>(m);
+#endif
 }
 
 

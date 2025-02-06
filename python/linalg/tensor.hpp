@@ -26,7 +26,7 @@ void init_tensor_cpu(py::module &m, const std::string& label)
     using _T = typename numpy_converter<T>::type;
 
     using conv = pybuffer_converter<backend>;
-    //expose the ttn node class.  This is our core tensor network object.
+
     py::class_<ttype>(m, (label).c_str(), py::buffer_protocol())
         .def(py::init([](py::buffer &b)
             {
@@ -34,10 +34,27 @@ void init_tensor_cpu(py::module &m, const std::string& label)
                 CALL_AND_RETHROW(conv::copy_to_tensor(b, tens));
                 return tens;
             }
-        ))
-        .def(py::init<const ttype&>())
+        ),          
+            R"mydelim(
+            Construct a linear algebra tensor object from a python buffer object.  This is the internal type used for linear
+            algebra operations by the pyTTN package.
+
+            :Parameters:    - **in** (:class:`np.ndarray`) - The Input numpy array buffer
+            )mydelim"
+        )
+        .def(py::init<const ttype&>(),          
+            R"mydelim(
+            Construct an empty linear algebra tensor object.  This is the internal type used for linear
+            algebra operations by the pyTTN package.
+            )mydelim")
 #ifdef PYTTN_BUILD_CUDA
-        .def(py::init<const tensor<T, D, linalg::cuda_backend>&>())
+        .def(py::init<const tensor<T, D, linalg::cuda_backend>&>(),          
+            R"mydelim(
+            Construct a linear algebra tensor object from a cuda linear algebra object.  This is the internal type used for linear
+            algebra operations by the pyTTN package.
+
+            :Parameters:    - **in** - The Input cuda linear algebra type
+            )mydelim")
 #endif
         .def_buffer([](ttype& mi) -> py::buffer_info 
                     {
@@ -97,9 +114,28 @@ void init_tensor_gpu(py::module &m, const std::string& label)
                 CALL_AND_RETHROW(conv::copy_to_tensor(b, tens));
                 return tens;
             }
-        ))
-        .def(py::init<const ttype&>())
-        .def(py::init<const tensor<T, D, linalg::blas_backend>&>())
+        ),          
+            R"mydelim(
+            Construct a cuda linear algebra tensor object from a python buffer object.  This is the internal type used for 
+            cuda accelerated linear algebra operations by the pyTTN package.
+
+            :Parameters:    - **in** (:class:`np.ndarray`) - The Input numpy array buffer
+            )mydelim"
+        )
+        .def(py::init<const ttype&>(),          
+            R"mydelim(
+            Construct an empty cuda linear algebra tensor object.  This is the internal type used for 
+            cuda accelerated linear algebra operations by the pyTTN package.
+            )mydelim"
+        )
+        .def(py::init<const tensor<T, D, linalg::blas_backend>&>(),
+            R"mydelim(
+            Construct a cuda linear algebra tensor object from a linear algebra tensor object.  This is the internal type used for 
+            cuda accelerated linear algebra operations by the pyTTN package.
+
+            :Parameters:    - **in**  - The input linear algebra tensor object
+            )mydelim"
+        )
         .def("complex_dtype", [](const ttype&){return !std::is_same<T, real_type>::value;})
         .def("__str__", [](const ttype& o){std::stringstream oss;   oss << o; return oss.str();});
         //.def("clear", &ttype::clear);

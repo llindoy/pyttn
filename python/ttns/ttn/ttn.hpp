@@ -300,7 +300,7 @@ void init_ttn(py::module &m, const std::string& label)
                         Uop[i] = U[i];
                     }
                     std::vector<size_t> state;
-                    real_type p = o.collapse_basis(U, state, truncate, tol, nchi); 
+                    real_type p = o.collapse_basis(Uop, state, truncate, tol, nchi); 
                     return std::make_pair(p, state);
                 }, 
                 py::arg(), py::arg("truncate")=true, py::arg("tol") = real_type(0), py::arg("nchi") = 0
@@ -444,10 +444,9 @@ void init_ttn(py::module &m, const std::string& label)
 
 }
 
-template <typename backend>
+template <typename real_type, typename backend>
 void initialise_ttn(py::module& m)
 {
-    using real_type = double;
     using complex_type = linalg::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN

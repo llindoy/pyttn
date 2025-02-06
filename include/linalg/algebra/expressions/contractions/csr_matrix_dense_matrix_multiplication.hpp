@@ -104,7 +104,7 @@ public:
 
             if(m_opA == backend_type::op_n || m_opA == backend_type::op_c)
             {
-                CALL_AND_HANDLE(backend_type::csrmm(m_transpose_result, m_opA, m_opB, m_n, m_k, m_m, coeff, m_Abuffer, m_rowptr, m_colind, m_Bbuffer, m_ldB, beta, res.buffer(), ldc), "csrmm call failed.");
+                CALL_AND_HANDLE(backend_type::csrmm(m_transpose_result, m_opA, m_opB, m_n, m_m, m_k, m_Asize, coeff, m_Abuffer, m_rowptr, m_colind, m_Bbuffer, m_ldB, beta, res.buffer(), ldc), "csrmm call failed.");
             }
             else
             {

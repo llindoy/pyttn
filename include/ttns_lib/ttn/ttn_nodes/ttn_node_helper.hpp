@@ -136,10 +136,19 @@ template <typename T>
 class orthogonal_vector<T, linalg::cuda_backend>
 {
 public:
-    template <typename r3type, typename vec2_type>
-    inline void append(const r3type& atens, vec2_type&& x)
+    using real_type = typename linalg::get_real_type<T>::type;
+    using size_type = typename linalg::blas_backend::size_type;
+public:
+    template <typename mattype>
+    static void pad_random_vectors(mattype&& ct, size_type iskip, std::mt19937& rng)
     {
-        RAISE_EXCEPTION("Generating orthogonal trial vector current not supported for cuda backend.");
+        RAISE_EXCEPTION("Pad random vectors not implemented");
+    }
+
+    template <typename mattype, typename rettype>
+    static void generate_random_vector(mattype&& ct, rettype&& x, std::mt19937& rng)
+    {
+        RAISE_EXCEPTION("Generate random vectors not implemented");
     }
 };
 #endif

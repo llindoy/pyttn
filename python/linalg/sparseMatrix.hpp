@@ -34,8 +34,33 @@ void init_csr_matrix(py::module &m, const std::string& label)
         .def(py::init<csr_matrix<T, obackend>>())
 #endif
         .def(py::init<const std::vector<T>&, const std::vector<index_type>&, const std::vector<index_type>&, size_t>(), py::arg(), py::arg(), py::arg(), py::arg("ncols")=0)
+        .def(py::init([](py::buffer &b, const py::buffer& _indices, const py::buffer& _rowptr, size_t ncols)
+            {
+                std::vector<T> tens;
+                std::vector<index_type> indices, rowptr;
+                pybuffer_to_vector(b, tens);
+                pybuffer_to_vector(_indices, indices);
+                pybuffer_to_vector(_rowptr, rowptr);
+
+                return ttype(tens, indices, rowptr, ncols);
+            }
+        ), py::arg(), py::arg(), py::arg(), py::arg("ncols")=0)
         .def(py::init<const coo_type&, size_t, size_t>(), py::arg(), py::arg("nrows")=0, py::arg("ncols")=0)
         .def("complex_dtype", [](const ttype&){return !std::is_same<T, real_type>::value;})
+        .def("__matmul__", 
+            [](const ttype& a, linalg::matrix<T, backend>& b)
+            {
+                linalg::matrix<T, backend> ret;
+                ret = a*b;
+                return ret;
+            })
+        .def("__matmul__", 
+            [](const ttype& a, linalg::vector<T, backend>& b)
+            {
+                linalg::vector<T, backend> ret;
+                ret = a*b;
+                return ret;
+            })
         .def("__str__", [](const ttype& o){std::stringstream oss;  oss << o; return oss.str();});
 }
 

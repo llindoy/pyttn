@@ -51,7 +51,7 @@ public:
             B.reallocate(A);
         }
 
-        bool include_constant_contribution = (std::abs(Op.Eshift() ) > cutoff);
+        bool include_constant_contribution = (linalg::abs(Op.Eshift() ) > cutoff);
 
         //now we iterate over every node in the tensor networks and we use the sizes of op and A to determine the sizes of B.
         for(size_type i=0; i < A.size(); ++i)

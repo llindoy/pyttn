@@ -51,7 +51,6 @@ namespace cusparse
 
 using size_type = std::size_t;
 using index_type = int32_t;
-static inline void cuda_safe_call(cudaError_t err){if(err != cudaSuccess){RAISE_EXCEPTION_STR(cudaGetErrorName(err));}}
 
 inline cusparseOperation_t convert_operation(cublasOperation_t op)
 {
@@ -62,7 +61,7 @@ inline cusparseOperation_t convert_operation(cublasOperation_t op)
 }
 
 template <typename T>
-static inline void spmm(cusparseHandle_t handle, cusparseOperation_t opA, cusparseOperation_t opB, size_type m, size_type n, size_type k, T alpha, const T* A, const index_type* rowptr, const index_type* colind, const T* B, size_type ldb, T beta, T* C, size_type ldc)
+static inline void spmm(cusparseHandle_t handle, cusparseOperation_t opA, cusparseOperation_t opB, size_type m, size_type n, size_type k, size_type nnz, T alpha, const T* A, const index_type* rowptr, const index_type* colind, const T* B, size_type ldb, T beta, T* C, size_type ldc)
 {
     cusparseConstSpMatDescr_t matA;
     cusparseConstDnMatDescr_t matB;
@@ -71,7 +70,7 @@ static inline void spmm(cusparseHandle_t handle, cusparseOperation_t opA, cuspar
     cudaDataType value_type = cuda_type<T>::type_enum();
 
     //construct the sparse matrix descriptor
-    cusparse_safe_call(cusparseCreateConstCsr(&matA, m, k, rowptr[m], static_cast<const void*>(rowptr), static_cast<const void*>(colind), static_cast<const void*>(A), offset_type, offset_type, CUSPARSE_INDEX_BASE_ZERO, value_type));
+    cusparse_safe_call(cusparseCreateConstCsr(&matA, m, k, nnz, static_cast<const void*>(rowptr), static_cast<const void*>(colind), static_cast<const void*>(A), offset_type, offset_type, CUSPARSE_INDEX_BASE_ZERO, value_type));
 
     //construct the dense matrix descriptors
     cusparse_safe_call(cusparseCreateConstDnMat(&matB, k, n, ldb, static_cast<const void*>(B), value_type, CUSPARSE_ORDER_ROW));
@@ -92,6 +91,37 @@ static inline void spmm(cusparseHandle_t handle, cusparseOperation_t opA, cuspar
     cuda_safe_call(cudaFree(buffer));
 }
 
+
+template <typename T>
+static inline void spmv(cusparseHandle_t handle, cusparseOperation_t opA, size_type m, size_type n, size_type nnz, T alpha, const T* A, const int* rowptr, const int* colind, const T* X, T beta, T* Y)
+{
+    cusparseConstSpMatDescr_t matA;
+    cusparseConstDnVecDescr_t vecX;
+    cusparseDnVecDescr_t vecY;
+    cusparseIndexType_t offset_type = cusparse_index<index_type>::type_enum();
+    cudaDataType value_type = cuda_type<T>::type_enum();
+
+    //construct the sparse matrix descriptor
+    cusparse_safe_call(cusparseCreateConstCsr(&matA, m, n, nnz, static_cast<const void*>(rowptr), static_cast<const void*>(colind), static_cast<const void*>(A), offset_type, offset_type, CUSPARSE_INDEX_BASE_ZERO, value_type));
+
+    //construct the dense matrix descriptors
+    cusparse_safe_call(cusparseCreateConstDnVec(&vecX, n, static_cast<const void*>(X), value_type));
+    cusparse_safe_call(cusparseCreateDnVec(&vecY, m, static_cast<void*>(Y), value_type));
+
+    void * buffer;
+    size_t bufferSize=0;
+
+    // allocate an external buffer if needed
+    cusparse_safe_call( cusparseSpMV_bufferSize(handle, opA, static_cast<const void*>(&alpha), matA, vecX, static_cast<const void*>(&beta), vecY, value_type, CUSPARSE_SPMV_ALG_DEFAULT, &bufferSize) );
+    cuda_safe_call( cudaMalloc(&buffer, bufferSize) );
+
+    cusparse_safe_call( cusparseSpMV(handle, opA, static_cast<const void*>(&alpha), matA, vecX, static_cast<const void*>(&beta), vecY, value_type, CUSPARSE_SPMV_ALG_DEFAULT, buffer) );
+
+    cusparse_safe_call(cusparseDestroySpMat(matA));
+    cusparse_safe_call(cusparseDestroyDnVec(vecX));
+    cusparse_safe_call(cusparseDestroyDnVec(vecY));
+    cuda_safe_call(cudaFree(buffer));
+}
 
 }   //namespace cusparse
 }   //namespace linalg

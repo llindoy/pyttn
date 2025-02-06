@@ -46,10 +46,10 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
     thrust_create_target(Thrust)
 
     set(PYTHON_BINDINGS_SRC pyttn.cpp 
-          linalg/tensor.cpp linalg/sparseMatrix.cpp linalg/backend.cpp
-          utils/orthopol.cpp utils/discretisation.cpp
-          ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
-          ttns/ttn/ntree.cpp #ttns/ttn/ttn.cpp ttns/ttn/ms_ttn.cpp
+          linalg/tensor.cpp linalg/sparseMatrix.cpp linalg/backend.cpp linalg/orthogonal_vector_gen.cpp
+          #utils/orthopol.cpp utils/discretisation.cpp
+          #ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
+          #ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp #ttns/ttn/ms_ttn.cpp
 
           )
     set_source_files_properties(${PYTHON_BINDINGS_SRC} PROPERTIES LANGUAGE CUDA)
@@ -185,7 +185,7 @@ pybind11_add_module(ttnpp ${PYTHON_BINDINGS_SRC})
 target_include_directories(ttnpp PUBLIC ${TTNS_INCLUDE_DIRECTORIES})
 
 if(USE_CUDA AND CMAKE_CUDA_COMPILER)
-    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver Thrust) 
+    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver CUDA::curand Thrust) 
     set_target_properties(ttnpp PROPERTIES CUDA_ARCHITECTURES "86")
 else()
     target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 

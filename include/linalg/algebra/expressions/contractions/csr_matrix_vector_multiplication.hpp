@@ -76,7 +76,7 @@ public:
             ttype opA = (m_opA == backend_type::op_h) ? backend_type::op_c : backend_type::op_n;
             bool conjB = (m_opX == backend_type::op_c || m_opX == backend_type::op_h);
 
-            CALL_AND_HANDLE(backend_type::csrmv(opA, conjB, m_n, m_m, coeff, m_Abuffer, m_rowptr, m_colind, m_Xbuffer, m_incX, beta, res.buffer(), incc), "Error when making call to backend::csrmv");
+            CALL_AND_HANDLE(backend_type::csrmv(opA, conjB, m_n, m_m, m_Asize, coeff, m_Abuffer, m_rowptr, m_colind, m_Xbuffer, m_incX, beta, res.buffer(), incc), "Error when making call to backend::csrmv");
         }
         catch(const std::exception& ex)
         {
