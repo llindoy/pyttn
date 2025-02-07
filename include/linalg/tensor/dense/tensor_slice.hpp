@@ -53,8 +53,8 @@ public:
      *  Value assignment operator.  This sets all elements of the tensor to a specific value.
      *  \param val The value that the tensor will be set to.
      */ 
-    template <typename U> 
-    inline typename std::enable_if<std::is_convertible<U, value_type>::value,  self_type&>::type operator=(const U& _val)
+    template <typename U, typename = typename std::enable_if<std::is_convertible<U, value_type>::value,  void>::type> 
+    inline self_type& operator=(const U& _val)
     {
         ASSERT(m_buffer != nullptr, "Unable to fill tensor object.  The buffer has not been allocated");
         CALL_AND_HANDLE(fill_impl(_val),"Failed to value assign each element of the array.  Failed to fill the buffer.");
@@ -430,7 +430,7 @@ public:
 
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <template <typename, size_t, typename> class ArrType, typename T, size_t D1, size_t D2, typename pref>
 class tensor_slice<ArrType<T, D1, cuda_backend>, pref, D2> : public tensor_slice_base<tensor_slice<ArrType<T, D1, cuda_backend>, pref, D2> >
 {
@@ -489,7 +489,7 @@ public:
     __host__ __device__ const_pointer data()const{return slice_base::m_buffer;}
 };
 
-#endif  //__NVCC__
+#endif  //PYTTN_BUILD_CUDA
 
 }   //namespace linalg
 

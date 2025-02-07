@@ -4,16 +4,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-from setuptools import Extension, setup
+from setuptools import Extension, setup, find_packages
 from setuptools.command.build_ext import build_ext
 
-# Convert distutils Windows platform specifiers to CMake -A arguments
-PLAT_TO_CMAKE = {
-    "win32": "Win32",
-    "win-amd64": "x64",
-    "win-arm32": "ARM",
-    "win-arm64": "ARM64",
-}
+__version__ = "0.0.1"
 
 
 # A CMakeExtension needs a sourcedir instead of a file list.
@@ -47,6 +41,7 @@ class CMakeBuild(build_ext):
         cmake_args = [
             f"-DBUILD_SRC=Off",
             f"-DBUILD_TESTS=Off",
+            f"-DBUILD_PYTHON_BINDINGS=ON",
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
@@ -124,19 +119,19 @@ class CMakeBuild(build_ext):
             ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
         )
 
-
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="pyttn",
-    version="0.0.1",
+    version=__version__,
     author="Lachlan Lindoy",
     author_email="lplindoy@gmail.com",
-    description="python bindings of pyttn_lib using pybind11",
+    description="python bindings of ttns_lib using pybind11",
     long_description="",
-    ext_modules=[CMakeExtension("pyttn")],
+    ext_modules=[CMakeExtension("pyttn._pyttn")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={"test": ["pytest>=6.0"]},
     python_requires=">=3.7",
+    packages = find_packages(),
 )

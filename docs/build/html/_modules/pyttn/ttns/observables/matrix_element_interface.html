@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyttn.ttns.observables.matrix_element_interface &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">API Documents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyttn.ttns.observables.matrix_element_interface</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyttn.ttns.observables.matrix_element_interface</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+
+
+
+<div class="viewcode-block" id="matrix_element_dtype">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.matrix_element_dtype">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">matrix_element_dtype</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class defining the general interface for the pybind11 wrappers generated for the matrix_element object.  These wrapper classes are</span>
+<span class="sd">    :class:`matrix_element_complex` and :class:`matrix_element_real` (with the real variant only present if the pybind11 wrapper has been built with support</span>
+<span class="sd">    for real valued TTNs.  These classes provide a set of functions for evaluating matrix elements of operators with respect to single and multiset TTNs</span>
+
+<span class="sd">    :param \*args: A variable length list of arguments. Valid options are</span>
+<span class="sd">        </span>
+<span class="sd">        - none - in this case we call the default constructor of the matrix element class to construct an empty matrix element.</span>
+<span class="sd">        - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - A TTN to define the topology and size of buffers needed to evaluate the tensor network.</span>
+<span class="sd">        - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Two TTNs with the same topology defining the size of the bra and ket respectively.</span>
+<span class="sd">        - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **H** (:class:`sop_operator_dtype` or :class:`ms_sop_operator_dtype`)- Two TTNs and a Hamiltonian operator with the same topology defining the size of the bra, ket and operator respectively.</span>
+
+<span class="sd">    :type \*args: [Arguments (variable number and type)]</span>
+<span class="sd">    :param \*\*kwargs: A dictionary containing optional input arguments.</span>
+
+<span class="sd">        - **nbuffers** (int, optional) - The number of buffers to allocate.   </span>
+<span class="sd">        - **use_capacity** (bool, optional) - Whether or not to use the capacity of the TTNs to determine the size of the buffers.</span>
+<span class="sd">    :type \*\*kwargs: dict(Arguments (variable number and type))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The ttn_dtype class is not constructable.  This class is present to provide cleaner documentation for the pybind11 classes.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="matrix_element_dtype.assign">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.matrix_element_dtype.assign">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign the value of this matrix element from another matrix element</span>
+
+<span class="sd">        :param o: The other matrix_element object</span>
+<span class="sd">        :type o: matrix_element_dtype</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="matrix_element_dtype.clear">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.matrix_element_dtype.clear">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Clear and deallocate all internal buffers of the matrix element&quot;</span>
+        <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="matrix_element_dtype.resize">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.matrix_element_dtype.resize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resize the matrix element to fit the required wavefunctions</span>
+
+<span class="sd">        :param \*args: A variable length list of arguments. Valid options are</span>
+<span class="sd">            </span>
+<span class="sd">            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - A TTN to define the topology and size of buffers needed to evaluate the tensor network.</span>
+<span class="sd">            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Two TTNs with the same topology defining the size of the bra and ket respectively.</span>
+
+<span class="sd">        :type \*args: [Arguments (variable number and type)]</span>
+<span class="sd">        :param \*\*kwargs: A dictionary containing optional input arguments.</span>
+
+<span class="sd">            - **nbuffers** (int, optional) - The number of buffers to allocate.   </span>
+<span class="sd">            - **use_capacity** (bool, optional) - Whether or not to use the capacity of the TTNs to determine the size of the buffers.</span>
+<span class="sd">        :type \*\*kwargs: dict(Arguments (variable number and type))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="matrix_element_dtype.__call__">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.matrix_element_dtype.__call__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">use_sparsity</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function for evaluating the inner product of tensor network states with matrix elements</span>
+
+<span class="sd">        :param \*args: A variable length list of arguments. See below for a list of valid arguments.</span>
+<span class="sd">        :type \*args: [Arguments (variable number and type)]</span>
+<span class="sd">        :param use_sparsity: Whether or not to exploit sparsity in the evaluation of the matrix elements. (Default: True)</span>
+<span class="sd">        :type use_sparsity: bool, optional</span>
+
+<span class="sd">        Valid options for the argument list depend on the type of quantity we are evaluating. </span>
+
+<span class="sd">        :math:`\\langle A | A \\rangle`:</span>
+<span class="sd">            </span>
+<span class="sd">            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the inner product of the ttn with itself. </span>
+
+<span class="sd">        :math:`\\langle A | O | A \\rangle`:</span>
+
+<span class="sd">            - **op** (:class:`site_operator_dtype`), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the single site operator op.</span>
+<span class="sd">            - **op** (:class:`site_operator_dtype`), **mode** (int), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the single site operator op acting on mode mode.</span>
+<span class="sd">            - **op** (list[:class:`site_operator_dtype`]), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the product of site operator op.</span>
+<span class="sd">            - **op** (list[:class:`site_operator_dtype`]), **modes** (list[int]), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the product of site operator op.  Each site operator acts on the corresponding mode stored in the modes list.</span>
+<span class="sd">            - **op** (:class:`product_operator_dtype`), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the product of site operator op.</span>
+<span class="sd">            - **op** (:class:`ms_sop_operator_dtype` or :class:`ms_sop_operator_dtype`), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the product of sum-of-product operator op.</span>
+
+<span class="sd">        :math:`\\langle A | B \\rangle`:</span>
+
+<span class="sd">            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the overlad .</span>
+
+<span class="sd">        :math:`\\langle A | O | B \\rangle`:</span>
+
+<span class="sd">            - **op** (:class:`site_operator_dtype`), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the matrix element of the single site operator op.</span>
+<span class="sd">            - **op** (:class:`site_operator_dtype`), **mode** (int), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the single site operator op acting on mode mode.</span>
+<span class="sd">            - **op** (list[:class:`site_operator_dtype`]), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the product of site operator op.</span>
+<span class="sd">            - **op** (list[:class:`site_operator_dtype`]), **modes** (list[int]), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the product of site operator op.  Each site operator acts on the corresponding mode stored in the modes list.</span>
+<span class="sd">            - **op** (:class:`product_operator_dtype`), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the product of site operator op.</span>
+<span class="sd">            - **op** (:class:`ms_sop_operator_dtype` or :class:`ms_sop_operator_dtype`), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the product of sum-of-product operator op.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+</div>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, siteop&amp; op, const _ttn&amp; A, const _ttn&amp; B){return o(op, A, B);})</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, siteop&amp; op, size_t mode, const _ttn&amp; A, const _ttn&amp; B){return o(op, mode, A, B);})</span>
+<span class="sd">        //inline T operator()(one_body_operator&lt;T, backend&gt;&amp; op, const state_type&amp; bra, const state_type&amp; ket)</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, std::vector&lt;siteop&gt;&amp; ops, const _ttn&amp; A, const _ttn&amp; B){return o(ops, A, B);})</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, std::vector&lt;siteop&gt;&amp; ops, const std::vector&lt;size_t&gt;&amp; modes, const _ttn&amp; A, const _ttn&amp; B){return o(ops, modes, A, B);})</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, prodop&amp; ops, const _ttn&amp; A, const _ttn&amp; B){return o(ops, A, B);})</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, sop_op&amp; sop, const _ttn&amp; A, const _ttn&amp; B){return o(sop, A, B);})</span>
+<span class="sd">        .def(</span>
+<span class="sd">              &quot;__call__&quot;, </span>
+<span class="sd">              [](matel&amp; o, const _msttn&amp; A, bool use_sparsity){return o(A, use_sparsity);}, </span>
+<span class="sd">              py::arg(), py::arg(&quot;use_sparsity&quot;)=true</span>
+<span class="sd">            )</span>
+<span class="sd">        .def(</span>
+<span class="sd">              &quot;__call__&quot;, </span>
+<span class="sd">              [](matel&amp; o, siteop&amp; op, size_t mode, const _msttn&amp; A, bool use_sparsity){return o(op, mode, A, use_sparsity);}, </span>
+<span class="sd">              py::arg(), py::arg(), py::arg(), py::arg(&quot;use_sparsity&quot;)=true</span>
+<span class="sd">            )</span>
+<span class="sd">        .def(</span>
+<span class="sd">              &quot;__call__&quot;, </span>
+<span class="sd">              [](matel&amp; o, std::vector&lt;siteop&gt;&amp; ops, const std::vector&lt;size_t&gt;&amp; modes, const _msttn&amp; A, bool use_sparsity){return o(ops, modes, A, use_sparsity);}, </span>
+<span class="sd">              py::arg(), py::arg(), py::arg(), py::arg(&quot;use_sparsity&quot;)=true</span>
+<span class="sd">            )</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, ms_sop_op&amp; sop, const _msttn&amp; A){return o(sop, A);})</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, const _msttn&amp; A, const _msttn&amp; B){return o(A, B);})</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, siteop&amp; op, const _msttn&amp; A){return o(op, A);})</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, siteop&amp; op, const _msttn&amp; A, const _msttn&amp; B){return o(op, A, B);})</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, siteop&amp; op, size_t mode, const _msttn&amp; A, const _msttn&amp; B){return o(op, mode, A, B);})</span>
+<span class="sd">        //inline T operator()(one_body_operator&lt;T, backend&gt;&amp; op, const state_type&amp; bra, const state_type&amp; ket)</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, std::vector&lt;siteop&gt;&amp; ops, const _msttn&amp; A, const _msttn&amp; B){return o(ops, A, B);})</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, std::vector&lt;siteop&gt;&amp; ops, const std::vector&lt;size_t&gt;&amp; modes, const _msttn&amp; A, const _msttn&amp; B){return o(ops, modes, A, B);})</span>
+<span class="sd">        .def(&quot;__call__&quot;, [](matel&amp; o, ms_sop_op&amp; sop, const _msttn&amp; A, const _msttn&amp; B){return o(sop, A, B);});</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

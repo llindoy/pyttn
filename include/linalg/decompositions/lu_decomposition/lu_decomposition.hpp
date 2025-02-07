@@ -154,7 +154,7 @@ public:
 };
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename matrix_type> 
 class lu_decomposition<matrix_type, typename std::enable_if<is_dense_matrix<matrix_type>::value && std::is_same<typename traits<matrix_type>::backend_type, cuda_backend>::value, void>::type > 
 {

@@ -33,8 +33,6 @@ public:
         {
             CALL_AND_HANDLE(res()[r].resize(p.hrank(), p.hrank()), "Failed to resize matel object.");
 
-            std::cerr << "this one" << std::endl;
-
             const auto& psi = p.as_matrix();
             CALL_AND_HANDLE(res()[r] = adjoint(psi)*psi, "Failed to apply the leaf node contraction.");
             is_identity() = false;

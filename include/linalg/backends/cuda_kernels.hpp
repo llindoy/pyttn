@@ -4,7 +4,7 @@
 //a file containing the kernels used for the linear algebra routines. 
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 namespace linalg
 {
 namespace cuda_kernels

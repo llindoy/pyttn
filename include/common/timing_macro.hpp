@@ -1,7 +1,8 @@
-#ifndef COMMON_TIMING_MACRO_HPP_
-#define COMMON_TIMING_MACRO_HPP_
+#ifndef COMMON_TIMING_MACRO_HPP
+#define COMMON_TIMING_MACRO_HPP
 
 #include <chrono>
+
 
 #ifdef TIMING
 #define INIT_TIMER auto start = std::chrono::high_resolution_clock::now();

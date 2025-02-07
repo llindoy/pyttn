@@ -17,11 +17,9 @@
 
 //important operators for acting on TTNs
 #include "operators/site_operators/matrix_operators.hpp"
-#include "operators/site_operators/direct_product_operator.hpp"
-#include "operators/site_operators/sequential_product_operator.hpp"
-#include "operators/site_operators/dvr_operator.hpp"
-//#include "operators/site_operators/sum_operator.hpp"
+#include "operators/site_operators/site_product_operator.hpp"
 #include "operators/site_operators/site_operator.hpp"
+#include "operators/product_operator.hpp"
 
 //actual integrator
 //#include "algorithms/one_site_gso_engine.hpp"

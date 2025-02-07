@@ -54,7 +54,6 @@ struct opinfo
         }
         m_indices.clear();
         m_indices.shrink_to_fit();
-
     }
 
     bool operator==(const opinfo& o) const
@@ -109,7 +108,7 @@ public:
     operator_data(){}
     operator_data(const opinfo& op) : m_opdef(op){}
     operator_data(const opinfo& op, const utils::term_indexing_array<size_t>& ind) : m_opdef(op), m_inds(ind){}
-    operator_data(const opinfo& op, const utils::term_indexing_array<size_t>& ind, const std::vector<T>& coeff) : m_opdef(op), m_inds(ind), m_accum_coeff(coeff){}
+    operator_data(const opinfo& op, const utils::term_indexing_array<size_t>& ind, const std::vector<literal::coeff<T>>& coeff) : m_opdef(op), m_inds(ind), m_accum_coeff(coeff){}
     operator_data(const operator_data& o) = default;
     operator_data(operator_data&& o) = default;
 
@@ -120,8 +119,8 @@ public:
     
     const opinfo& operator_definition() const{return m_opdef;}
     const utils::term_indexing_array<size_t>& indices() const{return m_inds;}
-    const std::vector<T>& accumulation_coefficients() const{return m_accum_coeff;}
-    void set_accumulation_coefficients(const std::vector<T>& coeffs) const{m_accum_coeff = coeffs;}
+    const std::vector<literal::coeff<T>>& accumulation_coefficients() const{return m_accum_coeff;}
+    void set_accumulation_coefficients(const std::vector<literal::coeff<T>>& coeffs) const{m_accum_coeff = coeffs;}
     const bool& is_identity() const{return m_opdef.m_is_identity;}
     bool& is_identity() {return m_opdef.m_is_identity;}
 
@@ -157,7 +156,7 @@ public:
 protected:
     opinfo& operator_definition(){return m_opdef;}
     utils::term_indexing_array<size_t>& indices(){return m_inds;}
-    std::vector<T>& accumulation_coefficients(){return m_accum_coeff;}
+    std::vector<literal::coeff<T>>& accumulation_coefficients(){return m_accum_coeff;}
 
 protected:
     opinfo m_opdef;
@@ -166,7 +165,7 @@ protected:
     //the coefficients used when accumulating the terms together to form a composite operator.  
     //If the m_opdef only contains a single element then this is simply set to vector of length 1
     //containing static_cast<T>(1.0), as we never need to accumulate this term
-    std::vector<T> m_accum_coeff;
+    std::vector<literal::coeff<T>> m_accum_coeff;
 
     friend class node_op_info<T>;
     friend class autoSOP<T>;
@@ -186,23 +185,17 @@ public:
 
     const std::vector<operator_data<T>>& spf() const{return m_spf;}
     const std::vector<operator_data<T>>& mf() const{return m_mf;}
-    const std::vector<T>& coeff() const{return m_coeff;}
+    const std::vector<literal::coeff<T>>& coeff() const{return m_coeff;}
 
     std::vector<operator_data<T>>& spf(){return m_spf;}
     std::vector<operator_data<T>>& mf(){return m_mf;}
-    std::vector<T>& coeff(){return m_coeff;}
+    std::vector<literal::coeff<T>>& coeff(){return m_coeff;}
 
     size_t nterms() const{return m_spf.size();}
 
     bool valid_bipartition() const
     {
         return (m_spf.size() == m_mf.size() && m_coeff.size() == m_mf.size());
-
-        for(size_t i = 0; i < m_spf.size(); ++i)
-        {
-            ASSERT(m_spf[i].nterms() == 1 || m_mf[i].nterms() == 1, "Failed to convert node_op_info to operator contraction info.  Invalid operator type detected.");
-            ASSERT(m_spf[i].indices() == m_mf[i].indices(), "Failed to convert node_op_info to operator contraction info.  Operator acting on different terms.");
-        }
     }
 
     void clear()
@@ -230,7 +223,7 @@ public:
 protected:
     std::vector<operator_data<T>> m_spf;
     std::vector<operator_data<T>> m_mf;
-    std::vector<T> m_coeff;
+    std::vector<literal::coeff<T>> m_coeff;
 
     friend class autoSOP<T>;
 
@@ -371,13 +364,13 @@ protected:
     void get_contraction_info_spf_term(const SPType& spf, spfind& sp, bool& identity_spf, bool exploit_identity_opt) const
     {
         //if the current term is the identity term
-        if(spf.is_identity())
+        if(spf.is_identity() && exploit_identity_opt)
         {
             identity_spf = true;
         }
 
         //if it is not the identity and we are making use of this fact
-        if(!exploit_identity_opt || !spf.is_identity())
+        if(!identity_spf)
         {
             sp.reserve(spf.nterms());
 
@@ -425,14 +418,13 @@ protected:
     template <typename MFType>
     void get_contraction_info_mf_term(const MFType& mf, mfind& m, bool& identity_mf, bool exploit_identity_opt) const
     {
-        if(mf.is_identity())
+        if((mf.is_identity() && exploit_identity_opt) || this->is_root())
         {
             identity_mf = true;
         }
 
-        //if the current term is the identity term
-        //if it is not the identity
-        if(!exploit_identity_opt || !mf.is_identity())
+        //if the current term is not the identity term
+        if(!identity_mf)
         {
             m.reserve(mf.nterms());            
             const auto& op = mf.operator_definition();
@@ -464,14 +456,17 @@ protected:
                     m.push_back(mf_index<size_t>{parent_index, {indexing.begin(), indexing.end()}});
                 }
             }
-            else
+        }
+        if(this->is_root() && !mf.is_identity())
+        {
+            m.reserve(mf.nterms());            
+            const auto& op = mf.operator_definition();
+
+            mf_index<size_t> empty(0);
+            empty.parent_index() = 0;
+            for(size_t mi = 0; mi < op.size(); ++mi)
             {
-                mf_index<size_t> empty(0);
-                empty.parent_index() = 0;
-                for(size_t mi = 0; mi < op.size(); ++mi)
-                {
-                    m.push_back(empty);
-                }
+                m.push_back(empty);
             }
         }
     }

@@ -1,11 +1,8 @@
 #include "sparseMatrix.hpp"
+#include "../pyttn_typedef.hpp"
 
-void initialise_sparse_matrices(py::module& m)
-{
-    using real_type = double;
-    using complex_type = linalg::complex<real_type>;
-    init_csr_matrix<real_type>(m, "csr_matrix_real");
-    init_csr_matrix<complex_type>(m, "csr_matrix_complex");
-    init_diagonal_matrix<real_type>(m, "diagonal_matrix_real");
-    init_diagonal_matrix<complex_type>(m, "diagonal_matrix_complex");
-}
+template <> void initialise_sparse_matrices<pyttn_real_type>(py::module& m);
+
+#ifdef PYTTN_BUILD_CUDA
+template <> void initialise_sparse_matrices_cuda<pyttn_real_type>(py::module& m);
+#endif

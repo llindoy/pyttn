@@ -2,11 +2,18 @@
 #define TTNS_TTN_BASE_HPP
 
 #include <random>
+#include <map>
+#include <vector>
+
+#include <linalg/utils/genrandom.hpp>
+
 #include <common/tmp_funcs.hpp>
 #include <common/exception_handling.hpp>
 
 #include "ttn_nodes/ms_ttn_node.hpp"
 #include "ttn_nodes/ttn_node.hpp"
+
+#include "tree/ntree_builder.hpp"
 
 #include "sweeping/sweeping_path.hpp"
 #include "orthogonality/decomposition_engine.hpp"
@@ -31,16 +38,16 @@ struct level_pair_comp
     }
 };
 
-template <template <typename, typename> class node_class, typename T, typename backend = blas_backend>
+template <template <typename, typename> class node_class, typename T, typename backend = linalg::blas_backend>
 class ttn_base : public tree<node_class<T, backend> > 
 {
 public:
-    static_assert(is_number<T>::value, "The first template argument to the ttn object must be a valid number type.");
-    static_assert(is_valid_backend<backend>::value, "The second template argument to the ttn object must be a valid backend.");
+    static_assert(linalg::is_number<T>::value, "The first template argument to the ttn object must be a valid number type.");
+    static_assert(linalg::is_valid_backend<backend>::value, "The second template argument to the ttn object must be a valid backend.");
 
     using real_type = typename linalg::get_real_type<T>::type;
 
-    using matrix_type = matrix<T, backend>;
+    using matrix_type = linalg::matrix<T, backend>;
     using base_type = tree<node_class<T, backend> >;
 
     using reference = typename base_type::reference;
@@ -56,8 +63,11 @@ public:
 
     using node_type = typename base_type::node_type;
     using bond_matrix_type = typename node_type::bond_matrix_type;
+    using population_matrix_type = typename node_type::population_matrix_type;
     using orthogonality_type = typename node_type::orthogonality_type;
     using value_type = typename node_type::value_type;
+
+    using hrank_info = std::map<std::pair<size_t, size_t>, typename node_type::hrank_type>;
 
     using ancestor_index = std::set<std::pair<size_type, size_type>, level_pair_comp<size_type>>;
 
@@ -70,6 +80,7 @@ private:
     using base_type::m_nleaves;
 
     std::vector<size_type> m_dim_sizes;
+    std::vector<size_type> m_dim_sizes_lhd;
     std::vector<size_type> m_leaf_indices;
 
     orthogonality_type m_orthog;
@@ -77,16 +88,18 @@ private:
     size_type m_orthogonality_centre = 0;
     bool m_has_orthogonality_centre = false; 
 
-    size_type m_nthreads = 1;
     size_type m_nset=1;
+    size_type m_nset_lhd=1;
 
     real_type m_maximum_bond_entropy;
 
     sweeping::traversal_path m_euler_tour;
     bool m_euler_tour_initialised = false;
 
-    std::mt19937 _rng;
+    linalg::random_engine<linalg::blas_backend> m_hrengine;
+    linalg::random_engine<backend> m_rengine;
 
+    bool m_purification = false;
 public: 
     const orthogonality_type& orthogonality_engine() const{return m_orthog;}
     orthogonality_type& orthogonality_engine(){return m_orthog;}
@@ -109,24 +122,24 @@ public:
     }
 
     template <typename INTEGER, typename Alloc>
-    ttn_base(const ntree<INTEGER, Alloc>& topology, size_type nset = 1) : m_nset(nset)
+    ttn_base(const ntree<INTEGER, Alloc>& topology, size_type nset = 1, bool purification = false) : m_nset(nset), m_purification(purification)
     {
         CALL_AND_HANDLE(construct_topology(topology, nset), "Failed to construct the ttn object.  Failed to allocate tree structure from topology ntree.");
     }
 
     template <typename INTEGER, typename Alloc>
-    ttn_base(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, size_type nset = 1) : m_nset(nset)
+    ttn_base(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, size_type nset = 1, bool purification = false) : m_nset(nset), m_purification(purification)
     {
         CALL_AND_HANDLE(construct_topology(topology, capacity, nset), "Failed to construct the ttn object.  Failed to allocate tree structure from topology ntree.");
     }
 
-    ttn_base(const std::string& _topology, size_type nset = 1) : m_nset(nset)
+    ttn_base(const std::string& _topology, size_type nset = 1, bool purification = false) : m_nset(nset), m_purification(purification)
     {
         ntree<size_type> topology(_topology);
         CALL_AND_HANDLE(construct_topology(topology, nset), "Failed to construct the ttn object.  Failed to allocate tree structure from topology ntree.");
     }
 
-    ttn_base(const std::string& _topology, const std::string& _capacity, size_type nset=1) : m_nset(nset)
+    ttn_base(const std::string& _topology, const std::string& _capacity, size_type nset=1, bool purification = false) : m_nset(nset), m_purification(purification)
     {
         ntree<size_type> topology(_topology);
         ntree<size_type> capacity(_capacity);
@@ -134,11 +147,27 @@ public:
     }
 
 protected:
+    template <typename U, typename BU>
+    static void assign_node(ttn_node_data<T, backend>& r, const ttn_node_data<U, BU>& i)
+    {
+        r = i;
+    }
+
+    template <typename U, typename BU>
+    static void assign_node(std::vector<ttn_node_data<T, backend>>& r, const std::vector<ttn_node_data<U, BU>>& i)
+    {
+        ASSERT(r.size() >= i.size(), "input does not fit into output.");
+        for(size_t ind = 0; ind < i.size(); ++ind)
+        {
+            r[ind] = i[ind];
+        }
+    }
+
     template <typename U, typename be>
     void _assign_ttn(const ttn_base<node_class, U, be>& other)
     {
         //first we check whether the current ttn object is capable of fitting the other one.  If it is then we don't need to attempt a reallocation at all
-        if(has_same_structure(*this, other) && other.mode_dimensions() == this->mode_dimensions() && this->nset() == other.nset())
+        if(has_same_structure(*this, other) && other.mode_dimensions() == this->mode_dimensions() && this->nset() == other.nset() && this->is_purification() == other.is_purification())
         {
             bool all_fit = true;
             //first check to see if the current structure can fit the assigned structure.  If it can then we don't have any problems
@@ -149,12 +178,14 @@ protected:
 
             for(auto z : common::zip(m_nodes, other))
             {
-                CALL_AND_HANDLE(std::get<0>(z)() = std::get<1>(z)(), "Failed when assigning slice index.");
+                CALL_AND_HANDLE(assign_node(std::get<0>(z)(), std::get<1>(z)()), "Failed when assigning slice index."); 
             }
             if(!all_fit){reset_orthogonality();}
 
-            _rng = other._rng;
+            m_hrengine = other.m_hrengine;
+            m_rengine = other.m_rengine;
 
+            m_purification = other.is_purification();
             m_orthogonality_centre = other.m_orthogonality_centre;
             m_has_orthogonality_centre = other.m_has_orthogonality_centre;
 
@@ -171,12 +202,17 @@ protected:
             clear();
             CALL_AND_RETHROW(base_type::operator=(other)); 
             m_dim_sizes = other.mode_dimensions(); 
+            m_dim_sizes_lhd = other.mode_dimensions_lhd(); 
             m_leaf_indices = other.leaf_indices();
             m_nset = other.m_nset;
+            m_nset_lhd = other.m_nset_lhd;
 
             m_orthog.clear();
-            _rng = other._rng;
+            m_hrengine = other.m_hrengine;
+            m_rengine = other.m_rengine;
 
+
+            m_purification = other.is_purification();
             m_orthogonality_centre = other.m_orthogonality_centre;
             m_has_orthogonality_centre = other.m_has_orthogonality_centre;
 
@@ -210,41 +246,50 @@ public:
 
 
     template <typename INTEGER, typename Alloc>
-    void resize(const ntree<INTEGER, Alloc>& topology, size_type nset = 1)
+    void resize(const ntree<INTEGER, Alloc>& topology, size_type nset = 1, bool purification = false)
     {
         CALL_AND_HANDLE(clear(), "Failed to resize ttn object.  Failed to clear currently allocated data.");
+        m_purification = purification;
         CALL_AND_HANDLE(construct_topology(topology, nset), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
     }
 
 
     template <typename INTEGER, typename Alloc>
-    void resize(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, size_type nset=1)
+    void resize(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, size_type nset=1, bool purification = false)
     {
         CALL_AND_HANDLE(clear(), "Failed to resize ttn object.  Failed to clear currently allocated data.");
+        m_purification = purification;
         CALL_AND_HANDLE(construct_topology(topology, capacity, nset), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
     }
 
 
-    void resize(const std::string& _topology, size_type nset=1)
+    void resize(const std::string& _topology, size_type nset=1, bool purification = false)
     {
         ntree<size_type> topology(_topology);
-        CALL_AND_HANDLE(resize(topology, nset), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
+        CALL_AND_HANDLE(resize(topology, nset, purification), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
     }
 
-    void resize(const std::string& _topology, const std::string& _capacity, size_type nset=1)
+    void resize(const std::string& _topology, const std::string& _capacity, size_type nset=1, bool purification = false)
     {
         ntree<size_type> topology(_topology);
         ntree<size_type> capacity(_capacity);
-        CALL_AND_HANDLE(resize(topology, capacity, nset), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
+        CALL_AND_HANDLE(resize(topology, capacity, nset, purification), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
     }
-    
-    std::mt19937& rng(){return _rng;}
-    const std::mt19937& rng() const{return _rng;}
+
+    std::mt19937& rng(){return m_hrengine.rng();}
+    const std::mt19937& rng() const{return m_hrengine.rng();}
+
+    linalg::random_engine<backend>& random_engine(){return m_rengine;}
+    const linalg::random_engine<backend>& random_engine() const{return m_rengine;}
+
+    linalg::random_engine<linalg::blas_backend>& random_engine_host(){return m_hrengine;}
+    const linalg::random_engine<linalg::blas_backend>& random_engine_host() const{return m_hrengine;}
 
     template <typename sseq>
     void set_seed(sseq& seed)
     {
-        _rng.seed(seed);
+        m_hrengine.set_seed(seed);
+        m_rengine.set_seed(seed);
     }
 
     void random()
@@ -255,7 +300,7 @@ public:
 
             for(auto& n : reverse(m_nodes))
             {
-                n.set_node_random(_rng);
+                n.set_node_random(m_rengine);
 
                 if(!n.is_root())
                 {
@@ -282,23 +327,48 @@ public:
 
 protected:
     template <typename int_type> 
-    void _set_state(const std::vector<int_type>& si, size_type set_index = 0)
+    void _set_state(const std::vector<int_type>& si, size_type set_index = 0, bool use_purification_info = false, bool random_unoccupied_initialisation=true)
     {
-        ASSERT(set_index < this->nset(), "Cannot set ttnbase to specified state.  Set index out of bounds.");
-        ASSERT(si.size() == this->nmodes(), "Cannot set ttnbase to specified state.  The state does not have the required numbers of modes.");
-
-        for(size_type i = 0; i < this->nmodes(); ++i)
+        //if we aren't using the set_state_purification function or we don't have a purification then we just set as usual
+        if(!use_purification_info || !m_purification)
         {
-            ASSERT(static_cast<size_type>(si[i]) < m_dim_sizes[i], "Cannot set state, state index out of bounds.");
+            ASSERT(set_index < this->nset(), "Cannot set ttnbase to specified state.  Set index out of bounds.");
+            ASSERT(si.size() == this->nmodes(), "Cannot set ttnbase to specified state.  The state does not have the required numbers of modes.");
+
+            for(size_type i = 0; i < this->nmodes(); ++i)
+            {
+                ASSERT(static_cast<size_type>(si[i]) < m_dim_sizes[i], "Cannot set state, state index out of bounds.");
+            }
+            
+            //now zero the state
+            this->zero();
+            this->initialise_logical_tensors_product_state(set_index);
+
+            for(size_type i = 0; i < this->nmodes(); ++i)
+            {
+                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[i], m_rengine, random_unoccupied_initialisation), "Failed to set state.");
+            }
         }
-        
-        //now zero the state
-        this->zero();
-        this->initialise_logical_tensors_product_state(set_index);
-
-        for(size_type i = 0; i < this->nmodes(); ++i)
+        //otherwise we need to do a strided set the correct degrees of freedom and ensure that when we trace over the ancilla we receive the state we aimed
+        //to set
+        else
         {
-            CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[i], _rng), "Failed to set state.");
+            ASSERT(set_index < this->nset(), "Cannot set ttnbase to specified state.  Set index out of bounds.");
+            ASSERT(si.size() == this->nmodes(), "Cannot set ttnbase to specified state.  The state does not have the required numbers of modes.");
+
+            for(size_type i = 0; i < this->nmodes(); ++i)
+            {
+                ASSERT(static_cast<size_type>(si[i]) < m_dim_sizes_lhd[i], "Cannot set state, state index out of bounds.");
+            }
+            
+            //now zero the state
+            this->zero();
+            this->initialise_logical_tensors_product_state(set_index);
+
+            for(size_type i = 0; i < this->nmodes(); ++i)
+            {
+                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[i]*(m_dim_sizes_lhd[i]), m_rengine, random_unoccupied_initialisation), "Failed to set state.");
+            }
         }
 
         //now enforce that the orthogonality centre is at the root
@@ -323,7 +393,7 @@ protected:
         m_has_orthogonality_centre = false;
         for(size_type i = 0; i < this->nmodes(); ++i)
         {
-            m_nodes[m_leaf_indices[i]].set_leaf_node_vector(set_index, ps[i], _rng);
+            m_nodes[m_leaf_indices[i]].set_leaf_node_vector(set_index, ps[i], m_rengine);
         }
         this->orthogonalise();
     }
@@ -345,13 +415,12 @@ protected:
         this->initialise_logical_tensors_product_state(set_index);
 
         m_has_orthogonality_centre = false;
-        std::uniform_real_distribution<real_type> dist(0, 1);
         for(size_type i = 0; i < this->nmodes(); ++i)
         {
             std::discrete_distribution<std::size_t> d{relval[i].begin(), relval[i].end()};
-            size_type ind = d(_rng);
+            size_type ind = d(m_hrengine.rng());
             state[i] = ind;
-            CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, ind, _rng), "Failed to set state.");
+            CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, ind, m_rengine), "Failed to set state.");
         }
 
         //now enforce that the orthogonality centre is at the root
@@ -366,7 +435,7 @@ protected:
 
         for(size_type i = 0; i < this->nmodes(); ++i)
         {
-            CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_purification(set_index, _rng), "Failed to set state.");
+            CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_purification(set_index, m_rengine), "Failed to set state.");
         }
 
         //now enforce that the orthogonality centre is at the root
@@ -386,8 +455,10 @@ protected:
 
 public:
     const bond_matrix_type& active_bond_matrix() const{return m_orthog.bond_matrix();}
-    bond_matrix_type& active_bond_matrix(){return m_orthog.bond_matrix();}
+    bond_matrix_type& active_bond_matrix() {return m_orthog.bond_matrix();}
 
+    const population_matrix_type& active_population_matrix() const{return m_orthog.population_matrix();}
+    population_matrix_type& active_population_matrix() {return m_orthog.population_matrix();}
 public:
 
     void clear()
@@ -399,6 +470,7 @@ public:
             m_orthogonality_centre = 0;
             m_has_orthogonality_centre = false;
             m_nset = 0;
+            m_purification = false;
 
             m_euler_tour.clear();
             m_euler_tour_initialised = false;
@@ -421,12 +493,15 @@ public:
         ASSERT(m_euler_tour_initialised, "Failed to access euler tour it has not been initialised.");
         return m_euler_tour;
     }
+    bool euler_tour_initialised() const{return m_euler_tour_initialised;}
 
     const std::vector<size_type>& mode_dimensions() const{return m_dim_sizes;}
+    const std::vector<size_type>& mode_dimensions_lhd() const{return m_dim_sizes_lhd;}
     size_type dim(size_type i) const{return m_dim_sizes[i];}
     size_type nmodes() const noexcept {return m_dim_sizes.size();}
     size_type ntensors() const noexcept{return m_nodes.size();}
     size_type nset() const noexcept{return m_nset;}
+    bool is_purification() const noexcept{return m_purification;}
     size_type orthogonality_centre() const noexcept{return m_orthogonality_centre;}
     real_type maximum_bond_entropy() const noexcept{return m_maximum_bond_entropy;}
 
@@ -451,6 +526,18 @@ public:
 
 
     void setup_orthogonality(){if(!m_orthog.is_initialised()){m_orthog.init(*this);}}
+
+
+    void bond_dimensions(hrank_info& binfo) const
+    {
+        for(const auto& a : m_nodes)
+        {
+            if(!a.is_root())
+            {
+                a.get_hrank(binfo[std::make_pair(a.id(), a.parent().id())]);
+            }
+        }
+    }
 
     /*
      *  Functions for adjusting the orthogonality condition of the TTNS
@@ -653,6 +740,22 @@ public:
         }
     }
 
+    void conj()
+    {
+        try
+        {
+            for(auto& a : m_nodes)
+            {
+                CALL_AND_RETHROW(a.conj());
+            }
+        }
+        catch(const std::exception& ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to conjugate ttn object.");
+        }
+    }
+
     real_type norm() const
     {
         real_type norm=0;
@@ -677,7 +780,7 @@ public:
 public:
     //scalar inplace multiplication and division
     template <typename U>
-    typename std::enable_if<is_number<U>::value, ttn_base&>::type operator*=(const U& u)
+    typename std::enable_if<linalg::is_number<U>::value, ttn_base&>::type operator*=(const U& u)
     {
         if(this->has_orthogonality_centre())
         {
@@ -691,7 +794,7 @@ public:
     }
 
     template <typename U>
-    typename std::enable_if<is_number<U>::value, ttn_base&>::type operator/=(const U& u)
+    typename std::enable_if<linalg::is_number<U>::value, ttn_base&>::type operator/=(const U& u)
     {
         if(this->has_orthogonality_centre())
         {
@@ -931,17 +1034,33 @@ protected:
     }
 
     template <typename INTEGER, typename Alloc>
-    void construct_topology(const ntree<INTEGER, Alloc>& _tree, const ntree<INTEGER, Alloc>& capacity, size_type nset = 1)
+    void construct_topology(const ntree<INTEGER, Alloc>& __tree, const ntree<INTEGER, Alloc>& _capacity, size_type nset = 1)
     {
-        ASSERT(_tree.size() > 2, "Failed to build ttn from topology tree.  The input topology must contain at least 3 elements.  If it contains fewer than 3 elements then this is just a vector and we won't want to use the full TTN structure.");
-        ASSERT(_tree.size() == capacity.size(), "Failed to construct ttn topology with capacity.");
+        ASSERT(__tree.size() > 2, "Failed to build ttn from topology tree.  The input topology must contain at least 3 elements.  If it contains fewer than 3 elements then this is just a vector and we won't want to use the full TTN structure.");
+        ASSERT(__tree.size() == _capacity.size(), "Failed to construct ttn topology with capacity.");
 
         m_nset = nset;
+        m_nset_lhd = nset;
+        if(m_purification)
+        {
+            m_nset = nset*nset;
+            m_nset_lhd = nset;
+        }
+
+
+        ntree<INTEGER, Alloc> _tree(__tree);
+        ntree<INTEGER, Alloc> capacity(_capacity);
+
+        ntree_builder<INTEGER>::sanitise_tree(_tree, true);
+        ntree_builder<INTEGER>::sanitise_tree(capacity, true);
 
         //otherwise if the topology tree contains more than 2 more elements we will attempt to interpret it as a (hierarchical) tucker tensor
         //and solve the problem in this space.
         m_nleaves = _tree.nleaves();
+
         m_dim_sizes.resize(m_nleaves);
+        m_dim_sizes_lhd.resize(m_nleaves);
+
         m_leaf_indices.resize(m_nleaves);
         //resize the m_nodes array to the correct size
         size_type required_size = _tree.size() - _tree.nleaves();
@@ -951,8 +1070,8 @@ protected:
         size_type count = 0;
         size_type leaf_counter = 0; 
         auto this_it = m_nodes.begin();
-        typename ntree<INTEGER, Alloc>::const_iterator capacity_iter = capacity.begin();
-        for(typename ntree<INTEGER, Alloc>::const_iterator tree_iter = _tree.begin(); tree_iter != _tree.end(); ++tree_iter, ++capacity_iter)
+        typename ntree<INTEGER, Alloc>::iterator capacity_iter = capacity.begin();
+        for(typename ntree<INTEGER, Alloc>::iterator tree_iter = _tree.begin(); tree_iter != _tree.end(); ++tree_iter, ++capacity_iter)
         {
             ASSERT(capacity_iter != capacity.end(), "The capacity and tree iter objects are not the same size.");
             ASSERT(tree_iter->value() <= capacity_iter->value(), "Failed to construct ttn object.  The capacity is less than the size.");
@@ -991,6 +1110,16 @@ protected:
                     else{++_nleaves;}
                 }
 
+                if(nchildren == 0)
+                {
+                    ASSERT(_nleaves == 1, "If this is an exterior node we can only handle a single leaf.");
+                }
+                else
+                {
+                    ASSERT(nchildren > 1, "Cannot handle a pure bond matrix in the ttn.");
+                    ASSERT(_nleaves == 0, "If this is an interior node we cannot handle any external degrees of freedom.");
+                }
+
                 size_type ncapacity_children = 0;
                 size_type capacity_nleaves = 0;
                 for(auto child_it = capacity_iter->begin(); child_it != capacity_iter->end(); ++child_it)
@@ -1006,7 +1135,7 @@ protected:
                 this_it->m_level = tree_iter->level();  
 
 
-                CALL_AND_HANDLE(this_it->setup_data_from_topology_node(*tree_iter, *capacity_iter, nchildren+_nleaves, nset), "Failed to set up data from topology.");
+                CALL_AND_HANDLE(this_it->setup_data_from_topology_node(*tree_iter, *capacity_iter, nchildren+_nleaves, nset, m_purification), "Failed to set up data from topology.");
 
                 //now we set up the children pointers
                 size_type index3 = 1;
@@ -1027,7 +1156,12 @@ protected:
             //if we are at a leaf node then we need to store the number of functions associated with this dimension
             else
             {
-                m_dim_sizes[leaf_counter] = tree_iter->value();    ++leaf_counter;
+                m_dim_sizes_lhd[leaf_counter] = tree_iter->value();    
+                m_dim_sizes[leaf_counter] = tree_iter->value();    
+
+                //if this is a purification then we need to double the local hilbert space dimension
+                if(m_purification){m_dim_sizes[leaf_counter]*=tree_iter->value();}
+                ++leaf_counter;
             }
         }
 

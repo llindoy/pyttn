@@ -1,0 +1,51 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "pybind11>=2.10.0",
+]
+build-backend="setuptools.build_meta"
+
+[tools.setuptools.packages]
+where=["pyttn"]
+
+[project]
+name = "PyTTN"
+
+keywords = [
+    "tensor network",
+    "Multi-layer multiconfiguration time-dependent Hartree",
+    "open quantum system",
+    "hierarchical equations of motion",
+    "pseudomode"
+]
+
+version="0.0.1"
+readme="README.md"
+license= { file="LICENSE.txt"}
+requires-python = ">=3.8"
+dependencies = [
+    "scipy",
+    "numpy",
+    "h5py",
+    "numba",
+    "networkx",
+    "pydot",
+    "graphviz",
+]
+
+
+[tools.setuptools]
+
+docs = [     
+    "jupyter-sphinx >= 0.5.3",
+    "nbsphinx >= 0.9.3",
+    "reno >= 4.0.0",
+    "sphinx-autodoc-typehints >= 2.0.0",
+]
+notebook = [
+    "notebook >= 7.1.0",
+    "jupyterlab >=4.1.1",
+]
+#[tool.cibuildwheel]
+
+

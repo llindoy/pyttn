@@ -13,6 +13,9 @@ class AIM : public model<value_type>
 {
 public:
     using real_type = typename linalg::get_real_type<value_type>::type;
+    using model<value_type>::hamiltonian;
+    using model<value_type>::system_info;
+
 public:
     AIM(){}
     AIM(size_t N, size_t Nimp) : m_T(N+Nimp, N+Nimp), m_U(Nimp, Nimp, Nimp, Nimp), m_impurity_indices(Nimp){}
@@ -139,7 +142,7 @@ protected:
         {
             for(size_t q = 0; q < Nt; ++q)
             {
-                if(std::abs(m_T(p, q)) > tol)
+                if(linalg::abs(m_T(p, q)) > tol)
                 {
                     H += m_T(p, q)*fermion_operator("cdag", p)*fermion_operator("c", q);
                 }
@@ -159,7 +162,7 @@ protected:
                     for(size_t s=0; s < Nimp; ++s)
                     {
                         size_t si = m_impurity_indices[s];
-                        if(std::abs(m_U(p, q, r, s)) > tol)
+                        if(linalg::abs(m_U(p, q, r, s)) > tol)
                         {
                             H += m_U(p, q, r, s)*fermion_operator("cdag", pi)*fermion_operator("cdag", qi)*fermion_operator("c", si)*fermion_operator("c", ri);
                         }

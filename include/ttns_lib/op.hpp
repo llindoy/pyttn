@@ -7,7 +7,7 @@
 namespace ttns
 {
 
-template <typename T, typename backend = blas_backend>
+template <typename T, typename backend = linalg::blas_backend>
 class Op
 {
 public:
@@ -119,7 +119,7 @@ public:
             linalg::matrix<T, backend> Umat(m_op.shape(0), m_op.shape(1));  Umat.set_buffer(m_op);
             linalg::tensor<T, 5, backend> Umt(dims1, m_dims[0], m_dims[0], m_strides[0], m_strides[0]);  
 
-            singular_value_decomposition<linalg::matrix<T, backend>, true> m_svd;
+            linalg::singular_value_decomposition<linalg::matrix<T, backend>, true> m_svd;
 
             linalg::matrix<T, backend> _U, _Vh;
             linalg::diagonal_matrix<real_type, backend> S;

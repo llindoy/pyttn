@@ -20,7 +20,7 @@ protected:
         T Sp = (S-1.0)/2.0;
         T m1 = Sp - T(i);
         T m2 = Sp - T(j);
-        return std::sqrt(Sp*(Sp+1.0) - m1*m2);
+        return linalg::sqrt(Sp*(Sp+1.0) - m1*m2);
     }
 public:
     S_p() {}
@@ -99,6 +99,12 @@ public:
             RAISE_EXCEPTION("Failed to construct S_+ as dense.");
         }
     }
+
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("s-"));
+        return ret;
+    }
 };
 
 template <typename T> 
@@ -110,7 +116,7 @@ protected:
         T Sp = (S-1.0)/2.0;
         T m1 = Sp - T(i);
         T m2 = Sp - T(j);
-        return std::sqrt(Sp*(Sp+1.0) - m1*m2);
+        return linalg::sqrt(Sp*(Sp+1.0) - m1*m2);
     }
 
 public:
@@ -191,6 +197,11 @@ public:
             RAISE_EXCEPTION("Failed to construct S_- as dense.");
         }
     }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("s+"));
+        return ret;
+    }
 };
 
 template <typename T> 
@@ -202,7 +213,7 @@ protected:
         T Sp = (S-1.0)/2.0;
         T m1 = Sp - T(i);
         T m2 = Sp - T(j);
-        return 0.5*std::sqrt(Sp*(Sp+1.0) - m1*m2);
+        return 0.5*linalg::sqrt(Sp*(Sp+1.0) - m1*m2);
     }
 public:
     S_x() {}
@@ -301,6 +312,11 @@ public:
             RAISE_EXCEPTION("Failed to construct S_x as dense.");
         }
     }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("sx"));
+        return ret;
+    }
 };
 
 template <typename T, bool is_complex = linalg::is_complex<T>::value>
@@ -329,6 +345,12 @@ public:
     {
         RAISE_EXCEPTION("Cannot form S_y as a real valued operator.");
     }
+
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(-1), std::string("sy"));
+        return ret;
+    }
 };
 
 template <typename RT> 
@@ -342,7 +364,7 @@ protected:
         T Sp = (S-1.0)/2.0;
         T m1 = Sp - T(i);
         T m2 = Sp - T(j);
-        return T(0, 0.5)*std::sqrt(Sp*(Sp+1.0) - m1*m2);
+        return T(0, 0.5)*linalg::sqrt(Sp*(Sp+1.0) - m1*m2);
     }
 
 
@@ -351,7 +373,7 @@ protected:
         T Sp = (S-1.0)/2.0;
         T m1 = Sp - T(i);
         T m2 = Sp - T(j);
-        return T(0, -0.5)*std::sqrt(Sp*(Sp+1.0) - m1*m2);
+        return T(0, -0.5)*linalg::sqrt(Sp*(Sp+1.0) - m1*m2);
     }
 
 public:
@@ -451,6 +473,11 @@ public:
             RAISE_EXCEPTION("Failed to construct S_y as dense.");
         }
     }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(-1), std::string("sy"));
+        return ret;
+    }
 };
 
 template <typename T> 
@@ -539,6 +566,11 @@ public:
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct S_z as dense.");
         }
+    }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("sz"));
+        return ret;
     }
 };
 

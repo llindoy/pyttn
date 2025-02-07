@@ -1,10 +1,9 @@
 #include "operator_dictionary.hpp"
+#include "../../pyttn_typedef.hpp"
 
-void initialise_operator_dictionary(py::module& m)
-{
-    using real_type = double;
-    using complex_type = linalg::complex<real_type>;
-  
-    init_operator_dictionary<real_type>(m, "real");
-    init_operator_dictionary<complex_type>(m, "complex");
-}
+template <> void initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(py::module& m);
+
+#ifdef PYTTN_BUILD_CUDA
+template <> void initialise_operator_dictionary<pyttn_real_type, linalg::cuda_backend>(py::module& m);
+#endif
+

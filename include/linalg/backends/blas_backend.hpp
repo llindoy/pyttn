@@ -190,7 +190,9 @@ protected:
         if(static_cast<blas_int_type>(batchCount) >= K)
         {
 #ifdef USE_OPENMP
-            #pragma omp parallel for schedule(static)
+#ifdef PARALLELISE_EXTENDED_BLAS
+            #pragma omp parallel for schedule(static) 
+#endif
 #endif
             for(size_t i=0; i<batchCount; ++i){gemm(TRANSA, TRANSB, M, N, K, ALPHA, A+i*strideA, LDA, B+i*strideB, LDB, BETA, C+i*strideC, LDC);}
         }
@@ -248,6 +250,38 @@ public:
     //function for copying between two dense buffers
     template <typename T> 
     static inline void copy(const T* src, size_type n, T* dest){std::copy_n(src, n, dest);}
+
+    template <typename T> 
+    static inline void rank_3_strided_copy(const T* src, size_type n1, size_type n2, size_type n3, T* dest, size_type n4)
+    {
+        for(size_type i = 0; i < n1; ++i)
+        {
+            for(size_type j = 0; j < n2; ++j)
+            {
+                for(size_type k=0; k< n3; ++k)
+                {
+                    dest[(i*n4+j)*n3+k] = src[(i*n2+j)*n3+k];
+                }
+            }
+        }
+    }
+
+    template <typename T> 
+    static inline void rank_3_strided_append(const T* pad, size_type n1, size_type n2, size_type n3, size_type iadd, T* dest, size_type n4)
+    {
+        for(size_type i = 0; i < n1; ++i)
+        {
+            for(size_type j = 0; j < iadd; ++j)
+            {
+                size_type aj = j + n2;
+                for(size_type k=0; k< n3; ++k)
+                {
+                    dest[(i*n4+aj)*n3+k] = pad[(j*n1+i)*n3+k];
+                }
+            }
+
+        }
+    }
 
     template <typename T> 
     static inline void assign(const T* src, size_type n, T* dest, T beta = T(0))
@@ -452,14 +486,14 @@ private:
     }
 public:
     template <typename T>
-    static inline void csrmv(transform_type opA, bool /* conjB */, blas_int_type m, blas_int_type /*n*/, T alpha, const T* A, const int* rowptr, const int* colind, const T* X, blas_int_type incx, T beta, T* Y, blas_int_type incy)
+    static inline void csrmv(transform_type opA, bool /* conjB */, blas_int_type m, blas_int_type /*n*/, size_type /*nnz*/, T alpha, const T* A, const int* rowptr, const int* colind, const T* X, blas_int_type incx, T beta, T* Y, blas_int_type incy)
     {
         ASSERT(opA == op_c || opA == op_n, "Failed to compute csrmv.  Transposed csr matrices are currently not supported.");
         eblas_kernels::csrmv::eval(m, alpha, A, rowptr, colind, X, incx, beta, Y, incy, [](const T& a){return a;}, [](const T& a){return a;});
     }
 
     template <typename T>
-    static inline void csrmv(transform_type opA, bool conjB, blas_int_type m, blas_int_type /*n*/, complex<T> alpha, const complex<T>* A, const int* rowptr, const int* colind, const complex<T>* X, blas_int_type incx, complex<T> beta, complex<T>* Y, blas_int_type incy)
+    static inline void csrmv(transform_type opA, bool conjB, blas_int_type m, blas_int_type /*n*/, size_type /*nnz*/, complex<T> alpha, const complex<T>* A, const int* rowptr, const int* colind, const complex<T>* X, blas_int_type incx, complex<T> beta, complex<T>* Y, blas_int_type incy)
     {
         ASSERT(opA == op_c || opA == op_n, "Failed to compute csrmv.  Transposed csr matrices are currently not supported.");
         if(opA == op_c)
@@ -476,13 +510,13 @@ public:
 
 public:
     template <typename T>
-    static inline void csrmm(transform_type opres, transform_type opA, transform_type opB, size_type m, size_type n, T alpha, const T* A, const int* rowptr, const int* colind, const T* B, size_type ldb, T beta, T* C, size_type ldc)
+    static inline void csrmm(bool opres, transform_type opA, transform_type opB, size_type m, size_type n, size_type /*k*/, size_type /*nnz*/, T alpha, const T* A, const int* rowptr, const int* colind, const T* B, size_type ldb, T beta, T* C, size_type ldc)
     {   
         csrmm_kernel_selector<5, 5>(opres, opA, opB, m, n, alpha, A, rowptr, colind, B, ldb, beta, C, ldc, [](const T& a){return a;}, [](const T& a){return a;});
     }
 
     template <typename T>
-    static inline void csrmm(transform_type opres, transform_type opA, transform_type opB, size_type m, size_type n, complex<T> alpha, const complex<T>* A, const int* rowptr, const int* colind, const complex<T>* B, size_type ldb, complex<T> beta, complex<T>* C, size_type ldc)
+    static inline void csrmm(bool opres, transform_type opA, transform_type opB, size_type m, size_type n, size_type /*k*/, size_type /*nnz*/, complex<T> alpha, const complex<T>* A, const int* rowptr, const int* colind, const complex<T>* B, size_type ldb, complex<T> beta, complex<T>* C, size_type ldc)
     {   
         csrmm_kernel_selector<4, 4>(opres, opA, opB, m, n, alpha, A, rowptr, colind, B, ldb, beta, C, ldc, [](const complex<T>& a){return conj(a);}, [](const complex<T>& a){return a;});
     }
@@ -1104,7 +1138,8 @@ public:
     }
 
 public:
-    static inline void index_to_inds(size_type index, const std::vector<size_type>& strides, std::vector<size_type>& inds)
+    template <typename arr2> 
+    static inline void index_to_inds(size_type index, const arr2& strides, std::vector<size_type>& inds)
     {
         for(size_type i = 0; i < inds.size(); ++i)
         {
@@ -1113,7 +1148,8 @@ public:
         }
     }
 
-    static inline size_type inds_to_index(const std::vector<size_type>& inds, const std::vector<size_type>& order, const std::vector<size_type>& strides)
+    template <typename arr2> 
+    static inline size_type inds_to_index(const std::vector<size_type>& inds, const std::vector<size_type>& order, const arr2& strides)
     {
         size_type ind = 0;
         for(size_type i = 0; i < inds.size(); ++i)
@@ -1123,17 +1159,14 @@ public:
         return ind;
     }
 
-    template <typename T, typename arr2> 
-    static inline void tensor_transpose(const T* in, const std::vector<size_type>& inds, const arr2& dims, T* out)
+    template <typename T, typename arr1, typename arr2> 
+    static inline void tensor_transpose(const T* in, const std::vector<size_type>& inds, const arr1& dims, const arr2& stride, T* out)
     {
         size_type N = inds.size();
-        std::vector<size_type> stride(N);
         std::vector<size_type> permuted_stride(N);
-        stride[N - 1] = 1;
         permuted_stride[N - 1] = 1;
         for(size_type i = 1; i < N; ++i)
         {
-            stride[N-(i+1)] = stride[N-i]*dims[N-i];
             permuted_stride[N-(i+1)] = permuted_stride[N-i]*dims[inds[N-i]];
         }
 
@@ -1147,7 +1180,6 @@ public:
             out[inds_to_index(ind, inds, permuted_stride)] = in[i];
         }
     }
-
 };
 
 

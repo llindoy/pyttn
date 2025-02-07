@@ -3,6 +3,44 @@
 external
 build
 build*
-pyttn
 bin
 temp
+*.h5
+*.pdf
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+*.egg-info
+.installed.cfg
+*.egg
+.vscode
+.vscode/
+.venv
+.venv/
+MANIFEST
+
+
+#Don't ignore the documentation
+!docs/build/

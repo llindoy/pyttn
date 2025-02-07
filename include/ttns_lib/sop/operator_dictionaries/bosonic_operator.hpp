@@ -63,7 +63,7 @@ public:
                 if(op->contains_lowered_state(i, index))
                 {
                     size_t n = op->get_occupation(i, index);
-                    buffer[counter] = coeff_a*std::sqrt((1.0*n));
+                    buffer[counter] = coeff_a*linalg::sqrt((1.0*n));
                     colind[counter] = op->get_lowered_index(i, index);
                     ++counter;
                 }
@@ -95,7 +95,7 @@ public:
                 size_t n = op->get_occupation(i, index);
                 if(op->contains_lowered_state(i, index))
                 {
-                    mat(i, op->get_lowered_index(i, index)) = coeff_a*std::sqrt((1.0*n));
+                    mat(i, op->get_lowered_index(i, index)) = coeff_a*linalg::sqrt((1.0*n));
                 }
             }
         }
@@ -106,6 +106,11 @@ public:
         }
     }
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("a"));
+        return ret;
+    }
 };
 
 
@@ -181,12 +186,12 @@ public:
             {
                 RT r = linalg::abs(m_squeeze);
 
-                coeff_a = std::cosh(r);
-                coeff_b = std::sinh(r);
+                coeff_a = linalg::cosh(r);
+                coeff_b = linalg::sinh(r);
                 if(linalg::is_complex<T>::value)
                 {
                     RT theta = linalg::arg(m_squeeze);
-                    coeff_b *= std::exp(T(0, -1)*theta);
+                    coeff_b *= linalg::exp(T(0, -1)*theta);
                 }
             }
 
@@ -196,7 +201,7 @@ public:
                 if(op->contains_lowered_state(i, index))
                 {
                     size_t n = op->get_occupation(i, index);
-                    buffer[counter] = coeff_a*std::sqrt((1.0*n));
+                    buffer[counter] = coeff_a*linalg::sqrt((1.0*n));
                     colind[counter] = op->get_lowered_index(i, index);
                     ++counter;
                 }
@@ -223,7 +228,7 @@ public:
                     if(op->contains_raised_state(i, index))
                     {
                         size_t n = op->get_occupation(i, index);
-                        buffer[counter] = -coeff_b*std::sqrt((n+1.0));
+                        buffer[counter] = -coeff_b*linalg::sqrt((n+1.0));
                         colind[counter] = op->get_raised_index(i, index);
                         ++counter;
                     }
@@ -252,12 +257,12 @@ public:
             {
                 RT r = linalg::abs(m_squeeze);
 
-                coeff_a = std::cosh(r);
-                coeff_b = std::sinh(r);
+                coeff_a = linalg::cosh(r);
+                coeff_b = linalg::sinh(r);
                 if(linalg::is_complex<T>::value)
                 {
                     RT theta = linalg::arg(m_squeeze);
-                    coeff_b *= std::exp(T(0, -1)*theta);
+                    coeff_b *= linalg::exp(T(0, -1)*theta);
                 }
             }
     
@@ -266,7 +271,7 @@ public:
                 size_t n = op->get_occupation(i, index);
                 if(op->contains_lowered_state(i, index))
                 {
-                    mat(i, op->get_lowered_index(i, index)) = coeff_a*std::sqrt((1.0*n));
+                    mat(i, op->get_lowered_index(i, index)) = coeff_a*linalg::sqrt((1.0*n));
                 }
 
                 if(m_has_disp)
@@ -285,7 +290,7 @@ public:
                 {
                     if(op->contains_raised_state(i, index))
                     {
-                        mat(i, op->get_raised_index(i, index)) = -coeff_b*std::sqrt((n+1.0));
+                        mat(i, op->get_raised_index(i, index)) = -coeff_b*linalg::sqrt((n+1.0));
                     }
                 }
             }
@@ -297,6 +302,11 @@ public:
         }
     }
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("a"));
+        return ret;
+    }
 protected:
     bool m_has_disp = false;
     T m_disp = T(0);
@@ -361,7 +371,7 @@ public:
                 if(op->contains_raised_state(i, index))
                 {
                     size_t n = op->get_occupation(i, index);
-                    buffer[counter] = coeff_a*std::sqrt((n+1.0));
+                    buffer[counter] = coeff_a*linalg::sqrt((n+1.0));
                     colind[counter] = op->get_raised_index(i, index);
                     ++counter;
                 }
@@ -392,7 +402,7 @@ public:
                 if(op->contains_raised_state(i, index))
                 {
                     size_t n = op->get_occupation(i, index);
-                    mat(i, op->get_raised_index(i, index)) = coeff_a*std::sqrt((n+1.0));
+                    mat(i, op->get_raised_index(i, index)) = coeff_a*linalg::sqrt((n+1.0));
                 }
             }
         }
@@ -401,6 +411,11 @@ public:
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct bosonic operator.");
         }
+    }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("adag"));
+        return ret;
     }
 };
 
@@ -477,12 +492,12 @@ public:
             {
                 RT r = linalg::abs(m_squeeze);
 
-                coeff_a = std::cosh(r);
-                coeff_b = std::sinh(r);
+                coeff_a = linalg::cosh(r);
+                coeff_b = linalg::sinh(r);
                 if(linalg::is_complex<T>::value)
                 {
                     RT theta = linalg::arg(m_squeeze);
-                    coeff_b *= std::exp(T(0, 1)*theta);
+                    coeff_b *= linalg::exp(T(0, 1)*theta);
                 }
             }
 
@@ -494,7 +509,7 @@ public:
                     if(op->contains_lowered_state(i, index))
                     {
                         size_t n = op->get_occupation(i, index);
-                        buffer[counter] = -coeff_b*std::sqrt((1.0*n));
+                        buffer[counter] = -coeff_b*linalg::sqrt((1.0*n));
                         colind[counter] = op->get_lowered_index(i, index);
                         ++counter;
                     }
@@ -520,7 +535,7 @@ public:
                 if(op->contains_raised_state(i, index))
                 {
                     size_t n = op->get_occupation(i, index);
-                    buffer[counter] = coeff_a*std::sqrt((n+1.0));
+                    buffer[counter] = coeff_a*linalg::sqrt((n+1.0));
                     colind[counter] = op->get_raised_index(i, index);
                     ++counter;
                 }
@@ -549,12 +564,12 @@ public:
             {
                 RT r = linalg::abs(m_squeeze);
 
-                coeff_a = std::cosh(r);
-                coeff_b = std::sinh(r);
+                coeff_a = linalg::cosh(r);
+                coeff_b = linalg::sinh(r);
                 if(linalg::is_complex<T>::value)
                 {
                     RT theta = linalg::arg(m_squeeze);
-                    coeff_b *= std::exp(T(0, -1)*theta);
+                    coeff_b *= linalg::exp(T(0, -1)*theta);
                 }
             }
     
@@ -565,7 +580,7 @@ public:
                 {
                     if(op->contains_lowered_state(i, index))
                     {
-                        mat(i, op->get_lowered_index(i, index)) = -coeff_b*std::sqrt((1.0*n));
+                        mat(i, op->get_lowered_index(i, index)) = -coeff_b*linalg::sqrt((1.0*n));
                     }
                 }
 
@@ -584,7 +599,7 @@ public:
 
                 if(op->contains_raised_state(i, index))
                 {
-                    mat(i, op->get_raised_index(i, index)) = coeff_a*std::sqrt((n+1.0));
+                    mat(i, op->get_raised_index(i, index)) = coeff_a*linalg::sqrt((n+1.0));
                 }
             }
         }
@@ -595,6 +610,11 @@ public:
         }
     }
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("adag"));
+        return ret;
+    }
 protected:
     bool m_has_disp = false;
     T m_disp = T(0);
@@ -694,6 +714,11 @@ public:
             RAISE_EXCEPTION("Failed to construct bosonic operator.");
         }
     }
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("n"));
+        return ret;
+    }
 };
 
 template <typename T> 
@@ -757,16 +782,20 @@ public:
     }
 
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        RAISE_EXCEPTION("Diagonal displacement operator transpose is invalid.");
+    }
 public:
     static void form_single_mode_displacement_operator(linalg::matrix<T>& Dk, const T& a, size_t ni)
     {   
         using real_type = typename linalg::get_real_type<T>::type;
         //form the dense displacement operator associated with a single mode.  
         T alpha = a;
-        T nalpha_conj = -conj(alpha);
-        real_type abs_alpha = abs(alpha);
+        T nalpha_conj = -linalg::conj(alpha);
+        real_type abs_alpha = linalg::abs(alpha);
         real_type a2 = abs_alpha*abs_alpha;
-        real_type expa2 = exp(-a2/2.0);
+        real_type expa2 = linalg::exp(-a2/2.0);
 
         Dk.resize(ni, ni);
         Dk(0, 0) = expa2;
@@ -886,14 +915,14 @@ public:
             size_t counter = 0;
 
 
-            RT coeff_a = 1.0/std::sqrt(2.0);
+            RT coeff_a = 1.0/linalg::sqrt(2.0);
 
             for(size_t i = 0; i < op->nstates(); ++i)
             {
                 if(op->contains_lowered_state(i, index))
                 {
                     size_t n = op->get_occupation(i, index);
-                    buffer[counter] = coeff_a*std::sqrt((1.0*n));
+                    buffer[counter] = coeff_a*linalg::sqrt((1.0*n));
                     colind[counter] = op->get_lowered_index(i, index);
                     ++counter;
                 }
@@ -908,7 +937,7 @@ public:
                 if(op->contains_raised_state(i, index))
                 {
                     size_t n = op->get_occupation(i, index);
-                    buffer[counter] = coeff_a*std::sqrt((n+1.0));
+                    buffer[counter] = coeff_a*linalg::sqrt((n+1.0));
                     colind[counter] = op->get_raised_index(i, index);
                     ++counter;
                 }
@@ -932,14 +961,14 @@ public:
 
             using RT = typename linalg::get_real_type<T>::type;
 
-            RT coeff_a = 1.0/std::sqrt(2.0);
+            RT coeff_a = 1.0/linalg::sqrt(2.0);
     
             for(size_t i = 0; i < op->nstates(); ++i)
             {
                 size_t n = op->get_occupation(i, index);
                 if(op->contains_lowered_state(i, index))
                 {
-                    mat(i, op->get_lowered_index(i, index)) = coeff_a*std::sqrt((1.0*n));
+                    mat(i, op->get_lowered_index(i, index)) = coeff_a*linalg::sqrt((1.0*n));
                 }
 
                 if(m_has_disp)
@@ -949,7 +978,7 @@ public:
 
                 if(op->contains_raised_state(i, index))
                 {
-                    mat(i, op->get_raised_index(i, index)) = coeff_a*std::sqrt((n+1.0));
+                    mat(i, op->get_raised_index(i, index)) = coeff_a*linalg::sqrt((n+1.0));
                 }
             }
 
@@ -961,6 +990,11 @@ public:
         }
     }
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(1), std::string("q"));
+        return ret;
+    }
 protected:
     bool m_has_disp = false;
     T m_disp = T(0);
@@ -993,6 +1027,12 @@ public:
     virtual void as_dense(const std::shared_ptr<utils::occupation_number_basis>& /* op */, size_t /* index */, linalg::matrix<T>& /* mat */) const
     {
         RAISE_EXCEPTION("Cannot form momentum as a real valued operator.");
+    }
+
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(-1), std::string("p"));
+        return ret;
     }
 };
 
@@ -1046,7 +1086,7 @@ public:
                 if(op->contains_lowered_state(i, index))
                 {
                     size_t n = op->get_occupation(i, index);
-                    buffer[counter] = T(0, 1.0)*std::sqrt(n/2.0);
+                    buffer[counter] = T(0, 1.0)*linalg::sqrt(n/2.0);
                     colind[counter] = op->get_lowered_index(i, index);
                     ++counter;
                 }
@@ -1054,7 +1094,7 @@ public:
                 if(op->contains_raised_state(i, index))
                 {
                     size_t n = op->get_occupation(i, index);
-                    buffer[counter] = T(0, -1.0)*std::sqrt((n+1.0)/2.0);
+                    buffer[counter] = T(0, -1.0)*linalg::sqrt((n+1.0)/2.0);
                     colind[counter] = op->get_raised_index(i, index);
                     ++counter;
                 }
@@ -1081,12 +1121,12 @@ public:
                 size_t n = op->get_occupation(i, index);
                 if(op->contains_lowered_state(i, index))
                 {
-                    mat(i, op->get_lowered_index(i, index)) = T(0, 1.0)*std::sqrt(n/2.0);
+                    mat(i, op->get_lowered_index(i, index)) = T(0, 1.0)*linalg::sqrt(n/2.0);
                 }
 
                 if(op->contains_raised_state(i, index))
                 {
-                    mat(i, op->get_raised_index(i, index)) = T(0, -1.0)*std::sqrt((n+1.0)/2.0);
+                    mat(i, op->get_raised_index(i, index)) = T(0, -1.0)*linalg::sqrt((n+1.0)/2.0);
                 }
             }
 
@@ -1098,6 +1138,11 @@ public:
         }
     }
 
+    virtual std::pair<T, std::string> transpose() const
+    {
+        std::pair<T, std::string> ret =  std::make_pair(T(-1), std::string("p"));
+        return ret;
+    }
 };
 
 }   //utils

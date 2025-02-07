@@ -13,6 +13,8 @@ class electronic_structure : public model<value_type>
 {
 public:
     using real_type = typename linalg::get_real_type<value_type>::type;
+    using model<value_type>::hamiltonian;
+    using model<value_type>::system_info;
 public:
     electronic_structure(){}
     electronic_structure(size_t N) : m_T(N, N), m_U(N, N, N, N) {}
@@ -96,7 +98,7 @@ protected:
         {
             for(size_t q = 0; q < N; ++q)
             {
-                if(std::abs(m_T(p, q)) > tol)
+                if(linalg::abs(m_T(p, q)) > tol)
                 {
                     H += m_T(p, q)*fermion_operator("cdag", p)*fermion_operator("c", q);
                 }
@@ -112,7 +114,7 @@ protected:
                 {
                     for(size_t s=0; s < N; ++s)
                     {
-                        if(std::abs(m_U(p, q, r, s)) > tol)
+                        if(linalg::abs(m_U(p, q, r, s)) > tol)
                         {
                             H += m_U(p, q, r, s)*fermion_operator("cdag", p)*fermion_operator("cdag", q)*fermion_operator("c", s)*fermion_operator("c", r);
                         }

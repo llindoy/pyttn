@@ -12,6 +12,8 @@ class spin_boson_base : public model<value_type>
 {
 public:
     using real_type = typename linalg::get_real_type<value_type>::type;
+    using model<value_type>::hamiltonian;
+    using model<value_type>::system_info;
 
     spin_boson_base() : m_eps(0), m_delta(0), m_spin_index(0) {}
     spin_boson_base(size_t spin_index, real_type eps, real_type delta, size_t N) : m_eps(eps), m_delta(delta), m_spin_index(spin_index), m_mode_dims(N) {}
@@ -62,11 +64,11 @@ protected:
     void build_system_op(Hop& H, real_type tol)
     {
         //add on the spin terms
-        if(std::abs(m_eps) > tol)
+        if(linalg::abs(m_eps) > tol)
         {   
             H += m_eps * sOP("sz", this->m_spin_index);
         }
-        if(std::abs(m_delta) > tol)
+        if(linalg::abs(m_delta) > tol)
         {   
             H += m_delta * sOP("sx", m_spin_index);
         }
@@ -86,6 +88,8 @@ class spin_boson_generic : public spin_boson_base<value_type>
 public:
     using base_type = spin_boson_base<value_type>;
     using real_type = typename linalg::get_real_type<value_type>::type;
+    using model<value_type>::hamiltonian;
+    using model<value_type>::system_info;
 public:
     spin_boson_generic() : base_type(){}
     spin_boson_generic(real_type eps, real_type delta, const linalg::matrix<value_type>& _T) : base_type(0, eps, delta, _T.shape(0)), m_T(_T){}
@@ -144,7 +148,7 @@ protected:
 
                 if(!(i == this->m_spin_index && j == this->m_spin_index))
                 {
-                    if(std::abs(m_T(i, j)) > tol)
+                    if(linalg::abs(m_T(i, j)) > tol)
                     {
                         H += m_T(i, j) * sOP(li, i) * sOP(lj, j);
                     }
@@ -165,6 +169,8 @@ class spin_boson_star : public spin_boson_base<value_type>
 public:
     using base_type = spin_boson_base<value_type>;
     using real_type = typename linalg::get_real_type<value_type>::type;
+    using model<value_type>::hamiltonian;
+    using model<value_type>::system_info;
 public:
     spin_boson_star(){}
     spin_boson_star(real_type eps, real_type delta, const std::vector<real_type>& _w, const std::vector<value_type>& _g) : base_type(0, eps, delta, _w.size()), m_w(_w), m_g(_g)
@@ -255,6 +261,8 @@ class spin_boson_chain : public spin_boson_base<value_type>
 public:
     using real_type = typename linalg::get_real_type<value_type>::type;
     using base_type = spin_boson_base<value_type>;
+    using model<value_type>::hamiltonian;
+    using model<value_type>::system_info;
 public:
     spin_boson_chain(){}
     spin_boson_chain(real_type eps, real_type delta, const std::vector<real_type>& _e, const std::vector<value_type>& _t) : base_type(0, eps, delta, _e.size()), m_e(_e), m_t(_t)

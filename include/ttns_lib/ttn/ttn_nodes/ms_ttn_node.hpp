@@ -18,7 +18,7 @@ namespace ttns
 template <typename T, typename backend>
 using multiset_node_data = std::vector<ttn_node_data<T, backend>>;
 
-template <typename T, typename backend, typename = typename std::enable_if<std::is_same<backend, blas_backend>::value, void>::type> 
+template <typename T, typename backend, typename = typename std::enable_if<std::is_same<backend, linalg::blas_backend>::value, void>::type> 
 std::ostream& operator<<(std::ostream& os, const multiset_node_data<T, backend>& t)
 {
     for(size_t i = 0; i < t.size(); ++i)
@@ -28,7 +28,7 @@ std::ostream& operator<<(std::ostream& os, const multiset_node_data<T, backend>&
     return os;
 }
 
-};
+}
 
 #include "node_traits/ttn_node_traits.hpp"
 #include "node_traits/ms_ttn_node_traits.hpp"
@@ -46,9 +46,9 @@ template <typename T, typename backend>
 class tree_node<tree_base<multiset_node_data<T, backend> > >: 
     public tree_node_base<tree_base<multiset_node_data<T, backend> > >
 {
-    static_assert(std::is_base_of<backend_base, backend>::value, "The second template argument to the ttn_node object must be a valid backend.");
+    static_assert(std::is_base_of<linalg::backend_base, backend>::value, "The second template argument to the ttn_node object must be a valid backend.");
 public:
-    using matrix_type = matrix<T, backend>;
+    using matrix_type = linalg::matrix<T, backend>;
     using value_type = multiset_node_data<T, backend>;
     using tree_type = tree_base<value_type>;
     using base_type = tree_node_base<tree_type>;
@@ -56,8 +56,10 @@ public:
     using real_type = typename tmp::get_real_type<T>::type;
     using node_type = tree_node<tree_base<value_type>>;
     using self_type = node_type;
+    using hrank_type = std::vector<size_type>;
 
     using bond_matrix_type = std::vector<matrix_type>;
+    using population_matrix_type = std::vector<linalg::diagonal_matrix<real_type, backend>>;
     using node_helper = ttn_node_helper<multiset_node_data, T, backend>;
 
     using engine_type = orthogonality::decomposition_engine<T, backend, false>;
@@ -89,6 +91,7 @@ public:
             m_workspace.resize(nset);
             m_U.resize(nset);
             m_R.resize(nset);
+            m_S.resize(nset);
             m_ortho_engine.resize(m_nthreads);
 
             for(size_type i = 0; i < nset; ++i) 
@@ -100,6 +103,7 @@ public:
                 for(const auto& a : nodes)
                 {
                     CALL_AND_HANDLE(r2l_core::resize_r_matrix(a()[i], m_R[i], true), "Failed to resize elements of the r tensor.");
+                    m_S[i].resize(m_R[i].shape(0), m_R[i].shape(1));
                 }
             }
     
@@ -137,10 +141,12 @@ public:
             {
                 m_U[i].clear();
                 m_R[i].clear();
+                m_S[i].clear();
                 m_workspace[i].clear();
             }
             m_U.clear();
             m_R.clear();
+            m_S.clear();
             m_workspace.clear();
 
             m_maxcapacity.clear();
@@ -172,22 +178,28 @@ public:
         size_type nthreads() const{return m_nthreads;}
         size_type& nthreads() {m_initialised = false; return m_nthreads;}
 
+        bool parallelise() const{return m_nthreads>1;}
+
         size_type most_recent_node() const{return m_most_recent_node;}
         size_type& most_recent_node(){return m_most_recent_node;}
 
-
+        population_matrix_type& population_matrix(){return m_S;}
         std::vector<matrix_type>& bond_matrix(){return m_R;}
         std::vector<engine_type>& eng(){return m_ortho_engine;}
         std::vector<matrix_type>& work(){return m_workspace;}
         std::vector<matrix_type>& R(){return m_R;}
         std::vector<matrix_type>& U(){return m_U;}
+        population_matrix_type& S(){return S;}
         
+        const population_matrix_type& population_matrix() const{return m_S;}
         const std::vector<matrix_type>& bond_matrix() const{return m_R;}
         const std::vector<engine_type>& eng() const{return m_ortho_engine;}
         const std::vector<matrix_type>& work() const{return m_workspace;}
         const std::vector<matrix_type>& R() const{return m_R;}
         const std::vector<matrix_type>& U() const{return m_U;}
+        const population_matrix_type& S() const{return m_S;}
 
+        linalg::diagonal_matrix<real_type, backend>& population_matrix(size_type i){return m_S[i];}
         matrix_type& bond_matrix(size_type i){return m_R[i];}
         engine_type& eng(size_type i)
         {       
@@ -197,7 +209,9 @@ public:
         matrix_type& work(size_type i){return m_workspace[i];}
         matrix_type& R(size_type i){return m_R[i];}
         matrix_type& U(size_type i){return m_U[i];}
+        linalg::diagonal_matrix<real_type, backend>& S(size_type i){return m_S[i];}
         
+        const linalg::diagonal_matrix<real_type, backend>& population_matrix(size_type i)const{return m_S[i];}
         const matrix_type& bond_matrix(size_type i) const{return m_R[i];}
         const engine_type& eng(size_type i) const
         {   
@@ -207,11 +221,13 @@ public:
         const matrix_type& work(size_type i) const{return m_workspace[i];}
         const matrix_type& R(size_type i) const{return m_R[i];}
         const matrix_type& U(size_type i) const{return m_U[i];}
+        const linalg::diagonal_matrix<real_type, backend>& S(size_type i)const{return m_S[i];}
         
     protected:
         std::vector<engine_type> m_ortho_engine;
         std::vector<matrix_type> m_U;
         std::vector<matrix_type> m_R;
+        population_matrix_type m_S;
         std::vector<matrix_type> m_workspace;
         std::vector<size_type> m_maxsize;
         std::vector<size_type> m_maxcapacity;
@@ -286,6 +302,11 @@ public:
         return ms;
     }
 
+    void get_hrank(std::vector<size_type>& res ) const
+    {
+        res.resize(m_data.size()); 
+        for(size_t i = 0; i < m_data.size(); ++i){res[i] = m_data[i].hrank();}
+    }
     size_type hrank(size_type i) const{return m_data[i].hrank();}
     size_type nmodes() const{return m_children.size();}
     size_type dimen(size_type i) const {return m_data[i].dimen();}
@@ -303,6 +324,26 @@ public:
     }
     const std::vector<size_type>& dims(size_type i) const{return m_data[i].dims();}
     size_type nbonds() const{return this->size() + (this->is_root() ? 0 : 1);}
+
+    size_type buffer_maxcapacity() const
+    {
+        size_t bs = 0;
+        for(size_t i = 0; i < nset(); ++i)
+        {
+            bs += m_data[i].capacity();
+        }
+        return bs;
+    }
+
+    size_t buffer_size() const
+    {
+        size_t bs = 0;
+        for(size_t i = 0; i < nset(); ++i)
+        {
+            bs += m_data[i].size();
+        }
+        return bs;
+    }
 
     const value_type& operator()() const {return m_data;}
     value_type& operator()() {return m_data;}
@@ -350,20 +391,20 @@ public:
         for(size_type i = 0; i < this->nset(); ++i)
         {
             auto vec = m_data[i].as_rank_1();
-            _norm += std::real(linalg::dot_product(linalg::conj(vec), vec));
+            _norm += linalg::real(linalg::dot_product(linalg::conj(vec), vec));
         }
         return std::sqrt(_norm);
     }
 
     template <typename U>
-    typename std::enable_if<is_number<U>::value, self_type&>::type operator*=(const U& u)
+    typename std::enable_if<linalg::is_number<U>::value, self_type&>::type operator*=(const U& u)
     {
         for(size_type i = 0; i < this->nset(); ++i){m_data[i].as_matrix() *= u;}
         return *this;
     }
 
     template <typename U>
-    typename std::enable_if<is_number<U>::value, self_type&>::type operator/=(const U& u)
+    typename std::enable_if<linalg::is_number<U>::value, self_type&>::type operator/=(const U& u)
     {
         for(size_type i = 0; i < this->nset(); ++i){m_data[i].as_matrix() /= u;}
         return *this;
@@ -375,12 +416,13 @@ public:
     setup_data_from_topology_node(const ntree_node<ntree<Itype, Atype>>& tree_iter, 
                                   const ntree_node<ntree<Itype, Atype>>& capacity_iter, 
                                   size_type ndims,
-                                  size_type nset = 1)
+                                  size_type nset = 1,
+                                  bool purification = false)
     {
         m_data.resize(nset);
         for(size_type i = 0; i < nset; ++i)
         {
-            m_data[i].setup_data_from_topology_node(tree_iter, capacity_iter, ndims);
+            m_data[i].setup_data_from_topology_node(tree_iter, capacity_iter, ndims, purification);
         }
     }
 
@@ -389,39 +431,48 @@ public:
     setup_data_from_topology_node(const ntree_node<ntree<std::vector<Itype>, Atype>>& tree_iter, 
                                   const ntree_node<ntree<std::vector<Itype>, Atype>>& capacity_iter, 
                                   size_type ndims,
-                                  size_type nset = 1)
+                                  size_type nset = 1,
+                                  bool purification = false)
     {
         ASSERT(tree_iter.value().size() == nset, "Cannot setup data from topology node the nset variable has not been set correctly.");
         m_data.resize(nset);
         for(size_type i = 0; i < nset; ++i)
         {
-            m_data[i].setup_data_from_topology_node(tree_iter, capacity_iter, ndims, i);
+            m_data[i].setup_data_from_topology_node(tree_iter, capacity_iter, ndims, i, purification);
         }
     }
 
 public:
     void set_node_identity(){for(auto& data : m_data){data.set_identity();}}
     void set_node_identity(size_type i){m_data[i].set_identity();}
-    void set_node_random(std::mt19937& rng){for(size_type i = 0; i < this->nset(); ++i){m_data[i].set_random(rng);}}
-    void set_node_random(size_type i, std::mt19937& rng){m_data[i].set_random(rng);}
+    void set_node_random(linalg::random_engine<backend>& rng){for(size_type i = 0; i < this->nset(); ++i){m_data[i].set_random(rng);}}
+    void set_node_random(size_type i, linalg::random_engine<backend>& rng){rng.fill_random(m_data[i]);}
 
-    void set_leaf_node_state(size_type sind, size_type i, std::mt19937& rng)
+    void set_leaf_node_state(size_type sind, size_type i, linalg::random_engine<backend>& rng, bool random_unoccupied_initialisation=false)
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
-        this->m_data[sind].set_node_state(i, rng);
+        this->m_data[sind].set_node_state(i, rng, random_unoccupied_initialisation);
     }
 
     template <typename U, typename be> 
-    void set_leaf_node_vector(size_type sind, const linalg::vector<U, be>& psi0, std::mt19937& rng)
+    void set_leaf_node_vector(size_type sind, const linalg::vector<U, be>& psi0, linalg::random_engine<backend>& rng)
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
         this->m_data[sind].set_node_vector(psi0, rng);
     }
 
-    void set_leaf_purification(size_type sind, std::mt19937& rng)
+    void set_leaf_purification(size_type sind, linalg::random_engine<backend>& rng)
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
         this->m_data[sind].set_node_purification(rng);
+    }
+
+    void conj()
+    {
+        for(size_t i = 0; i < this->nset(); ++i)
+        {
+            this->m_data[i].conj();
+        }
     }
 public:
     static size_type contraction_capacity(const node_type& a, const node_type& b){CALL_AND_RETHROW(return node_helper::contraction_capacity(a, b));}

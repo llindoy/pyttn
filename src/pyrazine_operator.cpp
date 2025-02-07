@@ -148,7 +148,6 @@ int main(int argc, char* argv[])
             STOP_TIMER("SOP built");
               
             START_TIMER;
-            sop.jordan_wigner();
             STOP_TIMER("jordan_wigner");
             //std::cout << sop << std::endl;
             //START_TIMER;
@@ -167,10 +166,10 @@ int main(int argc, char* argv[])
             topology().insert(1);
 
             size_t N1 = 1;  
-            size_t N2 = 1;
-            size_t N3 = 1;
-            size_t N4 = 1;
-            size_t N5 = 1;
+            size_t N2 = 2;
+            size_t N3 = 3;
+            size_t N4 = 4;
+            size_t N5 = 5;
 
             std::vector<size_t> m(24);
             for(size_t i=0; i < m.size(); ++i){m[i] = 1;}

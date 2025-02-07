@@ -23,7 +23,7 @@ public:
 };
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 
 
 template <>

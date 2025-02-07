@@ -138,9 +138,9 @@ namespace node_data_traits
 
     //clear traits for the ttn node data object
     template <typename T, size_t D, typename backend>
-    struct clear_traits<tensor<T, D, backend> > 
+    struct clear_traits<linalg::tensor<T, D, backend> > 
     {
-        void operator()(tensor<T, D, backend>& t){CALL_AND_RETHROW(t.clear());}
+        void operator()(linalg::tensor<T, D, backend>& t){CALL_AND_RETHROW(t.clear());}
     };
 }
 

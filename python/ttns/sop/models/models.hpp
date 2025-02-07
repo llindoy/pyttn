@@ -25,6 +25,8 @@ void init_models(py::module &m, const std::string& label)
     using namespace ttns;
     using real_type = typename linalg::get_real_type<T>::type;
 
+    using conv = linalg::pybuffer_converter<linalg::blas_backend>;
+
     //the base model type
     py::class_<model<T>>(m, (std::string("model_")+label).c_str())
         .def("hamiltonian", static_cast<SOP<T> (model<T>::*)(real_type)>(&model<T>::hamiltonian), py::arg("tol") = 1e-14)
@@ -42,8 +44,8 @@ void init_models(py::module &m, const std::string& label)
                 {
                     linalg::matrix<T, linalg::blas_backend> mT;
                     linalg::tensor<T, 4, linalg::blas_backend> tU;
-                    copy_pybuffer_to_tensor(_T, mT);
-                    copy_pybuffer_to_tensor(_U, tU);
+                    conv::copy_to_tensor(_T, mT);
+                    conv::copy_to_tensor(_U, tU);
                     return AIM<T>(mT, tU);
                 }
             )
@@ -52,8 +54,8 @@ void init_models(py::module &m, const std::string& label)
                 {
                     linalg::matrix<T, linalg::blas_backend> mT;
                     linalg::tensor<T, 4, linalg::blas_backend> tU;
-                    copy_pybuffer_to_tensor(_T, mT);
-                    copy_pybuffer_to_tensor(_U, tU);
+                    conv::copy_to_tensor(_T, mT);
+                    conv::copy_to_tensor(_U, tU);
                     return AIM<T>(mT, tU, inds);
                 }
             )
@@ -71,7 +73,7 @@ void init_models(py::module &m, const std::string& label)
             (
                 "T", 
                 static_cast<const linalg::matrix<T>& (AIM<T>::*)() const>(&AIM<T>::T), 
-                [](AIM<T>& o, py::buffer& i){linalg::copy_pybuffer_to_tensor<T, 2>(i, o.T());}
+                [](AIM<T>& o, py::buffer& i){conv::copy_to_tensor<T, 2>(i, o.T());}
             )
         .def("Tij", static_cast<const T& (AIM<T>::*)(size_t, size_t) const>(&AIM<T>::T), py::return_value_policy::reference)
 
@@ -79,7 +81,7 @@ void init_models(py::module &m, const std::string& label)
             (
                 "U", 
                 static_cast<const linalg::tensor<T, 4>& (AIM<T>::*)() const>(&AIM<T>::U),
-                [](AIM<T>& o, py::buffer& i){linalg::copy_pybuffer_to_tensor<T, 4>(i, o.U());}
+                [](AIM<T>& o, py::buffer& i){conv::copy_to_tensor<T, 4>(i, o.U());}
             )
         .def("Uijkl", static_cast<const T& (AIM<T>::*)(size_t, size_t, size_t, size_t) const>(&AIM<T>::U), py::return_value_policy::reference);    
 
@@ -91,8 +93,8 @@ void init_models(py::module &m, const std::string& label)
                 {
                     linalg::matrix<T, linalg::blas_backend> mT;
                     linalg::tensor<T, 4, linalg::blas_backend> tU;
-                    copy_pybuffer_to_tensor(_T, mT);
-                    copy_pybuffer_to_tensor(_U, tU);
+                    conv::copy_to_tensor(_T, mT);
+                    conv::copy_to_tensor(_U, tU);
                     return electronic_structure<T>(mT, tU);
                 }
             )
@@ -102,7 +104,7 @@ void init_models(py::module &m, const std::string& label)
             (
                 "T", 
                 static_cast<const linalg::matrix<T>& (electronic_structure<T>::*)() const>(&electronic_structure<T>::T), 
-                [](electronic_structure<T>& o, py::buffer& i){linalg::copy_pybuffer_to_tensor<T, 2>(i, o.T());}
+                [](electronic_structure<T>& o, py::buffer& i){conv::copy_to_tensor<T, 2>(i, o.T());}
             )
         .def("Tij", static_cast<const T& (electronic_structure<T>::*)(size_t, size_t) const>(&electronic_structure<T>::T), py::return_value_policy::reference)
 
@@ -110,7 +112,7 @@ void init_models(py::module &m, const std::string& label)
             (
                 "U", 
                 static_cast<const linalg::tensor<T, 4>& (electronic_structure<T>::*)() const>(&electronic_structure<T>::U),
-                [](electronic_structure<T>& o, py::buffer& i){linalg::copy_pybuffer_to_tensor<T, 4>(i, o.U());}
+                [](electronic_structure<T>& o, py::buffer& i){conv::copy_to_tensor<T, 4>(i, o.U());}
             )
         .def("Uijkl", static_cast<const T& (electronic_structure<T>::*)(size_t, size_t, size_t, size_t) const>(&electronic_structure<T>::U), py::return_value_policy::reference);
 
@@ -182,7 +184,7 @@ void init_models(py::module &m, const std::string& label)
         .def(py::init([](real_type eps, real_type delta, py::buffer& bT)
                 {
                     linalg::matrix<T, linalg::blas_backend> mT;
-                    copy_pybuffer_to_tensor(bT, mT);
+                    conv::copy_to_tensor(bT, mT);
                     return spin_boson_generic<T>(eps, delta, mT);
                 }
             )
@@ -190,7 +192,7 @@ void init_models(py::module &m, const std::string& label)
         .def(py::init([](size_t spin_index, real_type eps, real_type delta, py::buffer& bT)
                 {
                     linalg::matrix<T, linalg::blas_backend> mT;
-                    copy_pybuffer_to_tensor(bT, mT);
+                    conv::copy_to_tensor(bT, mT);
                     return spin_boson_generic<T>(spin_index, eps, delta, mT);
                 }
             )
@@ -199,7 +201,7 @@ void init_models(py::module &m, const std::string& label)
             (
                 "T", 
                 static_cast<const linalg::matrix<T>& (spin_boson_generic<T>::*)() const>(&spin_boson_generic<T>::T), 
-                [](spin_boson_generic<T>& o, py::buffer& i){linalg::copy_pybuffer_to_tensor<T, 2>(i, o.T());}
+                [](spin_boson_generic<T>& o, py::buffer& i){conv::copy_to_tensor<T, 2>(i, o.T());}
             );
 
     py::class_<spin_boson_star<T>, spin_boson_base<T>>(m, (std::string("spin_boson_star_")+label).c_str())
@@ -261,6 +263,7 @@ void init_models(py::module &m, const std::string& label)
 
 }
 
+template <typename real_type>
 void initialise_models(py::module& m);
 
 #endif  //PYTHON_BINDING_SOP_MODELS_HPP

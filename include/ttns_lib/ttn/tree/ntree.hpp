@@ -212,7 +212,10 @@ public:
     
     void insert(const value_type& data = value_type())  
     {
-        clear();
+        if(!empty())
+        {
+            RAISE_EXCEPTION("Failed to insert element as root into ntree.  It is not empty.");
+        }
         m_root = create_node();
         m_root->m_data = data;
         m_root->m_parent = nullptr;
@@ -241,6 +244,20 @@ public:
             destroy_node(m_root);
             m_root = nullptr;
         }
+    }
+
+    void leaf_indices(std::vector<std::vector<size_type>>& linds) const
+    {
+        linds.resize(this->nleaves());
+        if(this->empty()){return;}
+        m_root->leaf_indices(linds, false);
+    }
+
+    void node_indices(std::vector<std::vector<size_type>>& linds) const
+    {
+        linds.resize(this->nleaves());
+        if(this->empty()){return;}
+        m_root->node_indices(linds, false);
     }
 
 public:

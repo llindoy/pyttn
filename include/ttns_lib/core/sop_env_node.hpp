@@ -5,6 +5,7 @@
 #include <linalg/linalg.hpp>
 
 #include "observable_node.hpp"
+#include "../ttn/tree/tree_node.hpp"
 
 
 namespace ttns
@@ -68,6 +69,13 @@ public:
         CALL_AND_RETHROW(m_mf.reallocate_matrices(capacity));
     }
 
+    void initialise_root()
+    {
+        if(has_identity())
+        {
+            m_mf.id().fill_ones();
+        }
+    }
 
     void resize(size_type r)
     {

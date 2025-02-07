@@ -71,7 +71,7 @@ public:
         self_type& operator=(const base_iterator_type& src){m_iter = src;   return *this;}
 
         base_iterator_type base() const{return m_iter;}
-        operator tree_node_child_iterator<convertible_iterator>() const {return tree_node_child_iterator<convertible_iterator>(m_iter);}
+        //operator tree_node_child_iterator<convertible_iterator>() const {return tree_node_child_iterator<convertible_iterator>(m_iter);}
 
         reference operator*() const{return **m_iter;}
         pointer operator->() const{ return *m_iter;}

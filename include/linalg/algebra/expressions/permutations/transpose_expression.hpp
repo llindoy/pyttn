@@ -212,9 +212,12 @@ public:
     matrix_type matrix() const{return m_arr;}
     value_type coeff() const{return m_alpha;}
 
-    //function for evaluating the transpose_expression.  This function can only be applied to rank 2 dense tensors
+    //function for evaluating the transpose_expression.  This function can only be applied to csr matrices
     template <typename array_type>
-    typename std::enable_if<is_csr_matrix_type<_mat_type>::value && compatible_traits<_mat_type, array_type>::value, void>::type applicative(array_type& /* res */) const{RAISE_EXCEPTION("matrix transpose is currently not supported for this sparse matrix type.");}
+    typename std::enable_if<is_csr_matrix_type<_mat_type>::value && compatible_traits<_mat_type, array_type>::value, void>::type applicative(array_type& res) const
+    {
+        CALL_AND_HANDLE(_mat_type::transpose(m_arr, res, m_alpha), "Failed to transpose csr matrix.");
+    }
 
     template <typename array_type>
     typename std::enable_if<is_dense_matrix<array_type>::value && compatible_traits<_mat_type, array_type>::value, void>::type addition_applicative(array_type& /* res */) const{RAISE_EXCEPTION("matrix transpose is currently not supported for this sparse matrix type.")}

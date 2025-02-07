@@ -1,7 +1,7 @@
 #ifndef LINALG_ALGEBRA_CUBLAS_WRAPPER_HPP
 #define LINALG_ALGEBRA_CUBLAS_WRAPPER_HPP
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 
 #include "cuda_utils.hpp"
 

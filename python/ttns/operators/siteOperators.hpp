@@ -2,10 +2,6 @@
 #define PYTHON_BINDING_TTNS_SITE_OPERATORS_HPP
 
 #include <ttns_lib/operators/site_operators/matrix_operators.hpp>
-#include <ttns_lib/operators/site_operators/direct_product_operator.hpp>
-#include <ttns_lib/operators/site_operators/sequential_product_operator.hpp>
-#include <ttns_lib/operators/site_operators/liouville_space_operator.hpp>
-#include <ttns_lib/operators/site_operators/dvr_operator.hpp>
 #include <ttns_lib/operators/site_operators/site_operator.hpp>
 #include "../../utils.hpp"
 
@@ -19,69 +15,63 @@
 
 namespace py=pybind11;
 
-template <typename T>
+template <typename T, typename backend>
 void init_site_operators(py::module &m, const std::string& label)
 {
     using namespace ttns;
-    using prim = ops::primitive<T, linalg::blas_backend>;
-    using ident = ops::identity<T, linalg::blas_backend>;
-    using dmat = ops::dense_matrix_operator<T, linalg::blas_backend>;
-    using adjmat = ops::adjoint_dense_matrix_operator<T, linalg::blas_backend>;
-    using spmat = ops::sparse_matrix_operator<T, linalg::blas_backend>;
-    using diagmat = ops::diagonal_matrix_operator<T, linalg::blas_backend>;
-    using commmat = ops::dense_commutator_operator<T, linalg::blas_backend>;
-    using anti_commmat = ops::dense_anti_commutator_operator<T, linalg::blas_backend>;
-    using dvrop = ops::dvr_operator<T, linalg::blas_backend>;
-    using dirprodop = ops::direct_product_operator<T, linalg::blas_backend>;
-
+    using prim = ops::primitive<T, backend>;
+    using ident = ops::identity<T, backend>;
+    using dmat = ops::dense_matrix_operator<T, backend>;
+    using spmat = ops::sparse_matrix_operator<T, backend>;
+    using diagmat = ops::diagonal_matrix_operator<T, backend>;
 
     using size_type = typename prim::size_type;
     using real_type = typename prim::real_type;
 
-    using matrix_type = linalg::matrix<T, linalg::blas_backend>;
+    using matrix_type = linalg::matrix<T, backend>;
     using matrix_ref = typename prim::matrix_ref;
     using const_matrix_ref = typename prim::const_matrix_ref;
     using vector_ref = typename prim::vector_ref;
     using const_vector_ref = typename prim::const_vector_ref;
 
+    using conv = linalg::pybuffer_converter<backend>;
 
-    using siteop = site_operator<T, linalg::blas_backend>;
+    using siteop = site_operator<T, backend>;
+    using opdict = operator_dictionary<T, backend>;
     //the base primitive operator type
     py::class_<siteop>(m, (std::string("site_operator_")+label).c_str())
         .def(py::init())
         .def(py::init<const siteop&>())
         .def(py::init<const ident&>())
         .def(py::init<const dmat&>())
-        .def(py::init<const adjmat&>())
         .def(py::init<const spmat&>())
         .def(py::init<const diagmat&>())
-        .def(py::init<const commmat&>())
-        .def(py::init<const anti_commmat&>())
-        .def(py::init<const dvrop&>())
-        .def(py::init<const dirprodop&>())
+
+        .def(py::init<const ident&, size_t>())
+        .def(py::init<const dmat&, size_t>())
+        .def(py::init<const spmat&, size_t>())
+        .def(py::init<const diagmat&, size_t>())
+
+        .def(py::init<const sOP&, const system_modes&, bool>(), py::arg(), py::arg(), py::arg("use_sparse")=true)
+        .def(py::init<const sOP&, const system_modes&, const opdict&, bool>(), py::arg(), py::arg(), py::arg(), py::arg("use_sparse")=true)
+
+        .def("initialise", static_cast<void (siteop::*)(const sOP&, const system_modes&, bool)>(&siteop::initialise), py::arg(), py::arg(), py::arg("use_sparse")=true)
+        .def("initialise", static_cast<void (siteop::*)(const sOP&, const system_modes&, const opdict&, bool)>(&siteop::initialise), py::arg(), py::arg(), py::arg(), py::arg("use_sparse")=true)
 
         .def("complex_dtype", [](const siteop&){return !std::is_same<T, real_type>::value;})
+
+        .def("transpose", &siteop::transpose)
 
         .def("assign", [](siteop& op, const siteop& o){return op=o;})
         .def("assign", [](siteop& op, const ident& o){return op=o;})
         .def("assign", [](siteop& op, const dmat& o){return op=o;})
-        .def("assign", [](siteop& op, const adjmat& o){return op=o;})
         .def("assign", [](siteop& op, const spmat& o){return op=o;})
         .def("assign", [](siteop& op, const diagmat& o){return op=o;})
-        .def("assign", [](siteop& op, const commmat& o){return op=o;})
-        .def("assign", [](siteop& op, const anti_commmat& o){return op=o;})
-        .def("assign", [](siteop& op, const dvrop& o){return op=o;})
-        .def("assign", [](siteop& op, const dirprodop& o){return op=o;})
 
         .def("bind", [](siteop& op, const ident& o){return op.bind(o);})
         .def("bind", [](siteop& op, const dmat& o){return op.bind(o);})
-        .def("bind", [](siteop& op, const adjmat& o){return op.bind(o);})
         .def("bind", [](siteop& op, const spmat& o){return op.bind(o);})
         .def("bind", [](siteop& op, const diagmat& o){return op.bind(o);})
-        .def("bind", [](siteop& op, const commmat& o){return op.bind(o);})
-        .def("bind", [](siteop& op, const anti_commmat& o){return op.bind(o);})
-        .def("bind", [](siteop& op, const dvrop& o){return op.bind(o);})
-        .def("bind", [](siteop& op, const dirprodop& o){return op.bind(o);})
 
         .def("__copy__", [](const siteop& o){return siteop(o);})
         .def("__deepcopy__", [](const siteop& o, py::dict){return siteop(o);}, py::arg("memo"))
@@ -122,6 +112,7 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("is_resizable", &prim::is_resizable)
         .def("resize", &prim::resize)
         .def("clone", &prim::clone)
+        .def("transpose", &prim::transpose)
         .def("complex_dtype", [](const prim&){return !std::is_same<T, real_type>::value;})
         .def("__str__", &prim::to_string);
 
@@ -137,8 +128,8 @@ void init_site_operators(py::module &m, const std::string& label)
         .def(py::init<matrix_type>())
         .def(py::init([](py::buffer& b)
                 {
-                    linalg::matrix<T, linalg::blas_backend> mat;
-                    copy_pybuffer_to_tensor(b, mat);
+                    linalg::matrix<T, backend> mat;
+                    conv::copy_to_tensor(b, mat);
                     return dmat(mat);
                 }
             )
@@ -146,23 +137,8 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("complex_dtype", [](const dmat&){return !std::is_same<T, real_type>::value;})
         .def("matrix", &dmat::mat);
 
-    //a dense matrix representation of the adjoint of an operator
-    py::class_<adjmat, prim>(m, (std::string("adjoint_matrix_")+label).c_str())
-        .def(py::init())
-        .def(py::init<matrix_type>())
-        .def(py::init([](py::buffer& b)
-                {
-                    linalg::matrix<T, linalg::blas_backend> mat;
-                    copy_pybuffer_to_tensor(b, mat);
-                    return adjmat(mat);
-                }
-            )
-        )
-        .def("complex_dtype", [](const adjmat&){return !std::is_same<T, real_type>::value;})
-        .def("matrix", &adjmat::mat);
-
     //a csr matrix representation of an operator
-    using csr_type = linalg::csr_matrix<T, linalg::blas_backend>;
+    using csr_type = linalg::csr_matrix<T, backend>;
     using index_type = typename csr_type::index_type;
     py::class_<spmat, prim>(m, (std::string("sparse_matrix_")+label).c_str())
         .def(py::init())
@@ -172,14 +148,14 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("matrix", &spmat::mat);
 
     //a diagonal matrix representation of an operator
-    using diag_type = linalg::diagonal_matrix<T, linalg::blas_backend>;
+    using diag_type = linalg::diagonal_matrix<T, backend>;
     py::class_<diagmat, prim>(m, (std::string("diagonal_matrix_")+label).c_str())
         .def(py::init())
         .def(py::init<const diag_type&>())        
         .def(py::init([](py::buffer& b)
                 {
                     diag_type mat;
-                    copy_pybuffer_to_diagonal_matrix(b, mat);
+                    conv::copy_to_diagonal_matrix(b, mat);
                     return diagmat(mat);
                 }
             )
@@ -192,87 +168,19 @@ void init_site_operators(py::module &m, const std::string& label)
         .def(py::init<const linalg::tensor<T, 1>&, size_t, size_t>())
         .def("complex_dtype", [](const diagmat&){return !std::is_same<T, real_type>::value;})
         .def("matrix", &diagmat::mat);
-
-    //a special operator form for a the liouville space commutator operator
-    py::class_<commmat, prim>(m, (std::string("commutator_")+label).c_str())
-        .def(py::init())
-        .def(py::init<matrix_type>())
-        .def(py::init([](py::buffer& b)
-                {
-                    linalg::matrix<T, linalg::blas_backend> mat;
-                    copy_pybuffer_to_tensor(b, mat);
-                    return commmat(mat);
-                }
-            )
-        )
-        .def("complex_dtype", [](const commmat&){return !std::is_same<T, real_type>::value;})
-        .def("matrix", &commmat::mat);
-
-    //a special operator form for the liouville space anticommutator operator
-    py::class_<anti_commmat, prim>(m, (std::string("anti_commutator_")+label).c_str())
-        .def(py::init())
-        .def(py::init<matrix_type>())
-        .def(py::init([](py::buffer& b)
-                {
-                    linalg::matrix<T, linalg::blas_backend> mat;
-                    copy_pybuffer_to_tensor(b, mat);
-                    return anti_commmat(mat);
-                }
-            )
-        )
-        .def("complex_dtype", [](const anti_commmat&){return !std::is_same<T, real_type>::value;})
-        .def("matrix", &anti_commmat::mat);
-
-    //a special operator form for a seperable dvr operator
-    py::class_<dvrop, prim>(m, (std::string("dvr_")+label).c_str())
-        .def(py::init())
-        .def(py::init<const diag_type&, const std::vector<matrix_type>&>())
-        .def(py::init([](const diag_type& diag, std::vector<py::buffer>& b)
-                {
-                    std::vector<linalg::matrix<T, linalg::blas_backend>> a(b.size());
-                    for(size_t x = 0; x < b.size(); ++x)
-                    {
-                        copy_pybuffer_to_tensor(b[x], a[x]);
-                    }
-                    return dvrop(diag, a);
-                }
-            )
-        )
-        .def("complex_dtype", [](const dvrop&){return !std::is_same<T, real_type>::value;});
-
-    //a special operator form for a direct product operator
-    py::class_<dirprodop, prim>(m, (std::string("direct_product_")+label).c_str())
-        .def(py::init())
-        .def(py::init<const std::vector<matrix_type>&>())
-        .def(py::init([](std::vector<py::buffer>& b)
-                {
-                    std::vector<linalg::matrix<T, linalg::blas_backend>> a(b.size());
-                    for(size_t x = 0; x < b.size(); ++x)
-                    {
-                        copy_pybuffer_to_tensor(b[x], a[x]);
-                    }
-                    return dirprodop(a);
-                }
-            )
-        )
-        .def("complex_dtype", [](const dirprodop&){return !std::is_same<T, real_type>::value;});
-
-
-    //a special operator form for a sequential product operator
-    //using seqprodop = ops::sequential_product_operator<T, linalg::blas_backend>;
-    //py::class_<seqprodop, prim>(m, (std::string("sequential_product_")+label).c_str())
-    //    .def(py::init())
-    //    .def("append", &seqprodop::append_operator<diagmat>)
-    //    .def("append", &seqprodop::append_operator<dmat>)
-    //    .def("append", &seqprodop::append_operator<adjmat>)
-    //    .def("append", &seqprodop::append_operator<spmat>)
-    //    .def("append", &seqprodop::append_operator<commmat>)
-    //    .def("append", &seqprodop::append_operator<anti_commmat>)
-    //    .def("append", &seqprodop::append_operator<dvrop>)
-    //    .def("append", &seqprodop::append_operator<dirprodop>);
 }
 
-void initialise_site_operators(py::module& m);
+template <typename backend>
+void initialise_site_operators(py::module& m)
+{
+    using real_type = double;
+    using complex_type = linalg::complex<real_type>;
+
+#ifdef BUILD_REAL_TTN
+    init_site_operators<real_type, backend>(m, "real");
+#endif
+    init_site_operators<complex_type, backend>(m, "complex");
+}
 
 #endif  //PYTHON_BINDING_TTNS_SITE_OPERATORS_HPP
 

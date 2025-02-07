@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyttn.oqs.exponential_fit_bath &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pyttn/index.html">API Documents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyttn.oqs.exponential_fit_bath</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyttn.oqs.exponential_fit_bath</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.fermionic_bath</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.bosonic_bath</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.utils.truncate</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">system_modes</span><span class="p">,</span> <span class="n">boson_mode</span><span class="p">,</span> <span class="n">fermion_mode</span>
+
+<div class="viewcode-block" id="ExpFitOQSBath">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitOQSBath">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExpFitOQSBath</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The base class for handling a bath representing an exponential fit to a bath correlation function</span>
+<span class="sd">    of the form</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        C(t) = \\sum_k d_{k} \exp(-z_k t)</span>
+
+<span class="sd">    :param dk: The coefficient in the exponential decomposition</span>
+<span class="sd">    :type dk: np.ndarray</span>
+<span class="sd">    :param zk: The decay rates in the exponential decomposition</span>
+<span class="sd">    :type zk: np.ndarray</span>
+<span class="sd">    :param fermionic: Whether or not the bath is a fermionic bath (default False)</span>
+<span class="sd">    :type fermionic: bool, optional</span>
+<span class="sd">    :param combine_real: Whether or not to combine real frequency modes (default False)</span>
+<span class="sd">    :type combine_real: bool, optional</span>
+<span class="sd">    :param tol: The tolerance used to determine if a mode is a real frequency mode (default 1e-12)</span>
+<span class="sd">    :type tol: float, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">fermionic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">combine_real</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">):</span>
+        <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dk</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">zk</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid bath decomposition&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ck</span> <span class="o">=</span> <span class="n">dk</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wk</span> <span class="o">=</span> <span class="n">zk</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_real_mode</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">_dk</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">_zk</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dk</span><span class="p">)):</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">combine_real</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">zk</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="o">&lt;</span> <span class="n">tol</span><span class="p">):</span>
+                <span class="n">_zk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zk</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>           <span class="c1">#set the mode frequency </span>
+                <span class="n">_dk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dk</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>            <span class="c1">#set the mode coupling constant</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_real_mode</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>      <span class="c1">#flag that this is a real valued mode</span>
+
+                <span class="c1">#set up the information that will be used for additional mode combination.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">counter</span><span class="p">])</span>
+                <span class="n">counter</span> <span class="o">=</span> <span class="n">counter</span><span class="o">+</span><span class="mi">1</span>
+
+            <span class="c1">#otherwise we add on separate modes for forward and backward paths</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1">#handle the forward path object</span>
+                <span class="n">_zk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zk</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">_dk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dk</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_real_mode</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+                <span class="c1">#handle the backward path object</span>
+                <span class="n">_zk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">zk</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="n">_dk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">dk</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_real_mode</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+                <span class="c1">#now set up the information that will be used for attempting additional mode combination</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">counter</span><span class="p">,</span> <span class="n">counter</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">counter</span> <span class="o">=</span> <span class="n">counter</span><span class="o">+</span><span class="mi">2</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">_dk</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">_zk</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fermion</span> <span class="o">=</span> <span class="n">fermionic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="ExpFitOQSBath.is_fermionic">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitOQSBath.is_fermionic">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_fermionic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether or not the bath is fermionic</span>
+<span class="sd">        :rtype: bool </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fermion</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mode_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;An array containing the dimensionality of each of the modes&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;An array containing the bath decomposition coefficients&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dk</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;An array containing the bath decomposition decay rates&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zk</span></div>
+
+
+<div class="viewcode-block" id="ExpFitBosonicBath">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExpFitBosonicBath</span><span class="p">(</span><span class="n">ExpFitOQSBath</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for handling a bosonic bath representing an exponential fit to a bath correlation function</span>
+<span class="sd">    of the form</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        C(t) = \\sum_k d_{k} \exp(-z_k t)</span>
+
+<span class="sd">    :param dk: The coefficient in the exponential decomposition</span>
+<span class="sd">    :type dk: np.ndarray</span>
+<span class="sd">    :param zk: The decay rates in the exponential decomposition</span>
+<span class="sd">    :type zk: np.ndarray</span>
+<span class="sd">    :param combine_real: Whether or not to combine real frequency modes (default False)</span>
+<span class="sd">    :type combine_real: bool, optional</span>
+<span class="sd">    :param tol: The tolerance used to determine if a mode is a real frequency mode (default 1e-12)</span>
+<span class="sd">    :type tol: float, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">combine_real</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">):</span>
+        <span class="n">ExpFitOQSBath</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">fermionic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">combine_real</span><span class="o">=</span><span class="n">combine_real</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">truncate_modes</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ExpFitBosonicBath.truncate_modes">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.truncate_modes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_modes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">truncation</span> <span class="o">=</span> <span class="n">DepthTruncation</span><span class="p">(</span><span class="mi">8</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes</span>
+<span class="sd">        using the truncation rule defined in the truncation object.</span>
+
+<span class="sd">        :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(8))</span>
+<span class="sd">        :type truncation: TruncationBase, optional</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span> <span class="o">=</span> <span class="n">truncation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zk</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExpFitBosonicBath.Ct">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.Ct">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Ct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of the non-interacting bath correlation function evaluated at the time points t, </span>
+<span class="sd">        defined by:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            C(t) = \\sum_k d_{k} \exp(-z_k t)</span>
+<span class="sd">        </span>
+<span class="sd">        :param t: time</span>
+<span class="sd">        :type t: np.ndarray</span>
+<span class="sd">        :return: The bath correlation function</span>
+<span class="sd">        :rtype: np.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ck</span><span class="p">)):</span>
+            <span class="n">ret</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ck</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_wk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="ExpFitBosonicBath.system_information">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.system_information">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">system_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.</span>
+
+<span class="sd">        :return: Bath system information</span>
+<span class="sd">        :rtype: system_modes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zk</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to compute system information object.  The bath object has not not been truncated.&quot;</span><span class="p">);</span>
+
+
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">cmode</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="p">):</span>
+            <span class="n">ret</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">boson_mode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cmode</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="ExpFitBosonicBath.__str__">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitBosonicBath.__str__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;bosonic bath: </span><span class="se">\n</span><span class="s1"> &#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> </span><span class="se">\\</span><span class="s1">alpha &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ck</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> </span><span class="se">\\</span><span class="s1">nu &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wk</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> modes &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> composite &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="p">)</span></div>
+</div>
+
+
+
+    <span class="c1">#def add_bath_hamiltonian(self, H, Spl, Spr, Sml = None, Smr = None, binds=None):</span>
+    <span class="c1">#    if binds  == None:</span>
+    <span class="c1">#        binds = [x+1 for i in range(len(self._dk))]</span>
+    <span class="c1">#</span>
+    <span class="c1">#    H += </span>
+
+
+
+<span class="c1">#This is currently completely incorrect.  We need to set this up to split this into filled and unfilled baths</span>
+<div class="viewcode-block" id="ExpFitFermionicBath">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExpFitFermionicBath</span><span class="p">(</span><span class="n">ExpFitOQSBath</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for handling a fermionic bath representing an exponential fit to a bath correlation function</span>
+<span class="sd">    of the form</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        C(t) = \\sum_k d_{k} \exp(-z_k t)</span>
+
+<span class="sd">    :param dk: The coefficient in the exponential decomposition</span>
+<span class="sd">    :type dk: np.ndarray</span>
+<span class="sd">    :param zk: The decay rates in the exponential decomposition</span>
+<span class="sd">    :type zk: np.ndarray</span>
+<span class="sd">    :param combine_real: Whether or not to combine real frequency modes (default False)</span>
+<span class="sd">    :type combine_real: bool, optional</span>
+<span class="sd">    :param tol: The tolerance used to determine if a mode is a real frequency mode (default 1e-12)</span>
+<span class="sd">    :type tol: float, optional</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">combine_real</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">):</span>
+        <span class="n">ExpFitOQSBath</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">fermionic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">combine_real</span><span class="o">=</span><span class="n">combine_real</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">truncate_modes</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ExpFitFermionicBath.Ct">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath.Ct">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Ct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the value of the non-interacting bath correlation function evaluated at the time points t, </span>
+<span class="sd">        defined by:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            C(t) = \\sum_k d_{k} \exp(-z_k t)</span>
+<span class="sd">        </span>
+<span class="sd">        :param t: time</span>
+<span class="sd">        :type t: np.ndarray</span>
+<span class="sd">        :return: The bath correlation function</span>
+<span class="sd">        :rtype: np.ndarray</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ck</span><span class="p">)):</span>
+            <span class="n">ret</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ck</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_wk</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="ExpFitFermionicBath.truncate_modes">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath.truncate_modes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">truncate_modes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">truncation</span> <span class="o">=</span> <span class="n">DepthTruncation</span><span class="p">(</span><span class="mi">2</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes</span>
+<span class="sd">        using the truncation rule defined in the truncation object.</span>
+
+<span class="sd">        :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(2))</span>
+<span class="sd">        :type truncation: TruncationBase, optional</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span> <span class="o">=</span> <span class="n">truncation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dk</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zk</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExpFitFermionicBath.__str__">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath.__str__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;fermionic bath: &#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> </span><span class="se">\\</span><span class="s1">alpha &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ck</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> </span><span class="se">\\</span><span class="s1">nu &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wk</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> modes &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode_dims</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> composite &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExpFitFermionicBath.system_information">
+<a class="viewcode-back" href="../../../pyttn/pyttn.oqs.html#pyttn.oqs.exponential_fit_bath.ExpFitFermionicBath.system_information">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">system_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.</span>
+
+<span class="sd">        :return: Bath system information</span>
+<span class="sd">        :rtype: system_modes</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">cmode</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_modes</span><span class="p">):</span>
+            <span class="n">ret</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">fermion_mode</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cmode</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ret</span></div>
+</div>
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

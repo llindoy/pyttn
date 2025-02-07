@@ -34,7 +34,10 @@ public:
             std::vector<size_type> times_visited(A.size()); std::fill(std::begin(times_visited), std::end(times_visited), 0);
             //resize the traversal order array
             size_type ntraversal_sites = 0;
-            for(const auto& a : A){ntraversal_sites += a.is_leaf() ? 2 : (1 + a.size());}
+            for(const auto& a : A)
+            {
+                ntraversal_sites += a.is_leaf() ? 2 : (1 + a.size());
+            }
             std::vector<size_type> traversal_order(ntraversal_sites);
 
 
@@ -64,7 +67,10 @@ public:
                         "Failed to access parent of node when constructing the traversal order array."
                     );
                 }
-                else if(i+1 != ntraversal_sites){RAISE_EXCEPTION("Critical Error: This condition should never be meet");}
+                else if(i+1 != ntraversal_sites)
+                {
+                    RAISE_EXCEPTION("Critical Error: This condition should never be meet");
+                }
 
                 ++times_visited[curr_node_id];
             }

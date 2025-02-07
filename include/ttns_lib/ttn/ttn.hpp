@@ -9,8 +9,10 @@
 #include "ttn_nodes/ttn_node.hpp"
 #include "../op.hpp"
 #include "../operators/site_operators/site_operator.hpp"
+#include "../operators/product_operator.hpp"
 
 #include "ttnbase.hpp"
+#include "ms_ttn.hpp"
 
 namespace ttns
 {
@@ -18,7 +20,7 @@ namespace ttns
 template <typename T, typename backend>
 using ttn_node = typename tree<ttn_node_data<T, backend> >::node_type;
 
-template <typename T, typename backend = blas_backend>
+template <typename T, typename backend = linalg::blas_backend>
 class ttn : public ttn_base<ttn_node_data, T, backend> 
 {
 public:
@@ -48,8 +50,10 @@ private:
     //provide access to base class operators
     using base_type::m_nodes;
     using base_type::m_nleaves;
-    using base_type::_rng;
+    using base_type::m_rengine;
+    using base_type::m_hrengine;
     using base_type::m_orthog;
+    using base_type::rng;
     using base_type::m_dim_sizes;
     using base_type::m_leaf_indices;
     using base_type::m_has_orthogonality_centre;
@@ -88,11 +92,11 @@ public:
 
         this->m_orthog.clear();
 
-        this->m_orthogonality_centre = other.obj().m_orthogonality_centre;
-        this->m_has_orthogonality_centre = other.obj().m_has_orthogonality_centre;
+        this->m_orthogonality_centre = other.obj().orthogonality_centre();
+        this->m_has_orthogonality_centre = other.obj().has_orthogonality_centre();
 
-        this->m_euler_tour = other.obj().m_euler_tour;
-        this->m_euler_tour_initialised = other.obj().m_euler_tour_initialised;
+        this->m_euler_tour = other.obj().euler_tour();
+        this->m_euler_tour_initialised = other.obj().euler_tour_initialised();
     }
 
 
@@ -104,7 +108,7 @@ public:
 
 
     template <typename INTEGER, typename Alloc>
-    ttn(const ntree<INTEGER, Alloc>& topology) try : base_type(topology, 1) {}
+    ttn(const ntree<INTEGER, Alloc>& topology, bool purification = false) try : base_type(topology, 1, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
@@ -112,21 +116,21 @@ public:
     }
 
     template <typename INTEGER, typename Alloc>
-    ttn(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity)try : base_type(topology, capacity, 1) {}
+    ttn(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, bool purification = false)try : base_type(topology, capacity, 1, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
         RAISE_EXCEPTION("Failed to construct TTN object.");
     }
 
-    ttn(const std::string& _topology) try : base_type(_topology, 1) {}
+    ttn(const std::string& _topology, bool purification = false) try : base_type(_topology, 1, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
         RAISE_EXCEPTION("Failed to construct TTN object.");
     }
 
-    ttn(const std::string& _topology, const std::string& _capacity) try : base_type(_topology, _capacity, 1) {}
+    ttn(const std::string& _topology, const std::string& _capacity, bool purification = false) try : base_type(_topology, _capacity, 1, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
@@ -159,8 +163,8 @@ public:
             }
             if(!all_fit){this->m_orthog.clear();}
 
-            this->m_orthogonality_centre = other.obj().m_orthogonality_centre;
-            this->m_has_orthogonality_centre = other.obj().m_has_orthogonality_centre;
+            this->m_orthogonality_centre = other.obj().orthogonality_centre();
+            this->m_has_orthogonality_centre = other.obj().has_orthogonality_centre();
         }
         else
         {
@@ -177,22 +181,14 @@ public:
 
             this->m_orthog.clear();
 
-            this->m_orthogonality_centre = other.obj().m_orthogonality_centre;
-            this->m_has_orthogonality_centre = other.obj().m_has_orthogonality_centre;
+            this->m_orthogonality_centre = other.obj().orthogonality_centre();
+            this->m_has_orthogonality_centre = other.obj().has_orthogonality_centre();
 
-            this->m_euler_tour = other.obj().m_euler_tour;
-            this->m_euler_tour_initialised = other.obj().m_euler_tour_initialised;
+            this->m_euler_tour = other.obj().euler_tour();
+            this->m_euler_tour_initialised = other.obj().euler_tour_initialised();
         }
         return *this;
     }
-
-    //TODO: set up initialisation form sparse ttn object
-    //template <typename U>
-    //ttn& operator=(const tree<std::vector<sttn_node_data>& sTTN)
-    //{   
-
-    //}
-
 
     size_type maximum_bond_dimension() const
     {
@@ -221,7 +217,10 @@ public:
 
 public:
     template <typename int_type> 
-    void set_state(const std::vector<int_type>& si){CALL_AND_RETHROW(this->_set_state(si, 0));}
+    void set_state(const std::vector<int_type>& si, bool random_unoccupied_initialisation=true){CALL_AND_RETHROW(this->_set_state(si, 0, false, random_unoccupied_initialisation));}
+
+    template <typename int_type> 
+    void set_state_purification(const std::vector<int_type>& si, bool random_initialisation=true){CALL_AND_RETHROW(this->_set_state(si, 0, true, random_initialisation));}
 
     template <typename U, typename be> 
     void set_product(const std::vector<linalg::vector<U, be> >& ps){CALL_AND_RETHROW(this->_set_product(ps));}
@@ -229,7 +228,10 @@ public:
     template <typename Rvec> 
     void sample_product_state(std::vector<size_t>& state, const std::vector<Rvec>& relval){CALL_AND_RETHROW(this->_sample_product_state(state, relval));}
 
-    void set_purification(){CALL_AND_RETHROW(this->_set_purification());}
+    void set_identity_purification()
+    {
+        CALL_AND_RETHROW(this->_set_purification());
+    }
 public:
     
     real_type bond_entropy(size_t /* bond_index */)
@@ -342,6 +344,21 @@ public:
     }
 
  
+public:
+    //scalar inplace multiplication and division
+    template <typename U>
+    typename std::enable_if<linalg::is_number<U>::value, ttn&>::type operator*=(const U& u)
+    {
+        base_type::operator*=(u);
+        return *this;
+    }
+
+    template <typename U>
+    typename std::enable_if<linalg::is_number<U>::value, ttn&>::type operator/=(const U& u)
+    {
+        base_type::operator/=(u);
+        return *this;
+    }
   #ifdef CEREAL_LIBRARY_FOUND
 public:
     template <typename archive>
@@ -419,8 +436,8 @@ protected:
         }
     }
 
-
 protected:
+    /* 
     void shift_dangling_bond_up(linalg::tensor<T, 3, backend>& Top, linalg::tensor<T, 4, backend>& temp, linalg::tensor<T, 4, backend>& temp2, size_type curr, size_type prev, real_type tol = real_type(0), size_type nchi=0)
     {
         //get the parent tensor as a rank 3 tensor with the bond connecting the curr and prev sites separated off
@@ -520,8 +537,25 @@ protected:
     {
         CALL_AND_HANDLE(this->set_orthogonality_centre(i1), "Failed to apply one body operator.  Failed to shift orthogonality centre.");
     }
-
+    */
 public:
+    ttn& apply_product_operator(product_operator<T, backend>& op, bool shift_orthogonality = true)
+    {
+        for(auto& _op : op)
+        {
+            CALL_AND_HANDLE(apply_one_body_operator(_op, shift_orthogonality), "Failed to apply product operator error when applying one body operator.");
+        }
+        if(this->has_orthogonality_centre())
+        {
+            m_nodes[this->m_orthogonality_centre] *= op.coeff();
+        }
+        else
+        {
+            m_nodes[0] *= op.coeff();
+        }
+        return *this;
+    }
+
     ttn& apply_one_body_operator(const linalg::matrix<T, backend>& op, size_type index, bool shift_orthogonality = true)
     {
         ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
@@ -611,6 +645,17 @@ public:
         return *this;
     }
 
+    ttn& apply_operator(site_operator<T, backend>& op, bool shift_orthogonality = true)
+    {
+        CALL_AND_RETHROW(return apply_one_body_operator(op, shift_orthogonality));
+    }
+
+    ttn& apply_operator(product_operator<T, backend>& op, bool shift_orthogonality = true)
+    {
+        CALL_AND_RETHROW(return apply_product_operator(op, shift_orthogonality));
+    }
+
+    //TODO Implement action of hSOP on ttn object
 public:
     //here the collapse algorithm will be implemented in place.  This will be done iteratively shifting the orthogonality centre of the tree to a leaf.  Computing the probability of observing the state in each possible configuration of that leaf.  Then sampling the state based on this.  
     real_type collapse(std::vector<size_t>& state, bool truncate=false, real_type tol = real_type(0), size_type nchi = 0)
@@ -635,7 +680,7 @@ public:
             std::discrete_distribution<std::size_t> d{pi.begin(), pi.end()};
             auto& A = m_nodes[m_leaf_indices[i]];
             auto& a = A().as_matrix();
-            size_t ind = d(_rng);
+            size_t ind = d(rng());
             state[i] = ind;
 
             //now that we have sampled the index to retain we need to collapse the state onto this index.
@@ -654,15 +699,14 @@ public:
         this->normalise();
         if(truncate)
         {
-        //    this->truncate(tol, nchi, rel_truncate);
+            this->truncate(tol, nchi);
             this->normalise();
         }
 
         return pitot;
     }
 
-
-    real_type collapse_basis(std::vector<linalg::matrix<T>>& U, std::vector<size_t>& state, bool truncate=false, real_type tol = real_type(0), size_type nchi = 0)
+    real_type collapse_basis(std::vector<linalg::matrix<T, backend>>& U, std::vector<size_t>& state, bool truncate=false, real_type tol = real_type(0), size_type nchi = 0)
     {
         ASSERT(U.size() == m_nleaves, "Failed to collapse in user specified basis.  Basis transformation vectors are not compatible with ");
         state.resize(m_nleaves);
@@ -676,7 +720,7 @@ public:
             //shift orthogonality centre to leaf index
             this->set_orthogonality_centre(m_leaf_indices[i]);
 
-            linalg::matrix<T> b = U[i]*m_nodes[m_leaf_indices[i]]().as_matrix();
+            linalg::matrix<T, backend> b = U[i]*m_nodes[m_leaf_indices[i]]().as_matrix();
 
             real_type pisum = 0.0;
             for(size_t j = 0; j < m_dim_sizes[i]; ++j)
@@ -687,7 +731,7 @@ public:
 
             //now sample from the projection expectation values
             std::discrete_distribution<std::size_t> d{pi.begin(), pi.end()};
-            size_t ind = d(_rng);
+            size_t ind = d(rng());
             state[i] = ind;
 
             //now that we have sampled the index to retain we need to collapse the state onto this index.
@@ -708,7 +752,7 @@ public:
 
         if(truncate)
         {
-        //    this->truncate(tol, nchi, rel_truncate);
+            this->truncate(tol, nchi);
             this->normalise();
         }
 
@@ -732,24 +776,26 @@ public:
     }
 
     //function for performing a measurement on all modes.
-    void measure_all_without_collapse(std::vector<std::vector<real_type>>& res)
-    {
-        res.resize(m_nleaves);
-        for(size_t i = 0; i < m_nleaves; ++i)
-        {
-            measure_without_collapse(i, res[i]);
-        }
-    }
+    //void measure_all_without_collapse(std::vector<std::vector<real_type>>& res)
+    //{
+    //    res.resize(m_nleaves);
+    //    for(size_t i = 0; i < m_nleaves; ++i)
+    //    {
+    //        measure_without_collapse(i, res[i]);
+    //    }
+    //}
+
+
 };
 
 template <typename T, typename backend, typename real_type = typename linalg::get_real_type<T>::type>
-real_type collapse_wavefunction(const ttn<T, backend>& o, ttn<T, backend>& res, std::vector<size_t>& state, bool truncate=false, real_type tol = real_type(0), typename backend::size_type nchi = 0, bool rel_truncate = false, bool compute_be = false)
+real_type collapse_wavefunction(const ttn<T, backend>& o, ttn<T, backend>& res, std::vector<size_t>& state, bool truncate=false, real_type tol = real_type(0), typename backend::size_type nchi = 0)
 {
     //first we copy the res array into o
     res = o;
 
     //now perform the inplace collapse on o
-    return o.collapse(state, truncate, tol, nchi, rel_truncate, compute_be);
+    return o.collapse(state, truncate, tol, nchi);
 }
 
 template <typename T, typename backend> 

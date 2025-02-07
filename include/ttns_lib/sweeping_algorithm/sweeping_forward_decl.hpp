@@ -56,8 +56,8 @@ public:
 
     inline void update_env_down(const environment_type&, const hnode&, node_type&){}
     inline void update_env_down(const environment_type&, const hnode&, node_type&, node_type&){}
-    inline void update_env_up(const environment_type&, const hnode&, node_type&){}
-    inline void update_env_up(const environment_type&, const hnode&, node_type&, node_type&){}
+    inline void update_env_up(const environment_type&, const hnode&, node_type&, bool = false){}
+    inline void update_env_up(const environment_type&, const hnode&, node_type&, node_type&, bool = false){}
 
     const size_type& num_buffers() const{return m_num_buffers;}
     size_type& num_buffers(){return m_num_buffers;}
@@ -87,6 +87,8 @@ public:
 
     using hnode = typename ttn_type::node_type;
     using mat_type = linalg::matrix<T, backend>;
+    using bond_matrix_type = typename ttn_type::bond_matrix_type;
+    using population_matrix_type = typename ttn_type::population_matrix_type;
 
     using buffer_type = typename environment_type::buffer_type;
 
@@ -99,22 +101,22 @@ public:
     single_site& operator=(const single_site& o) = default;
     single_site& operator=(single_site&& o) = default;
     
-    void initialise(const ttn_type&, const env_container_type&){}
-    static inline void initialise(const ttn_type&, const env_container_type&, const parameter_list&){}
-    static inline void initialise(const ttn_type&, const env_container_type&, parameter_list&&){}
+    void initialise(const ttn_type&, const env_type&){}
+    static inline void initialise(const ttn_type&, const env_type&, const parameter_list&){}
+    static inline void initialise(const ttn_type&, const env_type&, parameter_list&&){}
     void clear(){}
 
 
     //perform the subspace expansion as we are moving down a tree.  This requires us to evaluate the optimal functions to add 
     //into A2.  For A1 they will be overwriten by the r matrix in the next step so we just 
     //here the A1 and A2 tensors must be left and right orthogonal respectively with the non-orthogonal component stored in r
-    bool subspace_expansion_down(hnode& /* A1 */, hnode& /* A2 */, env_node_type& /* h */, const env_type& /* op */, environment_type& /* env */)
+    bool subspace_expansion_down(hnode& /* A1 */, hnode& /* A2 */, const bond_matrix_type& /* r */, const population_matrix_type& /* s */, env_node_type& /* h */, const env_type& /* op */, environment_type& /* env */, linalg::random_engine<backend>& /* rng */)
     {
         return false;
     }
 
     //here the A1 and A2 tensors must be left and right orthogonal respectively with the non-orthogonal component stored in r
-    bool subspace_expansion_up(hnode& /* A1 */, hnode& /* A2 */, env_node_type& /* h */, const env_type& /* op */, environment_type& /* env */)
+    bool subspace_expansion_up(hnode& /* A1 */, hnode& /* A2 */, const bond_matrix_type& /* r */, const population_matrix_type& /* s */, env_node_type& /* h */, const env_type& /* op */, environment_type& /* env */, linalg::random_engine<backend>& /* rng */)
     {
         return false;
     }
@@ -125,8 +127,15 @@ public:
 
 };  //class single_site
 
+
+template <typename T, typename backend, template <typename, typename> class ttn_class, template <typename, typename, template <typename, typename> class > class Environment>
+class population_subspace_expansion;
+
 template <typename T, typename backend, template <typename, typename> class ttn_class, template <typename, typename, template <typename, typename> class > class Environment>
 class variance_subspace_expansion;
+
+template <typename T, typename backend, template <typename, typename> class ttn_class, template <typename, typename, template <typename, typename> class > class Environment>
+class variance_subspace_expansion_full_two_site;
 
 /* 
  *  Forward declaration of the different update types that have been implemented
@@ -164,6 +173,7 @@ public:
     T E() const{return T(0);}
     size_type update_site_tensor(hnode& /* A */, const environment_type& /* env */, env_node_type& /* h */, const env_type& /* op */){return 0;}
     void update_bond_tensor(bond_matrix_type& /* r */, const environment_type& /* env */, env_node_type& /* h */, const env_type& /* op */){}
+    void advance_hamiltonian(ttn_type&, environment_type&, env_container_type& , env_type& ){}
     void advance_half_step(){}
 
 };

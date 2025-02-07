@@ -2,6 +2,7 @@
 #define PYTHON_BINDING_TTNS_OPERATOR_DICTIONARY_HPP
 
 #include <ttns_lib/operators/sop_operator.hpp>
+#include <sstream>
 
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
@@ -13,12 +14,12 @@
 
 namespace py=pybind11;
 
-template <typename T>
+template <typename T, typename backend>
 void init_operator_dictionary(py::module &m, const std::string& label)
 {
     using namespace ttns;
 
-    using opdict = operator_dictionary<T, linalg::blas_backend>;
+    using opdict = operator_dictionary<T, backend>;
     using dict_type = typename opdict::dict_type;
     using elem_type = typename opdict::elem_type;
     //the base primitive operator type
@@ -33,21 +34,43 @@ void init_operator_dictionary(py::module &m, const std::string& label)
         .def("__deepcopy__", [](const opdict& o, py::dict){return opdict(o);}, py::arg("memo"))
 
         .def("clear", &opdict::clear)
+        .def("resize", &opdict::resize)
 
         .def("__setitem__", [](opdict& o, size_t i, const elem_type& el){o[i] = el;})
-        .def("__getitem__", [](opdict& o, size_t i){return o[i];})
+        .def("__getitem__", [](opdict& o, size_t i)->elem_type& {return o[i];}, py::return_value_policy::reference)
+                
         .def("site_dictionary", [](opdict& o, size_t i){return o.site_dictionary(i);})
 
         .def("insert", &opdict::insert)
         .def("__call__", [](const opdict& o, size_t nu, const std::string & l){return o(nu, l);})
 
         .def("__len__", &opdict::size)
-        .def("nmodes", &opdict::nmodes);
+        .def("nmodes", &opdict::nmodes)
+
+
+        .def("__str__", [](const opdict& o)
+        {
+            std::ostringstream oss;
+            for(size_t i = 0; i < o.nmodes(); ++i)
+            {
+                oss << "mode: " << i << std::endl;
+                for(const auto& t : o[i])
+                {
+                    oss << t.first << " " << t.second.to_string() << std::endl;
+                }
+            }
+            return oss.str();
+        });
 }
 
-
-void initialise_operator_dictionary(py::module& m);
-
+template <typename real_type, typename backend>
+void initialise_operator_dictionary(py::module& m)
+{
+    using complex_type = linalg::complex<real_type>;
+  
+    init_operator_dictionary<real_type, backend>(m, "real");
+    init_operator_dictionary<complex_type, backend>(m, "complex");
+}
 #endif  //PYTHON_BINDING_TTNS_OPERATOR_DICTIONARY_HPP
 
 

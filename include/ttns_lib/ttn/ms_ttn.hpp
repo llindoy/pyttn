@@ -9,13 +9,14 @@
 #include "ttn_nodes/ttn_node.hpp"
 
 #include "ttnbase.hpp"
+#include "ttn.hpp"
 
 namespace ttns
 {
 template <typename T, typename backend>
 using ms_ttn_node = typename tree<multiset_node_data<T, backend> >::node_type;
 
-template <typename T, typename backend = blas_backend>
+template <typename T, typename backend = linalg::blas_backend>
 class ms_ttn : public ttn_base<multiset_node_data, T, backend> 
 {
 public:
@@ -49,7 +50,10 @@ private:
     //provide access to base class operators
     using base_type::m_nodes;
     using base_type::m_nleaves;
-    using base_type::_rng;
+    using base_type::m_rengine;
+    using base_type::m_hrengine;
+    using base_type::rng;
+
     using base_type::m_orthog;
     using base_type::m_dim_sizes;
     using base_type::m_leaf_indices;
@@ -77,7 +81,7 @@ public:
     }
 
     template <typename INTEGER, typename Alloc>
-    ms_ttn(const ntree<INTEGER, Alloc>& topology, size_type nset) try : base_type(topology, nset) {}
+    ms_ttn(const ntree<INTEGER, Alloc>& topology, size_type nset, bool purification = false) try : base_type(topology, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
@@ -85,21 +89,21 @@ public:
     }
 
     template <typename INTEGER, typename Alloc>
-    ms_ttn(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, size_type nset)try : base_type(topology, capacity, nset) {}
+    ms_ttn(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, size_type nset, bool purification = false)try : base_type(topology, capacity, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
         RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
     }
 
-    ms_ttn(const std::string& _topology, size_type nset) try : base_type(_topology, nset) {}
+    ms_ttn(const std::string& _topology, size_type nset, bool purification = false) try : base_type(_topology, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
         RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
     }
 
-    ms_ttn(const std::string& _topology, const std::string& _capacity, size_type nset) try : base_type(_topology, _capacity, nset) {}
+    ms_ttn(const std::string& _topology, const std::string& _capacity, size_type nset, bool purification = false) try : base_type(_topology, _capacity, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
@@ -109,7 +113,7 @@ public:
 public:
     ms_ttn& operator=(const ms_ttn& other) = default;
     template <typename U, typename be>
-    ms_ttn& operator=(const ms_ttn<U, be>& other){CALL_AND_RETHROW(return this->base_type::operator=(other));}
+    ms_ttn& operator=(const ms_ttn<U, be>& other){CALL_AND_RETHROW(return base_type::operator=(other));}
 
     template <typename U, typename be>
     ms_ttn& assign_set(size_type set, const ttn<U, be>& other)
@@ -124,17 +128,74 @@ public:
     }
 
 public:
+    template <typename U, typename be>
+    void set_slice(size_type sind, const ttn<U, be>& o)
+    {
+        ASSERT(has_same_structure(o, *this), "Cannot assign ms_ttn slice unless it has the correct structure.");
+        ASSERT(o.mode_dimensions() == this->mode_dimensions(), "Cannot assign ms_ttn slice if the dimensions are not the same.");
+
+        bool all_fit = true;
+        //first check to see if the current structure can fit the assigned structure.  If it can then we don't have any problems
+        for(auto z : common::zip(*this, o))
+        {
+            if(!std::get<0>(z)()[sind].can_fit_node(std::get<1>(z)())){all_fit = false;}
+        }
+
+        for(auto z : common::zip(*this, o))
+        {
+            CALL_AND_HANDLE(std::get<0>(z)()[sind] = std::get<1>(z)(), "Failed when assigning slice index.");
+        }
+        if(!all_fit){this->reset_orthogonality();}
+
+        if(this->has_orthogonality_centre() )
+        {
+            if(!(o.has_orthogonality_centre() && o.orthogonality_centre() == this->orthogonality_centre()))
+            {
+                this->reset_orthogonality_centre();
+            }
+        }
+    }
+
+    template <typename U, typename be, bool C2>
+    void set_slice(size_type sind, const multiset_ttn_slice<U, be, C2>& o)
+    {
+        ASSERT(has_same_structure(o.obj(), *this), "Cannot assign ms_ttn slice unless it has the correct structure.");
+        ASSERT(o.obj().mode_dimensions() == this->mode_dimensions(), "Cannot assign ms_ttn slice if the dimensions are not the same.");
+
+        bool all_fit = true;
+        //first check to see if the current structure can fit the assigned structure.  If it can then we don't have any problems
+        for(auto z : common::zip(*this, o.obj()))
+        {
+            if(!std::get<0>(z)()[sind].can_fit_node(std::get<1>(z)()[o.slice_index()])){all_fit = false;}
+        }
+
+        for(auto z : common::zip(*this, o.obj()))
+        {
+            CALL_AND_HANDLE(std::get<0>(z)()[sind] = std::get<1>(z)()[o.slice_index()], "Failed when assigning slice index.");
+        }
+        if(!all_fit){this->reset_orthogonality();}
+
+        if(this->has_orthogonality_centre() )
+        {
+            if(!(o.obj().has_orthogonality_centre() && o.obj().orthogonality_centre() == this->orthogonality_centre()))
+            {
+                this->reset_orthogonality_centre();
+            }
+        }
+    }
+
+
     template <typename int_type> 
-    void set_state(size_type sind, const std::vector<int_type>& si){CALL_AND_RETHROW(_set_state(si, sind));}
+    void set_state(size_type sind, const std::vector<int_type>& si){CALL_AND_RETHROW(this->_set_state(si, sind));}
 
     template <typename U, typename be> 
-    void set_product(size_type sind, const std::vector<linalg::vector<U, be> >& ps){CALL_AND_RETHROW(_set_product(ps, sind));}
+    void set_product(size_type sind, const std::vector<linalg::vector<U, be> >& ps){CALL_AND_RETHROW(this->_set_product(ps, sind));}
 
     template <typename Rvec> 
-    void sample_product_state(size_type sind, std::vector<size_t>& state, const std::vector<Rvec>& relval){CALL_AND_RETHROW(_sample_product_state(state, relval, sind));}
+    void sample_product_state(size_type sind, std::vector<size_t>& state, const std::vector<Rvec>& relval){CALL_AND_RETHROW(this->_sample_product_state(state, relval, sind));}
 
     template <typename U, typename int_type> 
-    void set_state(const std::vector<U>& coeff, const std::vector<std::vector<int_type>>& si)
+    void set_state(const std::vector<U>& coeff, const std::vector<std::vector<int_type>>& si, bool random_unoccupied_initialisation=false)
     {
         ASSERT(coeff.size() == si.size() && coeff.size() == this->nset(), "Cannot set ttnbase to specified state.  Input arrays are not the correct size.");
 
@@ -144,7 +205,7 @@ public:
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
-                ASSERT(si[set_index][i] < m_dim_sizes[i], "Cannot set state, state index out of bounds.");
+                ASSERT(static_cast<size_type>(si[set_index][i]) < m_dim_sizes[i], "Cannot set state, state index out of bounds.");
             }
         }
         
@@ -158,7 +219,7 @@ public:
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
-                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[set_index][i], _rng), "Failed to set state.");
+                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[set_index][i], m_rengine, random_unoccupied_initialisation), "Failed to set state.");
             }
 
             //and scale them by the coeff array
@@ -170,7 +231,7 @@ public:
     }
 
     template <typename V, typename U, typename be> 
-    void set_product(const std::vector<U>& coeff, const std::vector<linalg::vector<V, be> >& ps)
+    void set_product(const std::vector<U>& coeff, const std::vector<std::vector<linalg::vector<V, be> > >& ps)
     {
         ASSERT(coeff.size() == ps.size() && coeff.size() == this->nset(), "Cannot set ttnbase to specified state.  Input arrays are not the correct size.");
 
@@ -189,7 +250,7 @@ public:
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
-                m_nodes[m_leaf_indices[i]].set_leaf_node_vector(set_index, ps[set_index][i], _rng );
+                m_nodes[m_leaf_indices[i]].set_leaf_node_vector(set_index, ps[set_index][i], m_rengine );
             }
 
             //and scale them by the coeff array
@@ -202,6 +263,7 @@ public:
 
     void set_purification()
     {
+        ASSERT(this->is_purification(), "Set state requires a purification state.");
         this->zero();
         size_type ns = static_cast<size_type>(std::sqrt(this->nset()));
         ASSERT(ns*ns == this->nset(), "Cannot set purification state.  The set dimension is not a perfect square and therefore cannot represent composite system, ancilla states.");
@@ -217,7 +279,7 @@ public:
 
             for(size_type mode = 0; mode < this->nmodes(); ++mode)
             {
-                m_nodes[m_leaf_indices[mode]].set_leaf_purification(set_index, _rng);
+                m_nodes[m_leaf_indices[mode]].set_leaf_purification(set_index, m_rengine );
             }
 
             //and scale them by the coeff array
@@ -241,9 +303,9 @@ public:
     size_type nthreads() const{return m_orthog.nthreads();}
     size_type& nthreads() {return m_orthog.nthreads();}
 
-/*  
     real_type bond_entropy(size_t bond_index)
     {
+/*  
         try
         {
             if(!m_orthog.is_initialised()){m_orthog.init(*this, m_maxsize, m_maxcapacity);}
@@ -286,10 +348,12 @@ public:
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to shift orthogonality centre.");
         }
+        */
     }
 
     real_type compute_maximum_bond_entropy()
     {
+/*  
         try
         {
             //first we ensure that the ttn is orthogonalised to the root node
@@ -343,8 +407,8 @@ public:
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to truncate ttn object.");
         }
-    }
 */
+    }
  
   #ifdef CEREAL_LIBRARY_FOUND
 public:
@@ -360,6 +424,59 @@ public:
         CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn object.  Error when serialising the base object.");
     }
 #endif
+
+public:
+    template <typename bType> 
+    static void flatten(const std::vector<bType>& buf, linalg::vector<T, backend>& res)
+    {
+        size_t size = 0; 
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            size += buf[i].size();
+        }
+        res.resize(size);
+        size_t iskip = 0;
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            backend::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
+            iskip += buf[i].size();
+        }
+    }
+
+    template <typename bType> 
+    static void flatten(const std::vector<bType>& buf, linalg::reinterpreted_tensor<T, 1, backend>& res)
+    {
+        size_t size = 0; 
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            size += buf[i].size();
+        }
+        ASSERT(res.size() == size, "Cannot flatten array invalid size.");
+        size_t iskip = 0;
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            backend::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
+            iskip += buf[i].size();
+        }
+    }
+
+    template <typename ftype, typename bType> 
+    static void unpack(const ftype& res, std::vector<bType>& buf)
+    {
+        size_t size = 0; 
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            size += buf[i].size();
+        }
+        ASSERT(res.size() == size, "Failed to unpack flattened array into multiset type.  Incompatibles sizes.");
+
+        size_t iskip = 0;
+        for(size_t i = 0; i < buf.size(); ++i)
+        {
+            backend::copy(res.buffer()+iskip, buf[i].size(), buf[i].buffer());
+            iskip += buf[i].size();
+        }
+    }
 };
 
 template <typename T, typename backend> 

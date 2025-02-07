@@ -153,7 +153,7 @@ public:
         {
             return linalg::trace(m_mf)*coeff();
         }
-        else if(m_oci.is_identity_mf())*coeff()
+        else if(m_oci.is_identity_mf())
         {
             return linalg::trace(m_spf)*coeff();
         }

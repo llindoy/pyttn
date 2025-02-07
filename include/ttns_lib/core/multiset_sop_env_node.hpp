@@ -5,6 +5,7 @@
 #include <linalg/linalg.hpp>
 
 #include "sop_env_node.hpp"
+#include "../ttn/tree/tree_node.hpp"
 
 
 namespace ttns
@@ -84,6 +85,16 @@ public:
         return m_data[i];
     }
 
+    void initialise_root()
+    {
+        for(size_t row = 0; row < m_data.size(); ++row)
+        {
+            for(size_t ci = 0; ci < m_data[row].size(); ++ci)
+            {
+                m_data[row][ci].initialise_root();
+            }
+        }
+    }
 public:
     void clear() 
     {
@@ -146,6 +157,8 @@ public:
     ms_sop_env_slice operator[](size_t i) const {return ms_sop_env_slice(m_obj[i], m_i, m_c);}
 
     size_t size() const{return m_obj.size();}
+    bool is_root() const{return m_obj.is_root();}
+    bool is_leaf() const{return m_obj.is_leaf();}
 protected:
     obj_type m_obj;
     size_t m_i;

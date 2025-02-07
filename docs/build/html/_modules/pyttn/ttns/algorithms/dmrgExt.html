@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyttn.ttns.algorithms.dmrgExt &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">API Documents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyttn.ttns.algorithms.dmrgExt</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyttn.ttns.algorithms.dmrgExt</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">one_site_dmrg_complex</span><span class="p">,</span> <span class="n">adaptive_one_site_dmrg_complex</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">,</span> <span class="n">sop_operator_complex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiset_one_site_dmrg_complex</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<div class="viewcode-block" id="single_set_dmrg">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.single_set_dmrg">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">single_set_dmrg</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing single set dmrg calculations</span>
+
+<span class="sd">    :param A: Tree Tensor Network that the DMRG algorithm will act on</span>
+<span class="sd">    :type A: ttn_complex</span>
+<span class="sd">    :param H: The Hamiltonian sop operator object</span>
+<span class="sd">    :type H: sop_operator_complex</span>
+<span class="sd">    :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion (&#39;onesite&#39;) or energy variance based (&#39;subspace&#39;).  (Default: &#39;onesite&#39;)</span>
+<span class="sd">    :type expansion: {&#39;onesite&#39;, &#39;subspace&#39;}, optional</span>
+<span class="sd">    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_dmrg_complex</span>
+
+<span class="sd">    :returns: The DMRG evaluation object</span>
+<span class="sd">    :rtype: one_site_dmrg_complex or adaptive_one_site_dmrg_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">sop_operator_complex</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;onesite&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">one_site_dmrg_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;subspace&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">adaptive_one_site_dmrg_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid input types for dmrg.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="multiset_dmrg">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.multiset_dmrg">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">multiset_dmrg</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwarg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing multiset dmrg calculations</span>
+
+<span class="sd">    :param A: Tree Tensor Network that the DMRG algorithm will act on</span>
+<span class="sd">    :type A: ttn_complex</span>
+<span class="sd">    :param H: The Hamiltonian sop operator object</span>
+<span class="sd">    :type H: sop_operator_complex</span>
+<span class="sd">    :param expansion: A string determining the type of bond dimension expansion to be used.  (Default: &#39;onesite&#39;)</span>
+<span class="sd">    :type expansion: {&#39;onesite&#39;}, optional</span>
+<span class="sd">    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see multiset_one_site_dmrg_complex </span>
+
+<span class="sd">    :returns: The DMRG evaluation object</span>
+<span class="sd">    :rtype: multiset_one_site_dmrg_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;onesite&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">multiset_one_site_dmrg_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;subspace&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;subspace expansion algorithm has not yet been implemented.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid input types for dmrg.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dmrg">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.dmrg">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dmrg</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing either single or multi set dmrg calculations. </span>
+<span class="sd">    Which type to construct is determined by the types of the input A and h matrices.  For details on the use of these</span>
+<span class="sd">    DMRG objects please see the documentation associated with the possible return types.</span>
+
+<span class="sd">    :param A: Tree Tensor Network that the DMRG algorithm will act on</span>
+<span class="sd">    :type A: ttn_complex or ms_ttn_complex</span>
+<span class="sd">    :param H: The Hamiltonian sop operator object</span>
+<span class="sd">    :type H: sop_operator_complex</span>
+<span class="sd">    :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion (&#39;onesite&#39;) or energy variance based (&#39;subspace&#39;).  (Default: &#39;onesite&#39;)</span>
+<span class="sd">    :type expansion: {&#39;onesite&#39;, &#39;subspace&#39;}, optional</span>
+<span class="sd">    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_dmrg_complex</span>
+
+<span class="sd">    :returns: The DMRG evaluation object</span>
+<span class="sd">    :rtype: one_site_dmrg_complex or adaptive_one_site_dmrg_complex or multiset_one_site_dmrg_complex</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">sop_operator_complex</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">single_set_dmrg</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="n">expansion</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">multiset_dmrg</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="n">expansion</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid input types for dmrg.&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

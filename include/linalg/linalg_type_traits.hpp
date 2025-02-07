@@ -144,7 +144,8 @@ template <typename T> struct is_const_lvalue_assignable : public std::conditiona
 template <typename src, typename dest>
 struct is_dense_copy_assignable : 
     public std::conditional                               //if dest is a dense tensor
-    <
+    <        
+        is_linalg_object<src>::value && is_linalg_object<dest>::value &&
         is_dense_tensor<dest>::value && traits<dest>::is_mutable,   
         typename std::conditional 
         <   
@@ -166,6 +167,7 @@ template <typename src, typename dest>
 struct is_sparse_copy_assignable : 
     public std::conditional 
     <
+        is_linalg_object<src>::value && is_linalg_object<dest>::value &&
         is_sparse_tensor<dest>::value && traits<dest>::is_mutable,   
         typename std::conditional
         <
@@ -194,6 +196,7 @@ template <typename src, typename dest>
 struct is_copy_assignable<src, dest> :
     public std::conditional
     <
+        is_linalg_object<src>::value && is_linalg_object<dest>::value &&
         is_tensor<dest>::value && traits<dest>::is_mutable,   //first we check that dest is a tensor that is mutable
         typename std::conditional                               //if dest is a tensor
         <
@@ -209,6 +212,7 @@ template <typename src, typename dest>
 struct is_dense_move_assignable :
     public std::conditional                               //if dest is a dense tensor
     <
+        is_linalg_object<src>::value && is_linalg_object<dest>::value &&
         is_dense_tensor<dest>::value && traits<dest>::is_mutable,   
         typename std::conditional 
         <   
@@ -229,6 +233,7 @@ template <typename src, typename dest>
 struct is_sparse_move_assignable : 
     public std::conditional 
     <
+        is_linalg_object<src>::value && is_linalg_object<dest>::value &&
         is_sparse_tensor<dest>::value && traits<dest>::is_mutable,   
         typename std::conditional
         <
@@ -254,6 +259,7 @@ template <typename src, typename dest>
 struct is_move_assignable<src, dest> :
     public std::conditional
     <
+        is_linalg_object<src>::value && is_linalg_object<dest>::value &&
         is_tensor<dest>::value && traits<dest>::is_mutable,   //first we check that dest is a tensor that is mutable
         typename std::conditional                               //if dest is a tensor
         <

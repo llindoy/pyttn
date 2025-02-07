@@ -1,0 +1,191 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyttn.oqs.bath_fitting.ESPRIT &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">API Documents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyttn.oqs.bath_fitting.ESPRIT</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyttn.oqs.bath_fitting.ESPRIT</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
+
+<span class="c1">#Here we have not made use of any of the knowledge of the form of the A matrix</span>
+<span class="c1">#This will be left as future updates.</span>
+<div class="viewcode-block" id="ESPRIT">
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.ESPRIT.ESPRIT">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ESPRIT</span><span class="p">(</span><span class="n">Ct</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Implementation of the Estimation of Signal Parameters via Rotational Invariant Techniques (ESPRIT)</span>
+<span class="sd">    method for decomposing a signal into the form </span>
+
+<span class="sd">    .. math:</span>
+<span class="sd">        C(t) \\approx \sum_{k=1}^K w_k \\exp(-\\nu t)</span>
+
+<span class="sd">    A. Paulraj, R. Roy, and T. Kailath, Proceedings of the IEEE 74, 1044 (1986).</span>
+
+<span class="sd">    :param Ct: An array containing the values to be fit</span>
+<span class="sd">    :type Ct: np.ndarray</span>
+<span class="sd">    :param K: The set of support points used for interpolating the function</span>
+<span class="sd">    :type K: np.ndarray</span>
+
+<span class="sd">    :returns:</span>
+<span class="sd">        - w(np.ndarray) - The weights in the decomposition</span>
+<span class="sd">        - nu(np.ndarray) - The exponents in the decomposition</span>
+<span class="sd">        - Ctfit(np.ndarray) - The function fit at the same points as the original Ct</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#extract the frequencies in the signal using ESPRIT</span>
+    <span class="n">expnu</span> <span class="o">=</span> <span class="n">ESPRIT_frequencies</span><span class="p">(</span><span class="n">Ct</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
+
+    <span class="c1">#construct the time dependence of each of the frequency signals</span>
+    <span class="n">ENU</span><span class="p">,</span> <span class="n">Kn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">expnu</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Ct</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">ENU</span><span class="p">,</span> <span class="n">Kn</span><span class="p">)</span>
+
+    <span class="c1">#extract the coupling constants by performing a laest squares fit</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">Ct</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1">#now return the weights, exponents and fit correlation function</span>
+    <span class="k">return</span> <span class="n">weights</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">expnu</span><span class="p">),</span> <span class="n">A</span><span class="nd">@weights</span></div>
+
+
+<span class="c1">#Here we have not made use of any of the knowledge of the form of the Y matrix.</span>
+<span class="c1">#This will seriously limit the number of points in Ct that can be efficiently </span>
+<span class="c1">#fit using this approach.</span>
+<div class="viewcode-block" id="ESPRIT_frequencies">
+<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.ESPRIT.ESPRIT_frequencies">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ESPRIT_frequencies</span><span class="p">(</span><span class="n">Ct</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract the frequencies to be used in the ESPRIT algorithm </span>
+
+<span class="sd">    :param Ct: An array containing the values to be fit</span>
+<span class="sd">    :type Ct: np.ndarray</span>
+<span class="sd">    :param K: The set of support points used for interpolating the function</span>
+<span class="sd">    :type K: np.ndarray</span>
+
+<span class="sd">    :returns:</span>
+<span class="sd">        - expnu(np.ndarray) - The exponential of the frequencies to be used in the ESPRIT decomposition</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ndata</span> <span class="o">=</span> <span class="n">Ct</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="p">(</span><span class="n">ndata</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+    <span class="c1">#Form a hankel matrix from the vector of Cts.  This gives us </span>
+    <span class="c1">#T signal points measured on an array of T detectors</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">hankel</span><span class="p">(</span><span class="n">Ct</span><span class="p">[:</span><span class="n">T</span><span class="p">],</span> <span class="n">Ct</span><span class="p">[</span><span class="n">T</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1">#extract the signal subspace from the detector measurements</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+    <span class="n">Us</span> <span class="o">=</span> <span class="n">U</span><span class="p">[:,</span> <span class="p">:</span><span class="n">K</span><span class="p">]</span>
+
+    <span class="c1">#divide into two virtual sub arrays</span>
+    <span class="n">S1</span> <span class="o">=</span> <span class="n">Us</span><span class="p">[:</span><span class="n">T</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">S2</span> <span class="o">=</span> <span class="n">Us</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span>
+
+    <span class="c1">#and use these sub arrays to extract the frequencies</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">S1</span><span class="p">,</span> <span class="n">S2</span><span class="p">,</span> <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ls</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="n">P</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ls</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ls</span><span class="p">))[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

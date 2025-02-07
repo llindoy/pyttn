@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <algorithm>
 #include <cmath>
+#include <memory>
 #include <utility>
 #include <complex>
 #include <unordered_set>
@@ -145,6 +146,7 @@ public:
             {
                 bt::m_localdims[i] = N[i];
             }
+            setup_dim_and_stride();
         }
         catch(const std::exception& ex)
         {

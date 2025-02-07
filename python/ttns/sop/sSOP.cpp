@@ -1,7 +1,8 @@
 #include "sSOP.hpp"
+#include "../../pyttn_typedef.hpp"
 
-void initialise_sSOP(py::module& m)
+
+template <> void initialise_sSOP<pyttn_real_type>(py::module& m)
 {
-    using real_type = double;
-    init_sSOP<real_type>(m);
+    init_sSOP<pyttn_real_type>(m);
 }

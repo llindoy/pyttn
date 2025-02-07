@@ -16,7 +16,7 @@ template <typename T, typename backend = blas_backend> using vector = tensor<T, 
 template <typename T, size_t D> using host_tensor = tensor<T, D, blas_backend>;
 template <typename T> using host_matrix = tensor<T, 2, blas_backend>;
 template <typename T> using host_vector = tensor<T, 1, blas_backend>;
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename T, size_t D> using device_tensor = tensor<T, D, cuda_backend>;
 template <typename T> using device_matrix = tensor<T, 2, cuda_backend>;
 template <typename T> using device_vector = tensor<T, 1, cuda_backend>;

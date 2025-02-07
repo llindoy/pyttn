@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required(VERSION 3.12)
 project(ttns_lib)
 
 
@@ -17,12 +17,12 @@ target_include_directories(ttns_lib INTERFACE
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 
 #compiler flags
-option(USE_CUDA "Compile with cuda" OFF)
+option(PYTTN_BUILD_CUDA "Compile with cuda" OFF)
 option(USE_OPENMP "Compile with openmp" OFF)
 option(USE_GEMM3M "Compile with openmp" OFF)
 option(BUILD_TESTS "Build Tests" OFF)
-option(BUILD_PYTHON_BINDINGS "Build Python Bindings" OFF)
-option(BUILD_SRC "Build C++ src" ON)
+option(BUILD_PYTHON_BINDINGS "Build Python Bindings" ON)
+option(BUILD_SRC "Build C++ src" OFF)
 
 if(USE_OPENMP)
     add_compile_definitions(USE_OPENMP)

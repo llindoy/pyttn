@@ -43,7 +43,6 @@ public:
         for(size_type i = 0; i < m_order.size(); ++i)
         {
             ASSERT(order[i] < irank, "Failed to compute tensor transpose, index out of bounds.");
-            ASSERT(order[i] >= 0, "Failed to compute tensor transpose, negative index identified.");
             m_order[i] = order[i];
             this->m_shape[i] = m_arr.shape(m_order[i]);
         }
@@ -57,7 +56,7 @@ public:
     typename std::enable_if<is_dense<array_type>::value, void>::type applicative(array_type& res) const
     {
         ASSERT(res.buffer() != m_arr.buffer(), "Inplace generic tensor reordering is not supported.");
-        CALL_AND_HANDLE(backend_type::tensor_transpose(m_arr.buffer(), m_order, m_arr.shape(), res.buffer()), "Failed to compute tensor transpose.");
+        CALL_AND_HANDLE(backend_type::tensor_transpose(m_arr.buffer(), m_order, m_arr.shape(), m_arr.stride(), res.buffer()), "Failed to compute tensor transpose.");
     }
 };
 

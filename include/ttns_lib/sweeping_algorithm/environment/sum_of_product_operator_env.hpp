@@ -17,6 +17,7 @@
 namespace ttns
 {
 
+//TODO: Ensure that the matrices are correctly resized for each evaluation.
 template <typename T, typename backend = linalg::blas_backend, template <typename, typename> class ttn_class = ttn>
 class sop_environment
 {
@@ -86,6 +87,7 @@ public:
                 auto& mel = std::get<0>(z); const auto& a = std::get<1>(z);   const auto& h = std::get<2>(z);
                 mel().initialise(h(), a);
             }
+            ham.root()().initialise_root();
         }
         catch(const std::exception& ex)
         {
@@ -107,19 +109,19 @@ public:
 
     inline void update_env_down(const environment_type& op, const hnode& _a1, node_type& _h)
     {
-        CALL_AND_HANDLE(mfo_core::evaluate(op.contraction_info()[_h.id()], _a1, m_buf.HA, m_buf.temp, m_buf.temp2, _h), "Failed to evaluate the mean field operator.");
+        CALL_AND_HANDLE(mfo_core::evaluate(op.contraction_info()[_h.id()], _a1, m_buf.HA, m_buf.temp, _h), "Failed to evaluate the mean field operator.");
     }
 
-    inline void update_env_up(const environment_type& op, const hnode& _a1, node_type& _h)
+    inline void update_env_up(const environment_type& op, const hnode& _a1, node_type& _h, bool force_update = true)
     {
-        CALL_AND_HANDLE(spo_core::evaluate(op, op.contraction_info()[_h.id()], _a1, _h, m_buf.HA, m_buf.temp), "Failed to evaluate the mean field operator.");
+        CALL_AND_HANDLE(spo_core::evaluate(op, op.contraction_info()[_h.id()], _a1, _h, m_buf.HA, m_buf.temp, false, force_update), "Failed to evaluate the single particle operator.");
     }
 
     const buffer_type& buffer() const{return m_buf;}
     buffer_type& buffer(){return m_buf;}
 
 public:
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
     static size_type maximum_dimension(const ttn_type& A)
     {
         size_type maxmfo = 0;

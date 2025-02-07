@@ -17,9 +17,9 @@ struct itranspose
     {   
         if(beta == T(0.0))
         {
-#ifdef USE_OPENMP
-            #pragma omp parallel for schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//            #pragma omp parallel for schedule(static)
+//#endif
             for(int i=0; i<n; i+=blockSize)
             {
                 //deal with the diagonal block
@@ -55,9 +55,9 @@ struct itranspose
         }
         else
         {
-#ifdef USE_OPENMP
-            #pragma omp parallel for schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//            #pragma omp parallel for schedule(static)
+//#endif
             for(int i=0; i<n; i+=blockSize)
             {
                 //deal with the diagonal block
@@ -107,9 +107,9 @@ struct transpose
     {   
         if(beta == T(0.0))
         {
-#ifdef USE_OPENMP
-            #pragma omp parallel for schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//            #pragma omp parallel for schedule(static)
+//#endif
             for(int i=0; i<n; i+=blockSizeN)
             {
                 for(int j=0; j<m; j+= blockSizeM)
@@ -128,9 +128,9 @@ struct transpose
         }
         else
         {
-#ifdef USE_OPENMP
-            #pragma omp parallel for schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//            #pragma omp parallel for schedule(static)
+//#endif
             for(int i=0; i<n; i+=blockSizeN)
             {
                 for(int j=0; j<m; j+= blockSizeM)
@@ -158,9 +158,9 @@ struct transpose
         int skip = m*n;
         if( beta == T(0.0))
         {
-#ifdef USE_OPENMP
-            #pragma omp parallel for collapse(3) schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//            #pragma omp parallel for collapse(3) schedule(static)
+//#endif
             for(int batch=0; batch < batchCount; ++batch)
             {
                 for(int i=0; i<n; i+=blockSizeN)
@@ -177,9 +177,9 @@ struct transpose
         }
         else
         {
-#ifdef USE_OPENMP
-            #pragma omp parallel for collapse(3) schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//            #pragma omp parallel for collapse(3) schedule(static)
+//#endif
             for(int batch=0; batch < batchCount; ++batch)
             {
                 for(int i=0; i<n; i+=blockSizeN)
@@ -233,18 +233,18 @@ protected:
     static inline void inner_loop(const size_t m, const size_t n, const size_t k, T1 alpha, const T2* A, const size_t inca, const T3* B, const size_t ldb, T4 beta, T5* C, const size_t ldc, OPA&& opa, OPB&& opb, FuncA&& fa, FuncCalc1&& fcalc1, FuncCalc2&& fcalc2)
     {
         size_t min_km = m > k ? k : m;
-#ifdef USE_OPENMP
-        #pragma omp parallel for  schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//        #pragma omp parallel for  schedule(static)
+//#endif
         for(size_t j=0; j<min_km; ++j)
         {
             auto opaj = fa(A, j*inca, alpha, std::forward<OPA>(opa));
             size_t bind = ldb*j; size_t cind = ldc*j;
             for(size_t i=0; i<n; ++i){C[cind+i] = fcalc1(C, opaj, B, beta, i, cind, bind, std::forward<OPB>(opb));}
         }
-#ifdef USE_OPENMP
-        #pragma omp parallel for schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//        #pragma omp parallel for schedule(static)
+//#endif
         for(size_t j=min_km; j<m; ++j){size_t cind = ldc*j;    for(size_t i=0; i<n; ++i){C[cind+i] = fcalc2(C, beta, i, cind);}}
     }
 
@@ -302,9 +302,9 @@ protected:
     static inline void inner_loop(const size_t TDM, const size_t TDN, const size_t m, const size_t n, const size_t k, T1 alpha, const T2* A, const size_t inca, const T3* B, const size_t ldb, T4 beta, T5* C, const size_t ldc, OPA&& opa, OPB&& opb, FuncA&& fa, FuncCalc1&& fcalc1, FuncCalc2&& fcalc2)
     {
         size_t min_km = m > k ? k : m;
-#ifdef USE_OPENMP
-        #pragma omp parallel  for schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//        #pragma omp parallel  for schedule(static)
+//#endif
         for(size_t jb=0; jb<m; jb+=TDM)
         {
             if(jb < min_km && jb + TDM < min_km) 
@@ -404,9 +404,9 @@ protected:
     static inline void inner_loop(const size_t m, const size_t n, const size_t k, T1 alpha, const T2* A, const size_t lda, const T3* B, const size_t incb, T4 beta, T5* C, const size_t ldc, OPA&& opa, OPB&& opb, FuncA&& fa, FuncCalc1&& fcalc1, FuncCalc2&& fcalc2)
     {
         size_t min_kn = n > k ? k : n;
-#ifdef USE_OPENMP
-        #pragma omp parallel for  schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//        #pragma omp parallel for  schedule(static)
+//#endif
         for(size_t j=0; j<m; ++j)
         {
             size_t aind = lda*j; size_t cind = ldc*j;
@@ -471,9 +471,9 @@ class dm_dgm_mt
     static inline void inner_loop(const size_t TDM, const size_t TDN, const size_t m, const size_t n, const size_t k, T1 alpha, const T2* A, const size_t lda, const T3* B, const size_t incb, T4 beta, T5* C, const size_t ldc, OPA&& opa, OPB&& opb, FuncA&& fa, FuncCalc1&& fcalc1, FuncCalc2&& fcalc2)
     {
         size_t min_kn = n > k ? k : n;
-#ifdef USE_OPENMP
-        #pragma omp parallel  for schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//        #pragma omp parallel  for schedule(static)
+//#endif
         for(size_t jb=0; jb<m; jb+=TDM)
         {
             for(size_t ib=0; ib<n; ib+=TDN)
@@ -669,9 +669,9 @@ protected:
     static inline void inner_loop(const size_type TDM, const size_type TDN, const size_type Ci, const size_type Cj, T alpha, const T* A, const index_type* rowptr, const index_type* colind, const T* B, const size_type ldb, const T beta, T* C, const size_type ldc, OPA&& opa, OPB&& opb, BLOCK_ASSIGN&& blfunc, ELEM_ASSIGN&& elfunc)
     {   
         std::array<T,MAXDIM> rbuf; 
-#ifdef USE_OPENMP
-        #pragma omp parallel for default(shared) private(rbuf)  schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//        #pragma omp parallel for default(shared) private(rbuf)  schedule(static)
+//#endif
         for(size_type bi=0; bi < Ci; bi += TDM)
         {
             for(size_type bj=0; bj<Cj; bj += TDN)
@@ -735,9 +735,9 @@ protected:
     static inline void inner_loop(const size_type TDM, const size_type TDN, const size_type Ci, const size_type Cj, T alpha, const T* A, const index_type* rowptr, const index_type* colind, const T* B, const size_type ldb, const T beta, T* C, const size_type ldc, OPA&& opa, OPB&& opb, BLOCK_ASSIGN&& blfunc, ELEM_ASSIGN&& elfunc)
     {   
         std::array<T,MAXDIM> rbuf; 
-#ifdef USE_OPENMP
-        #pragma omp parallel for default(shared) private(rbuf)
-#endif
+//#ifdef USE_OPENMP
+//        #pragma omp parallel for default(shared) private(rbuf)
+//#endif
         for(size_type bi=0; bi < Ci; bi += TDM)
         {
             for(size_type bj=0; bj<Cj; bj += TDN)
@@ -786,9 +786,9 @@ protected:
     template <typename T, typename OPA, typename OPB, typename ELEM_ASSIGN>
     static inline void inner_loop(const size_type m, T alpha, const T* A, const index_type* rowptr, const index_type* colind, const T* B, const size_type incb, const T beta, T* C, const size_type incc, OPA&& opa, OPB&& opb, ELEM_ASSIGN&& elfunc)
     {   
-#ifdef USE_OPENMP
-        #pragma omp parallel for default(shared) schedule(static)
-#endif
+//#ifdef USE_OPENMP
+//        #pragma omp parallel for default(shared) schedule(static)
+//#endif
         for(size_type i=0; i < m; ++i)
         {
             T rbt = 0.0;

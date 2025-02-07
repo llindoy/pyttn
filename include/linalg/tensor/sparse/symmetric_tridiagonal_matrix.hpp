@@ -118,7 +118,7 @@ public:
 };  //symmetric_tridiagonal_matrix<T, blas_backend>
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename T> 
 class symmetric_tridiagonal_matrix<T, cuda_backend> : public symmetric_tridiagonal_matrix_base<symmetric_tridiagonal_matrix<T, cuda_backend> >
 {

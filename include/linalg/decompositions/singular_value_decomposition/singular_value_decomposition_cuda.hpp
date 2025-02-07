@@ -3,7 +3,7 @@
 
 #include "singular_value_decomposition_base.hpp"
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 
 namespace linalg
 {
@@ -383,7 +383,7 @@ protected:
 
 }   //namespace linalg
 
-#endif	//__NVCC__
+#endif	//PYTTN_BUILD_CUDA
 
 #endif //LINALG_DECOMPOSITIONS_SINGULAR_VALUE_DECOMPOSITION_HELPER_CUDA_HPP
 

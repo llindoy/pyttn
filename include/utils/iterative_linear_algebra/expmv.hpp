@@ -515,7 +515,7 @@ public:
             CALL_AND_HANDLE(base_type::m_tempr.resize(x.size()), "Failed to resize the working buffer.");
             CALL_AND_HANDLE(base_type::m_arnoldi.resize(krylov_dim, size), "Failed to resize krylov subspace.");
 
-            if(dt == real_type(0)){return 0.0;}
+            if(std::abs(dt*coeff) == real_type(0.0)){return 0;}
 
             size_type nevals = 0;
             real_type dt_trial = dt/m_ndt;
@@ -527,7 +527,6 @@ public:
                 CALL_AND_HANDLE(base_type::determine_order(x, dt_trial, coeff, scale_factor, nan_encountered, err_res, std::forward<Args>(args)...), "Failed to determine order");
 
                 ASSERT(!nan_encountered, "Cannot recover from nan.");
-                if(nan_encountered)
 
                 nevals += base_type::m_cur_order;
 

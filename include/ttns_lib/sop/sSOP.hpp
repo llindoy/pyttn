@@ -7,10 +7,15 @@
 
 #include <utils/io/input_wrapper.hpp>
 #include <common/zip.hpp>
+#include "coeff_type.hpp"
+#include "system_information.hpp"
+#include "operator_dictionaries/default_operator_dictionaries.hpp"
 
 namespace ttns
 {
 
+class sPOP;
+template <typename T> class sNBO;
 
 class sOP
 {
@@ -83,7 +88,7 @@ static inline sOP fermion_operator(const std::string& op, size_t mode)
     utils::io::remove_whitespace_and_to_lower(label);
 
     return sOP(op, mode, true);
-};
+}
 
 inline bool operator<(const sOP& A, const sOP& B)
 {   
@@ -304,17 +309,12 @@ inline ttns::sPOP operator*(const ttns::sPOP& a, const ttns::sPOP& b)
 }
 
 
-
-
-
-
-
 namespace ttns
 {
 
-template <typename T> class sNBO;
 template <typename T> std::ostream& operator<<(std::ostream& os, const sNBO<T>& op);
 
+//TODO: Allow for mapping of sNBO operator to a vector of site_operators.
 template <typename T> 
 class sNBO
 {
@@ -323,6 +323,7 @@ public:
     using const_iterator = typename sPOP::const_iterator;
     using reverse_iterator = typename sPOP::reverse_iterator;
     using const_reverse_iterator = typename sPOP::const_reverse_iterator;
+    using function_type = typename literal::coeff<T>::function_type;
 public:
     sNBO(){}
 
@@ -336,6 +337,15 @@ public:
 
     sNBO(const T& coeff, const sPOP& p) : m_coeff(coeff), m_ops(p) {}
     sNBO(const T& coeff, sPOP&& p) : m_coeff(coeff), m_ops(std::forward<sPOP>(p)) {}
+
+    sNBO(const literal::coeff<T>& coeff, const sPOP& p) : m_coeff(coeff), m_ops(p) {}
+    sNBO(const literal::coeff<T>& coeff, sPOP&& p) : m_coeff(coeff), m_ops(std::forward<sPOP>(p)) {}
+
+    sNBO(const function_type& coeff, const sPOP& p) : m_coeff(coeff), m_ops(p) {}
+    sNBO(const function_type& coeff, sPOP&& p) : m_coeff(coeff), m_ops(std::forward<sPOP>(p)) {}
+
+    sNBO(function_type&& coeff, const sPOP& p) : m_coeff(std::move(coeff)), m_ops(p) {}
+    sNBO(function_type&& coeff, sPOP&& p) : m_coeff(std::move(coeff)), m_ops(std::forward<sPOP>(p)) {}
 
     template <typename ... Args>
     sNBO(const T& coeff, const sOP& p, Args&&... args) : m_coeff(coeff), m_ops(p, std::forward<Args>(args)...) {}
@@ -359,8 +369,8 @@ public:
         return *this;
     }
 
-    const T& coeff() const{return m_coeff;}
-    T& coeff(){return m_coeff;}
+    const literal::coeff<T>& coeff() const{return m_coeff;}
+    literal::coeff<T>& coeff(){return m_coeff;}
 
     const std::list<sOP>& ops() const{return m_ops.ops();}
     std::list<sOP>& ops(){return m_ops.ops();}
@@ -398,7 +408,13 @@ public:
         return *this;
     }
 
-    sNBO<T>& operator*=(const T& b)
+    //sNBO<T>& operator*=(const T& b)
+    //{
+    //    m_coeff*=b;
+    //    return *this;
+    //}
+
+    sNBO<T>& operator*=(const literal::coeff<T>& b)
     {
         m_coeff*=b;
         return *this;
@@ -429,7 +445,7 @@ public:
     const_reverse_iterator rend() const {  return const_reverse_iterator(m_ops.rend());  }
 
 protected:
-    T m_coeff;
+    literal::coeff<T> m_coeff;
     sPOP m_ops;
 };
 
@@ -442,7 +458,7 @@ std::ostream& operator<<(std::ostream& os, const ttns::sNBO<T>& op)
 
 }   //namespace ttns
 
-template <typename T>
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
 ttns::sNBO<T> operator*(const T& a, const ttns::sOP& b)
 {
     ttns::sNBO<T> ret(a, {b});
@@ -450,7 +466,7 @@ ttns::sNBO<T> operator*(const T& a, const ttns::sOP& b)
 }
 
 
-template <typename T>
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
 ttns::sNBO<T> operator*(const ttns::sOP& a, const T& b)
 {
     ttns::sNBO<T> ret(b, {a});
@@ -458,7 +474,7 @@ ttns::sNBO<T> operator*(const ttns::sOP& a, const T& b)
 }
 
 
-template <typename T>
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
 ttns::sNBO<T> operator*(const T& a, const ttns::sPOP& b)
 {
     ttns::sNBO<T> ret(a, b);
@@ -466,15 +482,47 @@ ttns::sNBO<T> operator*(const T& a, const ttns::sPOP& b)
 }
 
 
-template <typename T>
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
 ttns::sNBO<T> operator*(const ttns::sPOP& a, const T& b)
 {
     ttns::sNBO<T> ret(b, a);
     return ret;
 }
 
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
+ttns::sNBO<T> operator*(const ttns::literal::coeff<T>& a, const ttns::sOP& b)
+{
+    ttns::sNBO<T> ret(a, {b});
+    return ret;
+}
 
-template <typename T, typename U>
+
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
+ttns::sNBO<T> operator*(const ttns::sOP& a, const ttns::literal::coeff<T>& b)
+{
+    ttns::sNBO<T> ret(b, {a});
+    return ret;
+}
+
+
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
+ttns::sNBO<T> operator*(const ttns::literal::coeff<T>& a, const ttns::sPOP& b)
+{
+    ttns::sNBO<T> ret(a, b);
+    return ret;
+}
+
+template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
+ttns::sNBO<T> operator*(const ttns::sPOP& a, const ttns::literal::coeff<T>& b)
+{
+    ttns::sNBO<T> ret(b, a);
+    return ret;
+}
+
+
+
+
+template <typename T, typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
 ttns::sNBO<decltype(T()*U())> operator*(const ttns::sNBO<T>& a, const U& b)
 {
     ttns::sNBO<decltype(T()*U())> ret(a);
@@ -482,8 +530,24 @@ ttns::sNBO<decltype(T()*U())> operator*(const ttns::sNBO<T>& a, const U& b)
     return ret;
 }
 
-template <typename T, typename U>
+template <typename T, typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
 ttns::sNBO<decltype(T()*U())> operator*(const U& a, const ttns::sNBO<T>& b)
+{
+    ttns::sNBO<decltype(T()*U())> ret(b);
+    ret.coeff()*=a;
+    return ret;
+}
+
+template <typename T, typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
+ttns::sNBO<decltype(T()*U())> operator*(const ttns::sNBO<T>& a, const ttns::literal::coeff<U>& b)
+{
+    ttns::sNBO<decltype(T()*U())> ret(a);
+    ret.coeff()*=b;
+    return ret;
+}
+
+template <typename T, typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
+ttns::sNBO<decltype(T()*U())> operator*(const ttns::literal::coeff<U>& a, const ttns::sNBO<T>& b)
 {
     ttns::sNBO<decltype(T()*U())> ret(b);
     ret.coeff()*=a;
@@ -645,7 +709,7 @@ public:
     {
         for(auto& t : a.terms())
         {
-            m_terms.push_back({-t.coeff(), t.pop()});
+            m_terms.push_back({T(-1.0)*t.coeff(), t.pop()});
         }
         return *this;
     }
@@ -665,7 +729,7 @@ public:
     template <typename U>
     sSOP<T>& operator-=(const sNBO<U>& a)
     {
-        m_terms.push_back({-a.coeff(), a.pop()});
+        m_terms.push_back({T(-1.0)*a.coeff(), a.pop()});
         return *this;
     }
 
@@ -751,7 +815,7 @@ std::ostream& operator<<(std::ostream& os, const ttns::sSOP<T>& op)
     const auto plus = "+";
     for(const auto& t : op)
     {
-        sep = std::real(t.coeff()) >= 0 ? plus : separator;
+        sep = t.coeff().is_positive() ? plus : separator;
         os << sep << t << std::endl;
     }
     return os;
@@ -919,7 +983,7 @@ ttns::sSOP<decltype(T()*U())> operator-(const ttns::sSOP<T>& a, const ttns::sSOP
 
     for(auto& t : b.terms())
     {
-        ret.terms().push_back({-t.coeff(), t.pop()});
+        ret.terms().push_back({T(-1.0)*t.coeff(), t.pop()});
     }
     return  ret;
 }
@@ -932,7 +996,7 @@ ttns::sSOP<decltype(T()*U())> operator-(const ttns::sNBO<T>& a, const ttns::sSOP
     ret.terms().push_back(a);
     for(auto& t : b.terms())
     {
-        ret.terms().push_back({-t.coeff(), t.pop()});
+        ret.terms().push_back({T(-1.0)*t.coeff(), t.pop()});
     }
     return  ret;
 }
@@ -941,7 +1005,7 @@ template <typename T, typename U>
 ttns::sSOP<decltype(T()*U())> operator-(const ttns::sSOP<T>& a, const ttns::sNBO<U>& b)
 {
     ttns::sSOP<decltype(T()*U())> ret(a);
-    ret.terms().push_back({-b.coeff(), b.pop()});
+    ret.terms().push_back({T(-1.0)*b.coeff(), b.pop()});
     return  ret;
 }
 
@@ -954,7 +1018,7 @@ ttns::sSOP<T> operator-(const ttns::sPOP& a, const ttns::sSOP<T>& b)
     ret.terms().push_back({T(1.0), a});
     for(auto& t : b.terms())
     {
-        ret.terms().push_back({-t.coeff(), t.pop()});
+        ret.terms().push_back({T(-1.0)*t.coeff(), t.pop()});
     }
     return  ret;
 }
@@ -974,7 +1038,7 @@ ttns::sSOP<T> operator-(const ttns::sOP& a, const ttns::sSOP<T>& b)
     ret.terms().push_back({1.0, a});
     for(auto& t : b.terms())
     {
-        ret.terms().push_back({-t.coeff(), t.pop()});
+        ret.terms().push_back({T(-1.0)*t.coeff(), t.pop()});
     }
     return  ret;
 }
@@ -1093,6 +1157,28 @@ ttns::sSOP<decltype(T()*U())> operator*(const U& a, const ttns::sSOP<T>& b)
     }
     return  ret;
 }
+template <typename T, typename U> 
+ttns::sSOP<decltype(T()*U())> operator*(const ttns::sSOP<T>& a, const ttns::literal::coeff<U>& b)
+{
+    ttns::sSOP<decltype(T()*U())> ret(a);
+    for(auto& op : ret.terms())
+    {
+        op *= b;
+    }
+    return  ret;
+}
+
+
+template <typename T, typename U> 
+ttns::sSOP<decltype(T()*U())> operator*(const ttns::literal::coeff<U>& a, const ttns::sSOP<T>& b)
+{
+    ttns::sSOP<decltype(T()*U())> ret(b);
+    for(auto& op : ret.terms())
+    {
+        op *= a;
+    }
+    return  ret;
+}
 
 
 template <typename T> 
@@ -1175,7 +1261,60 @@ ttns::sSOP<decltype(T()*U())> operator*(const ttns::sSOP<T>& a, const ttns::sSOP
     return  ret;
 }
 
+/*  
+namespace ttns
+{
+template <typename T>
+sNBO<T> jordan_wigner(const sOP& op, const system_modes& sys_info) const
+{
+    if(op.fermionic())
+    {       
+        using fermi_dict = fermion::default_fermion_operator_dictionary<double>;
+        std::vector<bool> is_fermion_mode(op.mode());      std::fill(is_fermion_mode.begin(), is_fermion_mode.end(), false);
+        for(size_t i = 0; i < op.mode(); ++i)
+        {
+            is_fermion_mode[i] = sys_info[i].fermionic();
+        }
 
+        bool do_jw;
+        CALL_AND_HANDLE(do_jw = fermi_dict::query(op.op())->changes_parity(), "Failed to jordan_wigner map fermionic mode.");
+
+        if(do_jw)
+        {
+            std::list<sOP> res;
+            for(size_t i = 0; i < op.mode(); ++i)
+            {
+                if(is_fermion_mode[i])
+                {
+                    res.push_back({"jw", i});
+                }
+            }
+            res.push_back({op.op(), op.mode()});
+            sPOP ret(res);
+            return 1.0*ret;
+        }
+        else
+        {
+            sOP res(op.op(), op.mode());
+            return 1.0*res;
+        }
+
+    }
+    else
+    {
+        sOP res(op.op(), op.mode());
+        return 1.0*res;
+    }
+}
+
+
+template <typename T>
+sNBO<T> jordan_wigner(const sPOP& op, const system_modes& sys_info) const
+{
+    RAISE_EXCEPTION("Jordan wigner mapping of product operator has not yet been implement.");
+}
+}
+*/
 
 #endif  //TTNS_OPERATOR_GEN_LIB_SSOP_HPP
 
