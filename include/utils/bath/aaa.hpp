@@ -23,7 +23,7 @@ linalg::complex<T> Ct(T t, const linalg::vector<linalg::complex<T>>& p, const li
     {
         if(linalg::imag(p(i)) > 0)
         {
-            ret += ii*r(i)*std::exp(ii*p(i)*t);
+            ret += ii*r(i)*linalg::exp(ii*p(i)*t);
         }
     }
     return ret;
@@ -94,7 +94,7 @@ public:
         p.resize(npoles);
         r.resize(npoles);
 
-        size_t ind = 0;     for(size_t i = 0; i < m+1; ++i){if(std::abs(beta(i)) > std::numeric_limits<T>::epsilon()*T(10)){p(ind) = alpha(i)/beta(i);    ++ind;}}
+        size_t ind = 0;     for(size_t i = 0; i < m+1; ++i){if(linalg::abs(beta(i)) > std::numeric_limits<T>::epsilon()*T(10)){p(ind) = alpha(i)/beta(i);    ++ind;}}
     
         //compute the residues using numerical integration. 
         compute_residues(p, r, tol, qorder);
@@ -107,7 +107,7 @@ public:
 
         z.resize(nzeros);
 
-        ind = 0;    for(size_t i = 0; i < m+1; ++i){if(std::abs(beta(i)) > std::numeric_limits<T>::epsilon()*T(10)){z(ind) = alpha(i)/beta(i);    ++ind;}}
+        ind = 0;    for(size_t i = 0; i < m+1; ++i){if(linalg::abs(beta(i)) > std::numeric_limits<T>::epsilon()*T(10)){z(ind) = alpha(i)/beta(i);    ++ind;}}
 
     }
 
@@ -366,7 +366,7 @@ protected:
         for(size_t i = 0; i < FZ.size(); ++i)
         {
             T val = linalg::real(linalg::abs(FZ(i)-R(i)));
-            if(val > max && std::abs(val-max) > std::numeric_limits<T>::epsilon()*T(10))
+            if(val > max && linalg::abs(val-max) > std::numeric_limits<T>::epsilon()*T(10))
             {
                 max = val;
                 argmax = i;

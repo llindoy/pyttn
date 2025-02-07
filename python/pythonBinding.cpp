@@ -108,20 +108,22 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_ttn<pyttn_real_type,linalg::blas_backend>(m);
     initialise_msttn<pyttn_real_type, linalg::blas_backend>(m);
 
-    initialise_matrix_element<linalg::blas_backend>(m);
+    initialise_matrix_element<pyttn_real_type, linalg::blas_backend>(m);
+
+
     //
     //Wrap operator classes
     //
     auto m_ops = m.def_submodule("ops", "Operator submodule for TTNS library.");
-    initialise_site_operators<linalg::blas_backend>(m_ops);
-    initialise_product_operator<linalg::blas_backend>(m);
-    initialise_sop_operator<linalg::blas_backend>(m);
+    initialise_site_operators<pyttn_real_type, linalg::blas_backend>(m_ops);
+    initialise_product_operator<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_sop_operator<pyttn_real_type, linalg::blas_backend>(m);    
 
     //
     //Wrap the core algorithms for operating on ttns
     //
-    initialise_dmrg<linalg::blas_backend>(m);
-    initialise_tdvp<linalg::blas_backend>(m);
+    initialise_dmrg<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_tdvp<pyttn_real_type, linalg::blas_backend>(m);
 }
 
 

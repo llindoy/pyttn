@@ -81,7 +81,7 @@ public:
     }
 
     template <typename INTEGER, typename Alloc>
-    ms_ttn(const ntree<INTEGER, Alloc>& topology, size_type nset, bool purification = false) try : base_type(topology, nset, purification) {}
+    ms_ttn(size_type nset, const ntree<INTEGER, Alloc>& topology, bool purification = false) try : base_type(topology, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
@@ -89,21 +89,21 @@ public:
     }
 
     template <typename INTEGER, typename Alloc>
-    ms_ttn(const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, size_type nset, bool purification = false)try : base_type(topology, capacity, nset, purification) {}
+    ms_ttn(size_type nset, const ntree<INTEGER, Alloc>& topology, const ntree<INTEGER, Alloc>& capacity, bool purification = false)try : base_type(topology, capacity, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
         RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
     }
 
-    ms_ttn(const std::string& _topology, size_type nset, bool purification = false) try : base_type(_topology, nset, purification) {}
+    ms_ttn(size_type nset, const std::string& _topology, bool purification = false) try : base_type(_topology, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;
         RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
     }
 
-    ms_ttn(const std::string& _topology, const std::string& _capacity, size_type nset, bool purification = false) try : base_type(_topology, _capacity, nset, purification) {}
+    ms_ttn(size_type nset, const std::string& _topology, const std::string& _capacity, bool purification = false) try : base_type(_topology, _capacity, nset, purification) {}
     catch(const std::exception& ex)
     {
         std::cerr << ex.what() << std::endl;

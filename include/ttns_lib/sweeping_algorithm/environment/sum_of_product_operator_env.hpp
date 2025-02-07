@@ -131,7 +131,7 @@ public:
             
             for(const auto& a : A)
             {
-                size_type size = mfo_core::contraction_buffer_size(a, use_capacity);   
+                size_type size = mfo_core::contraction_buffer_size(a, true);   
                 if(size > maxmfo){maxmfo = size;}
             }
         }

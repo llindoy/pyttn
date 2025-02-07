@@ -1,12 +1,13 @@
 import numpy as np
 
+
 class ttn_dtype:
     """A class defining the general interface for the pybind11 wrappers generated for the ttn object.  These wrapper classes are
     :class:`ttn_complex` and :class:`ttn_real` (with the real variant only present if the pybind11 wrapper has been built with support
     for real valued TTNs.
 
     :param \*args: A variable length list of arguments. Valid options are
-        
+
         - none - in this case we call the default constructor of the ttn class to construct an empty ttn.
         - **A** (:class:`ms_ttn_slice_complex` or :class:`ms_ttn_slice_real`) - Construct a ttn to represent a single slice of a multiset TTN
         - **A** (:class:`ttn_complex` or :class:`ttn_real`) - Construct the ttn object from another ttn object potentially converting the dtype
@@ -21,7 +22,8 @@ class ttn_dtype:
     """
 
     def __init__(self, *args, dtype=np.complex128, **kwargs):
-        raise RuntimeError("The ttn_dtype class is not constructable.  This class is present to provide cleaner documentation for the pybind11 classes.")
+        raise RuntimeError(
+            "The ttn_dtype class is not constructable.  This class is present to provide cleaner documentation for the pybind11 classes.")
 
     @property
     def complex_dtype(self):
@@ -31,7 +33,6 @@ class ttn_dtype:
         :rtype: {np.complex128 or np.float64}
         """
         pass
-
 
     def assign(self, o):
         """Assign the value of this ttn from another ttn
@@ -49,7 +50,6 @@ class ttn_dtype:
         """
         pass
 
-
     def reset_orthogonality_centre(self):
         """Resets the orthogonality centre of the TTN to the root node of the tree."""
         pass
@@ -58,7 +58,7 @@ class ttn_dtype:
         """Resize the TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction
 
         :param \*args: A variable length list of arguments. Valid options are
-            
+
             - **topology** (:class:`ntree` or str) - Construct a ttn from a ntree object defining the topology and bond dimensions of the ttn
             - **topology** (:class:`ntree` or str), **capacity** (ntree or str ) - Construct a ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions
         :type \*args: [Arguments (variable number and type)]
@@ -66,7 +66,6 @@ class ttn_dtype:
         :type purification: bool, optional
         """
         pass
-
 
     def set_seed(self, seed):
         """Set the value of the random number generate seed used for internal operations requiring random sampling
@@ -86,7 +85,6 @@ class ttn_dtype:
         """
         pass
 
-
     def set_product(self, state):
         """Set the coefficients in the TTN so that it represents a product of a set of one body states 
 
@@ -94,7 +92,6 @@ class ttn_dtype:
         :type state: list[list[dtype]]
         """
         pass
-
 
     def set_identity_purification(self):
         """Sets the state of the TTN to a purification state representing the identity
@@ -194,7 +191,6 @@ class ttn_dtype:
         """
         pass
 
-
     def nset(self):
         """
         :returns: The number of set variables for the TTN.  Here it is one
@@ -245,7 +241,6 @@ class ttn_dtype:
         """
         pass
 
-
     def maximum_bond_dimension(self):
         """            
         :returns: The maximum bond dimension
@@ -278,7 +273,6 @@ class ttn_dtype:
         """
         pass
 
-
     def is_orthogonalised(self):
         """            
         :returns: Whether or not the TTN has an orthogonality centre at the root
@@ -286,7 +280,6 @@ class ttn_dtype:
 
         """
         pass
-
 
     def force_set_orthogonality_centre(self, i):
         """Sets the orthogonality centre of the tensor network to index i but does not modify the tensor to ensure that this is a
@@ -334,7 +327,6 @@ class ttn_dtype:
         :type force: bool, optional
 
         """
-
 
     def truncate(self, tol=0, nchi=0):
         """Ensures the tensor network is in an orthogonalised form.  Then performs an euler tour truncating each bond according to the user
@@ -456,7 +448,7 @@ class ttn_dtype:
         """Apply a one-body operator to the TTN updating its value
 
         :param \*args: A variable length list of arguments. Valid options are
-            
+
             - **op** (linalg.matrix or np.ndarray or site_operator_dtype), **mode** (int) -  Apply the operator op to mode mode
             - **op** (site_operator_dtype) - Apply the operator op to the mode specified by op
         :type \*args: [Arguments (variable number and type)]

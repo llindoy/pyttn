@@ -114,10 +114,9 @@ void init_product_operator(py::module &m, const std::string& label)
         .def("__str__", [](const pop& o){std::ostringstream oss; oss << o; return oss.str();});
 }
 
-template <typename backend>
+template <typename real_type, typename backend>
 void initialise_product_operator(py::module& m)
 {
-    using real_type = double;
     using complex_type = linalg::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN

@@ -2,6 +2,7 @@ from pyttn.ttnpp import one_site_dmrg_complex, adaptive_one_site_dmrg_complex, t
 from pyttn.ttnpp import multiset_one_site_dmrg_complex, ms_ttn_complex, multiset_sop_operator_complex
 import numpy as np
 
+
 def single_set_dmrg(A, H, expansion='onesite', **kwargs):
     """A factory method for constructing an object used for performing single set dmrg calculations
 
@@ -25,6 +26,7 @@ def single_set_dmrg(A, H, expansion='onesite', **kwargs):
     else:
         raise RuntimeError("Invalid input types for dmrg.")
 
+
 def multiset_dmrg(A, H, expansion='onesite', **kwargs):
     """A factory method for constructing an object used for performing multiset dmrg calculations
 
@@ -43,9 +45,11 @@ def multiset_dmrg(A, H, expansion='onesite', **kwargs):
         if expansion == 'onesite':
             return multiset_one_site_dmrg_complex(A, H, **kwargs)
         elif expansion == 'subspace':
-            raise ValueError("subspace expansion algorithm has not yet been implemented.")
+            raise ValueError(
+                "subspace expansion algorithm has not yet been implemented.")
     else:
         raise RuntimeError("Invalid input types for dmrg.")
+
 
 def dmrg(A, H, expansion='onesite', **kwargs):
     """A factory method for constructing an object used for performing either single or multi set dmrg calculations. 

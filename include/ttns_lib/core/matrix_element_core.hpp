@@ -117,7 +117,7 @@ public:
         }
     }
 
-    static inline void compute_leaf(site_operator<T>& op, const hdata& p, triad_type& temp, observable_node& res, size_type r, boolnode& is_identity)
+    static inline void compute_leaf(site_operator<T, backend>& op, const hdata& p, triad_type& temp, observable_node& res, size_type r, boolnode& is_identity)
     {
         try
         {
@@ -259,7 +259,7 @@ public:
         }
     }
 
-    static inline void compute_leaf(site_operator<T>& op, const hdata& b, const hdata& k, triad_type& temp, observable_node& res, size_type r)
+    static inline void compute_leaf(site_operator<T, backend>& op, const hdata& b, const hdata& k, triad_type& temp, observable_node& res, size_type r)
     {
         CALL_AND_RETHROW(compute_leaf(op.op(), b, k, temp, res, r));
     }

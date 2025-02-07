@@ -170,10 +170,9 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("matrix", &diagmat::mat);
 }
 
-template <typename backend>
+template <typename real_type, typename backend>
 void initialise_site_operators(py::module& m)
 {
-    using real_type = double;
     using complex_type = linalg::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN

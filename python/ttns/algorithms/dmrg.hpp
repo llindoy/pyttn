@@ -294,10 +294,9 @@ void init_dmrg(py::module &m, const std::string& label)
     init_dmrg_core<T, ttns::ms_ttn, backend>(m, (std::string("multiset_one_site_dmrg_")+label));
 }
 
-template <typename backend>
+template <typename real_type, typename backend>
 void initialise_dmrg(py::module& m)
 {
-    using real_type = double;
     using complex_type = linalg::complex<real_type>;
   
 #ifdef BUILD_REAL_TTN

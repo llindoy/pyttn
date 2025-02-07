@@ -2,6 +2,7 @@ from pyttn.ttnpp import liouville_space
 from .SOPExt import SOP
 from .opdictExt import *
 
+
 def liouville_space_superoperator(Op, sys, optype, opdict=None, Lopdict=None, coeff=1.0):
     """A function for taking a Hilbert space operator and system information object and constructing a Liouville space operator
     object rdependent on the argument optype.  Here we support the automatic generation of 4 different types of Liouville space operator
@@ -18,22 +19,26 @@ def liouville_space_superoperator(Op, sys, optype, opdict=None, Lopdict=None, co
 
     if optype == '-':
         if is_operator_dictionary(opdict):
-            liouville_space.commutator_superoperator(Op, sys, opdict, Lop, Lopdict, coeff=coeff)
+            liouville_space.commutator_superoperator(
+                Op, sys, opdict, Lop, Lopdict, coeff=coeff)
         else:
             liouville_space.commutator_superoperator(Op, sys, Lop, coeff=coeff)
     elif optype == '+':
         if is_operator_dictionary(opdict):
-            liouville_space.anticommutator_superoperator(Op, sys, opdict, Lop, Lopdict, coeff=coeff)
+            liouville_space.anticommutator_superoperator(
+                Op, sys, opdict, Lop, Lopdict, coeff=coeff)
         else:
             liouville_space.commutator_superoperator(Op, sys, Lop, coeff=coeff)
     elif optype == 'L' or optype == 'l':
         if is_operator_dictionary(opdict):
-            liouville_space.left_superoperator(Op, sys, opdict, Lop, Lopdict, coeff=coeff)
+            liouville_space.left_superoperator(
+                Op, sys, opdict, Lop, Lopdict, coeff=coeff)
         else:
             liouville_space.left_superoperator(Op, sys, Lop, coeff=coeff)
     elif optype == 'R' or optype == 'r':
         if is_operator_dictionary(opdict):
-            liouville_space.right_superoperator(Op, sys, opdict, Lop, Lopdict, coeff=coeff)
+            liouville_space.right_superoperator(
+                Op, sys, opdict, Lop, Lopdict, coeff=coeff)
         else:
             liouville_space.right_superoperator(Op, sys, Lop, coeff=coeff)
     else:

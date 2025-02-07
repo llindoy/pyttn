@@ -130,10 +130,9 @@ void init_matrix_element(py::module &m, const std::string& label)
         //inline std::vector<T>& operator()(std::vector<std::vector<site_operator<T, backend>>& ops, const std::vector<size_type>& modes, const state_type& bra, const state_type& ket, std::vector<T>& res)
 }
 
-template <typename backend>
+template <typename real_type, typename backend>
 void initialise_matrix_element(py::module& m)
 {
-    using real_type = double;
     using complex_type = linalg::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN

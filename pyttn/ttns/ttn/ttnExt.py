@@ -1,6 +1,7 @@
 import numpy as np
 
-def ttn(*args, dtype = np.complex128, **kwargs):
+
+def ttn(*args, dtype=np.complex128, **kwargs):
     """Factory function for constructing a tree tensor network state operator
 
     :param \*args: Variable length list of arguments. This function can handle two possible lists of arguments
@@ -23,45 +24,45 @@ def ttn(*args, dtype = np.complex128, **kwargs):
 
     try:
         from pyttn.ttnpp import ttn_real
-        if(args):
+        if (args):
             if isinstance(args[0], ttn_complex):
                 return ttn_complex(*args, **kwargs)
             elif isinstance(args[0], ttn_real):
-                if(dtype == np.complex128):
+                if (dtype == np.complex128):
                     return ttn_complex(*args, **kwargs)
                 else:
                     return ttn_real(*args, **kwargs)
             else:
-                if(dtype == np.complex128):
+                if (dtype == np.complex128):
                     return ttn_complex(*args, **kwargs)
-                elif(dtype == np.float64):
+                elif (dtype == np.float64):
                     return ttn_real(*args, **kwargs)
                 else:
                     raise RuntimeError("Invalid dtype for ttn")
         else:
-            if(dtype == np.complex128):
+            if (dtype == np.complex128):
                 return ttn_complex(*args, **kwargs)
-            elif(dtype == np.float64):
+            elif (dtype == np.float64):
                 return ttn_real(*args, **kwargs)
             else:
                 raise RuntimeError("Invalid dtype for ttn")
     except ImportError:
-        if(args):
+        if (args):
             if isinstance(args[0], ttn_complex):
                 return ttn_complex(*args, **kwargs)
             else:
-                if(dtype == np.complex128):
+                if (dtype == np.complex128):
                     return ttn_complex(*args, **kwargs)
                 else:
                     raise RuntimeError("Invalid dtype for ttn")
         else:
-            if(dtype == np.complex128):
+            if (dtype == np.complex128):
                 return ttn_complex(*args, **kwargs)
             else:
                 raise RuntimeError("Invalid dtype for ttn")
 
 
-def multiset_ttn(*args, dtype = np.complex128, **kwargs):
+def multiset_ttn(*args, dtype=np.complex128, **kwargs):
     """Factory function for constructing a multiset tree tensor network state operator
 
     :param \*args: Variable length list of arguments. This function can handle two possible lists of arguments
@@ -83,43 +84,44 @@ def multiset_ttn(*args, dtype = np.complex128, **kwargs):
 
     try:
         from pyttn.ttnpp import ms_ttn_real
-        if(args):
+        if (args):
             if isinstance(args[0], ms_ttn_complex):
                 return ms_ttn_complex(*args, **kwargs)
             elif isinstance(args[0], ms_ttn_real):
-                if(dtype == np.complex128):
+                if (dtype == np.complex128):
                     return ms_ttn_complex(*args, **kwargs)
                 else:
                     return ms_ttn_real(*args, **kwargs)
             else:
-                if(dtype == np.complex128):
+                if (dtype == np.complex128):
                     return ms_ttn_complex(*args, **kwargs)
-                elif(dtype == np.float64):
+                elif (dtype == np.float64):
                     return ms_ttn_real(*args, **kwargs)
                 else:
                     raise RuntimeError("Invalid dtype for ms_ttn")
         else:
-            if(dtype == np.complex128):
+            if (dtype == np.complex128):
                 return ms_ttn_complex(*args, **kwargs)
-            elif(dtype == np.float64):
+            elif (dtype == np.float64):
                 return ms_ttn_real(*args, **kwargs)
             else:
                 raise RuntimeError("Invalid dtype for ms_ttn")
-            
+
     except ImportError:
-        if(args):
+        if (args):
             if isinstance(args[0], ms_ttn_complex):
                 return ms_ttn_complex(*args, **kwargs)
             else:
-                if(dtype == np.complex128):
+                if (dtype == np.complex128):
                     return ms_ttn_complex(*args, **kwargs)
                 else:
                     raise RuntimeError("Invalid dtype for ms_ttn")
         else:
-            if(dtype == np.complex128):
+            if (dtype == np.complex128):
                 return ms_ttn_complex(*args, **kwargs)
             else:
                 raise RuntimeError("Invalid dtype for ms_ttn")
+
 
 def ms_ttn(*args, dtype=np.complex128, **kwargs):
     """Factory function for constructing a multiset tree tensor network state operator

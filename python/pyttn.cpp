@@ -41,22 +41,19 @@
 
 #include "ttns/ttn/ntree.hpp"
 #include "ttns/ttn/ttn.hpp"
-/*
+
 #include "ttns/ttn/ms_ttn.hpp"
+
+#include "ttns/observables/matrix_element.hpp"
+
 #include "ttns/operators/siteOperators.hpp"
 #include "ttns/operators/sop_operator.hpp"
 #include "ttns/operators/product_operator.hpp"
 
-#include "ttns/observables/matrix_element.hpp"
-
 #include "ttns/algorithms/dmrg.hpp"
 #include "ttns/algorithms/tdvp.hpp"
-*/
-//using namespace ttns;
-namespace py = pybind11;
 
-//PYBIND11_MAKE_OPAQUE(std::vector<int>);
-//PYBIND11_MAKE_OPAQUE(std::vector<size_t>);
+namespace py = pybind11;
 
 template <typename... Args>
 using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
@@ -74,8 +71,13 @@ PYBIND11_MODULE(ttnpp, m)
         )mydelimiter");
 
     auto m_models = m.def_submodule("models", R"mydelimiter(
-        Pre-defined models specifying system and Hamiltonian information.
+        Submodule of the TTNS Library containing pre-defined models specifying system and Hamiltonian information.
         )mydelimiter");
+
+    auto m_ops = m.def_submodule("ops", R"mydelimiter(
+        Operator submodule for TTNS library.
+        )mydelimiter");
+
 
 #ifdef PYTTN_BUILD_CUDA
     auto m_cuda = m.def_submodule("cuda",R"mydelimiter(
@@ -89,6 +91,10 @@ PYBIND11_MODULE(ttnpp, m)
     auto m_models_gpu = m_cuda.def_submodule("models", R"mydelimiter(
         Pre-defined models specifying system and Hamiltonian information.
         )mydelimiter");
+    auto m_ops_gpu = m_cuda.def_submodule("ops", R"mydelimiter(
+        Operator submodule for TTNS library.
+        )mydelimiter");
+    
 #endif
 
     //
@@ -143,11 +149,33 @@ PYBIND11_MODULE(ttnpp, m)
     //
     initialise_ntree(m);
     initialise_ttn<pyttn_real_type, linalg::blas_backend>(m);
-    //initialise_msttn<linalg::blas_backend>(m);
+    initialise_msttn<pyttn_real_type, linalg::blas_backend>(m);
 
 #ifdef PYTTN_BUILD_CUDA
-    initialise_ttn<pyttn_real_type, linalg::cuda_backend>(m);
+    initialise_ttn<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    initialise_msttn<pyttn_real_type, linalg::cuda_backend>(m_cuda);
 #endif
+
+    initialise_matrix_element<pyttn_real_type, linalg::blas_backend>(m);
+
+    initialise_site_operators<pyttn_real_type, linalg::blas_backend>(m_ops);
+    initialise_product_operator<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_sop_operator<pyttn_real_type, linalg::blas_backend>(m);
+
+#ifdef PYTTN_BUILD_CUDA
+    initialise_matrix_element<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+
+    initialise_site_operators<pyttn_real_type, linalg::cuda_backend>(m_ops_gpu);
+    initialise_product_operator<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    initialise_sop_operator<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+#endif
+
+    //
+    //Wrap the core algorithms for operating on ttns
+    //
+    initialise_dmrg<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_tdvp<pyttn_real_type, linalg::blas_backend>(m);
+
 }
 
 

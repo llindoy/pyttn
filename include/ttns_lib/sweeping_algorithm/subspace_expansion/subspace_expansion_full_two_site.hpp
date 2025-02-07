@@ -227,7 +227,7 @@ public:
                     //check if any of the dominant svds of the Hamiltonian acting on the twosite coefficient tensor are occupied through the half step
                     if(m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
                     {
-                        if(std::real(m_S(i, i)) > 0){sv = std::sqrt(std::real(m_S(i, i)))*svd_scale;}
+                        if(linalg::real(m_S(i, i)) > 0){sv = std::sqrt(linalg::real(m_S(i, i)))*svd_scale;}
                         if(!std::isnan(sv))
                         {
                             if(sv > m_spawning_threshold){++nadd;}
@@ -235,7 +235,7 @@ public:
                     }
                     else
                     {
-                        if(std::real(m_S(i, i)) > 0){sv = std::real(m_S(i, i))*svd_scale*svd_scale;}
+                        if(linalg::real(m_S(i, i)) > 0){sv = linalg::real(m_S(i, i))*svd_scale*svd_scale;}
                         if(!std::isnan(sv))
                         {
                             if(sv > m_spawning_threshold){++nadd;}
@@ -389,7 +389,7 @@ public:
                     
                     if(m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
                     {
-                        if(std::real(m_S(i, i)) > 0){sv = std::sqrt(std::real(m_S(i, i)))*svd_scale;}
+                        if(linalg::real(m_S(i, i)) > 0){sv = std::sqrt(linalg::real(m_S(i, i)))*svd_scale;}
                         if(!std::isnan(sv))
                         {
                             if(sv > m_spawning_threshold){++nadd;}
@@ -397,7 +397,7 @@ public:
                     }
                     else
                     {
-                        if(std::real(m_S(i, i)) > 0){sv = std::real(m_S(i, i))*svd_scale*svd_scale;}
+                        if(linalg::real(m_S(i, i)) > 0){sv = linalg::real(m_S(i, i))*svd_scale*svd_scale;}
                         if(!std::isnan(sv))
                         {
                             if(sv > m_spawning_threshold){++nadd;}

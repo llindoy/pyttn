@@ -2,7 +2,8 @@ from .opsExt import ops
 from .opsExt import __site_op_dict__
 import numpy as np
 
-def site_operator(*args, mode = None, optype=None, dtype=np.complex128, **kwargs):
+
+def site_operator(*args, mode=None, optype=None, dtype=np.complex128, **kwargs):
     """Factory function for constructing a one site operator.
 
     :param \*args: Variable length list of arguments. There are several valid options for the \*args parameters.  If the optype variable is None the allowed options are
@@ -28,28 +29,30 @@ def site_operator(*args, mode = None, optype=None, dtype=np.complex128, **kwargs
     except:
         site_operator_real = None
     ret = None
-    if(optype is None):
-        if(args and len(args) == 1):
-            if(args[0].complex_dtype() or site_operator_real is None):
+    if (optype is None):
+        if (args and len(args) == 1):
+            if (args[0].complex_dtype() or site_operator_real is None):
                 ret = site_operator_complex(args[0])
             else:
                 ret = site_operator_real(args[0])
         elif args and len(args) <= 3:
-            if(dtype == np.complex128 or site_operator_real is None):
+            if (dtype == np.complex128 or site_operator_real is None):
                 ret = site_operator_complex(*args, **kwargs)
             else:
                 ret = site_operator_real(*args, **kwargs)
         else:
-            raise RuntimeError("Failed to construct site_operator object invalid arguments.")
+            raise RuntimeError(
+                "Failed to construct site_operator object invalid arguments.")
     else:
         if optype in __site_op_dict__:
             M = __site_op_dict__[optype](*args, dtype=dtype, **kwargs)
-            if(M.complex_dtype() or site_operator_real is None):
+            if (M.complex_dtype() or site_operator_real is None):
                 ret = site_operator_complex(M)
             else:
                 ret = site_operator_real(M)
         else:
-            raise RuntimeError("Failed to construct site_operator object.  optype not recognized.")
+            raise RuntimeError(
+                "Failed to construct site_operator object.  optype not recognized.")
     if not mode is None:
         ret.mode = mode
 

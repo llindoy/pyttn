@@ -36,27 +36,32 @@ public:
             {
                 if(s_op->is_diagonal())
                 {
-                    linalg::diagonal_matrix<T, backend> M;
-                    s_op->as_diagonal(basis, mode_index, M);
+                    linalg::diagonal_matrix<T> Mhost;
+                    s_op->as_diagonal(basis, mode_index, Mhost);
+                    linalg::diagonal_matrix<T, backend> M(Mhost);
                     return std::make_shared<ops::diagonal_matrix_operator<T, backend>>(M);
                 }
                 else if(s_op->is_sparse())
                 {
-                    linalg::csr_matrix<T, backend> M;
-                    s_op->as_csr(basis, mode_index, M);
+                    linalg::csr_matrix<T> Mhost;
+                    s_op->as_csr(basis, mode_index, Mhost);                    
+                    linalg::csr_matrix<T, backend> M(Mhost);
+
                     return std::make_shared<ops::sparse_matrix_operator<T, backend>>(M);
                 }
                 else
                 {
-                    linalg::matrix<T, backend> M;
-                    s_op->as_dense(basis, mode_index, M);
+                    linalg::matrix<T> Mhost;
+                    s_op->as_dense(basis, mode_index, Mhost);
+                    linalg::matrix<T, backend> M(Mhost);
                     return std::make_shared<ops::dense_matrix_operator<T, backend>>(M);
                 }
             }
             else
             {
-                linalg::matrix<T, backend> M;
-                s_op->as_dense(basis, mode_index, M);
+                linalg::matrix<T> Mhost;
+                s_op->as_dense(basis, mode_index, Mhost);
+                linalg::matrix<T, backend> M(Mhost);
                 return std::make_shared<ops::dense_matrix_operator<T, backend>>(M);
             }
         }

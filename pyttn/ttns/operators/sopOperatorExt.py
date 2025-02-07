@@ -8,13 +8,14 @@ try:
 
 except ImportError:
     sop_operator_real = None
-    ttn_real = None 
+    ttn_real = None
     SOP_real = None
     multiset_sop_operator_real = None
-    ms_ttn_real = None 
+    ms_ttn_real = None
     multiset_SOP_real = None
 
-def sop_operator(h: SOP_real|SOP_complex, A : ttn_real|ttn_complex, sysinf : system_modes, *args, **kwargs):
+
+def sop_operator(h: SOP_real | SOP_complex, A: ttn_real | ttn_complex, sysinf: system_modes, *args, **kwargs):
     """Function for constructing the hierarchical sum of product operator of a string operator
 
     :param h: The sum of product operator representation of the Hamiltonian
@@ -30,14 +31,17 @@ def sop_operator(h: SOP_real|SOP_complex, A : ttn_real|ttn_complex, sysinf : sys
         if isinstance(A, ttn_complex) and isinstance(h, SOP_complex):
             return sop_operator_complex(h, A, sysinf, *args, **kwargs)
         else:
-            raise RuntimeError("Invalid argument for the creation of a sop_operator.")
+            raise RuntimeError(
+                "Invalid argument for the creation of a sop_operator.")
     else:
         if isinstance(A, ttn_real) and isinstance(h, SOP_real):
             return sop_operator_real(h, A, sysinf, *args, **kwargs)
         elif isinstance(A, ttn_complex) and isinstance(h, SOP_complex):
             return sop_operator_complex(h, A, sysinf, *args, **kwargs)
         else:
-            raise RuntimeError("Invalid argument for the creation of a sop_operator.")
+            raise RuntimeError(
+                "Invalid argument for the creation of a sop_operator.")
+
 
 def multiset_sop_operator(h, A, sysinf, *args, **kwargs):
     """Function for constructing the multiset hierarchical sum of product operator of a string operator
@@ -55,11 +59,13 @@ def multiset_sop_operator(h, A, sysinf, *args, **kwargs):
         if isinstance(A, ms_ttn_complex) and isinstance(h, multiset_SOP_complex):
             return multiset_sop_operator_complex(h, A, sysinf, *args, **kwargs)
         else:
-            raise RuntimeError("Invalid argument for the creation of a sop_operator.")
+            raise RuntimeError(
+                "Invalid argument for the creation of a sop_operator.")
     else:
         if isinstance(A, ms_ttn_real) and isinstance(h, multiset_SOP_real) and not multiset_SOP_real is None:
             return multiset_sop_operator_real(h, A, sysinf, *args, **kwargs)
         elif isinstance(A, ms_ttn_complex) and isinstance(h, multiset_SOP_complex):
             return multiset_sop_operator_complex(h, A, sysinf, *args, **kwargs)
         else:
-            raise RuntimeError("Invalid argument for the creation of a sop_operator.")
+            raise RuntimeError(
+                "Invalid argument for the creation of a sop_operator.")

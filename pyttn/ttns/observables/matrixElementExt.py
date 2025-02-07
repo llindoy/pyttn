@@ -1,6 +1,7 @@
 import numpy as np
 
-def matrix_element(*args, dtype = np.complex128, **kwargs):
+
+def matrix_element(*args, dtype=np.complex128, **kwargs):
     """A factory method for constructing an object used for evaluating matrix elements from a TTN. If this function is passed a TTN object it uses
     this to construct a matrix_element suitable for evaluating matrix elements of this class.  Otherwise this will construct an empty matrix_element
     object with the required dtype.
@@ -18,7 +19,7 @@ def matrix_element(*args, dtype = np.complex128, **kwargs):
 
     try:
         from pyttn.ttnpp import matrix_element_real, ttn_real, ms_ttn_real
-        if(args):
+        if (args):
             if isinstance(args[0], ttn_complex) or isinstance(args[0], ms_ttn_complex):
                 return matrix_element_complex(*args, **kwargs)
             elif isinstance(args[0], ttn_real) or isinstance(args[0], ms_ttn_real):
@@ -26,21 +27,21 @@ def matrix_element(*args, dtype = np.complex128, **kwargs):
             else:
                 raise RuntimeError("Invalid dtype for matrix_element")
         else:
-            if(dtype == np.complex128):
+            if (dtype == np.complex128):
                 return matrix_element_complex(**kwargs)
-            elif(dtype == np.float64):
+            elif (dtype == np.float64):
                 return matrix_element_real(**kwargs)
             else:
                 raise RuntimeError("Invalid dtype for matrix_element")
 
     except ImportError:
-        if(args):
+        if (args):
             if isinstance(args[0], ttn_complex) or isinstance(args[0], ms_ttn_complex):
                 return matrix_element_complex(*args, **kwargs)
             else:
                 raise RuntimeError("Invalid dtype for matrix_element")
         else:
-            if(dtype == np.complex128):
+            if (dtype == np.complex128):
                 return matrix_element_complex(**kwargs)
             else:
                 raise RuntimeError("Invalid dtype for matrix_element")
