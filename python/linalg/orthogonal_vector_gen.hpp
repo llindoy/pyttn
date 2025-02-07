@@ -22,7 +22,7 @@ void init_orthogonal_vector(py::module& m, const std::string& label)
     using vectype = linalg::vector<T, backend>;
     using mattype = linalg::matrix<T, backend>;
 
-    py::class_<ttype>(m, (label).c_str())
+    py::class_<ttype>(m, label.c_str(), py::module_local())
         .def_static("pad_random", 
             [](mattype& a, size_type i, random_engine<backend>& rng)
             {
@@ -40,26 +40,23 @@ void init_orthogonal_vector(py::module& m, const std::string& label)
 
 }
 
-template <typename T, typename backend>
+template <typename backend>
 void init_random_engine(py::module& m, const std::string& label)
 {
     using namespace linalg;
     using size_type = typename backend::size_type;
-    using ttype = orthogonal_vector<T, backend>;
+    using ttype = random_engine<backend>;
 
-    py::class_<ttype>(m, (label).c_str())
+    py::class_<ttype>(m, label.c_str())
         .def(py::init());
 }
-
-
 
 template <typename real_type, typename backend>
 void initialise_orthogonal_vector(py::module& m)
 {
     using complex_type = linalg::complex<real_type>;
 
-    init_random_engine<real_type, backend>(m, "random_engine_real");
-    init_random_engine<complex_type, backend>(m, "random_engine_complex");
+    init_random_engine<backend>(m, "random_engine");
     init_orthogonal_vector<real_type, backend>(m, "orthogonal_vector_real");
     init_orthogonal_vector<complex_type, backend>(m, "orthogonal_vector_complex");
 }

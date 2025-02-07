@@ -445,23 +445,23 @@ public:
 public:
     void set_node_identity(){for(auto& data : m_data){data.set_identity();}}
     void set_node_identity(size_type i){m_data[i].set_identity();}
-    void set_node_random(linalg::random_engine& rng){for(size_type i = 0; i < this->nset(); ++i){m_data[i].set_random(rng);}}
-    void set_node_random(size_type i, linalg::random_engine& rng){rng.fill_random(m_data[i]);}
+    void set_node_random(linalg::random_engine<backend>& rng){for(size_type i = 0; i < this->nset(); ++i){m_data[i].set_random(rng);}}
+    void set_node_random(size_type i, linalg::random_engine<backend>& rng){rng.fill_random(m_data[i]);}
 
-    void set_leaf_node_state(size_type sind, size_type i, linalg::random_engine& rng, bool random_unoccupied_initialisation=false)
+    void set_leaf_node_state(size_type sind, size_type i, linalg::random_engine<backend>& rng, bool random_unoccupied_initialisation=false)
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
         this->m_data[sind].set_node_state(i, rng, random_unoccupied_initialisation);
     }
 
     template <typename U, typename be> 
-    void set_leaf_node_vector(size_type sind, const linalg::vector<U, be>& psi0, linalg::random_engine& rng)
+    void set_leaf_node_vector(size_type sind, const linalg::vector<U, be>& psi0, linalg::random_engine<backend>& rng)
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
         this->m_data[sind].set_node_vector(psi0, rng);
     }
 
-    void set_leaf_purification(size_type sind, linalg::random_engine& rng)
+    void set_leaf_purification(size_type sind, linalg::random_engine<backend>& rng)
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
         this->m_data[sind].set_node_purification(rng);

@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-#include "../utils/genrandom.hpp"
+#include <linalg/utils/genrandom.hpp>
 
 #include <common/tmp_funcs.hpp>
 #include <common/exception_handling.hpp>
@@ -96,8 +96,8 @@ private:
     sweeping::traversal_path m_euler_tour;
     bool m_euler_tour_initialised = false;
 
-    std::mt19937 _rng;
-    random_engine<backend> m_rengine;
+    linalg::random_engine<linalg::blas_backend> m_hrengine;
+    linalg::random_engine<backend> m_rengine;
 
     bool m_purification = false;
 public: 
@@ -182,7 +182,7 @@ protected:
             }
             if(!all_fit){reset_orthogonality();}
 
-            _rng = other._rng;
+            m_hrengine = other.m_hrengine;
             m_rengine = other.m_rengine;
 
             m_purification = other.is_purification();
@@ -208,7 +208,7 @@ protected:
             m_nset_lhd = other.m_nset_lhd;
 
             m_orthog.clear();
-            _rng = other._rng;
+            m_hrengine = other.m_hrengine;
             m_rengine = other.m_rengine;
 
 
@@ -275,18 +275,21 @@ public:
         ntree<size_type> capacity(_capacity);
         CALL_AND_HANDLE(resize(topology, capacity, nset, purification), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
     }
-    
-    std::mt19937& rng(){return _rng;}
-    const std::mt19937& rng() const{return _rng;}
 
-    random_engine<backend> random(){return m_rengine;}
-    const random_engine<backend> random() const{return m_rengine;}
+    std::mt19937& rng(){return m_hrengine.rng();}
+    const std::mt19937& rng() const{return m_hrengine.rng();}
+
+    linalg::random_engine<backend> random_engine(){return m_rengine;}
+    const linalg::random_engine<backend> random_engine() const{return m_rengine;}
+
+    linalg::random_engine<linalg::blas_backend> random_engine_host(){return m_hrengine;}
+    const linalg::random_engine<linalg::blas_backend> random_engine_host() const{return m_hrengine;}
 
     template <typename sseq>
     void set_seed(sseq& seed)
     {
-        _rng.seed(seed);
-        m_rengine.set_seet(seed);
+        m_hrengine.set_seed(seed);
+        m_rengine.set_seed(seed);
     }
 
     void random()
@@ -415,7 +418,7 @@ protected:
         for(size_type i = 0; i < this->nmodes(); ++i)
         {
             std::discrete_distribution<std::size_t> d{relval[i].begin(), relval[i].end()};
-            size_type ind = d(_rng);
+            size_type ind = d(m_hrengine.rng());
             state[i] = ind;
             CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, ind, m_rengine), "Failed to set state.");
         }

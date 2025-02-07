@@ -7,7 +7,6 @@
 #include "../tree/tree.hpp"
 #include "../tree/tree_node.hpp"
 #include "../tree/ntree.hpp"
-#include "ttn_node_helper.hpp"
 
 #include <vector>
 #include <stdexcept>
@@ -371,8 +370,8 @@ public:
             CALL_AND_HANDLE(ttens = linalg::trans(atens, {1, 0, 2}), "Failed to transpose the atens object into utens.");
             auto tmat = ttens.reinterpret_shape(atens.shape(1), atens.shape(0)*atens.shape(2));
 
-            using orthog = helper::orthogonal_vector<T, backend>;
-            CALL_AND_RETHROW(orthog::pad_random_vectors(tmat, _shape[1], rng));
+            using orthog = linalg::orthogonal_vector<T, backend>;
+            CALL_AND_RETHROW(orthog::pad_random(tmat, _shape[1], rng));
 
             //now transpose the results back into the original vector
             CALL_AND_HANDLE(atens = linalg::trans(ttens, {1, 0, 2}), "Failed to transpose the atens object into utens.");
@@ -395,8 +394,8 @@ public:
         auto tmat = ttens.reinterpret_shape(atens.shape(1), atens.shape(0)*atens.shape(2));
 
         CALL_AND_HANDLE(r.resize(tmat.shape(1)), "Failed to resize random vector.");
-        using orthog = helper::orthogonal_vector<T, backend>;
-        CALL_AND_RETHROW(orthog::generate_random_vector(tmat, r, rng));
+        using orthog = linalg::orthogonal_vector<T, backend>;
+        CALL_AND_RETHROW(orthog::generate(tmat, r, rng));
     }
 
     void expand_bond(size_type mode, size_type iadd, matrix_type& temp, const matrix_type& pad)
@@ -442,7 +441,7 @@ public:
     void set_random(linalg::random_engine<backend>& rng)
     {
         auto& mat = this->as_matrix();
-        rng.fill_random(mat);
+        rng.fill_normal(mat);
     }
 
     void set_node_state(size_type i, linalg::random_engine<backend>& rng, bool random_unoccupied_initialisation=false)
@@ -450,16 +449,21 @@ public:
         size_type s1 = this->shape(0);
         size_type s2 = this->shape(1);
 
-        linalg::matrix<T, linalg::blas_backend> ct(s2, s1);  ct.fill_zeros();
-        ct(0, i) = T(1.0);
-
-        using orthog = helper::orthogonal_vector<T, backend>;
         if(random_unoccupied_initialisation)
         {
-            CALL_AND_RETHROW(orthog::pad_random_vectors(ct, 1, rng));
+            using orthog = linalg::orthogonal_vector<T, backend>;
+            linalg::vector<T, linalg::blas_backend> ct(s1);  ct.fill_zeros();
+            ct(i) = T(1.0);
+            linalg::matrix<T,backend> cte(s2, s1); 
+            CALL_AND_HANDLE(cte[0]=ct, "Failed to set first row of results.");
+            CALL_AND_RETHROW(orthog::pad_random(cte, 1, rng));
+            this->as_matrix() = linalg::trans(cte);
         }
         else
-        {
+        {        
+            linalg::matrix<T, linalg::blas_backend> ct(s1, s2);  ct.fill_zeros();
+            ct(i, 0) = T(1.0);
+
             size_type cu = i;
             size_type cd = i;
 
@@ -472,12 +476,12 @@ public:
                     if(cu+1 != s1)
                     {
                         cu+=1;
-                        ct(j, cu) = T(1.0);
+                        ct(cu, j) = T(1.0);
                     }
                     else if(cd != 0)
                     {
                         cd-=1;
-                        ct(j, cd) = T(1.0);
+                        ct(cd, j) = T(1.0);
                     }
                     else{RAISE_EXCEPTION("Failed to set node state unable to set unoccupied vectors.");}
                 }
@@ -487,33 +491,31 @@ public:
                     if(cd != 0)
                     {
                         cd-=1;
-                        ct(j, cd) = T(1.0);
+                        ct(cd, j) = T(1.0);
                     }
                     else if(cu+1 != s1)
                     {
                         cu+=1;
-                        ct(j, cu) = T(1.0);
+                        ct(cu, j) = T(1.0);
                     }
                     else{RAISE_EXCEPTION("Failed to set node state unable to set unoccupied vectors.");}
                 }
             }
-
+            this->as_matrix() = ct;
         }
-
-        this->as_matrix() = linalg::trans(ct);
     }
 
     template <typename U, typename be> 
     void set_node_vector(const linalg::vector<U, be>& psi0, linalg::random_engine<backend>& rng)
     {
-
         size_type s1 = this->shape(0);
         size_type s2 = this->shape(1);
 
-        linalg::matrix<T, linalg::blas_backend> ct(s2, s1);  ct.fill_zeros();
-        CALL_AND_HANDLE(ct[0] = psi0, "Failed to assign psi0 in htucker.");
-        using orthog = helper::orthogonal_vector<T, backend>;
-        CALL_AND_RETHROW(orthog::pad_random_vectors(ct, 1, rng));
+        linalg::vector<T, be> _psi0(psi0);
+        linalg::matrix<T, backend> ct(s2, s1);  ct.fill_zeros();
+        CALL_AND_HANDLE(ct[0] = _psi0, "Failed to assign psi0 in htucker.");
+        using orthog = linalg::orthogonal_vector<T, backend>;
+        CALL_AND_RETHROW(orthog::pad_random(ct, 1, rng));
 
         this->as_matrix() = linalg::trans(ct);
     }
@@ -523,16 +525,18 @@ public:
         size_type s1 = this->shape(0);
         size_type s2 = this->shape(1);
 
-        linalg::matrix<T, linalg::blas_backend> ct(s2, s1);  ct.fill_zeros();
+        linalg::vector<T, linalg::blas_backend> ct(s1);  ct.fill_zeros();
         size_type ns = static_cast<size_type>(std::sqrt(s1));
         ASSERT(ns*ns == s1, "Cannot setup purification.  The node does not have square local dimension and consequently can not handle a composite system, ancilla state.");
         for(size_t i = 0; i < ns; ++i)
         {
-            ct(0, i*ns + ((i + 1)%ns)) = 1.0/std::sqrt(ns);
+            ct(i*ns + ((i + 1)%ns)) = 1.0/std::sqrt(ns);
         }
-        using orthog = helper::orthogonal_vector<T, backend>;
-        CALL_AND_RETHROW(orthog::pad_random_vectors(ct, 1, rng));
-        this->as_matrix() = linalg::trans(ct);
+        linalg::matrix<T,backend> cte(s2, s1); 
+        CALL_AND_HANDLE(cte[0]=ct, "Failed to set first row of results.");
+        using orthog = linalg::orthogonal_vector<T, backend>;
+        CALL_AND_RETHROW(orthog::pad_random(cte, 1, rng));
+        this->as_matrix() = linalg::trans(cte);
     }
 
     static void query_node_sizes(const ttn_node_data<T, backend>& a, std::array<size_type, 3>& sizes, bool is_leaf = false)

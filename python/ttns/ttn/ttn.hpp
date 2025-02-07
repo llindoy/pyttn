@@ -31,6 +31,7 @@ void init_ttn(py::module &m, const std::string& label)
     using sop = sop_operator<T, backend>;
 
     using conv = linalg::pybuffer_converter<backend>;
+
 #ifdef PYTTN_BUILD_CUDA
     using otherbackend = typename other_backend<backend>::type;
 #endif
@@ -143,7 +144,7 @@ void init_ttn(py::module &m, const std::string& label)
         .def("set_product", &_ttn::template set_product<T, backend>)
         .def("set_product", [](_ttn& self, std::vector<py::buffer>& ps)
                             {
-                                std::vector<linalg::vector<T>> _ps(ps.size());
+                                std::vector<linalg::vector<T, backend>> _ps(ps.size());
                                 for(size_t i = 0; i < ps.size(); ++i)
                                 {
                                     conv::copy_to_tensor(ps[i], _ps[i]);

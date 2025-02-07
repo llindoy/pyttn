@@ -105,6 +105,10 @@ public:
             arr(i) = random_normal<T>::generate(m_rng, dist);
         }
     }
+
+
+    const std::mt19937& rng() const{return m_rng;}
+    std::mt19937& rng(){return m_rng;}
 protected:
     std::mt19937 m_rng;
 };
