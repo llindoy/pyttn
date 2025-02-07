@@ -55,7 +55,7 @@ void pybuffer_to_vector(const py::buffer& b, std::vector<T>& res)
         res.resize(info.size);
         real_type* ptr = static_cast<real_type*>(info.ptr);
 
-        for(size_t i = 0; i < info.size; ++i)
+        for(size_t i = 0; i < static_cast<size_t>(info.size); ++i)
         {
             res[i] = ptr[i];
         }

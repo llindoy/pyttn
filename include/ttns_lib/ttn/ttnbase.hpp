@@ -279,11 +279,11 @@ public:
     std::mt19937& rng(){return m_hrengine.rng();}
     const std::mt19937& rng() const{return m_hrengine.rng();}
 
-    linalg::random_engine<backend> random_engine(){return m_rengine;}
-    const linalg::random_engine<backend> random_engine() const{return m_rengine;}
+    linalg::random_engine<backend>& random_engine(){return m_rengine;}
+    const linalg::random_engine<backend>& random_engine() const{return m_rengine;}
 
-    linalg::random_engine<linalg::blas_backend> random_engine_host(){return m_hrengine;}
-    const linalg::random_engine<linalg::blas_backend> random_engine_host() const{return m_hrengine;}
+    linalg::random_engine<linalg::blas_backend>& random_engine_host(){return m_hrengine;}
+    const linalg::random_engine<linalg::blas_backend>& random_engine_host() const{return m_hrengine;}
 
     template <typename sseq>
     void set_seed(sseq& seed)

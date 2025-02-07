@@ -115,7 +115,7 @@ public:
     //perform the subspace expansion as we are moving down a tree.  This requires us to evaluate the optimal functions to add 
     //into A2.  For A1 they will be overwriten by the r matrix in the next step so we just 
     //here the A1 and A2 tensors must be left and right orthogonal respectively with the non-orthogonal component stored in r
-    bool subspace_expansion_down(hnode& A1, hnode& A2, bond_matrix_type& r, population_matrix_type& S, env_node_type& h, const env_type& op, environment_type& env, std::mt19937& rng)
+    bool subspace_expansion_down(hnode& A1, hnode& A2, bond_matrix_type& r, population_matrix_type& S, env_node_type& h, const env_type& op, environment_type& env, linalg::random_engine<backend>& rng)
     {
         try
         {
@@ -129,7 +129,7 @@ public:
     }
 
     //here the A1 and A2 tensors must be left and right orthogonal respectively with the non-orthogonal component stored in r
-    bool subspace_expansion_up(hnode& A1, hnode& A2, bond_matrix_type& r, population_matrix_type& S, env_node_type& h, const env_type& op, environment_type& env, std::mt19937& rng)
+    bool subspace_expansion_up(hnode& A1, hnode& A2, bond_matrix_type& r, population_matrix_type& S, env_node_type& h, const env_type& op, environment_type& env, linalg::random_engine<backend>& rng)
     {
         try
         {

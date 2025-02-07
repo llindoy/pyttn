@@ -50,7 +50,10 @@ private:
     //provide access to base class operators
     using base_type::m_nodes;
     using base_type::m_nleaves;
+    using base_type::m_rengine;
+    using base_type::m_hrengine;
     using base_type::rng;
+
     using base_type::m_orthog;
     using base_type::m_dim_sizes;
     using base_type::m_leaf_indices;
@@ -216,7 +219,7 @@ public:
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
-                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[set_index][i], rng(), random_unoccupied_initialisation), "Failed to set state.");
+                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[set_index][i], m_rengine, random_unoccupied_initialisation), "Failed to set state.");
             }
 
             //and scale them by the coeff array
@@ -247,7 +250,7 @@ public:
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
-                m_nodes[m_leaf_indices[i]].set_leaf_node_vector(set_index, ps[set_index][i], rng() );
+                m_nodes[m_leaf_indices[i]].set_leaf_node_vector(set_index, ps[set_index][i], m_rengine );
             }
 
             //and scale them by the coeff array
@@ -276,7 +279,7 @@ public:
 
             for(size_type mode = 0; mode < this->nmodes(); ++mode)
             {
-                m_nodes[m_leaf_indices[mode]].set_leaf_purification(set_index, rng());
+                m_nodes[m_leaf_indices[mode]].set_leaf_purification(set_index, m_rengine );
             }
 
             //and scale them by the coeff array

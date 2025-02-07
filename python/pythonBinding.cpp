@@ -94,19 +94,19 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_system_info(m);
     initialise_SOP<pyttn_real_type>(m);
     initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
-    initialise_liouville_space<linalg::blas_backend>(m);
+    initialise_liouville_space<pyttn_real_type, linalg::blas_backend>(m);
 
     //
     //Wrap the models functionality included in SOP
     //
-    initialise_models(m_models);
+    initialise_models<pyttn_real_type>(m_models);
     
     //
     //Wrap core ttns functionality
     //
     initialise_ntree(m);
-    initialise_ttn<linalg::blas_backend>(m);
-    initialise_msttn<linalg::blas_backend>(m);
+    initialise_ttn<pyttn_real_type,linalg::blas_backend>(m);
+    initialise_msttn<pyttn_real_type, linalg::blas_backend>(m);
 
     initialise_matrix_element<linalg::blas_backend>(m);
     //

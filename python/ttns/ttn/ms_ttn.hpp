@@ -326,10 +326,9 @@ void init_msttn(py::module &m, const std::string& label)
         ;
 }
 
-template <typename backend>
+template <typename real_type, typename backend>
 void initialise_msttn(py::module& m)
 {
-    using real_type = double;
     using complex_type = linalg::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN

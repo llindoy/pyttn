@@ -179,11 +179,11 @@ public:
                 {   
                     CALL_AND_RETHROW(static_cast<update_type*>(this)->update_bond_tensor(_r, _env, _h, _op));
                 }, 
-                [this](hnode& _a1, hnode& _a2, bond_matrix_type& _r, population_matrix_type& _s, env_node_type& _h, env_type& _op, environment_type& _env, std::mt19937& _rng)
+                [this](hnode& _a1, hnode& _a2, bond_matrix_type& _r, population_matrix_type& _s, env_node_type& _h, env_type& _op, environment_type& _env, linalg::random_engine<backend>& _rng)
                 {
                     CALL_AND_RETHROW(return static_cast<subspace_type*>(this)->subspace_expansion_down(_a1, _a2, _r, _s, _h, _op, _env, _rng));
                 },
-                [this](hnode& _a1, hnode& _a2, bond_matrix_type& _r, population_matrix_type& _s, env_node_type& _h, env_type& _op, environment_type& _env, std::mt19937& _rng)
+                [this](hnode& _a1, hnode& _a2, bond_matrix_type& _r, population_matrix_type& _s, env_node_type& _h, env_type& _op, environment_type& _env, linalg::random_engine<backend>& _rng)
                 {
                     CALL_AND_RETHROW(return static_cast<subspace_type*>(this)->subspace_expansion_up(_a1, _a2, _r, _s, _h, _op, _env, _rng));
                 },
@@ -241,7 +241,7 @@ public:
                 subspace_expanded_f = forward_loop_step(A, op,
                     [](hnode& , const environment_type&, env_node_type&, env_type&){},
                     [](bond_matrix_type& , const environment_type& , env_node_type&, env_type&){},
-                    [this](hnode& _a1, hnode& _a2, bond_matrix_type& _r, population_matrix_type& _s, env_node_type& _h, env_type& _op, environment_type& _env, std::mt19937& _rng)
+                    [this](hnode& _a1, hnode& _a2, bond_matrix_type& _r, population_matrix_type& _s, env_node_type& _h, env_type& _op, environment_type& _env, linalg::random_engine<backend>& _rng)
                     {
                         CALL_AND_RETHROW(return static_cast<subspace_type*>(this)->subspace_expansion_down(_a1, _a2, _r, _s, _h, _op, _env, _rng));
                     },
@@ -265,7 +265,7 @@ public:
                 subspace_expanded_b = backward_loop_step(A, op, 
                     [](hnode& , const environment_type&, env_node_type&, env_type&){},
                     [](bond_matrix_type& , const environment_type& , env_node_type&, env_type&){},
-                    [this](hnode& _a1, hnode& _a2, bond_matrix_type& _r, population_matrix_type& _s, env_node_type& _h, env_type& _op, environment_type& _env, std::mt19937& _rng)
+                    [this](hnode& _a1, hnode& _a2, bond_matrix_type& _r, population_matrix_type& _s, env_node_type& _h, env_type& _op, environment_type& _env, linalg::random_engine<backend>& _rng)
                     {
                         CALL_AND_RETHROW(return static_cast<subspace_type*>(this)->subspace_expansion_up(_a1, _a2, _r, _s, _h, _op, _env, _rng));
                     },
@@ -376,7 +376,7 @@ protected:
 
                     bool seloc = false;
                     //as we descend the tree apply the subspace expansion
-                    CALL_AND_HANDLE(seloc = sf(A[mode], A, psi.active_bond_matrix(), psi.active_population_matrix(), h[mode], op, m_env, psi.rng()), "Subspace expansion Failed.");
+                    CALL_AND_HANDLE(seloc = sf(A[mode], A, psi.active_bond_matrix(), psi.active_population_matrix(), h[mode], op, m_env, psi.random_engine()), "Subspace expansion Failed.");
                     if(seloc){subspace_expanded = true;}
 
                     //now we can update the mean field Hamiltonian at the node.  
@@ -473,7 +473,7 @@ protected:
                     CALL_AND_HANDLE(A.apply_to_node(orthog), "Failed to enforce orthogonality condition at node.");
 
                     bool seloc = false;
-                    CALL_AND_HANDLE(seloc = sf(A, A.parent(), psi.active_bond_matrix(), psi.active_population_matrix(), h, op, m_env, psi.rng()), "Subspace expansion failed.");
+                    CALL_AND_HANDLE(seloc = sf(A, A.parent(), psi.active_bond_matrix(), psi.active_population_matrix(), h, op, m_env, psi.random_engine()), "Subspace expansion failed.");
                     if(seloc){subspace_expanded = true;}
 
                     CALL_AND_HANDLE(A.apply_bond_matrix_to_parent(orthog), "Failed to apply bond matrix down up.");

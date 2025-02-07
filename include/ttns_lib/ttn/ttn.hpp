@@ -50,8 +50,10 @@ private:
     //provide access to base class operators
     using base_type::m_nodes;
     using base_type::m_nleaves;
-    using base_type::rng;
+    using base_type::m_rengine;
+    using base_type::m_hrengine;
     using base_type::m_orthog;
+    using base_type::rng;
     using base_type::m_dim_sizes;
     using base_type::m_leaf_indices;
     using base_type::m_has_orthogonality_centre;
