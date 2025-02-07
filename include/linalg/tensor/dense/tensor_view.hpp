@@ -460,7 +460,7 @@ public:
 };
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // D dimensional implementation of the tensor view object for use with the  //
@@ -528,7 +528,7 @@ public:
     __host__ __device__ const_pointer data()const{return m_buffer;}
 };
 
-#endif  //__NVCC__
+#endif  //PYTTN_BUILD_CUDA
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //                      SPECIAL TENSOR VIEW IMPLEMENTATIONS                          //

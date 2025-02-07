@@ -82,7 +82,7 @@ protected:
 }   //namespace linalg
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 #include <thrust/reduce.h>
 #include <thrust/functional.h>
 #include <thrust/device_ptr.h>

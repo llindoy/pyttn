@@ -13,7 +13,7 @@ namespace expression_templates
 
 template <typename backend> struct requires_working_buffer{static constexpr bool value(){return false;}};
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <> struct requires_working_buffer<cuda_backend>{static constexpr bool value(){return true;}};
 #endif
 

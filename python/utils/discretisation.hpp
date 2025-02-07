@@ -85,6 +85,7 @@ void init_discretisation(py::module &m)
             );
 }
 
+template <typename T>
 void initialise_discretisation(py::module& m);
 
 #endif

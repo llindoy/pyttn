@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# pyTTN: An Open Source Toolbox for Quantum Dynamics Simulations Using Tree Tensor Networks
+# pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks
 <!-- Add badges when complete -->
 <!--
 [![ArXiv]()
@@ -59,12 +59,21 @@ External Libraries:
 
 The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${PyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from github.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
 
+pyTTN also supports the use of a CUDA backend to accelerate the internal tensor operations.  When compiling the CUDA backend, pyTTN gains the following additional dependencies:
+External Libraries:
+- [CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) 
+- [cuTENSOR](https://developer.nvidia.com/cutensor)
+
+By default pyTTN does not build the CUDA backend.  For details on how to do so see ...
+
 ## Installation
 You can install pyTTN using pip like this:
 ```
 $ cd ${pyTTN_ROOT_DIR}
 $ python3 -m pip install .
 ```
+
+### Building with CUDA Support
 
 ## Using the Software
 Example python scripts showing the use of pyTTN for a range of application are provided in the ${PyTTN_ROOT_DIR}/examples.  These examples included

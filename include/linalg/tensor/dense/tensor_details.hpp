@@ -3,7 +3,7 @@
 
 #include "../../linalg_forward_decl.hpp"
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 #include "../../backends/cuda_kernels.hpp"
 #endif
 
@@ -152,7 +152,7 @@ public:
     }
 };
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //                          DETAILS OBJECTS FOR THE CUDA BACKEND TENSORS                        //
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -225,7 +225,7 @@ public:
         cuda_backend::func_fill_3(a.buffer(), m, n, o, std::forward<Func>(f), std::forward<Args>(args)...);
     }
 };
-#endif //__NVCC__
+#endif //PYTTN_BUILD_CUDA
 
 ///@endcond
 } //namespace linalg //

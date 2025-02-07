@@ -1,8 +1,7 @@
 #include "orthopol.hpp"
+#include "../pyttn_typedef.hpp"
 
-void initialise_orthopol(py::module& m)
+template <> void initialise_orthopol<pyttn_real_type>(py::module& m)
 {
-    using real_type = double;
-
-    init_orthopol<real_type>(m);
+    init_orthopol<pyttn_real_type>(m);
 }

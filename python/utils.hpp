@@ -16,6 +16,57 @@ namespace py=pybind11;
 namespace linalg
 {
 
+template <typename T>
+class numpy_converter
+{
+    public:
+    using type = T;
+};
+
+template <>
+class numpy_converter<complex<float>>
+{
+public:
+    using type = std::complex<float>;
+};
+
+template <>
+class numpy_converter<complex<double>>
+{
+public:
+    using type = std::complex<double>;
+};
+
+template <typename T> 
+void pybuffer_to_vector(const py::buffer& b, std::vector<T>& res)
+{
+    using _T = typename numpy_converter<T>::type;
+    using real_type = typename get_real_type<T>::type;
+
+
+    py::buffer_info info = b.request();
+    if(info.format == py::format_descriptor<_T>::format())
+    {
+        T* ptr = static_cast<T*>(info.ptr);
+        res = std::vector<T>(ptr, ptr+info.size);
+    }
+    else if(info.format == py::format_descriptor<real_type>::format())
+    {
+        res.resize(info.size);
+        real_type* ptr = static_cast<real_type*>(info.ptr);
+
+        for(size_t i = 0; i < static_cast<size_t>(info.size); ++i)
+        {
+            res[i] = ptr[i];
+        }
+    }
+    else
+    {
+        RAISE_EXCEPTION("Failed to convert pybuffer to vector.")
+    }
+}
+
+
 template <typename backend>
 class pybuffer_converter
 {
@@ -23,8 +74,10 @@ public:
     template<typename T, size_t D>
     static void convert_to_tensor(const py::buffer& b, linalg::tensor<T, D, backend>& t)
     {
+        using _T = typename numpy_converter<T>::type;
+
         py::buffer_info info = b.request();
-        if(info.format != py::format_descriptor<T>::format())
+        if(info.format != py::format_descriptor<_T>::format())
         {
             RAISE_EXCEPTION("Incompatible format for arrays assignment. Incorrect scalar type.");
         }
@@ -51,16 +104,17 @@ public:
     static void copy_to_tensor(const py::buffer& b, linalg::tensor<T, D, backend>& t)
     {
         py::buffer_info info = b.request();
+        using _T = typename numpy_converter<T>::type;
 
         using real_type = typename get_real_type<T>::type;
 
-        if(info.format == py::format_descriptor<T>::format())
+        if(info.format == py::format_descriptor<_T>::format())
         {
             convert_to_tensor(b, t);
         }
         else if(info.format == py::format_descriptor<real_type>::format())
         {
-            linalg::tensor<real_type, D> temp;
+            linalg::tensor<real_type, D, backend> temp;
             convert_to_tensor(b, temp);
             t = temp;
         }
@@ -86,15 +140,16 @@ public:
     static void copy_to_diagonal_matrix(const py::buffer& b, diagonal_matrix<T, backend>& t)
     {
         py::buffer_info info = b.request();
+        using _T = typename numpy_converter<T>::type;
 
         using real_type = typename get_real_type<T>::type;
-        if(info.format == py::format_descriptor<T>::format())
+        if(info.format == py::format_descriptor<_T>::format())
         {
             convert_to_diagonal_matrix(b, t);
         }
         else if(info.format == py::format_descriptor<real_type>::format())
         {
-            diagonal_matrix<real_type> temp;
+            diagonal_matrix<real_type, backend> temp;
             convert_to_diagonal_matrix(b, temp);
             t=temp;
         }
@@ -108,15 +163,17 @@ public:
 
 }
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename backend> class other_backend;
 template <> class other_backend<linalg::blas_backend>
 {
+public:
     using type = linalg::cuda_backend;
 };
 
 template <> class other_backend<linalg::cuda_backend>
 {
+public:
     using type = linalg::blas_backend;
 };
 #endif

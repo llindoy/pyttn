@@ -25,7 +25,7 @@ public:
     template <typename T, typename vtype, template <typename > class op > 
     static inline auto apply(const T* a, unary_expression<vtype, op, blas_backend> b, size_type i) -> complex<decltype(a[i]+b[i])> {return complex<decltype(a[i]+b[i])>(a[i],b[i]);}
 };
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <>
 class complex_op<cuda_backend>
 {
@@ -60,7 +60,7 @@ public:
     template <typename T, typename vtype, template <typename > class op > 
     static inline auto apply(const T* a, unary_expression<vtype, op, blas_backend> b, size_type i) -> complex<decltype(a[i]+b[i])> {return polar(a[i],b[i]);}
 };
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <>
 class polar_op<cuda_backend>
 {
@@ -89,7 +89,7 @@ public:
     template <typename T> static inline auto apply(const T* a, size_type i) -> complex<decltype(a[i])>{return complex<decltype(a[i])>(cos(a[i]), sin(a[i]));}
     template <typename T> static inline auto apply(const T& a, size_type i) -> complex<decltype(a[i])>{return complex<decltype(a[i])>(cos(a[i]), sin(a[i]));}
 };
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <>
 class unit_polar_op<cuda_backend>
 {
@@ -113,7 +113,7 @@ public:
     template <typename T> static inline typename get_real_type<T>::type apply(const T* a, size_type i) {return real(a[i]);}
     template <typename T> static inline typename get_real_type<typename T::value_type>::type apply(const T& a, size_type i){return real(a[i]);}
 };
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <>
 class real_op<cuda_backend>
 {
@@ -134,7 +134,7 @@ public:
     template <typename T> static inline typename get_real_type<T>::type apply(const T* a, size_type i) {return imag(a[i]);}
     template <typename T> static inline typename get_real_type<typename T::value_type>::type apply(const T& a, size_type i){return imag(a[i]);}
 };
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <>
 class imag_op<cuda_backend>
 {
@@ -155,7 +155,7 @@ public:
     template <typename T> static inline typename get_real_type<T>::type apply(const T* a, size_type i) {return norm(a[i]);}
     template <typename T> static inline typename get_real_type<typename T::value_type>::type apply(const T& a, size_type i){return norm(a[i]);}
 };
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <>
 class norm_op<cuda_backend>
 {
@@ -176,7 +176,7 @@ public:
     template <typename T> static inline typename get_real_type<T>::type apply(const T* a, size_type i) {return arg(a[i]);}
     template <typename T> static inline typename get_real_type<typename T::value_type>::type apply(const T& a, size_type i){return arg(a[i]);}
 };
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <>
 class arg_op<cuda_backend>
 {

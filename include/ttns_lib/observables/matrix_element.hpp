@@ -730,7 +730,7 @@ public:
 
  */
 protected:
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
     T gather_result(const linalg::matrix<T, linalg::cuda_backend>& o)
     {
         CALL_AND_HANDLE(m_hmat = o, "Failed to copy device result back to host.");

@@ -5,6 +5,8 @@
 #include <map>
 #include <vector>
 
+#include <linalg/utils/genrandom.hpp>
+
 #include <common/tmp_funcs.hpp>
 #include <common/exception_handling.hpp>
 
@@ -65,7 +67,6 @@ public:
     using orthogonality_type = typename node_type::orthogonality_type;
     using value_type = typename node_type::value_type;
 
-
     using hrank_info = std::map<std::pair<size_t, size_t>, typename node_type::hrank_type>;
 
     using ancestor_index = std::set<std::pair<size_type, size_type>, level_pair_comp<size_type>>;
@@ -95,7 +96,8 @@ private:
     sweeping::traversal_path m_euler_tour;
     bool m_euler_tour_initialised = false;
 
-    std::mt19937 _rng;
+    linalg::random_engine<linalg::blas_backend> m_hrengine;
+    linalg::random_engine<backend> m_rengine;
 
     bool m_purification = false;
 public: 
@@ -180,7 +182,8 @@ protected:
             }
             if(!all_fit){reset_orthogonality();}
 
-            _rng = other._rng;
+            m_hrengine = other.m_hrengine;
+            m_rengine = other.m_rengine;
 
             m_purification = other.is_purification();
             m_orthogonality_centre = other.m_orthogonality_centre;
@@ -205,7 +208,9 @@ protected:
             m_nset_lhd = other.m_nset_lhd;
 
             m_orthog.clear();
-            _rng = other._rng;
+            m_hrengine = other.m_hrengine;
+            m_rengine = other.m_rengine;
+
 
             m_purification = other.is_purification();
             m_orthogonality_centre = other.m_orthogonality_centre;
@@ -270,14 +275,21 @@ public:
         ntree<size_type> capacity(_capacity);
         CALL_AND_HANDLE(resize(topology, capacity, nset, purification), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
     }
-    
-    std::mt19937& rng(){return _rng;}
-    const std::mt19937& rng() const{return _rng;}
+
+    std::mt19937& rng(){return m_hrengine.rng();}
+    const std::mt19937& rng() const{return m_hrengine.rng();}
+
+    linalg::random_engine<backend>& random_engine(){return m_rengine;}
+    const linalg::random_engine<backend>& random_engine() const{return m_rengine;}
+
+    linalg::random_engine<linalg::blas_backend>& random_engine_host(){return m_hrengine;}
+    const linalg::random_engine<linalg::blas_backend>& random_engine_host() const{return m_hrengine;}
 
     template <typename sseq>
     void set_seed(sseq& seed)
     {
-        _rng.seed(seed);
+        m_hrengine.set_seed(seed);
+        m_rengine.set_seed(seed);
     }
 
     void random()
@@ -288,7 +300,7 @@ public:
 
             for(auto& n : reverse(m_nodes))
             {
-                n.set_node_random(_rng);
+                n.set_node_random(m_rengine);
 
                 if(!n.is_root())
                 {
@@ -334,7 +346,7 @@ protected:
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
-                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[i], _rng, random_unoccupied_initialisation), "Failed to set state.");
+                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[i], m_rengine, random_unoccupied_initialisation), "Failed to set state.");
             }
         }
         //otherwise we need to do a strided set the correct degrees of freedom and ensure that when we trace over the ancilla we receive the state we aimed
@@ -355,7 +367,7 @@ protected:
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
-                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[i]*(m_dim_sizes_lhd[i]), _rng, random_unoccupied_initialisation), "Failed to set state.");
+                CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, si[i]*(m_dim_sizes_lhd[i]), m_rengine, random_unoccupied_initialisation), "Failed to set state.");
             }
         }
 
@@ -381,7 +393,7 @@ protected:
         m_has_orthogonality_centre = false;
         for(size_type i = 0; i < this->nmodes(); ++i)
         {
-            m_nodes[m_leaf_indices[i]].set_leaf_node_vector(set_index, ps[i], _rng);
+            m_nodes[m_leaf_indices[i]].set_leaf_node_vector(set_index, ps[i], m_rengine);
         }
         this->orthogonalise();
     }
@@ -403,13 +415,12 @@ protected:
         this->initialise_logical_tensors_product_state(set_index);
 
         m_has_orthogonality_centre = false;
-        std::uniform_real_distribution<real_type> dist(0, 1);
         for(size_type i = 0; i < this->nmodes(); ++i)
         {
             std::discrete_distribution<std::size_t> d{relval[i].begin(), relval[i].end()};
-            size_type ind = d(_rng);
+            size_type ind = d(m_hrengine.rng());
             state[i] = ind;
-            CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, ind, _rng), "Failed to set state.");
+            CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_node_state(set_index, ind, m_rengine), "Failed to set state.");
         }
 
         //now enforce that the orthogonality centre is at the root
@@ -424,7 +435,7 @@ protected:
 
         for(size_type i = 0; i < this->nmodes(); ++i)
         {
-            CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_purification(set_index, _rng), "Failed to set state.");
+            CALL_AND_HANDLE(m_nodes[m_leaf_indices[i]].set_leaf_purification(set_index, m_rengine), "Failed to set state.");
         }
 
         //now enforce that the orthogonality centre is at the root

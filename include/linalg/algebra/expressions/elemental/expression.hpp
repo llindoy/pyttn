@@ -28,7 +28,7 @@ private:
     value_type m_value;
 };
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename T>
 class literal_type<T, cuda_backend>
 {
@@ -96,7 +96,7 @@ struct expression_applicative<diagonal_matrix_type, expr, blas_backend>
     }
 };
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 
 //generic cuda wrapper
 template <typename type, typename expr>
@@ -173,7 +173,7 @@ public:
     value_type operator[](size_type i) const{return op_type::apply(m_eval, i);}
 };  //class unary_expression
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 /////////////////////////////////////////////////////////////////////////////////
 //               Unary expression type wrapper for cuda backend                //
 /////////////////////////////////////////////////////////////////////////////////
@@ -239,7 +239,7 @@ public:
     value_type operator[](size_type i) const{return op_type::apply(m_left, m_right, i);}
 };  //class binary_expression
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 /////////////////////////////////////////////////////////////////////////////////
 //              Binary expression type wrapper for cuda backend                //
 /////////////////////////////////////////////////////////////////////////////////
@@ -306,7 +306,7 @@ private:
 public:
     expression_tree(const expr& _expr, shape_type _shape) : base_type(_shape), m_expr(_expr) {}
     expression_tree() = delete;
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
     __host__ __device__ ~expression_tree(){}
 #else
     ~expression_tree(){}
@@ -358,7 +358,7 @@ private:
 public:
     expression_tree(const expr& _expr, shape_type _shape) : base_type(_shape), m_expr(_expr) {}
     expression_tree() = delete;
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
     __host__ __device__ ~expression_tree(){}
 #else
     ~expression_tree(){}

@@ -12,7 +12,7 @@
 #include <cereal/types/complex.hpp>
 #include <cereal/details/helpers.hpp>
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 
 namespace cereal
 {
@@ -87,7 +87,7 @@ struct buffer_reader_wrapper<T, blas_backend>
     }
 };
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename T>
 struct buffer_writer_wrapper<T, cuda_backend>
 {

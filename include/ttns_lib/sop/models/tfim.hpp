@@ -13,6 +13,8 @@ class TFIM : public model<value_type>
 {
 public:
     using real_type = typename linalg::get_real_type<value_type>::type;
+    using model<value_type>::hamiltonian;
+    using model<value_type>::system_info;
 public:
     TFIM(){}
     TFIM(size_t N, real_type _t, real_type _J, bool open_boundary_condition = false) : m_N(N), m_t(_t), m_J(_J), m_open_boundary_conditions(open_boundary_condition){}
@@ -62,7 +64,7 @@ protected:
     template <typename Hop>
     void build_sop_repr(Hop& H, real_type tol)
     {
-        if(std::abs(m_t) > tol)
+        if(linalg::abs(m_t) > tol)
         {
             //add on the onsite terms
             for(size_t i = 0; i < m_N; ++i)
@@ -71,7 +73,7 @@ protected:
             }       
         }
 
-        if(std::abs(m_J) > tol)
+        if(linalg::abs(m_J) > tol)
         {
             //add on the onsite terms
             for(size_t i = 1; i < m_N; ++i)

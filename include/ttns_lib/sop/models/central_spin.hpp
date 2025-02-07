@@ -11,6 +11,9 @@ template <typename value_type>
 class central_spin_base : public model<value_type>
 {
 public:
+    using model<value_type>::hamiltonian;
+    using model<value_type>::system_info;
+public:
     using real_type = typename linalg::get_real_type<value_type>::type;
 
     central_spin_base() : m_eps(0), m_delta(0), m_spin_index(0) {}
@@ -62,7 +65,7 @@ protected:
     void build_system_op(Hop& H, real_type tol)
     {
         //add on the spin terms
-        if(std::abs(m_eps) > tol)
+        if(linalg::abs(m_eps) > tol)
         {   
             H += m_eps * sOP("sz", this->m_spin_index);
         }
@@ -87,6 +90,8 @@ class central_spin_homogeneous : public central_spin_base<value_type>
 public:
     using base_type = central_spin_base<value_type>;
     using real_type = typename linalg::get_real_type<value_type>::type;
+    using model<value_type>::hamiltonian;
+    using model<value_type>::system_info;
 public:
     central_spin_homogeneous(){}
     central_spin_homogeneous(real_type eps, real_type delta, const std::vector<real_type>& _w, const std::vector<value_type>& _g) : base_type(0, eps, delta, _w.size()), m_w(_w), m_g(_g)

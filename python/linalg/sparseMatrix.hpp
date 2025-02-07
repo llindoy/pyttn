@@ -22,25 +22,62 @@ void init_csr_matrix(py::module &m, const std::string& label)
     using ttype = csr_matrix<T, backend>;
     using index_type = typename ttype::index_type;
     using coo_type = std::vector<std::tuple<index_type, index_type, T>>;
-    using real_type = typename linalg::get_real_type<T>::type;
+    using real_type = typename get_real_type<T>::type;
 
+#ifdef PYTTN_BUILD_CUDA
+    using obackend = typename other_backend<backend>::type;
+#endif
     //to do figure out a way of exposing the c++ buffers to python
     py::class_<ttype>(m, (label).c_str())
+        .def(py::init<ttype>())
+#ifdef PYTTN_BUILD_CUDA
+        .def(py::init<csr_matrix<T, obackend>>())
+#endif
         .def(py::init<const std::vector<T>&, const std::vector<index_type>&, const std::vector<index_type>&, size_t>(), py::arg(), py::arg(), py::arg(), py::arg("ncols")=0)
+        .def(py::init([](py::buffer &b, const py::buffer& _indices, const py::buffer& _rowptr, size_t ncols)
+            {
+                std::vector<T> tens;
+                std::vector<index_type> indices, rowptr;
+                pybuffer_to_vector(b, tens);
+                pybuffer_to_vector(_indices, indices);
+                pybuffer_to_vector(_rowptr, rowptr);
+
+                return ttype(tens, indices, rowptr, ncols);
+            }
+        ), py::arg(), py::arg(), py::arg(), py::arg("ncols")=0)
         .def(py::init<const coo_type&, size_t, size_t>(), py::arg(), py::arg("nrows")=0, py::arg("ncols")=0)
         .def("complex_dtype", [](const ttype&){return !std::is_same<T, real_type>::value;})
-        .def("__str__", [](const ttype& o){std::stringstream oss;   oss << o; return oss.str();});
+        .def("__matmul__", 
+            [](const ttype& a, linalg::matrix<T, backend>& b)
+            {
+                linalg::matrix<T, backend> ret;
+                ret = a*b;
+                return ret;
+            })
+        .def("__matmul__", 
+            [](const ttype& a, linalg::vector<T, backend>& b)
+            {
+                linalg::vector<T, backend> ret;
+                ret = a*b;
+                return ret;
+            })
+        .def("__str__", [](const ttype& o){std::stringstream oss;  oss << o; return oss.str();});
 }
 
-template <typename T, typename backend>
+template <typename T>
 void init_diagonal_matrix(py::module& m, const std::string& label)
 {
     using namespace linalg;
+    using backend = blas_backend;
     using ttype = diagonal_matrix<T, backend>;
-    using real_type = typename linalg::get_real_type<T>::type;
+    using real_type = typename get_real_type<T>::type;
 
     using conv = pybuffer_converter<backend>;
     py::class_<ttype>(m, (label).c_str(), py::buffer_protocol())
+        .def(py::init<ttype>())
+#ifdef PYTTN_BUILD_CUDA
+        .def(py::init<diagonal_matrix<T, cuda_backend>>())
+#endif
         .def(py::init([](py::buffer &b)
             {
                 ttype tens;
@@ -54,6 +91,13 @@ void init_diagonal_matrix(py::module& m, const std::string& label)
         .def(py::init<const tensor<T, 1>&>())
         .def(py::init<const tensor<T, 1>&, size_t>())
         .def(py::init<const tensor<T, 1>&, size_t, size_t>())
+
+#ifdef PYTTN_BUILD_CUDA
+        .def(py::init<const tensor<T, 1, cuda_backend>&>())
+        .def(py::init<const tensor<T, 1, cuda_backend>&, size_t>())
+        .def(py::init<const tensor<T, 1, cuda_backend>&, size_t, size_t>())
+#endif
+
         .def_buffer([](ttype& mi) -> py::buffer_info 
                     {
                         return py::buffer_info
@@ -74,16 +118,62 @@ void init_diagonal_matrix(py::module& m, const std::string& label)
 }
 
 
-template <typename backend>
+template <typename real_type>
 void initialise_sparse_matrices(py::module& m)
 {
-    using real_type = double;
     using complex_type = linalg::complex<real_type>;
-    init_csr_matrix<real_type, backend>(m, "csr_matrix_real");
-    init_csr_matrix<complex_type, backend>(m, "csr_matrix_complex");
-    init_diagonal_matrix<real_type, backend>(m, "diagonal_matrix_real");
-    init_diagonal_matrix<complex_type, backend>(m, "diagonal_matrix_complex");
+    init_csr_matrix<real_type, linalg::blas_backend>(m, "csr_matrix_real");
+    init_csr_matrix<complex_type, linalg::blas_backend>(m, "csr_matrix_complex");
+    init_diagonal_matrix<real_type>(m, "diagonal_matrix_real");
+    init_diagonal_matrix<complex_type>(m, "diagonal_matrix_complex");
 }
+
+#ifdef PYTTN_BUILD_CUDA
+template <typename T>
+void init_diagonal_matrix_cuda(py::module& m, const std::string& label)
+{
+    using namespace linalg;
+    using backend = cuda_backend;
+    using ttype = diagonal_matrix<T, backend>;
+    using real_type = typename get_real_type<T>::type;
+
+    using conv = pybuffer_converter<backend>;
+    py::class_<ttype>(m, (label).c_str())
+        .def(py::init<ttype>())
+        .def(py::init<diagonal_matrix<T, blas_backend>>())
+        .def(py::init([](py::buffer &b)
+            {
+                ttype tens;
+                conv::copy_to_diagonal_matrix(b, tens);
+                return tens;
+            }
+        ))
+        .def(py::init<const std::vector<T>&>())
+        .def(py::init<const std::vector<T>&, size_t>())
+        .def(py::init<const std::vector<T>&, size_t, size_t>())
+        .def(py::init<const tensor<T, 1>&>())
+        .def(py::init<const tensor<T, 1>&, size_t>())
+        .def(py::init<const tensor<T, 1>&, size_t, size_t>())
+        .def(py::init<const tensor<T, 1, cuda_backend>&>())
+        .def(py::init<const tensor<T, 1, cuda_backend>&, size_t>())
+        .def(py::init<const tensor<T, 1, cuda_backend>&, size_t, size_t>())
+
+        .def("complex_dtype", [](const ttype&){return !std::is_same<T, real_type>::value;})
+        .def("__str__", [](const ttype& o){std::stringstream oss;   oss << o; return oss.str();});
+
+    //expose the ttn node class.  This is our core tensor network object.
+}
+template <typename real_type>
+void initialise_sparse_matrices_cuda(py::module& m)
+{
+    using complex_type = linalg::complex<real_type>;
+    init_csr_matrix<real_type, linalg::cuda_backend>(m, "csr_matrix_real");
+    init_csr_matrix<complex_type, linalg::cuda_backend>(m, "csr_matrix_complex");
+    init_diagonal_matrix_cuda<real_type>(m, "diagonal_matrix_real");
+    init_diagonal_matrix_cuda<complex_type>(m, "diagonal_matrix_complex");
+}
+#endif
+
 
 #endif  //PYTHON_BINDING_LINALG_SPARSE_MATRIX_HPP
 

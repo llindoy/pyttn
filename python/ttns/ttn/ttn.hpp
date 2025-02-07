@@ -31,7 +31,8 @@ void init_ttn(py::module &m, const std::string& label)
     using sop = sop_operator<T, backend>;
 
     using conv = linalg::pybuffer_converter<backend>;
-#ifdef __NVCC__
+
+#ifdef PYTTN_BUILD_CUDA
     using otherbackend = typename other_backend<backend>::type;
 #endif
 
@@ -63,7 +64,7 @@ void init_ttn(py::module &m, const std::string& label)
         .def("__str__", [](const _ttn_node_data& o){std::ostringstream oss; oss << o; return oss.str();})
 
         .def("set_matrix", [](_ttn_node_data& i, const linalg::matrix<T, backend>& mat){i.as_matrix() = mat;})
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
         .def("set_matrix", [](_ttn_node_data& i, const linalg::matrix<T, otherbackend>& mat){i.as_matrix() = mat;})
 #endif
         .def("set_matrix", [](_ttn_node_data& i, py::buffer& mat){conv::copy_to_tensor(mat, i.as_matrix());})
@@ -143,7 +144,7 @@ void init_ttn(py::module &m, const std::string& label)
         .def("set_product", &_ttn::template set_product<T, backend>)
         .def("set_product", [](_ttn& self, std::vector<py::buffer>& ps)
                             {
-                                std::vector<linalg::vector<T>> _ps(ps.size());
+                                std::vector<linalg::vector<T, backend>> _ps(ps.size());
                                 for(size_t i = 0; i < ps.size(); ++i)
                                 {
                                     conv::copy_to_tensor(ps[i], _ps[i]);
@@ -246,7 +247,7 @@ void init_ttn(py::module &m, const std::string& label)
                 static_cast<const _ttn_node_data& (_ttn::*)(size_t) const>(&_ttn::site_tensor),
                 py::return_value_policy::reference, "For details see :meth:`pyttn.ttn_dtype.site_tensor`"
             )
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
         .def(
                 "set_site_tensor",
                 [](_ttn& self, size_t i, const linalg::matrix<T, otherbackend>& mat)
@@ -289,7 +290,7 @@ void init_ttn(py::module &m, const std::string& label)
         //        }
         //    )
         //
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
         .def(
                 "collapse_basis", 
                 [](_ttn& o, std::vector<linalg::matrix<T, otherbackend>>& U, bool truncate=true, real_type tol=real_type(0), size_t nchi=0)
@@ -300,7 +301,7 @@ void init_ttn(py::module &m, const std::string& label)
                         Uop[i] = U[i];
                     }
                     std::vector<size_t> state;
-                    real_type p = o.collapse_basis(U, state, truncate, tol, nchi); 
+                    real_type p = o.collapse_basis(Uop, state, truncate, tol, nchi); 
                     return std::make_pair(p, state);
                 }, 
                 py::arg(), py::arg("truncate")=true, py::arg("tol") = real_type(0), py::arg("nchi") = 0
@@ -444,10 +445,9 @@ void init_ttn(py::module &m, const std::string& label)
 
 }
 
-template <typename backend>
+template <typename real_type, typename backend>
 void initialise_ttn(py::module& m)
 {
-    using real_type = double;
     using complex_type = linalg::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN

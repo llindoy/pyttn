@@ -125,7 +125,7 @@ public:
     }
 
     template <typename IntegType, typename BufType>
-    bool down(hnode& A1, hnode& A2, bond_matrix_type& r, const dmat_type& pops, env_node_type& h, const env_type& op, std::mt19937& rng, IntegType& eigensolver, BufType& buf, real_type svd_scale)
+    bool down(hnode& A1, hnode& A2, bond_matrix_type& r, const dmat_type& pops, env_node_type& h, const env_type& op, linalg::random_engine<backend>& rng, IntegType& eigensolver, BufType& buf, real_type svd_scale)
     {
         try
         {
@@ -305,7 +305,7 @@ public:
     }
 
     template <typename IntegType, typename BufType>
-    bool up(hnode& A1, hnode& A2, bond_matrix_type& r, const dmat_type& pops, env_node_type& h, const env_type& op, std::mt19937& rng, IntegType& eigensolver, BufType& buf, real_type svd_scale)
+    bool up(hnode& A1, hnode& A2, bond_matrix_type& r, const dmat_type& pops, env_node_type& h, const env_type& op, linalg::random_engine<backend>& rng, IntegType& eigensolver, BufType& buf, real_type svd_scale)
     {
         try
         {

@@ -54,7 +54,6 @@ struct opinfo
         }
         m_indices.clear();
         m_indices.shrink_to_fit();
-
     }
 
     bool operator==(const opinfo& o) const
@@ -197,12 +196,6 @@ public:
     bool valid_bipartition() const
     {
         return (m_spf.size() == m_mf.size() && m_coeff.size() == m_mf.size());
-
-        for(size_t i = 0; i < m_spf.size(); ++i)
-        {
-            ASSERT(m_spf[i].nterms() == 1 || m_mf[i].nterms() == 1, "Failed to convert node_op_info to operator contraction info.  Invalid operator type detected.");
-            ASSERT(m_spf[i].indices() == m_mf[i].indices(), "Failed to convert node_op_info to operator contraction info.  Operator acting on different terms.");
-        }
     }
 
     void clear()

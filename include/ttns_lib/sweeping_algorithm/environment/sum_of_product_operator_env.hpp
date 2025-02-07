@@ -121,7 +121,7 @@ public:
     buffer_type& buffer(){return m_buf;}
 
 public:
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
     static size_type maximum_dimension(const ttn_type& A)
     {
         size_type maxmfo = 0;

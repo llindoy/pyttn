@@ -162,7 +162,7 @@ public:
         if(o.m_funcs.size() == 0)
         {
             m_constant *= o.m_constant;
-            if(std::abs(o.m_constant) < 1e-14)
+            if(linalg::abs(o.m_constant) < 1e-14)
             {
                 m_funcs.clear();
             }
@@ -176,7 +176,7 @@ public:
         }
         else if(m_funcs.size() == 0)
         {
-            if(std::abs(m_constant)  < 1e-14){}
+            if(linalg::abs(m_constant)  < 1e-14){}
             else
             {
                 for(size_t i = 0; i < o.m_funcs.size(); ++i)
@@ -191,7 +191,7 @@ public:
         {
             std::vector<std::pair<T, function_type>> funcs;
             //now add on the acoeff terms
-            if(std::abs(m_constant) > 1e-14)
+            if(linalg::abs(m_constant) > 1e-14)
             {
                 for(size_t i = 0; i < o.m_funcs.size(); ++i)
                 {
@@ -199,7 +199,7 @@ public:
                     funcs.push_back(std::make_pair(std::get<0>(bi)*m_constant, std::get<1>(bi)));
                 }
             }
-            if(std::abs(o.m_constant) > 1e-14)
+            if(linalg::abs(o.m_constant) > 1e-14)
             {
                 for(size_t i = 0; i < m_funcs.size(); ++i)
                 {
@@ -234,11 +234,11 @@ public:
 
     bool is_zero(real_type tol = 1e-14) const
     {
-        if(m_funcs.size() == 0){return std::abs(m_constant) < tol;}
+        if(m_funcs.size() == 0){return linalg::abs(m_constant) < tol;}
         return false;
     }
 
-    bool is_positive() const{return std::real(m_constant) >= 0;}
+    bool is_positive() const{return linalg::real(m_constant) >= 0;}
 
 public:
     //Functions for accessing the coefficient
@@ -420,7 +420,7 @@ ttns::literal::coeff<V> operator*(const ttns::literal::coeff<T>& a, const ttns::
     ttns::literal::coeff<V> ret(a.constant()*b.constant());
     using function_type = typename ttns::literal::coeff<V>::function_type;
     //now add on the acoeff terms
-    if(std::abs(a.constant()) > 1e-14)
+    if(linalg::abs(a.constant()) > 1e-14)
     {
         for(size_t i = 0; i < b.funcs().size(); ++i)
         {
@@ -429,7 +429,7 @@ ttns::literal::coeff<V> operator*(const ttns::literal::coeff<T>& a, const ttns::
             ret.funcs().push_back(std::make_pair(std::get<0>(bi)*a.constant(), function_type([bif](real_type t){return bif(t);})));
         }
     }
-    if(std::abs(b.constant()) > 1e-14)
+    if(linalg::abs(b.constant()) > 1e-14)
     {
         for(size_t i = 0; i < a.funcs().size(); ++i)
         {

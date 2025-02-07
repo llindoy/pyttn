@@ -50,8 +50,10 @@ private:
     //provide access to base class operators
     using base_type::m_nodes;
     using base_type::m_nleaves;
-    using base_type::_rng;
+    using base_type::m_rengine;
+    using base_type::m_hrengine;
     using base_type::m_orthog;
+    using base_type::rng;
     using base_type::m_dim_sizes;
     using base_type::m_leaf_indices;
     using base_type::m_has_orthogonality_centre;
@@ -678,7 +680,7 @@ public:
             std::discrete_distribution<std::size_t> d{pi.begin(), pi.end()};
             auto& A = m_nodes[m_leaf_indices[i]];
             auto& a = A().as_matrix();
-            size_t ind = d(_rng);
+            size_t ind = d(rng());
             state[i] = ind;
 
             //now that we have sampled the index to retain we need to collapse the state onto this index.
@@ -718,7 +720,7 @@ public:
             //shift orthogonality centre to leaf index
             this->set_orthogonality_centre(m_leaf_indices[i]);
 
-            linalg::matrix<T> b = U[i]*m_nodes[m_leaf_indices[i]]().as_matrix();
+            linalg::matrix<T, backend> b = U[i]*m_nodes[m_leaf_indices[i]]().as_matrix();
 
             real_type pisum = 0.0;
             for(size_t j = 0; j < m_dim_sizes[i]; ++j)
@@ -729,7 +731,7 @@ public:
 
             //now sample from the projection expectation values
             std::discrete_distribution<std::size_t> d{pi.begin(), pi.end()};
-            size_t ind = d(_rng);
+            size_t ind = d(rng());
             state[i] = ind;
 
             //now that we have sampled the index to retain we need to collapse the state onto this index.

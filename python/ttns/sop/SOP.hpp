@@ -185,6 +185,7 @@ void init_SOP(py::module &m, const std::string& label)
 }
 
 
+template <typename T>
 void initialise_SOP(py::module& m);
 
 #endif

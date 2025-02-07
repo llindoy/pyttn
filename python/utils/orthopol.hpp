@@ -148,6 +148,7 @@ void init_orthopol(py::module &m)
           );
 }
 
+template <typename T>
 void initialise_orthopol(py::module& m);
 
 #endif

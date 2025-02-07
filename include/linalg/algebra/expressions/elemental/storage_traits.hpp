@@ -108,7 +108,7 @@ struct diagonal_matrix_view_storage_type<T, blas_backend>
     T operator[](size_type i)const{return buffer[i*incx];}
 };
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename T> 
 struct diagonal_matrix_view_storage_type<T, cuda_backend>
 {

@@ -1,10 +1,12 @@
 #ifndef LINALG_CUDA_UTILS_HPP
 #define LINALG_CUDA_UTILS_HPP
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 #include <cusparse_v2.h>
 #include <cuComplex.h>
 #include <cuda_runtime.h>
+
+static inline void cuda_safe_call(cudaError_t err){if(err != cudaSuccess){RAISE_EXCEPTION_STR(cudaGetErrorName(err));}}
 
 namespace linalg
 {
@@ -39,6 +41,20 @@ public:
     static inline cudaDataType_t type_enum(){return CUDA_C_64F;}
 };
 
+
+template <typename T> class cusparse_index;
+
+template <> class cusparse_index<int32_t>
+{
+public:
+    static inline cusparseIndexType_t type_enum(){return CUSPARSE_INDEX_32I;}
+};
+
+template <> class cusparse_index<int64_t>
+{
+public:
+    static inline cusparseIndexType_t type_enum(){return CUSPARSE_INDEX_64I;}
+};
 }
 
 #endif

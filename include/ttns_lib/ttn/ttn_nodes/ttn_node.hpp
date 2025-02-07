@@ -7,7 +7,6 @@
 #include "../tree/tree.hpp"
 #include "../tree/tree_node.hpp"
 #include "../tree/ntree.hpp"
-#include "ttn_node_helper.hpp"
 
 #include <vector>
 #include <stdexcept>
@@ -34,6 +33,8 @@ protected:
     friend tree_node<tree_base<ttn_node_data<T, backend> > >;
     friend tree_node<tree_base<std::vector<ttn_node_data<T, backend> > > >;
 
+    template <typename U, typename be> friend class ttn_node_data;
+
 public:
     ttn_node_data() : matrix_type(), m_mode_dims(), m_mode_capacity(), m_max_hrank(0), m_max_dimen(0) {}
     ttn_node_data(ttn_node_data&& o) = default;
@@ -41,6 +42,17 @@ public:
     {
         CALL_AND_HANDLE(matrix_type::allocate(o.max_dimen(), o.max_hrank()), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
         CALL_AND_HANDLE(matrix_type::operator=(static_cast<const linalg::matrix<T, backend>&>(o)), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
+        m_mode_dims = o.m_mode_dims;
+        m_mode_capacity = o.m_mode_capacity;
+        m_max_hrank = o.m_max_hrank;
+        m_max_dimen = o.m_max_dimen;
+    }
+
+    template <typename U, typename be, typename = typename std::enable_if<not std::is_same<be, backend>::value or not std::is_same<U, T>::value, void>::type>
+    ttn_node_data(const ttn_node_data<U, be> & o) : matrix_type()
+    {
+        CALL_AND_HANDLE(matrix_type::allocate(o.max_dimen(), o.max_hrank()), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
+        CALL_AND_HANDLE(matrix_type::operator=(static_cast<const linalg::matrix<U, be>&>(o)), "Failed to copy assign ttn_node_data. Failed when applying base type copy operator.");
         m_mode_dims = o.m_mode_dims;
         m_mode_capacity = o.m_mode_capacity;
         m_max_hrank = o.m_max_hrank;
@@ -343,7 +355,7 @@ public:
         }
     }
 
-    void expand_bond(size_type mode, size_type iadd, matrix_type& temp, std::mt19937& rng)
+    void expand_bond(size_type mode, size_type iadd, matrix_type& temp, linalg::random_engine<backend>& rng)
     {
         try
         {
@@ -358,8 +370,8 @@ public:
             CALL_AND_HANDLE(ttens = linalg::trans(atens, {1, 0, 2}), "Failed to transpose the atens object into utens.");
             auto tmat = ttens.reinterpret_shape(atens.shape(1), atens.shape(0)*atens.shape(2));
 
-            using orthog = helper::orthogonal_vector<T, backend>;
-            CALL_AND_RETHROW(orthog::pad_random_vectors(tmat, _shape[1], rng));
+            using orthog = linalg::orthogonal_vector<T, backend>;
+            CALL_AND_RETHROW(orthog::pad_random(tmat, _shape[1], rng));
 
             //now transpose the results back into the original vector
             CALL_AND_HANDLE(atens = linalg::trans(ttens, {1, 0, 2}), "Failed to transpose the atens object into utens.");
@@ -372,7 +384,7 @@ public:
     }
 
     template <typename RType>
-    void generate_random_orthogonal(size_type mode, matrix_type& temp, std::mt19937& rng, RType&& r)
+    void generate_random_orthogonal(size_type mode, matrix_type& temp, linalg::random_engine<backend>& rng, RType&& r)
     {
         auto atens = this->as_rank_3(mode);
         temp.resize(this->shape(0), this->shape(1));
@@ -382,8 +394,8 @@ public:
         auto tmat = ttens.reinterpret_shape(atens.shape(1), atens.shape(0)*atens.shape(2));
 
         CALL_AND_HANDLE(r.resize(tmat.shape(1)), "Failed to resize random vector.");
-        using orthog = helper::orthogonal_vector<T, backend>;
-        CALL_AND_RETHROW(orthog::generate_random_vector(tmat, r, rng));
+        using orthog = linalg::orthogonal_vector<T, backend>;
+        CALL_AND_RETHROW(orthog::generate(tmat, r, rng));
     }
 
     void expand_bond(size_type mode, size_type iadd, matrix_type& temp, const matrix_type& pad)
@@ -426,27 +438,32 @@ public:
         this->operator=(ch);
     }
 
-    void set_random(std::mt19937& rng)
+    void set_random(linalg::random_engine<backend>& rng)
     {
         auto& mat = this->as_matrix();
-        backend::fill_random_normal(mat.buffer(), mat.size(), rng);
+        rng.fill_normal(mat);
     }
 
-    void set_node_state(size_type i, std::mt19937& rng, bool random_unoccupied_initialisation=false)
+    void set_node_state(size_type i, linalg::random_engine<backend>& rng, bool random_unoccupied_initialisation=false)
     {
         size_type s1 = this->shape(0);
         size_type s2 = this->shape(1);
 
-        linalg::matrix<T, linalg::blas_backend> ct(s2, s1);  ct.fill_zeros();
-        ct(0, i) = T(1.0);
-
-        using orthog = helper::orthogonal_vector<T, backend>;
         if(random_unoccupied_initialisation)
         {
-            CALL_AND_RETHROW(orthog::pad_random_vectors(ct, 1, rng));
+            using orthog = linalg::orthogonal_vector<T, backend>;
+            linalg::vector<T, linalg::blas_backend> ct(s1);  ct.fill_zeros();
+            ct(i) = T(1.0);
+            linalg::matrix<T,backend> cte(s2, s1); 
+            CALL_AND_HANDLE(cte[0]=ct, "Failed to set first row of results.");
+            CALL_AND_RETHROW(orthog::pad_random(cte, 1, rng));
+            this->as_matrix() = linalg::trans(cte);
         }
         else
-        {
+        {        
+            linalg::matrix<T, linalg::blas_backend> ct(s1, s2);  ct.fill_zeros();
+            ct(i, 0) = T(1.0);
+
             size_type cu = i;
             size_type cd = i;
 
@@ -459,12 +476,12 @@ public:
                     if(cu+1 != s1)
                     {
                         cu+=1;
-                        ct(j, cu) = T(1.0);
+                        ct(cu, j) = T(1.0);
                     }
                     else if(cd != 0)
                     {
                         cd-=1;
-                        ct(j, cd) = T(1.0);
+                        ct(cd, j) = T(1.0);
                     }
                     else{RAISE_EXCEPTION("Failed to set node state unable to set unoccupied vectors.");}
                 }
@@ -474,52 +491,52 @@ public:
                     if(cd != 0)
                     {
                         cd-=1;
-                        ct(j, cd) = T(1.0);
+                        ct(cd, j) = T(1.0);
                     }
                     else if(cu+1 != s1)
                     {
                         cu+=1;
-                        ct(j, cu) = T(1.0);
+                        ct(cu, j) = T(1.0);
                     }
                     else{RAISE_EXCEPTION("Failed to set node state unable to set unoccupied vectors.");}
                 }
             }
-
+            this->as_matrix() = ct;
         }
-
-        this->as_matrix() = linalg::trans(ct);
     }
 
     template <typename U, typename be> 
-    void set_node_vector(const linalg::vector<U, be>& psi0, std::mt19937& rng)
+    void set_node_vector(const linalg::vector<U, be>& psi0, linalg::random_engine<backend>& rng)
     {
-
         size_type s1 = this->shape(0);
         size_type s2 = this->shape(1);
 
-        linalg::matrix<T, linalg::blas_backend> ct(s2, s1);  ct.fill_zeros();
-        CALL_AND_HANDLE(ct[0] = psi0, "Failed to assign psi0 in htucker.");
-        using orthog = helper::orthogonal_vector<T, backend>;
-        CALL_AND_RETHROW(orthog::pad_random_vectors(ct, 1, rng));
+        linalg::vector<T, be> _psi0(psi0);
+        linalg::matrix<T, backend> ct(s2, s1);  ct.fill_zeros();
+        CALL_AND_HANDLE(ct[0] = _psi0, "Failed to assign psi0 in htucker.");
+        using orthog = linalg::orthogonal_vector<T, backend>;
+        CALL_AND_RETHROW(orthog::pad_random(ct, 1, rng));
 
         this->as_matrix() = linalg::trans(ct);
     }
 
-    void set_node_purification(std::mt19937& rng)
+    void set_node_purification(linalg::random_engine<backend>& rng)
     {
         size_type s1 = this->shape(0);
         size_type s2 = this->shape(1);
 
-        linalg::matrix<T, linalg::blas_backend> ct(s2, s1);  ct.fill_zeros();
+        linalg::vector<T, linalg::blas_backend> ct(s1);  ct.fill_zeros();
         size_type ns = static_cast<size_type>(std::sqrt(s1));
         ASSERT(ns*ns == s1, "Cannot setup purification.  The node does not have square local dimension and consequently can not handle a composite system, ancilla state.");
         for(size_t i = 0; i < ns; ++i)
         {
-            ct(0, i*ns + ((i + 1)%ns)) = 1.0/std::sqrt(ns);
+            ct(i*ns + ((i + 1)%ns)) = 1.0/std::sqrt(ns);
         }
-        using orthog = helper::orthogonal_vector<T, backend>;
-        CALL_AND_RETHROW(orthog::pad_random_vectors(ct, 1, rng));
-        this->as_matrix() = linalg::trans(ct);
+        linalg::matrix<T,backend> cte(s2, s1); 
+        CALL_AND_HANDLE(cte[0]=ct, "Failed to set first row of results.");
+        using orthog = linalg::orthogonal_vector<T, backend>;
+        CALL_AND_RETHROW(orthog::pad_random(cte, 1, rng));
+        this->as_matrix() = linalg::trans(cte);
     }
 
     static void query_node_sizes(const ttn_node_data<T, backend>& a, std::array<size_type, 3>& sizes, bool is_leaf = false)
@@ -654,13 +671,25 @@ protected:
     }
 };
 
-template <typename T, typename backend, typename = typename std::enable_if<std::is_same<backend, linalg::blas_backend>::value, void>::type> 
-std::ostream& operator<<(std::ostream& os, const ttn_node_data<T, backend>& t)
+template <typename T, typename backend> 
+typename std::enable_if<std::is_same<backend, linalg::blas_backend>::value, std::ostream&>::type 
+operator<<(std::ostream& os, const ttn_node_data<T, backend>& t)
 {
     os << "dims: " << "[ ";     for(size_t i=0; i<t.nmodes(); ++i){os << t.dim(i) << (i+1 != t.nmodes() ? ", " : "]");}    os << std::endl;
     os << static_cast<const linalg::matrix<T, backend>&>(t) << std::endl;
     return os;
 }
+
+#ifdef PYTTN_BUILD_CUDA
+template <typename T, typename backend> 
+typename std::enable_if<std::is_same<backend, linalg::cuda_backend>::value, std::ostream&>::type  
+operator<<(std::ostream& os, const ttn_node_data<T, backend>& t)
+{
+    ttn_node_data<T, linalg::blas_backend> odata(t);
+    os << t;
+    return os;
+}
+#endif
 
 }
 
@@ -1128,7 +1157,7 @@ public:
     bool can_fit_node(const ttn_node_data<U, be>& o) const{return m_data.can_fit_node(o);}
 
 public:
-    real_type norm() const{auto vec = m_data.as_rank_1();    return std::sqrt(std::real(linalg::dot_product(linalg::conj(vec), vec))); }
+    real_type norm() const{auto vec = m_data.as_rank_1();    return std::sqrt(linalg::real(linalg::dot_product(linalg::conj(vec), vec))); }
 
     template <typename U>
     typename std::enable_if<linalg::is_number<U>::value, self_type&>::type operator*=(const U& u){m_data.as_matrix() *= u;    return *this;    }
@@ -1150,23 +1179,23 @@ public:
 
 public:
     void set_node_identity(size_type /*  set_index */ = 0){m_data.set_identity();}
-    void set_node_random(std::mt19937& rng){m_data.set_random(rng);}
-    void set_node_random(size_type /* set_index */, std::mt19937& rng){m_data.set_random(rng);}
+    void set_node_random(linalg::random_engine<backend>& rng){m_data.set_random(rng);}
+    void set_node_random(size_type /* set_index */, linalg::random_engine<backend>& rng){m_data.set_random(rng);}
 
-    void set_leaf_node_state(size_type /* set_index */, size_type i, std::mt19937& rng, bool random_unoccupied_initialisation=false)
+    void set_leaf_node_state(size_type /* set_index */, size_type i, linalg::random_engine<backend>& rng, bool random_unoccupied_initialisation=false)
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
         this->m_data.set_node_state(i, rng, random_unoccupied_initialisation);
     }
 
     template <typename U, typename be> 
-    void set_leaf_node_vector(size_type /* set_index */, const linalg::vector<U, be>& psi0, std::mt19937& rng)
+    void set_leaf_node_vector(size_type /* set_index */, const linalg::vector<U, be>& psi0, linalg::random_engine<backend>& rng)
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
         this->m_data.set_node_vector(psi0, rng);
     }
 
-    void set_leaf_purification(size_type /* set_index */, std::mt19937& rng)
+    void set_leaf_purification(size_type /* set_index */, linalg::random_engine<backend>& rng)
     {
         ASSERT(this->is_leaf(), "Function is only applicable for leaf state nodes.");
         this->m_data.set_node_purification(rng);

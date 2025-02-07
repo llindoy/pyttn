@@ -19,6 +19,7 @@ keywords = [
     "pseudomode"
 ]
 
+version="0.0.1"
 readme="README.md"
 license= { file="LICENSE.txt"}
 requires-python = ">=3.8"
@@ -31,6 +32,9 @@ dependencies = [
     "pydot",
     "graphviz",
 ]
+
+
+[tools.setuptools]
 
 docs = [     
     "jupyter-sphinx >= 0.5.3",

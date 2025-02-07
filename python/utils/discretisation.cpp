@@ -1,6 +1,7 @@
 #include "discretisation.hpp"
+#include "../pyttn_typedef.hpp"
 
-void initialise_discretisation(py::module& m)
+template <> void initialise_discretisation<pyttn_real_type>(py::module& m)
 {
     using real_type = double;
 

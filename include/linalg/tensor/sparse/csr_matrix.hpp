@@ -259,6 +259,8 @@ public:
     template <typename srcbck> using memtransfer = memory::transfer<srcbck, backend_type>;
 
     using coo_type = std::vector<std::tuple<index_type, index_type, value_type>>;
+    template <typename U> friend class csr_matrix_base;
+
 protected:
     pointer m_vals;                                     ///< The 1-dimensional array used to store the values present in the matrix
     topology_type m_topo;
@@ -781,7 +783,7 @@ public:
 };  //csr_matrix<T, blas_backend>
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <typename T> 
 class csr_matrix<T, cuda_backend> : public csr_matrix_base<csr_matrix<T, cuda_backend> >
 {
@@ -825,6 +827,16 @@ std::ostream& operator<<(std::ostream& out, const csr_matrix<T, blas_backend>& m
     }
     return out;
 }
+
+#ifdef PYTTN_BUILD_CUDA
+template <typename T>
+std::ostream& operator<<(std::ostream& out, const csr_matrix<T, cuda_backend>& _mat)
+{
+    csr_matrix<T, blas_backend> mat (_mat);
+    out << mat;
+    return out;
+}
+#endif
 
 }   //namespace linalg
 

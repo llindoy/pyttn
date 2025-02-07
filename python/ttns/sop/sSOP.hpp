@@ -839,5 +839,6 @@ void init_sSOP(py::module& m)
     }
 }
 
+template <typename T>
 void initialise_sSOP(py::module& m);
 #endif

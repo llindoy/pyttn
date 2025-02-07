@@ -430,7 +430,7 @@ public:
 
 
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 template <template <typename, size_t, typename> class ArrType, typename T, size_t D1, size_t D2, typename pref>
 class tensor_slice<ArrType<T, D1, cuda_backend>, pref, D2> : public tensor_slice_base<tensor_slice<ArrType<T, D1, cuda_backend>, pref, D2> >
 {
@@ -489,7 +489,7 @@ public:
     __host__ __device__ const_pointer data()const{return slice_base::m_buffer;}
 };
 
-#endif  //__NVCC__
+#endif  //PYTTN_BUILD_CUDA
 
 }   //namespace linalg
 

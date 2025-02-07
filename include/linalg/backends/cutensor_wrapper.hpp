@@ -1,7 +1,7 @@
 #ifndef LINALG_ALGEBRA_CUSPARSE_WRAPPER_HPP
 #define LINALG_ALGEBRA_CUSPARSE_WRAPPER_HPP
 
-#ifdef __NVCC__
+#ifdef PYTTN_BUILD_CUDA
 
 #include "cuda_utils.hpp"
 
@@ -97,8 +97,6 @@ void transpose(cutensorHandle_t handle, const T* A, const int64_t* extentA, cons
         cutensorOperationDescriptor_t perm;
         CALL_AND_HANDLE(cutensor_safe_call(cutensorCreatePermutation(handle, &perm, descA, modesA, CUTENSOR_OP_IDENTITY, descB, descCompute)), "Failed to construct permutation plan.");
 
-        //TODO: ensure that the scalar type is correct
-
         //set the algorithm to use
         const cutensorAlgo_t algo = CUTENSOR_ALGO_DEFAULT;
 
@@ -116,8 +114,8 @@ void transpose(cutensorHandle_t handle, const T* A, const int64_t* extentA, cons
         CALL_AND_HANDLE(cutensor_safe_call(cutensorDestroyPlan(plan)), "Failed to destroy plan.");
         CALL_AND_HANDLE(cutensor_safe_call(cutensorDestroyOperationDescription(desc)), "Failed to destroy plan.");
         CALL_AND_HANDLE(cutensor_safe_call(cutensorDestroyPlanPreference(planPref)), "Failed to destroy planPref.");
-        destroy_tensor_descriptor(descA);
-        destroy_tensor_descriptor(descB);
+        CALL_AND_RETHROW(destroy_tensor_descriptor(descA));
+        CALL_AND_RETHROW(destroy_tensor_descriptor(descB));
     }
     catch(const std::exception& ex)
     {

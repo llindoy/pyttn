@@ -25,7 +25,6 @@ void init_models(py::module &m, const std::string& label)
     using namespace ttns;
     using real_type = typename linalg::get_real_type<T>::type;
 
-
     using conv = linalg::pybuffer_converter<linalg::blas_backend>;
 
     //the base model type
@@ -264,6 +263,7 @@ void init_models(py::module &m, const std::string& label)
 
 }
 
+template <typename real_type>
 void initialise_models(py::module& m);
 
 #endif  //PYTHON_BINDING_SOP_MODELS_HPP
