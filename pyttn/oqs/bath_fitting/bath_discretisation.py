@@ -186,7 +186,7 @@ class OrthopolDiscretisation:
         for Nbi in Nbs:
             Nbi = max(2, Nbi)
             moments = np.array(orthopol_discretisation.moments(
-                Sw, wmin, wmax, Nbi, moment_scaling=ms, atol=atol, rtol=rtol, minbound=1e-30, maxbound=1e30, nquad=nquad))
+                S, wmin, wmax, Nbi, moment_scaling=ms, atol=atol, rtol=rtol, minbound=1e-30, maxbound=1e30, nquad=nquad))
             nm = np.polyfit(np.arange(moments.shape[0]), np.log(
                 np.abs(moments)), 1)[0]
             ms = ms*np.exp(-nm)
@@ -206,4 +206,4 @@ class OrthopolDiscretisation:
 
         g, w = orthopol_discretisation.discretise(
             S, self.wmin, self.wmax, self.Nb, moment_scaling=self.moment_scaling, atol=self.atol, rtol=self.rtol, nquad=self.nquad)
-        return quadnp.array(g), np.array(w)
+        return np.array(g), np.array(w)

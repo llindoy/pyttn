@@ -8,7 +8,7 @@ import h5py
 import scipy
 import copy
 
-sys.path.append("../../ttns_lib/")
+sys.path.append("../../")
 from pyttn import *
 from pyttn import oqs, utils
 from numba import jit
