@@ -1159,8 +1159,8 @@ public:
         return ind;
     }
 
-    template <typename T, typename arr1, typename arr2> 
-    static inline void tensor_transpose(const T* in, const std::vector<size_type>& inds, const arr1& dims, const arr2& stride, T* out)
+    template <typename T, typename arr1, typename arr2, typename arr3, typename arr4> 
+    static inline void tensor_transpose(const T* in, const arr1& dims, const arr2& stride, T* out, const arr3& /*dimsB*/, const arr4& /*stride*/, const std::vector<size_type>& inds)
     {
         size_type N = inds.size();
         std::vector<size_type> permuted_stride(N);

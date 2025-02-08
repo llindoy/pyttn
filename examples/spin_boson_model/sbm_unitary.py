@@ -166,7 +166,7 @@ if __name__ == "__main__":
     parser.add_argument('--s', type = float, default=1)
 
     #number of bath modes
-    parser.add_argument('--N', type=int, default=128)
+    parser.add_argument('--N', type=int, default=384)
 
     #geometry to be used for bath dynamics
     parser.add_argument('--geom', type = str, default='chain')
@@ -179,7 +179,7 @@ if __name__ == "__main__":
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=64)
+    parser.add_argument('--chi', type=int, default=16)
     parser.add_argument('--degree', type=int, default=1)
 
     #maximum bosonic hilbert space dimension
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
     parser.add_argument('--nunoccupied', type=int, default=0)
-    parser.add_argument('--spawning_threshold', type=float, default=1e-6)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-4)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
     args = parser.parse_args()

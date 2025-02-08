@@ -171,11 +171,17 @@ public:
     template <typename At1, typename At2>
     static inline void apply(const linalg::csr_matrix<T, linalg::cuda_backend>& m_operator, const At1& A, At2& HA)
     {
-        CALL_AND_HANDLE
-        (
-            linalg::cuda_backend::async_for(0, A.shape(0), [&A, &HA, &m_operator](size_t i){CALL_AND_HANDLE(HA[i] = m_operator*A[i], "Failed to apply sparse matrix operator.");}),
-            "Error when applying rank 3 applicative."
-        );
+        //TODO: Parallelise this function over cuda streams.
+        for(size_t i = 0; i < A.shape(0); ++i)
+        {
+            CALL_AND_HANDLE(HA[i] = m_operator*A[i], "Failed to apply sparse matrix operator.");
+        }
+
+        //CALL_AND_HANDLE
+        //(
+        //    linalg::cuda_backend::async_for(0, A.shape(0), [&A, &HA, &m_operator](size_t i){CALL_AND_HANDLE(HA[i] = m_operator*A[i], "Failed to apply sparse matrix operator.");}),
+        //    "Error when applying rank 3 applicative."
+        //);
     }
 };
 #endif

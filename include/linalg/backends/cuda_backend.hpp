@@ -906,10 +906,24 @@ private:
     }
 
 public:
-    template <typename T, typename arr1, typename arr2> 
-    static inline void tensor_transpose(const T* in, const std::vector<size_type>& inds, const arr1& dims, const arr2& stride, T* out)
+    template <typename T, typename arr1, typename arr2, typename arr3, typename arr4> 
+    static inline void tensor_transpose(const T* in, const arr1& dimsA, const arr2& _strideA, T* out, const arr3& dimsB, const arr4& _strideB, const std::vector<size_type>& inds)
     {
-        RAISE_EXCEPTION("CUDA GENERIC TENSOR TRANSPOSE NOT IMPLEMENTED.");
+        ASSERT(environment().is_initialised(), "cuda backend tensor transpose call failed.  The cuda environment has not yet been initialised.");
+
+        std::vector<int64_t> extentA(dimsA.size());
+        std::vector<int64_t> extentB(dimsA.size());
+        std::vector<int64_t> strideA(dimsA.size());
+        std::vector<int64_t> strideB(dimsA.size());
+
+        for(size_t i = 0; i < dimsA.size(); ++i)
+        {
+            extentA[i] = dimsA[i];
+            strideA[i] = _strideA[i];
+            extentB[i] = dimsB[i];
+            strideB[i] = _strideB[i];
+        }
+        CALL_AND_HANDLE(cutensor::transpose<T>(environment().cutensor_handle(), environment().current_stream(), in, extentA, strideA, out, extentB, strideB, inds), "Failed to compute tensor transpose.")
     }
 };  //cuda_backend
 

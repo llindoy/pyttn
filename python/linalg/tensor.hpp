@@ -78,7 +78,13 @@ void init_tensor_cpu(py::module &m, const std::string& label)
                    )
         .def("complex_dtype", [](const ttype&){return !std::is_same<T, real_type>::value;})
         .def("__str__", [](const ttype& o){std::stringstream oss;   oss << o; return oss.str();})
-        .def("clear", &ttype::clear);
+        .def("clear", &ttype::clear)
+        .def("transpose", 
+            [](const ttype& o, const std::vector<int>& inds)
+            {
+                ttype b = linalg::transpose(o, inds);
+                return b;
+            });
 }
 
 template <typename real_type> void initialise_tensors(py::module& m)
@@ -137,7 +143,13 @@ void init_tensor_gpu(py::module &m, const std::string& label)
             )mydelim"
         )
         .def("complex_dtype", [](const ttype&){return !std::is_same<T, real_type>::value;})
-        .def("__str__", [](const ttype& o){std::stringstream oss;   oss << o; return oss.str();});
+        .def("__str__", [](const ttype& o){std::stringstream oss;   oss << o; return oss.str();})
+        .def("transpose", 
+            [](const ttype& o, const std::vector<int>& inds)
+            {
+                ttype b = linalg::transpose(o, inds);
+                return b;
+            });
         //.def("clear", &ttype::clear);
 }
 
