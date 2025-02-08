@@ -1,6 +1,7 @@
 import numpy as np
 
-def operator_dictionary(*args, dtype = np.complex128):
+
+def operator_dictionary(*args, dtype=np.complex128):
     """Factory function for constructing a user defined operator dictionary.
 
     :param \*args: Variable length list of arguments. 
@@ -13,15 +14,15 @@ def operator_dictionary(*args, dtype = np.complex128):
     from pyttn.ttnpp import operator_dictionary_complex
     try:
         from pyttn.ttnpp import operator_dictionary_real
-        if(dtype == np.complex128):
+        if (dtype == np.complex128):
             return operator_dictionary_complex(*args)
-        elif(dtype == np.float64):
+        elif (dtype == np.float64):
             return operator_dictionary_real(*args)
         else:
             raise RuntimeError("Invalid dtype for operator_dictionary")
 
     except ImportError:
-        if(dtype == np.complex128):
+        if (dtype == np.complex128):
             return operator_dictionary_complex(*args)
         else:
             raise RuntimeError("Invalid dtype for operator_dictionary")

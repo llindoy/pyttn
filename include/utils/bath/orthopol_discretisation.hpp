@@ -87,7 +87,7 @@ public:
             std::get<1>(wg[i]) = std::sqrt(n_poly.weights()(i));
         }
 
-        std::sort(wg.begin(), wg.end(), [](const std::pair<T, real_type>& a, const std::pair<T, real_type>& b){return std::abs(std::get<0>(a)) < std::abs(std::get<0>(b));});
+        std::sort(wg.begin(), wg.end(), [](const std::pair<T, real_type>& a, const std::pair<T, real_type>& b){return linalg::abs(std::get<0>(a)) < linalg::abs(std::get<0>(b));});
 
         g.resize(N);
         w.resize(N);

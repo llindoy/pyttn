@@ -198,9 +198,9 @@ protected:
                     if(ended_early){keep_running = false;}
                     auto H = m_arnoldi.H();      
                     m_eigensolver(H, m_vals, m_rvecs, m_lvecs, true);
-                    err_res = local_error_estimate(std::abs(dt), coeff/scale_factor);
+                    err_res = local_error_estimate(linalg::abs(dt), coeff/scale_factor);
                     if(ended_early){m_cur_order = m_arnoldi.current_krylov_dim(); return;}
-                    mdtres[counter] = std::make_pair(std::abs(std::pow(m_eps/(err_res/std::abs(dt)), real_type(1.0/m_arnoldi.current_krylov_dim()))*(std::abs(dt))), m_arnoldi.current_krylov_dim());
+                    mdtres[counter] = std::make_pair(linalg::abs(std::pow(m_eps/(err_res/linalg::abs(dt)), real_type(1.0/m_arnoldi.current_krylov_dim()))*(linalg::abs(dt))), m_arnoldi.current_krylov_dim());
                     ++counter;
                 } 
                 catch(const std::exception& ex)
@@ -212,7 +212,7 @@ protected:
             
                 if(!nan_encountered)    
                 {
-                    if(err_res/std::abs(dt) < m_delta*m_eps || keep_running == false)
+                    if(err_res/linalg::abs(dt) < m_delta*m_eps || keep_running == false)
                     {
                         m_cur_order = iend; return;
                     }
@@ -230,7 +230,7 @@ protected:
                         m_arnoldi.finalise_krylov_rep(m_cur_order);
                         auto H2 = m_arnoldi.H();      
                         CALL_AND_HANDLE(m_eigensolver(H2, m_vals, m_rvecs, m_lvecs, true), "Failed to diagonalise upper hessenberg matrix.");
-                        CALL_AND_HANDLE(err_res = local_error_estimate(std::abs(dt), coeff/scale_factor), "Failed to compute local error estimate."); 
+                        CALL_AND_HANDLE(err_res = local_error_estimate(linalg::abs(dt), coeff/scale_factor), "Failed to compute local error estimate."); 
                         return;
                     }
                     istart = iend + 1;
@@ -240,7 +240,7 @@ protected:
             real_type maxdt = 0;    size_type order = 0;
             for(size_type i = 0; i < counter; ++i)
             {
-                if(std::abs(std::get<0>(mdtres[i])) > maxdt){maxdt = std::abs(std::get<0>(mdtres[i]));  order = std::get<1>(mdtres[i]);}
+                if(linalg::abs(std::get<0>(mdtres[i])) > maxdt){maxdt = linalg::abs(std::get<0>(mdtres[i]));  order = std::get<1>(mdtres[i]);}
             }
             m_cur_order = order;
 
@@ -249,7 +249,7 @@ protected:
                 m_arnoldi.finalise_krylov_rep(m_cur_order);
                 auto H2 = m_arnoldi.H();      
                 CALL_AND_HANDLE(m_eigensolver(H2, m_vals, m_rvecs, m_lvecs, true), "Failed to diagonalise upper hessenberg matrix.");
-                CALL_AND_HANDLE(err_res = local_error_estimate(std::abs(dt), coeff/scale_factor), "Failed to compute local error estimate."); 
+                CALL_AND_HANDLE(err_res = local_error_estimate(linalg::abs(dt), coeff/scale_factor), "Failed to compute local error estimate."); 
             }
         }
         catch(const std::exception& ex)
@@ -426,7 +426,7 @@ public:
 
                 if(!nan_encountered)
                 {
-                    err = err_res;///std::abs(dt_trial);
+                    err = err_res;///linalg::abs(dt_trial);
 
                     ASSERT(base_type::m_cur_order >= 1, "The iend value obtained is not allowed.");
                     
@@ -434,12 +434,12 @@ public:
                     while(!error_tol_satisfied)
                     {
                         dt_trial_next = base_type::m_gamma*std::pow(base_type::m_eps/err, real_type(1.0/base_type::m_cur_order))*(dt_trial);
-                        if(std::abs(dt_trial_next) < 0.1*std::abs(dt_trial)){dt_trial_next = 0.1*dt_trial;}
-                        if(std::abs(dt_trial_next) > 10*std::abs(dt_trial)){dt_trial_next = 10*dt_trial;}
+                        if(linalg::abs(dt_trial_next) < 0.1*linalg::abs(dt_trial)){dt_trial_next = 0.1*dt_trial;}
+                        if(linalg::abs(dt_trial_next) > 10*linalg::abs(dt_trial)){dt_trial_next = 10*dt_trial;}
                         dt_trial = dt_trial_next;
 
-                        CALL_AND_HANDLE(err_res = base_type::local_error_estimate(std::abs(dt_trial), coeff/scale_factor), "Failed to compute local error estimate."); 
-                        err = err_res/std::abs(dt_trial);
+                        CALL_AND_HANDLE(err_res = base_type::local_error_estimate(linalg::abs(dt_trial), coeff/scale_factor), "Failed to compute local error estimate."); 
+                        err = err_res/linalg::abs(dt_trial);
                         error_tol_satisfied = err < base_type::m_delta*base_type::m_eps;
                     }
 
@@ -447,11 +447,11 @@ public:
                     dt_completed += dt_trial;   
 
                     dt_trial_next = base_type::m_gamma*std::pow(base_type::m_eps/err_res, real_type(1.0/base_type::m_cur_order))*(dt_trial);
-                    if(std::abs(dt_trial_next) < 0.1*std::abs(dt_trial)){dt_trial_next = 0.1*dt_trial;}
-                    if(std::abs(dt_trial_next) > 10*std::abs(dt_trial)){dt_trial_next = 10*dt_trial;}
+                    if(linalg::abs(dt_trial_next) < 0.1*linalg::abs(dt_trial)){dt_trial_next = 0.1*dt_trial;}
+                    if(linalg::abs(dt_trial_next) > 10*linalg::abs(dt_trial)){dt_trial_next = 10*dt_trial;}
                     dt_trial = dt_trial_next;
 
-                    if(std::abs(dt_trial + dt_completed) > std::abs(dt)){dt_trial = dt-dt_completed;}
+                    if(linalg::abs(dt_trial + dt_completed) > linalg::abs(dt)){dt_trial = dt-dt_completed;}
                 }
                 else
                 {
@@ -515,7 +515,7 @@ public:
             CALL_AND_HANDLE(base_type::m_tempr.resize(x.size()), "Failed to resize the working buffer.");
             CALL_AND_HANDLE(base_type::m_arnoldi.resize(krylov_dim, size), "Failed to resize krylov subspace.");
 
-            if(std::abs(dt*coeff) == real_type(0.0)){return 0;}
+            if(linalg::abs(dt*coeff) == real_type(0.0)){return 0;}
 
             size_type nevals = 0;
             real_type dt_trial = dt/m_ndt;

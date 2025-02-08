@@ -51,8 +51,10 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
           linalg/tensor.cpp linalg/sparseMatrix.cpp linalg/backend.cpp linalg/orthogonal_vector_gen.cpp
           utils/orthopol.cpp utils/discretisation.cpp
           ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
-          ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp #ttns/ttn/ms_ttn.cpp
-
+          ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp ttns/ttn/ms_ttn.cpp
+          ttns/observables/matrix_element.cpp 
+          ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp
+          ttns/algorithms/tdvp.cpp ttns/algorithms/dmrg.cpp
           )
     set_source_files_properties(${PYTHON_BINDINGS_SRC} PROPERTIES LANGUAGE CUDA)
     if(COMPILER_SET)
@@ -71,7 +73,7 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
         set(LINALG_LIBS ${LINALG_LIBS} ${LLVM_LIBRARIES} ${CLANG_LIBS} ${CLANG_CLANG_LIBS} ${CUDA_cusparse_LIBRARY})
     endif()
 else()
-    set(PYTHON_BINDINGS_SRC pythonBinding.cpp 
+    set(PYTHON_BINDINGS_SRC pyttn.cpp 
           utils/orthopol.cpp utils/discretisation.cpp
           linalg/sparseMatrix.cpp linalg/tensor.cpp linalg/backend.cpp
           ttns/observables/matrix_element.cpp 

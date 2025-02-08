@@ -1,16 +1,13 @@
 import numpy as np
 
 
-
-
-
 class matrix_element_dtype:
     """A class defining the general interface for the pybind11 wrappers generated for the matrix_element object.  These wrapper classes are
     :class:`matrix_element_complex` and :class:`matrix_element_real` (with the real variant only present if the pybind11 wrapper has been built with support
     for real valued TTNs.  These classes provide a set of functions for evaluating matrix elements of operators with respect to single and multiset TTNs
 
     :param \*args: A variable length list of arguments. Valid options are
-        
+
         - none - in this case we call the default constructor of the matrix element class to construct an empty matrix element.
         - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - A TTN to define the topology and size of buffers needed to evaluate the tensor network.
         - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Two TTNs with the same topology defining the size of the bra and ket respectively.
@@ -25,7 +22,8 @@ class matrix_element_dtype:
     """
 
     def __init__(self, *args, dtype=np.complex128, **kwargs):
-        raise RuntimeError("The ttn_dtype class is not constructable.  This class is present to provide cleaner documentation for the pybind11 classes.")
+        raise RuntimeError(
+            "The ttn_dtype class is not constructable.  This class is present to provide cleaner documentation for the pybind11 classes.")
 
     def assign(self, o):
         """Assign the value of this matrix element from another matrix element
@@ -35,17 +33,15 @@ class matrix_element_dtype:
         """
         pass
 
-
     def clear(self):
         "Clear and deallocate all internal buffers of the matrix element"
         pass
-
 
     def resize(self, *args, **kwargs):
         """Resize the matrix element to fit the required wavefunctions
 
         :param \*args: A variable length list of arguments. Valid options are
-            
+
             - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - A TTN to define the topology and size of buffers needed to evaluate the tensor network.
             - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Two TTNs with the same topology defining the size of the bra and ket respectively.
 
@@ -70,7 +66,7 @@ class matrix_element_dtype:
         Valid options for the argument list depend on the type of quantity we are evaluating. 
 
         :math:`\\langle A | A \\rangle`:
-            
+
             - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the inner product of the ttn with itself. 
 
         :math:`\\langle A | O | A \\rangle`:
@@ -96,6 +92,7 @@ class matrix_element_dtype:
             - **op** (:class:`ms_sop_operator_dtype` or :class:`ms_sop_operator_dtype`), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the product of sum-of-product operator op.
         """
         pass
+
 
 """
         .def("__call__", [](matel& o, siteop& op, const _ttn& A, const _ttn& B){return o(op, A, B);})

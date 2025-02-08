@@ -13,6 +13,7 @@ template <typename T, typename backend>
 class sop_ttn_contraction_engine;
 
 //implementation of sum of product operator ttn contraction for blas types.  This also supports action of two-mode operators on the sop
+//TODO: add support for ms_ttn ms_sop contractions.
 template <typename T>
 class sop_ttn_contraction_engine<T, linalg::blas_backend>
 {
@@ -418,7 +419,7 @@ protected:
         }
     }
 
-  template <typename A1type, typename Bvtype>
+    template <typename A1type, typename Bvtype>
     static inline void add_block(const T& lcoeff, size_type coeff_index, const A1type& Ai, Bvtype& Bv, const std::vector<size_type>& Adims, const std::vector<size_type>& strides)
     {
         size_type N = Adims.size()-1;
@@ -465,7 +466,6 @@ protected:
         }
     }
 
-
     static inline size_type expand_coeff_index(const std::vector<size_type>& id, const std::vector<size_type>& strides)
     {
         size_type ret = 0;
@@ -488,6 +488,26 @@ protected:
     }
 
 };
+
+#ifdef PYTTN_BUILD_CUDA
+/*TODO: Implement the contractions*/
+template <typename T>
+class sop_ttn_contraction_engine<T, linalg::cuda_backend>
+{
+public:
+    using backend = linalg::cuda_backend;
+    using sop_type = sop_operator<T, backend>;
+    using ttn_type = ttn<T, backend>;
+    using size_type = typename ttn_type::size_type;
+    using real_type = typename ttn_type::real_type;
+
+    static inline void sop_ttn_contraction(const sop_type& Op, const ttn_type& A, ttn_type& B, T coeff = T(1.0), real_type cutoff = real_type(1e-12))
+    {
+        RAISE_EXCEPTION("SOP TTN contraction not implement for cuda backend.");
+    }
+};
+
+#endif
 
 
 }   //namespace ttns

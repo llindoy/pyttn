@@ -37,7 +37,7 @@ protected:
         size_type maxdim = 0;
         for(size_type mode = 0; mode < A().nmodes(); ++mode)
         {
-            auto _A = A().as_rank_3(mode, use_capacity);
+            auto _A = A.as_rank_3(mode, use_capacity);
             size_type dim = _A.shape(0)*_A.shape(1)*_A.shape(1);
             if(dim > maxdim){maxdim = dim;}
         }
@@ -47,7 +47,7 @@ protected:
 public:
     static inline size_type contraction_buffer_size(const hnode& A, bool use_capacity = false)
     {
-        return contraciton_buffer_size(A(), use_capacity);
+        return contraction_buffer_size(A(), use_capacity);
     }
 
     static inline size_type contraction_buffer_size(const ms_hnode& A, bool use_capacity = false)

@@ -2,6 +2,7 @@ from pyttn.ttnpp import one_site_tdvp_complex, ttn_complex, sop_operator_complex
 from pyttn.ttnpp import multiset_one_site_tdvp_complex, ms_ttn_complex, multiset_sop_operator_complex
 import numpy as np
 
+
 def single_set_tdvp(A, H, expansion='onesite', **kwargs):
     """A factory method for constructing an object used for performing single set TDVP calculations
 
@@ -23,7 +24,7 @@ def single_set_tdvp(A, H, expansion='onesite', **kwargs):
             return adaptive_one_site_tdvp_complex(A, H, **kwargs)
     else:
         raise RuntimeError("Invalid input types for single set tdvp.")
-        
+
 
 def multiset_tdvp(A, H, expansion='onesite', **kwargs):
     """A factory method for constructing an object used for performing multiset tdvp calculations
@@ -43,9 +44,11 @@ def multiset_tdvp(A, H, expansion='onesite', **kwargs):
         if expansion == 'onesite':
             return multiset_one_site_tdvp_complex(A, H, **kwargs)
         elif expansion == 'subspace':
-            raise ValueError("subspace expansion algorithm has not yet been implemented for multiset TTNs.")
+            raise ValueError(
+                "subspace expansion algorithm has not yet been implemented for multiset TTNs.")
     else:
         raise RuntimeError("Invalid input types for multiset tdvp.")
+
 
 def tdvp(A, H, expansion='onesite', **kwargs):
     """A factory method for constructing an object used for performing either single or multi set tdvp calculations. 

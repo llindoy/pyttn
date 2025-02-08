@@ -18,7 +18,7 @@ namespace ttns
 template <typename T, typename backend>
 using multiset_node_data = std::vector<ttn_node_data<T, backend>>;
 
-template <typename T, typename backend, typename = typename std::enable_if<std::is_same<backend, linalg::blas_backend>::value, void>::type> 
+template <typename T, typename backend> 
 std::ostream& operator<<(std::ostream& os, const multiset_node_data<T, backend>& t)
 {
     for(size_t i = 0; i < t.size(); ++i)

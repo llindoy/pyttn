@@ -360,10 +360,9 @@ void init_tdvp(py::module &m, const std::string& label)
     init_tdvp_core<T, ttns::ms_ttn, backend>(m, (std::string("multiset_one_site_tdvp_")+label));
 }
 
-template <typename backend>
+template <typename real_type, typename backend>
 void initialise_tdvp(py::module& m)
 {
-    using real_type = double;
     using complex_type = linalg::complex<real_type>;
   
 #ifdef BUILD_REAL_TTN

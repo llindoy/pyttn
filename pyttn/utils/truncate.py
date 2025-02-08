@@ -4,8 +4,10 @@ import numpy as np
 class TruncationBase:
     """Base class for local Hilbert space mode decomposition
     """
+
     def __init__(self):
-        return 
+        return
+
 
 class DepthTruncation(TruncationBase):
     """A class for truncating system modes to a fixed number of levels   
@@ -28,7 +30,8 @@ class DepthTruncation(TruncationBase):
     :returns: A list containing the local Hilbert space dimension of each mode
     :rtype: list 
     """
-    def __init__(self, Lmax = 2):
+
+    def __init__(self, Lmax=2):
         self.Lmax = Lmax
 
     def __call__(self, gk, wk, is_fermion):
@@ -36,6 +39,7 @@ class DepthTruncation(TruncationBase):
             return [2 for i in range(len(wk))]
         else:
             return [self.Lmax for i in range(len(wk))]
+
 
 class EnergyTruncation(TruncationBase):
     """A class for truncating system modes to a fixed number of levels   
@@ -65,7 +69,7 @@ class EnergyTruncation(TruncationBase):
     :rtype: list 
     """
 
-    def __init__(self, ecut = 0, Lmax = 2, Lmin = 1, func='abs'):
+    def __init__(self, ecut=0, Lmax=2, Lmin=1, func='abs'):
         self.ecut = ecut
         self.Lmax = Lmax
         self.Lmin = Lmin
@@ -98,7 +102,7 @@ class EnergyTruncation(TruncationBase):
             if nbose < self.Lmin:
                 nbose = self.Lmin
 
-            if(nbose > self.Lmax):
+            if (nbose > self.Lmax):
                 nbose = self.Lmax
             Nb.append(nbose)
         return Nb

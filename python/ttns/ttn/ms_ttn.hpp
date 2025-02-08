@@ -20,17 +20,14 @@ template <typename T, typename backend>
 void init_msttn(py::module &m, const std::string& label)
 {
     using namespace ttns;
-    using _msttn = ms_ttn<T, backend>;
-    //using const_msttn_slice = multiset_ttn_slice<T, backend, true>;
-    using _msttn_slice = multiset_ttn_slice<T, backend, false>;
-    using _msttn_node = typename _msttn::node_type;
-    using _msttn_node_data = multiset_node_data<T, backend>;
     using real_type = typename linalg::get_real_type<T>::type;
     using size_type = typename backend::size_type;
-    using _msttn_slice_real = multiset_ttn_slice<real_type, backend, false>;
-    //using siteop = site_operator<T, backend>;
-    
-    //using conv = linalg::pybuffer_converter<backend>;
+
+    using _msttn = ms_ttn<T, backend>;
+    using _msttn_node = typename _msttn::node_type;
+    using _msttn_node_data = multiset_node_data<T, backend>;
+    using _msttn_slice = multiset_ttn_slice<T, backend, false>;
+    //using _msttn_slice_real = multiset_ttn_slice<real_type, backend, false>;
 
     py::class_<_msttn_node>(m, (std::string("ms_ttn_node_")+label).c_str())
         .def(py::init())
@@ -48,25 +45,16 @@ void init_msttn(py::module &m, const std::string& label)
                 py::keep_alive<0, 1>()
             );
 
-    //using csobj_type = typename const_msttn_slice::obj_type;
-    //py::class_<const_msttn_slice>(m, (std::string("const_ms_ttn_slice_")+label).c_str())
-    //    .def(py::init<csobj_type, size_type>())
-    //    .def(py::init<const _msttn_slice&>())
-    //    //.def("assign", &_msttn_slice::operator=)
-    //    //.def("assign", &_msttn::template operator=<real_type, backend> )
-    //    .def("nset", &_msttn_slice::nset);
-
+    //TODO: Figure out why the commented out assign functions don't compile
     using sobj_type = typename _msttn_slice::obj_type;
     py::class_<_msttn_slice>(m, (std::string("ms_ttn_slice_")+label).c_str())
         .def(py::init<sobj_type, size_type>())
         .def(py::init<const _msttn_slice&>())
-        //.def("assign", &_msttn_slice::operator=)
         .def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const ttn<real_type, backend>&)>(&_msttn_slice::template operator=<real_type, backend>))
         .def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const ttn<T, backend>&)>(&_msttn_slice::template operator=<T, backend>))
-        .def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice_real&)>(&_msttn_slice::template operator=<real_type, backend>))
-        .def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice&)>(&_msttn_slice::template operator=<T, backend>))
+        //.def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice_real&)>(&_msttn_slice::template operator=<real_type, backend>))
+        //.def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice&)>(&_msttn_slice::template operator=<T, backend>))
         .def("nset", &_msttn_slice::nset);
-
 
 
     //expose the ttn node class.  This is our core tensor network object.
@@ -74,10 +62,10 @@ void init_msttn(py::module &m, const std::string& label)
         .def(py::init<const _msttn&>())
         .def(py::init<const ms_ttn<real_type, backend>&>())
 
-        .def(py::init<const ntree<size_t>&, size_t, bool>(), py::arg(), py::arg(), py::arg("purification") = false)
-        .def(py::init<const ntree<size_t>&, const ntree<size_t>&, size_t, bool>(), py::arg(), py::arg(), py::arg(), py::arg("purification") = false)
-        .def(py::init<const std::string&, size_t, bool>(), py::arg(), py::arg(), py::arg("purification") = false)
-        .def(py::init<const std::string&, const std::string, size_t, bool &>(), py::arg(), py::arg(), py::arg(), py::arg("purification") = false)
+        .def(py::init<size_t, const ntree<size_t>&, bool>(), py::arg(), py::arg(), py::arg("purification") = false)
+        .def(py::init<size_t, const ntree<size_t>&, const ntree<size_t>&, bool>(), py::arg(), py::arg(), py::arg(), py::arg("purification") = false)
+        .def(py::init<size_t, const std::string&, bool>(), py::arg(), py::arg(), py::arg("purification") = false)
+        .def(py::init<size_t, const std::string&, const std::string, bool &>(), py::arg(), py::arg(), py::arg(), py::arg("purification") = false)
 
         .def("complex_dtype", [](const _msttn&){return !std::is_same<T, real_type>::value;})
         .def("assign", [](_msttn& o, const _msttn& i){o=i;})
@@ -89,8 +77,8 @@ void init_msttn(py::module &m, const std::string& label)
 
         .def("assign_slice", static_cast<void (_msttn::*)(size_type, const ttn<real_type, backend>&)>(&_msttn::template set_slice<real_type, backend>))
         .def("assign_slice", static_cast<void (_msttn::*)(size_type, const ttn<T, backend>&)>(&_msttn::template set_slice<T, backend>))
-        .def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice_real&)>(&_msttn::template set_slice<real_type, backend>))
-        .def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice&)>(&_msttn::template set_slice<T, backend>))
+        //.def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice_real&)>(&_msttn::template set_slice<real_type, backend>)) 
+        //.def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice&)>(&_msttn::template set_slice<T, backend>))
 
         .def("bond_dimensions", &_msttn::bond_dimensions)
         .def("bond_dimensions", [](const _msttn& o){typename _msttn::hrank_info res;  o.bond_dimensions(res);   return res;})

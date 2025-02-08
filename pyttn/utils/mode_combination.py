@@ -3,7 +3,8 @@ import numpy as np
 
 from pyttn import system_modes
 
-class ModeCombination:    
+
+class ModeCombination:
     """A class for automatically combining modes of a system_modes object together to form a new system_modes 
     object consisting of composite modes.  The approach implemented within this class involves sweeping from left
     to right and we attempt to combine the next mode into the current mode provided we have not already combined nbmax
@@ -27,13 +28,13 @@ class ModeCombination:
     :returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode
     :rtype: list of list
     """
-    def __init__(self, nhilb = 1, nbmax = 1, blocksize=1):
+
+    def __init__(self, nhilb=1, nbmax=1, blocksize=1):
         self.nbmax = nbmax
         self.nhilb = nhilb
         self.blocksize = blocksize
 
-
-    def mode_combination_array(self, mode_dims, mode_inds=None, _blocksize=None):    
+    def mode_combination_array(self, mode_dims, mode_inds=None, _blocksize=None):
         """Perform the mode combination process on a array of mode dimensions.     
 
         :param mode_dims: the mode dimensions
@@ -62,41 +63,41 @@ class ModeCombination:
         chilb = 1
         mode = 0
         while not all_modes_traversed:
-            #if the current cmode object is empty then we just add the current mode to the composite mode and increment
-            if(len(cmode) == 0):
-                #add in all modes up to the blocksize
+            # if the current cmode object is empty then we just add the current mode to the composite mode and increment
+            if (len(cmode) == 0):
+                # add in all modes up to the blocksize
                 for j in range(blocksize):
                     cmode.append(mode_inds[mode])
                     chilb = chilb*mode_dims[mode]
                     mode += 1
-                    #but if we get to the end of the mode dims array exit at this stage
-                    if(mode == len(mode_dims)):
+                    # but if we get to the end of the mode dims array exit at this stage
+                    if (mode == len(mode_dims)):
                         all_modes_traversed = True
                         composite_modes.append(copy.deepcopy(cmode))
             else:
-                #othewise we check to see if the composite mode could accept the current mode without exceeding the bounds
-                #then we add and increment
+                # othewise we check to see if the composite mode could accept the current mode without exceeding the bounds
+                # then we add and increment
                 nextdims = 1
                 for j in range(blocksize):
-                    if(mode < len(mode_dims)):
+                    if (mode < len(mode_dims)):
                         nextdims = nextdims*mode_dims[mode+j]
 
                 if (nbmax == None or len(cmode) < nbmax) and chilb*nextdims <= nhilbmax:
-                    #add all modes in the next block
+                    # add all modes in the next block
                     for j in range(blocksize):
                         cmode.append(mode_inds[mode])
                         chilb = chilb*mode_dims[mode]
                         mode += 1
 
-                        #bailing out early if we hit the end
-                        if(mode == len(mode_dims)):
+                        # bailing out early if we hit the end
+                        if (mode == len(mode_dims)):
                             all_modes_traversed = True
                             composite_modes.append(copy.deepcopy(cmode))
 
                 else:
-                    #otherwise we have reached the end of the current composite mode.  We will now reset the composite 
-                    #mode object and we will not increment the mode so that it start a new composite mode object in the
-                    #next iteration
+                    # otherwise we have reached the end of the current composite mode.  We will now reset the composite
+                    # mode object and we will not increment the mode so that it start a new composite mode object in the
+                    # next iteration
                     composite_modes.append(copy.deepcopy(cmode))
                     cmode = []
                     chilb = 1
@@ -113,13 +114,14 @@ class ModeCombination:
         :returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode
         :rtype: list of list
         """
-        #extract the composite mode dimensions from the system
+        # extract the composite mode dimensions from the system
         mode_dims = [system[i].lhd() for i in range(len(system))]
 
-        #now perform the mode combination on this array
-        composite_modes = self.mode_combination_array(mode_dims, _blocksize=_blocksize)
+        # now perform the mode combination on this array
+        composite_modes = self.mode_combination_array(
+            mode_dims, _blocksize=_blocksize)
 
-        #and set up a composite system object using this information
+        # and set up a composite system object using this information
         composite_system = system_modes(len(composite_modes))
         for i in range(len(composite_system)):
             for j in composite_modes[i]:
@@ -127,7 +129,7 @@ class ModeCombination:
 
         return composite_system
 
-    def __call__(self, system, _blocksize = None):
+    def __call__(self, system, _blocksize=None):
         """Perform the mode combination process on a system_modes object.     
 
         :param system: the system_modes object defining all mode data

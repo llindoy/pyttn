@@ -39,6 +39,8 @@ share/python-wheels/
 .vscode/
 .venv
 .venv/
+.pytest_cache/
+.pytest_cache
 MANIFEST
 
 

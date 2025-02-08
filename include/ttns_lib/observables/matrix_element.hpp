@@ -518,7 +518,7 @@ protected:
         for(size_t j = 0; j < hr.nterms(); ++j)
         {
             CALL_AND_HANDLE(retval += hr[j].coeff()*gather_result(m_matel[0]()[j]), "Failed to return result.");
-            if(use_identity && std::abs(Eshift) > 1e-14)
+            if(use_identity && linalg::abs(Eshift) > 1e-14)
             {
                 CALL_AND_HANDLE(retval += Eshift*gather_result(m_matel[0]().id()), "Failed to return result.");
             }
@@ -529,12 +529,12 @@ protected:
     inline T accum_root(const sttn_node_data<T>& hr, size_t i, size_t c, T Eshift = T(0), bool use_identity = false)
     {
         ASSERT(i == 0 && c == 0, "Index out of bounds.");
-        return accum_root(hr, Eshift, use_identity = false);
+        return accum_root(hr, Eshift, use_identity);
     }
 
     inline T accum_root(const multiset_sttn_node_data<T>& hr, size_t i, size_t c, T Eshift = T(0), bool use_identity = false)
     {
-        return accum_root(hr[i][c], Eshift, use_identity = false);
+        return accum_root(hr[i][c], Eshift, use_identity);
     }
 
 public:
@@ -560,7 +560,7 @@ public:
                     bool use_identity = false;
                     T Eshift = sop.Eshift_val(set_index, nr);
                     size_t col = sop.column_index(set_index, nr);
-                    if(col == set_index && sop.is_scalar(set_index, nr) && std::abs(Eshift) > 1e-14)
+                    if(col == set_index && sop.is_scalar(set_index, nr) && linalg::abs(Eshift) > 1e-14)
                     {
                         CALL_AND_HANDLE(this->compute_norm_internal(psi, true, set_index, 0), "Failed to compute norm of diagonal term.");
                         T val(0);

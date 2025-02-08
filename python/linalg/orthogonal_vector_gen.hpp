@@ -44,7 +44,6 @@ template <typename backend>
 void init_random_engine(py::module& m, const std::string& label)
 {
     using namespace linalg;
-    using size_type = typename backend::size_type;
     using ttype = random_engine<backend>;
 
     py::class_<ttype>(m, label.c_str())

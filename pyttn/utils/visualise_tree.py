@@ -1,5 +1,6 @@
 from pyttn import ntree
 
+
 def visualise_tree(tree, prog="dot", ax=None, node_size=500, linewidth=3, add_labels=True):
     """A function for plotting an ntree object
 
@@ -23,7 +24,7 @@ def visualise_tree(tree, prog="dot", ax=None, node_size=500, linewidth=3, add_la
 
         G = nx.Graph()
 
-        #add all of the nodes to the tree
+        # add all of the nodes to the tree
         labeldict = {}
         for i in tree:
             G.add_node(i)
@@ -37,7 +38,8 @@ def visualise_tree(tree, prog="dot", ax=None, node_size=500, linewidth=3, add_la
                     G.add_edge(i, i[ind])
 
         pos = graphviz_layout(G, prog=prog, root=tree())
-        nx.draw(G, pos, labels=labeldict, node_size=node_size, width=linewidth, ax=None)
+        nx.draw(G, pos, labels=labeldict,
+                node_size=node_size, width=linewidth, ax=None)
     except Exception as e:
         print(e)
         raise RuntimeError("Failed to visualise tree structure.")

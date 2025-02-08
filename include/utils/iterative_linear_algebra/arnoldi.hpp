@@ -210,12 +210,12 @@ public:
                             size_type n = get_eig_index();
                             eigenvalue_index = n;
 
-                            m_residues(0, iter) = m_arnoldi.hk1k()*std::abs(m_rvecs(m_vals.size()-1, n));
+                            m_residues(0, iter) = m_arnoldi.hk1k()*linalg::abs(m_rvecs(m_vals.size()-1, n));
                             if(m_verbose)
                             {
                                 std::cerr << 0 << " " << iter << " " << iend << " " << m_residues(0, iter) << " " << (m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n)) << std::endl;
                             }
-                            if(m_residues(0, iter) < m_eps || m_residues(0, iter) < m_rel_eps*std::abs((m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n))))
+                            if(m_residues(0, iter) < m_eps || m_residues(0, iter) < m_rel_eps*linalg::abs((m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n))))
                             {
                                 do_restart = false;
                                 keep_running=false;
@@ -327,9 +327,9 @@ public:
                             size_type eigindex = eigorder[eigenvalues_evaluated-1];
 
                             //and compute the associated residue
-                            m_residues(iter) = m_arnoldi.hk1k()*std::abs(m_rvecs(m_vals.size()-1, eigindex));
+                            m_residues(iter) = m_arnoldi.hk1k()*linalg::abs(m_rvecs(m_vals.size()-1, eigindex));
 
-                            if(m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps*std::abs((m_invert_mode ? 1.0/m_vals(eigindex, eigindex) : m_vals(eigindex, eigindex))))
+                            if(m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps*linalg::abs((m_invert_mode ? 1.0/m_vals(eigindex, eigindex) : m_vals(eigindex, eigindex))))
                             {
                                 do_restart = false;
                                 keep_running=false;
@@ -441,12 +441,12 @@ public:
     //                            size_type n = get_eig_index();
     //                            eigenvalue_index = n;
 
-    //                            m_residues(eigindex, iter) = m_arnoldi.hk1k()*std::abs(m_rvecs(m_vals.size()-1, n));
+    //                            m_residues(eigindex, iter) = m_arnoldi.hk1k()*linalg::abs(m_rvecs(m_vals.size()-1, n));
     //                            if(m_verbose)
     //                            {
     //                                std::cerr << eigindex << " " << iter << " " << iend << " " << m_residues(eigindex, iter) << " " << (m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n)) << std::endl;
     //                            }
-    //                            if(m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps*std::abs((m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n))))
+    //                            if(m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps*linalg::abs((m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n))))
     //                            {
     //                                do_restart = false;
     //                                keep_running=false;
@@ -496,21 +496,21 @@ protected:
         {   
             for(size_type i = 0; i < m_vals.size(0); ++i)
             {
-                if(std::abs(m_vals(i,i)) > m_val){m_val = std::abs(m_vals(i,i)); index = i;}
+                if(linalg::abs(m_vals(i,i)) > m_val){m_val = linalg::abs(m_vals(i,i)); index = i;}
             }
         }
         else if(m_mode == eigenvalue_target::smallest_real)
         {
             for(size_type i = 0; i < m_vals.size(0); ++i)
             {
-                if(std::real(m_vals(i,i)) < m_val || i == 0 ){m_val = linalg::real(m_vals(i,i)); index = i;}
+                if(linalg::real(m_vals(i,i)) < m_val || i == 0 ){m_val = linalg::real(m_vals(i,i)); index = i;}
             }
         }
         else if(m_mode == eigenvalue_target::largest_real)
         {
             for(size_type i = 0; i < m_vals.size(0); ++i)
             {
-                if(std::real(m_vals(i,i)) > m_val || i == 0 ){m_val = linalg::real(m_vals(i,i)); index = i;}
+                if(linalg::real(m_vals(i,i)) > m_val || i == 0 ){m_val = linalg::real(m_vals(i,i)); index = i;}
             }
         }
         return index;
@@ -526,7 +526,7 @@ protected:
 
         if(m_mode == eigenvalue_target::largest_magnitude)
         {   
-            std::sort(eigs.begin(), eigs.end(), [](const std::pair<T, size_type>& a, const std::pair<T, size_type>& b){return std::abs(a.first) > std::abs(b.first);});
+            std::sort(eigs.begin(), eigs.end(), [](const std::pair<T, size_type>& a, const std::pair<T, size_type>& b){return linalg::abs(a.first) > linalg::abs(b.first);});
         }
         else if(m_mode == eigenvalue_target::smallest_real)
         {

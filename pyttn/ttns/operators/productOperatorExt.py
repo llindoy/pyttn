@@ -6,10 +6,11 @@ try:
 
 except ImportError:
     product_operator_real = None
-    ttn_real = None 
+    ttn_real = None
     SOP_real = None
 
-def product_operator(h, sysinf, *args, dtype = np.complex128, **kwargs):
+
+def product_operator(h, sysinf, *args, dtype=np.complex128, **kwargs):
     """Function for constructing a product_operator
 
     :param h: The product operator representation of the Hamiltonian
@@ -21,8 +22,7 @@ def product_operator(h, sysinf, *args, dtype = np.complex128, **kwargs):
     :type dtype: {np.float64, np.complex128}, optional
     :type \*\*kwargs: Additional keyword arguments. See product_operator_real/product_operator_complex for options
     """
-    if(dtype == np.complex128 or product_operator_real is None):
+    if (dtype == np.complex128 or product_operator_real is None):
         return product_operator_complex(h, sysinf, *args, **kwargs)
     else:
         return product_operator_real(h, sysinf, *args, **kwargs)
-

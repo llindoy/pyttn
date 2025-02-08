@@ -39,8 +39,8 @@ class CMakeBuild(build_ext):
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
         # from Python.
         cmake_args = [
-            f"-DBUILD_SRC=Off",
-            f"-DBUILD_TESTS=Off",
+            f"-DBUILD_SRC=OFF",
+            f"-DBUILD_TESTS=OFF",
             f"-DBUILD_PYTHON_BINDINGS=ON",
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",

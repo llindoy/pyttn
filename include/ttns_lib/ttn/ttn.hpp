@@ -655,8 +655,7 @@ public:
         CALL_AND_RETHROW(return apply_product_operator(op, shift_orthogonality));
     }
 
-    //TODO Implement action of hSOP on ttn object
-public:
+    public:
     //here the collapse algorithm will be implemented in place.  This will be done iteratively shifting the orthogonality centre of the tree to a leaf.  Computing the probability of observing the state in each possible configuration of that leaf.  Then sampling the state based on this.  
     real_type collapse(std::vector<size_t>& state, bool truncate=false, real_type tol = real_type(0), size_type nchi = 0)
     {

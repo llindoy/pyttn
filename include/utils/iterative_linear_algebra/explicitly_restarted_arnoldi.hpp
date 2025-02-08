@@ -161,7 +161,7 @@ public:
                     mx -= E*x;
                     m_residues[iter-1] = std::sqrt( linalg::real(linalg::dot_product(linalg::conj(m_x), m_x)));
                     //std::cerr << E << " " << m_residues[iter-1] << std::endl;
-                    if(m_residues[iter-1]/std::abs(E) < m_eps)
+                    if(m_residues[iter-1]/linalg::abs(E) < m_eps)
                     {
                         m_residues.resize(iter);
                         return true;

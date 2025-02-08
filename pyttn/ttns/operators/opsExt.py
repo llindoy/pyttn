@@ -2,6 +2,7 @@ import pyttn.ttnpp.ops as ops
 import numpy as np
 import scipy as sp
 
+
 def identity(*args, dtype=np.complex128):
     """Factory function for constructing an identity matrix site operator
 
@@ -14,12 +15,13 @@ def identity(*args, dtype=np.complex128):
     :returns: identity operator
     :rtype: ops.identity_complex or ops.identity_real
     """
-    if(dtype == np.complex128):
+    if (dtype == np.complex128):
         return ops.identity_complex(*args)
-    elif(dtype == np.float64):
+    elif (dtype == np.float64):
         return ops.identity_real(*args)
     else:
         raise RuntimeError("Invalid dtype for identity operator")
+
 
 def matrix(*args, dtype=np.complex128):
     """Factory function for constructing a matrix site operator
@@ -31,20 +33,22 @@ def matrix(*args, dtype=np.complex128):
     :returns: matrix operator
     :rtype: ops.matrix_complex or ops.matrix_real
     """
-    if(dtype == np.complex128):
+    if (dtype == np.complex128):
         return ops.matrix_complex(*args)
-    elif(dtype == np.float64):
+    elif (dtype == np.float64):
         return ops.matrix_real(*args)
     else:
         raise RuntimeError("Invalid dtype for matrix operator")
 
+
 def __sparse_matrix_default(*args, dtype=np.complex128):
-    if(dtype == np.complex128):
+    if (dtype == np.complex128):
         return ops.sparse_matrix_complex(*args)
-    elif(dtype == np.float64):
+    elif (dtype == np.float64):
         return ops.sparse_matrix_real(*args)
     else:
         raise RuntimeError("Invalid dtype for sparse_matrix operator")
+
 
 def sparse_matrix(*args, dtype=np.complex128):
     """Factory function for constructing a sparse matrix site operator
@@ -57,7 +61,7 @@ def sparse_matrix(*args, dtype=np.complex128):
     :rtype: ops.sparse_complex or ops.sparse_real
     """
 
-    if(len(args) == 1):
+    if (len(args) == 1):
         if isinstance(args[0], sp.sparse.csr_matrix) or isinstance(args[0], sp.sparse.coo_matrix):
             m2 = None
             if isinstance(args[0], sp.sparse.csr_matrix):
@@ -65,7 +69,7 @@ def sparse_matrix(*args, dtype=np.complex128):
             else:
                 m2 = args[0].tocsr()
 
-            if(m2.dtype == np.complex128 or dtype==np.complex128):
+            if (m2.dtype == np.complex128 or dtype == np.complex128):
                 return ops.sparse_matrix_complex(m2.data, m2.indices, m2.indptr, ncols=m2.shape[1])
             else:
                 return ops.sparse_matrix_real(m2.data, m2.indices, m2.indptr, ncols=m2.shape[1])
@@ -73,6 +77,7 @@ def sparse_matrix(*args, dtype=np.complex128):
             __sparse_matrix_default(*args, dtype=dtype)
     else:
         __sparse_matrix_default(*args, dtype=dtype)
+
 
 def diagonal_matrix(*args, dtype=np.complex128):
     """Factory function for constructing an diagonal matrix site operator
@@ -84,18 +89,17 @@ def diagonal_matrix(*args, dtype=np.complex128):
     :returns: diagonal operator
     :rtype: ops.diagonal_complex or ops.diagonal_real
     """
-    if(dtype == np.complex128):
+    if (dtype == np.complex128):
         return ops.diagonal_matrix_complex(*args)
-    elif(dtype == np.float64):
+    elif (dtype == np.float64):
         return ops.diagonal_matrix_real(*args)
     else:
         raise RuntimeError("Invalid dtype for diagonal_matrix operator")
 
 
-
 __site_op_dict__ = {
-        "identity": identity, 
-        "matrix": matrix, 
-        "sparse_matrix": sparse_matrix, 
-        "diagonal_matrix": diagonal_matrix, 
+    "identity": identity,
+    "matrix": matrix,
+    "sparse_matrix": sparse_matrix,
+    "diagonal_matrix": diagonal_matrix,
 }
