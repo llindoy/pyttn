@@ -20,6 +20,8 @@ template <typename T, typename backend>
 void init_msttn(py::module &m, const std::string& label)
 {
     using namespace ttns;
+    using numpy_type = typename linalg::numpy_converter<T>::type;
+
     using real_type = typename linalg::get_real_type<T>::type;
     using size_type = typename backend::size_type;
 
@@ -43,7 +45,9 @@ void init_msttn(py::module &m, const std::string& label)
                 "__iter__",
                 [](_msttn_node& s){return py::make_iterator(s.begin(), s.end());},
                 py::keep_alive<0, 1>()
-            );
+            )
+        .def("backend", [](){return backend::label();});
+
 
     //TODO: Figure out why the commented out assign functions don't compile
     using sobj_type = typename _msttn_slice::obj_type;
@@ -54,7 +58,8 @@ void init_msttn(py::module &m, const std::string& label)
         .def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const ttn<T, backend>&)>(&_msttn_slice::template operator=<T, backend>))
         //.def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice_real&)>(&_msttn_slice::template operator=<real_type, backend>))
         //.def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice&)>(&_msttn_slice::template operator=<T, backend>))
-        .def("nset", &_msttn_slice::nset);
+        .def("nset", &_msttn_slice::nset)
+        .def("backend", [](){return backend::label();});
 
 
     //expose the ttn node class.  This is our core tensor network object.
@@ -92,8 +97,10 @@ void init_msttn(py::module &m, const std::string& label)
 
         .def("set_state", &_msttn::template set_state<int>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
         .def("set_state", &_msttn::template set_state<size_t>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
-        .def("set_state", &_msttn::template set_state<T, int>, py::arg(), py::arg(), py::arg("random_unoccupied_initialisation")=false)
-        .def("set_state", &_msttn::template set_state<T, size_t>, py::arg(), py::arg(), py::arg("random_unoccupied_initialisation")=false)
+        
+        .def("set_state", &_msttn::template set_state<numpy_type, int>, py::arg(), py::arg(), py::arg("random_unoccupied_initialisation")=false)
+        .def("set_state", &_msttn::template set_state<numpy_type, size_t>, py::arg(), py::arg(), py::arg("random_unoccupied_initialisation")=false)
+
         .def("set_state", &_msttn::template set_state<real_type, int>, py::arg(), py::arg(), py::arg("random_unoccupied_initialisation")=false)
         .def("set_state", &_msttn::template set_state<real_type, size_t>, py::arg(), py::arg(), py::arg("random_unoccupied_initialisation")=false)
         .def("set_state_purification", &_msttn::template set_state<int>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
@@ -123,9 +130,9 @@ void init_msttn(py::module &m, const std::string& label)
         //    )        
 
         .def("__imul__", [](_msttn& a, const real_type& b){return a*=b;})
-        .def("__imul__", [](_msttn& a, const T& b){return a*=b;})
+        .def("__imul__", [](_msttn& a, const numpy_type& b){return a*=T(b);})
         .def("__idiv__", [](_msttn& a, const real_type& b){return a*=b;})
-        .def("__idiv__", [](_msttn& a, const T& b){return a*=b;})
+        .def("__idiv__", [](_msttn& a, const numpy_type& b){return a*=T(b);})
         
         .def("conj", &_msttn::conj)
         .def("random", &_msttn::random)
@@ -311,7 +318,8 @@ void init_msttn(py::module &m, const std::string& label)
 
         //ttn& apply_one_body_operator(const Op<T, backend>& op, bool shift_orthogonality = true)
         //ttn& apply_operator(const Op<T, backend>& op, real_type tol = real_type(0), size_type nchi=0)
-        ;
+        .def("backend", [](const _msttn&){return backend::label();});
+
 }
 
 template <typename real_type, typename backend>

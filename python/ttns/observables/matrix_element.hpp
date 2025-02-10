@@ -19,6 +19,7 @@ void init_matrix_element(py::module &m, const std::string& label)
 {
     using namespace ttns;
 
+    using _T = typename linalg::numpy_converter<T>::type;
 
     using siteop = site_operator<T, backend>;
     using prodop = product_operator<T, backend>;
@@ -62,34 +63,34 @@ void init_matrix_element(py::module &m, const std::string& label)
             )
         .def(
               "__call__", 
-              [](matel& o, siteop& op, size_t mode, const _ttn& A, bool use_sparsity){return o(op, mode, A, use_sparsity);}, 
+              [](matel& o, siteop& op, size_t mode, const _ttn& A, bool use_sparsity){return _T(o(op, mode, A, use_sparsity));}, 
               py::arg(), py::arg(), py::arg(), py::arg("use_sparsity")=true
             )
         .def(
               "__call__", 
-              [](matel& o, std::vector<siteop>& ops, const _ttn& A, bool use_sparsity){return o(ops, A, use_sparsity);}, 
+              [](matel& o, std::vector<siteop>& ops, const _ttn& A, bool use_sparsity){return _T(o(ops, A, use_sparsity));}, 
               py::arg(), py::arg(), py::arg("use_sparsity")=true
             )           
         .def(
               "__call__", 
-              [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _ttn& A, bool use_sparsity){return o(ops, modes, A, use_sparsity);}, 
+              [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _ttn& A, bool use_sparsity){return _T(o(ops, modes, A, use_sparsity));}, 
               py::arg(), py::arg(), py::arg(), py::arg("use_sparsity")=true
             )
         .def(
               "__call__", 
-              [](matel& o, prodop& ops, const _ttn& A, bool use_sparsity){return o(ops, A, use_sparsity);}, 
+              [](matel& o, prodop& ops, const _ttn& A, bool use_sparsity){return _T(o(ops, A, use_sparsity));}, 
               py::arg(), py::arg(), py::arg("use_sparsity")=true
             )
-        .def("__call__", [](matel& o, sop_op& sop, const _ttn& A){return o(sop, A);})
-        .def("__call__", [](matel& o, const _ttn& A, const _ttn& B){return o(A, B);})
-        .def("__call__", [](matel& o, siteop& op, const _ttn& A){return o(op, A);})
-        .def("__call__", [](matel& o, siteop& op, const _ttn& A, const _ttn& B){return o(op, A, B);})
-        .def("__call__", [](matel& o, siteop& op, size_t mode, const _ttn& A, const _ttn& B){return o(op, mode, A, B);})
+        .def("__call__", [](matel& o, sop_op& sop, const _ttn& A){return _T(o(sop, A));})
+        .def("__call__", [](matel& o, const _ttn& A, const _ttn& B){return _T(o(A, B));})
+        .def("__call__", [](matel& o, siteop& op, const _ttn& A){return _T(o(op, A));})
+        .def("__call__", [](matel& o, siteop& op, const _ttn& A, const _ttn& B){return _T(o(op, A, B));})
+        .def("__call__", [](matel& o, siteop& op, size_t mode, const _ttn& A, const _ttn& B){return _T(o(op, mode, A, B));})
         //inline T operator()(one_body_operator<T, backend>& op, const state_type& bra, const state_type& ket)
-        .def("__call__", [](matel& o, std::vector<siteop>& ops, const _ttn& A, const _ttn& B){return o(ops, A, B);})
-        .def("__call__", [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _ttn& A, const _ttn& B){return o(ops, modes, A, B);})
-        .def("__call__", [](matel& o, prodop& ops, const _ttn& A, const _ttn& B){return o(ops, A, B);})
-        .def("__call__", [](matel& o, sop_op& sop, const _ttn& A, const _ttn& B){return o(sop, A, B);})
+        .def("__call__", [](matel& o, std::vector<siteop>& ops, const _ttn& A, const _ttn& B){return _T(o(ops, A, B));})
+        .def("__call__", [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _ttn& A, const _ttn& B){return _T(o(ops, modes, A, B));})
+        .def("__call__", [](matel& o, prodop& ops, const _ttn& A, const _ttn& B){return _T(o(ops, A, B));})
+        .def("__call__", [](matel& o, sop_op& sop, const _ttn& A, const _ttn& B){return _T(o(sop, A, B));})
 
         .def(
               "resize", 
@@ -103,28 +104,30 @@ void init_matrix_element(py::module &m, const std::string& label)
             )
         .def(
               "__call__", 
-              [](matel& o, const _msttn& A, bool use_sparsity){return o(A, use_sparsity);}, 
+              [](matel& o, const _msttn& A, bool use_sparsity){return _T(o(A, use_sparsity));}, 
               py::arg(), py::arg("use_sparsity")=true
             )
         .def(
               "__call__", 
-              [](matel& o, siteop& op, size_t mode, const _msttn& A, bool use_sparsity){return o(op, mode, A, use_sparsity);}, 
+              [](matel& o, siteop& op, size_t mode, const _msttn& A, bool use_sparsity){return _T(o(op, mode, A, use_sparsity));}, 
               py::arg(), py::arg(), py::arg(), py::arg("use_sparsity")=true
             )
         .def(
               "__call__", 
-              [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _msttn& A, bool use_sparsity){return o(ops, modes, A, use_sparsity);}, 
+              [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _msttn& A, bool use_sparsity){return _T(o(ops, modes, A, use_sparsity));}, 
               py::arg(), py::arg(), py::arg(), py::arg("use_sparsity")=true
             )
-        .def("__call__", [](matel& o, ms_sop_op& sop, const _msttn& A){return o(sop, A);})
-        .def("__call__", [](matel& o, const _msttn& A, const _msttn& B){return o(A, B);})
-        .def("__call__", [](matel& o, siteop& op, const _msttn& A){return o(op, A);})
-        .def("__call__", [](matel& o, siteop& op, const _msttn& A, const _msttn& B){return o(op, A, B);})
-        .def("__call__", [](matel& o, siteop& op, size_t mode, const _msttn& A, const _msttn& B){return o(op, mode, A, B);})
+        .def("__call__", [](matel& o, ms_sop_op& sop, const _msttn& A){return _T(o(sop, A));})
+        .def("__call__", [](matel& o, const _msttn& A, const _msttn& B){return _T(o(A, B));})
+        .def("__call__", [](matel& o, siteop& op, const _msttn& A){return _T(o(op, A));})
+        .def("__call__", [](matel& o, siteop& op, const _msttn& A, const _msttn& B){return _T(o(op, A, B));})
+        .def("__call__", [](matel& o, siteop& op, size_t mode, const _msttn& A, const _msttn& B){return _T(o(op, mode, A, B));})
         //inline T operator()(one_body_operator<T, backend>& op, const state_type& bra, const state_type& ket)
-        .def("__call__", [](matel& o, std::vector<siteop>& ops, const _msttn& A, const _msttn& B){return o(ops, A, B);})
-        .def("__call__", [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _msttn& A, const _msttn& B){return o(ops, modes, A, B);})
-        .def("__call__", [](matel& o, ms_sop_op& sop, const _msttn& A, const _msttn& B){return o(sop, A, B);});
+        .def("__call__", [](matel& o, std::vector<siteop>& ops, const _msttn& A, const _msttn& B){return _T(o(ops, A, B));})
+        .def("__call__", [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _msttn& A, const _msttn& B){return _T(o(ops, modes, A, B));})
+        .def("__call__", [](matel& o, ms_sop_op& sop, const _msttn& A, const _msttn& B){return _T(o(sop, A, B));})
+        .def("backend", [](const matel&){return backend::label();});
+
 
         //inline typename std::enable_if<std::is_base_of<op_base, op_type>::value, std::vector<T>&>::type operator()(std::vector<site_operator<T, backend>>& op, size_type mode, const state_type& bra, const state_type& ket, std::vector<T>& res)
         //inline std::vector<T>& operator()(std::vector<std::vector<site_operator<T, backend>>& ops, const std::vector<size_type>& modes, const state_type& bra, const state_type& ket, std::vector<T>& res)

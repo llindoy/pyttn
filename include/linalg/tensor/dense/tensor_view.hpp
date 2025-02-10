@@ -489,10 +489,12 @@ public:
     template <typename ... Args> self_type& operator=(Args&& ... args){CALL_AND_RETHROW(base_type::operator=(std::forward<Args>(args)...));   return *this;}
 
 public:
-    //accessor operator[]
-    inline typename slice_traits::slice_type operator[](size_type i){ASSERT(internal::compare_bounds(i, m_shape[0]), "Unable to return slice of array.  Slice index out of bounds."); return slice_traits::make(*this, i);}
-    inline typename const_slice_traits::slice_type operator[](size_type i) const{ASSERT(internal::compare_bounds(i, m_shape[0]), "Unable to return slice of array.  Slice index out of bounds."); return const_slice_traits::make(*this, i);}
-
+    //accessor operator[] for returning slices
+    inline typename slice_traits::slice_type operator[](size_type i) {return slice_traits::make(this, i);}
+    inline typename const_slice_traits::slice_type operator[](size_type i) const{return const_slice_traits::make(this, i);}
+    inline typename slice_traits::slice_type slice(size_type i) {ASSERT(internal::compare_bounds(i, m_shape[0]), "Unable to return slice of array.  Slice index out of bounds."); return slice_traits::make(this, i);}
+    inline typename const_slice_traits::slice_type slice(size_type i) const{ASSERT(internal::compare_bounds(i, m_shape[0]), "Unable to return slice of array.  Slice index out of bounds."); return const_slice_traits::make(this, i);}
+   
     __host__ __device__ pointer buffer(){return m_buffer;}
     __host__ __device__ const_pointer buffer()const{return m_buffer;}
     __host__ __device__ pointer data(){return m_buffer;}

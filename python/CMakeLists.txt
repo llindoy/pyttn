@@ -5,6 +5,7 @@ include(CheckIPOSupported)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 #compiler flags
 option(USE_CUDA "Compile with cuda" OFF)
 option(USE_OPENMP "Compile with openmp" OFF)
@@ -40,12 +41,17 @@ check_language(CUDA)
 #attempt to set up cuda if the user has requested it and cuda is installed
 if(USE_CUDA AND CMAKE_CUDA_COMPILER)
     add_definitions(-DPYTTN_BUILD_CUDA)
+
+    set(CUTENSOR_INCLUDE /usr/include)
+    set(CUTENSOR_LIBRARY_PATH /usr/lib/x86_64-linux-gnu/)
     enable_language(CUDA)
     find_package(CUDAToolkit REQUIRED)
     find_package(Thrust REQUIRED)
+    find_package(CUTENSOR REQUIRED)
     thrust_create_target(Thrust)
 
-    #TODO: Need to set up search for cutensor
+    message(STATUS ${CUTENSOR_LIBRARY})
+    message(STATUS ${CUTENSOR_INCLUDE_PATH})
 
     set(PYTHON_BINDINGS_SRC pyttn.cpp 
           linalg/tensor.cpp linalg/sparseMatrix.cpp linalg/backend.cpp linalg/orthogonal_vector_gen.cpp
@@ -189,7 +195,7 @@ pybind11_add_module(ttnpp ${PYTHON_BINDINGS_SRC})
 target_include_directories(ttnpp PUBLIC ${TTNS_INCLUDE_DIRECTORIES})
 
 if(USE_CUDA AND CMAKE_CUDA_COMPILER)
-    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver CUDA::curand Thrust ) 
+    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver CUDA::curand CUDA::cutensor Thrust ) 
     set_target_properties(ttnpp PROPERTIES CUDA_ARCHITECTURES "86")
 else()
     target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 

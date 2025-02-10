@@ -128,7 +128,6 @@ public:
         //we need to fix this code, it currently doesn't work
         if(std::is_same<backend, linalg::cuda_backend>::value)
         {
-            
             for(const auto& a : A)
             {
                 size_type size = mfo_core::contraction_buffer_size(a, true);   

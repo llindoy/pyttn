@@ -1,6 +1,8 @@
 #ifndef PYTHON_BINDING_DMRG_HPP
 #define PYTHON_BINDING_DMRG_HPP
 
+#include "../../utils.hpp"
+
 #include <ttns_lib/ttn/ttn.hpp>
 #include <ttns_lib/ttn/ms_ttn.hpp>
 #include <ttns_lib/sweeping_algorithm/dmrg.hpp>
@@ -21,6 +23,8 @@ template <typename T, template <typename, typename> class ttn_class, typename ba
 void init_dmrg_core(py::module& m, const std::string& label)
 {
     using namespace ttns;
+
+    using _T = typename linalg::numpy_converter<T>::type;
 
     using dmrg = _one_site_dmrg<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -57,7 +61,7 @@ void init_dmrg_core(py::module& m, const std::string& label)
             :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
             :type numthreads: int, optional
           )mydelim")
-        .def("E", &dmrg::E, "Returns the current energy computed through the last DMRG sweep.")
+        .def("E", [](const dmrg& o){return _T(o.E());}, "Returns the current energy computed through the last DMRG sweep.")
         .def_property
             (
                 "restarts", 
@@ -101,6 +105,7 @@ void init_dmrg_core(py::module& m, const std::string& label)
             :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
             :type update_env: bool, optional
           )mydelim")
+        .def("backend", [](const dmrg&){return backend::label();})
         .doc() = R"mydelim(
             A class implementing the one site DMRG algorithm on trees.
           )mydelim";
@@ -112,6 +117,8 @@ template <typename T, template <typename, typename> class ttn_class, typename ba
 void init_dmrg_adaptive(py::module& m, const std::string& label)
 {
     using namespace ttns;
+
+    using _T = typename linalg::numpy_converter<T>::type;
 
     using admrg = _adaptive_one_site_dmrg<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -155,7 +162,7 @@ void init_dmrg_adaptive(py::module& m, const std::string& label)
             :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
             :type numthreads: int, optional
             )mydelim")
-        .def("E", &admrg::E, "Returns the current energy computed through the last DMRG sweep.")
+        .def("E", [](const admrg& o){return _T(o.E());}, "Returns the current energy computed through the last DMRG sweep.")
         .def_property
             (
                 "restarts", 
@@ -274,7 +281,7 @@ void init_dmrg_adaptive(py::module& m, const std::string& label)
             :param attempt_expansion: Whether or not to attempt subspace expansion throughout the update scheme.  (Default: False)
             :type attempt_expansion: bool, optional
           )mydelim")
-
+        .def("backend", [](const admrg&){return backend::label();})
         .doc() = R"mydelim(
               A class implementing the adaptive one site DMRG algorithm on trees.
             )mydelim";

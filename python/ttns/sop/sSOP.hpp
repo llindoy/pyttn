@@ -1,6 +1,8 @@
 #ifndef PYTHON_BINDING_STRING_SOP_HPP
 #define PYTHON_BINDING_STRING_SOP_HPP
 
+#include "../../utils.hpp"
+
 #include <ttns_lib/sop/coeff_type.hpp>
 #include <ttns_lib/sop/sSOP.hpp>
 
@@ -19,6 +21,7 @@ template <typename real_type>
 void init_sSOP(py::module& m)
 {
     using complex_type = linalg::complex<real_type>;
+    using numpy_complex_type = typename linalg::numpy_converter<complex_type>::type;
     using namespace ttns;
     using namespace literal;
     //wrapper for the sOP type 
@@ -87,7 +90,7 @@ void init_sSOP(py::module& m)
               )mydelim")
 
         .def("__div__", [](const sOP& a, const real_type& b){return a*(1.0/b);})
-        .def("__div__", [](const sOP& a, const complex_type& b){return a*(1.0/b);}, R"mydelim(
+        .def("__div__", [](const sOP& a, const numpy_complex_type& b){return a*(1.0/complex_type(b));}, R"mydelim(
               Functions for dividing a sOP by a scalar .
 
               :Parameters:  - **a** (:class:`sOP`) - The left term in the expression
@@ -101,7 +104,7 @@ void init_sSOP(py::module& m)
         .def("__mul__", [](const sOP& a, const coeff<real_type>& b){return a*b;})
         .def("__mul__", [](const sOP& a, const coeff<complex_type>& b){return a*b;})
         .def("__mul__", [](const sOP& a, const real_type& b){return a*b;})
-        .def("__mul__", [](const sOP& a, const complex_type& b){return a*b;})
+        .def("__mul__", [](const sOP& a, const numpy_complex_type& b){return a*complex_type(b);})
         .def("__mul__", [](const sOP& a, const sOP& b){return a*b;})
         .def("__mul__", [](const sOP& a, const sPOP& b){return a*b;})
         .def("__mul__", [](const sOP& a, const sNBO<real_type>& b){return a*b;})
@@ -133,7 +136,7 @@ void init_sSOP(py::module& m)
         .def("__rmul__", [](const sOP& a, const coeff<real_type>& b){return a*b;})
         .def("__rmul__", [](const sOP& a, const coeff<complex_type>& b){return a*b;})
         .def("__rmul__", [](const sOP& a, const real_type& b){return a*b;})
-        .def("__rmul__", [](const sOP& a, const complex_type& b){return a*b;}, R"mydelim(
+        .def("__rmul__", [](const sOP& a, const numpy_complex_type& b){return a*complex_type(b);}, R"mydelim(
               Functions for multiplying a sOP by a scalar from the right.
 
               :Parameters:  - **a** (:class:`sOP`) - The sOP
@@ -302,7 +305,7 @@ void init_sSOP(py::module& m)
               )mydelim")
 
         .def("__div__", [](const sOP& a, const real_type& b){return a*(1.0/b);})
-        .def("__div__", [](const sOP& a, const complex_type& b){return a*(1.0/b);}, R"mydelim(
+        .def("__div__", [](const sOP& a, const numpy_complex_type& b){return a*(1.0/complex_type(b));}, R"mydelim(
               Functions for dividing a sPOP by a scalar .
 
               :Parameters:  - **a** (:class:`sPOP`) - The sPOP
@@ -316,7 +319,7 @@ void init_sSOP(py::module& m)
         .def("__mul__", [](const sPOP& a, const coeff<real_type>& b){return a*b;})
         .def("__mul__", [](const sPOP& a, const coeff<complex_type>& b){return a*b;})
         .def("__mul__", [](const sPOP& a, const real_type& b){return a*b;})
-        .def("__mul__", [](const sPOP& a, const complex_type& b){return a*b;})
+        .def("__mul__", [](const sPOP& a, const numpy_complex_type& b){return a*complex_type(b);})
         .def("__mul__", [](const sPOP& a, const sOP& b){return a*b;})
         .def("__mul__", [](const sPOP& a, const sPOP& b){return a*b;})
         .def("__mul__", [](const sPOP& a, const sNBO<real_type>& b){return a*b;})
@@ -346,7 +349,7 @@ void init_sSOP(py::module& m)
         .def("__rmul__", [](const sPOP& a, const coeff<real_type>& b){return a*b;})
         .def("__rmul__", [](const sPOP& a, const coeff<complex_type>& b){return a*b;})
         .def("__rmul__", [](const sPOP& a, const real_type& b){return a*b;})
-        .def("__rmul__", [](const sPOP& a, const complex_type& b){return a*b;}, R"mydelim(
+        .def("__rmul__", [](const sPOP& a, const numpy_complex_type& b){return a*complex_type(b);}, R"mydelim(
               Functions for multiplying a sPOP by a scalar from the right.
 
               :Parameters:  - **a** (:class:`sPOP`) - The sPOP
@@ -395,7 +398,7 @@ void init_sSOP(py::module& m)
 
 
             .def("__div__", [](const coef& a, const real_type& b){return a/b;})
-            .def("__div__", [](const coef& a, const complex_type& b){return a/b;})
+            .def("__div__", [](const coef& a, const numpy_complex_type b){return a/complex_type(b);})
 
             .def("__add__", [](coef& a, const coef& b){return a+b;})
             .def("__sub__", [](coef& a, const coef& b){return a-b;})
@@ -411,7 +414,7 @@ void init_sSOP(py::module& m)
             .def("__mul__", [](coef& a, const sSOP<complex_type>& b){return a*b;})
 
             .def("__rmul__", [](const coef& a, const real_type& b){return a*b;})
-            .def("__rmul__", [](const coef& a, const complex_type& b){return a*b;});
+            .def("__rmul__", [](const coef& a, const numpy_complex_type& b){return a*complex_type(b);});
     }
       
     {
@@ -421,7 +424,7 @@ void init_sSOP(py::module& m)
         py::class_<coef>(m, "coeff_complex")
             .def(py::init())
             .def(py::init<const real_type&>())
-            .def(py::init<const complex_type&>())
+            .def(py::init([](const numpy_complex_type& o){return coef(complex_type(o));}))
             .def(py::init<const func_type&>())
             .def(py::init<const real_func_type&>())
             .def(py::init<const coef&>())
@@ -429,7 +432,7 @@ void init_sSOP(py::module& m)
             .def("assign", [](coef& self, const coef& o){self=o;})
             .def("assign", [](coef& self, const coeff<real_type>& o){self=o;})
             .def("assign", [](coef& self, const real_type& o){self=o;})
-            .def("assign", [](coef& self, const complex_type& o){self=o;})
+            .def("assign", [](coef& self, const numpy_complex_type& o){self=complex_type(o);})
             .def("assign", [](coef& self, const func_type& o){self=o;})
             .def("assign", [](coef& self, const real_func_type& o){self=coeff<real_type>(o);})
             .def("__copy__",[](const coef& o){return coef(o);})
@@ -446,10 +449,10 @@ void init_sSOP(py::module& m)
             .def("__imul__", [](coef& a, const real_type& b){return a*=b;})
             .def("__idiv__", [](coef& a, const real_type& b){return a/=b;})
 
-            .def("__iadd__", [](coef& a, const complex_type& b){return a+=b;})
-            .def("__isub__", [](coef& a, const complex_type& b){return a-=b;})
-            .def("__imul__", [](coef& a, const complex_type& b){return a*=b;})
-            .def("__idiv__", [](coef& a, const complex_type& b){return a/=b;})
+            .def("__iadd__", [](coef& a, const numpy_complex_type& b){return a+=complex_type(b);})
+            .def("__isub__", [](coef& a, const numpy_complex_type& b){return a-=complex_type(b);})
+            .def("__imul__", [](coef& a, const numpy_complex_type& b){return a*=complex_type(b);})
+            .def("__idiv__", [](coef& a, const numpy_complex_type& b){return a/=complex_type(b);})
 
             .def("__iadd__", [](coef& a, const coef& b){return a+=b;})
             .def("__isub__", [](coef& a, const coef& b){return a-=b;})
@@ -460,7 +463,7 @@ void init_sSOP(py::module& m)
             .def("__imul__", [](coef& a, const coeff<real_type>& b){return a*=b;})
 
             .def("__div__", [](const coef& a, const real_type& b){return a/b;})
-            .def("__div__", [](const coef& a, const complex_type& b){return a/b;})
+            .def("__div__", [](const coef& a, const numpy_complex_type& b){return a/complex_type(b);})
 
             .def("__add__", [](const coef& a, const coef& b){return a+b;})
             .def("__sub__", [](const coef& a, const coef& b){return a-b;})
@@ -476,7 +479,7 @@ void init_sSOP(py::module& m)
             .def("__mul__", [](const coef& a, const sSOP<complex_type>& b){return a*b;})
 
             .def("__rmul__", [](const coef& a, const real_type& b){return a*b;})
-            .def("__rmul__", [](const coef& a, const complex_type& b){return a*b;});
+            .def("__rmul__", [](const coef& a, const numpy_complex_type& b){return a*complex_type(b);});
     }
 
     {
@@ -543,12 +546,12 @@ void init_sSOP(py::module& m)
             .def("__sub__", [](const NBO& a, const sSOP<complex_type>& b){return a-b;})
 
             .def("__div__", [](const NBO& a, const real_type& b){return a*(1.0/b);})
-            .def("__div__", [](const NBO& a, const complex_type& b){return a*(1.0/b);})
+            .def("__div__", [](const NBO& a, const numpy_complex_type& b){return a*(1.0/complex_type(b));})
 
             .def("__mul__", [](const NBO& a, const coeff<real_type>& b){return a*b;})
             .def("__mul__", [](const NBO& a, const coeff<complex_type>& b){return a*b;})
             .def("__mul__", [](const NBO& a, const real_type& b){return a*b;})
-            .def("__mul__", [](const NBO& a, const complex_type& b){return a*b;})
+            .def("__mul__", [](const NBO& a, const numpy_complex_type& b){return a*complex_type(b);})
             .def("__mul__", [](const NBO& a, const sOP& b){return a*b;})
             .def("__mul__", [](const NBO& a, const sPOP& b){return a*b;})
             .def("__mul__", [](const NBO& a, const sNBO<real_type>& b){return a*b;})
@@ -559,7 +562,7 @@ void init_sSOP(py::module& m)
             .def("__rmul__", [](const NBO& a, const coeff<real_type>& b){return a*b;})
             .def("__rmul__", [](const NBO& a, const coeff<complex_type>& b){return a*b;})
             .def("__rmul__", [](const NBO& a, const real_type& b){return a*b;})
-            .def("__rmul__", [](const NBO& a, const complex_type& b){return a*b;});
+            .def("__rmul__", [](const NBO& a, const numpy_complex_type& b){return a*complex_type(b);});
     }
     {
         using NBO = sNBO<complex_type>;
@@ -568,8 +571,8 @@ void init_sSOP(py::module& m)
             .def(py::init())
             .def(py::init<const sOP&>())
             .def(py::init<const sPOP&>())
-            .def(py::init<const complex_type&, const sPOP&>())
-            .def(py::init<const complex_type&, const sOP&>())
+            .def(py::init([](const numpy_complex_type& coeff, const sPOP& o){return NBO(complex_type(coeff), o);}))
+            .def(py::init([](const numpy_complex_type& coeff, const sOP& o){return NBO(complex_type(coeff), o);}))
             .def(py::init<const coeff<complex_type>&, const sPOP&>())
             .def(py::init<const coeff<complex_type>&, const sOP&>())
             .def(py::init<const NBO&>())
@@ -610,7 +613,7 @@ void init_sSOP(py::module& m)
             .def("__imul__", [](NBO& a, const sOP& b){return a*=b;})
             .def("__imul__", [](NBO& a, const sPOP& b){return a*=b;})
             .def("__imul__", [](NBO& a, const NBO& b){return a*=b;})
-            .def("__imul__", [](NBO& a, const complex_type& b){return a*=b;})
+            .def("__imul__", [](NBO& a, const numpy_complex_type& b){return a*=complex_type(b);})
 
             .def("__add__", [](const NBO& a, const sOP& b){return a+b;})
             .def("__add__", [](const NBO& a, const sPOP& b){return a+b;})
@@ -627,12 +630,12 @@ void init_sSOP(py::module& m)
             .def("__sub__", [](const NBO& a, const sSOP<complex_type>& b){return a-b;})
 
             .def("__div__", [](const NBO& a, const real_type& b){return a*(1.0/b);})
-            .def("__div__", [](const NBO& a, const complex_type& b){return a*(1.0/b);})
+            .def("__div__", [](const NBO& a, const numpy_complex_type& b){return a*(1.0/complex_type(b));})
 
             .def("__mul__", [](const NBO& a, const coeff<real_type>& b){return a*b;})
             .def("__mul__", [](const NBO& a, const coeff<complex_type>& b){return a*b;})
             .def("__mul__", [](const NBO& a, const real_type& b){return a*b;})
-            .def("__mul__", [](const NBO& a, const complex_type& b){return a*b;})
+            .def("__mul__", [](const NBO& a, const numpy_complex_type& b){return a*complex_type(b);})
             .def("__mul__", [](const NBO& a, const sOP& b){return a*b;})
             .def("__mul__", [](const NBO& a, const sPOP& b){return a*b;})
             .def("__mul__", [](const NBO& a, const sNBO<real_type>& b){return a*b;})
@@ -643,7 +646,7 @@ void init_sSOP(py::module& m)
             .def("__rmul__", [](const NBO& a, const coeff<real_type>& b){return a*b;})
             .def("__rmul__", [](const NBO& a, const coeff<complex_type>& b){return a*b;})
             .def("__rmul__", [](const NBO& a, const real_type& b){return a*b;})
-            .def("__rmul__", [](const NBO& a, const complex_type& b){return a*b;});
+            .def("__rmul__", [](const NBO& a, const numpy_complex_type& b){return a*complex_type(b);});
     }
     {
         using _SOP = sSOP<real_type>;
@@ -719,12 +722,12 @@ void init_sSOP(py::module& m)
             .def("__sub__", [](const _SOP& a, const sSOP<complex_type>& b){return a-b;})
 
             .def("__div__", [](const _SOP& a, const real_type& b){return a*(1.0/b);})
-            .def("__div__", [](const _SOP& a, const complex_type& b){return a*(1.0/b);})
+            .def("__div__", [](const _SOP& a, const numpy_complex_type& b){return a*(1.0/complex_type(b));})
 
             .def("__mul__", [](const _SOP& a, const coeff<real_type>& b){return a*b;})
             .def("__mul__", [](const _SOP& a, const coeff<complex_type>& b){return a*b;})
             .def("__mul__", [](const _SOP& a, const real_type& b){return a*b;})
-            .def("__mul__", [](const _SOP& a, const complex_type& b){return a*b;})
+            .def("__mul__", [](const _SOP& a, const numpy_complex_type& b){return a*complex_type(b);})
             .def("__mul__", [](const _SOP& a, const sOP& b){return a*b;})
             .def("__mul__", [](const _SOP& a, const sPOP& b){return a*b;})
             .def("__mul__", [](const _SOP& a, const sNBO<real_type>& b){return a*b;})
@@ -735,7 +738,7 @@ void init_sSOP(py::module& m)
             .def("__rmul__", [](const _SOP& a, const coeff<real_type>& b){return a*b;})
             .def("__rmul__", [](const _SOP& a, const coeff<complex_type>& b){return a*b;})
             .def("__rmul__", [](const _SOP& a, const real_type& b){return b*a;})
-            .def("__rmul__", [](const _SOP& a, const complex_type& b){return b*a;});
+            .def("__rmul__", [](const _SOP& a, const numpy_complex_type& b){return complex_type(b)*a;});
     }
     {
         using _SOP = sSOP<complex_type>;
@@ -796,7 +799,7 @@ void init_sSOP(py::module& m)
             .def("__iadd__", [](_SOP& a, const _SOP& b){return a+=b;})
 
             .def("__imul__", [](_SOP& a, const real_type& b){return a*=b;})
-            .def("__imul__", [](_SOP& a, const complex_type& b){return a*=b;})
+            .def("__imul__", [](_SOP& a, const numpy_complex_type& b){return a*=complex_type(b);})
             .def("__imul__", [](_SOP& a, const sOP& b){return a*=b;})
             .def("__imul__", [](_SOP& a, const sPOP& b){return a*=b;})
             .def("__imul__", [](_SOP& a, const sNBO<real_type>& b){return a*=b;})
@@ -819,12 +822,12 @@ void init_sSOP(py::module& m)
             .def("__sub__", [](const _SOP& a, const _SOP& b){return a-b;})
 
             .def("__div__", [](const _SOP& a, const real_type& b){return a*(1.0/b);})
-            .def("__div__", [](const _SOP& a, const complex_type& b){return a*(1.0/b);})
+            .def("__div__", [](const _SOP& a, const numpy_complex_type& b){return a*(1.0/complex_type(b));})
 
             .def("__mul__", [](const _SOP& a, const coeff<real_type>& b){return a*b;})
             .def("__mul__", [](const _SOP& a, const coeff<complex_type>& b){return a*b;})
             .def("__mul__", [](const _SOP& a, const real_type& b){return a*b;})
-            .def("__mul__", [](const _SOP& a, const complex_type& b){return a*b;})
+            .def("__mul__", [](const _SOP& a, const numpy_complex_type& b){return a*complex_type(b);})
             .def("__mul__", [](const _SOP& a, const sOP& b){return a*b;})
             .def("__mul__", [](const _SOP& a, const sPOP& b){return a*b;})
             .def("__mul__", [](const _SOP& a, const sNBO<real_type>& b){return a*b;})
@@ -835,7 +838,7 @@ void init_sSOP(py::module& m)
             .def("__rmul__", [](const _SOP& a, const coeff<real_type>& b){return a*b;})
             .def("__rmul__", [](const _SOP& a, const coeff<complex_type>& b){return a*b;})
             .def("__rmul__", [](const _SOP& a, const real_type& b){return a*b;})
-            .def("__rmul__", [](const _SOP& a, const complex_type& b){return a*b;});
+            .def("__rmul__", [](const _SOP& a, const numpy_complex_type& b){return a*complex_type(b);});
     }
 }
 

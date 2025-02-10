@@ -30,6 +30,8 @@ void init_ttn(py::module &m, const std::string& label)
     using prodop = product_operator<T, backend>;
     using sop = sop_operator<T, backend>;
 
+    using numpy_type = typename linalg::numpy_converter<T>::type;
+
     using conv = linalg::pybuffer_converter<backend>;
 
 #ifdef PYTTN_BUILD_CUDA
@@ -78,7 +80,9 @@ void init_ttn(py::module &m, const std::string& label)
                 "as_matrix", 
                 static_cast<linalg::matrix<T, backend>& (_ttn_node_data::*)()>(&_ttn_node_data::as_matrix),
                 py::return_value_policy::reference
-            );
+            )
+        .def("backend", [](){return backend::label();});
+
 
     py::class_<_ttn_node>(m, (std::string("ttn_node_")+label).c_str())
         .def(py::init())
@@ -94,7 +98,9 @@ void init_ttn(py::module &m, const std::string& label)
                 "__iter__",
                 [](_ttn_node& s){return py::make_iterator(s.begin(), s.end());},
                 py::keep_alive<0, 1>()
-            );
+            )
+        .def("backend", [](){return backend::label();});
+
 
     //expose the ttn node class.  This is our core tensor network object.
     py::class_<_ttn>(m, (std::string("ttn_")+label).c_str())
@@ -164,9 +170,9 @@ void init_ttn(py::module &m, const std::string& label)
             )        
 
         .def("__imul__", [](_ttn& a, const real_type& b){return a*=b;})
-        .def("__imul__", [](_ttn& a, const T& b){return a*=b;}, "For details see :meth:`pyttn.ttn_dtype.__imul__`")
+        .def("__imul__", [](_ttn& a, const numpy_type& b){return a*=T(b);}, "For details see :meth:`pyttn.ttn_dtype.__imul__`")
         .def("__idiv__", [](_ttn& a, const real_type& b){return a/=b;})
-        .def("__idiv__", [](_ttn& a, const T& b){return a/=b;}, "For details see :meth:`pyttn.ttn_dtype.__idiv__`")
+        .def("__idiv__", [](_ttn& a, const numpy_type& b){return a/=T(b);}, "For details see :meth:`pyttn.ttn_dtype.__idiv__`")
         
         .def("conj", &_ttn::conj, "For details see :meth:`pyttn.ttn_dtype.conj`")
         .def("random", &_ttn::random, "For details see :meth:`pyttn.ttn_dtype.random`")
@@ -404,7 +410,7 @@ void init_ttn(py::module &m, const std::string& label)
                 {
                     _ttn i;
                     using contr = sop_ttn_contraction_engine<T, backend>;
-                    CALL_AND_RETHROW(contr::sop_ttn_contraction(op, o, i));
+                    CALL_AND_RETHROW(contr::sop_ttn_contraction(op, o, i, numpy_type(1)));
                     o = i;
                     return o;
                 }, "For details see :meth:`pyttn.ttn_dtype.__imatmul__`"
@@ -435,13 +441,20 @@ void init_ttn(py::module &m, const std::string& label)
                     return i;
                 }, "For details see :meth:`pyttn.ttn_dtype.__rmatmul__`"
             )
+        .def("backend", [](const _ttn&){return backend::label();})
         .doc() = R"mydelim(
           The pybind11 wrapper class for handling a general tree tensor network
           )mydelim";
-        ;
 
       
-    m.def("apply_sop_to_ttn", &sop_ttn_contraction_engine<T, backend>::sop_ttn_contraction, py::arg(), py::arg(), py::arg(), py::arg("coeff")=T(1), py::arg("cutoff")=real_type(1e-12));
+    m.def("apply_sop_to_ttn", 
+            [](const sop& Op, const _ttn& A, _ttn& B, numpy_type coeff, real_type cutoff )
+            {
+                using cont_eng = sop_ttn_contraction_engine<T, backend>;
+                CALL_AND_RETHROW(cont_eng::sop_ttn_contraction(Op, A, B, T(coeff), cutoff));
+            },
+            py::arg(), py::arg(), py::arg(), py::arg("coeff")=numpy_type(1), py::arg("cutoff")=real_type(1e-12)
+        );
 
 }
 

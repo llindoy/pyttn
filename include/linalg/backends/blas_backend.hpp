@@ -40,6 +40,7 @@ public:
     template <typename T> struct eCop<complex<T>> {inline complex<T> operator()(const complex<T>& a){return conj(a);}};
     template <typename T> struct eNop{inline T operator()(const T& a){return a;}};
 
+    static inline std::string label(){return std::string("blas");}
 protected:
     static constexpr size_type default_nthreads = 1;
     static constexpr bool default_batchpar = false;
@@ -1159,8 +1160,8 @@ public:
         return ind;
     }
 
-    template <typename T, typename arr1, typename arr2> 
-    static inline void tensor_transpose(const T* in, const std::vector<size_type>& inds, const arr1& dims, const arr2& stride, T* out)
+    template <typename T, typename arr1, typename arr2, typename arr3, typename arr4> 
+    static inline void tensor_transpose(const T* in, const arr1& dims, const arr2& stride, T* out, const arr3& /*dimsB*/, const arr4& /*stride*/, const std::vector<size_type>& inds)
     {
         size_type N = inds.size();
         std::vector<size_type> permuted_stride(N);

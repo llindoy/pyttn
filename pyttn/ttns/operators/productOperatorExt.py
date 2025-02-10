@@ -1,16 +1,33 @@
 import numpy as np
 
-from pyttn.ttnpp import product_operator_complex, ttn_complex, SOP_complex, system_modes
+from pyttn.ttnpp import product_operator_complex
 try:
-    from pyttn.ttnpp import product_operator_real, ttn_real, SOP_real
+    from pyttn.ttnpp import product_operator_real
+    __real_ttn_import = True
 
 except ImportError:
+    __real_ttn_import = False
     product_operator_real = None
-    ttn_real = None
-    SOP_real = None
 
 
-def product_operator(h, sysinf, *args, dtype=np.complex128, **kwargs):
+#and attempt to import the cuda backend
+try:
+    from pyttn.ttnpp.cuda import product_operator_complex as product_operator_complex_cuda
+    __cuda_import = True
+
+    #and if we have imported real ttns we import the cuda versions
+    if __real_ttn_import:
+        from pyttn.ttnpp.cuda import product_operator_real as product_operator_real_cuda
+    else:
+        product_operator_real_cuda = None
+
+except ImportError:
+    __cuda_import = False
+    product_operator_real_cuda = None
+    product_operator_complex_cuda = None
+
+
+def product_operator(h, sysinf, *args, dtype=np.complex128, backend="blas", **kwargs):
     """Function for constructing a product_operator
 
     :param h: The product operator representation of the Hamiltonian
@@ -20,9 +37,17 @@ def product_operator(h, sysinf, *args, dtype=np.complex128, **kwargs):
     :type \*args: Variable length list of arguments. See product_operator_real/product_operator_complex for options
     :param dtype: The internal variable type for the product operator.(Default: np.complex128) 
     :type dtype: {np.float64, np.complex128}, optional
+    :param backend: The computational backend to use for the product operator  (Default: "blas") 
+    :type backend: {"blas", "cuda"}, optional
     :type \*\*kwargs: Additional keyword arguments. See product_operator_real/product_operator_complex for options
     """
-    if (dtype == np.complex128 or product_operator_real is None):
-        return product_operator_complex(h, sysinf, *args, **kwargs)
-    else:
-        return product_operator_real(h, sysinf, *args, **kwargs)
+    if backend == "blas":
+        if (dtype == np.complex128 or not __real_ttn_import):
+            return product_operator_complex(h, sysinf, *args, **kwargs)
+        else:
+            return product_operator_real(h, sysinf, *args, **kwargs)
+    elif __cuda_import and backend == "cuda":
+        if (dtype == np.complex128 or not __real_ttn_import):
+            return product_operator_complex(h, sysinf, *args, **kwargs)
+        else:
+            return product_operator_real(h, sysinf, *args, **kwargs)

@@ -22,6 +22,10 @@ void initialise_blas_backend(py::module& m)
             )mydelim")
         .def_static("destroy", &blas_backend::destroy, R"mydelim(
             Clear the blas_backend object.   Free any resources allocated.
+            )mydelim")
+        .def_static("label", &blas_backend::label, R"mydelim(
+            :returns: A string representing a blas backend
+            :rtype: str
             )mydelim");
 }
 
@@ -102,6 +106,10 @@ void initialise_cuda_backend(py::module& m)
                 return oss.str();
             }, R"mydelim(
             :returns: A string of the cuda device properties
+            :rtype: str
+            )mydelim")        
+        .def_static("label", &cuda_backend::label, R"mydelim(
+            :returns: A string representing a blas backend
             :rtype: str
             )mydelim");
 }

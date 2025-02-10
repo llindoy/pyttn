@@ -35,7 +35,7 @@ protected:
     static inline size_type contraction_buffer_size(const hdata& A, bool use_capacity = false)
     {
         size_type maxdim = 0;
-        for(size_type mode = 0; mode < A().nmodes(); ++mode)
+        for(size_type mode = 0; mode < A.nmodes(); ++mode)
         {
             auto _A = A.as_rank_3(mode, use_capacity);
             size_type dim = _A.shape(0)*_A.shape(1)*_A.shape(1);
