@@ -40,6 +40,7 @@ public:
     template <typename T> struct eCop<complex<T>> {inline complex<T> operator()(const complex<T>& a){return conj(a);}};
     template <typename T> struct eNop{inline T operator()(const T& a){return a;}};
 
+    static inline std::string label(){return std::string("blas");}
 protected:
     static constexpr size_type default_nthreads = 1;
     static constexpr bool default_batchpar = false;

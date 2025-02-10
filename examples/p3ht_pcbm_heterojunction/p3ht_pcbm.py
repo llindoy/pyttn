@@ -6,6 +6,7 @@ import time
 import sys
 import copy
 import h5py
+sys.path.append("../../")
 
 from pyttn import ntree, ntreeBuilder
 from pyttn import system_modes, generic_mode, boson_mode
@@ -116,7 +117,7 @@ def output_results(ofname, timepoints, res, maxchi, runtime):
     h5.close()
 
 
-def p3ht_pcbm_single_set(topo, capacity, tmax=200, dt=0.25, adaptive=True, spawning_threshold=1e-6, unoccupied_threshold=1e-4, nunoccupied=0, ofname='p3ht_pcbm.h5', output_skip=1):
+def p3ht_pcbm_single_set(topo, capacity, mode_dims, tmax=200, dt=0.25, adaptive=True, spawning_threshold=1e-6, unoccupied_threshold=1e-4, nunoccupied=0, ofname='p3ht_pcbm.h5', output_skip=1):
     from model_B_hamiltonian import hamiltonian
     """Function for performing the dynamics of the single set p3ht_pcbm model
     """
@@ -203,7 +204,7 @@ def p3ht_pcbm_single_set(topo, capacity, tmax=200, dt=0.25, adaptive=True, spawn
     output_results(ofname, timepoints, res, maxchi, (t2-t1))
 
 def p3ht_pcbm_multiset(topo, mode_dims, tmax=200, dt=0.25, ofname='p3ht_pcbm.h5', output_skip=1):
-    from pyttn import ms_ttn, multiset_sop_operator
+    from pyttn import ms_ttn, ms_sop_operator
     from model_B_hamiltonian import multiset_hamiltonian
     """Function for performing the dynamics of the multiset p3ht_pcbm model
     """
@@ -219,9 +220,9 @@ def p3ht_pcbm_multiset(topo, mode_dims, tmax=200, dt=0.25, ofname='p3ht_pcbm.h5'
     H = multiset_hamiltonian()
     
     #set up the wavefunction for simulating the dynamics
-    A = ms_ttn(topo, 26, dtype=np.complex128)
+    A = ms_ttn(26, topo, dtype=np.complex128)
     state = [[0 for i in range(Nmodes)] for j in range(26)]
-    coeff = np.zeros(26, dtype=np.complex128)
+    coeff = np.zeros(26, dtype=np.float64)
     coeff[0] = 1
     A.set_state(coeff, state)
     
@@ -229,7 +230,7 @@ def p3ht_pcbm_multiset(topo, mode_dims, tmax=200, dt=0.25, ofname='p3ht_pcbm.h5'
     mel = matrix_element(A)
     
     #set up the sum of product operator object for evolution
-    h = multiset_sop_operator(H, A, sysinf)
+    h = ms_sop_operator(H, A, sysinf)
     
     #setup the evolution object
     sweep = tdvp(A, h, krylov_dim = 12)
@@ -368,7 +369,6 @@ if __name__ == "__main__":
             args.ansatz, 
             args.chi, 
             chi2=args.chi2, 
-            tmax=args.tmax*fs, 
             dt=args.dt*fs,
             use_multiset=args.use_multiset, 
             adaptive=args.adaptive, 

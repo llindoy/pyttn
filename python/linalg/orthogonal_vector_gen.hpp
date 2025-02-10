@@ -22,7 +22,7 @@ void init_orthogonal_vector(py::module& m, const std::string& label)
     using vectype = linalg::vector<T, backend>;
     using mattype = linalg::matrix<T, backend>;
 
-    py::class_<ttype>(m, label.c_str(), py::module_local())
+    py::class_<ttype>(m, label.c_str())
         .def_static("pad_random", 
             [](mattype& a, size_type i, random_engine<backend>& rng)
             {
@@ -36,8 +36,8 @@ void init_orthogonal_vector(py::module& m, const std::string& label)
                 ttype::generate(a, b, rng);
                 return b;
             }
-        );
-
+        )        
+        .def("backend", [](const ttype&){return backend::label();});
 }
 
 template <typename backend>
@@ -47,7 +47,8 @@ void init_random_engine(py::module& m, const std::string& label)
     using ttype = random_engine<backend>;
 
     py::class_<ttype>(m, label.c_str())
-        .def(py::init());
+        .def(py::init())
+        .def("backend", [](const ttype&){return backend::label();});
 }
 
 template <typename real_type, typename backend>

@@ -223,7 +223,7 @@ public:
             }
 
             //and scale them by the coeff array
-            m_nodes[0]()[set_index] *= coeff[set_index];
+            m_nodes[0]()[set_index] *= T(coeff[set_index]);
         }
 
         //now enforce that the orthogonality centre is at the root

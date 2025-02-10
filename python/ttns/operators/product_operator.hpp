@@ -111,7 +111,9 @@ void init_product_operator(py::module &m, const std::string& label)
             )
         .def("clear", &pop::clear)
         .def("nmodes", &pop::nmodes)
-        .def("__str__", [](const pop& o){std::ostringstream oss; oss << o; return oss.str();});
+        .def("__str__", [](const pop& o){std::ostringstream oss; oss << o; return oss.str();})
+        .def("backend", [](const pop&){return backend::label();});
+
 }
 
 template <typename real_type, typename backend>

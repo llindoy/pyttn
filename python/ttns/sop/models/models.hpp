@@ -25,6 +25,8 @@ void init_models(py::module &m, const std::string& label)
     using namespace ttns;
     using real_type = typename linalg::get_real_type<T>::type;
 
+    using cT = typename linalg::numpy_converter<T>::type;
+
     using conv = linalg::pybuffer_converter<linalg::blas_backend>;
 
     //the base model type
@@ -206,7 +208,14 @@ void init_models(py::module &m, const std::string& label)
 
     py::class_<spin_boson_star<T>, spin_boson_base<T>>(m, (std::string("spin_boson_star_")+label).c_str())
         .def(py::init())
-        .def(py::init<real_type, real_type, const std::vector<real_type>&, const std::vector<T>&>())
+        .def(py::init([](real_type eps, real_type del, const std::vector<real_type>& w, const std::vector<cT>& g)
+                {
+                    std::vector<T> cg(g.size());
+                    for(size_t i = 0; i < g.size(); ++i){cg[i] = g[i];}
+                    return spin_boson_star<T>(eps, del, w, cg);
+                }
+            )
+        )
         .def(py::init([](real_type eps, real_type del, const std::vector<real_type>& w, const std::vector<real_type>& g)
                 {
                     std::vector<T> cg(g.size());
@@ -215,7 +224,14 @@ void init_models(py::module &m, const std::string& label)
                 }
             )
         )
-        .def(py::init<size_t, real_type, real_type, const std::vector<real_type>&, const std::vector<T>&>())
+        .def(py::init([](size_t spin_index, real_type eps, real_type del, const std::vector<real_type>& w, const std::vector<cT>& g)
+                {
+                    std::vector<T> cg(g.size());
+                    for(size_t i = 0; i < g.size(); ++i){cg[i] = g[i];}
+                    return spin_boson_star<T>(spin_index, eps, del, w, cg);
+                }
+            )
+        )
         .def(py::init([](size_t spin_index, real_type eps, real_type del, const std::vector<real_type>& w, const std::vector<real_type>& g)
                 {
                     std::vector<T> cg(g.size());
@@ -233,13 +249,31 @@ void init_models(py::module &m, const std::string& label)
         .def_property
             (
                 "g", 
-                static_cast<const std::vector<T>& (spin_boson_star<T>::*)() const>(&spin_boson_star<T>::g), 
-                [](spin_boson_star<T>& o, const std::vector<T>& i){o.g() = i;}
+                [](const spin_boson_star<T>& o)
+                {
+                    std::vector<cT> ret(o.g().size());
+                    for(size_t i = 0; i <o.g().size(); ++i){ret[i] = o.g()[i];}
+                    return ret;
+                },
+                [](spin_boson_star<T>& o, const std::vector<cT>& in)
+                {
+                    o.g().resize(in.size()); 
+                    for(size_t i = 0; i <o.g().size(); ++i){o.g()[i] = in[i];}
+                }
             );
 
     py::class_<spin_boson_chain<T>, spin_boson_base<T>>(m, (std::string("spin_boson_chain_")+label).c_str())
         .def(py::init())
-        .def(py::init<real_type, real_type, const std::vector<real_type>&, const std::vector<T>&>())
+        .def(py::init([](real_type eps, real_type del, const std::vector<real_type>& e, const std::vector<cT>& t)
+                {
+                    {
+                        std::vector<T> ct(t.size());
+                        for(size_t i = 0; i <t.size(); ++i){ct[i] = t[i];}
+                        return spin_boson_chain<T>(eps, del, e, ct);
+                    }
+                }
+            )
+        )
         .def(py::init([](real_type eps, real_type del, const std::vector<real_type>& e, const std::vector<real_type>& t)
                 {
                     std::vector<T> ct(t.size());
@@ -257,8 +291,17 @@ void init_models(py::module &m, const std::string& label)
         .def_property
             (
                 "t", 
-                static_cast<const std::vector<T>& (spin_boson_chain<T>::*)() const>(&spin_boson_chain<T>::t), 
-                [](spin_boson_chain<T>& o, const std::vector<T>& i){o.t() = i;}
+                [](const spin_boson_chain<T>& o)
+                {
+                    std::vector<cT> ret(o.t().size());
+                    for(size_t i = 0; i <o.t().size(); ++i){ret[i] = o.t()[i];}                    
+                    return ret;
+                }, 
+                [](spin_boson_chain<T>& o, const std::vector<cT>& in)
+                {
+                    o.t().resize(in.size()); 
+                    for(size_t i = 0; i <o.t().size(); ++i){o.t()[i] = in[i];}
+                }
             );
 
 }

@@ -60,7 +60,9 @@ void init_operator_dictionary(py::module &m, const std::string& label)
                 }
             }
             return oss.str();
-        });
+        })
+        .def("backend", [](const opdict&){return backend::label();});
+
 }
 
 template <typename real_type, typename backend>

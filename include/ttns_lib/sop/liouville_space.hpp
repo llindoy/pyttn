@@ -20,8 +20,8 @@ class liouville_space
 public:
     //for the left superoperator object.  We just iterate over each term in op and construct a new SOP object acting
     //on a space with twice the dimension where the original modes correspond to the even degrees of freedom
-    template <typename T>
-    static inline void left_superoperator(const SOP<T>& op, const system_modes& sysinf, SOP<T>& res, T gcoeff = T(1.0))
+    template <typename T, typename U>
+    static inline void left_superoperator(const SOP<T>& op, const system_modes& sysinf, SOP<T>& res, U gcoeff = U(1.0))
     {
         ASSERT(sysinf.nprimitive_modes() == op.nmodes(), "Failed to construct left superoperator input operator and system information are incompatible.");
         //make sure the res operator can fit the result
@@ -46,13 +46,13 @@ public:
             {
                 lt *= sOP(site_op.op(), 2*site_op.mode(), site_op.fermionic());
             }
-            res += gcoeff*coeff*lt;
+            res += T(gcoeff)*coeff*lt;
         }
     }
 
 
-    template <typename T>
-    static inline void left_superoperator(const sSOP<T>& op, const system_modes& sysinf, sSOP<T>& res, T gcoeff = T(1.0))
+    template <typename T, typename U>
+    static inline void left_superoperator(const sSOP<T>& op, const system_modes& sysinf, sSOP<T>& res, U gcoeff = U(1.0))
     {
         ASSERT(sysinf.nprimitive_modes() >= op.nmodes(), "Failed to construct left superoperator input operator and system information are incompatible.");
         //iterater over each term in the operator
@@ -70,15 +70,15 @@ public:
             {
                 lt *= sOP(site_op.op(), 2*site_op.mode(), site_op.fermionic());
             }
-            res += gcoeff*coeff*lt;
+            res += T(gcoeff)*coeff*lt;
         }
     }
     
     //for the right superoperator object.  We just iterate over each term in op and construct a new SOP object acting
     //on a space with twice the dimension where the original modes correspond to the odd degrees of freedom.  And for
     //each operator we need to find out the transpose degree of freedom.
-    template <typename T>
-    static inline void right_superoperator(const SOP<T>& op, const system_modes& sysinf, SOP<T>& res, T gcoeff = T(1.0))
+    template <typename T, typename U>
+    static inline void right_superoperator(const SOP<T>& op, const system_modes& sysinf, SOP<T>& res, U gcoeff = U(1.0))
     {
         ASSERT(sysinf.nprimitive_modes() == op.nmodes(), "Failed to construct left superoperator input operator and system information are incompatible.");
         //make sure the res operator can fit the result
@@ -108,13 +108,13 @@ public:
                 coeff *= std::get<0>(tinfo);
                 lt *= sOP(std::get<1>(tinfo), 2*site_op.mode()+1, site_op.fermionic());
             }
-            res += gcoeff*coeff*lt;
+            res += T(gcoeff)*coeff*lt;
         }
     }
 
 
-    template <typename T>
-    static inline void right_superoperator(const sSOP<T>& op, const system_modes& sysinf, sSOP<T>& res, T gcoeff = T(1.0))
+    template <typename T, typename U>
+    static inline void right_superoperator(const sSOP<T>& op, const system_modes& sysinf, sSOP<T>& res, U gcoeff = U(1.0))
     {
         ASSERT(sysinf.nprimitive_modes() >= op.nmodes(), "Failed to construct left superoperator input operator and system information are incompatible.");
         //iterater over each term in the operator
@@ -137,34 +137,34 @@ public:
                 coeff *= std::get<0>(tinfo);
                 lt *= sOP(std::get<1>(tinfo), 2*site_op.mode()+1, site_op.fermionic());
             }
-            res += gcoeff*coeff*lt;
+            res += T(gcoeff)*coeff*lt;
         }
     }
 
     //construct the commutator superoperator object
-    template <typename T>
-    static inline void commutator_superoperator(const SOP<T>& op, const system_modes& sysinf, SOP<T>& res, T gcoeff = T(1.0))
+    template <typename T, typename U>
+    static inline void commutator_superoperator(const SOP<T>& op, const system_modes& sysinf, SOP<T>& res, U gcoeff = U(1.0))
     {
         CALL_AND_RETHROW(left_superoperator(op, sysinf, res, gcoeff));
-        CALL_AND_RETHROW(right_superoperator(op, sysinf, res, T(-1.0)*gcoeff));
+        CALL_AND_RETHROW(right_superoperator(op, sysinf, res, U(-1.0)*gcoeff));
     }
-    template <typename T>
-    static inline void commutator_superoperator(const sSOP<T>& op, const system_modes& sysinf, sSOP<T>& res, T gcoeff = T(1.0))
+    template <typename T, typename U>
+    static inline void commutator_superoperator(const sSOP<T>& op, const system_modes& sysinf, sSOP<T>& res, U gcoeff = U(1.0))
     {
         CALL_AND_RETHROW(left_superoperator(op, sysinf, res, gcoeff));
-        CALL_AND_RETHROW(right_superoperator(op, sysinf, res, T(-1.0)*gcoeff));
+        CALL_AND_RETHROW(right_superoperator(op, sysinf, res, U(-1.0)*gcoeff));
     }
 
     //construct the anticommutator superoperator object
-    template <typename T>
-    static inline void anticommutator_superoperator(const SOP<T>& op, const system_modes& sysinf, SOP<T>& res, T gcoeff = T(1.0))
+    template <typename T, typename U>
+    static inline void anticommutator_superoperator(const SOP<T>& op, const system_modes& sysinf, SOP<T>& res, U gcoeff = U(1.0))
     {
         CALL_AND_RETHROW(left_superoperator(op, sysinf, res, gcoeff));
         CALL_AND_RETHROW(right_superoperator(op, sysinf, res, gcoeff));
     }
 
-    template <typename T>
-    static inline void anticommutator_superoperator(const sSOP<T>& op, const system_modes& sysinf, sSOP<T>& res, T gcoeff = T(1.0))
+    template <typename T, typename U>
+    static inline void anticommutator_superoperator(const sSOP<T>& op, const system_modes& sysinf, sSOP<T>& res, U gcoeff = U(1.0))
     {
         CALL_AND_RETHROW(left_superoperator(op, sysinf, res, gcoeff));
         CALL_AND_RETHROW(right_superoperator(op, sysinf, res, gcoeff));
@@ -172,8 +172,8 @@ public:
 public:
     //for the left superoperator object.  We just iterate over each term in op and construct a new SOP object acting
     //on a space with twice the dimension where the original modes correspond to the even degrees of freedom
-    template <typename T, typename backend = linalg::blas_backend>
-    static inline void left_superoperator(const SOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, SOP<T>& res, operator_dictionary<T, backend>& opdictf, T gcoeff = T(1.0))
+    template <typename T, typename U, typename backend = linalg::blas_backend>
+    static inline void left_superoperator(const SOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, SOP<T>& res, operator_dictionary<T, backend>& opdictf, U gcoeff = U(1.0))
     {
         ASSERT(sysinf.nprimitive_modes() == op.nmodes(), "Failed to construct left superoperator input operator and system information are incompatible.");
         //make sure the res operator can fit the result
@@ -215,12 +215,12 @@ public:
                 }
                 lt *= sOP(site_op.op(), 2*site_op.mode(), site_op.fermionic());
             }
-            res += gcoeff*coeff*lt;
+            res += T(gcoeff)*coeff*lt;
         }
     }
 
-    template <typename T, typename backend = linalg::blas_backend>
-    static inline void left_superoperator(const sSOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, sSOP<T>& res, operator_dictionary<T, backend>& opdictf, T gcoeff = T(1.0))
+    template <typename T, typename U, typename backend = linalg::blas_backend>
+    static inline void left_superoperator(const sSOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, sSOP<T>& res, operator_dictionary<T, backend>& opdictf, U gcoeff = U(1.0))
     {
         ASSERT(sysinf.nprimitive_modes() >= op.nmodes(), "Failed to construct left superoperator input operator and system information are incompatible.");
         ASSERT(op.nmodes() <= opdict.nmodes(), "Failed to construct left_superoperator the operator dictionary and operator are not compatible.");
@@ -250,15 +250,15 @@ public:
                 }
                 lt *= sOP(site_op.op(), 2*site_op.mode(), site_op.fermionic());
             }
-            res += gcoeff*coeff*lt;
+            res += T(gcoeff)*coeff*lt;
         }
     }
 
     //for the right superoperator object.  We just iterate over each term in op and construct a new SOP object acting
     //on a space with twice the dimension where the original modes correspond to the odd degrees of freedom.  And for
     //each operator we need to find out the transpose degree of freedom.
-    template <typename T, typename backend = linalg::blas_backend>
-    static inline void right_superoperator(const SOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, SOP<T>& res, operator_dictionary<T, backend>& opdictf, T gcoeff = T(1.0))
+    template <typename T, typename U, typename backend = linalg::blas_backend>
+    static inline void right_superoperator(const SOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, SOP<T>& res, operator_dictionary<T, backend>& opdictf, U gcoeff = U(1.0))
     {
         ASSERT(sysinf.nprimitive_modes() == op.nmodes(), "Failed to construct left superoperator input operator and system information are incompatible.");
         //make sure the res operator can fit the result
@@ -311,13 +311,13 @@ public:
                     lt *= sOP(std::get<1>(tinfo), 2*site_op.mode()+1, site_op.fermionic());
                 }
             }
-            res += gcoeff*coeff*lt;
+            res += T(gcoeff)*coeff*lt;
         }
 
     }
 
-    template <typename T, typename backend = linalg::blas_backend>
-    static inline void right_superoperator(const sSOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, sSOP<T>& res, operator_dictionary<T, backend>& opdictf, T gcoeff = T(1.0))
+    template <typename T, typename U, typename backend = linalg::blas_backend>
+    static inline void right_superoperator(const sSOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, sSOP<T>& res, operator_dictionary<T, backend>& opdictf, U gcoeff = U(1.0))
     {
 
         ASSERT(sysinf.nprimitive_modes() >= op.nmodes(), "Failed to construct left superoperator input operator and system information are incompatible.");
@@ -358,33 +358,33 @@ public:
                     lt *= sOP(std::get<1>(tinfo), 2*site_op.mode()+1, site_op.fermionic());
                 }
             }
-            res += gcoeff*coeff*lt;
+            res += T(gcoeff)*coeff*lt;
         }
 
     }
     //construct the commutator superoperator object
-    template <typename T, typename backend = linalg::blas_backend>
-    static inline void commutator_superoperator(const SOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, SOP<T>& res, operator_dictionary<T, backend>& opdictf, T gcoeff = T(1.0))
+    template <typename T, typename U, typename backend = linalg::blas_backend>
+    static inline void commutator_superoperator(const SOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, SOP<T>& res, operator_dictionary<T, backend>& opdictf, U gcoeff = U(1.0))
     {
         CALL_AND_RETHROW(left_superoperator(op, sysinf, opdict, res, opdictf, gcoeff));
-        CALL_AND_RETHROW(right_superoperator(op, sysinf, opdict, res, opdictf, T(-1.0)*gcoeff));
+        CALL_AND_RETHROW(right_superoperator(op, sysinf, opdict, res, opdictf, U(-1.0)*gcoeff));
     }
-    template <typename T, typename backend = linalg::blas_backend>
-    static inline void commutator_superoperator(const sSOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, sSOP<T>& res, operator_dictionary<T, backend>& opdictf, T gcoeff = T(1.0))
+    template <typename T, typename U, typename backend = linalg::blas_backend>
+    static inline void commutator_superoperator(const sSOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, sSOP<T>& res, operator_dictionary<T, backend>& opdictf, U gcoeff = U(1.0))
     {
         CALL_AND_RETHROW(left_superoperator(op, sysinf, opdict, res, opdictf, gcoeff));
-        CALL_AND_RETHROW(right_superoperator(op, sysinf, opdict, res, opdictf, T(-1.0)*gcoeff));
+        CALL_AND_RETHROW(right_superoperator(op, sysinf, opdict, res, opdictf, U(-1.0)*gcoeff));
     }
 
     //construct the anticommutator superoperator object
-    template <typename T, typename backend = linalg::blas_backend>
-    static inline void anticommutator_superoperator(const SOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, SOP<T>& res, operator_dictionary<T, backend>& opdictf, T gcoeff = T(1.0))
+    template <typename T, typename U, typename backend = linalg::blas_backend>
+    static inline void anticommutator_superoperator(const SOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, SOP<T>& res, operator_dictionary<T, backend>& opdictf, U gcoeff = U(1.0))
     {
         CALL_AND_RETHROW(left_superoperator(op, sysinf, opdict, res, opdictf, gcoeff));
         CALL_AND_RETHROW(right_superoperator(op, sysinf, opdict, res, opdictf, gcoeff));
     }
-    template <typename T, typename backend = linalg::blas_backend>
-    static inline void anticommutator_superoperator(const sSOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, sSOP<T>& res, operator_dictionary<T, backend>& opdictf, T gcoeff = T(1.0))
+    template <typename T, typename U, typename backend = linalg::blas_backend>
+    static inline void anticommutator_superoperator(const sSOP<T>& op, const system_modes& sysinf, const operator_dictionary<T, backend>& opdict, sSOP<T>& res, operator_dictionary<T, backend>& opdictf, U gcoeff = U(1.0))
     {
         CALL_AND_RETHROW(left_superoperator(op, sysinf, opdict, res, opdictf, gcoeff));
         CALL_AND_RETHROW(right_superoperator(op, sysinf, opdict, res, opdictf, gcoeff));

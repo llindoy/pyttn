@@ -36,6 +36,7 @@ public:
     using index_type = typename cuda_environment::index_type;
     using int_type = index_type;
 
+    static inline std::string label(){return std::string("cuda");}
 
 protected:
     static constexpr size_type default_nstreams = 1;

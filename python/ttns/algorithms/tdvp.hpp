@@ -1,6 +1,8 @@
 #ifndef PYTHON_BINDING_TDVP_HPP
 #define PYTHON_BINDING_TDVP_HPP
 
+#include "../../utils.hpp"
+
 #include <ttns_lib/ttn/ttn.hpp>
 #include <ttns_lib/ttn/ms_ttn.hpp>
 #include <ttns_lib/sweeping_algorithm/tdvp.hpp>
@@ -21,6 +23,8 @@ template <typename T, template <typename, typename> class ttn_class, typename ba
 void init_tdvp_core(py::module& m, const std::string& label)
 {
     using namespace ttns;
+
+    using _T = typename linalg::numpy_converter<T>::type;
 
     using tdvp = _one_site_tdvp<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -56,8 +60,8 @@ void init_tdvp_core(py::module& m, const std::string& label)
         .def_property
             (
                 "coefficient", 
-                static_cast<const T& (tdvp::*)() const>(&tdvp::coefficient),
-                [](tdvp& o, const T& i){o.coefficient() = i;},
+                [](const tdvp& o){return _T(o.coefficient());},
+                [](tdvp& o, const _T& i){o.coefficient() = i;},
                 "A coefficient used to scale the timestep."
             )
         .def_property
@@ -125,7 +129,9 @@ void init_tdvp_core(py::module& m, const std::string& label)
             :type H: sop_operator_complex
             :param attempt_expansion: Whether or not to attempt subspace expansion throughout the update scheme.  (Default: False)
             :type attempt_expansion: bool, optional
-          )mydelim");
+          )mydelim")
+          .def("backend", [](const tdvp&){return backend::label();});
+
 
 }
 
@@ -134,6 +140,8 @@ template <typename T, template <typename, typename> class ttn_class, typename ba
 void init_tdvp_adaptive(py::module& m, const std::string& label)
 {
     using namespace ttns;
+
+    using _T = typename linalg::numpy_converter<T>::type;
 
     using atdvp = _adaptive_one_site_tdvp<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -153,8 +161,8 @@ void init_tdvp_adaptive(py::module& m, const std::string& label)
         .def_property
             (
                 "coefficient", 
-                static_cast<const T& (atdvp::*)() const>(&atdvp::coefficient),
-                [](atdvp& o, const T& i){o.coefficient() = i;}
+                [](const atdvp& o){return _T(o.coefficient());},
+                [](atdvp& o, const _T& i){o.coefficient() = i;}
             )
         .def_property
             (
@@ -243,7 +251,9 @@ void init_tdvp_adaptive(py::module& m, const std::string& label)
         .def("clear", &atdvp::clear)
         .def("step", [](atdvp& o, _ttn& A, _sop& sop, bool update_environment=false){return o(A, sop, update_environment);}, py::arg(), py::arg(), py::arg("update_env") = false)
         .def("__call__", [](atdvp& o, _ttn& A, _sop& sop, bool update_environment=false){return o(A, sop, update_environment);}, py::arg(), py::arg(), py::arg("update_env") = false)
-        .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false);
+        .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false)
+        .def("backend", [](const atdvp&){return backend::label();});
+
 }
 
 
@@ -251,6 +261,8 @@ template <typename T, template <typename, typename> class ttn_class, typename ba
 void init_tdvp_adaptive_ts_cost(py::module& m, const std::string& label)
 {
     using namespace ttns;
+
+    using _T = typename linalg::numpy_converter<T>::type;
 
     using atdvp = _subspace_two_site_cost_tdvp<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -270,8 +282,8 @@ void init_tdvp_adaptive_ts_cost(py::module& m, const std::string& label)
         .def_property
             (
                 "coefficient", 
-                static_cast<const T& (atdvp::*)() const>(&atdvp::coefficient),
-                [](atdvp& o, const T& i){o.coefficient() = i;}
+                [](const atdvp& o){return _T(o.coefficient());},
+                [](atdvp& o, const _T& i){o.coefficient() = i;}
             )
         .def_property
             (
@@ -348,7 +360,9 @@ void init_tdvp_adaptive_ts_cost(py::module& m, const std::string& label)
         .def("clear", &atdvp::clear)
         .def("step", [](atdvp& o, _ttn& A, _sop& sop, bool update_environment=false){return o(A, sop, update_environment);}, py::arg(), py::arg(), py::arg("update_env") = false)
         .def("__call__", [](atdvp& o, _ttn& A, _sop& sop, bool update_environment=false){return o(A, sop, update_environment);}, py::arg(), py::arg(), py::arg("update_env") = false)
-        .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false);
+        .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion")=false)
+        .def("backend", [](const atdvp&){return backend::label();});
+
 }
 
 template <typename T, typename backend>

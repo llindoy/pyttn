@@ -131,7 +131,7 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_system_info(m);
     initialise_SOP<pyttn_real_type>(m);
     initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
-    initialise_liouville_space<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_liouville_space<pyttn_real_type>(m);
 
     //
     //Wrap the models functionality included in SOP
@@ -141,7 +141,6 @@ PYBIND11_MODULE(ttnpp, m)
 #ifdef PYTTN_BUILD_CUDA
     //the GPU implementations
     initialise_operator_dictionary<pyttn_real_type, linalg::cuda_backend>(m_cuda);
-    initialise_liouville_space<pyttn_real_type, linalg::cuda_backend>(m_cuda);
 #endif
 
     //
@@ -175,6 +174,11 @@ PYBIND11_MODULE(ttnpp, m)
     //
     initialise_dmrg<pyttn_real_type, linalg::blas_backend>(m);
     initialise_tdvp<pyttn_real_type, linalg::blas_backend>(m);
+
+#ifdef PYTTN_BUILD_CUDA
+    //initialise_dmrg<pyttn_real_type, linalg::cuda_backend>(m);
+    //initialise_tdvp<pyttn_real_type, linalg::cuda_backend>(m);
+#endif
 
 }
 

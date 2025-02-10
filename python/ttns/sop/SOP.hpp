@@ -12,6 +12,7 @@
 #include <pybind11/pytypes.h>
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
+#include "../../utils.hpp"
 
 
 namespace py=pybind11;
@@ -20,6 +21,8 @@ template <typename T>
 void init_SOP(py::module &m, const std::string& label)
 {
     using namespace ttns;
+
+    using _T = typename linalg::numpy_converter<T>::type;
 
     using real_type = typename linalg::get_real_type<T>::type;
     using _SOP = SOP<T>;
@@ -63,12 +66,12 @@ void init_SOP(py::module &m, const std::string& label)
         .def("__str__", [](const _SOP& o){std::ostringstream oss; oss << o; return oss.str();})
 
         .def("__imul__", [](_SOP& a, const real_type& b){return a*=b;})
-        .def("__imul__", [](_SOP& a, const T& b){return a*=b;})
-        .def("__idiv__", [](_SOP& a, const real_type& b){return a*=b;})
-        .def("__idiv__", [](_SOP& a, const T& b){return a*=b;})
+        .def("__imul__", [](_SOP& a, const _T& b){return a*=T(b);})
+        .def("__idiv__", [](_SOP& a, const real_type& b){return a/=b;})
+        .def("__idiv__", [](_SOP& a, const _T& b){return a/=T(b);})
 
         .def("__iadd__", [](_SOP& a, const real_type& b){return a+=b;})
-        .def("__iadd__", [](_SOP& a, const T& b){return a+=b;})
+        .def("__iadd__", [](_SOP& a, const _T& b){return a+=T(b);})
         .def("__iadd__", [](_SOP& a, const sOP& b){return a+=b;})
         .def("__iadd__", [](_SOP& a, const sPOP& b){return a+=b;})
         .def("__iadd__", [](_SOP& a, const sNBO<real_type>& b){return a+=b;})
@@ -77,7 +80,7 @@ void init_SOP(py::module &m, const std::string& label)
         .def("__iadd__", [](_SOP& a, const sSOP<T>& b){return a+=b;})
 
         .def("__isub__", [](_SOP& a, const real_type& b){return a-=b;})
-        .def("__isub__", [](_SOP& a, const T& b){return a-=b;})
+        .def("__isub__", [](_SOP& a, const _T& b){return a-=T(b);})
         .def("__isub__", [](_SOP& a, const sOP& b){return a-=b;})
         .def("__isub__", [](_SOP& a, const sPOP& b){return a-=b;})
         .def("__isub__", [](_SOP& a, const sNBO<real_type>& b){return a-=b;})
@@ -85,7 +88,7 @@ void init_SOP(py::module &m, const std::string& label)
         .def("__isub__", [](_SOP& a, const sSOP<real_type>& b){return a-=b;})
         .def("__isub__", [](_SOP& a, const sSOP<T>& b){return a-=b;})
 
-        .def("__add__", [](_SOP& a, const T& b){return a+b;})
+        .def("__add__", [](_SOP& a, const _T& b){return a+T(b);})
         .def("__add__", [](_SOP& a, const real_type& b){return a+b;})
         .def("__add__", [](_SOP& a, const sOP& b){return a+b;})
         .def("__add__", [](_SOP& a, const sPOP& b){return a+b;})
@@ -94,8 +97,8 @@ void init_SOP(py::module &m, const std::string& label)
         .def("__add__", [](_SOP& a, const sSOP<real_type>& b){return a+b;})
         .def("__add__", [](_SOP& a, const sSOP<T>& b){return a+b;})
 
-        .def("__rdd__", [](_SOP& b, const T& a){return a+b;})
-        .def("__rdd__", [](_SOP& b, const real_type& a){return a+b;})
+        .def("__radd__", [](_SOP& b, const _T& a){return T(a)+b;})
+        .def("__radd__", [](_SOP& b, const real_type& a){return a+b;})
         .def("__radd__", [](_SOP& b, const sOP& a){return a+b;})
         .def("__radd__", [](_SOP& b, const sPOP& a){return a+b;})
         .def("__radd__", [](_SOP& b, const sNBO<real_type>& a){return a+b;})
@@ -103,7 +106,7 @@ void init_SOP(py::module &m, const std::string& label)
         .def("__radd__", [](_SOP& b, const sSOP<real_type>& a){return a+b;})
         .def("__radd__", [](_SOP& b, const sSOP<T>& a){return a+b;})
 
-        .def("__sub__", [](_SOP& a, const T& b){return a-b;})
+        .def("__sub__", [](_SOP& a, const _T& b){return a-T(b);})
         .def("__sub__", [](_SOP& a, const real_type& b){return a-b;})
         .def("__sub__", [](_SOP& a, const sOP& b){return a-b;})
         .def("__sub__", [](_SOP& a, const sPOP& b){return a-b;})
@@ -111,7 +114,7 @@ void init_SOP(py::module &m, const std::string& label)
         .def("__sub__", [](_SOP& a, const sNBO<T>& b){return a-b;})
         .def("__sub__", [](_SOP& a, const sSOP<real_type>& b){return a-b;})
         .def("__sub__", [](_SOP& a, const sSOP<T>& b){return a-b;})
-        .def("__rsub__", [](_SOP& b, const T& a){return a-b;})
+        .def("__rsub__", [](_SOP& b, const _T& a){return T(a)-b;})
         .def("__rsub__", [](_SOP& b, const real_type& a){return a-b;})
         .def("__rsub__", [](_SOP& b, const sOP& a){return a-b;})
         .def("__rsub__", [](_SOP& b, const sPOP& a){return a-b;})

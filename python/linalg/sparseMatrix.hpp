@@ -61,7 +61,9 @@ void init_csr_matrix(py::module &m, const std::string& label)
                 ret = a*b;
                 return ret;
             })
-        .def("__str__", [](const ttype& o){std::stringstream oss;  oss << o; return oss.str();});
+        .def("__str__", [](const ttype& o){std::stringstream oss;  oss << o; return oss.str();})
+        .def("backend", [](const ttype&){return backend::label();});
+
 }
 
 template <typename T>
@@ -112,7 +114,9 @@ void init_diagonal_matrix(py::module& m, const std::string& label)
                     }
                    )
         .def("complex_dtype", [](const ttype&){return !std::is_same<T, real_type>::value;})
-        .def("__str__", [](const ttype& o){std::stringstream oss;   oss << o; return oss.str();});
+        .def("__str__", [](const ttype& o){std::stringstream oss;   oss << o; return oss.str();})
+        .def("backend", [](const ttype&){return backend::label();});
+
 
     //expose the ttn node class.  This is our core tensor network object.
 }
@@ -159,7 +163,8 @@ void init_diagonal_matrix_cuda(py::module& m, const std::string& label)
         .def(py::init<const tensor<T, 1, cuda_backend>&, size_t, size_t>())
 
         .def("complex_dtype", [](const ttype&){return !std::is_same<T, real_type>::value;})
-        .def("__str__", [](const ttype& o){std::stringstream oss;   oss << o; return oss.str();});
+        .def("__str__", [](const ttype& o){std::stringstream oss;   oss << o; return oss.str();})
+        .def("backend", [](const ttype&){return backend::label();});
 
     //expose the ttn node class.  This is our core tensor network object.
 }

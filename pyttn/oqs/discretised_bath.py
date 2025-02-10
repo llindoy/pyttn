@@ -6,7 +6,7 @@ from pyttn.utils.truncate import *
 from pyttn import system_modes, boson_mode, fermion_mode
 
 
-class ExpFitOQSBath:
+class discretisedOQSBath:
     """The base class for handling a bath representing a discretised bath correlation function
     of the form
 
@@ -75,7 +75,7 @@ class ExpFitOQSBath:
         return self._wk
 
 
-class ExpFitBosonicBath(ExpFitOQSBath):
+class discretisedBosonicBath(discretisedOQSBath):
     """A class for handling a bosonic bath representing a discretised bath correlation function
     of the form
 
@@ -93,7 +93,7 @@ class ExpFitBosonicBath(ExpFitOQSBath):
     """
 
     def __init__(self, gk, wk, tol=1e-12):
-        ExpFitOQSBath.__init__(self, gk, wk, fermionic=False,
+        discretisedOQSBath.__init__(self, gk, wk, fermionic=False,
                                 tol=tol)
         self.truncate_modes()
 
@@ -131,9 +131,7 @@ class ExpFitBosonicBath(ExpFitOQSBath):
     #
     #    H +=
 
-
-# This is currently completely incorrect.  We need to set this up to split this into filled and unfilled baths
-class ExpFitFermionicBath(ExpFitOQSBath):
+class discretisedFermionicBath(discretisedOQSBath):
     """A class for handling a fermionic bath representing an exponential fit to a bath correlation function
     of the form
 
@@ -152,7 +150,7 @@ class ExpFitFermionicBath(ExpFitOQSBath):
     """
 
     def __init__(self, dk, zk, combine_real=False, tol=1e-12):
-        ExpFitOQSBath.__init__(self, dk, zk, fermionic=True,
+        discretisedOQSBath.__init__(self, dk, zk, fermionic=True,
                                combine_real=combine_real, tol=tol)
         self.truncate_modes()
 

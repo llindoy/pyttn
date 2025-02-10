@@ -101,7 +101,9 @@ void init_site_operators(py::module &m, const std::string& label)
                 "apply", 
                 static_cast<void (siteop::*)(const_vector_ref, vector_ref, real_type, real_type)>(&siteop::apply)
             )
-        .def("__str__", &siteop::to_string);
+        .def("__str__", &siteop::to_string)
+        .def("backend", [](const siteop&){return backend::label();});
+
 
     //the base primitive operator type
     py::class_<prim>(m, (std::string("primitive_")+label).c_str())
@@ -114,7 +116,9 @@ void init_site_operators(py::module &m, const std::string& label)
         .def("clone", &prim::clone)
         .def("transpose", &prim::transpose)
         .def("complex_dtype", [](const prim&){return !std::is_same<T, real_type>::value;})
-        .def("__str__", &prim::to_string);
+        .def("__str__", &prim::to_string)
+        .def("backend", [](const prim&){return backend::label();});
+
 
     //a type for storing a trivial representation of the identity operator
     py::class_<ident, prim>(m, (std::string("identity_")+label).c_str())

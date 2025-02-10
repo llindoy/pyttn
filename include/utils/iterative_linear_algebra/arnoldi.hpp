@@ -43,7 +43,7 @@ protected:
     linalg::diagonal_matrix<complex_type, linalg::blas_backend> m_vals;
 
     linalg::matrix<complex_type, linalg::blas_backend> m_rvecs;
-    linalg::matrix<complex_type, linalg::blas_backend> m_rvecsd;
+    linalg::matrix<complex_type, backend> m_rvecsd;
     linalg::matrix<complex_type, linalg::blas_backend> m_lvecs;
 
     linalg::matrix<real_type> m_residues;

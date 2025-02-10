@@ -109,6 +109,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     #run dynamics and measure properties storing them in a file
     Sz = np.zeros(nstep+1)
     maxchi = np.zeros(nstep+1)
+    print(op)
     Sz[0] = np.real(mel(op, A, A))
     maxchi[0] = A.maximum_bond_dimension()
 

@@ -84,7 +84,9 @@ void init_tensor_cpu(py::module &m, const std::string& label)
             {
                 ttype b = linalg::transpose(o, inds);
                 return b;
-            });
+            })
+        .def("backend", [](const ttype&){return backend::label();});
+
 }
 
 template <typename real_type> void initialise_tensors(py::module& m)
@@ -149,8 +151,9 @@ void init_tensor_gpu(py::module &m, const std::string& label)
             {
                 ttype b = linalg::transpose(o, inds);
                 return b;
-            });
-        //.def("clear", &ttype::clear);
+            })
+        .def("backend", [](const ttype&){return backend::label();});
+         //.def("clear", &ttype::clear);
 }
 
 template <typename real_type> void initialise_tensors_cuda(py::module& m)

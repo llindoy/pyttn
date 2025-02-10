@@ -64,7 +64,9 @@ void init_sop_operator(py::module &m, const std::string& label)
         .def("clear", &_sop::clear)
         .def("update", &_sop::template update<real_type>)
         .def("nterms", &_sop::nterms)
-        .def("nmodes", &_sop::nmodes);
+        .def("nmodes", &_sop::nmodes)
+        .def("backend", [](const _sop&){return backend::label();});
+
 
     py::class_<_mssop>(m, (std::string("multiset_sop_operator_")+label).c_str())
         .def(py::init())
@@ -95,7 +97,9 @@ void init_sop_operator(py::module &m, const std::string& label)
         .def("clear", &_mssop::clear)
         .def("update", &_mssop::template update<real_type>)
         .def("nset", &_mssop::nset)
-        .def("nmodes", &_mssop::nmodes);
+        .def("nmodes", &_mssop::nmodes)
+        .def("backend", [](const _mssop&){return backend::label();});
+
 }
 
 template <typename real_type, typename backend>
