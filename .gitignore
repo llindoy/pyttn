@@ -9,6 +9,7 @@ temp
 *.pdf
 
 # Byte-compiled / optimized / DLL files
+__pycache__
 __pycache__/
 *.py[cod]
 *$py.class
@@ -42,6 +43,8 @@ share/python-wheels/
 .pytest_cache/
 .pytest_cache
 MANIFEST
+
+
 
 
 #Don't ignore the documentation
