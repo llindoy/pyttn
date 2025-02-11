@@ -46,7 +46,7 @@ void init_msttn(py::module &m, const std::string& label)
                 [](_msttn_node& s){return py::make_iterator(s.begin(), s.end());},
                 py::keep_alive<0, 1>()
             )
-        .def("backend", [](){return backend::label();});
+        .def("backend", [](const _msttn_node&){return backend::label();});
 
 
     //TODO: Figure out why the commented out assign functions don't compile
@@ -59,7 +59,7 @@ void init_msttn(py::module &m, const std::string& label)
         //.def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice_real&)>(&_msttn_slice::template operator=<real_type, backend>))
         //.def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice&)>(&_msttn_slice::template operator=<T, backend>))
         .def("nset", &_msttn_slice::nset)
-        .def("backend", [](){return backend::label();});
+        .def("backend", [](const _msttn_slice&){return backend::label();});
 
 
     //expose the ttn node class.  This is our core tensor network object.

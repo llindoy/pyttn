@@ -5,11 +5,11 @@ from .chain_map import chain_map
 from pyttn import fOP, coeff
 
 #setup the star Hamiltonian for the spin boson model
-def add_fermionic_star_bath_hamiltonian(H, Sp, Sm, g, w, binds = None):
+def add_fermionic_star_bath_hamiltonian(H, Sp, Sm, g, w, binds = None, bskip=1):
     Nb = g.shape[0]
     if not isinstance(binds, np.ndarray):
         if binds is None:
-            binds = [i+1 for i in range(Nb)]
+            binds = [i+bskip for i in range(Nb)]
 
     for i in range(Nb):
         H += g[i] * Sp * fOP("c", binds[i])
@@ -19,11 +19,11 @@ def add_fermionic_star_bath_hamiltonian(H, Sp, Sm, g, w, binds = None):
     return H
 
 #setup the chain hamiltonian for the spin boson model - this is the tedopa method
-def add_fermionic_chain_bath_hamiltonian(H, Sp, Sm, t, e, binds = None):
+def add_fermionic_chain_bath_hamiltonian(H, Sp, Sm, t, e, binds = None, bskip=1):
     Nb = e.shape[0]
     if not isinstance(binds, np.ndarray):
         if binds is None:
-            binds = [i+1 for i in range(Nb)]
+            binds = [i+bskip for i in range(Nb)]
 
     for i in range(Nb):
         if i == 0:
@@ -37,10 +37,10 @@ def add_fermionic_chain_bath_hamiltonian(H, Sp, Sm, t, e, binds = None):
     return H
 
 #setup the chain hamiltonian for the spin boson model - that is this implements the method described in Nuomin, Beratan, Zhang, Phys. Rev. A 105, 032406
-def add_fermionic_ipchain_bath_hamiltonian(H, Sp, Sm, Nb, t0, w, P, binds = None):
+def add_fermionic_ipchain_bath_hamiltonian(H, Sp, Sm, Nb, t0, w, P, binds = None, bskip=1):
     if not isinstance(binds, np.ndarray):
         if binds is None:
-            binds = [i+1 for i in range(Nb)]
+            binds = [i+bskip for i in range(Nb)]
 
     class func_class:
         def __init__(self, i, t0, e0, U0, conj = False):
@@ -64,25 +64,25 @@ def add_fermionic_ipchain_bath_hamiltonian(H, Sp, Sm, Nb, t0, w, P, binds = None
 
     return H
 
-def add_fermionic_bath_hamiltonian(H, Sp, Sm, g, w, binds = None, geom='star', return_frequencies=False):
+def add_fermionic_bath_hamiltonian(H, Sp, Sm, g, w, binds = None, geom='star', bskip=1):
     if geom == 'star':
         if not return_frequencies:
-            return add_fermionic_star_bath_hamiltonian(H, Sp, Sm, g, w, binds=binds)
+            return add_fermionic_star_bath_hamiltonian(H, Sp, Sm, g, w, binds=binds, bskip=bskip)
         else:
-            return add_fermionic_star_bath_hamiltonian(H, Sp, Sm, g, w, binds=binds), w
+            return add_fermionic_star_bath_hamiltonian(H, Sp, Sm, g, w, binds=binds, bskip=bskip), w
     elif geom == 'chain':
         t, e = chain_map(g, w)
         if not return_frequencies:
-            return add_fermionic_chain_bath_hamiltonian(H, Sp, Sm, t, e, binds=binds)
+            return add_fermionic_chain_bath_hamiltonian(H, Sp, Sm, t, e, binds=binds, bskip=bskip)
         else:
-            return add_fermionic_star_bath_hamiltonian(H, Sp, Sm, g, w, binds=binds), e
+            return add_fermionic_star_bath_hamiltonian(H, Sp, Sm, g, w, binds=binds, bskip=bskip), e
     elif geom == 'ipchain':
         w2 = copy.deepcopy(w)
         t, e, U = chain_map(g, w, return_unitary = True)
         if not return_frequencies:
-            return add_fermionic_ipchain_bath_hamiltonian(H, Sp, Sm, e.shape[0], t[0], w2, U, binds=binds)
+            return add_fermionic_ipchain_bath_hamiltonian(H, Sp, Sm, e.shape[0], t[0], w2, U, binds=binds, bskip=bskip)
         else:
-            return add_fermionic_star_bath_hamiltonian(H, Sp, Sm, g, w, binds=binds), e
+            return add_fermionic_star_bath_hamiltonian(H, Sp, Sm, g, w, binds=binds, bskip=bskip), e
     else:
         raise RuntimeError("Cannot add bath Hamiltonian geometry not recognised.")
 

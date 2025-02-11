@@ -88,7 +88,7 @@ def __softmspace(start, stop, N, beta=1, endpoint=True):
 
 
 def __generate_grid_points(N, wc, wmin=1e-9):
-    Z1 = softmspace(wmin, wc, N//2)
+    Z1 = __softmspace(wmin, wc, N//2)
     nZ1 = -np.flip(Z1)
     Z = np.concatenate((nZ1, Z1))
     return Z

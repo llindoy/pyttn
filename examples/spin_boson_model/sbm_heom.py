@@ -48,11 +48,6 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
     bath = oqs.BosonicBath(J, beta=beta)
     dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
 
-    import matplotlib.pyplot as plt
-    plt.plot(t, bath.Ct(t))
-    plt.plot(t, oqs.BosonicBath.Ctexp(t, dk, -1.0j*zk))
-    plt.show()
-
     expbath = oqs.ExpFitBosonicBath(dk, zk)
     expbath.truncate_modes(utils.EnergyTruncation(10*wc, Lmax=L, Lmin=Lmin))
     bsys = expbath.system_information()
@@ -80,7 +75,6 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
     #construct the system information object by combining the system information with the bath
     #information
     sysinf = combine_systems(sysinf, bsys)
-    print(sysinf.nprimitive_modes(), N)
 
     #set up the total Hamiltonian
     H = SOP(N)

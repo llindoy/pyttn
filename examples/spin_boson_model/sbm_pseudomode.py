@@ -45,13 +45,6 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
     bath = oqs.BosonicBath(J, beta=beta)
     dk, zk = bath.expfit(oqs.ESPRITDecomposition(K=K, tmax=nstep*dt, Nt = nstep))
 
-
-    import matplotlib.pyplot as plt
-    plt.plot(t, bath.Ct(t))
-    plt.plot(t, oqs.BosonicBath.Ctexp(t, dk, -1.0j*zk))
-    plt.show()
-
-    #set up the exp bath object this takes the dk and zk terms.  Truncate the modes and
     #extract the system information object from this.
     expbath = oqs.ExpFitBosonicBath(dk, zk)
     expbath.truncate_modes(utils.EnergyTruncation(10*wc, Lmax=L, Lmin=Lmin))

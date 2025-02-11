@@ -33,7 +33,10 @@ def fit_bath(Nb, alpha, wc, s, dt, beta = None, nstep = 1, method="orthopol", to
 
     elif method == "density":
         #discretise the bath correleation function using the orthonormal polynomial based cutoff 
-        g,w = bath.discretise(oqs.DensityDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
+        if not beta == None:
+            g,w = bath.discretise(oqs.DensityDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
+        else:
+            g,w = bath.discretise(oqs.DensityDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
 
         fitbath = oqs.DiscreteBosonicBath(g, w)
 
@@ -49,12 +52,7 @@ def fit_bath(Nb, alpha, wc, s, dt, beta = None, nstep = 1, method="orthopol", to
         fitbath = oqs.ExpFitBosonicBath(dk, zk)
 
     import matplotlib.pyplot as plt
-    Cte = bath.Ct(t)
-    Ctfit = fitbath.Ct(t)
-    plt.plot(t, np.real(bath.Ct(t)), 'k-')
-    plt.plot(t, np.imag(bath.Ct(t)), 'k--')
-    plt.plot(t, np.real(fitbath.Ct(t)), 'r-')
-    plt.plot(t, np.imag(fitbath.Ct(t)), 'r--')
+    plt.plot(t, np.abs(bath.Ct(t)-fitbath.Ct(t)), 'k-')
     plt.show()
 
 

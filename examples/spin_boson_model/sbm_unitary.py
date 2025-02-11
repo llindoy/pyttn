@@ -25,6 +25,9 @@ def setup_topology(chi, nbose, mode_dims, degree):
 def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut = 20, nstep = 1, Nw = 10.0, geom='star', ofname='sbm.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024):
     t = np.arange(nstep+1)*dt
 
+    """
+    Set up the system bath Hamiltonian
+    """
     #setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
     def J(w):
@@ -36,11 +39,6 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     #discretise the bath correleation function using the orthonormal polynomial based cutoff 
     g,w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw*wc), Nw*wc))
 
-    import matplotlib.pyplot as plt
-    plt.plot(t, bath.Ct(t))
-    plt.plot(t, oqs.BosonicBath.Ctexp(t, g*g, w))
-    plt.show()
-
     #set up the total Hamiltonian
     N = Nb+1
     H = SOP(N)
@@ -48,25 +46,33 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     #add on the system part of the system bath Hamiltonian
     H += eps*sOP("sz", 0) + delta*sOP("sx", 0)
 
-    #add on the bath and system bath contributions of the bath hamiltonian
-    H, frequencies = oqs.unitary.add_bosonic_bath_hamiltonian(H, sOP("sz", 0), g, w, geom=geom, return_frequencies=True)
+    #set up the discretised bath object
+    discbath = oqs.DiscreteBosonicBath(g, w)
 
-    #set up the local hilbert space dimensions of the bosonic modes
-    mode_dims = [min(max(4, int(wc*Ncut/frequencies[i])), nbose) for i in range(Nb)]
+    #add the system bath Hamiltonian terms to the Hamiltonian
+    H = discbath.add_system_bath_hamiltonian(H, sOP("sz", 0), geom=geom)
 
-    #set up the local hilbert space dimensions of the bosonic modes
-    bsys = system_modes(Nb)
-    for i in range(Nb):
-        bsys[i] = boson_mode(mode_dims[i])
+    #truncate the system bath modes
+    discbath.truncate_modes(utils.EnergyTruncation(10*wc, Lmax=nbose, Lmin=4))
+
+    #and get the bath information
+    bsys = discbath.system_information()
 
     #set up the mode combination informatino
     if use_mode_combination:
         mode_comb = utils.ModeCombination(nbmax, nhilbmax)
         bsys = mode_comb(bsys)
 
+    #set up the total system information object including both system information and bath information
     sysinf = system_modes(1)
     sysinf[0] = tls_mode()
     sysinf = combine_systems(sysinf, bsys)
+
+
+    """
+    Set up the TTN structures and initial state of the wavefunction
+    """
+    #get the dimension of each of the bath modes forming the tree
     tree_mode_dims = []
     for ind in range(len(bsys)):
         tree_mode_dims.append(bsys[ind].lhd())
@@ -84,14 +90,22 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     A = ttn(topo, capacity, dtype=np.complex128)
     A.set_state([0 for i in range(len(bsys)+1)])
 
+
+    """
+    Set up the operator objects representing the Hamiltonian and observables of interest
+    """
     #set up the Hamiltonian as a sop object
     h = sop_operator(H, A, sysinf)
 
-    #construct objects need for evaluating observables
-    mel = matrix_element(A)
-
     #set up the observable to measure
     op = site_operator(sOP("sz", 0), sysinf)
+
+
+    """
+    Set up objects used for computing matrix elements and performing the time evolution
+    """
+    #construct objects need for evaluating observables
+    mel = matrix_element(A)
 
     #set up tdvp sweeping algorithm parameters
     sweep = None
@@ -106,10 +120,13 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     sweep.dt = dt
     sweep.coefficient = -1.0j
 
+
+    """
+    Perform the time evolution and measure the required observables dumping to a hdf5 file.
+    """
     #run dynamics and measure properties storing them in a file
     Sz = np.zeros(nstep+1)
     maxchi = np.zeros(nstep+1)
-    print(op)
     Sz[0] = np.real(mel(op, A, A))
     maxchi[0] = A.maximum_bond_dimension()
 
@@ -167,10 +184,10 @@ if __name__ == "__main__":
     parser.add_argument('--s', type = float, default=1)
 
     #number of bath modes
-    parser.add_argument('--N', type=int, default=384)
+    parser.add_argument('--N', type=int, default=128)
 
     #geometry to be used for bath dynamics
-    parser.add_argument('--geom', type = str, default='chain')
+    parser.add_argument('--geom', type = str, default='ipchain')
 
     #system hamiltonian parameters
     parser.add_argument('--delta', type = float, default=1)
