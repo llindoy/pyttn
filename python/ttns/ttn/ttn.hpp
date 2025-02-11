@@ -81,7 +81,7 @@ void init_ttn(py::module &m, const std::string& label)
                 static_cast<linalg::matrix<T, backend>& (_ttn_node_data::*)()>(&_ttn_node_data::as_matrix),
                 py::return_value_policy::reference
             )
-        .def("backend", [](){return backend::label();});
+        .def("backend", [](const _ttn_node_data&){return backend::label();});
 
 
     py::class_<_ttn_node>(m, (std::string("ttn_node_")+label).c_str())
@@ -99,7 +99,7 @@ void init_ttn(py::module &m, const std::string& label)
                 [](_ttn_node& s){return py::make_iterator(s.begin(), s.end());},
                 py::keep_alive<0, 1>()
             )
-        .def("backend", [](){return backend::label();});
+        .def("backend", [](const _ttn_node&){return backend::label();});
 
 
     //expose the ttn node class.  This is our core tensor network object.

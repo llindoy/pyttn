@@ -103,7 +103,7 @@ def __evaluate_function(z, Z, f, w):
     return r
 
 
-def AAA_algorithm(F, Z, tol=1e-13, nmax=100, *args, **kwargs):
+def AAA_algorithm(F, Z, tol=1e-13, K = None, nmax=100, *args, **kwargs):
     """Implementation of the adaptive Antoulas-Anderson (AAA) algorithm for rational approximation
     Y. Nakatsukasa, O. Sète, and L. N. Trefethen, SIAM Journal on Scientific Computing 40, A1494 (2018).
 
@@ -113,6 +113,8 @@ def AAA_algorithm(F, Z, tol=1e-13, nmax=100, *args, **kwargs):
     :type Z: np.ndarray
     :param tol: The convergence tolerance for the AAA algorithm. (default: 1e-13)
     :type tol: float, optional
+    :param K: The maximum number of poles to fit. (default: None)
+    :type K: int or None, optional
     :param nmax: The maximum number of poles to use in the AAA fit. (default: 100)
     :type nmax: int, optional
     :param \*args: Variable length argument list to be passed to the F function
@@ -163,7 +165,7 @@ def AAA_algorithm(F, Z, tol=1e-13, nmax=100, *args, **kwargs):
         D = C[:, :i+1] @ w
         R = N/D
         err = np.linalg.norm(Fz-R, np.inf)
-        if (err <= tol*np.linalg.norm(Fz, np.inf)):
+        if (err <= tol*np.linalg.norm(Fz, np.inf) or len(z) == K):
             break
 
     z1 = np.array(z, dtype=np.complex128)

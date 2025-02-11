@@ -43,6 +43,7 @@ except ImportError:
 def __sop_operator_blas(h, A, sysinf, *args, **kwargs):
     if not __real_ttn_import:
         if isinstance(A, ttn_complex) and isinstance(h, SOP_complex):
+            print(h)
             return sop_operator_complex(h, A, sysinf, *args, **kwargs)
         else:
             raise RuntimeError(
@@ -89,7 +90,6 @@ def sop_operator(h, A, sysinf, *args, **kwargs):
     if len(args) > 0:
         if(args[0].backend() != A.backend()):
             raise RuntimeError("Attempted to construct sop_operator with opdict but opdict backend is not compatible with ttn backend.")
-    print(A.backend())
     if(A.backend() == "blas"):
         return __sop_operator_blas(h, A, sysinf, *args, **kwargs)
     elif __cuda_import and A.backend()== "cuda":

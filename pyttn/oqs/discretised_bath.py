@@ -3,11 +3,11 @@ from .fermionic_bath import *
 from .bosonic_bath import *
 
 from pyttn.utils.truncate import *
-from pyttn import system_modes, boson_mode, fermion_mode
+from pyttn import system_modes, boson_mode, fermion_mode, sSOP
 
 
-class discretisedOQSBath:
-    """The base class for handling a bath representing a discretised bath correlation function
+class DiscreteOQSBath:
+    """The base class for handling a bath representing a Discrete bath correlation function
     of the form
 
     .. math::
@@ -26,7 +26,7 @@ class discretisedOQSBath:
     """
 
     def __init__(self, gk, wk, fermionic=False, tol=1e-12):
-        if (len(dk) != len(zk)):
+        if (len(gk) != len(wk)):
             raise RuntimeError("Invalid bath decomposition")
 
         self._gk = np.array(gk)
@@ -55,7 +55,7 @@ class discretisedOQSBath:
         :rtype: np.ndarray
         """
         ret = np.zeros(t.shape, dtype=np.complex128)
-        for k in range(len(self._ck)):
+        for k in range(len(self._gk)):
             ret += np.abs(self._gk[k])**2*np.exp(-1.0j*self._wk[k]*t)
         return ret
 
@@ -75,8 +75,8 @@ class discretisedOQSBath:
         return self._wk
 
 
-class discretisedBosonicBath(discretisedOQSBath):
-    """A class for handling a bosonic bath representing a discretised bath correlation function
+class DiscreteBosonicBath(DiscreteOQSBath):
+    """A class for handling a bosonic bath representing a Discrete bath correlation function
     of the form
 
     .. math::
@@ -93,8 +93,10 @@ class discretisedBosonicBath(discretisedOQSBath):
     """
 
     def __init__(self, gk, wk, tol=1e-12):
-        discretisedOQSBath.__init__(self, gk, wk, fermionic=False,
+        DiscreteOQSBath.__init__(self, gk, wk, fermionic=False,
                                 tol=tol)
+        self._gk_trunc = gk
+        self._wk_trunc = wk
         self.truncate_modes()
 
     def truncate_modes(self, truncation=DepthTruncation(8)):
@@ -105,7 +107,7 @@ class discretisedBosonicBath(discretisedOQSBath):
         :type truncation: TruncationBase, optional
 
         """
-        self._mode_dims = truncation(self._gk, self._wk, False)
+        self._mode_dims = truncation(self._gk_trunc, self._wk_trunc, False)
 
     def system_information(self):
         """Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.
@@ -118,20 +120,63 @@ class discretisedBosonicBath(discretisedOQSBath):
                 "Failed to compute system information object.  The bath object has not not been truncated.")
 
         ret = system_modes(len(self._mode_dims))
-        for ind in rang(len(self._mode_dims)):
+        for ind in range(len(self._mode_dims)):
             ret[ind] = boson_mode(self._mode_dims[ind])
         return ret
 
     def __str__(self):
         return 'bosonic bath: \n ' + '\n \\alpha ' + str(self._gk) + '\n \\nu ' + str(self._wk) + '\n modes ' + str(self._mode_dims) + '\n composite ' + str(self._composite_modes)
 
-    # def add_bath_hamiltonian(self, H, Spl, Spr, Sml = None, Smr = None, binds=None):
-    #    if binds  == None:
-    #        binds = [x+1 for i in range(len(self._dk))]
-    #
-    #    H +=
+    def add_system_bath_hamiltonian(self, H, Sp, Sm = None, geom='star', binds = None, bskip=1):
+        """Attach the bath and system bath coupling Hamiltonians associated with this bath object to an existing SOP Hamiltonian
 
-class discretisedFermionicBath(discretisedOQSBath):
+        :param H: The total Hamiltonian 
+        :type H: SOP
+        :param Sp: An operator that couples to the bath annihilation operator terms
+        :type Sp: sOP or sPOP or sNBO or sSOP 
+        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
+        :type Sm: sOP or sPOP or sNBO or sSOP, optional
+        :param geom: The geometry of the bath to use
+        :type geom: {"star", "chain", "ipchain"}
+        :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
+        :type binds: list, optional
+        :param bskip: The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)
+        :type bskip: int, optional
+
+        :return: The total Hamiltonian now including the system bath terms
+        :rtype: type(H)
+        """
+        from .unitary import add_bosonic_bath_hamiltonian
+        H, freq = add_bosonic_bath_hamiltonian(H, Sp, self._gk, self._wk, Sm=Sm, binds=binds, geom=geom, bskip=bskip, return_frequencies=True)
+        self._wk_trunc=freq
+        return H
+
+    def system_bath_hamiltonian(self, Sp, Sm = None, geom='star', binds = None, bskip=1):
+        """Construct a sSOP containing the system bath Hamiltonian of the object.
+
+        :param H: The total Hamiltonian 
+        :type H: SOP
+        :param Sp: An operator that couples to the bath annihilation operator terms
+        :type Sp: sOP or sPOP or sNBO or sSOP 
+        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\\dagger + a) (Default: None)
+        :type Sm: sOP or sPOP or sNBO or sSOP, optional
+        :param geom: The geometry of the bath to use
+        :type geom: {"star", "chain", "ipchain"}
+        :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
+        :type binds: list, optional
+        :param bskip: The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)
+        :type bskip: int, optional
+
+        :return: The total Hamiltonian now including the system bath terms
+        :rtype: sSOP
+        """
+        H = sSOP()
+        from .unitary import add_bosonic_bath_hamiltonian
+        H, freq = add_bosonic_bath_hamiltonian(H, Sp, self._gk, self._wk, Sm=Sm, binds=binds, geom=geom, bskip=bskip, return_frequencies=True)
+        self._wk_trunc=freq
+        return H
+
+class DiscreteFermionicBath(DiscreteOQSBath):
     """A class for handling a fermionic bath representing an exponential fit to a bath correlation function
     of the form
 
@@ -150,7 +195,7 @@ class discretisedFermionicBath(discretisedOQSBath):
     """
 
     def __init__(self, dk, zk, combine_real=False, tol=1e-12):
-        discretisedOQSBath.__init__(self, dk, zk, fermionic=True,
+        DiscreteOQSBath.__init__(self, dk, zk, fermionic=True,
                                combine_real=combine_real, tol=tol)
         self.truncate_modes()
 
@@ -162,7 +207,7 @@ class discretisedFermionicBath(discretisedOQSBath):
         :type truncation: TruncationBase, optional
 
         """
-        self._mode_dims = truncation(self._dk, self._zk, True)
+        self._mode_dims = truncation(self._gk, self._wk, True)
 
     def __str__(self):
         return 'fermionic bath: ' + '\n \\alpha ' + str(self._gk) + '\n \\nu ' + str(self._wk) + '\n modes ' + str(self._mode_dims) + '\n composite ' + str(self._composite_modes)
@@ -178,3 +223,50 @@ class discretisedFermionicBath(discretisedOQSBath):
         for ind in rang(len(self._mode_dims)):
             ret[ind] = fermion_mode()
         return ret
+
+    def add_system_bath_hamiltonian(self, H, Sp, Sm = None, geom='star', binds = None, bskip=1):
+        """Attach the bath and system bath coupling Hamiltonians associated with this bath object to an existing SOP Hamiltonian
+
+        :param H: The total Hamiltonian 
+        :type H: SOP
+        :param Sp: An operator that couples to the bath annihilation operator terms
+        :type Sp: sOP or sPOP or sNBO or sSOP 
+        :param Sm: An operator that couples to the bath creation operator terms.
+        :type Sm: sOP or sPOP or sNBO or sSOP
+        :param geom: The geometry of the bath to use
+        :type geom: {"star", "chain", "ipchain"}
+        :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
+        :type binds: list, optional
+        :param bskip: The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)
+        :type bskip: int, optional
+
+        :return: The total Hamiltonian now including the system bath terms
+        :rtype: type(H)
+        """
+        from .unitary import add_fermionic_bath_hamiltonian
+        H = add_fermionic_bath_hamiltonian(H, Sp, Sm, self._gk, self._wk, binds=binds, geom=geom, bskip=bskip)
+        return H
+
+    def system_bath_hamiltonian(self, Sp, Sm = None, geom='star', binds = None, bskip=1):
+        """Construct a sSOP containing the system bath Hamiltonian of the object.
+
+        :param H: The total Hamiltonian 
+        :type H: SOP
+        :param Sp: An operator that couples to the bath annihilation operator terms
+        :type Sp: sOP or sPOP or sNBO or sSOP 
+        :param Sm: An operator that couples to the bath creation operator terms.
+        :type Sm: sOP or sPOP or sNBO or sSOP
+        :param geom: The geometry of the bath to use
+        :type geom: {"star", "chain", "ipchain"}
+        :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
+        :type binds: list, optional
+        :param bskip: The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)
+        :type bskip: int, optional
+
+        :return: The total Hamiltonian now including the system bath terms
+        :rtype: sSOP
+        """
+        H = sSOP()
+        from .unitary import add_fermionic_bath_hamiltonian
+        H = add_fermionic_bath_hamiltonian(H, Sp, self._gk, self._wk, Sm=Sm, binds=binds, geom=geom, bskip=bskip)
+        return H

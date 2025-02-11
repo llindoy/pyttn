@@ -3,7 +3,7 @@ from pyttn.ttnpp import sOP, sPOP, sNBO_real, sNBO_complex, sSOP_real, sSOP_comp
 import numpy as np
 
 
-def coeff(coeff, dtype=np.complex128):
+def coeff(*args, dtype=np.complex128):
     """A function for constructing the coeff type for Hamiltonian specification
 
     :param coeff: A variable list for specifying the coefficient.  Valid options are
