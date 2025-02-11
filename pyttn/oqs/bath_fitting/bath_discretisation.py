@@ -85,9 +85,9 @@ class DensityDiscretisation(BathDiscretisation):
         w = None
 
         if self.rho is None:
-            @jit(nopython=True)
+            #@jit(nopython=True)
             def rhofunc(w):
-                return S(w)/np.where(np.abs(w) < wcut, wcut, np.abs(w))
+                return S(w)/np.where(np.abs(w) < self.wcut, self.wcut, np.abs(w))
 
             g, w = density_discretisation.discretise(S, rhofunc, self.wmin, self.wmax, self.Nb, atol=self.atol,
                                                      rtol=self.rtol, nquad=self.nquad, wtol=self.wtol, ftol=self.ftol, niters=self.niters)

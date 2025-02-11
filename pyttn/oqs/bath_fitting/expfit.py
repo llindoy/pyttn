@@ -150,13 +150,20 @@ class AAADecomposition:
 
     :param tol: The tolerance used within the AAA algorithm. (Default: 1e-4)
     :type tol: float, optional
+    :param K: The maximum number of poles to fit. (default: None)
+    :type K: int or None, optional
     :param w: Either the support points or a key word used to generate the support points.  For details see the AAA_support_points function.  (Default: "linear")
     :type w: str or np.ndarray or list, optional
     :param aaa_nmax: The maximum number of poles to allow within the AAA algorithm. (Default:500)
     :type aaa_nmax: int, optional
     :param coeff: A coefficient to go in front of the frequency terms. (Default: 1)
     :type coeff: float, optional
-    :param \*\*kwargs: Keyword arguments to pass to AAA_support_points
+    :param wmin: The minimum allowed frequency. (Default: None)
+    :type wmin: float or None, optional
+    :param wmax: The maximum allowed frequency. (Default: None)
+    :type wmax: float or None, optional
+    :param Naaa: The number of support points used by the AAA algorithm. (Default: 1000)
+    :type Naaa: int or None, optional
 
     Callable arguments:
 
@@ -169,12 +176,17 @@ class AAADecomposition:
 
     """
 
-    def __init__(self, tol=1e-4, w="linear", aaa_nmax=500, coeff=1.0, **kwargs):
-        self.Z1 = AAA_support_points(w=w, **kwargs)
+    def __init__(self, tol=1e-4, K = None, w="linear", aaa_nmax=500, coeff=1.0, wmin=None, wmax=None, Naaa=1000):
+        self.Z1 = None
+        self.w = w
+        self.wmin=wmin
+        self.wmax=wmax
+        self.Naaa = Naaa
 
         self.aaa_nmax = aaa_nmax
         self.coeff = coeff
         self.aaa_tol = tol
+        self.K = K
 
     def __AAA_to_HEOM(p, r, coeff=1.0):
         """Convert the poles and residues from the AAA algorithm into the coefficients and frequencies needed
@@ -205,9 +217,13 @@ class AAADecomposition:
             - zk (np.ndarray) - The exponents in the sum-of-exponential decomposition of the bath correlation function
             - func (callable) - The AAA rational function fit of the spectral density
         """
+        #generate the support points for the AAA decomposition
+        if not isinstance(self.Z1, (np.ndarray, list)):
+            self.Z1 = AAA_support_points(w=self.w, wmin=self.wmin, wmax=self.wmax, Naaa=self.Naaa)
+
         # first compute the aaa decomposition of the spectral function
         func1, p, r, z = AAA_algorithm(
-            S, self.Z1, nmax=self.aaa_nmax, tol=self.aaa_tol)
+            S, self.Z1, nmax=self.aaa_nmax, tol=self.aaa_tol, K = self.K)
 
         # and convert that to the heom correlation function coefficients
         dk, zk = AAADecomposition.__AAA_to_HEOM(p, r, coeff=self.coeff)

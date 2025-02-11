@@ -6,8 +6,8 @@ from pyttn.utils.truncate import *
 from pyttn import system_modes, boson_mode, fermion_mode
 
 
-class discretisedOQSBath:
-    """The base class for handling a bath representing a discretised bath correlation function
+class DiscreteOQSBath:
+    """The base class for handling a bath representing a Discrete bath correlation function
     of the form
 
     .. math::
@@ -26,7 +26,7 @@ class discretisedOQSBath:
     """
 
     def __init__(self, gk, wk, fermionic=False, tol=1e-12):
-        if (len(dk) != len(zk)):
+        if (len(gk) != len(wk)):
             raise RuntimeError("Invalid bath decomposition")
 
         self._gk = np.array(gk)
@@ -55,7 +55,7 @@ class discretisedOQSBath:
         :rtype: np.ndarray
         """
         ret = np.zeros(t.shape, dtype=np.complex128)
-        for k in range(len(self._ck)):
+        for k in range(len(self._gk)):
             ret += np.abs(self._gk[k])**2*np.exp(-1.0j*self._wk[k]*t)
         return ret
 
@@ -75,8 +75,8 @@ class discretisedOQSBath:
         return self._wk
 
 
-class discretisedBosonicBath(discretisedOQSBath):
-    """A class for handling a bosonic bath representing a discretised bath correlation function
+class DiscreteBosonicBath(DiscreteOQSBath):
+    """A class for handling a bosonic bath representing a Discrete bath correlation function
     of the form
 
     .. math::
@@ -93,7 +93,7 @@ class discretisedBosonicBath(discretisedOQSBath):
     """
 
     def __init__(self, gk, wk, tol=1e-12):
-        discretisedOQSBath.__init__(self, gk, wk, fermionic=False,
+        DiscreteOQSBath.__init__(self, gk, wk, fermionic=False,
                                 tol=tol)
         self.truncate_modes()
 
@@ -131,7 +131,7 @@ class discretisedBosonicBath(discretisedOQSBath):
     #
     #    H +=
 
-class discretisedFermionicBath(discretisedOQSBath):
+class DiscreteFermionicBath(DiscreteOQSBath):
     """A class for handling a fermionic bath representing an exponential fit to a bath correlation function
     of the form
 
@@ -150,7 +150,7 @@ class discretisedFermionicBath(discretisedOQSBath):
     """
 
     def __init__(self, dk, zk, combine_real=False, tol=1e-12):
-        discretisedOQSBath.__init__(self, dk, zk, fermionic=True,
+        DiscreteOQSBath.__init__(self, dk, zk, fermionic=True,
                                combine_real=combine_real, tol=tol)
         self.truncate_modes()
 
