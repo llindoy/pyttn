@@ -16,6 +16,8 @@
 
 #ifdef PYTTN_BUILD_CUDA
 #include <thrust/equal.h>
+#include <thrust/copy.h>
+#include <thrust/device_ptr.h>
 
 namespace linalg
 {
@@ -592,7 +594,6 @@ public:
         CALL_AND_HANDLE(cuda_safe_call(cudaMemcpy(dest, src, n*sizeof(T), cudaMemcpyDeviceToDevice)), "Failed to copy memory buffer from one buffer to another.  cudaMemcpy call failed.");
     }
 
-
     template <typename T> 
     static inline void rank_3_strided_copy(const T* src, size_type n1, size_type n2, size_type n3, T* dest, size_type n4)
     {
@@ -665,11 +666,11 @@ public:
         cuda_kernels::addition_assign_real_to_complex_array<<<dg, db, 0, environment().current_stream()>>>(src, n, dest);
     }
     
-
     template <typename T> 
     static inline void copy_matrix_subblock(size_type m1, size_type n1, const T* src, size_type lda, T* dest, size_type ldb)
     {   
-        RAISE_EXCEPTION("CUDA kernel Currently not implemented.");
+        ASSERT(environment().is_initialised(), "cuda backend copy_matrix_subblock operation failed.  The cuda environment has not yet been initialised.");
+        CALL_AND_HANDLE(cuda_safe_call(cudaMemcpy2D(dest, lda*sizeof(T), src, ldb*sizeof(T), n1, m1, cudaMemcpyDeviceToDevice)), "Failed to copy memory buffer from one buffer to another.  cudaMemcpy2D call failed.");
     }
 
     //function for filling a buffer with a value

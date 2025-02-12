@@ -98,6 +98,7 @@ public:
 
 
 protected:
+    //TODO: Make this make use of the svd threshold checker.
     template <typename Stype>
     size_type get_truncated_bond_dimension(Stype& S, size_type ashape, real_type tol = real_type(-1), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation)
     {

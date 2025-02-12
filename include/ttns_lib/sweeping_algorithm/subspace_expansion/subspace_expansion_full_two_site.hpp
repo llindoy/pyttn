@@ -254,7 +254,10 @@ public:
                     CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), nadd, buf.temp[0]), "Failed to expand A1 tensor."); 
 
                     //expand the r-matrix
-                    CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], nadd), "Failed to expand R matrix.");
+                    CALL_AND_HANDLE(buf.temp[0].resize(r.shape(0), r.shape(1)), "Failed to resize temporary array.");
+                    CALL_AND_HANDLE(buf.temp[0] = r, "Failed to copy array into temporary buffer.");
+                    CALL_AND_HANDLE(r.resize(r.shape(0)+nadd, r.shape(1)+nadd), "Failed to resize matrix.");
+                    CALL_AND_HANDLE(r.set_subblock(buf.temp[0]), "Failed to expand R matrix");
 
                     //expand the A2 tensor padding with the right singular vectors
                     CALL_AND_HANDLE(A2().expand_bond(mode, nadd, buf.temp[0], m_V), "Failed to expand A1 tensor."); 
@@ -279,7 +282,10 @@ public:
                 CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), nadd, buf.temp[0]), "Failed to expand A1 tensor."); 
 
                 //expand the r-matrix
-                CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], nadd), "Failed to expand R matrix.");
+                CALL_AND_HANDLE(buf.temp[0].resize(r.shape(0), r.shape(1)), "Failed to resize temporary array.");
+                CALL_AND_HANDLE(buf.temp[0] = r, "Failed to copy array into temporary buffer.");
+                CALL_AND_HANDLE(r.resize(r.shape(0)+nadd, r.shape(1)+nadd), "Failed to resize matrix.");
+                CALL_AND_HANDLE(r.set_subblock(buf.temp[0]), "Failed to expand R matrix");
 
                 //expand the A2 tensor padding with the right singular vectors
                 CALL_AND_HANDLE(A2().expand_bond(mode, nadd, buf.temp[0], rng), "Failed to expand A1 tensor."); 
@@ -418,7 +424,10 @@ public:
                     CALL_AND_HANDLE(A2().expand_bond(mode, nadd, buf.temp[0]), "Failed to expand A2 tensor.");
 
                     //expand the r-matrix
-                    CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], nadd), "Failed to expand R matrix.");
+                    CALL_AND_HANDLE(buf.temp[0].resize(r.shape(0), r.shape(1)), "Failed to resize temporary array.");
+                    CALL_AND_HANDLE(buf.temp[0] = r, "Failed to copy array into temporary buffer.");
+                    CALL_AND_HANDLE(r.resize(r.shape(0)+nadd, r.shape(1)+nadd), "Failed to resize matrix.");
+                    CALL_AND_HANDLE(r.set_subblock(buf.temp[0]), "Failed to expand R matrix");
 
                     //expand the A1 tensor around the index pointing to the root zero padding
                     CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), nadd, buf.temp[0], m_U), "Failed to expand A1 tensor.");
@@ -444,7 +453,10 @@ public:
                 CALL_AND_HANDLE(A2().expand_bond(mode, add, buf.temp[0]), "Failed to expand A2 tensor.");
 
                 //expand the r-matrix
-                CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], add), "Failed to expand R matrix.");
+                CALL_AND_HANDLE(buf.temp[0].resize(r.shape(0), r.shape(1)), "Failed to resize temporary array.");
+                CALL_AND_HANDLE(buf.temp[0] = r, "Failed to copy array into temporary buffer.");
+                CALL_AND_HANDLE(r.resize(r.shape(0)+nadd, r.shape(1)+nadd), "Failed to resize matrix.");
+                CALL_AND_HANDLE(r.set_subblock(buf.temp[0]), "Failed to expand R matrix");
 
                 //expand the A1 tensor around the index pointing to the root zero padding
                 CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), add, buf.temp[0], rng), "Failed to expand A1 tensor.")
