@@ -304,7 +304,7 @@ public:
         {
             for(size_type mi = 0; mi < m_nodes[ni].size(); ++mi)
             {
-                
+                edges.push_back(std::make_pair(Itype(m_nodes[ni].id()), Itype(m_nodes[ni].child(mi).id())));
             }
         }
     }

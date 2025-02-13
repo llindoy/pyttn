@@ -11,7 +11,7 @@ class DiscreteOQSBath:
     of the form
 
     .. math::
-        C(t) = \\sum_k g_{k}^2 \exp(-1.0j w_k t)
+        C(t) = \\sum_k g_{k}^2 \\exp(-1.0j w_k t)
 
     :param gk: The coefficient in the exponential decomposition
     :type gk: np.ndarray
@@ -47,7 +47,7 @@ class DiscreteOQSBath:
         defined by:
 
         .. math::
-            C(t) = \\sum_k g_{k}^2 \exp(-1.0j*w_k t)
+            C(t) = \\sum_k g_{k}^2 \\exp(-1.0j*w_k t)
 
         :param t: time
         :type t: np.ndarray
@@ -80,7 +80,7 @@ class DiscreteBosonicBath(DiscreteOQSBath):
     of the form
 
     .. math::
-        C(t) = \\sum_k g_{k}^2 \exp(-1.0j w_k t)
+        C(t) = \\sum_k g_{k}^2 \\exp(-1.0j w_k t)
 
     :param gk: The coefficient in the exponential decomposition
     :type gk: np.ndarray
@@ -134,7 +134,7 @@ class DiscreteBosonicBath(DiscreteOQSBath):
         :type H: SOP
         :param Sp: An operator that couples to the bath annihilation operator terms
         :type Sp: sOP or sPOP or sNBO or sSOP 
-        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
+        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\\dagger + a) (Default: None)
         :type Sm: sOP or sPOP or sNBO or sSOP, optional
         :param geom: The geometry of the bath to use
         :type geom: {"star", "chain", "ipchain"}
@@ -181,7 +181,7 @@ class DiscreteFermionicBath(DiscreteOQSBath):
     of the form
 
     .. math::
-        C(t) = \\sum_k g_{k}^2 \exp(-1.0j w_k t)
+        C(t) = \\sum_k g_{k}^2 \\exp(-1.0j w_k t)
 
     :param gk: The coefficient in the exponential decomposition
     :type gk: np.ndarray

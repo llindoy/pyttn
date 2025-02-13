@@ -129,9 +129,16 @@ void init_ttn(py::module &m, const std::string& label)
         .def("__copy__", [](const _ttn& o){return _ttn(o);})
         .def("__deepcopy__", [](const _ttn& o, py::dict){return _ttn(o);}, py::arg("memo"))
 
+        .def("bonds", [](const _ttn& o){std::vector<std::pair<int, int>> edges; o.get_edges(edges); return edges;})
+        
         .def("bond_dimensions", &_ttn::bond_dimensions)
         .def("bond_dimensions", [](const _ttn& o){typename _ttn::hrank_info res;  o.bond_dimensions(res);   return res;})
         .def("bond_dimensions", [](const _ttn& o, typename _ttn::hrank_info& res){;  o.bond_dimensions(res);}, "For details see :meth:`pyttn.ttn_dtype.bond_dimensions`")
+        
+        .def("bond_capacities", &_ttn::bond_capacities)
+        .def("bond_capacities", [](const _ttn& o){typename _ttn::hrank_info res;  o.bond_capacities(res);   return res;})
+        .def("bond_capacities", [](const _ttn& o, typename _ttn::hrank_info& res){;  o.bond_capacities(res);}, "For details see :meth:`pyttn.ttn_dtype.bond_capacities`")
+
         //.def("reset_orthogonality", &_ttn::reset_orthogonality)
         .def("reset_orthogonality_centre", &_ttn::reset_orthogonality_centre)
 
@@ -200,6 +207,9 @@ void init_ttn(py::module &m, const std::string& label)
         .def("bond_entropy", &_ttn::bond_entropy, "For details see :meth:`pyttn.ttn_dtype.bond_entropy`")
         .def("maximum_bond_dimension", [](const _ttn& o){return o.maximum_bond_dimension();}, "For details see :meth:`pyttn.ttn_dtype.maximum_bond_dimension")
         .def("minimum_bond_dimension", [](const _ttn& o){return o.minimum_bond_dimension();}, "For details see :meth:`pyttn.ttn_dtype.minimum_bond_dimension`")
+        .def("maximum_bond_capacity", [](const _ttn& o){return o.maximum_bond_capacity();}, "For details see :meth:`pyttn.ttn_dtype.maximum_bond_capacity")
+        .def("minimum_bond_capacity", [](const _ttn& o){return o.minimum_bond_capacity();}, "For details see :meth:`pyttn.ttn_dtype.minimum_bond_capacity`")
+
 
         .def("has_orthogonality_centre", [](const _ttn& o){return o.has_orthogonality_centre();}, "For details see :meth:`pyttn.ttn_dtype.has_orthogonality_centre`")
         .def("orthogonality_centre", [](const _ttn& o){return o.orthogonality_centre();}, "For details see :meth:`pyttn.ttn_dtype.orthogonality_centre`")

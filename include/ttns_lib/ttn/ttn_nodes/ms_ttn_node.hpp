@@ -307,6 +307,12 @@ public:
         res.resize(m_data.size()); 
         for(size_t i = 0; i < m_data.size(); ++i){res[i] = m_data[i].hrank();}
     }
+
+    void get_max_hrank(std::vector<size_type>& res ) const
+    {
+        res.resize(m_data.size()); 
+        for(size_t i = 0; i < m_data.size(); ++i){res[i] = m_data[i].max_hrank();}
+    }
     size_type hrank(size_type i) const{return m_data[i].hrank();}
     size_type nmodes() const{return m_children.size();}
     size_type dimen(size_type i) const {return m_data[i].dimen();}

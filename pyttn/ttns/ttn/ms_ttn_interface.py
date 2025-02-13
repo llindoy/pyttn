@@ -6,18 +6,18 @@ class ms_ttn_dtype:
     :class:`ttn_complex` and :class:`ttn_real` (with the real variant only present if the pybind11 wrapper has been built with support
     for real valued multiset TTNs.
 
-    :param \*args: A variable length list of arguments. Valid options are
+    :param \\*args: A variable length list of arguments. Valid options are
 
         - none - in this case we call the default constructor of the multiset ttn class to construct an empty ttn.
         - **A** (:class:`ms_ttn_complex` or :class:`ms_ttn_real`) - Construct the multiset ttn object from another multiset multiset ttn object potentially converting the dtype
         - **topology** (:class:`ntree` or str), **nset** (int) - Construct a ms multiset ttn from a ntree object defining the topology and bond dimensions of the ms multiset ttn and a variable specifying the number of sets
         - **topology** (:class:`ntree` or str), **capacity** (:class:`ntree` or str ), **nset** (int) - Construct a multiset ttn from an ntree object defining the topology, a capacity defining the maximum bond dimensions, and a variable specifying the number of set
 
-    :type \*args: [Arguments (variable number and type)]
-    :param \*\*kwargs: A dictionary containing optional input arguments.
+    :type \\*args: [Arguments (variable number and type)]
+    :param \\*\\*kwargs: A dictionary containing optional input arguments.
 
         - **purification** (bool) - Whether or not this state should represent a purification of a state.
-    :type \*\*kwargs: dict(Arguments (variable number and type))
+    :type \\*\\*kwargs: dict(Arguments (variable number and type))
     """
 
     def __init__(self, *args, dtype=np.complex128, **kwargs):
@@ -61,10 +61,26 @@ class ms_ttn_dtype:
 
         """
 
+    def bond(self):
+        """Return a list of all bonds in the network
+
+        :returns: All bonds in the network
+        :rtype: list[int, int]
+        """
+        pass
+
     def bond_dimensions(self):
         """Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network
 
         :returns: All bond dimensions in the network
+        :rtype: dict([int, int], list[int])
+        """
+        pass
+
+    def bond_capacities(self):
+        """Return a dictionary containing the bond (the two sites forming the bond) and maximum bond dimension of all bonds in the network
+
+        :returns: All maximum bond dimensions in the network
         :rtype: dict([int, int], list[int])
         """
         pass
@@ -76,11 +92,11 @@ class ms_ttn_dtype:
     def resize(self, *args, nset, purification=False):
         """Resize the multiset TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction
 
-        :param \*args: A variable length list of arguments. Valid options are
+        :param \\*args: A variable length list of arguments. Valid options are
 
             - **topology** (:class:`ntree` or str) - Construct a multiset ttn from a ntree object defining the topology and bond dimensions of the ttn
             - **topology** (:class:`ntree` or str), **capacity** (ntree or str ) - Construct a multiset ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions
-        :type \*args: [Arguments (variable number and type)]
+        :type \\*args: [Arguments (variable number and type)]
         :param nset: The number of set variables to use for the ms_ttn
         :type nset: int
         :param purification: Whether or not the buffers should be resized to store a purification of the requested state size.  (Default: False)
@@ -97,15 +113,14 @@ class ms_ttn_dtype:
         pass
 
     def set_state(self, *args, random_unoccupied_initialisation=False):
-        """Set the coefficients in the multiset TTN so that it represents a user specified product state 
+        """Set the coefficients in the multiset TTN so that it represents a user specified product state
 
-
-        :param \*args: A variable length list of arguments. Valid options are
+        :param \\*args: A variable length list of arguments. Valid options are
 
             - **set_index** (int), **state** (list[int]) - For setting the state to be a product state vector acting on a specific set index
-            - **coeff** (list[dtype]), **state** (list[list[int]]) - For setting the system to be the state :math:`\\sum_i c_i \\|i\\rangle \\bigotimes \mathrm{state}_i`
+            - **coeff** (list[dtype]), **state** (list[list[int]]) - For setting the system to be the state :math:`\\sum_i c_i \\|i\\rangle \\bigotimes \\mathrm{state}_i`
 
-        :type \*args: [Arguments (variable number and type)]
+        :type \\*args: [Arguments (variable number and type)]
         :param random_unoccupied_initialisation: Whether or not to set all other elements of the multiset TTN not determining the product state to random values or not. (Default: False)
         :type random_unoccupied_initialisation: bool, optional
         """
@@ -114,7 +129,7 @@ class ms_ttn_dtype:
     # def set_product(self, state):
     #    """Set the coefficients in the multiset TTN so that it represents a product of a set of one body states
 
-    #    :param \*args: A variable length list of arguments. Valid options are
+    #    :param \\*args: A variable length list of arguments. Valid options are
     #
     #        - **set_index** (int), **state** (list[list[dtype]]) - For setting the state to be a product state vector acting on a specific set index
     #        - **coeff** (list[dtype]), **state** (list[list[list[dtype]]]) - For setting the system to be the state :math:`\\sum_i c_i \\|i\\rangle \\bigotimes \mathrm{state}_i`
@@ -476,11 +491,11 @@ class ms_ttn_dtype:
     # def apply_one_body_operator(self, *args, shift_orthogonality=True):
     #    """Apply a one-body operator to the multiset TTN updating its value
 
-    #    :param \*args: A variable length list of arguments. Valid options are
+    #    :param \\*args: A variable length list of arguments. Valid options are
     #
     #        - **op** (linalg.matrix or np.ndarray or site_operator_dtype), **mode** (int) -  Apply the operator op to mode mode
     #        - **op** (site_operator_dtype) - Apply the operator op to the mode specified by op
-    #    :type \*args: [Arguments (variable number and type)]
+    #    :type \\*args: [Arguments (variable number and type)]
     #    :param shift_orthogonality: Whether or not to shift the orthogonality centre of the multiset TTN to the leaf node that will be updated by this one-body operator.  (Default: True)
     #    :type shift_orthogonality: bool, optional
     #    """

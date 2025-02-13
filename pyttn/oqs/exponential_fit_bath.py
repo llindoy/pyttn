@@ -11,7 +11,7 @@ class ExpFitOQSBath:
     of the form
 
     .. math::
-        C(t) = \\sum_k d_{k} \exp(-z_k t)
+        C(t) = \\sum_k d_{k} \\exp(-z_k t)
 
     :param dk: The coefficient in the exponential decomposition
     :type dk: np.ndarray
@@ -82,7 +82,7 @@ class ExpFitOQSBath:
         defined by:
 
         .. math::
-            C(t) = \\sum_k d_{k} \exp(-z_k t)
+            C(t) = \\sum_k d_{k} \\exp(-z_k t)
 
         :param t: time
         :type t: np.ndarray
@@ -116,7 +116,7 @@ class ExpFitBosonicBath(ExpFitOQSBath):
     of the form
 
     .. math::
-        C(t) = \\sum_k d_{k} \exp(-z_k t)
+        C(t) = \\sum_k d_{k} \\exp(-z_k t)
 
     :param dk: The coefficient in the exponential decomposition
     :type dk: np.ndarray
@@ -174,7 +174,7 @@ class ExpFitFermionicBath(ExpFitOQSBath):
     of the form
 
     .. math::
-        C(t) = \\sum_k d_{k} \exp(-z_k t)
+        C(t) = \\sum_k d_{k} \\exp(-z_k t)
 
     :param dk: The coefficient in the exponential decomposition
     :type dk: np.ndarray
