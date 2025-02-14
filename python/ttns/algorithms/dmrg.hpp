@@ -297,8 +297,13 @@ template <typename T, typename backend>
 void init_dmrg(py::module &m, const std::string& label)
 {
     init_dmrg_core<T, ttns::ttn, backend>(m, (std::string("one_site_dmrg_")+label));
-    init_dmrg_adaptive<T, ttns::ttn, backend>(m, (std::string("adaptive_one_site_dmrg_")+label));
     init_dmrg_core<T, ttns::ms_ttn, backend>(m, (std::string("multiset_one_site_dmrg_")+label));
+}
+
+template <typename T, typename backend>
+void init_dmrg_subspace(py::module &m, const std::string& label)
+{
+    init_dmrg_adaptive<T, ttns::ttn, backend>(m, (std::string("adaptive_one_site_dmrg_")+label));
 }
 
 template <typename real_type, typename backend>
@@ -310,6 +315,17 @@ void initialise_dmrg(py::module& m)
     //init_dmrg<real_type, backend>(m, "real");
 #endif
     init_dmrg<complex_type, backend>(m, "complex");
+}
+
+template <typename real_type, typename backend>
+void initialise_dmrg_adaptive(py::module& m)
+{
+    using complex_type = linalg::complex<real_type>;
+  
+#ifdef BUILD_REAL_TTN
+    //init_dmrg<real_type, backend>(m, "real");
+#endif
+    init_dmrg_subspace<complex_type, backend>(m, "complex");
 }
 
 

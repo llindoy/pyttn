@@ -344,7 +344,6 @@ inline void init_system_info(py::module &m)
                             - **index** (int) - The index of this mode
         )mydelim")
 
-
         .def("add_mode", static_cast<void (system_modes::*)(const mode_data&)>(&system_modes::add_mode), R"mydelim(
             Append a new mode to the end of the system specified in a mode_data object.
 
@@ -401,7 +400,20 @@ inline void init_system_info(py::module &m)
                                 - **mode** (list[:class:`primitive_mode_data`]) - A list primitive_mode_data object used to construct the new mode
 
         )mydelim"
-            )       
+        )
+        .def("mode_dimensions",
+            [](const system_modes& o)
+            {
+                std::vector<size_t> dims;
+                o.get_mode_dimensions(dims);
+                return dims;
+            }, 
+        R"mydelim(
+                Returns a list containing the local Hilbert space dimensions of each mode in the system.
+                :Returns:       The local Hilbert space dimensions of each mode of the system
+                :Return Type:   list(int)
+        )mydelim"
+        )         
         .def(
                 "mode", 
                 static_cast<const mode_data& (system_modes::*)(size_t) const>(&system_modes::mode), 

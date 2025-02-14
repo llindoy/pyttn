@@ -315,6 +315,16 @@ public:
             RAISE_EXCEPTION("Failed to apply two-site energy variance object.");
         }
     }
+
+    static inline void expand_matrix(mat& r, mat& temp, size_type iadd)
+    {
+        CALL_AND_HANDLE(temp.resize(r.shape(0), r.shape(1)), "Failed to resize temporary array.");
+        CALL_AND_HANDLE(temp = r, "Failed to copy array into temporary buffer.");
+        CALL_AND_HANDLE(r.resize(r.shape(0) + iadd, r.shape(1) + iadd), "Failed to resize matrix.");
+        //Fill the entire r matrix with zeros to avoid any issues with uninitialised values
+        CALL_AND_HANDLE(r.fill_zeros(), "Failed to fill the r matrix with zeros.");
+        CALL_AND_HANDLE(r.set_subblock(temp), "Failed to expand R matrix");
+    }
 };
 
 }   //namespace ttns

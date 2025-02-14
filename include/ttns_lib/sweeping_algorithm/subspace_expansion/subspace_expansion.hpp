@@ -300,10 +300,7 @@ namespace ttns
                             CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), nadd, buf.temp[0]), "Failed to expand A1 tensor.");
 
                             // expand the r-matrix
-                            CALL_AND_HANDLE(buf.temp[0].resize(r.shape(0), r.shape(1)), "Failed to resize temporary array.");
-                            CALL_AND_HANDLE(buf.temp[0] = r, "Failed to copy array into temporary buffer.");
-                            CALL_AND_HANDLE(r.resize(r.shape(0) + nadd, r.shape(1) + nadd), "Failed to resize matrix.");
-                            CALL_AND_HANDLE(r.set_subblock(buf.temp[0]), "Failed to expand R matrix");
+                            CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], nadd), "Failed to expand R matrix.");
 
                             // expand the A2 tensor padding with the right singular vectors
                             CALL_AND_HANDLE(A2().expand_bond(mode, nadd, buf.temp[0], m_V), "Failed to expand A1 tensor.");
@@ -326,16 +323,13 @@ namespace ttns
                     size_type add = required_terms - nadd;
 
                     // expand the A1 tensor zero padding
-                    CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), nadd, buf.temp[0]), "Failed to expand A1 tensor.");
+                    CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), add, buf.temp[0]), "Failed to expand A1 tensor.");
 
                     // expand the r-matrix
-                    CALL_AND_HANDLE(buf.temp[0].resize(r.shape(0), r.shape(1)), "Failed to resize temporary array.");
-                    CALL_AND_HANDLE(buf.temp[0] = r, "Failed to copy array into temporary buffer.");
-                    CALL_AND_HANDLE(r.resize(r.shape(0) + nadd, r.shape(1) + nadd), "Failed to resize matrix.");
-                    CALL_AND_HANDLE(r.set_subblock(buf.temp[0]), "Failed to expand R matrix");
+                    CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], add), "Failed to expand R matrix.");
 
                     // expand the A2 tensor padding with the right singular vectors
-                    CALL_AND_HANDLE(A2().expand_bond(mode, nadd, buf.temp[0], rng), "Failed to expand A1 tensor.");
+                    CALL_AND_HANDLE(A2().expand_bond(mode, add, buf.temp[0], rng), "Failed to expand A1 tensor.");
 
                     // resize the Hamiltonian object stored at the child node to the correct size.  Here we don't care about the values
                     // stored in these matrices as they will be updated before they are used for anything.
@@ -517,10 +511,7 @@ namespace ttns
                             CALL_AND_HANDLE(A2().expand_bond(mode, nadd, buf.temp[0]), "Failed to expand A2 tensor.");
 
                             // expand the r-matrix
-                            CALL_AND_HANDLE(buf.temp[0].resize(r.shape(0), r.shape(1)), "Failed to resize temporary array.");
-                            CALL_AND_HANDLE(buf.temp[0] = r, "Failed to copy array into temporary buffer.");
-                            CALL_AND_HANDLE(r.resize(r.shape(0) + nadd, r.shape(1) + nadd), "Failed to resize matrix.");
-                            CALL_AND_HANDLE(r.set_subblock(buf.temp[0]), "Failed to expand R matrix");
+                            CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], nadd), "Failed to expand R matrix.");
 
                             // expand the A1 tensor around the index pointing to the root zero padding
                             CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), nadd, buf.temp[0], m_U), "Failed to expand A1 tensor.");
@@ -547,10 +538,7 @@ namespace ttns
                     CALL_AND_HANDLE(A2().expand_bond(mode, add, buf.temp[0]), "Failed to expand A2 tensor.");
 
                     // expand the r-matrix
-                    CALL_AND_HANDLE(buf.temp[0].resize(r.shape(0), r.shape(1)), "Failed to resize temporary array.");
-                    CALL_AND_HANDLE(buf.temp[0] = r, "Failed to copy array into temporary buffer.");
-                    CALL_AND_HANDLE(r.resize(r.shape(0) + nadd, r.shape(1) + nadd), "Failed to resize matrix.");
-                    CALL_AND_HANDLE(r.set_subblock(buf.temp[0]), "Failed to expand R matrix");
+                    CALL_AND_HANDLE(twosite::expand_matrix(r, buf.temp[0], add), "Failed to expand R matrix.");
 
                     // expand the A1 tensor around the index pointing to the root zero padding
                     CALL_AND_HANDLE(A1().expand_bond(A1.nmodes(), add, buf.temp[0], rng), "Failed to expand A1 tensor.")
@@ -668,7 +656,7 @@ namespace ttns
         size_type m_maxcapacity;
         size_type m_max_dim = 0;
 
-        orthogonality::truncation_mode m_trunc_mode = orthogonality::truncation_mode::singular_values_truncation;
+        orthogonality::truncation_mode m_trunc_mode = orthogonality::truncation_mode::second_order_truncation;
 
         mat_type m_U;
         linalg::diagonal_matrix<T, backend> m_S;

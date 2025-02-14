@@ -13,7 +13,8 @@ namespace orthogonality
 enum truncation_mode
 {
     weight_truncation = 0,
-    singular_values_truncation = 1
+    singular_values_truncation = 1,
+    second_order_truncation = 2
 };
 
 
@@ -129,7 +130,6 @@ protected:
                 for(size_type i = 0; i < bond_dimension; ++i)
                 {
                     if(std::abs(m_shost(i, i)) > tol*snorm){++nb;}
-                    std::cerr << i << " " << m_shost(i, i) << " " << tol << " " << snorm << std::endl;
                 }
             }
             else if(trunc_mode == truncation_mode::weight_truncation)

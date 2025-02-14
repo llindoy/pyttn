@@ -215,30 +215,6 @@ public:
         return mbd;
     }
 
-    size_type maximum_bond_capacity() const
-    {
-        size_type mbd = 0;
-        for(const auto& n : m_nodes)
-        {
-            if(n.hrank() > mbd){mbd = n.max_hrank();}
-        }
-        return mbd;
-    }
-
-    size_type minimum_bond_capacity() const
-    {
-        size_type mbd = 0;
-        bool first_call = true;
-        for(const auto& n : m_nodes)
-        {
-            if(!first_call)
-            {
-                if(n.hrank() < mbd || mbd == 0){mbd = n.max_hrank();}
-            }
-            else{first_call = false;}
-        }
-        return mbd;
-    }
 
 public:
     template <typename int_type> 

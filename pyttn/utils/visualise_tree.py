@@ -1,5 +1,5 @@
 
-def visualise_ntree(tree, prog="dot", ax=None, node_size=500, linewidth=3, add_labels=True):
+def visualise_ntree(tree, prog="dot", ax=None, node_size=300, linewidth=3, add_labels=True):
     """A function for plotting an ntree object
 
     :param tree: The tree to be visualised
@@ -43,7 +43,7 @@ def visualise_ntree(tree, prog="dot", ax=None, node_size=500, linewidth=3, add_l
         raise RuntimeError("Failed to visualise tree structure.")
     
 
-def visualise_ttn(tree, prog="dot", ax=None, node_size=500, linewidth=3, bond_prop=None, colourmap='viridis'):
+def visualise_ttn(tree, prog="dot", ax=None, node_size=300, linewidth=3, bond_prop=None, colourmap='viridis', label_all_bonds=False):
     """A function for plotting an ttn object
 
     :param tree: The tree to be visualised
@@ -60,7 +60,8 @@ def visualise_ttn(tree, prog="dot", ax=None, node_size=500, linewidth=3, bond_pr
     :type bond_prop: {"bond dimension", "bond capacity"}, optional
     :param colourmap: An optional name for colour map to use when plotting bond properties. (Default: 'viridis')
     :type colourmap: str, optional
-
+    :param label_all_bonds: An optional boolean specifying whether or not to label all bonds in the TTN.  If False only the bonds with the maximum and minimum value of the property will be labelled. (Default: False)
+    :type label_all_bonds: bool, optional
     """
     try:
         import networkx as nx
@@ -104,26 +105,34 @@ def visualise_ttn(tree, prog="dot", ax=None, node_size=500, linewidth=3, bond_pr
             min_edge = min(prop, key = prop.get)
             min_val = prop[min_edge]
 
-            edge_labels = {max_edge : str(max_val), min_edge : str(min_val)}
-            try:
-                import matplotlib as mpl
-                cmap = mpl.cm.get_cmap(colourmap)
-                colours = [ cmap((prop[(v, u)])/max_val) for u, v in edges]  
+            if(label_all_bonds):
+                edge_labels = prop
+            else: 
+                edge_labels = {max_edge : str(max_val), min_edge : str(min_val)}
+
+            if colourmap is not None:
+                try:
+                    import matplotlib as mpl
+                    cmap = mpl.cm.get_cmap(colourmap)
+                    colours = [ cmap((prop[(v, u)])/max_val) for u, v in edges]  
+                    nx.draw(G, pos,
+                        node_size=node_size, width=linewidth, edge_color = colours, ax=ax)
+                    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+                except:
+                    nx.draw(G, pos,
+                        node_size=node_size, width=linewidth, ax=ax)
+                    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+            else:
                 nx.draw(G, pos,
-                    node_size=node_size, width=linewidth, edge_color = colours, ax=ax)
-                nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-            except:
-                nx.draw(G, pos,
-                    node_size=node_size, width=linewidth, ax=ax, edge_labels=edge_labels)
+                    node_size=node_size, width=linewidth, ax=ax)
                 nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-       
     except Exception as e:
         print(e)
         raise RuntimeError("Failed to visualise tree structure.")
 
 
-def visualise_tree(tree, prog="dot", ax=None, node_size=500, linewidth=3, add_labels=True, bond_prop=None, colourmap = 'viridis'):
+def visualise_tree(tree, prog="dot", ax=None, node_size=300, linewidth=3, add_labels=True, bond_prop=None, colourmap = 'viridis', label_all_bonds=False):
     """A function for plotting a tree structured object
 
     :param tree: The tree to be visualised
@@ -141,6 +150,8 @@ def visualise_tree(tree, prog="dot", ax=None, node_size=500, linewidth=3, add_la
     :param bond_prop: A parameter specifying the bond property to plot for a ttn or ms_ttn.  See :meth:`visualise_ttn` or :meth:`visualise_ms_ttn` for more details. 
     :param colourmap: An optional name for colour map to use when plotting bond properties. (Default: 'viridis')
     :type colourmap: str, optional
+    :param label_all_bonds: An optional boolean specifying whether or not to label all bonds in the TTN.  If False only the bonds with the maximum and minimum value of the property will be labelled. (Default: False)
+    :type label_all_bonds: bool, optional
     """
 
     from pyttn import ntree, is_ttn, is_ms_ttn
@@ -148,4 +159,4 @@ def visualise_tree(tree, prog="dot", ax=None, node_size=500, linewidth=3, add_la
     if isinstance(tree, ntree):
         visualise_ntree(tree, prog=prog, ax=ax, node_size=node_size, linewidth=linewidth, add_labels=add_labels)
     elif is_ttn(tree):
-        visualise_ttn(tree, prog=prog, ax=ax, node_size=node_size, linewidth=linewidth, bond_prop=bond_prop, colourmap=colourmap)
+        visualise_ttn(tree, prog=prog, ax=ax, node_size=node_size, linewidth=linewidth, bond_prop=bond_prop, colourmap=colourmap, label_all_bonds=label_all_bonds)

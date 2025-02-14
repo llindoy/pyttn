@@ -112,9 +112,9 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     #set up tdvp sweeping algorithm parameters
     sweep = None
     if not adaptive:
-        sweep = tdvp(A, h, krylov_dim = 12)
+        sweep = tdvp(A, h, krylov_dim = 16)
     else:
-        sweep = tdvp(A, h, krylov_dim=12, subspace_neigs = 6, expansion='subspace')
+        sweep = tdvp(A, h, krylov_dim=16, subspace_neigs = 2, expansion='subspace')
         sweep.spawning_threshold = spawning_threshold
         sweep.unoccupied_threshold=unoccupied_threshold
         sweep.minimum_unoccupied=nunoccupied
@@ -169,7 +169,6 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
             h5.close()
 
             import matplotlib.pyplot as plt
-            utils.visualise_tree(A, bond_prop="bond dimension")
             plt.show()
                 
     #and finally dump everything to file at the end of the simulation
@@ -191,10 +190,10 @@ if __name__ == "__main__":
     parser.add_argument('--s', type = float, default=1)
 
     #number of bath modes
-    parser.add_argument('--N', type=int, default=16)
+    parser.add_argument('--N', type=int, default=128)
 
     #geometry to be used for bath dynamics
-    parser.add_argument('--geom', type = str, default='star')
+    parser.add_argument('--geom', type = str, default='chain')
 
     #system hamiltonian parameters
     parser.add_argument('--delta', type = float, default=1)
@@ -204,11 +203,11 @@ if __name__ == "__main__":
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=16)
-    parser.add_argument('--degree', type=int, default=2)
+    parser.add_argument('--chi', type=int, default=32)
+    parser.add_argument('--degree', type=int, default=1)
 
     #maximum bosonic hilbert space dimension
-    parser.add_argument('--nbose', type=int, default=100)
+    parser.add_argument('--nbose', type=int, default=30)
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.005)
@@ -220,7 +219,7 @@ if __name__ == "__main__":
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
     parser.add_argument('--nunoccupied', type=int, default=0)
-    parser.add_argument('--spawning_threshold', type=float, default=1e-4)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-5)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
     args = parser.parse_args()

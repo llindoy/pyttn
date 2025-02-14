@@ -274,22 +274,6 @@ class ttn_dtype:
         """
         pass
 
-    def maximum_bond_capacity(self):
-        """            
-        :returns: The maximum bond dimension
-        :rtype: int
-
-        """
-        pass
-
-    def minimum_bond_capacity(self):
-        """            
-        :returns: The minimum bond dimension
-        :rtype: int
-
-        """
-        pass
-
     def has_orthogonality_centre(self):
         """            
         :returns: Whether or not the TTN has an active orthogonality centre

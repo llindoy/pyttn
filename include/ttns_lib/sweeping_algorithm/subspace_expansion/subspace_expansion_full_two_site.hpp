@@ -568,7 +568,7 @@ protected:
     size_type m_maxcapacity;
     size_type m_max_dim = 0;
 
-    orthogonality::truncation_mode m_trunc_mode = orthogonality::truncation_mode::singular_values_truncation;
+    orthogonality::truncation_mode m_trunc_mode = orthogonality::truncation_mode::second_order_truncation;
 
     linalg::singular_value_decomposition<mat_type, true> m_svd;
     mat_type m_twosite_energy;

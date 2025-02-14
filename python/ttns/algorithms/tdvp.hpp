@@ -369,9 +369,14 @@ template <typename T, typename backend>
 void init_tdvp(py::module &m, const std::string& label)
 {
     init_tdvp_core<T, ttns::ttn, backend>(m, (std::string("one_site_tdvp_")+label));
+    init_tdvp_core<T, ttns::ms_ttn, backend>(m, (std::string("multiset_one_site_tdvp_")+label));
+}
+
+template <typename T, typename backend>
+void init_tdvp_subspace(py::module &m, const std::string& label)
+{
     init_tdvp_adaptive<T, ttns::ttn, backend>(m, (std::string("adaptive_one_site_tdvp_")+label));
     init_tdvp_adaptive_ts_cost<T, ttns::ttn, backend>(m, (std::string("subspace_two_site_cost_tdvp_")+label));
-    init_tdvp_core<T, ttns::ms_ttn, backend>(m, (std::string("multiset_one_site_tdvp_")+label));
 }
 
 template <typename real_type, typename backend>
@@ -383,6 +388,18 @@ void initialise_tdvp(py::module& m)
     //init_tdvp<real_type, backend>(m, "real");
 #endif
     init_tdvp<complex_type, backend>(m, "complex");
+}
+
+
+template <typename real_type, typename backend>
+void initialise_tdvp_adaptive(py::module& m)
+{
+    using complex_type = linalg::complex<real_type>;
+  
+#ifdef BUILD_REAL_TTN
+    //init_tdvp<real_type, backend>(m, "real");
+#endif
+    init_tdvp_subspace<complex_type, backend>(m, "complex");
 }
 
 
