@@ -13,7 +13,8 @@ namespace orthogonality
 enum truncation_mode
 {
     weight_truncation = 0,
-    singular_values_truncation = 1
+    singular_values_truncation = 1,
+    second_order_truncation = 2
 };
 
 
@@ -98,6 +99,7 @@ public:
 
 
 protected:
+    //TODO: Make this make use of the svd threshold checker.
     template <typename Stype>
     size_type get_truncated_bond_dimension(Stype& S, size_type ashape, real_type tol = real_type(-1), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation)
     {
@@ -128,7 +130,6 @@ protected:
                 for(size_type i = 0; i < bond_dimension; ++i)
                 {
                     if(std::abs(m_shost(i, i)) > tol*snorm){++nb;}
-                    std::cerr << i << " " << m_shost(i, i) << " " << tol << " " << snorm << std::endl;
                 }
             }
             else if(trunc_mode == truncation_mode::weight_truncation)

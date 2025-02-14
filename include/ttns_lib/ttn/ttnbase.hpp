@@ -539,6 +539,17 @@ public:
         }
     }
 
+    void bond_capacities(hrank_info& binfo) const
+    {
+        for(const auto& a : m_nodes)
+        {
+            if(!a.is_root())
+            {
+                a.get_max_hrank(binfo[std::make_pair(a.id(), a.parent().id())]);
+            }
+        }
+    }
+
     /*
      *  Functions for adjusting the orthogonality condition of the TTNS
      */

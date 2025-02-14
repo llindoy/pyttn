@@ -42,7 +42,7 @@ def test_dmrg_mps_tfim(N, expected_result, adaptive, use_mps):
 
     #now add on the zz interactions
     for i in range(N-1):
-        H += -1.0*h*sOP("sz", i)*sOP("sz", i+1)
+        H += -1.0*J*sOP("sz", i)*sOP("sz", i+1)
 
     #setup the system topology
     A = None
@@ -132,7 +132,7 @@ def test_dmrg_mps_tfim_strided(N, expected_result, second_chain_interactions, ad
 
         #now add on the zz interactions
         for i in range(N-1):
-            H += -1.0*h*sOP("sz", 2*i+1)*sOP("sz", 2*(i+1)+1)
+            H += -1.0*J*sOP("sz", 2*i+1)*sOP("sz", 2*(i+1)+1)
 
     #setup the system topology
     A = None
@@ -210,7 +210,7 @@ def test_dmrg_mps_tfim_fork(N, expected_result, adaptive):
 
     #now add on the zz interactions
     for i in range(N-1):
-        H += -1.0*h*sOP("sz", 4*i)*sOP("sz", 4*(i+1))
+        H += -1.0*J*sOP("sz", 4*i)*sOP("sz", 4*(i+1))
 
     def build_tree(chi, chif):
         topo = ntreeBuilder.mps_tree([chif for i in range(N)], chi)

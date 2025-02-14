@@ -1114,6 +1114,8 @@ public:
     size_type maxhrank(bool use_capacity = false) const{return m_data.hrank(use_capacity);}
 
     void get_hrank(size_type& res ) const{res = m_data.hrank();}
+    void get_max_hrank(size_type& res ) const{res = m_data.max_hrank();}
+
     size_type hrank() const{return m_data.hrank();}
     size_type nmodes() const{return m_data.nmodes();}
     size_type dimen() const {return m_data.dimen();}

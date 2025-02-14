@@ -6,7 +6,7 @@ class ttn_dtype:
     :class:`ttn_complex` and :class:`ttn_real` (with the real variant only present if the pybind11 wrapper has been built with support
     for real valued TTNs.
 
-    :param \*args: A variable length list of arguments. Valid options are
+    :param \\*args: A variable length list of arguments. Valid options are
 
         - none - in this case we call the default constructor of the ttn class to construct an empty ttn.
         - **A** (:class:`ms_ttn_slice_complex` or :class:`ms_ttn_slice_real`) - Construct a ttn to represent a single slice of a multiset TTN
@@ -14,11 +14,11 @@ class ttn_dtype:
         - **topology** (:class:`ntree` or str) - Construct a ttn from a ntree object defining the topology and bond dimensions of the ttn
         - **topology** (:class:`ntree` or str), **capacity** (:class:`ntree` or str ) - Construct a ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions
 
-    :type \*args: [Arguments (variable number and type)]
-    :param \*\*kwargs: A dictionary containing optional input arguments.
+    :type \\*args: [Arguments (variable number and type)]
+    :param \\*\\*kwargs: A dictionary containing optional input arguments.
 
         - **purification** (bool) - Whether or not this state should represent a purification of a state.
-    :type \*\*kwargs: dict(Arguments (variable number and type))
+    :type \\*\\*kwargs: dict(Arguments (variable number and type))
     """
 
     def __init__(self, *args, dtype=np.complex128, **kwargs):
@@ -42,6 +42,14 @@ class ttn_dtype:
         """
         pass
 
+    def bond(self):
+        """Return a list of all bonds in the network
+
+        :returns: All bonds in the network
+        :rtype: list[int, int]
+        """
+        pass
+
     def bond_dimensions(self):
         """Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network
 
@@ -50,6 +58,15 @@ class ttn_dtype:
         """
         pass
 
+    def bond_capacities(self):
+        """Return a dictionary containing the bond (the two sites forming the bond) and maximum bond dimension of all bonds in the network
+
+        :returns: All maximum bond dimensions in the network
+        :rtype: dict([int, int], int)
+        """
+        pass
+
+
     def reset_orthogonality_centre(self):
         """Resets the orthogonality centre of the TTN to the root node of the tree."""
         pass
@@ -57,11 +74,11 @@ class ttn_dtype:
     def resize(self, *args, purification=False):
         """Resize the TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction
 
-        :param \*args: A variable length list of arguments. Valid options are
+        :param \\*args: A variable length list of arguments. Valid options are
 
             - **topology** (:class:`ntree` or str) - Construct a ttn from a ntree object defining the topology and bond dimensions of the ttn
             - **topology** (:class:`ntree` or str), **capacity** (ntree or str ) - Construct a ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions
-        :type \*args: [Arguments (variable number and type)]
+        :type \\*args: [Arguments (variable number and type)]
         :param purification: Whether or not the buffers should be resized to store a purification of the requested state size.  (Default: False)
         :type purification: bool, optional
         """
@@ -447,11 +464,11 @@ class ttn_dtype:
     def apply_one_body_operator(self, *args, shift_orthogonality=True):
         """Apply a one-body operator to the TTN updating its value
 
-        :param \*args: A variable length list of arguments. Valid options are
+        :param \\*args: A variable length list of arguments. Valid options are
 
             - **op** (linalg.matrix or np.ndarray or site_operator_dtype), **mode** (int) -  Apply the operator op to mode mode
             - **op** (site_operator_dtype) - Apply the operator op to the mode specified by op
-        :type \*args: [Arguments (variable number and type)]
+        :type \\*args: [Arguments (variable number and type)]
         :param shift_orthogonality: Whether or not to shift the orthogonality centre of the TTN to the leaf node that will be updated by this one-body operator.  (Default: True)
         :type shift_orthogonality: bool, optional
         """

@@ -33,6 +33,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     def J(w):
         return np.abs(np.pi/2*alpha*wc*np.power(w/wc, s)*np.exp(-np.abs(w/wc)))*np.where(w > 0, 1.0, -1.0)
 
+
     #set up the open quantum system bath object
     bath = oqs.BosonicBath(J, beta=beta)
 
@@ -86,6 +87,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     topo = setup_topology(chi0, nbose, tree_mode_dims, degree)
     capacity = setup_topology(chi, nbose, tree_mode_dims, degree)
 
+
     #construct and initialise the ttn wavefunction
     A = ttn(topo, capacity, dtype=np.complex128)
     A.set_state([0 for i in range(len(bsys)+1)])
@@ -110,9 +112,9 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     #set up tdvp sweeping algorithm parameters
     sweep = None
     if not adaptive:
-        sweep = tdvp(A, h, krylov_dim = 12)
+        sweep = tdvp(A, h, krylov_dim = 16)
     else:
-        sweep = tdvp(A, h, krylov_dim=12, subspace_neigs = 6, expansion='subspace')
+        sweep = tdvp(A, h, krylov_dim=16, subspace_neigs = 2, expansion='subspace')
         sweep.spawning_threshold = spawning_threshold
         sweep.unoccupied_threshold=unoccupied_threshold
         sweep.minimum_unoccupied=nunoccupied
@@ -157,6 +159,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
         maxchi[i+1] = A.maximum_bond_dimension()
         print(i, Sz[i+1], A.maximum_bond_dimension())
 
+
         #outputting results to files every 10 steps
         if(i % 10 == 0):
             h5 = h5py.File(ofname, 'w')
@@ -164,6 +167,9 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
             h5.create_dataset('Sz', data=Sz)
             h5.create_dataset('maxchi', data=maxchi)
             h5.close()
+
+            import matplotlib.pyplot as plt
+            plt.show()
                 
     #and finally dump everything to file at the end of the simulation
     h5 = h5py.File(ofname, 'w')
@@ -187,7 +193,7 @@ if __name__ == "__main__":
     parser.add_argument('--N', type=int, default=128)
 
     #geometry to be used for bath dynamics
-    parser.add_argument('--geom', type = str, default='ipchain')
+    parser.add_argument('--geom', type = str, default='chain')
 
     #system hamiltonian parameters
     parser.add_argument('--delta', type = float, default=1)
@@ -197,11 +203,11 @@ if __name__ == "__main__":
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=16)
+    parser.add_argument('--chi', type=int, default=32)
     parser.add_argument('--degree', type=int, default=1)
 
     #maximum bosonic hilbert space dimension
-    parser.add_argument('--nbose', type=int, default=100)
+    parser.add_argument('--nbose', type=int, default=30)
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.005)
@@ -213,7 +219,7 @@ if __name__ == "__main__":
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
     parser.add_argument('--nunoccupied', type=int, default=0)
-    parser.add_argument('--spawning_threshold', type=float, default=1e-4)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-5)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
     args = parser.parse_args()

@@ -215,6 +215,7 @@ public:
         return mbd;
     }
 
+
 public:
     template <typename int_type> 
     void set_state(const std::vector<int_type>& si, bool random_unoccupied_initialisation=true){CALL_AND_RETHROW(this->_set_state(si, 0, false, random_unoccupied_initialisation));}

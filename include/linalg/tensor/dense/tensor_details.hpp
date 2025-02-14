@@ -115,6 +115,12 @@ public:
             }
         }
     }
+    void set_subblock(const ArrType& block)
+    {
+        array_type& a = static_cast<array_type&>(*this);
+        ASSERT(block.shape(0) <= a.shape(0) && block.shape(1) <= a.shape(1), "Failed to set subblock.  Block is larger than matrix.");
+        CALL_AND_RETHROW(linalg::blas_backend::copy_matrix_subblock(block.shape(0), block.shape(1), block.buffer(), block.shape(1), a.buffer(), a.shape(1)));
+    }
 };
 
 template <typename ArrType>
@@ -199,6 +205,13 @@ public:
         size_type m = a.shape(0);
         size_type n = a.shape(1);
         cuda_backend::func_fill_2(a.buffer(), m, n, std::forward<Func>(f), std::forward<Args>(args)...);
+    }
+
+    void set_subblock(const ArrType& block)
+    {
+        array_type& a = static_cast<array_type&>(*this);
+        ASSERT(block.shape(0) <= a.shape(0) && block.shape(1) <= a.shape(1), "Failed to set subblock.  Block is larger than matrix.");
+        CALL_AND_RETHROW(linalg::cuda_backend::copy_matrix_subblock(block.shape(0), block.shape(1), block.buffer(), block.shape(1), a.buffer(), a.shape(1)));
     }
 };
 

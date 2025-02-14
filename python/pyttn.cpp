@@ -173,11 +173,17 @@ PYBIND11_MODULE(ttnpp, m)
     //Wrap the core algorithms for operating on ttns
     //
     initialise_dmrg<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_dmrg_adaptive<pyttn_real_type, linalg::blas_backend>(m);
+
     initialise_tdvp<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_tdvp_adaptive<pyttn_real_type, linalg::blas_backend>(m);
 
 #ifdef PYTTN_BUILD_CUDA
-    //initialise_dmrg<pyttn_real_type, linalg::cuda_backend>(m);
-    //initialise_tdvp<pyttn_real_type, linalg::cuda_backend>(m);
+    initialise_dmrg<pyttn_real_type, linalg::cuda_backend>(m);
+    //initialise_dmrg_adaptive<pyttn_real_type, linalg::cuda_backend>(m);
+
+    initialise_tdvp<pyttn_real_type, linalg::cuda_backend>(m);
+    //initialise_tdvp_adaptive<pyttn_real_type, linalg::cuda_backend>(m);
 #endif
 
 }

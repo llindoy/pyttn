@@ -43,7 +43,6 @@ except ImportError:
 def __sop_operator_blas(h, A, sysinf, *args, **kwargs):
     if not __real_ttn_import:
         if isinstance(A, ttn_complex) and isinstance(h, SOP_complex):
-            print(h)
             return sop_operator_complex(h, A, sysinf, *args, **kwargs)
         else:
             raise RuntimeError(

@@ -84,9 +84,14 @@ void init_msttn(py::module &m, const std::string& label)
         .def("assign_slice", static_cast<void (_msttn::*)(size_type, const ttn<T, backend>&)>(&_msttn::template set_slice<T, backend>))
         //.def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice_real&)>(&_msttn::template set_slice<real_type, backend>)) 
         //.def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice&)>(&_msttn::template set_slice<T, backend>))
+        .def("bonds", [](const _msttn& o){std::vector<std::pair<int, int>> edges; o.get_edges(edges); return edges;})
 
         .def("bond_dimensions", &_msttn::bond_dimensions)
         .def("bond_dimensions", [](const _msttn& o){typename _msttn::hrank_info res;  o.bond_dimensions(res);   return res;})
+        
+        .def("bond_capacities", &_msttn::bond_capacities)
+        .def("bond_capacities", [](const _msttn& o){typename _msttn::hrank_info res;  o.bond_capacities(res);   return res;})
+
 
         .def("resize", static_cast<void (_msttn::*)(const ntree<size_t, std::allocator<size_t>>&, size_t, bool)>(&_msttn::resize), py::arg(), py::arg(), py::arg("purification") = false)
         .def("resize", static_cast<void (_msttn::*)(const ntree<size_t, std::allocator<size_t>>&, const ntree<size_t, std::allocator<size_t>>&, size_t, bool)>(&_msttn::resize), py::arg(), py::arg(), py::arg(), py::arg("purification") = false)
@@ -106,6 +111,7 @@ void init_msttn(py::module &m, const std::string& label)
         .def("set_state_purification", &_msttn::template set_state<int>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
         .def("set_state_purification", &_msttn::template set_state<size_t>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
 
+        /*
         //.def("set_product", &_msttn::template set_product<real_type, backend>)
         //.def("set_product", &_msttn::template set_product<T, backend>)
         //.def("set_product", [](_msttn& self, std::vector<py::buffer>& ps)
@@ -127,7 +133,8 @@ void init_msttn(py::module &m, const std::string& label)
         //            o.sample_product_state(state, x); 
         //            return state;
         //        }
-        //    )        
+        //    )     
+        */   
 
         .def("__imul__", [](_msttn& a, const real_type& b){return a*=b;})
         .def("__imul__", [](_msttn& a, const numpy_type& b){return a*=T(b);})
@@ -161,12 +168,13 @@ void init_msttn(py::module &m, const std::string& label)
         .def("nelems", [](const _msttn& o){return o.nelems();})
         .def("__len__", [](const _msttn& o){return o.nmodes();})
 
+        /*
         //.def("compute_maximum_bond_entropy", &_msttn::compute_maximum_bond_entropy)
         //.def("maximum_bond_entropy", [](const _msttn& o){return o.maximum_bond_entropy();})
         //.def("bond_entropy", &_msttn::bond_entropy)
         //.def("maximum_bond_dimension", [](const _msttn& o){return o.maximum_bond_dimension();})
         //.def("minimum_bond_dimension", [](const _msttn& o){return o.minimum_bond_dimension();})
-
+        */
         .def("has_orthogonality_centre", [](const _msttn& o){return o.has_orthogonality_centre();})
         .def("orthogonality_centre", [](const _msttn& o){return o.orthogonality_centre();})
         .def("is_orthogonalised", [](const _msttn& o){return o.is_orthogonalised();})
@@ -219,6 +227,7 @@ void init_msttn(py::module &m, const std::string& label)
                 static_cast<const _msttn_node_data& (_msttn::*)(size_t) const>(&_msttn::site_tensor),
                 py::return_value_policy::reference
             )
+        /*
         //.def(
         //        "set_site_tensor",
         //        [](_msttn& self, size_t i, const linalg::matrix<T>& mat)
@@ -318,6 +327,7 @@ void init_msttn(py::module &m, const std::string& label)
 
         //ttn& apply_one_body_operator(const Op<T, backend>& op, bool shift_orthogonality = true)
         //ttn& apply_operator(const Op<T, backend>& op, real_type tol = real_type(0), size_type nchi=0)
+        */
         .def("backend", [](const _msttn&){return backend::label();});
 
 }

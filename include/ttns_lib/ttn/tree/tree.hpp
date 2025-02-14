@@ -296,6 +296,18 @@ public:
     }
 #endif
 
+    template <typename Itype>
+    typename std::enable_if<std::is_integral<Itype>::value, void>::type get_edges(std::vector<std::pair<Itype, Itype>>& edges) const
+    {
+        edges.clear();
+        for(size_type ni = 0; ni < m_nodes.size(); ++ni)
+        {
+            for(size_type mi = 0; mi < m_nodes[ni].size(); ++mi)
+            {
+                edges.push_back(std::make_pair(Itype(m_nodes[ni].id()), Itype(m_nodes[ni].child(mi).id())));
+            }
+        }
+    }
 public:
     template <typename U>
     void construct_topology(const tree_base<U>& other)

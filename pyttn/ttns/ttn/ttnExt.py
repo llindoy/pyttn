@@ -32,6 +32,50 @@ except ImportError:
     ms_ttn_real_cuda = None
 
 
+def is_ttn(A):
+    """A function for determining whether a given object is a ttn
+    :param A: The object to test
+    :returns: Whether or not the object is a ms_ttn
+    :rtype: bool
+    """
+    ret = isinstance(A, ttn_complex)
+    if __real_ttn_import:
+        ret = ret or isinstance(A, ttn_real)
+
+    if __cuda_import:
+        ret = ret or isinstance(A, ttn_complex_cuda)
+
+        if __real_ttn_import:
+            ret = ret or isinstance(A, ttn_real_cuda)
+
+    return ret
+
+def is_ms_ttn(A):
+    """A function for determining whether a given object is a multiset ttn
+    :param A: The object to test
+    :returns: Whether or not the object is a ms_ttn
+    :rtype: bool
+    """
+    ret = isinstance(A, ms_ttn_complex)
+    if __real_ttn_import:
+        ret = ret or isinstance(A, ms_ttn_real)
+
+    if __cuda_import:
+        ret = ret or isinstance(A, ms_ttn_complex_cuda)
+
+        if __real_ttn_import:
+            ret = ret or isinstance(A, ms_ttn_real_cuda)
+
+    return ret
+
+def is_multiset_ttn(A):
+    """A function for determining whether a given object is a multiset ttn
+    :param A: The object to test
+    :returns: Whether or not the object is a ms_ttn
+    :rtype: bool
+    """
+    return is_ms_ttn(A)
+
 def __ttn_blas(*args, dtype=np.complex128, **kwargs):
     if (args):
         if isinstance(args[0], ttn_complex):

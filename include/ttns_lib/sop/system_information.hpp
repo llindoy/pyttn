@@ -368,6 +368,16 @@ public:
         return m_modes[i];
     }
 
+    void get_mode_dimensions(std::vector<size_t>& dims) const
+    {
+        dims.clear();
+        dims.resize(m_modes.size());
+        for(size_t i = 0; i < m_modes.size(); ++i)
+        {
+            dims[i] = m_modes[i].lhd();
+        }
+    }
+
 
     std::pair<size_t, size_t> primitive_mode_index(size_t i) const
     {
