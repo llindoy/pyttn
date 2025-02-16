@@ -34,7 +34,7 @@ def __single_set_tdvp_cuda(A, H, expansion='onesite', **kwargs):
         raise RuntimeError("Invalid input types for single set tdvp.")
 
 def single_set_tdvp(A, H, expansion='onesite', **kwargs):
-    """A factory method for constructing an object used for performing single set TDVP calculations
+    r"""A factory method for constructing an object used for performing single set TDVP calculations
 
     :param A: Tree Tensor Network that the DMRG algorithm will act on
     :type A: ttn_complex
@@ -42,7 +42,7 @@ def single_set_tdvp(A, H, expansion='onesite', **kwargs):
     :type H: sop_operator_complex
     :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
     :type expansion: {'onesite', 'subspace'}, optional
-    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_tdvp_complex
+    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_tdvp_complex
 
     :returns: The TDVP evaluation object
     :rtype: one_site_tdvp_complex or adaptive_one_site_tdvp_complex
@@ -74,7 +74,7 @@ def __multiset_tdvp_cuda(A, H, expansion='onesite', **kwargs):
         raise RuntimeError("Invalid input types for multiset tdvp.")
 
 def multiset_tdvp(A, H, expansion='onesite', **kwargs):
-    """A factory method for constructing an object used for performing multiset tdvp calculations
+    r"""A factory method for constructing an object used for performing multiset tdvp calculations
 
     :param A: Tree Tensor Network that the TDVP algorithm will act on
     :type A: ttn_complex
@@ -82,7 +82,7 @@ def multiset_tdvp(A, H, expansion='onesite', **kwargs):
     :type H: sop_operator_complex
     :param expansion: A string determining the type of bond dimension expansion to be used.  (Default: 'onesite')
     :type expansion: {'onesite'}, optional
-    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see multiset_one_site_dmrg_complex 
+    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see multiset_one_site_dmrg_complex 
 
     :returns: The TDVP evaluation object
     :rtype: multiset_one_site_tdvp_complex 
@@ -96,7 +96,7 @@ def multiset_tdvp(A, H, expansion='onesite', **kwargs):
             raise RuntimeError("Invalid backend for multiset set tdvp")
 
 def tdvp(A, H, expansion='onesite', **kwargs):
-    """A factory method for constructing an object used for performing either single or multi set tdvp calculations. 
+    r"""A factory method for constructing an object used for performing either single or multi set tdvp calculations. 
     Which type to construct is determined by the types of the input A and h matrices.
 
     :param A: Tree Tensor Network that the DMRG algorithm will act on
@@ -105,7 +105,7 @@ def tdvp(A, H, expansion='onesite', **kwargs):
     :type H: sop_operator_complex
     :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
     :type expansion: {'onesite', 'subspace'}, optional
-    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_tdvp_complex or adaptive_one_site_tdvp_complex
+    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_tdvp_complex or adaptive_one_site_tdvp_complex
 
     :returns: The TDVP evaluation object
     :rtype: one_site_tdvp_complex or adaptive_one_site_tdvp_complex or multiset_one_site_tdvp_complex

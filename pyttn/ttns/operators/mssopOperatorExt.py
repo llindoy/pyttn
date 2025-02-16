@@ -75,7 +75,7 @@ def __multiset_sop_operator_cuda(h, A, sysinf, *args, **kwargs):
                 "Invalid argument for the creation of a multiset_sop_operator.")
 
 def multiset_sop_operator(h, A, sysinf, *args, **kwargs):
-    """Function for constructing the multiset hierarchical sum of product operator of a string operator
+    r"""Function for constructing the multiset hierarchical sum of product operator of a string operator
 
     :param h: The sum of product operator representation of the Hamiltonian
     :type h: multiset_SOP_real or multiset_SOP_complex
@@ -83,8 +83,8 @@ def multiset_sop_operator(h, A, sysinf, *args, **kwargs):
     :type A: ms_ttn_real or ms_ttn_complex
     :param sysinf: The composition of the system defining the default dictionary to be considered for each node
     :type sysinf: system_modes
-    :type \\*args: Variable length list of arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options
-    :type \\*\\*kwargs: Additional keyword arguments. See /multiset_sop_operator_complex/multiset_sop_operator_real for options
+    :type *args: Variable length list of arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options
+    :type **kwargs: Additional keyword arguments. See /multiset_sop_operator_complex/multiset_sop_operator_real for options
     """
     if len(args) > 0:
         if(args[0].backend() != A.backend()):
@@ -100,7 +100,7 @@ def multiset_sop_operator(h, A, sysinf, *args, **kwargs):
 
 
 def ms_sop_operator(h, A, sysinf, *args, **kwargs):
-    """Function for constructing the multiset hierarchical sum of product operator of a string operator
+    r"""Function for constructing the multiset hierarchical sum of product operator of a string operator
 
     :param h: The sum of product operator representation of the Hamiltonian
     :type h: multiset_SOP_real or multiset_SOP_complex
@@ -108,7 +108,7 @@ def ms_sop_operator(h, A, sysinf, *args, **kwargs):
     :type A: ms_ttn_real or ms_ttn_complex
     :param sysinf: The composition of the system defining the default dictionary to be considered for each node
     :type sysinf: system_modes
-    :type \\*args: Variable length list of arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options
-    :type \\*\\*kwargs: Additional keyword arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options
+    :type *args: Variable length list of arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options
+    :type **kwargs: Additional keyword arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options
     """
     return multiset_sop_operator(h, A, sysinf, *args, **kwargs)

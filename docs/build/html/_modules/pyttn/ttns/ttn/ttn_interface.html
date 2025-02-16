@@ -92,7 +92,7 @@
 <span class="sd">    :class:`ttn_complex` and :class:`ttn_real` (with the real variant only present if the pybind11 wrapper has been built with support</span>
 <span class="sd">    for real valued TTNs.</span>
 
-<span class="sd">    :param \*args: A variable length list of arguments. Valid options are</span>
+<span class="sd">    :param *args: A variable length list of arguments. Valid options are</span>
 <span class="sd">        </span>
 <span class="sd">        - none - in this case we call the default constructor of the ttn class to construct an empty ttn.</span>
 <span class="sd">        - **A** (:class:`ms_ttn_slice_complex` or :class:`ms_ttn_slice_real`) - Construct a ttn to represent a single slice of a multiset TTN</span>
@@ -100,11 +100,11 @@
 <span class="sd">        - **topology** (:class:`ntree` or str) - Construct a ttn from a ntree object defining the topology and bond dimensions of the ttn</span>
 <span class="sd">        - **topology** (:class:`ntree` or str), **capacity** (:class:`ntree` or str ) - Construct a ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions</span>
 
-<span class="sd">    :type \*args: [Arguments (variable number and type)]</span>
-<span class="sd">    :param \*\*kwargs: A dictionary containing optional input arguments.</span>
+<span class="sd">    :type *args: [Arguments (variable number and type)]</span>
+<span class="sd">    :param **kwargs: A dictionary containing optional input arguments.</span>
 
 <span class="sd">        - **purification** (bool) - Whether or not this state should represent a purification of a state.</span>
-<span class="sd">    :type \*\*kwargs: dict(Arguments (variable number and type))</span>
+<span class="sd">    :type **kwargs: dict(Arguments (variable number and type))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -155,11 +155,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">purification</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resize the TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction</span>
 
-<span class="sd">        :param \*args: A variable length list of arguments. Valid options are</span>
+<span class="sd">        :param *args: A variable length list of arguments. Valid options are</span>
 <span class="sd">            </span>
 <span class="sd">            - **topology** (:class:`ntree` or str) - Construct a ttn from a ntree object defining the topology and bond dimensions of the ttn</span>
 <span class="sd">            - **topology** (:class:`ntree` or str), **capacity** (ntree or str ) - Construct a ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions</span>
-<span class="sd">        :type \*args: [Arguments (variable number and type)]</span>
+<span class="sd">        :type *args: [Arguments (variable number and type)]</span>
 <span class="sd">        :param purification: Whether or not the buffers should be resized to store a purification of the requested state size.  (Default: False)</span>
 <span class="sd">        :type purification: bool, optional</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -685,11 +685,11 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">apply_one_body_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">shift_orthogonality</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply a one-body operator to the TTN updating its value</span>
 
-<span class="sd">        :param \*args: A variable length list of arguments. Valid options are</span>
+<span class="sd">        :param *args: A variable length list of arguments. Valid options are</span>
 <span class="sd">            </span>
 <span class="sd">            - **op** (linalg.matrix or np.ndarray or site_operator_dtype), **mode** (int) -  Apply the operator op to mode mode</span>
 <span class="sd">            - **op** (site_operator_dtype) - Apply the operator op to the mode specified by op</span>
-<span class="sd">        :type \*args: [Arguments (variable number and type)]</span>
+<span class="sd">        :type *args: [Arguments (variable number and type)]</span>
 <span class="sd">        :param shift_orthogonality: Whether or not to shift the orthogonality centre of the TTN to the leaf node that will be updated by this one-body operator.  (Default: True)</span>
 <span class="sd">        :type shift_orthogonality: bool, optional</span>
 <span class="sd">        &quot;&quot;&quot;</span>

@@ -4,7 +4,7 @@ from .aaa import AAA_algorithm
 
 
 class ExpFitDecomposition:
-    """Base class for exponential fit decompositions
+    r"""Base class for exponential fit decompositions
     """
 
     def __init__(self):
@@ -12,7 +12,7 @@ class ExpFitDecomposition:
 
 
 def ESPRIT_support_points(t="linear", tmax=None, Nt=1000):
-    """A function for automatically generating support points to be used within the ESPRIT algorithm.  
+    r"""A function for automatically generating support points to be used within the ESPRIT algorithm.  
 
     :param t: Either the support points or a key word used to generate the support points. (Default: "linear") This parameter can be either a
 
@@ -39,7 +39,7 @@ def ESPRIT_support_points(t="linear", tmax=None, Nt=1000):
 
 
 class ESPRITDecomposition(ExpFitDecomposition):
-    """A class providing an easy to use interface for applying the ESPRIT decomposition to 
+    r"""A class providing an easy to use interface for applying the ESPRIT decomposition to 
     construct a sum-of-exponential approximation for a bath correlation function
 
     Constructor arguments: 
@@ -48,7 +48,7 @@ class ESPRITDecomposition(ExpFitDecomposition):
     :type K: int
     :param t: Either the support points orr a key word used to generate the support points.  For details see the ESPRIT_support_points function.  (Default: "linear")
     :type t: str or np.ndarray or list, optional
-    :param \*\*kwargs: Keyword arguments to pass to ESPRIT_support_points
+    :param **kwargs: Keyword arguments to pass to ESPRIT_support_points
 
     Callable arguments:
 
@@ -95,7 +95,7 @@ def __generate_grid_points(N, wc, wmin=1e-9):
 
 
 def AAA_support_points(w="linear", wmin=None, wmax=None, Naaa=1000):
-    """A function for automatically generating support points to be used within the AAA algorithm.  
+    r"""A function for automatically generating support points to be used within the AAA algorithm.  
 
     :param w: Either the support points orr a key word used to generate the support points. (Default: "linear") This parameter can be either a
 
@@ -141,7 +141,7 @@ def AAA_support_points(w="linear", wmin=None, wmax=None, Naaa=1000):
 
 
 class AAADecomposition:
-    """A class providing an easy to use interface for applying the AAA based rational function 
+    r"""A class providing an easy to use interface for applying the AAA based rational function 
     decomposition to approximate a bath spectral density.  This class includes tools used for
     automatic generation of support points, as well as manually specified support points to 
     allow for both easy general use and flexibility when handling more complex spectral densities.
@@ -189,7 +189,7 @@ class AAADecomposition:
         self.K = K
 
     def __AAA_to_HEOM(p, r, coeff=1.0):
-        """Convert the poles and residues from the AAA algorithm into the coefficients and frequencies needed
+        r"""Convert the poles and residues from the AAA algorithm into the coefficients and frequencies needed
         for the HEOM algorithms
 
         :param p: The poles extracted from the AAA algorithm
@@ -207,7 +207,7 @@ class AAADecomposition:
         return rr, pp
 
     def __call__(self, S):
-        """Perform the AAA decomposition on the function S.
+        r"""Perform the AAA decomposition on the function S.
 
         :param S: The spectral density function to be decomposed.
         :type S: callable

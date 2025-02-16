@@ -12,9 +12,13 @@ sys.path.append("../../")
 from pyttn import *
 from pyttn import oqs, utils
 from numba import jit
+from pyttn.utils import visualise_tree
+
+import matplotlib.pyplot as plt
 
 def setup_topology(chi, nbose, mode_dims, degree):
     topo = ntree("(1(2(2))(2))")
+
     if(degree > 1):
         ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi)
     else:
@@ -57,12 +61,13 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
     discbath.truncate_modes(utils.EnergyTruncation(10*wc, Lmax=nbose, Lmin=4))
 
     #and get the bath information
-    bsys = discbath.system_information()
 
     #set up the mode combination informatino
     if use_mode_combination:
         mode_comb = utils.ModeCombination(nbmax, nhilbmax)
-        bsys = mode_comb(bsys)
+        bsys = discbath.system_information(mode_comb)
+    else:
+        bsys = discbath.system_information()
 
     #set up the total system information object including both system information and bath information
     sysinf = system_modes(1)
@@ -71,22 +76,19 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
 
 
     """
-    Set up the TTN structures and initial state of the wavefunction
+    Set up the TTN structures and initial state of the wavefunction. 
+    Here we make use of the discrete bath add_bath_tree function to add each of the trees
     """
-    #get the dimension of each of the bath modes forming the tree
-    tree_mode_dims = []
-    for ind in range(len(bsys)):
-        tree_mode_dims.append(bsys[ind].lhd())
-
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
     if adaptive:
         chi0 = min(4, chi)
 
-    #now build the topology and capacity arrays
-    topo = setup_topology(chi0, nbose, tree_mode_dims, degree)
-    capacity = setup_topology(chi, nbose, tree_mode_dims, degree)
-
+    #build the trees for the system mode and 
+    topo = ntree("(1(2(2)))")
+    capacity = ntree("(1(2(2)))")
+    linds = discbath.add_bath_tree(topo(), degree, chi0, min(chi0, nbose))
+    discbath.add_bath_tree(capacity(), degree, chi, min(chi, nbose))
 
     #construct and initialise the ttn wavefunction
     A = ttn(topo, capacity, dtype=np.complex128)
@@ -167,9 +169,6 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, Ncut
             h5.create_dataset('Sz', data=Sz)
             h5.create_dataset('maxchi', data=maxchi)
             h5.close()
-
-            import matplotlib.pyplot as plt
-            plt.show()
                 
     #and finally dump everything to file at the end of the simulation
     h5 = h5py.File(ofname, 'w')
@@ -190,7 +189,7 @@ if __name__ == "__main__":
     parser.add_argument('--s', type = float, default=1)
 
     #number of bath modes
-    parser.add_argument('--N', type=int, default=128)
+    parser.add_argument('--N', type=int, default=8)
 
     #geometry to be used for bath dynamics
     parser.add_argument('--geom', type = str, default='chain')
@@ -204,7 +203,7 @@ if __name__ == "__main__":
 
     #maximum bond dimension
     parser.add_argument('--chi', type=int, default=32)
-    parser.add_argument('--degree', type=int, default=1)
+    parser.add_argument('--degree', type=int, default=2)
 
     #maximum bosonic hilbert space dimension
     parser.add_argument('--nbose', type=int, default=30)

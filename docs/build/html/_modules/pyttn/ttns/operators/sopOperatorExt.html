@@ -110,8 +110,8 @@
 <span class="sd">    :type A: ttn_real or ttn_complex</span>
 <span class="sd">    :param sysinf: The composition of the system defining the default dictionary to be considered for each node</span>
 <span class="sd">    :type sysinf: system_modes</span>
-<span class="sd">    :type \*args: Variable length list of arguments. See sop_operator_complex/sop_operator_real for options</span>
-<span class="sd">    :type \*\*kwargs: Additional keyword arguments. See sop_operator_complex/sop_operator_real for options</span>
+<span class="sd">    :type *args: Variable length list of arguments. See sop_operator_complex/sop_operator_real for options</span>
+<span class="sd">    :type **kwargs: Additional keyword arguments. See sop_operator_complex/sop_operator_real for options</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">SOP_real</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">SOP_complex</span><span class="p">):</span>
@@ -138,8 +138,8 @@
 <span class="sd">    :type A: ms_ttn_real or ms_ttn_complex</span>
 <span class="sd">    :param sysinf: The composition of the system defining the default dictionary to be considered for each node</span>
 <span class="sd">    :type sysinf: system_modes</span>
-<span class="sd">    :type \*args: Variable length list of arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options</span>
-<span class="sd">    :type \*\*kwargs: Additional keyword arguments. See /multiset_sop_operator_complex/multiset_sop_operator_real for options</span>
+<span class="sd">    :type *args: Variable length list of arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options</span>
+<span class="sd">    :type **kwargs: Additional keyword arguments. See /multiset_sop_operator_complex/multiset_sop_operator_real for options</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">multiset_SOP_real</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">multiset_SOP_complex</span><span class="p">):</span>

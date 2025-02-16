@@ -31,7 +31,7 @@ def __vector_cuda(v):
         raise RuntimeError("Invalid dtype for linalg.vector")
 
 def vector(v, backend='blas'):
-    """
+    r"""
     A function for converting from a 1 dimensional numpy array to a C++ linalg::tensor<T,1> type
     used by the C++ layer of pyTTN.
 
@@ -73,7 +73,7 @@ def __matrix_cuda(v):
         raise RuntimeError("Invalid dtype for linalg.matrix")
 
 def matrix(M, backend='blas'):
-    """
+    r"""
     A function for converting from a numpy array to a C++ linalg::tensor<T,2> type
     used by the C++ layer of pyTTN.
 
@@ -114,7 +114,7 @@ def __tensor_3_cuda(v):
         raise RuntimeError("Invalid dtype for linalg.tensor_3")
 
 def tensor_3(M, backend='blas'):
-    """
+    r"""
     A function for converting from a numpy array to a C++ linalg::tensor<T,3> type
     used by the C++ layer of pyTTN.
 
@@ -156,7 +156,7 @@ def __tensor_4_cuda(v):
         raise RuntimeError("Invalid dtype for linalg.tensor_4")
 
 def tensor_4(M, backend='blas'):
-    """
+    r"""
     A function for converting from a numpy array to a C++ linalg::tensor<T,4> type
     used by the C++ layer of pyTTN.
 
@@ -178,7 +178,7 @@ def tensor_4(M, backend='blas'):
 
 
 def tensor(T, backend='blas'):
-    """
+    r"""
     A function for converting from a numpy array to a C++ linalg::tensor<T,D> type
     for D<=4 used by the C++ layer of pyTTN.
 

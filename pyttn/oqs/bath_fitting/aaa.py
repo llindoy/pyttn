@@ -11,7 +11,7 @@ def __residue_integrand(theta, r, rs, poles):
 
 
 def __compute_residues_integ(r,  poles, tol):
-    """Compute the poles and residues given the baryocentric representation of a rational function
+    r"""Compute the poles and residues given the baryocentric representation of a rational function
 
     :param r: The rational function object
     :type r: callable
@@ -34,7 +34,7 @@ def __compute_residues_integ(r,  poles, tol):
 
 
 def __prz(r, z, f, w, tol):
-    """Compute the poles and residues given the baryocentric representation of a rational function
+    r"""Compute the poles and residues given the baryocentric representation of a rational function
 
     :param r: The rational function object
     :type r: callable
@@ -80,10 +80,10 @@ def __prz(r, z, f, w, tol):
 
 
 def __evaluate_function(z, Z, f, w):
-    """Evaluate the baryocentric form of the rational function approximation
+    r"""Evaluate the baryocentric form of the rational function approximation
 
     .. math:
-        r(z) = \\frac{\\sum_{j=1}^N \\frac{w_j f_j}{z-Z_j}}{\\sum_{j=1}^N \\frac{w_j}{z-Z_j}}
+        r(z) = \frac{\sum_{j=1}^N \frac{w_j f_j}{z-Z_j}}{\sum_{j=1}^N \frac{w_j}{z-Z_j}}
 
     :params z: The point at which to evaluate the function
     :type z: np.ndarray
@@ -104,7 +104,7 @@ def __evaluate_function(z, Z, f, w):
 
 
 def AAA_algorithm(F, Z, tol=1e-13, K = None, nmax=100, *args, **kwargs):
-    """Implementation of the adaptive Antoulas-Anderson (AAA) algorithm for rational approximation
+    r"""Implementation of the adaptive Antoulas-Anderson (AAA) algorithm for rational approximation
     Y. Nakatsukasa, O. Sète, and L. N. Trefethen, SIAM Journal on Scientific Computing 40, A1494 (2018).
 
     :param F: The function to be fit
@@ -117,8 +117,8 @@ def AAA_algorithm(F, Z, tol=1e-13, K = None, nmax=100, *args, **kwargs):
     :type K: int or None, optional
     :param nmax: The maximum number of poles to use in the AAA fit. (default: 100)
     :type nmax: int, optional
-    :param \*args: Variable length argument list to be passed to the F function
-    :param \*\*kwargs: Arbitrary keyword arguments to be passed to the F function
+    :param *args: Variable length argument list to be passed to the F function
+    :param **kwargs: Arbitrary keyword arguments to be passed to the F function
 
     :returns:
         - func - A function defining the rational function approximation

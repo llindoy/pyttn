@@ -108,16 +108,16 @@
 <div class="viewcode-block" id="DensityDiscretisation">
 <a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.bath_discretisation.DensityDiscretisation">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DensityDiscretisation</span><span class="p">(</span><span class="n">BathDiscretisation</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class wrapping the density based discretisation approach.  Selects frequencies from a density of frequencies :math:`\\rho(\\omega)`</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class wrapping the density based discretisation approach.  Selects frequencies from a density of frequencies :math:`\rho(\omega)`</span>
 <span class="sd">    according to the expression</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \\int_{\\omega_{\\mathrm{min}}}^{\\omega_k} \\rho(\omega)\\mathrm{d} \\omega = k, </span>
+<span class="sd">        \int_{\omega_{\mathrm{min}}}^{\omega_k} \rho(\omega)\mathrm{d} \omega = k, </span>
 
 <span class="sd">    with coupling constants then determined by</span>
 <span class="sd">    </span>
 <span class="sd">    .. math::</span>
-<span class="sd">        g_k^2 = \\frac{1}{\pi} \\frac{S(\\omega_k)}{\\rho(\\omega_k)}. </span>
+<span class="sd">        g_k^2 = \frac{1}{\pi} \frac{S(\omega_k)}{\rho(\omega_k)}. </span>
 <span class="sd">        </span>
 <span class="sd">    Constructor arguments</span>
 
@@ -194,7 +194,7 @@
 <span class="sd">    satisfying the orthogonality constraint</span>
 
 <span class="sd">    .. math::</span>
-<span class="sd">        \\int_{\\omega_{\\mathrm{min}}}^{\\omega_\\mathrm{max}} S(\\omega) \\pi_i(\\omega) \\pi_j(\\omega) \\mathrm{d}\\omega = \\delta_{ij}.</span>
+<span class="sd">        \int_{\omega_{\mathrm{min}}}^{\omega_\mathrm{max}} S(\omega) \pi_i(\omega) \pi_j(\omega) \mathrm{d}\omega = \delta_{ij}.</span>
 
 <span class="sd">    The coupling constants and frequencies are then obtained from the weights and nodes, respectively, of the Gaussian quadrature rule associated</span>
 <span class="sd">    with these orthonormal polynomials.</span>

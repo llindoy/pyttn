@@ -90,7 +90,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">ttn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for constructing a tree tensor network state operator</span>
 
-<span class="sd">    :param \*args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
+<span class="sd">    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
 
 <span class="sd">        - Default construct TTN object</span>
 <span class="sd">        - ttn (ttn_dtype) - Copy construct TTN object</span>
@@ -100,7 +100,7 @@
 
 <span class="sd">    :param dtype: The dtype to use for the site operator.  (Default: np.complex128) </span>
 <span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
-<span class="sd">    :param \*\*kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
+<span class="sd">    :param **kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
 
 <span class="sd">    :returns: The Tree Tensor Network State object</span>
 <span class="sd">    :rtype: ttn_dtype (dtype=complex or real)</span>
@@ -154,7 +154,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">multiset_ttn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for constructing a multiset tree tensor network state operator</span>
 
-<span class="sd">    :param \*args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
+<span class="sd">    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
 
 <span class="sd">        - Default construct a multiset TTN object</span>
 <span class="sd">        - msttn (ms_ttn_dtype) - Copy construct a multiset TTN object</span>
@@ -163,7 +163,7 @@
 
 <span class="sd">    :param dtype: The dtype to use for the site operator.  (Default: np.complex128) </span>
 <span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
-<span class="sd">    :param \*\*kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
+<span class="sd">    :param **kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
 
 <span class="sd">    :returns: The Multiset Tree Tensor Network State object</span>
 <span class="sd">    :rtype: ms_ttn_dtype (dtype=complex or real)</span>
@@ -217,7 +217,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">ms_ttn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for constructing a multiset tree tensor network state operator</span>
 
-<span class="sd">    :param \*args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
+<span class="sd">    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
 
 <span class="sd">        - Default construct a multiset TTN object</span>
 <span class="sd">        - msttn (ms_ttn_dtype) - Copy construct a multiset TTN object</span>
@@ -226,7 +226,7 @@
 
 <span class="sd">    :param dtype: The dtype to use for the site operator.  (Default: np.complex128) </span>
 <span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
-<span class="sd">    :param \*\*kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
+<span class="sd">    :param **kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
 
 <span class="sd">    :returns: The Multiset Tree Tensor Network State object</span>
 <span class="sd">    :rtype: ms_ttn_dtype (dtype=complex or real)</span>

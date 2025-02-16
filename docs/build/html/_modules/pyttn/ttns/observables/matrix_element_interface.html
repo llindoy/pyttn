@@ -96,19 +96,19 @@
 <span class="sd">    :class:`matrix_element_complex` and :class:`matrix_element_real` (with the real variant only present if the pybind11 wrapper has been built with support</span>
 <span class="sd">    for real valued TTNs.  These classes provide a set of functions for evaluating matrix elements of operators with respect to single and multiset TTNs</span>
 
-<span class="sd">    :param \*args: A variable length list of arguments. Valid options are</span>
+<span class="sd">    :param *args: A variable length list of arguments. Valid options are</span>
 <span class="sd">        </span>
 <span class="sd">        - none - in this case we call the default constructor of the matrix element class to construct an empty matrix element.</span>
 <span class="sd">        - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - A TTN to define the topology and size of buffers needed to evaluate the tensor network.</span>
 <span class="sd">        - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Two TTNs with the same topology defining the size of the bra and ket respectively.</span>
 <span class="sd">        - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **H** (:class:`sop_operator_dtype` or :class:`ms_sop_operator_dtype`)- Two TTNs and a Hamiltonian operator with the same topology defining the size of the bra, ket and operator respectively.</span>
 
-<span class="sd">    :type \*args: [Arguments (variable number and type)]</span>
-<span class="sd">    :param \*\*kwargs: A dictionary containing optional input arguments.</span>
+<span class="sd">    :type *args: [Arguments (variable number and type)]</span>
+<span class="sd">    :param **kwargs: A dictionary containing optional input arguments.</span>
 
 <span class="sd">        - **nbuffers** (int, optional) - The number of buffers to allocate.   </span>
 <span class="sd">        - **use_capacity** (bool, optional) - Whether or not to use the capacity of the TTNs to determine the size of the buffers.</span>
-<span class="sd">    :type \*\*kwargs: dict(Arguments (variable number and type))</span>
+<span class="sd">    :type **kwargs: dict(Arguments (variable number and type))</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -139,17 +139,17 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resize the matrix element to fit the required wavefunctions</span>
 
-<span class="sd">        :param \*args: A variable length list of arguments. Valid options are</span>
+<span class="sd">        :param *args: A variable length list of arguments. Valid options are</span>
 <span class="sd">            </span>
 <span class="sd">            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - A TTN to define the topology and size of buffers needed to evaluate the tensor network.</span>
 <span class="sd">            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Two TTNs with the same topology defining the size of the bra and ket respectively.</span>
 
-<span class="sd">        :type \*args: [Arguments (variable number and type)]</span>
-<span class="sd">        :param \*\*kwargs: A dictionary containing optional input arguments.</span>
+<span class="sd">        :type *args: [Arguments (variable number and type)]</span>
+<span class="sd">        :param **kwargs: A dictionary containing optional input arguments.</span>
 
 <span class="sd">            - **nbuffers** (int, optional) - The number of buffers to allocate.   </span>
 <span class="sd">            - **use_capacity** (bool, optional) - Whether or not to use the capacity of the TTNs to determine the size of the buffers.</span>
-<span class="sd">        :type \*\*kwargs: dict(Arguments (variable number and type))</span>
+<span class="sd">        :type **kwargs: dict(Arguments (variable number and type))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
@@ -159,18 +159,18 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">use_sparsity</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Function for evaluating the inner product of tensor network states with matrix elements</span>
 
-<span class="sd">        :param \*args: A variable length list of arguments. See below for a list of valid arguments.</span>
-<span class="sd">        :type \*args: [Arguments (variable number and type)]</span>
+<span class="sd">        :param *args: A variable length list of arguments. See below for a list of valid arguments.</span>
+<span class="sd">        :type *args: [Arguments (variable number and type)]</span>
 <span class="sd">        :param use_sparsity: Whether or not to exploit sparsity in the evaluation of the matrix elements. (Default: True)</span>
 <span class="sd">        :type use_sparsity: bool, optional</span>
 
 <span class="sd">        Valid options for the argument list depend on the type of quantity we are evaluating. </span>
 
-<span class="sd">        :math:`\\langle A | A \\rangle`:</span>
+<span class="sd">        :math:`\langle A | A \rangle`:</span>
 <span class="sd">            </span>
 <span class="sd">            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the inner product of the ttn with itself. </span>
 
-<span class="sd">        :math:`\\langle A | O | A \\rangle`:</span>
+<span class="sd">        :math:`\langle A | O | A \rangle`:</span>
 
 <span class="sd">            - **op** (:class:`site_operator_dtype`), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the single site operator op.</span>
 <span class="sd">            - **op** (:class:`site_operator_dtype`), **mode** (int), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the single site operator op acting on mode mode.</span>
@@ -179,11 +179,11 @@
 <span class="sd">            - **op** (:class:`product_operator_dtype`), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the product of site operator op.</span>
 <span class="sd">            - **op** (:class:`ms_sop_operator_dtype` or :class:`ms_sop_operator_dtype`), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the product of sum-of-product operator op.</span>
 
-<span class="sd">        :math:`\\langle A | B \\rangle`:</span>
+<span class="sd">        :math:`\langle A | B \rangle`:</span>
 
 <span class="sd">            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the overlad .</span>
 
-<span class="sd">        :math:`\\langle A | O | B \\rangle`:</span>
+<span class="sd">        :math:`\langle A | O | B \rangle`:</span>
 
 <span class="sd">            - **op** (:class:`site_operator_dtype`), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the matrix element of the single site operator op.</span>
 <span class="sd">            - **op** (:class:`site_operator_dtype`), **mode** (int), **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the expectation value of the single site operator op acting on mode mode.</span>

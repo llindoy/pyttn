@@ -6,11 +6,11 @@ import scipy
 
 
 def ESPRIT(Ct, K):
-    """Implementation of the Estimation of Signal Parameters via Rotational Invariant Techniques (ESPRIT)
+    r"""Implementation of the Estimation of Signal Parameters via Rotational Invariant Techniques (ESPRIT)
     method for decomposing a signal into the form 
 
     .. math:
-        C(t) \\approx \sum_{k=1}^K w_k \\exp(-\\nu t)
+        C(t) \approx \sum_{k=1}^K w_k \exp(-\nu t)
 
     A. Paulraj, R. Roy, and T. Kailath, Proceedings of the IEEE 74, 1044 (1986).
 
@@ -44,7 +44,7 @@ def ESPRIT(Ct, K):
 
 
 def ESPRIT_frequencies(Ct, K):
-    """Extract the frequencies to be used in the ESPRIT algorithm 
+    r"""Extract the frequencies to be used in the ESPRIT algorithm 
 
     :param Ct: An array containing the values to be fit
     :type Ct: np.ndarray

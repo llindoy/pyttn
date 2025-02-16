@@ -2,9 +2,9 @@ import numpy as np
 
 
 def operator_dictionary(*args, dtype=np.complex128):
-    """Factory function for constructing a user defined operator dictionary.
+    r"""Factory function for constructing a user defined operator dictionary.
 
-    :param \*args: Variable length list of arguments. 
+    :param *args: Variable length list of arguments. 
     :param dtype: The dtype to use for the site operator.  (Default: np.complex128) 
     :type dtype: {np.float64, np.complex128}, optional
 

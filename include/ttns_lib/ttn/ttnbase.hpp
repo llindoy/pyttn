@@ -1047,8 +1047,14 @@ protected:
     template <typename INTEGER, typename Alloc>
     void construct_topology(const ntree<INTEGER, Alloc>& __tree, const ntree<INTEGER, Alloc>& _capacity, size_type nset = 1)
     {
+        ntree<INTEGER, Alloc> _tree(__tree);
+        ntree<INTEGER, Alloc> capacity(_capacity);
+
+        ntree_builder<INTEGER>::sanitise_tree(_tree, true);
+        ntree_builder<INTEGER>::sanitise_tree(capacity, true);
+
         ASSERT(__tree.size() > 2, "Failed to build ttn from topology tree.  The input topology must contain at least 3 elements.  If it contains fewer than 3 elements then this is just a vector and we won't want to use the full TTN structure.");
-        ASSERT(__tree.size() == _capacity.size(), "Failed to construct ttn topology with capacity.");
+        ASSERT(_tree.size() == capacity.size(), "Failed to construct ttn topology with capacity.");
 
         m_nset = nset;
         m_nset_lhd = nset;
@@ -1057,13 +1063,6 @@ protected:
             m_nset = nset*nset;
             m_nset_lhd = nset;
         }
-
-
-        ntree<INTEGER, Alloc> _tree(__tree);
-        ntree<INTEGER, Alloc> capacity(_capacity);
-
-        ntree_builder<INTEGER>::sanitise_tree(_tree, true);
-        ntree_builder<INTEGER>::sanitise_tree(capacity, true);
 
         //otherwise if the topology tree contains more than 2 more elements we will attempt to interpret it as a (hierarchical) tucker tensor
         //and solve the problem in this space.

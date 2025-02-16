@@ -4,7 +4,7 @@ import numpy as np
 
 
 def coeff(*args, dtype=np.complex128):
-    """A function for constructing the coeff type for Hamiltonian specification
+    r"""A function for constructing the coeff type for Hamiltonian specification
 
     :param coeff: A variable list for specifying the coefficient.  Valid options are
 
@@ -26,9 +26,9 @@ def coeff(*args, dtype=np.complex128):
 
 
 def sNBO(*args, dtype=np.complex128):
-    """A function for constructing an n-body operator string
+    r"""A function for constructing an n-body operator string
 
-    :param \*args: A variable list for specifying the coefficient.  Valid options are
+    :param *args: A variable list for specifying the coefficient.  Valid options are
 
         -  Default construct the sNBO
         - op (sOP) - Construct NBO from single site operator
@@ -54,9 +54,9 @@ def sNBO(*args, dtype=np.complex128):
 
 
 def sSOP(*args, dtype=np.complex128):
-    """A function for constructing a sum-of-product string operator
+    r"""A function for constructing a sum-of-product string operator
 
-    :param \*args: A variable list for specifying the coefficient.  Valid options are
+    :param *args: A variable list for specifying the coefficient.  Valid options are
 
         -  Default construct the sSOP
         - op (str) - Construct the sSOP from a string defining a sOP
