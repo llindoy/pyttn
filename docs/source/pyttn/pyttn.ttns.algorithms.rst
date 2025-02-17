@@ -1,13 +1,23 @@
-pyttn.models package
-====================
+pyttn.ttns.algorithms package
+=============================
 
 Submodules
 ----------
 
-pyttn.models.modelsExt module
------------------------------
+pyttn.ttns.algorithms.dmrgExt module
+------------------------------------
 
-.. automodule:: pyttn.models.modelsExt
+.. automodule:: pyttn.ttns.algorithms.dmrgExt
+   :members:
+   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
+   :exclude-members: __init__,__module__,__annotations__
+   :undoc-members:
+   :show-inheritance:
+
+pyttn.ttns.algorithms.tdvpExt module
+------------------------------------
+
+.. automodule:: pyttn.ttns.algorithms.tdvpExt
    :members:
    :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
    :exclude-members: __init__,__module__,__annotations__
@@ -17,7 +27,7 @@ pyttn.models.modelsExt module
 Module contents
 ---------------
 
-.. automodule:: pyttn.models
+.. automodule:: pyttn.ttns.algorithms
    :members:
    :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
    :exclude-members: __init__,__module__,__annotations__

@@ -44,8 +44,3 @@ share/python-wheels/
 .pytest_cache
 MANIFEST
 
-
-
-
-#Don't ignore the documentation
-!docs/build/

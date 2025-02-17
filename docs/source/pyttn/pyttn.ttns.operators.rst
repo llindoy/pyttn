@@ -1,53 +1,53 @@
-pyttn.oqs.bath\_fitting package
-===============================
+pyttn.ttns.operators package
+============================
 
 Submodules
 ----------
 
-pyttn.oqs.bath\_fitting.ESPRIT module
--------------------------------------
+pyttn.ttns.operators.mssopOperatorExt module
+--------------------------------------------
 
-.. automodule:: pyttn.oqs.bath_fitting.ESPRIT
+.. automodule:: pyttn.ttns.operators.mssopOperatorExt
    :members:
    :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
 
-pyttn.oqs.bath\_fitting.ESPRIT\_bath\_fitting module
-----------------------------------------------------
-
-.. automodule:: pyttn.oqs.bath_fitting.ESPRIT_bath_fitting
-   :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
-   :undoc-members:
-   :show-inheritance:
-
-pyttn.oqs.bath\_fitting.aaa module
+pyttn.ttns.operators.opsExt module
 ----------------------------------
 
-.. automodule:: pyttn.oqs.bath_fitting.aaa
+.. automodule:: pyttn.ttns.operators.opsExt
    :members:
    :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
 
-pyttn.oqs.bath\_fitting.bath\_discretisation module
----------------------------------------------------
+pyttn.ttns.operators.productOperatorExt module
+----------------------------------------------
 
-.. automodule:: pyttn.oqs.bath_fitting.bath_discretisation
+.. automodule:: pyttn.ttns.operators.productOperatorExt
    :members:
    :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
 
-pyttn.oqs.bath\_fitting.expfit module
--------------------------------------
+pyttn.ttns.operators.siteOperatorsExt module
+--------------------------------------------
 
-.. automodule:: pyttn.oqs.bath_fitting.expfit
+.. automodule:: pyttn.ttns.operators.siteOperatorsExt
+   :members:
+   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
+   :exclude-members: __init__,__module__,__annotations__
+   :undoc-members:
+   :show-inheritance:
+
+pyttn.ttns.operators.sopOperatorExt module
+------------------------------------------
+
+.. automodule:: pyttn.ttns.operators.sopOperatorExt
    :members:
    :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
    :exclude-members: __init__,__module__,__annotations__
@@ -57,7 +57,7 @@ pyttn.oqs.bath\_fitting.expfit module
 Module contents
 ---------------
 
-.. automodule:: pyttn.oqs.bath_fitting
+.. automodule:: pyttn.ttns.operators
    :members:
    :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
    :exclude-members: __init__,__module__,__annotations__
