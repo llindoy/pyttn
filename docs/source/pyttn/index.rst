@@ -1,5 +1,6 @@
-pyTTN package
-=============
+#############
+The pyTTN API
+#############
 
 The pyTTN package: An Open Source Toolbox for Quantum Dynamics Simulations Using Tree Tensor Networks.
 
@@ -13,7 +14,6 @@ Subpackages
    pyttn.models
    pyttn.oqs
    pyttn.utils
-   pyttn.ttnpp <../ttnpp/ttnpp>
 
 
 Module contents

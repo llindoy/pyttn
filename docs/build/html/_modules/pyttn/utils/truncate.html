@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -91,8 +91,10 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">TruncationBase</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for local Hilbert space mode decomposition</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> </div>
+        <span class="k">return</span></div>
+
 
 
 <div class="viewcode-block" id="DepthTruncation">
@@ -118,7 +120,8 @@
 <span class="sd">    :returns: A list containing the local Hilbert space dimension of each mode</span>
 <span class="sd">    :rtype: list </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Lmax</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Lmax</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lmax</span> <span class="o">=</span> <span class="n">Lmax</span>
 
 <div class="viewcode-block" id="DepthTruncation.__call__">
@@ -129,6 +132,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Lmax</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wk</span><span class="p">))]</span></div>
 </div>
+
 
 
 <div class="viewcode-block" id="EnergyTruncation">
@@ -161,7 +165,7 @@
 <span class="sd">    :rtype: list </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ecut</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">Lmax</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">Lmin</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="s1">&#39;abs&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ecut</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Lmax</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">Lmin</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="s1">&#39;abs&#39;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ecut</span> <span class="o">=</span> <span class="n">ecut</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lmax</span> <span class="o">=</span> <span class="n">Lmax</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Lmin</span> <span class="o">=</span> <span class="n">Lmin</span>
@@ -196,7 +200,7 @@
             <span class="k">if</span> <span class="n">nbose</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lmin</span><span class="p">:</span>
                 <span class="n">nbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lmin</span>
 
-            <span class="k">if</span><span class="p">(</span><span class="n">nbose</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lmax</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">nbose</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lmax</span><span class="p">):</span>
                 <span class="n">nbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Lmax</span>
             <span class="n">Nb</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nbose</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Nb</span></div>

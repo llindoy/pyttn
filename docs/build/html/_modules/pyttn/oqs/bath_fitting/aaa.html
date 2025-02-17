@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -94,8 +94,9 @@
     <span class="n">vals</span> <span class="o">=</span> <span class="n">r</span><span class="p">(</span><span class="n">poles</span><span class="o">+</span><span class="n">zvs</span><span class="p">)</span><span class="o">*</span><span class="n">zvs</span>
     <span class="k">return</span> <span class="n">vals</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">__compute_residues_integ</span><span class="p">(</span><span class="n">r</span><span class="p">,</span>  <span class="n">poles</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the poles and residues given the baryocentric representation of a rational function</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the poles and residues given the baryocentric representation of a rational function</span>
 
 <span class="sd">    :param r: The rational function object</span>
 <span class="sd">    :type r: callable</span>
@@ -107,16 +108,18 @@
 <span class="sd">    :returns: The residue associated with each pole</span>
 <span class="sd">    :rtype: np.ndarray</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1">#find the distance between pole i and the nearest pole to it - this ensures that we can evaluate the pole using</span>
-    <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">([</span><span class="n">xs</span> <span class="o">-</span> <span class="n">poles</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argpartition</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">poles</span> <span class="o">-</span> <span class="n">xs</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">xs</span> <span class="ow">in</span> <span class="n">poles</span><span class="p">])</span><span class="o">/</span><span class="mf">10.0</span>
+    <span class="c1"># find the distance between pole i and the nearest pole to it - this ensures that we can evaluate the pole using</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">([</span><span class="n">xs</span> <span class="o">-</span> <span class="n">poles</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argpartition</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">poles</span> <span class="o">-</span> <span class="n">xs</span><span class="p">),</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span>
+                  <span class="k">for</span> <span class="n">xs</span> <span class="ow">in</span> <span class="n">poles</span><span class="p">])</span><span class="o">/</span><span class="mf">10.0</span>
     <span class="n">rs</span> <span class="o">=</span> <span class="n">vals</span>
 
-    <span class="n">res</span> <span class="o">=</span> <span class="n">quad_vec</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">__residue_integrand</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">rs</span><span class="p">,</span> <span class="n">poles</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">epsrel</span> <span class="o">=</span> <span class="n">tol</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">quad_vec</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">__residue_integrand</span><span class="p">(</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">rs</span><span class="p">,</span> <span class="n">poles</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">epsrel</span><span class="o">=</span><span class="n">tol</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">res</span>
 
-<span class="c1">#def compute_residues_rational(zeros, poles):</span>
+
 <span class="k">def</span><span class="w"> </span><span class="nf">__prz</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">tol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the poles and residues given the baryocentric representation of a rational function</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the poles and residues given the baryocentric representation of a rational function</span>
 
 <span class="sd">    :param r: The rational function object</span>
 <span class="sd">    :type r: callable</span>
@@ -136,11 +139,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">m</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    
-    <span class="c1">#setup the generalised eigenproblem suitable for obtaining the poles of this function</span>
-    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+    <span class="c1"># setup the generalised eigenproblem suitable for obtaining the poles of this function</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
     <span class="n">B</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
     <span class="n">M</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
     <span class="n">M</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">w</span>
     <span class="n">M</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
@@ -148,19 +151,21 @@
     <span class="n">poles</span> <span class="o">=</span> <span class="n">splinalg</span><span class="o">.</span><span class="n">eigvals</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
     <span class="n">poles</span> <span class="o">=</span> <span class="n">poles</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">poles</span><span class="p">)]</span>
 
-    <span class="c1">#setup the generalised eigenproblem suitable for obtaining the zeros of this function</span>
+    <span class="c1"># setup the generalised eigenproblem suitable for obtaining the zeros of this function</span>
     <span class="n">M</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">w</span><span class="o">*</span><span class="n">f</span>
 
     <span class="n">zeros</span> <span class="o">=</span> <span class="n">splinalg</span><span class="o">.</span><span class="n">eigvals</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
     <span class="n">zeros</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">zeros</span><span class="p">)]</span>
 
     <span class="n">res</span> <span class="o">=</span> <span class="n">__compute_residues_integ</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">poles</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
-    
+
     <span class="k">return</span> <span class="n">poles</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">zeros</span>
 
-<span class="c1">#function for evaluating the baryocentric form of the rational function approximation of another function</span>
+<span class="c1"># function for evaluating the baryocentric form of the rational function approximation of another function</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">__evaluate_function</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluate the baryocentric form of the rational function approximation</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate the baryocentric form of the rational function approximation</span>
 
 <span class="sd">    .. math:</span>
 <span class="sd">        r(z) = \frac{\sum_{j=1}^N \frac{w_j f_j}{z-Z_j}}{\sum_{j=1}^N \frac{w_j}{z-Z_j}}</span>
@@ -182,10 +187,11 @@
     <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">CC</span><span class="o">@</span><span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">f</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">CC</span><span class="nd">@w</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">r</span>
 
+
 <div class="viewcode-block" id="AAA_algorithm">
 <a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.aaa.AAA_algorithm">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">AAA_algorithm</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-13</span><span class="p">,</span> <span class="n">nmax</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Implementation of the adaptive Antoulas-Anderson (AAA) algorithm for rational approximation</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">AAA_algorithm</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-13</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">nmax</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Implementation of the adaptive Antoulas-Anderson (AAA) algorithm for rational approximation</span>
 <span class="sd">    Y. Nakatsukasa, O. Sète, and L. N. Trefethen, SIAM Journal on Scientific Computing 40, A1494 (2018).</span>
 
 <span class="sd">    :param F: The function to be fit</span>
@@ -194,6 +200,8 @@
 <span class="sd">    :type Z: np.ndarray</span>
 <span class="sd">    :param tol: The convergence tolerance for the AAA algorithm. (default: 1e-13)</span>
 <span class="sd">    :type tol: float, optional</span>
+<span class="sd">    :param K: The maximum number of poles to fit. (default: None)</span>
+<span class="sd">    :type K: int or None, optional</span>
 <span class="sd">    :param nmax: The maximum number of poles to use in the AAA fit. (default: 100)</span>
 <span class="sd">    :type nmax: int, optional</span>
 <span class="sd">    :param *args: Variable length argument list to be passed to the F function</span>
@@ -206,10 +214,10 @@
 <span class="sd">        - zeros(np.ndarray) - The zeros of the rational function</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    
+
     <span class="n">M</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="c1">#evaluate the function at the sample points</span>
+    <span class="c1"># evaluate the function at the sample points</span>
     <span class="n">Fz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
     <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
     <span class="n">Z0</span> <span class="o">=</span> <span class="n">Z</span>
@@ -219,14 +227,14 @@
     <span class="n">SF</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">diags</span><span class="p">(</span><span class="n">Fz</span><span class="p">)</span>
     <span class="n">z</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">f</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">nmax</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">M</span><span class="p">,</span> <span class="n">nmax</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
     <span class="n">w</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nmax</span><span class="p">):</span>
         <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Fz</span><span class="o">-</span><span class="n">R</span><span class="p">))</span>
         <span class="n">z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
         <span class="n">f</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Fz</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
 
-        <span class="c1">#delete the elements that we don&#39;t need any more</span>
+        <span class="c1"># delete the elements that we don&#39;t need any more</span>
         <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">Fz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">Fz</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -244,21 +252,17 @@
         <span class="n">D</span> <span class="o">=</span> <span class="n">C</span><span class="p">[:,</span> <span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">@</span> <span class="n">w</span>
         <span class="n">R</span> <span class="o">=</span> <span class="n">N</span><span class="o">/</span><span class="n">D</span>
         <span class="n">err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Fz</span><span class="o">-</span><span class="n">R</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
-        <span class="k">if</span><span class="p">(</span> <span class="n">err</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Fz</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">err</span> <span class="o">&lt;=</span> <span class="n">tol</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Fz</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)</span> <span class="o">==</span> <span class="n">K</span><span class="p">):</span>
             <span class="k">break</span>
 
-    <span class="n">z1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
-    <span class="n">f1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
-    <span class="n">w1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span> 
+    <span class="n">z1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">w1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
 
-    <span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span> <span class="p">:</span> <span class="n">__evaluate_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">w1</span><span class="p">)</span>
-    <span class="n">poles</span><span class="p">,</span><span class="n">residues</span><span class="p">,</span> <span class="n">zeros</span> <span class="o">=</span> <span class="n">__prz</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
-    
+    <span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="k">return</span> <span class="n">__evaluate_function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">w1</span><span class="p">)</span>
+    <span class="n">poles</span><span class="p">,</span> <span class="n">residues</span><span class="p">,</span> <span class="n">zeros</span> <span class="o">=</span> <span class="n">__prz</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">func</span><span class="p">,</span> <span class="n">poles</span><span class="p">,</span> <span class="n">residues</span><span class="p">,</span> <span class="n">zeros</span></div>
-
-
-
-
 
 </pre></div>
 

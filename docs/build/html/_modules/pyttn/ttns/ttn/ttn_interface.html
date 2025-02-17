@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -85,15 +85,16 @@
   <h1>Source code for pyttn.ttns.ttn.ttn_interface</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+
 <div class="viewcode-block" id="ttn_dtype">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ttn_dtype</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class defining the general interface for the pybind11 wrappers generated for the ttn object.  These wrapper classes are</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A class defining the general interface for the pybind11 wrappers generated for the ttn object.  These wrapper classes are</span>
 <span class="sd">    :class:`ttn_complex` and :class:`ttn_real` (with the real variant only present if the pybind11 wrapper has been built with support</span>
 <span class="sd">    for real valued TTNs.</span>
 
 <span class="sd">    :param *args: A variable length list of arguments. Valid options are</span>
-<span class="sd">        </span>
+
 <span class="sd">        - none - in this case we call the default constructor of the ttn class to construct an empty ttn.</span>
 <span class="sd">        - **A** (:class:`ms_ttn_slice_complex` or :class:`ms_ttn_slice_real`) - Construct a ttn to represent a single slice of a multiset TTN</span>
 <span class="sd">        - **A** (:class:`ttn_complex` or :class:`ttn_real`) - Construct the ttn object from another ttn object potentially converting the dtype</span>
@@ -108,22 +109,22 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The ttn_dtype class is not constructable.  This class is present to provide cleaner documentation for the pybind11 classes.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;The ttn_dtype class is not constructable.  This class is present to provide cleaner documentation for the pybind11 classes.&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">complex_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the data type stored in the ttn</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the data type stored in the ttn</span>
 
 <span class="sd">        :returns: dtype</span>
 <span class="sd">        :rtype: {np.complex128 or np.float64}</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
-
 <div class="viewcode-block" id="ttn_dtype.assign">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.assign">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign the value of this ttn from another ttn</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assign the value of this ttn from another ttn</span>
 
 <span class="sd">        :param o: The other ttn object</span>
 <span class="sd">        :type o: ttn_dtype or ttn_real</span>
@@ -131,12 +132,34 @@
         <span class="k">pass</span></div>
 
 
+<div class="viewcode-block" id="ttn_dtype.bond">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.bond">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bond</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a list of all bonds in the network</span>
+
+<span class="sd">        :returns: All bonds in the network</span>
+<span class="sd">        :rtype: list[int, int]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
 <div class="viewcode-block" id="ttn_dtype.bond_dimensions">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.bond_dimensions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">bond_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network</span>
 
 <span class="sd">        :returns: All bond dimensions in the network</span>
+<span class="sd">        :rtype: dict([int, int], int)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ttn_dtype.bond_capacities">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.bond_capacities">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bond_capacities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a dictionary containing the bond (the two sites forming the bond) and maximum bond dimension of all bonds in the network</span>
+
+<span class="sd">        :returns: All maximum bond dimensions in the network</span>
 <span class="sd">        :rtype: dict([int, int], int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
@@ -146,17 +169,17 @@
 <div class="viewcode-block" id="ttn_dtype.reset_orthogonality_centre">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.reset_orthogonality_centre">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reset_orthogonality_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resets the orthogonality centre of the TTN to the root node of the tree.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resets the orthogonality centre of the TTN to the root node of the tree.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="ttn_dtype.resize">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.resize">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">purification</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resize the TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resize the TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction</span>
 
 <span class="sd">        :param *args: A variable length list of arguments. Valid options are</span>
-<span class="sd">            </span>
+
 <span class="sd">            - **topology** (:class:`ntree` or str) - Construct a ttn from a ntree object defining the topology and bond dimensions of the ttn</span>
 <span class="sd">            - **topology** (:class:`ntree` or str), **capacity** (ntree or str ) - Construct a ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions</span>
 <span class="sd">        :type *args: [Arguments (variable number and type)]</span>
@@ -166,11 +189,10 @@
         <span class="k">pass</span></div>
 
 
-
 <div class="viewcode-block" id="ttn_dtype.set_seed">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.set_seed">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the value of the random number generate seed used for internal operations requiring random sampling</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the value of the random number generate seed used for internal operations requiring random sampling</span>
 
 <span class="sd">        :param seed: The new value of the seed</span>
 <span class="sd">        :type seed: int</span>
@@ -181,7 +203,7 @@
 <div class="viewcode-block" id="ttn_dtype.set_state">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.set_state">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">random_unoccupied_initialisation</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the coefficients in the TTN so that it represents a user specified product state </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the coefficients in the TTN so that it represents a user specified product state </span>
 
 <span class="sd">        :param state: The occupation number state to set the TTN to</span>
 <span class="sd">        :type state: list[int]</span>
@@ -191,11 +213,10 @@
         <span class="k">pass</span></div>
 
 
-
 <div class="viewcode-block" id="ttn_dtype.set_product">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.set_product">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the coefficients in the TTN so that it represents a product of a set of one body states </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the coefficients in the TTN so that it represents a product of a set of one body states </span>
 
 <span class="sd">        :param state: A list containing a set of vectors corresponding to the individual product states</span>
 <span class="sd">        :type state: list[list[dtype]]</span>
@@ -203,11 +224,10 @@
         <span class="k">pass</span></div>
 
 
-
 <div class="viewcode-block" id="ttn_dtype.set_identity_purification">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.set_identity_purification">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_identity_purification</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the state of the TTN to a purification state representing the identity</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sets the state of the TTN to a purification state representing the identity</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
@@ -215,7 +235,7 @@
 <div class="viewcode-block" id="ttn_dtype.sample_product">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.sample_product">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sample_product</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sample a direct product of occupation states from a set of probabilities of observing each mode in a given state </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sample a direct product of occupation states from a set of probabilities of observing each mode in a given state </span>
 
 <span class="sd">        :param state: A list containing a set of vectors corresponding to the probabilities of observing each occupation state</span>
 <span class="sd">        :type state: list[list[dtype]]</span>
@@ -226,7 +246,7 @@
 <div class="viewcode-block" id="ttn_dtype.__imul__">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.__imul__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Inplace multiplication of the TTN object by a scalar</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Inplace multiplication of the TTN object by a scalar</span>
 
 <span class="sd">        :param b: Scalar value to multiply TTN by</span>
 <span class="sd">        :type b: number</span>
@@ -237,7 +257,7 @@
 <div class="viewcode-block" id="ttn_dtype.__idiv__">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.__idiv__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">__idiv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Inplace division of the TTN object by a scalar</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Inplace division of the TTN object by a scalar</span>
 
 <span class="sd">        :param b: Scalar value to divide TTN by</span>
 <span class="sd">        :type b: number</span>
@@ -276,7 +296,7 @@
 <div class="viewcode-block" id="ttn_dtype.__iter__">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.__iter__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: Iterator object over nodes in TTN</span>
 <span class="sd">        :rtype: iterator</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -286,7 +306,7 @@
 <div class="viewcode-block" id="ttn_dtype.mode_dimensions">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.mode_dimensions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">mode_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: List of local Hilbert space dimensions</span>
 <span class="sd">        :rtype: list[int]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -296,7 +316,7 @@
 <div class="viewcode-block" id="ttn_dtype.dim">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.dim">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the local Hilbert space dimension of mode i</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the local Hilbert space dimension of mode i</span>
 
 <span class="sd">        :param i: The index of the mode</span>
 <span class="sd">        :type i: int</span>
@@ -310,7 +330,7 @@
 <div class="viewcode-block" id="ttn_dtype.nmodes">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.nmodes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nmodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The number of modes in the TTN</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -320,7 +340,7 @@
 <div class="viewcode-block" id="ttn_dtype.is_purification">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.is_purification">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_purification</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: Whether or not the state represents a purification</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -330,7 +350,7 @@
 <div class="viewcode-block" id="ttn_dtype.ntensors">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.ntensors">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">ntensors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The total number of tensors in the tensor network</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -340,18 +360,17 @@
 <div class="viewcode-block" id="ttn_dtype.nsites">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.nsites">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nsites</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The total number of tensors in the tensor network</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 
-
 <div class="viewcode-block" id="ttn_dtype.nset">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.nset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The number of set variables for the TTN.  Here it is one</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -361,7 +380,7 @@
 <div class="viewcode-block" id="ttn_dtype.nelem">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.nelem">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nelem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The total number of elements in all tensors of the network.</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -371,7 +390,7 @@
 <div class="viewcode-block" id="ttn_dtype.__len__">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.__len__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The number of modes in the TTN</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -381,7 +400,7 @@
 <div class="viewcode-block" id="ttn_dtype.compute_maximum_bond_entropy">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.compute_maximum_bond_entropy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_maximum_bond_entropy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes the maximum SvN across any bond in the tensor network and returns the results</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes the maximum SvN across any bond in the tensor network and returns the results</span>
 
 <span class="sd">        :returns: The maximum bond entropy in the tensor network</span>
 <span class="sd">        :rtype: float</span>
@@ -393,7 +412,7 @@
 <div class="viewcode-block" id="ttn_dtype.maximum_bond_entropy">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.maximum_bond_entropy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">maximum_bond_entropy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the previously computed maximum SvN across any bond in the tensor network</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the previously computed maximum SvN across any bond in the tensor network</span>
 
 <span class="sd">        :returns: The maximum bond entropy in the tensor network</span>
 <span class="sd">        :rtype: float</span>
@@ -405,7 +424,7 @@
 <div class="viewcode-block" id="ttn_dtype.bond_entropy">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.bond_entropy">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">bond_entropy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the SvN across the ith bond of the current orthogonality centre. </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns the SvN across the ith bond of the current orthogonality centre. </span>
 <span class="sd">        Where for all nodes but the root 0 corresponds to the parent of the current orthogonality centre and its children are then 1-nchild,</span>
 <span class="sd">        For the root i just indexes the children</span>
 
@@ -416,11 +435,10 @@
         <span class="k">pass</span></div>
 
 
-
 <div class="viewcode-block" id="ttn_dtype.maximum_bond_dimension">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.maximum_bond_dimension">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">maximum_bond_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;            </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;            </span>
 <span class="sd">        :returns: The maximum bond dimension</span>
 <span class="sd">        :rtype: int</span>
 
@@ -431,7 +449,7 @@
 <div class="viewcode-block" id="ttn_dtype.minimum_bond_dimension">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.minimum_bond_dimension">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">minimum_bond_dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;            </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;            </span>
 <span class="sd">        :returns: The minimum bond dimension</span>
 <span class="sd">        :rtype: int</span>
 
@@ -442,7 +460,7 @@
 <div class="viewcode-block" id="ttn_dtype.has_orthogonality_centre">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.has_orthogonality_centre">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">has_orthogonality_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;            </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;            </span>
 <span class="sd">        :returns: Whether or not the TTN has an active orthogonality centre</span>
 <span class="sd">        :rtype: bool</span>
 
@@ -453,7 +471,7 @@
 <div class="viewcode-block" id="ttn_dtype.orthogonality_centre">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.orthogonality_centre">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">orthogonality_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;            </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;            </span>
 <span class="sd">        :returns: The index of the current orthogonality centre</span>
 <span class="sd">        :rtype: int</span>
 
@@ -461,11 +479,10 @@
         <span class="k">pass</span></div>
 
 
-
 <div class="viewcode-block" id="ttn_dtype.is_orthogonalised">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.is_orthogonalised">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_orthogonalised</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;            </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;            </span>
 <span class="sd">        :returns: Whether or not the TTN has an orthogonality centre at the root</span>
 <span class="sd">        :rtype: bool</span>
 
@@ -473,11 +490,10 @@
         <span class="k">pass</span></div>
 
 
-
 <div class="viewcode-block" id="ttn_dtype.force_set_orthogonality_centre">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.force_set_orthogonality_centre">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">force_set_orthogonality_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the orthogonality centre of the tensor network to index i but does not modify the tensor to ensure that this is a</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sets the orthogonality centre of the tensor network to index i but does not modify the tensor to ensure that this is a</span>
 <span class="sd">        valid orthogonality centre</span>
 
 <span class="sd">        :param i: The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre</span>
@@ -490,7 +506,7 @@
 <div class="viewcode-block" id="ttn_dtype.shift_orthogonality_centre">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.shift_orthogonality_centre">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">shift_orthogonality_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nchi</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shift the orthogonality centre down the ith bond of the current orthogonality centre with possible truncation. </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Shift the orthogonality centre down the ith bond of the current orthogonality centre with possible truncation. </span>
 <span class="sd">        Where for all nodes but the root 0 corresponds to the parent of the current orthogonality centre and its children are then 1-nchild</span>
 <span class="sd">        For the root i just indexes the children</span>
 
@@ -508,7 +524,7 @@
 <div class="viewcode-block" id="ttn_dtype.set_orthogonality_centre">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.set_orthogonality_centre">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_orthogonality_centre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nchi</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the orthogonality centre of the tensor network to index i either introducing an orthogonality centre if there is none</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sets the orthogonality centre of the tensor network to index i either introducing an orthogonality centre if there is none</span>
 <span class="sd">        or simply shifting the orthogonality centre from its current location to the required location</span>
 
 <span class="sd">        :param i: The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre</span>
@@ -525,7 +541,7 @@
 <div class="viewcode-block" id="ttn_dtype.orthogonalise">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.orthogonalise">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">orthogonalise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shifts the orthogonality centre to the root node of the TTN</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Shifts the orthogonality centre to the root node of the TTN</span>
 
 <span class="sd">        :param force: Whether or not to force a full reorthogonalisation of the TTN regardless of whether or not it believes it has an orthogonality centre</span>
 <span class="sd">        :type force: bool, optional</span>
@@ -533,11 +549,10 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 
-
 <div class="viewcode-block" id="ttn_dtype.truncate">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.truncate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">truncate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nchi</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensures the tensor network is in an orthogonalised form.  Then performs an euler tour truncating each bond according to the user</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Ensures the tensor network is in an orthogonalised form.  Then performs an euler tour truncating each bond according to the user</span>
 <span class="sd">        specified tol and nchi parameters</span>
 
 <span class="sd">        :param tol: A truncation tolerance for the singular values to discard weight.  (Default: 0)</span>
@@ -552,7 +567,7 @@
 <div class="viewcode-block" id="ttn_dtype.normalise">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.normalise">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">normalise</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensures the TTN is a normalised to one and returns the previous value of the norm of the tensor</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Ensures the TTN is a normalised to one and returns the previous value of the norm of the tensor</span>
 
 <span class="sd">        :returns: The previous 2-norm of the TTN</span>
 <span class="sd">        :rtype: float</span>
@@ -563,7 +578,7 @@
 <div class="viewcode-block" id="ttn_dtype.norm">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.norm">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns: The 2-norm of the TTN</span>
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -573,7 +588,7 @@
 <div class="viewcode-block" id="ttn_dtype.__setitem__">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.__setitem__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the value of a site tensor in the tensor network</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sets the value of a site tensor in the tensor network</span>
 
 <span class="sd">        :param i: Index of the node to set</span>
 <span class="sd">        :type i: int</span>
@@ -587,7 +602,7 @@
 <div class="viewcode-block" id="ttn_dtype.__getitem__">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.__getitem__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access tensor data at node i</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Access tensor data at node i</span>
 
 <span class="sd">        :param i: Index of the node to access data from</span>
 <span class="sd">        :type i: int</span>
@@ -602,7 +617,7 @@
 <div class="viewcode-block" id="ttn_dtype.set_site_tensor">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.set_site_tensor">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_site_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the value of a site tensor in the tensor network</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sets the value of a site tensor in the tensor network</span>
 
 <span class="sd">        :param i: Index of the node to set</span>
 <span class="sd">        :type i: int</span>
@@ -616,7 +631,7 @@
 <div class="viewcode-block" id="ttn_dtype.site_tensor">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.site_tensor">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">site_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access tensor data at node i</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Access tensor data at node i</span>
 
 <span class="sd">        :param i: Index of the node to access data from</span>
 <span class="sd">        :type i: int</span>
@@ -631,7 +646,7 @@
 <div class="viewcode-block" id="ttn_dtype.measure_without_collapse">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.measure_without_collapse">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">measure_without_collapse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate the probablity of observing each state following a projective measurement applied to mode i without performing the collapse</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Evaluate the probablity of observing each state following a projective measurement applied to mode i without performing the collapse</span>
 
 <span class="sd">        :param i: The physical mode to perform the projective measurement on</span>
 <span class="sd">        :type i: int</span>
@@ -645,7 +660,7 @@
 <div class="viewcode-block" id="ttn_dtype.collapse_basis">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.collapse_basis">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">collapse_basis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nchi</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a projective measurement across all modes in the TTN applying a basis transformation U_i to each mode i before doing so</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform a projective measurement across all modes in the TTN applying a basis transformation U_i to each mode i before doing so</span>
 
 <span class="sd">        :param U: A list of basis transformations to apply to the state before performing the projective measurement</span>
 <span class="sd">        :type U: list[np.ndarray] or list[linalg.matrix]</span>
@@ -665,7 +680,7 @@
 <div class="viewcode-block" id="ttn_dtype.collapse">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.collapse">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">collapse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">truncate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">nchi</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform a projective measurement across all modes in the TTN </span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform a projective measurement across all modes in the TTN </span>
 
 <span class="sd">        :param truncate: Whether or not to truncate the state following collapse as it is a product state. (Default: True)</span>
 <span class="sd">        :type truncate: bool, optional</span>
@@ -683,10 +698,10 @@
 <div class="viewcode-block" id="ttn_dtype.apply_one_body_operator">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.apply_one_body_operator">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply_one_body_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">shift_orthogonality</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply a one-body operator to the TTN updating its value</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a one-body operator to the TTN updating its value</span>
 
 <span class="sd">        :param *args: A variable length list of arguments. Valid options are</span>
-<span class="sd">            </span>
+
 <span class="sd">            - **op** (linalg.matrix or np.ndarray or site_operator_dtype), **mode** (int) -  Apply the operator op to mode mode</span>
 <span class="sd">            - **op** (site_operator_dtype) - Apply the operator op to the mode specified by op</span>
 <span class="sd">        :type *args: [Arguments (variable number and type)]</span>
@@ -699,7 +714,7 @@
 <div class="viewcode-block" id="ttn_dtype.apply_product_operator">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.apply_product_operator">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply_product_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">shift_orthogonality</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply a product of one-body operator to the TTN updating its value</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a product of one-body operator to the TTN updating its value</span>
 
 <span class="sd">        :param op: The product operator to apply to the system</span>
 <span class="sd">        :type op: product_operator_dtype</span>
@@ -712,7 +727,7 @@
 <div class="viewcode-block" id="ttn_dtype.apply_operator">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.apply_operator">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">apply_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">shift_orthogonality</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply a product of one-body operator to the TTN updating its value</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply a product of one-body operator to the TTN updating its value</span>
 
 <span class="sd">        :param op: The product operator to apply to the system</span>
 <span class="sd">        :type op: site_operator_dtype or product_operator_dtype</span>
@@ -725,7 +740,7 @@
 <div class="viewcode-block" id="ttn_dtype.__imatmul__">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.__imatmul__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__imatmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply an operator to the TTN updating its value.  Shifting the orthogonality centre to the leaf nodes that will be updated by this operator</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply an operator to the TTN updating its value.  Shifting the orthogonality centre to the leaf nodes that will be updated by this operator</span>
 
 <span class="sd">        :param op: The product operator to apply to the system</span>
 <span class="sd">        :type op: site_operator_dtype or product_operator_dtype or sop_opertor_dtype</span>
@@ -737,7 +752,7 @@
 <div class="viewcode-block" id="ttn_dtype.__rmatmul__">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn_dtype.__rmatmul__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__rmatmul__</span><span class="p">(</span><span class="n">A</span><span class="p">,</span>  <span class="n">op</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply an operator to the TTN updating its value, returning the result as a new TTN</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Apply an operator to the TTN updating its value, returning the result as a new TTN</span>
 
 <span class="sd">        :param A: The ttn to apply the operator to</span>
 <span class="sd">        :type A: ttn_dtype</span>

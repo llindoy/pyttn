@@ -3,7 +3,7 @@ import numpy as np
 
 class ms_ttn_dtype:
     r"""A class defining the general interface for the pybind11 wrappers generated for the multiset ttn object.  These wrapper classes are
-    :class:`ttn_complex` and :class:`ttn_real` (with the real variant only present if the pybind11 wrapper has been built with support
+    :class:`ms_ttn_complex` and :class:`ms_ttn_real` (with the real variant only present if the pybind11 wrapper has been built with support
     for real valued multiset TTNs.
 
     :param *args: A variable length list of arguments. Valid options are

@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -85,24 +85,83 @@
   <h1>Source code for pyttn.ttns.operators.sopOperatorExt</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">sop_operator_complex</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">,</span> <span class="n">SOP_complex</span><span class="p">,</span> <span class="n">system_modes</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiset_sop_operator_complex</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">,</span> <span class="n">multiset_SOP_complex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">sop_operator_complex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_complex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">SOP_complex</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">sop_operator_real</span><span class="p">,</span> <span class="n">ttn_real</span><span class="p">,</span> <span class="n">SOP_real</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiset_sop_operator_real</span><span class="p">,</span> <span class="n">ms_ttn_real</span><span class="p">,</span> <span class="n">multiset_SOP_real</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">sop_operator_real</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_real</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">SOP_real</span>
+
+    <span class="n">__real_ttn_import</span> <span class="o">=</span> <span class="kc">True</span>
 
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">__real_ttn_import</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">sop_operator_real</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">ttn_real</span> <span class="o">=</span> <span class="kc">None</span> 
+    <span class="n">ttn_real</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">SOP_real</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">multiset_sop_operator_real</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">ms_ttn_real</span> <span class="o">=</span> <span class="kc">None</span> 
-    <span class="n">multiset_SOP_real</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1">#and attempt to import the cuda backend</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">sop_operator_complex</span> <span class="k">as</span> <span class="n">sop_operator_complex_cuda</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_complex</span> <span class="k">as</span> <span class="n">ttn_complex_cuda</span>
+
+    <span class="n">__cuda_import</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1">#and if we have imported real ttns we import the cuda versions</span>
+    <span class="k">if</span> <span class="n">__real_ttn_import</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">sop_operator_real</span> <span class="k">as</span> <span class="n">sop_operator_real_cuda</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_real</span> <span class="k">as</span> <span class="n">ttn_real_cuda</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sop_operator_real_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">ttn_real_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">__cuda_import</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">sop_operator_real_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">sop_operator_complex_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ttn_real_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ttn_complex_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__sop_operator_blas</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">__real_ttn_import</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">SOP_complex</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sop_operator_complex</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid argument for the creation of a sop_operator.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_real</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">SOP_real</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sop_operator_real</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">SOP_complex</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sop_operator_complex</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid argument for the creation of a sop_operator.&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__sop_operator_cuda</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">__real_ttn_import</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex_cuda</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">SOP_complex</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sop_operator_complex_cuda</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid argument for the creation of a sop_operator.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_real_cuda</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">SOP_real</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sop_operator_real_cuda</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex_cuda</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">SOP_complex</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">sop_operator_complex_cuda</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid argument for the creation of a sop_operator.&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="sop_operator">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.sop_operator">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">sop_operator</span><span class="p">(</span><span class="n">h</span><span class="p">:</span> <span class="n">SOP_real</span><span class="o">|</span><span class="n">SOP_complex</span><span class="p">,</span> <span class="n">A</span> <span class="p">:</span> <span class="n">ttn_real</span><span class="o">|</span><span class="n">ttn_complex</span><span class="p">,</span> <span class="n">sysinf</span> <span class="p">:</span> <span class="n">system_modes</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function for constructing the hierarchical sum of product operator of a string operator</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sop_operator</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function for constructing the hierarchical sum of product operator of a string operator</span>
 
 <span class="sd">    :param h: The sum of product operator representation of the Hamiltonian</span>
 <span class="sd">    :type h: SOP_real or SOP_complex</span>
@@ -113,46 +172,16 @@
 <span class="sd">    :type *args: Variable length list of arguments. See sop_operator_complex/sop_operator_real for options</span>
 <span class="sd">    :type **kwargs: Additional keyword arguments. See sop_operator_complex/sop_operator_real for options</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">SOP_real</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">SOP_complex</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">sop_operator_complex</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid argument for the creation of a sop_operator.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">backend</span><span class="p">()</span> <span class="o">!=</span> <span class="n">A</span><span class="o">.</span><span class="n">backend</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Attempted to construct sop_operator with opdict but opdict backend is not compatible with ttn backend.&quot;</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">backend</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;blas&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">__sop_operator_blas</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">__cuda_import</span> <span class="ow">and</span> <span class="n">A</span><span class="o">.</span><span class="n">backend</span><span class="p">()</span><span class="o">==</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">__sop_operator_cuda</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_real</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">SOP_real</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">sop_operator_real</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">SOP_complex</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">sop_operator_complex</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid argument for the creation of a sop_operator.&quot;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="multiset_sop_operator">
-<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.multiset_sop_operator">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">multiset_sop_operator</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function for constructing the multiset hierarchical sum of product operator of a string operator</span>
-
-<span class="sd">    :param h: The sum of product operator representation of the Hamiltonian</span>
-<span class="sd">    :type h: multiset_SOP_real or multiset_SOP_complex</span>
-<span class="sd">    :param A: A TTN object with defining the topology of output hierarchical SOP object</span>
-<span class="sd">    :type A: ms_ttn_real or ms_ttn_complex</span>
-<span class="sd">    :param sysinf: The composition of the system defining the default dictionary to be considered for each node</span>
-<span class="sd">    :type sysinf: system_modes</span>
-<span class="sd">    :type *args: Variable length list of arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options</span>
-<span class="sd">    :type **kwargs: Additional keyword arguments. See /multiset_sop_operator_complex/multiset_sop_operator_real for options</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">multiset_SOP_real</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">multiset_SOP_complex</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">multiset_sop_operator_complex</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid argument for the creation of a sop_operator.&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_real</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">multiset_SOP_real</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">multiset_SOP_real</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">multiset_sop_operator_real</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">multiset_SOP_complex</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">multiset_sop_operator_complex</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid argument for the creation of a sop_operator.&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid backend type for sop_operator&quot;</span><span class="p">)</span></div>
 
 </pre></div>
 

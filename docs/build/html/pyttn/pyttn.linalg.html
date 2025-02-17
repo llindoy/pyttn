@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="pyttn.models package" href="pyttn.models.html" />
-    <link rel="prev" title="pyTTN package" href="index.html" /> 
+    <link rel="prev" title="The pyTTN API" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,17 +43,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul class="current">
@@ -62,15 +62,14 @@
 <li class="toctree-l2 current"><a class="reference internal" href="index.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">pyttn.linalg package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.linalg.sparseMatrixExt">pyttn.linalg.sparseMatrixExt module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.linalg.tensorExt">pyttn.linalg.tensorExt module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.linalg">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn-linalg-sparsematrixext-module">pyttn.linalg.sparseMatrixExt module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyttn-linalg-tensorext-module">pyttn.linalg.tensorExt module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="pyttn.models.html">pyttn.models package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyttn.oqs.html">pyttn.oqs package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyttn.utils.html">pyttn.utils package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../ttnpp/ttnpp.html">pyttn.ttnpp</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="index.html#module-pyttn">Module contents</a></li>
@@ -92,7 +91,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">pyTTN package</a></li>
+          <li class="breadcrumb-item"><a href="index.html">The pyTTN API</a></li>
       <li class="breadcrumb-item active">pyttn.linalg package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/pyttn/pyttn.linalg.rst.txt" rel="nofollow"> View page source</a>
@@ -108,122 +107,14 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="module-pyttn.linalg.sparseMatrixExt">
-<span id="pyttn-linalg-sparsematrixext-module"></span><h2>pyttn.linalg.sparseMatrixExt module<a class="headerlink" href="#module-pyttn.linalg.sparseMatrixExt" title="Link to this heading"></a></h2>
+<section id="pyttn-linalg-sparsematrixext-module">
+<h2>pyttn.linalg.sparseMatrixExt module<a class="headerlink" href="#pyttn-linalg-sparsematrixext-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-pyttn.linalg.tensorExt">
-<span id="pyttn-linalg-tensorext-module"></span><h2>pyttn.linalg.tensorExt module<a class="headerlink" href="#module-pyttn.linalg.tensorExt" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pyttn.linalg.tensorExt.matrix">
-<span class="sig-prename descclassname"><span class="pre">pyttn.linalg.tensorExt.</span></span><span class="sig-name descname"><span class="pre">matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/linalg/tensorExt.html#matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.linalg.tensorExt.matrix" title="Link to this definition"></a></dt>
-<dd><p>A function for converting from a numpy array to a C++ linalg::tensor&lt;T,2&gt; type
-used by the C++ layer of pyTTN.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>M</strong> (<em>np.ndarray</em>) – The numpy matrix</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A pybind11 wrapped linalg::tensor&lt;T, 2&gt; object</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.matrix_real" title="pyttn.ttnpp.linalg.matrix_real">matrix_real</a>, <a class="reference internal" href="../ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.matrix_complex" title="pyttn.ttnpp.linalg.matrix_complex">matrix_complex</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyttn.linalg.tensorExt.tensor">
-<span class="sig-prename descclassname"><span class="pre">pyttn.linalg.tensorExt.</span></span><span class="sig-name descname"><span class="pre">tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/linalg/tensorExt.html#tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.linalg.tensorExt.tensor" title="Link to this definition"></a></dt>
-<dd><p>A function for converting from a numpy array to a C++ linalg::tensor&lt;T,D&gt; type
-for D&lt;=4 used by the C++ layer of pyTTN.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>M</strong> (<em>np.ndarray</em>) – The numpy tensor</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A pybind11 wrapped linalg::tensor&lt;T, D&gt; object</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pybind11 wrapped linalg::tensor&lt;T,D&gt; object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyttn.linalg.tensorExt.vector">
-<span class="sig-prename descclassname"><span class="pre">pyttn.linalg.tensorExt.</span></span><span class="sig-name descname"><span class="pre">vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/linalg/tensorExt.html#vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.linalg.tensorExt.vector" title="Link to this definition"></a></dt>
-<dd><p>A function for converting from a 1 dimensional numpy array to a C++ linalg::tensor&lt;T,1&gt; type
-used by the C++ layer of pyTTN.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>M</strong> (<em>np.ndarray</em>) – The numpy array</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A pybind11 wrapped linalg::tensor&lt;T, 1&gt; object</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.vector_real" title="pyttn.ttnpp.linalg.vector_real">vector_real</a>, <a class="reference internal" href="../ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.vector_complex" title="pyttn.ttnpp.linalg.vector_complex">vector_complex</a></p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="pyttn-linalg-tensorext-module">
+<h2>pyttn.linalg.tensorExt module<a class="headerlink" href="#pyttn-linalg-tensorext-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-pyttn.linalg">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyttn.linalg" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pyttn.linalg.matrix">
-<span class="sig-prename descclassname"><span class="pre">pyttn.linalg.</span></span><span class="sig-name descname"><span class="pre">matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/linalg/tensorExt.html#matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.linalg.matrix" title="Link to this definition"></a></dt>
-<dd><p>A function for converting from a numpy array to a C++ linalg::tensor&lt;T,2&gt; type
-used by the C++ layer of pyTTN.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>M</strong> (<em>np.ndarray</em>) – The numpy matrix</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A pybind11 wrapped linalg::tensor&lt;T, 2&gt; object</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.matrix_real" title="pyttn.ttnpp.linalg.matrix_real">matrix_real</a>, <a class="reference internal" href="../ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.matrix_complex" title="pyttn.ttnpp.linalg.matrix_complex">matrix_complex</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyttn.linalg.tensor">
-<span class="sig-prename descclassname"><span class="pre">pyttn.linalg.</span></span><span class="sig-name descname"><span class="pre">tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/linalg/tensorExt.html#tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.linalg.tensor" title="Link to this definition"></a></dt>
-<dd><p>A function for converting from a numpy array to a C++ linalg::tensor&lt;T,D&gt; type
-for D&lt;=4 used by the C++ layer of pyTTN.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>M</strong> (<em>np.ndarray</em>) – The numpy tensor</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A pybind11 wrapped linalg::tensor&lt;T, D&gt; object</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>pybind11 wrapped linalg::tensor&lt;T,D&gt; object</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pyttn.linalg.vector">
-<span class="sig-prename descclassname"><span class="pre">pyttn.linalg.</span></span><span class="sig-name descname"><span class="pre">vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyttn/linalg/tensorExt.html#vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyttn.linalg.vector" title="Link to this definition"></a></dt>
-<dd><p>A function for converting from a 1 dimensional numpy array to a C++ linalg::tensor&lt;T,1&gt; type
-used by the C++ layer of pyTTN.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>M</strong> (<em>np.ndarray</em>) – The numpy array</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A pybind11 wrapped linalg::tensor&lt;T, 1&gt; object</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="../ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.vector_real" title="pyttn.ttnpp.linalg.vector_real">vector_real</a>, <a class="reference internal" href="../ttnpp/ttnpp.linalg.html#pyttn.ttnpp.linalg.vector_complex" title="pyttn.ttnpp.linalg.vector_complex">vector_complex</a></p>
-</dd>
-</dl>
-</dd></dl>
-
+<section id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
 </section>
 </section>
 
@@ -231,7 +122,7 @@ used by the C++ layer of pyTTN.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="pyTTN package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="The pyTTN API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="pyttn.models.html" class="btn btn-neutral float-right" title="pyttn.models package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

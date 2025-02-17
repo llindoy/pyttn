@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -87,10 +87,41 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiset_one_site_tdvp_complex</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+
+<span class="c1">#and attempt to import the cuda backend</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">one_site_tdvp_complex</span> <span class="k">as</span> <span class="n">one_site_tdvp_complex_cuda</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_complex</span> <span class="k">as</span> <span class="n">ttn_complex_cuda</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">sop_operator_complex</span> <span class="k">as</span>  <span class="n">sop_operator_cuda</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">mulitset_one_site_tdvp_complex</span> <span class="k">as</span> <span class="n">multiset_one_site_tdvp_complex_cuda</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">ms_ttn_complex</span> <span class="k">as</span> <span class="n">ms_ttn_complex_cuda</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiset_sop_operator_complex</span> <span class="k">as</span>  <span class="n">multiset_sop_operator_cuda</span>
+    <span class="n">__cuda_import</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">__cuda_import</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__single_set_tdvp_blas</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">sop_operator_complex</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;onesite&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;subspace&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">adaptive_one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid input types for single set tdvp.&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__single_set_tdvp_cuda</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex_cuda</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">sop_operator_complex_cuda</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;onesite&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">one_site_tdvp_complex_cuda</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid input types for single set tdvp.&quot;</span><span class="p">)</span>
+
 <div class="viewcode-block" id="single_set_tdvp">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.single_set_tdvp">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">single_set_tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing single set TDVP calculations</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing single set TDVP calculations</span>
 
 <span class="sd">    :param A: Tree Tensor Network that the DMRG algorithm will act on</span>
 <span class="sd">    :type A: ttn_complex</span>
@@ -103,20 +134,37 @@
 <span class="sd">    :returns: The TDVP evaluation object</span>
 <span class="sd">    :rtype: one_site_tdvp_complex or adaptive_one_site_tdvp_complex</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">sop_operator_complex</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;onesite&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;subspace&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">adaptive_one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid input types for single set tdvp.&quot;</span><span class="p">)</span></div>
+    <span class="k">if</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">backend</span><span class="p">()</span> <span class="o">==</span> <span class="n">H</span><span class="o">.</span><span class="n">backend</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">A</span><span class="o">.</span><span class="n">backend</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;blas&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__single_set_tdvp_blas</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="n">expansion</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">A</span><span class="o">.</span><span class="n">backend</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__single_set_tdvp_blas</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="n">expansion</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid backend for single set tdvp&quot;</span><span class="p">)</span></div>
 
-        
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__multiset_tdvp_blas</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;onesite&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">multiset_one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;subspace&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;subspace expansion algorithm has not yet been implemented for multiset TTNs.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid input types for multiset tdvp.&quot;</span><span class="p">)</span>
+    
+<span class="k">def</span><span class="w"> </span><span class="nf">__multiset_tdvp_cuda</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex_cuda</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex_cuda</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;onesite&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">multiset_one_site_tdvp_complex_cuda</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid input types for multiset tdvp.&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="multiset_tdvp">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.multiset_tdvp">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">multiset_tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing multiset tdvp calculations</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing multiset tdvp calculations</span>
 
 <span class="sd">    :param A: Tree Tensor Network that the TDVP algorithm will act on</span>
 <span class="sd">    :type A: ttn_complex</span>
@@ -129,19 +177,19 @@
 <span class="sd">    :returns: The TDVP evaluation object</span>
 <span class="sd">    :rtype: multiset_one_site_tdvp_complex </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">multiset_sop_operator_complex</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;onesite&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">multiset_one_site_tdvp_complex</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">expansion</span> <span class="o">==</span> <span class="s1">&#39;subspace&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;subspace expansion algorithm has not yet been implemented for multiset TTNs.&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid input types for multiset tdvp.&quot;</span><span class="p">)</span></div>
+    <span class="k">if</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">backend</span><span class="p">()</span> <span class="o">==</span> <span class="n">H</span><span class="o">.</span><span class="n">backend</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">A</span><span class="o">.</span><span class="n">backend</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;blas&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__multiset_tdvp_blas</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="n">expansion</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">A</span><span class="o">.</span><span class="n">backend</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;cuda&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__multiset_tdvp_blas</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="n">expansion</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid backend for multiset set tdvp&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="tdvp">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.tdvp">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;onesite&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing either single or multi set tdvp calculations. </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A factory method for constructing an object used for performing either single or multi set tdvp calculations. </span>
 <span class="sd">    Which type to construct is determined by the types of the input A and h matrices.</span>
 
 <span class="sd">    :param A: Tree Tensor Network that the DMRG algorithm will act on</span>

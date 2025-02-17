@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -87,10 +87,11 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.sSOPExt</span><span class="w"> </span><span class="kn">import</span> <span class="n">__is_sSOP</span><span class="p">,</span> <span class="n">__is_sNBO</span><span class="p">,</span> <span class="n">__is_sPOP</span><span class="p">,</span> <span class="n">__is_sOP</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+
 <div class="viewcode-block" id="SOP">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.SOP">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">SOP</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for constructing a sum-of-product compact string operator.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">SOP</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factory function for constructing a sum-of-product compact string operator.</span>
 
 <span class="sd">    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
 
@@ -106,23 +107,24 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">SOP_complex</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">SOP_real</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">SOP_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
-        <span class="k">elif</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">SOP_real</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for SOP&quot;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">SOP_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for SOP&quot;</span><span class="p">)</span></div>
 
 
+
 <div class="viewcode-block" id="multiset_SOP">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.multiset_SOP">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">multiset_SOP</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for constructing a multiset sum-of-product compact string operator.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">multiset_SOP</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factory function for constructing a multiset sum-of-product compact string operator.</span>
 
 <span class="sd">    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
 
@@ -138,23 +140,24 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiset_SOP_complex</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">multiset_SOP_real</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">multiset_SOP_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
-        <span class="k">elif</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">multiset_SOP_real</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for multiset_SOP&quot;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">multiset_SOP_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for multiset_SOP&quot;</span><span class="p">)</span></div>
 
 
+
 <div class="viewcode-block" id="sum_of_product">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.sum_of_product">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sum_of_product</span><span class="p">(</span><span class="n">nset</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function for constructing a generic sum-of-product compact string operator.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factory function for constructing a generic sum-of-product compact string operator.</span>
 
 <span class="sd">    :param nset: The number of set variables to use</span>
 <span class="sd">    :type nset: int</span>
@@ -169,19 +172,20 @@
 <span class="sd">    :rtype: SOP_real or SOP_complex or multiset_SOP_real or multiset_SOP_complex</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">nset</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">SOP</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">nset</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">SOP</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">nset</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">multiset_SOP</span><span class="p">(</span><span class="n">nset</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">multiset_SOP</span><span class="p">(</span><span class="n">nset</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to construct sum of product operator object.&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;Failed to construct sum of product operator object.&quot;</span><span class="p">)</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">__is_SOP_real</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">SOP_real</span><span class="p">,</span> <span class="n">multiset_SOP_real</span>
-        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">SOP_real</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">multiset_SOP_real</span><span class="p">)</span> 
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">SOP_real</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">multiset_SOP_real</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
 
@@ -190,13 +194,16 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">SOP_complex</span><span class="p">,</span> <span class="n">multiset_SOP_complex</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">SOP_complex</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">multiset_SOP_complex</span><span class="p">)</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">__is_SOP</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">__is_SOP_real</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="ow">or</span> <span class="n">__is_SOP_complex</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">__validate_SOP</span><span class="p">(</span><span class="n">Op</span><span class="p">,</span> <span class="n">sys</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">__is_SOP</span><span class="p">(</span><span class="n">Op</span><span class="p">):</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">Op</span><span class="o">.</span><span class="n">nmodes</span><span class="p">()</span> <span class="o">!=</span> <span class="n">sys</span><span class="o">.</span><span class="n">nprimitive_nmodes</span><span class="p">()):</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Operator size is not compatible with system size.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">Op</span><span class="o">.</span><span class="n">nmodes</span><span class="p">()</span> <span class="o">!=</span> <span class="n">sys</span><span class="o">.</span><span class="n">nprimitive_nmodes</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Operator size is not compatible with system size.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Op</span>
     <span class="k">elif</span> <span class="n">__is_sSOP</span><span class="p">(</span><span class="n">Op</span><span class="p">):</span>
         <span class="n">op</span> <span class="o">=</span> <span class="n">SOP</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">nprimitive_modes</span><span class="p">())</span>

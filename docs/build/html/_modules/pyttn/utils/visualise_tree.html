@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -83,11 +83,10 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyttn.utils.visualise_tree</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">ntree</span>
-
-<div class="viewcode-block" id="visualise_tree">
-<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.visualise_tree.visualise_tree">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">visualise_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">add_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span></span>
+<div class="viewcode-block" id="visualise_ntree">
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.visualise_tree.visualise_ntree">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">visualise_ntree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">add_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A function for plotting an ntree object</span>
 
 <span class="sd">    :param tree: The tree to be visualised</span>
@@ -110,7 +109,7 @@
 
         <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
 
-        <span class="c1">#add all of the nodes to the tree</span>
+        <span class="c1"># add all of the nodes to the tree</span>
         <span class="n">labeldict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tree</span><span class="p">:</span>
             <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
@@ -124,10 +123,136 @@
                     <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
 
         <span class="n">pos</span> <span class="o">=</span> <span class="n">graphviz_layout</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">prog</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">tree</span><span class="p">())</span>
-        <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labeldict</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="n">node_size</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labeldict</span><span class="p">,</span>
+                <span class="n">node_size</span><span class="o">=</span><span class="n">node_size</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to visualise tree structure.&quot;</span><span class="p">)</span></div>
+
+    
+
+<div class="viewcode-block" id="visualise_ttn">
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.visualise_tree.visualise_ttn">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">visualise_ttn</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">bond_prop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colourmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">label_all_bonds</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function for plotting an ttn object</span>
+
+<span class="sd">    :param tree: The tree to be visualised</span>
+<span class="sd">    :type tree: ttn_dtype</span>
+<span class="sd">    :param prog: The visualisation function used with graphviz_layout (default: &quot;dot&quot;)</span>
+<span class="sd">    :type prog: str, optional</span>
+<span class="sd">    :param ax: Draw the tree in specified Matplotlib axes</span>
+<span class="sd">    :type ax: Matplotlib Axes object, optional</span>
+<span class="sd">    :param node_size: The node size used for visualisation (default: 500)</span>
+<span class="sd">    :type node_size: int, optional</span>
+<span class="sd">    :param linewidth: The width of edges connecting nodes (default: 3)</span>
+<span class="sd">    :type linewidth: int, optional</span>
+<span class="sd">    :param bond_prop: A string specifying the bond property to visualise for this system</span>
+<span class="sd">    :type bond_prop: {&quot;bond dimension&quot;, &quot;bond capacity&quot;}, optional</span>
+<span class="sd">    :param colourmap: An optional name for colour map to use when plotting bond properties. (Default: &#39;viridis&#39;)</span>
+<span class="sd">    :type colourmap: str, optional</span>
+<span class="sd">    :param label_all_bonds: An optional boolean specifying whether or not to label all bonds in the TTN.  If False only the bonds with the maximum and minimum value of the property will be labelled. (Default: False)</span>
+<span class="sd">    :type label_all_bonds: bool, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">networkx.drawing.nx_pydot</span><span class="w"> </span><span class="kn">import</span> <span class="n">graphviz_layout</span>
+
+        <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+
+        <span class="c1"># add all of the nodes to the tree</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="n">bonds</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">bonds</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">:</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1">#get the bond properties that are to be visualised</span>
+        <span class="n">set_colours</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bond_prop</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">bond_prop</span> <span class="o">==</span> <span class="s2">&quot;bond dimension&quot;</span><span class="p">:</span>
+                <span class="n">prop</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">bond_dimensions</span><span class="p">()</span>
+                <span class="n">set_colours</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">elif</span> <span class="n">bond_prop</span> <span class="o">==</span> <span class="s2">&quot;bond capacity&quot;</span><span class="p">:</span>
+                <span class="n">prop</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">bond_capacities</span><span class="p">()</span>
+                <span class="n">set_colours</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">set_colours</span> <span class="o">=</span><span class="kc">False</span>
+
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">graphviz_layout</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">prog</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">set_colours</span><span class="p">:</span>
+            <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span>
+                    <span class="n">node_size</span><span class="o">=</span><span class="n">node_size</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#now we get colours from the edge properties</span>
+
+            <span class="c1">#first get the max and min values so we can normalise the colour range</span>
+            <span class="n">edges</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">()</span>
+            <span class="n">max_edge</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
+            <span class="n">max_val</span> <span class="o">=</span> <span class="n">prop</span><span class="p">[</span><span class="n">max_edge</span><span class="p">]</span>
+            <span class="n">min_edge</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">prop</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
+            <span class="n">min_val</span> <span class="o">=</span> <span class="n">prop</span><span class="p">[</span><span class="n">min_edge</span><span class="p">]</span>
+
+            <span class="k">if</span><span class="p">(</span><span class="n">label_all_bonds</span><span class="p">):</span>
+                <span class="n">edge_labels</span> <span class="o">=</span> <span class="n">prop</span>
+            <span class="k">else</span><span class="p">:</span> 
+                <span class="n">edge_labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">max_edge</span> <span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">max_val</span><span class="p">),</span> <span class="n">min_edge</span> <span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">min_val</span><span class="p">)}</span>
+
+            <span class="k">if</span> <span class="n">colourmap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
+                    <span class="n">cmap</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">colourmap</span><span class="p">)</span>
+                    <span class="n">colours</span> <span class="o">=</span> <span class="p">[</span> <span class="n">cmap</span><span class="p">((</span><span class="n">prop</span><span class="p">[(</span><span class="n">v</span><span class="p">,</span> <span class="n">u</span><span class="p">)])</span><span class="o">/</span><span class="n">max_val</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">]</span>  
+                    <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span>
+                        <span class="n">node_size</span><span class="o">=</span><span class="n">node_size</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span> <span class="n">edge_color</span> <span class="o">=</span> <span class="n">colours</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+                    <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_edge_labels</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">edge_labels</span><span class="o">=</span><span class="n">edge_labels</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span>
+                        <span class="n">node_size</span><span class="o">=</span><span class="n">node_size</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+                    <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_edge_labels</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">edge_labels</span><span class="o">=</span><span class="n">edge_labels</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span>
+                    <span class="n">node_size</span><span class="o">=</span><span class="n">node_size</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+                <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_edge_labels</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">edge_labels</span><span class="o">=</span><span class="n">edge_labels</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Failed to visualise tree structure.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="visualise_tree">
+<a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.visualise_tree.visualise_tree">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">visualise_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">add_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bond_prop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colourmap</span> <span class="o">=</span> <span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">label_all_bonds</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function for plotting a tree structured object</span>
+
+<span class="sd">    :param tree: The tree to be visualised</span>
+<span class="sd">    :type tree: ntree or ttn_dtype or ms_ttn_dtype</span>
+<span class="sd">    :param prog: The visualisation function used with graphviz_layout (default: &quot;dot&quot;)</span>
+<span class="sd">    :type prog: str, optional</span>
+<span class="sd">    :param ax: Draw the tree in specified Matplotlib axes</span>
+<span class="sd">    :type ax: Matplotlib Axes object, optional</span>
+<span class="sd">    :param node_size: The node size used for visualisation (default: 500)</span>
+<span class="sd">    :type node_size: int, optional</span>
+<span class="sd">    :param linewidth: The width of edges connecting nodes (default: 3)</span>
+<span class="sd">    :type linewidth: int, optional</span>
+<span class="sd">    :param add_labels: Whether or not to include the ntree node labels.  This option is only used if tree is an ntree. (default: True)</span>
+<span class="sd">    :type add_labels: bool, optional</span>
+<span class="sd">    :param bond_prop: A parameter specifying the bond property to plot for a ttn or ms_ttn.  See :meth:`visualise_ttn` or :meth:`visualise_ms_ttn` for more details. </span>
+<span class="sd">    :param colourmap: An optional name for colour map to use when plotting bond properties. (Default: &#39;viridis&#39;)</span>
+<span class="sd">    :type colourmap: str, optional</span>
+<span class="sd">    :param label_all_bonds: An optional boolean specifying whether or not to label all bonds in the TTN.  If False only the bonds with the maximum and minimum value of the property will be labelled. (Default: False)</span>
+<span class="sd">    :type label_all_bonds: bool, optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">ntree</span><span class="p">,</span> <span class="n">is_ttn</span><span class="p">,</span> <span class="n">is_ms_ttn</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">ntree</span><span class="p">):</span>
+        <span class="n">visualise_ntree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">prog</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="n">node_size</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span> <span class="n">add_labels</span><span class="o">=</span><span class="n">add_labels</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">is_ttn</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+        <span class="n">visualise_ttn</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">prog</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="n">node_size</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span> <span class="n">bond_prop</span><span class="o">=</span><span class="n">bond_prop</span><span class="p">,</span> <span class="n">colourmap</span><span class="o">=</span><span class="n">colourmap</span><span class="p">,</span> <span class="n">label_all_bonds</span><span class="o">=</span><span class="n">label_all_bonds</span><span class="p">)</span></div>
 
 </pre></div>
 

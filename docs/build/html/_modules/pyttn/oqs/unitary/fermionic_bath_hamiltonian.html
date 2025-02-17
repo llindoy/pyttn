@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -89,14 +89,18 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.chain_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain_map</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">fOP</span><span class="p">,</span> <span class="n">coeff</span>
 
+<span class="k">def</span><span class="w"> </span><span class="nf">__generate_binds</span><span class="p">(</span><span class="n">binds</span><span class="p">,</span> <span class="n">bskip</span><span class="p">,</span> <span class="n">Nb</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">binds</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">binds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">binds</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="n">bskip</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nb</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">binds</span>
+
 <span class="c1">#setup the star Hamiltonian for the spin boson model</span>
 <div class="viewcode-block" id="add_fermionic_star_bath_hamiltonian">
 <a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.unitary.html#pyttn.oqs.unitary.fermionic_bath_hamiltonian.add_fermionic_star_bath_hamiltonian">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">add_fermionic_star_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">binds</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_fermionic_star_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">binds</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bskip</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">Nb</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">binds</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">binds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">binds</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nb</span><span class="p">)]</span>
+    <span class="n">binds</span> <span class="o">=</span> <span class="n">__generate_binds</span><span class="p">(</span><span class="n">binds</span><span class="p">,</span> <span class="n">bskip</span><span class="p">,</span> <span class="n">Nb</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nb</span><span class="p">):</span>
         <span class="n">H</span> <span class="o">+=</span> <span class="n">g</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">Sp</span> <span class="o">*</span> <span class="n">fOP</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">binds</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
@@ -109,11 +113,9 @@
 <span class="c1">#setup the chain hamiltonian for the spin boson model - this is the tedopa method</span>
 <div class="viewcode-block" id="add_fermionic_chain_bath_hamiltonian">
 <a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.unitary.html#pyttn.oqs.unitary.fermionic_bath_hamiltonian.add_fermionic_chain_bath_hamiltonian">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">add_fermionic_chain_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">binds</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_fermionic_chain_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">binds</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bskip</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">Nb</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">binds</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">binds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">binds</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nb</span><span class="p">)]</span>
+    <span class="n">binds</span> <span class="o">=</span> <span class="n">__generate_binds</span><span class="p">(</span><span class="n">binds</span><span class="p">,</span> <span class="n">bskip</span><span class="p">,</span> <span class="n">Nb</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nb</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -128,57 +130,52 @@
 
 
 <span class="c1">#setup the chain hamiltonian for the spin boson model - that is this implements the method described in Nuomin, Beratan, Zhang, Phys. Rev. A 105, 032406</span>
-<div class="viewcode-block" id="add_fermionic_ipchain_bath_hamiltonian">
-<a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.unitary.html#pyttn.oqs.unitary.fermionic_bath_hamiltonian.add_fermionic_ipchain_bath_hamiltonian">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">add_fermionic_ipchain_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">Nb</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">binds</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">binds</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">binds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">binds</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nb</span><span class="p">)]</span>
-
-    <span class="k">class</span><span class="w"> </span><span class="nc">func_class</span><span class="p">:</span>
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">e0</span><span class="p">,</span> <span class="n">U0</span><span class="p">,</span> <span class="n">conj</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">i</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">conj</span><span class="o">=</span><span class="n">conj</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">t0</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">t0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">e</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">e0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">U0</span><span class="p">)</span>
-
-        <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ti</span><span class="p">):</span>
-            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span><span class="o">@</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="n">j</span><span class="o">*</span><span class="n">ti</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">e</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">])</span>
-
-            <span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conj</span><span class="p">):</span>
-                <span class="n">val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-
-            <span class="k">return</span> <span class="n">val</span>
-
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">Nb</span><span class="p">):</span>
-        <span class="n">H</span> <span class="o">+=</span> <span class="n">coeff</span><span class="p">(</span><span class="n">func_class</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">conj</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span><span class="o">*</span><span class="n">Sp</span><span class="o">*</span><span class="n">fOP</span><span class="p">(</span><span class="s2">&quot;c&quot;</span><span class="p">,</span> <span class="n">binds</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> 
-        <span class="n">H</span> <span class="o">+=</span> <span class="n">coeff</span><span class="p">(</span><span class="n">func_class</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">conj</span><span class="o">=</span><span class="kc">True</span> <span class="p">))</span><span class="o">*</span><span class="n">fOP</span><span class="p">(</span><span class="s2">&quot;cdag&quot;</span><span class="p">,</span> <span class="n">binds</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">*</span><span class="n">Sm</span>
-
-    <span class="k">return</span> <span class="n">H</span></div>
-
+<span class="c1">#def add_fermionic_ipchain_bath_hamiltonian(H, Sp, Sm, Nb, t0, w, P, binds = None, bskip=1):</span>
+<span class="c1">#    binds = __generate_binds(binds, bskip, Nb)</span>
+<span class="c1">#</span>
+<span class="c1">#    class func_class:</span>
+<span class="c1">#        def __init__(self, i, t0, e0, U0, conj = False):</span>
+<span class="c1">#            self.i = copy.deepcopy(i)</span>
+<span class="c1">#            self.conj=conj</span>
+<span class="c1">#            self.t0 = copy.deepcopy(t0)</span>
+<span class="c1">#            self.e = copy.deepcopy(e0)</span>
+<span class="c1">#            self.U = copy.deepcopy(U0)</span>
+<span class="c1">#</span>
+<span class="c1">#        def __call__(self, ti):</span>
+<span class="c1">#            val = self.t0*np.conj(self.U[:, 0])@(np.exp(-1.0j*ti*self.e)*self.U[:, self.i])#</span>
+<span class="c1">#</span>
+<span class="c1">#            if(self.conj):</span>
+<span class="c1">#                val = np.conj(val)</span>
+<span class="c1">#</span>
+<span class="c1">#            return val</span>
+<span class="c1">#</span>
+<span class="c1">#    for i in range(Nb):</span>
+<span class="c1">#        H += coeff(func_class(i, t0, w, P, conj=False))*Sp*fOP(&quot;c&quot;, binds[i]) </span>
+<span class="c1">#        H += coeff(func_class(i, t0, w, P, conj=True ))*fOP(&quot;cdag&quot;, binds[i])*Sm</span>
+<span class="c1">#</span>
+<span class="c1">#    return H</span>
 
 <div class="viewcode-block" id="add_fermionic_bath_hamiltonian">
 <a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.unitary.html#pyttn.oqs.unitary.fermionic_bath_hamiltonian.add_fermionic_bath_hamiltonian">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">add_fermionic_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">binds</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">geom</span><span class="o">=</span><span class="s1">&#39;star&#39;</span><span class="p">,</span> <span class="n">return_frequencies</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_fermionic_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">binds</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">geom</span><span class="o">=</span><span class="s1">&#39;star&#39;</span><span class="p">,</span> <span class="n">bskip</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">geom</span> <span class="o">==</span> <span class="s1">&#39;star&#39;</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">return_frequencies</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">add_fermionic_star_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">binds</span><span class="o">=</span><span class="n">binds</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">add_fermionic_star_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">binds</span><span class="o">=</span><span class="n">binds</span><span class="p">,</span> <span class="n">bskip</span><span class="o">=</span><span class="n">bskip</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">add_fermionic_star_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">binds</span><span class="o">=</span><span class="n">binds</span><span class="p">),</span> <span class="n">w</span>
+            <span class="k">return</span> <span class="n">add_fermionic_star_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">binds</span><span class="o">=</span><span class="n">binds</span><span class="p">,</span> <span class="n">bskip</span><span class="o">=</span><span class="n">bskip</span><span class="p">),</span> <span class="n">w</span>
     <span class="k">elif</span> <span class="n">geom</span> <span class="o">==</span> <span class="s1">&#39;chain&#39;</span><span class="p">:</span>
         <span class="n">t</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">chain_map</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">return_frequencies</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">add_fermionic_chain_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">binds</span><span class="o">=</span><span class="n">binds</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">add_fermionic_chain_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">binds</span><span class="o">=</span><span class="n">binds</span><span class="p">,</span> <span class="n">bskip</span><span class="o">=</span><span class="n">bskip</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">add_fermionic_star_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">binds</span><span class="o">=</span><span class="n">binds</span><span class="p">),</span> <span class="n">e</span>
-    <span class="k">elif</span> <span class="n">geom</span> <span class="o">==</span> <span class="s1">&#39;ipchain&#39;</span><span class="p">:</span>
-        <span class="n">w2</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
-        <span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">chain_map</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">return_unitary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">return_frequencies</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">add_fermionic_ipchain_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">w2</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">binds</span><span class="o">=</span><span class="n">binds</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">add_fermionic_star_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">binds</span><span class="o">=</span><span class="n">binds</span><span class="p">),</span> <span class="n">e</span>
+            <span class="k">return</span> <span class="n">add_fermionic_chain_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span class="n">Sm</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">binds</span><span class="o">=</span><span class="n">binds</span><span class="p">,</span> <span class="n">bskip</span><span class="o">=</span><span class="n">bskip</span><span class="p">),</span> <span class="n">e</span>
+    <span class="c1">#elif geom == &#39;ipchain&#39;:</span>
+    <span class="c1">#    w2 = copy.deepcopy(w)</span>
+    <span class="c1">#    t, e, U = chain_map(g, w, return_unitary = True)</span>
+    <span class="c1">#    if not return_frequencies:</span>
+    <span class="c1">#        return add_fermionic_ipchain_bath_hamiltonian(H, Sp, Sm, e.shape[0], t[0], w2, U, binds=binds, bskip=bskip)</span>
+    <span class="c1">#    else:</span>
+    <span class="c1">#        return add_fermionic_ipchain_bath_hamiltonian(H, Sp, Sm, e.shape[0], t[0], w2, U, binds=binds, bskip=bskip), e</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot add bath Hamiltonian geometry not recognised.&quot;</span><span class="p">)</span></div>
 

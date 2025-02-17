@@ -21,9 +21,7 @@
       <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ttnpp.linalg package" href="ttnpp.linalg.html" />
-    <link rel="prev" title="pyttn.utils package" href="../pyttn/pyttn.utils.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,37 +43,22 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Tutorials/index.html">Tutorials</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../Examples/index.html">Examples</a></li>
-</ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../pyttn/API%20Outline.html">API Outline</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../pyttn/index.html">API Documents</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../pyttn/index.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../pyttn/pyttn.linalg.html">pyttn.linalg package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pyttn/pyttn.models.html">pyttn.models package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pyttn/pyttn.oqs.html">pyttn.oqs package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pyttn/pyttn.utils.html">pyttn.utils package</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pyttn.ttnpp</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.ttnpp">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../pyttn/index.html#module-pyttn">Module contents</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../pyttn/index.html">API Documents</a></li>
 </ul>
 
         </div>
@@ -92,7 +75,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../pyttn/index.html">pyTTN package</a></li>
       <li class="breadcrumb-item active">ttnpp module</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/ttnpp/ttnpp.rst.txt" rel="nofollow"> View page source</a>
@@ -241,6 +223,8 @@ knowledge of the total number of degrees of freedom.</p>
 <span class="sig-name descname"><span class="pre">__radd__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.SOP_complex.__radd__" title="Link to this definition"></a></dt>
 <dd><p>Overloaded function.</p>
 <ol class="arabic simple">
+<li><p>__radd__(self: pyttn.ttnpp.SOP_complex, arg0: complex) -&gt; pyttn.ttnpp.SOP_complex</p></li>
+<li><p>__radd__(self: pyttn.ttnpp.SOP_complex, arg0: float) -&gt; pyttn.ttnpp.SOP_complex</p></li>
 <li><p>__radd__(self: pyttn.ttnpp.SOP_complex, arg0: pyttn.ttnpp.sOP) -&gt; pyttn.ttnpp.SOP_complex</p></li>
 <li><p>__radd__(self: pyttn.ttnpp.SOP_complex, arg0: pyttn.ttnpp.sPOP) -&gt; pyttn.ttnpp.SOP_complex</p></li>
 <li><p>__radd__(self: pyttn.ttnpp.SOP_complex, arg0: pyttn.ttnpp.sNBO_real) -&gt; pyttn.ttnpp.SOP_complex</p></li>
@@ -374,29 +358,6 @@ knowledge of the total number of degrees of freedom.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.ttnpp.</span></span><span class="sig-name descname"><span class="pre">adaptive_one_site_dmrg_complex</span></span><a class="headerlink" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A class implementing the adaptive one site DMRG algorithm on trees.</p>
-<p>Constructor arguments</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the DMRG algorithm</p></li>
-<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
-<li><p><strong>krylov_dim</strong> (<em>int</em><em>, </em><em>optional</em>) – The krylov subspace dimension used for the eigensolver steps. (Default: 16)</p></li>
-<li><p><strong>subspace_krylov_dim</strong> (<em>int</em><em>, </em><em>optional</em>) – The subspace expansion based krylov subspace dimension. This is only used if expansion=”subspace”. (Default: 6)</p></li>
-<li><p><strong>subspace_neigs</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion=”subspace”. (Default: 2)</p></li>
-<li><p><strong>numthreads</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of openmp threads to be used by the solver. (Default: 1)</p></li>
-</ul>
-</dd>
-</dl>
-<p>Callable arguments</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the DMRG algorithm</p></li>
-<li><p><strong>h</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
-<li><p><strong>update_env</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)</p></li>
-</ul>
-</dd>
-</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.adaptive_one_site_dmrg_complex.E">
 <span class="sig-name descname"><span class="pre">E</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex" title="pyttn.ttnpp.adaptive_one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.adaptive_one_site_dmrg_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">complex</span></span></span><a class="headerlink" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex.E" title="Link to this definition"></a></dt>
@@ -406,7 +367,17 @@ knowledge of the total number of degrees of freedom.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.adaptive_one_site_dmrg_complex.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex" title="pyttn.ttnpp.adaptive_one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.adaptive_one_site_dmrg_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><span class="pre">pyttn.ttnpp.ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><span class="pre">pyttn.ttnpp.sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex.__call__" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Performs a single step of the single site DMRG algorithm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the DMRG algorithm</p></li>
+<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
+<li><p><strong>update_env</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.adaptive_one_site_dmrg_complex.__copy__">
@@ -421,6 +392,11 @@ knowledge of the total number of degrees of freedom.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.adaptive_one_site_dmrg_complex.assign">
 <span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex" title="pyttn.ttnpp.adaptive_one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.adaptive_one_site_dmrg_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex" title="pyttn.ttnpp.adaptive_one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.adaptive_one_site_dmrg_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex.assign" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.adaptive_one_site_dmrg_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex" title="pyttn.ttnpp.adaptive_one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.adaptive_one_site_dmrg_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex.backend" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -450,7 +426,7 @@ knowledge of the total number of degrees of freedom.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.adaptive_one_site_dmrg_complex.initialise">
 <span class="sig-name descname"><span class="pre">initialise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex" title="pyttn.ttnpp.adaptive_one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.adaptive_one_site_dmrg_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><span class="pre">pyttn.ttnpp.ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><span class="pre">pyttn.ttnpp.sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">krylov_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subspace_krylov_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subspace_neigs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.adaptive_one_site_dmrg_complex.initialise" title="Link to this definition"></a></dt>
-<dd><p>Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Netwok A, with Hamiltonian H.</p>
+<dd><p>Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Network A, with Hamiltonian H.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -498,7 +474,7 @@ knowledge of the total number of degrees of freedom.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the DMRG algorithm</p></li>
 <li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
-<li><p><strong>update_env</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)</p></li>
+<li><p><strong>attempt_expansion</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to attempt subspace expansion throughout the update scheme.  (Default: False)</p></li>
 </ul>
 </dd>
 </dl>
@@ -579,6 +555,11 @@ knowledge of the total number of degrees of freedom.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.adaptive_one_site_tdvp_complex.assign">
 <span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.adaptive_one_site_tdvp_complex" title="pyttn.ttnpp.adaptive_one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.adaptive_one_site_tdvp_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.adaptive_one_site_tdvp_complex" title="pyttn.ttnpp.adaptive_one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.adaptive_one_site_tdvp_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.adaptive_one_site_tdvp_complex.assign" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.adaptive_one_site_tdvp_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.adaptive_one_site_tdvp_complex" title="pyttn.ttnpp.adaptive_one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.adaptive_one_site_tdvp_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.adaptive_one_site_tdvp_complex.backend" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1208,7 +1189,7 @@ for the user to define all operators acting on this mode.</p>
 <li><p>__call__(self: pyttn.ttnpp.matrix_element_complex, arg0: list[ttns::site_operator&lt;std::complex&lt;double&gt;, linalg::blas_backend&gt;], arg1: list[int], arg2: pyttn.ttnpp.ttn_complex, arg3: pyttn.ttnpp.ttn_complex) -&gt; complex</p></li>
 <li><p>__call__(self: pyttn.ttnpp.matrix_element_complex, arg0: ttns::product_operator&lt;std::complex&lt;double&gt;, linalg::blas_backend&gt;, arg1: pyttn.ttnpp.ttn_complex, arg2: pyttn.ttnpp.ttn_complex) -&gt; complex</p></li>
 <li><p>__call__(self: pyttn.ttnpp.matrix_element_complex, arg0: ttns::sop_operator&lt;std::complex&lt;double&gt;, linalg::blas_backend&gt;, arg1: pyttn.ttnpp.ttn_complex, arg2: pyttn.ttnpp.ttn_complex) -&gt; complex</p></li>
-<li><p>__call__(self: pyttn.ttnpp.matrix_element_complex, arg0: pyttn.ttnpp.ms_ttn_complex, use_sparsity: bool = True) -&gt; float</p></li>
+<li><p>__call__(self: pyttn.ttnpp.matrix_element_complex, arg0: pyttn.ttnpp.ms_ttn_complex, use_sparsity: bool = True) -&gt; complex</p></li>
 <li><p>__call__(self: pyttn.ttnpp.matrix_element_complex, arg0: ttns::site_operator&lt;std::complex&lt;double&gt;, linalg::blas_backend&gt;, arg1: int, arg2: pyttn.ttnpp.ms_ttn_complex, use_sparsity: bool = True) -&gt; complex</p></li>
 <li><p>__call__(self: pyttn.ttnpp.matrix_element_complex, arg0: list[ttns::site_operator&lt;std::complex&lt;double&gt;, linalg::blas_backend&gt;], arg1: list[int], arg2: pyttn.ttnpp.ms_ttn_complex, use_sparsity: bool = True) -&gt; complex</p></li>
 <li><p>__call__(self: pyttn.ttnpp.matrix_element_complex, arg0: ttns::multiset_sop_operator&lt;std::complex&lt;double&gt;, linalg::blas_backend&gt;, arg1: pyttn.ttnpp.ms_ttn_complex) -&gt; complex</p></li>
@@ -1235,6 +1216,11 @@ for the user to define all operators acting on this mode.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.matrix_element_complex.assign">
 <span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.matrix_element_complex" title="pyttn.ttnpp.matrix_element_complex"><span class="pre">pyttn.ttnpp.matrix_element_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.matrix_element_complex" title="pyttn.ttnpp.matrix_element_complex"><span class="pre">pyttn.ttnpp.matrix_element_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.matrix_element_complex" title="pyttn.ttnpp.matrix_element_complex"><span class="pre">pyttn.ttnpp.matrix_element_complex</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.matrix_element_complex.assign" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.matrix_element_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.matrix_element_complex" title="pyttn.ttnpp.matrix_element_complex"><span class="pre">pyttn.ttnpp.matrix_element_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.matrix_element_complex.backend" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1276,24 +1262,27 @@ and provides several helper functions for determining the properties of the unde
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.mode_data.__copy__">
-<span class="sig-name descname"><span class="pre">__copy__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.mode_data.__copy__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__copy__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.mode_data" title="pyttn.ttnpp.mode_data"><span class="pre">pyttn.ttnpp.mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.mode_data" title="pyttn.ttnpp.mode_data"><span class="pre">pyttn.ttnpp.mode_data</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.mode_data.__copy__" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.mode_data.__deepcopy__">
-<span class="sig-name descname"><span class="pre">__deepcopy__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.mode_data.__deepcopy__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__deepcopy__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.mode_data" title="pyttn.ttnpp.mode_data"><span class="pre">pyttn.ttnpp.mode_data</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">memo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.mode_data" title="pyttn.ttnpp.mode_data"><span class="pre">pyttn.ttnpp.mode_data</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.mode_data.__deepcopy__" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.mode_data.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.mode_data.__str__" title="Link to this definition"></a></dt>
-<dd><p>Return str(self).</p>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.mode_data" title="pyttn.ttnpp.mode_data"><span class="pre">pyttn.ttnpp.mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.mode_data.__str__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.mode_data.append">
-<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.mode_data.append" title="Link to this definition"></a></dt>
-<dd><p>Append a primitive mode to the current mode</p>
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.mode_data.append" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>append(self: pyttn.ttnpp.mode_data, arg0: pyttn.ttnpp.primitive_mode_data) -&gt; None</p>
+<blockquote>
+<div><p>Append a primitive mode to the current mode</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1301,7 +1290,11 @@ and provides several helper functions for determining the properties of the unde
 </ul>
 </dd>
 </dl>
-<p>Append all primitive modes contained in another mode data object to the current mode</p>
+</div></blockquote>
+</li>
+<li><p>append(self: pyttn.ttnpp.mode_data, arg0: pyttn.ttnpp.mode_data) -&gt; None</p>
+<blockquote>
+<div><p>Append all primitive modes contained in another mode data object to the current mode</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1309,12 +1302,19 @@ and provides several helper functions for determining the properties of the unde
 </ul>
 </dd>
 </dl>
+</div></blockquote>
+</li>
+</ol>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.mode_data.assign">
-<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.mode_data.assign" title="Link to this definition"></a></dt>
-<dd><p>Assign the value of the mode data object from another mode data object</p>
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.mode_data.assign" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>assign(self: pyttn.ttnpp.mode_data, arg0: pyttn.ttnpp.mode_data) -&gt; None</p>
+<blockquote>
+<div><p>Assign the value of the mode data object from another mode data object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1322,7 +1322,11 @@ and provides several helper functions for determining the properties of the unde
 </ul>
 </dd>
 </dl>
-<p>Assign the value of the mode data object so that it contains a single primitive mode data object</p>
+</div></blockquote>
+</li>
+<li><p>assign(self: pyttn.ttnpp.mode_data, arg0: pyttn.ttnpp.primitive_mode_data) -&gt; None</p>
+<blockquote>
+<div><p>Assign the value of the mode data object so that it contains a single primitive mode data object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1330,7 +1334,11 @@ and provides several helper functions for determining the properties of the unde
 </ul>
 </dd>
 </dl>
-<p>Assign the value of the mode data object so that it contains a list single primitive mode data object</p>
+</div></blockquote>
+</li>
+<li><p>assign(self: pyttn.ttnpp.mode_data, arg0: list[pyttn.ttnpp.primitive_mode_data]) -&gt; None</p>
+<blockquote>
+<div><p>Assign the value of the mode data object so that it contains a list single primitive mode data object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1338,11 +1346,14 @@ and provides several helper functions for determining the properties of the unde
 </ul>
 </dd>
 </dl>
+</div></blockquote>
+</li>
+</ol>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.mode_data.contains_fermion">
-<span class="sig-name descname"><span class="pre">contains_fermion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.mode_data.contains_fermion" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">contains_fermion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.mode_data" title="pyttn.ttnpp.mode_data"><span class="pre">pyttn.ttnpp.mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.mode_data.contains_fermion" title="Link to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>whether a mode is fermionic</p>
@@ -1355,7 +1366,7 @@ and provides several helper functions for determining the properties of the unde
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.mode_data.lhd">
-<span class="sig-name descname"><span class="pre">lhd</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.mode_data.lhd" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">lhd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.mode_data" title="pyttn.ttnpp.mode_data"><span class="pre">pyttn.ttnpp.mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyttn.ttnpp.mode_data.lhd" title="Link to this definition"></a></dt>
 <dd><p>Return the local Hilbert space dimension of the composite mode.  This is the product of the local Hilbert space dimensions of the primitive modes</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -1369,7 +1380,7 @@ and provides several helper functions for determining the properties of the unde
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.mode_data.liouville_space">
-<span class="sig-name descname"><span class="pre">liouville_space</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.mode_data.liouville_space" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">liouville_space</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.mode_data" title="pyttn.ttnpp.mode_data"><span class="pre">pyttn.ttnpp.mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.mode_data" title="pyttn.ttnpp.mode_data"><span class="pre">pyttn.ttnpp.mode_data</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.mode_data.liouville_space" title="Link to this definition"></a></dt>
 <dd><p>Constructs a new mode_data object that corresponds to a Liouville space representation of this object.  This is done
 by taking each mode and appending a dual space operator following this mode of the same type.</p>
 <dl class="field-list simple">
@@ -1509,6 +1520,31 @@ by taking each mode and appending a dual space operator following this mode of t
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_complex.assign_slice">
+<span class="sig-name descname"><span class="pre">assign_slice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.ms_ttn_complex.assign_slice" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>assign_slice(self: pyttn.ttnpp.ms_ttn_complex, arg0: int, arg1: ttns::ttn&lt;double, linalg::blas_backend&gt;) -&gt; None</p></li>
+<li><p>assign_slice(self: pyttn.ttnpp.ms_ttn_complex, arg0: int, arg1: pyttn.ttnpp.ttn_complex) -&gt; None</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ms_ttn_complex" title="pyttn.ttnpp.ms_ttn_complex"><span class="pre">pyttn.ttnpp.ms_ttn_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.ms_ttn_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_complex.bond_capacities">
+<span class="sig-name descname"><span class="pre">bond_capacities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.ms_ttn_complex.bond_capacities" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>bond_capacities(self: pyttn.ttnpp.ms_ttn_complex, arg0: dict[tuple[int, int], list[int]]) -&gt; None</p></li>
+<li><p>bond_capacities(self: pyttn.ttnpp.ms_ttn_complex) -&gt; dict[tuple[int, int], list[int]]</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_complex.bond_dimensions">
 <span class="sig-name descname"><span class="pre">bond_dimensions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.ms_ttn_complex.bond_dimensions" title="Link to this definition"></a></dt>
 <dd><p>Overloaded function.</p>
@@ -1517,6 +1553,11 @@ by taking each mode and appending a dual space operator following this mode of t
 <li><p>bond_dimensions(self: pyttn.ttnpp.ms_ttn_complex) -&gt; dict[tuple[int, int], list[int]]</p></li>
 </ol>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_complex.bonds">
+<span class="sig-name descname"><span class="pre">bonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ms_ttn_complex" title="pyttn.ttnpp.ms_ttn_complex"><span class="pre">pyttn.ttnpp.ms_ttn_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyttn.ttnpp.ms_ttn_complex.bonds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_complex.clear">
@@ -1726,6 +1767,11 @@ by taking each mode and appending a dual space operator following this mode of t
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_node_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ms_ttn_node_complex" title="pyttn.ttnpp.ms_ttn_node_complex"><span class="pre">pyttn.ttnpp.ms_ttn_node_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.ms_ttn_node_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_node_complex.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ms_ttn_node_complex" title="pyttn.ttnpp.ms_ttn_node_complex"><span class="pre">pyttn.ttnpp.ms_ttn_node_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.ms_ttn_node_complex.complex_dtype" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -1761,6 +1807,21 @@ by taking each mode and appending a dual space operator following this mode of t
 <dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_slice_complex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.ttnpp.</span></span><span class="sig-name descname"><span class="pre">ms_ttn_slice_complex</span></span><a class="headerlink" href="#pyttn.ttnpp.ms_ttn_slice_complex" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_slice_complex.assign">
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.ms_ttn_slice_complex.assign" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>assign(self: pyttn.ttnpp.ms_ttn_slice_complex, arg0: ttns::ttn&lt;double, linalg::blas_backend&gt;) -&gt; pyttn.ttnpp.ms_ttn_slice_complex</p></li>
+<li><p>assign(self: pyttn.ttnpp.ms_ttn_slice_complex, arg0: pyttn.ttnpp.ttn_complex) -&gt; pyttn.ttnpp.ms_ttn_slice_complex</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_slice_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ms_ttn_slice_complex" title="pyttn.ttnpp.ms_ttn_slice_complex"><span class="pre">pyttn.ttnpp.ms_ttn_slice_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.ms_ttn_slice_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.ms_ttn_slice_complex.nset">
 <span class="sig-name descname"><span class="pre">nset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ms_ttn_slice_complex" title="pyttn.ttnpp.ms_ttn_slice_complex"><span class="pre">pyttn.ttnpp.ms_ttn_slice_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyttn.ttnpp.ms_ttn_slice_complex.nset" title="Link to this definition"></a></dt>
@@ -1854,27 +1915,6 @@ by taking each mode and appending a dual space operator following this mode of t
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.ttnpp.</span></span><span class="sig-name descname"><span class="pre">multiset_one_site_dmrg_complex</span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_dmrg_complex" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A class implementing the one site DMRG algorithm on trees.</p>
-<p>Construct arguments</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the DMRG algorithm</p></li>
-<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
-<li><p><strong>krylov_dim</strong> (<em>int</em><em>, </em><em>optional</em>) – The krylov subspace dimension used for the eigensolver steps. (Default: 16)</p></li>
-<li><p><strong>numthreads</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of openmp threads to be used by the solver. (Default: 1)</p></li>
-</ul>
-</dd>
-</dl>
-<p>Callable arguments</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – Tree Tensor Network that the DMRG algorithm will act on</p></li>
-<li><p><strong>h</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
-<li><p><strong>update_env</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)</p></li>
-</ul>
-</dd>
-</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_dmrg_complex.E">
 <span class="sig-name descname"><span class="pre">E</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_one_site_dmrg_complex" title="pyttn.ttnpp.multiset_one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.multiset_one_site_dmrg_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">complex</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_dmrg_complex.E" title="Link to this definition"></a></dt>
@@ -1903,6 +1943,11 @@ by taking each mode and appending a dual space operator following this mode of t
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_dmrg_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_one_site_dmrg_complex" title="pyttn.ttnpp.multiset_one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.multiset_one_site_dmrg_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_dmrg_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_dmrg_complex.clear">
 <span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_one_site_dmrg_complex" title="pyttn.ttnpp.multiset_one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.multiset_one_site_dmrg_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_dmrg_complex.clear" title="Link to this definition"></a></dt>
 <dd><p>Clear all internal buffers of the DMRG object.</p>
@@ -1923,7 +1968,7 @@ by taking each mode and appending a dual space operator following this mode of t
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_dmrg_complex.initialise">
 <span class="sig-name descname"><span class="pre">initialise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_one_site_dmrg_complex" title="pyttn.ttnpp.multiset_one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.multiset_one_site_dmrg_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ms_ttn_complex" title="pyttn.ttnpp.ms_ttn_complex"><span class="pre">pyttn.ttnpp.ms_ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_sop_operator_complex" title="pyttn.ttnpp.multiset_sop_operator_complex"><span class="pre">pyttn.ttnpp.multiset_sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">krylov_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_dmrg_complex.initialise" title="Link to this definition"></a></dt>
-<dd><p>Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Netwok A, with Hamiltonian H.</p>
+<dd><p>Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Network A, with Hamiltonian H.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1981,7 +2026,17 @@ by taking each mode and appending a dual space operator following this mode of t
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex" title="pyttn.ttnpp.multiset_one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.multiset_one_site_tdvp_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ms_ttn_complex" title="pyttn.ttnpp.ms_ttn_complex"><span class="pre">pyttn.ttnpp.ms_ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_sop_operator_complex" title="pyttn.ttnpp.multiset_sop_operator_complex"><span class="pre">pyttn.ttnpp.multiset_sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.__call__" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Performs a single step of the single site TDVP algorithm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the TDVP algorithm</p></li>
+<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
+<li><p><strong>update_env</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.__copy__">
@@ -1999,54 +2054,98 @@ by taking each mode and appending a dual space operator following this mode of t
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex" title="pyttn.ttnpp.multiset_one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.multiset_one_site_tdvp_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.clear">
 <span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex" title="pyttn.ttnpp.multiset_one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.multiset_one_site_tdvp_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.clear" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Clear all internal buffers of the TDVP object.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.coefficient">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coefficient</span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.coefficient" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>A coefficient used to scale the timestep.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.dt">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.dt" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The timestep used for integration of the dynamics.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.expmv_tol">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">expmv_tol</span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.expmv_tol" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The tolerance used for the krylov subspace matrix exponential</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.initialise">
 <span class="sig-name descname"><span class="pre">initialise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex" title="pyttn.ttnpp.multiset_one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.multiset_one_site_tdvp_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ms_ttn_complex" title="pyttn.ttnpp.ms_ttn_complex"><span class="pre">pyttn.ttnpp.ms_ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_sop_operator_complex" title="pyttn.ttnpp.multiset_sop_operator_complex"><span class="pre">pyttn.ttnpp.multiset_sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">krylov_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nstep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.initialise" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialise one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><code class="xref py py-class docutils literal notranslate"><span class="pre">ttn_complex</span></code></a>) - The Tree Tensor Network Object that will be optimised using the DMRG algorithm</p></li>
+<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><code class="xref py py-class docutils literal notranslate"><span class="pre">sop_operator_complex</span></code></a>) - The Hamiltonian sop operator object</p></li>
+<li><p><strong>krylov_dim</strong> (int, optional) - The krylov subspace dimension used for the eigensolver steps. (Default: 16)</p></li>
+<li><p><strong>nstep</strong> (int, optional): The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)</p></li>
+<li><p><strong>num_threads</strong> (int, optional) - The number of openmp threads to be used by the solver. (Default: 1)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.krylov_steps">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">krylov_steps</span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.krylov_steps" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The number of internal substeps used by the krylov subspace integrator for each real step.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.prepare_environment">
 <span class="sig-name descname"><span class="pre">prepare_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex" title="pyttn.ttnpp.multiset_one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.multiset_one_site_tdvp_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ms_ttn_complex" title="pyttn.ttnpp.ms_ttn_complex"><span class="pre">pyttn.ttnpp.ms_ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_sop_operator_complex" title="pyttn.ttnpp.multiset_sop_operator_complex"><span class="pre">pyttn.ttnpp.multiset_sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">attempt_expansion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.prepare_environment" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Update all Single Particle Function environment tensors to prepare the system for performing a TDVP sweep.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the TDVP algorithm</p></li>
+<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
+<li><p><strong>attempt_expansion</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to attempt subspace expansion throughout the update scheme.  (Default: False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.step">
 <span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex" title="pyttn.ttnpp.multiset_one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.multiset_one_site_tdvp_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ms_ttn_complex" title="pyttn.ttnpp.ms_ttn_complex"><span class="pre">pyttn.ttnpp.ms_ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_sop_operator_complex" title="pyttn.ttnpp.multiset_sop_operator_complex"><span class="pre">pyttn.ttnpp.multiset_sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.step" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Performs a single step of the single site TDVP algorithm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the TDVP algorithm</p></li>
+<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
+<li><p><strong>update_env</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.t">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.t" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The current time point reached by the integrator.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_one_site_tdvp_complex.use_time_dependent_hamiltonian">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">use_time_dependent_hamiltonian</span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_one_site_tdvp_complex.use_time_dependent_hamiltonian" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Whether or not to update the time variable of the Hamiltonian object throughout integration.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -2067,6 +2166,11 @@ by taking each mode and appending a dual space operator following this mode of t
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.multiset_sop_operator_complex.assign">
 <span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_sop_operator_complex" title="pyttn.ttnpp.multiset_sop_operator_complex"><span class="pre">pyttn.ttnpp.multiset_sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_sop_operator_complex" title="pyttn.ttnpp.multiset_sop_operator_complex"><span class="pre">pyttn.ttnpp.multiset_sop_operator_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_sop_operator_complex.assign" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.multiset_sop_operator_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.multiset_sop_operator_complex" title="pyttn.ttnpp.multiset_sop_operator_complex"><span class="pre">pyttn.ttnpp.multiset_sop_operator_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.multiset_sop_operator_complex.backend" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -3219,27 +3323,6 @@ Here the tree also automatically includes local optimised bases with the number 
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.ttnpp.</span></span><span class="sig-name descname"><span class="pre">one_site_dmrg_complex</span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_dmrg_complex" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>A class implementing the one site DMRG algorithm on trees.</p>
-<p>Construct arguments</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the DMRG algorithm</p></li>
-<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
-<li><p><strong>krylov_dim</strong> (<em>int</em><em>, </em><em>optional</em>) – The krylov subspace dimension used for the eigensolver steps. (Default: 16)</p></li>
-<li><p><strong>numthreads</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of openmp threads to be used by the solver. (Default: 1)</p></li>
-</ul>
-</dd>
-</dl>
-<p>Callable arguments</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – Tree Tensor Network that the DMRG algorithm will act on</p></li>
-<li><p><strong>h</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
-<li><p><strong>update_env</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)</p></li>
-</ul>
-</dd>
-</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_dmrg_complex.E">
 <span class="sig-name descname"><span class="pre">E</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.one_site_dmrg_complex" title="pyttn.ttnpp.one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.one_site_dmrg_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">complex</span></span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_dmrg_complex.E" title="Link to this definition"></a></dt>
@@ -3268,6 +3351,11 @@ Here the tree also automatically includes local optimised bases with the number 
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.one_site_dmrg_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.one_site_dmrg_complex" title="pyttn.ttnpp.one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.one_site_dmrg_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_dmrg_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_dmrg_complex.clear">
 <span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.one_site_dmrg_complex" title="pyttn.ttnpp.one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.one_site_dmrg_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_dmrg_complex.clear" title="Link to this definition"></a></dt>
 <dd><p>Clear all internal buffers of the DMRG object.</p>
@@ -3288,7 +3376,7 @@ Here the tree also automatically includes local optimised bases with the number 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_dmrg_complex.initialise">
 <span class="sig-name descname"><span class="pre">initialise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.one_site_dmrg_complex" title="pyttn.ttnpp.one_site_dmrg_complex"><span class="pre">pyttn.ttnpp.one_site_dmrg_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><span class="pre">pyttn.ttnpp.ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><span class="pre">pyttn.ttnpp.sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">krylov_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_dmrg_complex.initialise" title="Link to this definition"></a></dt>
-<dd><p>Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Netwok A, with Hamiltonian H.</p>
+<dd><p>Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Network A, with Hamiltonian H.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -3346,7 +3434,17 @@ Here the tree also automatically includes local optimised bases with the number 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.one_site_tdvp_complex" title="pyttn.ttnpp.one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.one_site_tdvp_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><span class="pre">pyttn.ttnpp.ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><span class="pre">pyttn.ttnpp.sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.__call__" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Performs a single step of the single site TDVP algorithm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the TDVP algorithm</p></li>
+<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
+<li><p><strong>update_env</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.__copy__">
@@ -3364,54 +3462,98 @@ Here the tree also automatically includes local optimised bases with the number 
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.one_site_tdvp_complex" title="pyttn.ttnpp.one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.one_site_tdvp_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.clear">
 <span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.one_site_tdvp_complex" title="pyttn.ttnpp.one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.one_site_tdvp_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.clear" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Clear all internal buffers of the TDVP object.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.coefficient">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coefficient</span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.coefficient" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>A coefficient used to scale the timestep.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.dt">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.dt" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The timestep used for integration of the dynamics.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.expmv_tol">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">expmv_tol</span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.expmv_tol" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The tolerance used for the krylov subspace matrix exponential</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.initialise">
 <span class="sig-name descname"><span class="pre">initialise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.one_site_tdvp_complex" title="pyttn.ttnpp.one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.one_site_tdvp_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><span class="pre">pyttn.ttnpp.ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><span class="pre">pyttn.ttnpp.sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">krylov_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nstep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_threads</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.initialise" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Initialise one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><code class="xref py py-class docutils literal notranslate"><span class="pre">ttn_complex</span></code></a>) - The Tree Tensor Network Object that will be optimised using the DMRG algorithm</p></li>
+<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><code class="xref py py-class docutils literal notranslate"><span class="pre">sop_operator_complex</span></code></a>) - The Hamiltonian sop operator object</p></li>
+<li><p><strong>krylov_dim</strong> (int, optional) - The krylov subspace dimension used for the eigensolver steps. (Default: 16)</p></li>
+<li><p><strong>nstep</strong> (int, optional): The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)</p></li>
+<li><p><strong>num_threads</strong> (int, optional) - The number of openmp threads to be used by the solver. (Default: 1)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.krylov_steps">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">krylov_steps</span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.krylov_steps" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The number of internal substeps used by the krylov subspace integrator for each real step.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.prepare_environment">
 <span class="sig-name descname"><span class="pre">prepare_environment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.one_site_tdvp_complex" title="pyttn.ttnpp.one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.one_site_tdvp_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><span class="pre">pyttn.ttnpp.ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><span class="pre">pyttn.ttnpp.sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">attempt_expansion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.prepare_environment" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Update all Single Particle Function environment tensors to prepare the system for performing a TDVP sweep.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the TDVP algorithm</p></li>
+<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
+<li><p><strong>attempt_expansion</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to attempt subspace expansion throughout the update scheme.  (Default: False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.step">
 <span class="sig-name descname"><span class="pre">step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.one_site_tdvp_complex" title="pyttn.ttnpp.one_site_tdvp_complex"><span class="pre">pyttn.ttnpp.one_site_tdvp_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><span class="pre">pyttn.ttnpp.ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><span class="pre">pyttn.ttnpp.sop_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.step" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Performs a single step of the single site TDVP algorithm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><em>ttn_complex</em></a>) – The Tree Tensor Network Object that will be optimised using the TDVP algorithm</p></li>
+<li><p><strong>H</strong> (<a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><em>sop_operator_complex</em></a>) – The Hamiltonian sop operator object</p></li>
+<li><p><strong>update_env</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.t">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">t</span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.t" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The current time point reached by the integrator.</p>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="pyttn.ttnpp.one_site_tdvp_complex.use_time_dependent_hamiltonian">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">use_time_dependent_hamiltonian</span></span><a class="headerlink" href="#pyttn.ttnpp.one_site_tdvp_complex.use_time_dependent_hamiltonian" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Whether or not to update the time variable of the Hamiltonian object throughout integration.</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -3463,6 +3605,11 @@ Here the tree also automatically includes local optimised bases with the number 
 <li><p>assign(self: pyttn.ttnpp.operator_dictionary_complex, arg0: list[dict[str, ttns::site_operator&lt;std::complex&lt;double&gt;, linalg::blas_backend&gt;]]) -&gt; None</p></li>
 </ol>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.operator_dictionary_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.operator_dictionary_complex" title="pyttn.ttnpp.operator_dictionary_complex"><span class="pre">pyttn.ttnpp.operator_dictionary_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.operator_dictionary_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.operator_dictionary_complex.clear">
@@ -3541,6 +3688,11 @@ Here the tree also automatically includes local optimised bases with the number 
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.operator_dictionary_real.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.operator_dictionary_real" title="pyttn.ttnpp.operator_dictionary_real"><span class="pre">pyttn.ttnpp.operator_dictionary_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.operator_dictionary_real.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.operator_dictionary_real.clear">
 <span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.operator_dictionary_real" title="pyttn.ttnpp.operator_dictionary_real"><span class="pre">pyttn.ttnpp.operator_dictionary_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.operator_dictionary_real.clear" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -3586,23 +3738,22 @@ Here the tree also automatically includes local optimised bases with the number 
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.primitive_mode_data.__copy__">
-<span class="sig-name descname"><span class="pre">__copy__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.primitive_mode_data.__copy__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__copy__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.primitive_mode_data.__copy__" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.primitive_mode_data.__deepcopy__">
-<span class="sig-name descname"><span class="pre">__deepcopy__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.primitive_mode_data.__deepcopy__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__deepcopy__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">memo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.primitive_mode_data.__deepcopy__" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.primitive_mode_data.__str__">
-<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.primitive_mode_data.__str__" title="Link to this definition"></a></dt>
-<dd><p>Return str(self).</p>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.primitive_mode_data.__str__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.primitive_mode_data.assign">
-<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.primitive_mode_data.assign" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.primitive_mode_data.assign" title="Link to this definition"></a></dt>
 <dd><p>Assign the value of the primitive_mode_data object from another primitive_mode_data object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -3613,7 +3764,7 @@ Here the tree also automatically includes local optimised bases with the number 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.primitive_mode_data.fermionic">
-<span class="sig-name descname"><span class="pre">fermionic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.primitive_mode_data.fermionic" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">fermionic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.primitive_mode_data" title="pyttn.ttnpp.primitive_mode_data"><span class="pre">pyttn.ttnpp.primitive_mode_data</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.primitive_mode_data.fermionic" title="Link to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>whether the mode is fermionic</p>
@@ -3668,6 +3819,11 @@ Here the tree also automatically includes local optimised bases with the number 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.product_operator_complex.assign">
 <span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.product_operator_complex" title="pyttn.ttnpp.product_operator_complex"><span class="pre">pyttn.ttnpp.product_operator_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.product_operator_complex" title="pyttn.ttnpp.product_operator_complex"><span class="pre">pyttn.ttnpp.product_operator_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.product_operator_complex.assign" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.product_operator_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.product_operator_complex" title="pyttn.ttnpp.product_operator_complex"><span class="pre">pyttn.ttnpp.product_operator_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.product_operator_complex.backend" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -4938,6 +5094,11 @@ depending on the dtype used.</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.sop_operator_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><span class="pre">pyttn.ttnpp.sop_operator_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.sop_operator_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.sop_operator_complex.clear">
 <span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.sop_operator_complex" title="pyttn.ttnpp.sop_operator_complex"><span class="pre">pyttn.ttnpp.sop_operator_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.sop_operator_complex.clear" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -5008,6 +5169,11 @@ depending on the dtype used.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.subspace_two_site_cost_tdvp_complex.assign">
 <span class="sig-name descname"><span class="pre">assign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.subspace_two_site_cost_tdvp_complex" title="pyttn.ttnpp.subspace_two_site_cost_tdvp_complex"><span class="pre">pyttn.ttnpp.subspace_two_site_cost_tdvp_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.subspace_two_site_cost_tdvp_complex" title="pyttn.ttnpp.subspace_two_site_cost_tdvp_complex"><span class="pre">pyttn.ttnpp.subspace_two_site_cost_tdvp_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.subspace_two_site_cost_tdvp_complex.assign" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.subspace_two_site_cost_tdvp_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.subspace_two_site_cost_tdvp_complex" title="pyttn.ttnpp.subspace_two_site_cost_tdvp_complex"><span class="pre">pyttn.ttnpp.subspace_two_site_cost_tdvp_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.subspace_two_site_cost_tdvp_complex.backend" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -5358,6 +5524,14 @@ by taking each mode and appending a dual space operator following this mode of t
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.system_modes.mode_dimensions">
+<span class="sig-name descname"><span class="pre">mode_dimensions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.system_modes" title="pyttn.ttnpp.system_modes"><span class="pre">pyttn.ttnpp.system_modes</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyttn.ttnpp.system_modes.mode_dimensions" title="Link to this definition"></a></dt>
+<dd><p>Returns a list containing the local Hilbert space dimensions of each mode in the system.
+:Returns:       The local Hilbert space dimensions of each mode of the system
+:Return Type:   list(int)</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.system_modes.mode_index">
 <span class="sig-name descname"><span class="pre">mode_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.system_modes" title="pyttn.ttnpp.system_modes"><span class="pre">pyttn.ttnpp.system_modes</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pyttn.ttnpp.system_modes.mode_index" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -5566,6 +5740,23 @@ by taking each mode and appending a dual space operator following this mode of t
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ttn_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><span class="pre">pyttn.ttnpp.ttn_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.ttn_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ttn_complex.bond_capacities">
+<span class="sig-name descname"><span class="pre">bond_capacities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.ttn_complex.bond_capacities" title="Link to this definition"></a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>bond_capacities(self: pyttn.ttnpp.ttn_complex, arg0: dict[tuple[int, int], int]) -&gt; None</p></li>
+<li><p>bond_capacities(self: pyttn.ttnpp.ttn_complex) -&gt; dict[tuple[int, int], int]</p></li>
+<li><p>bond_capacities(self: pyttn.ttnpp.ttn_complex, arg0: dict[tuple[int, int], int]) -&gt; None</p></li>
+</ol>
+<p>For details see <a class="reference internal" href="../pyttn/index.html#pyttn.ttn_dtype.bond_capacities" title="pyttn.ttn_dtype.bond_capacities"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyttn.ttn_dtype.bond_capacities()</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.ttn_complex.bond_dimensions">
 <span class="sig-name descname"><span class="pre">bond_dimensions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyttn.ttnpp.ttn_complex.bond_dimensions" title="Link to this definition"></a></dt>
 <dd><p>Overloaded function.</p>
@@ -5582,6 +5773,11 @@ by taking each mode and appending a dual space operator following this mode of t
 <span class="sig-name descname"><span class="pre">bond_entropy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><span class="pre">pyttn.ttnpp.ttn_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pyttn.ttnpp.ttn_complex.bond_entropy" title="Link to this definition"></a></dt>
 <dd><p>For details see <a class="reference internal" href="../pyttn/index.html#pyttn.ttn_dtype.bond_entropy" title="pyttn.ttn_dtype.bond_entropy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pyttn.ttn_dtype.bond_entropy()</span></code></a></p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ttn_complex.bonds">
+<span class="sig-name descname"><span class="pre">bonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_complex" title="pyttn.ttnpp.ttn_complex"><span class="pre">pyttn.ttnpp.ttn_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pyttn.ttnpp.ttn_complex.bonds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.ttn_complex.clear">
@@ -5887,6 +6083,11 @@ by taking each mode and appending a dual space operator following this mode of t
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ttn_data_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_data_complex" title="pyttn.ttnpp.ttn_data_complex"><span class="pre">pyttn.ttnpp.ttn_data_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.ttn_data_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.ttn_data_complex.clear">
 <span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_data_complex" title="pyttn.ttnpp.ttn_data_complex"><span class="pre">pyttn.ttnpp.ttn_data_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.ttn_data_complex.clear" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -6008,6 +6209,11 @@ by taking each mode and appending a dual space operator following this mode of t
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.ttn_node_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_node_complex" title="pyttn.ttnpp.ttn_node_complex"><span class="pre">pyttn.ttnpp.ttn_node_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.ttn_node_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.ttn_node_complex.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.ttn_node_complex" title="pyttn.ttnpp.ttn_node_complex"><span class="pre">pyttn.ttnpp.ttn_node_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.ttn_node_complex.complex_dtype" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -6045,10 +6251,7 @@ by taking each mode and appending a dual space operator following this mode of t
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../pyttn/pyttn.utils.html" class="btn btn-neutral float-left" title="pyttn.utils package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="ttnpp.linalg.html" class="btn btn-neutral float-right" title="ttnpp.linalg package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

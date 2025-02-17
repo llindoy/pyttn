@@ -19,9 +19,7 @@
       <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ttnpp.utils package" href="ttnpp.utils.html" />
-    <link rel="prev" title="ttnpp module" href="ttnpp.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,37 +41,22 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Tutorials/index.html">Tutorials</a></li>
 </ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../Examples/index.html">Examples</a></li>
-</ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../pyttn/API%20Outline.html">API Outline</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../pyttn/index.html">API Documents</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../pyttn/index.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../pyttn/pyttn.linalg.html">pyttn.linalg package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pyttn/pyttn.models.html">pyttn.models package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pyttn/pyttn.oqs.html">pyttn.oqs package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pyttn/pyttn.utils.html">pyttn.utils package</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="ttnpp.html">pyttn.ttnpp</a><ul class="current">
-<li class="toctree-l4 current"><a class="reference internal" href="ttnpp.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="ttnpp.html#module-pyttn.ttnpp">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../pyttn/index.html#module-pyttn">Module contents</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../pyttn/index.html">API Documents</a></li>
 </ul>
 
         </div>
@@ -90,8 +73,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../pyttn/index.html">pyTTN package</a></li>
-          <li class="breadcrumb-item"><a href="ttnpp.html">ttnpp module</a></li>
       <li class="breadcrumb-item active">ttnpp.linalg package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/ttnpp/ttnpp.linalg.rst.txt" rel="nofollow"> View page source</a>
@@ -108,12 +89,56 @@
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyttn.ttnpp.linalg" title="Link to this heading"></a></h2>
 <p>Linear algebra submodule for TTNS library.”</p>
 <dl class="py class">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.backend">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.ttnpp.linalg.</span></span><span class="sig-name descname"><span class="pre">backend</span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.backend" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.backend.destroy">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">destroy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.backend.destroy" title="Link to this definition"></a></dt>
+<dd><p>Clear the blas_backend object.   Free any resources allocated.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.backend.initialise">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initialise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nthreads</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_par</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.backend.initialise" title="Link to this definition"></a></dt>
+<dd><p>Initialise blas backend passing user defined arguments</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nthreads</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of threads to use for linear algebra operations (Default: 1)</p></li>
+<li><p><strong>batch_par</strong> – Whether or not to parallelise batched gemm operationrs (Default: false)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.backend.label">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">label</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.backend.label" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A string representing a blas backend</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.csr_matrix_complex">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.ttnpp.linalg.</span></span><span class="sig-name descname"><span class="pre">csr_matrix_complex</span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.csr_matrix_complex" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.csr_matrix_complex.__str__">
 <span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.csr_matrix_complex" title="pyttn.ttnpp.linalg.csr_matrix_complex"><span class="pre">pyttn.ttnpp.linalg.csr_matrix_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.csr_matrix_complex.__str__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.csr_matrix_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.csr_matrix_complex" title="pyttn.ttnpp.linalg.csr_matrix_complex"><span class="pre">pyttn.ttnpp.linalg.csr_matrix_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.csr_matrix_complex.backend" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -133,6 +158,11 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.csr_matrix_real.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.csr_matrix_real" title="pyttn.ttnpp.linalg.csr_matrix_real"><span class="pre">pyttn.ttnpp.linalg.csr_matrix_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.csr_matrix_real.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.csr_matrix_real.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.csr_matrix_real" title="pyttn.ttnpp.linalg.csr_matrix_real"><span class="pre">pyttn.ttnpp.linalg.csr_matrix_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.csr_matrix_real.complex_dtype" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -146,6 +176,11 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.diagonal_matrix_complex.__str__">
 <span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.diagonal_matrix_complex" title="pyttn.ttnpp.linalg.diagonal_matrix_complex"><span class="pre">pyttn.ttnpp.linalg.diagonal_matrix_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.diagonal_matrix_complex.__str__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.diagonal_matrix_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.diagonal_matrix_complex" title="pyttn.ttnpp.linalg.diagonal_matrix_complex"><span class="pre">pyttn.ttnpp.linalg.diagonal_matrix_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.diagonal_matrix_complex.backend" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -165,6 +200,11 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.diagonal_matrix_real.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.diagonal_matrix_real" title="pyttn.ttnpp.linalg.diagonal_matrix_real"><span class="pre">pyttn.ttnpp.linalg.diagonal_matrix_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.diagonal_matrix_real.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.diagonal_matrix_real.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.diagonal_matrix_real" title="pyttn.ttnpp.linalg.diagonal_matrix_real"><span class="pre">pyttn.ttnpp.linalg.diagonal_matrix_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.diagonal_matrix_real.complex_dtype" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -181,8 +221,28 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.matrix_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_complex" title="pyttn.ttnpp.linalg.matrix_complex"><span class="pre">pyttn.ttnpp.linalg.matrix_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.matrix_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.matrix_complex.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_complex" title="pyttn.ttnpp.linalg.matrix_complex"><span class="pre">pyttn.ttnpp.linalg.matrix_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.matrix_complex.clear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.matrix_complex.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_complex" title="pyttn.ttnpp.linalg.matrix_complex"><span class="pre">pyttn.ttnpp.linalg.matrix_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.matrix_complex.complex_dtype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.matrix_complex.set_subblock">
+<span class="sig-name descname"><span class="pre">set_subblock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_complex" title="pyttn.ttnpp.linalg.matrix_complex"><span class="pre">pyttn.ttnpp.linalg.matrix_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Buffer</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.matrix_complex.set_subblock" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.matrix_complex.transpose">
+<span class="sig-name descname"><span class="pre">transpose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_complex" title="pyttn.ttnpp.linalg.matrix_complex"><span class="pre">pyttn.ttnpp.linalg.matrix_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_complex" title="pyttn.ttnpp.linalg.matrix_complex"><span class="pre">pyttn.ttnpp.linalg.matrix_complex</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.matrix_complex.transpose" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -197,8 +257,81 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.matrix_real.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_real" title="pyttn.ttnpp.linalg.matrix_real"><span class="pre">pyttn.ttnpp.linalg.matrix_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.matrix_real.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.matrix_real.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_real" title="pyttn.ttnpp.linalg.matrix_real"><span class="pre">pyttn.ttnpp.linalg.matrix_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.matrix_real.clear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.matrix_real.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_real" title="pyttn.ttnpp.linalg.matrix_real"><span class="pre">pyttn.ttnpp.linalg.matrix_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.matrix_real.complex_dtype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.matrix_real.set_subblock">
+<span class="sig-name descname"><span class="pre">set_subblock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_real" title="pyttn.ttnpp.linalg.matrix_real"><span class="pre">pyttn.ttnpp.linalg.matrix_real</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Buffer</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.matrix_real.set_subblock" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.matrix_real.transpose">
+<span class="sig-name descname"><span class="pre">transpose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_real" title="pyttn.ttnpp.linalg.matrix_real"><span class="pre">pyttn.ttnpp.linalg.matrix_real</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_real" title="pyttn.ttnpp.linalg.matrix_real"><span class="pre">pyttn.ttnpp.linalg.matrix_real</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.matrix_real.transpose" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.orthogonal_vector_complex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.ttnpp.linalg.</span></span><span class="sig-name descname"><span class="pre">orthogonal_vector_complex</span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.orthogonal_vector_complex" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.orthogonal_vector_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.orthogonal_vector_complex" title="pyttn.ttnpp.linalg.orthogonal_vector_complex"><span class="pre">pyttn.ttnpp.linalg.orthogonal_vector_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.orthogonal_vector_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.orthogonal_vector_complex.generate">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_complex" title="pyttn.ttnpp.linalg.matrix_complex"><span class="pre">pyttn.ttnpp.linalg.matrix_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.random_engine" title="pyttn.ttnpp.linalg.random_engine"><span class="pre">pyttn.ttnpp.linalg.random_engine</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_complex" title="pyttn.ttnpp.linalg.vector_complex"><span class="pre">pyttn.ttnpp.linalg.vector_complex</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.orthogonal_vector_complex.generate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.orthogonal_vector_complex.pad_random">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pad_random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_complex" title="pyttn.ttnpp.linalg.matrix_complex"><span class="pre">pyttn.ttnpp.linalg.matrix_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.random_engine" title="pyttn.ttnpp.linalg.random_engine"><span class="pre">pyttn.ttnpp.linalg.random_engine</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.orthogonal_vector_complex.pad_random" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.orthogonal_vector_real">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.ttnpp.linalg.</span></span><span class="sig-name descname"><span class="pre">orthogonal_vector_real</span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.orthogonal_vector_real" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.orthogonal_vector_real.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.orthogonal_vector_real" title="pyttn.ttnpp.linalg.orthogonal_vector_real"><span class="pre">pyttn.ttnpp.linalg.orthogonal_vector_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.orthogonal_vector_real.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.orthogonal_vector_real.generate">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_real" title="pyttn.ttnpp.linalg.matrix_real"><span class="pre">pyttn.ttnpp.linalg.matrix_real</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.random_engine" title="pyttn.ttnpp.linalg.random_engine"><span class="pre">pyttn.ttnpp.linalg.random_engine</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_real" title="pyttn.ttnpp.linalg.vector_real"><span class="pre">pyttn.ttnpp.linalg.vector_real</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.orthogonal_vector_real.generate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.orthogonal_vector_real.pad_random">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pad_random</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.matrix_real" title="pyttn.ttnpp.linalg.matrix_real"><span class="pre">pyttn.ttnpp.linalg.matrix_real</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.random_engine" title="pyttn.ttnpp.linalg.random_engine"><span class="pre">pyttn.ttnpp.linalg.random_engine</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.orthogonal_vector_real.pad_random" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.random_engine">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyttn.ttnpp.linalg.</span></span><span class="sig-name descname"><span class="pre">random_engine</span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.random_engine" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.random_engine.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.random_engine" title="pyttn.ttnpp.linalg.random_engine"><span class="pre">pyttn.ttnpp.linalg.random_engine</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.random_engine.backend" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -213,8 +346,23 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_3_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_3_complex" title="pyttn.ttnpp.linalg.tensor_3_complex"><span class="pre">pyttn.ttnpp.linalg.tensor_3_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_3_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_3_complex.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_3_complex" title="pyttn.ttnpp.linalg.tensor_3_complex"><span class="pre">pyttn.ttnpp.linalg.tensor_3_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_3_complex.clear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_3_complex.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_3_complex" title="pyttn.ttnpp.linalg.tensor_3_complex"><span class="pre">pyttn.ttnpp.linalg.tensor_3_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_3_complex.complex_dtype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_3_complex.transpose">
+<span class="sig-name descname"><span class="pre">transpose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_3_complex" title="pyttn.ttnpp.linalg.tensor_3_complex"><span class="pre">pyttn.ttnpp.linalg.tensor_3_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_3_complex" title="pyttn.ttnpp.linalg.tensor_3_complex"><span class="pre">pyttn.ttnpp.linalg.tensor_3_complex</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_3_complex.transpose" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -229,8 +377,23 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_3_real.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_3_real" title="pyttn.ttnpp.linalg.tensor_3_real"><span class="pre">pyttn.ttnpp.linalg.tensor_3_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_3_real.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_3_real.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_3_real" title="pyttn.ttnpp.linalg.tensor_3_real"><span class="pre">pyttn.ttnpp.linalg.tensor_3_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_3_real.clear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_3_real.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_3_real" title="pyttn.ttnpp.linalg.tensor_3_real"><span class="pre">pyttn.ttnpp.linalg.tensor_3_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_3_real.complex_dtype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_3_real.transpose">
+<span class="sig-name descname"><span class="pre">transpose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_3_real" title="pyttn.ttnpp.linalg.tensor_3_real"><span class="pre">pyttn.ttnpp.linalg.tensor_3_real</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_3_real" title="pyttn.ttnpp.linalg.tensor_3_real"><span class="pre">pyttn.ttnpp.linalg.tensor_3_real</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_3_real.transpose" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -245,8 +408,23 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_4_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_4_complex" title="pyttn.ttnpp.linalg.tensor_4_complex"><span class="pre">pyttn.ttnpp.linalg.tensor_4_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_4_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_4_complex.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_4_complex" title="pyttn.ttnpp.linalg.tensor_4_complex"><span class="pre">pyttn.ttnpp.linalg.tensor_4_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_4_complex.clear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_4_complex.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_4_complex" title="pyttn.ttnpp.linalg.tensor_4_complex"><span class="pre">pyttn.ttnpp.linalg.tensor_4_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_4_complex.complex_dtype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_4_complex.transpose">
+<span class="sig-name descname"><span class="pre">transpose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_4_complex" title="pyttn.ttnpp.linalg.tensor_4_complex"><span class="pre">pyttn.ttnpp.linalg.tensor_4_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_4_complex" title="pyttn.ttnpp.linalg.tensor_4_complex"><span class="pre">pyttn.ttnpp.linalg.tensor_4_complex</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_4_complex.transpose" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -261,8 +439,23 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_4_real.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_4_real" title="pyttn.ttnpp.linalg.tensor_4_real"><span class="pre">pyttn.ttnpp.linalg.tensor_4_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_4_real.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_4_real.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_4_real" title="pyttn.ttnpp.linalg.tensor_4_real"><span class="pre">pyttn.ttnpp.linalg.tensor_4_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_4_real.clear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_4_real.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_4_real" title="pyttn.ttnpp.linalg.tensor_4_real"><span class="pre">pyttn.ttnpp.linalg.tensor_4_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_4_real.complex_dtype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.tensor_4_real.transpose">
+<span class="sig-name descname"><span class="pre">transpose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_4_real" title="pyttn.ttnpp.linalg.tensor_4_real"><span class="pre">pyttn.ttnpp.linalg.tensor_4_real</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.linalg.tensor_4_real" title="pyttn.ttnpp.linalg.tensor_4_real"><span class="pre">pyttn.ttnpp.linalg.tensor_4_real</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.tensor_4_real.transpose" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -277,8 +470,23 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.vector_complex.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_complex" title="pyttn.ttnpp.linalg.vector_complex"><span class="pre">pyttn.ttnpp.linalg.vector_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.vector_complex.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.vector_complex.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_complex" title="pyttn.ttnpp.linalg.vector_complex"><span class="pre">pyttn.ttnpp.linalg.vector_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.vector_complex.clear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.vector_complex.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_complex" title="pyttn.ttnpp.linalg.vector_complex"><span class="pre">pyttn.ttnpp.linalg.vector_complex</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.vector_complex.complex_dtype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.vector_complex.transpose">
+<span class="sig-name descname"><span class="pre">transpose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_complex" title="pyttn.ttnpp.linalg.vector_complex"><span class="pre">pyttn.ttnpp.linalg.vector_complex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_complex" title="pyttn.ttnpp.linalg.vector_complex"><span class="pre">pyttn.ttnpp.linalg.vector_complex</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.vector_complex.transpose" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -293,8 +501,23 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.vector_real.backend">
+<span class="sig-name descname"><span class="pre">backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_real" title="pyttn.ttnpp.linalg.vector_real"><span class="pre">pyttn.ttnpp.linalg.vector_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.vector_real.backend" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.vector_real.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_real" title="pyttn.ttnpp.linalg.vector_real"><span class="pre">pyttn.ttnpp.linalg.vector_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.vector_real.clear" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyttn.ttnpp.linalg.vector_real.complex_dtype">
 <span class="sig-name descname"><span class="pre">complex_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_real" title="pyttn.ttnpp.linalg.vector_real"><span class="pre">pyttn.ttnpp.linalg.vector_real</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.vector_real.complex_dtype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyttn.ttnpp.linalg.vector_real.transpose">
+<span class="sig-name descname"><span class="pre">transpose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_real" title="pyttn.ttnpp.linalg.vector_real"><span class="pre">pyttn.ttnpp.linalg.vector_real</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pyttn.ttnpp.linalg.vector_real" title="pyttn.ttnpp.linalg.vector_real"><span class="pre">pyttn.ttnpp.linalg.vector_real</span></a></span></span><a class="headerlink" href="#pyttn.ttnpp.linalg.vector_real.transpose" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -305,10 +528,7 @@
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="ttnpp.html" class="btn btn-neutral float-left" title="ttnpp module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="ttnpp.utils.html" class="btn btn-neutral float-right" title="ttnpp.utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

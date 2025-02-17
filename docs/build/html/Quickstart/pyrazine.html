@@ -1,0 +1,789 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nonadiabatic Dynamics of 24-mode Pyrazine &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Handling Continuous Bosonic Baths with pyttn.oqs" href="oqs_baths.html" />
+    <link rel="prev" title="Spin Dynamics of an anisotropic XY model on a Cayley Tree" href="cayley_xy_tdvp.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Quickstart</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#ground-state-calculations">Ground State Calculations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#dynamics-calculations">Dynamics Calculations</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tfim_tdvp.html">Quench Dynamics: 1D Transverse Field Ising Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cayley_xy_tdvp.html">Spin Dynamics of an anisotropic XY model on a Cayley Tree</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Nonadiabatic Dynamics of 24-mode Pyrazine</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Contents">Contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Importing-the-Package">Importing the Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Setting-up-the-System-and-Hamiltonian">Setting up the System and Hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Preparing-the-Initial-Wavefunction">Preparing the Initial Wavefunction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Preparing-the-pyttn.sop_operator-Hamiltonian">Preparing the <code class="docutils literal notranslate"><span class="pre">pyttn.sop_operator</span></code> Hamiltonian</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Running-the-Dynamics">Running the Dynamics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#non-markovian-open-quantum-system-dynamics">Non-Markovian Open Quantum System Dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#using-the-multiset-ansatz">Using the Multiset Ansatz</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pyttn/API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pyttn/index.html">API Documents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Quickstart</a></li>
+      <li class="breadcrumb-item active">Nonadiabatic Dynamics of 24-mode Pyrazine</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/Quickstart/pyrazine.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Nonadiabatic-Dynamics-of-24-mode-Pyrazine">
+<h1>Nonadiabatic Dynamics of 24-mode Pyrazine<a class="headerlink" href="#Nonadiabatic-Dynamics-of-24-mode-Pyrazine" title="Link to this heading"></a></h1>
+<p>In this quickstart guide, we apply pyTTN to evaluate the non-adiabatic dynamics of the 24-mode pyrazine model following excitation to the <span class="math notranslate nohighlight">\(S_2\)</span> elecronic state. This model is a standard benchmark model for software aimed at simulating quantum dynamics of molecular systems. Here we make use of the standard quadratic vibronic Hamiltonian presented in <a class="reference external" href="https://doi.org/10.1063/1.478061">A. Raab, G. A. Worth, H.-D. Meyer, L. S. Cederbaum, J. Chem. Phys. 110, 936–946 (1999)</a>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{split}
+\hat{H} &amp;= \sum_{i=1}^{24} \omega_i \left( - \frac{\partial^2 }{\partial Q_i^2} + Q_i^2\right) - \Delta \hat{\sigma}_z
+         + \sum_{i\in G_1} \left( a_i \ket{0}\bra{0} + b_i \ket{1} \bra{1} \right) Q_i  \\ &amp;+ \sum_{i\in G_3} c_i \hat{\sigma}_x Q_i
+    +\sum_{(i,j)\in G_2}\left( a_{ij} \ket{0}\bra{0} + b_{ij} \ket{1}\bra{1} \right) Q_i Q_j +\sum_{(i,j)\in G_4}c_{ij} \hat{\sigma}_x Q_i Q_j
+\end{split}\end{split}\]</div>
+<p>Here we are interested in the dynamics of the system starting from the initial state:</p>
+<div class="math notranslate nohighlight">
+\[\ket{\Psi(0)} = \ket{S_2} \bigotimes_{k=1}^{24} \ket{0}_k\]</div>
+<p>and will evaluate the autocorrelation</p>
+<div class="math notranslate nohighlight">
+\[a(t) = \braket{\Psi(0)}{\Psi(t)} = \braket{\Psi(t/2)^*}{\Psi(t/2)}\]</div>
+<p>and shifted and scaled spectrum</p>
+<div class="math notranslate nohighlight">
+\[I(\omega) \propto \int_0^{t_{\mathrm{max}}} \mathrm{Re}\left[a(t) e^{-\frac{t}{\tau}} \cos\left(\frac{\pi t}{2t_{\mathrm{max}}}\right) e^{i\omega t} \right]\mathrm{d} t\]</div>
+<section id="Contents">
+<h2>Contents<a class="headerlink" href="#Contents" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#Importing-the-Package"><span class="std std-ref">Importing the Package</span></a></p></li>
+<li><p><a class="reference internal" href="#Setting-up-the-System-and-Hamiltonian"><span class="std std-ref">Setting up the System and Hamiltonian</span></a></p></li>
+<li><p><a class="reference internal" href="#Preparing-the-Initial-Wavefunction"><span class="std std-ref">Preparing the Initial Wavefunction</span></a></p></li>
+<li><p><a class="reference internal" href="#Preparing-the-pyttn.sop_operator-Hamiltonian"><span class="std std-ref">Preparing the pyttn.pyttn.sOP_operator Representation of the Hamiltonian</span></a></p></li>
+<li><p><a class="reference internal" href="#Running-the-Dynamics"><span class="std std-ref">Running the Dynamics</span></a></p></li>
+</ol>
+</section>
+<section id="Importing-the-Package">
+<h2>Importing the Package<a class="headerlink" href="#Importing-the-Package" title="Link to this heading"></a></h2>
+<p>We start by importing the required modules for this example</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[129]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;1&#39;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyttn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualise_tree</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Setting-up-the-System-and-Hamiltonian">
+<h2>Setting up the System and Hamiltonian<a class="headerlink" href="#Setting-up-the-System-and-Hamiltonian" title="Link to this heading"></a></h2>
+<p>The construction of the pyrazine model Hamiltonian that we consider in this section is considerably more involved than was the case for the spin models we have considered in previous examples. This is due to the large number of distinct vibronic coupling constants with different forms depending on the symmetry of the vibrational modes.</p>
+<section id="Vibrational-Mode-Labels">
+<h3>Vibrational Mode Labels<a class="headerlink" href="#Vibrational-Mode-Labels" title="Link to this heading"></a></h3>
+<p>In order to define the Hamiltonian, we will start by labelling the vibrational modes and construct the various groupings of the modes:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[130]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#convert from eV to hartree</span>
+<span class="n">eV</span> <span class="o">=</span> <span class="mf">0.0367493049512081</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">modes</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;el&#39;</span><span class="p">,</span> <span class="s1">&#39;v10a&#39;</span><span class="p">,</span> <span class="s1">&#39;v6a&#39;</span><span class="p">,</span> <span class="s1">&#39;v1&#39;</span><span class="p">,</span> <span class="s1">&#39;v9a&#39;</span><span class="p">,</span> <span class="s1">&#39;v8a&#39;</span><span class="p">,</span> <span class="s1">&#39;v2&#39;</span><span class="p">,</span> <span class="s1">&#39;v6b&#39;</span><span class="p">,</span> <span class="s1">&#39;v8b&#39;</span><span class="p">,</span> <span class="s1">&#39;v4&#39;</span><span class="p">,</span> <span class="s1">&#39;v5&#39;</span><span class="p">,</span> <span class="s1">&#39;v3&#39;</span><span class="p">,</span> <span class="s1">&#39;v16a&#39;</span><span class="p">,</span> <span class="s1">&#39;v12&#39;</span><span class="p">,</span> <span class="s1">&#39;v13&#39;</span><span class="p">,</span> <span class="s1">&#39;v19b&#39;</span><span class="p">,</span> <span class="s1">&#39;v18b&#39;</span><span class="p">,</span> <span class="s1">&#39;v18a&#39;</span><span class="p">,</span> <span class="s1">&#39;v14&#39;</span><span class="p">,</span> <span class="s1">&#39;v19a&#39;</span><span class="p">,</span> <span class="s1">&#39;v17a&#39;</span><span class="p">,</span> <span class="s1">&#39;v20b&#39;</span><span class="p">,</span> <span class="s1">&#39;v16b&#39;</span> <span class="p">,</span> <span class="s1">&#39;v11&#39;</span><span class="p">,</span> <span class="s1">&#39;v7b&#39;</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mode_index</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">modes</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">vibrational_mode_index</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">modes</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Ag</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;v6a&#39;</span><span class="p">,</span> <span class="s1">&#39;v1&#39;</span><span class="p">,</span> <span class="s1">&#39;v9a&#39;</span><span class="p">,</span> <span class="s1">&#39;v8a&#39;</span><span class="p">,</span> <span class="s1">&#39;v2&#39;</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">B1g</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;v10a&#39;</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">B2g</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;v4&#39;</span> <span class="p">,</span> <span class="s1">&#39;v5&#39;</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">B3g</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;v6b&#39;</span><span class="p">,</span> <span class="s1">&#39;v3&#39;</span><span class="p">,</span> <span class="s1">&#39;v8b&#39;</span><span class="p">,</span> <span class="s1">&#39;v7b&#39;</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">Au</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;v16a&#39;</span><span class="p">,</span> <span class="s1">&#39;v17a&#39;</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">B1u</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;v12&#39;</span><span class="p">,</span> <span class="s1">&#39;v18a&#39;</span><span class="p">,</span> <span class="s1">&#39;v19a&#39;</span><span class="p">,</span> <span class="s1">&#39;v13&#39;</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">B2u</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;v18b&#39;</span><span class="p">,</span> <span class="s1">&#39;v14&#39;</span><span class="p">,</span> <span class="s1">&#39;v19b&#39;</span><span class="p">,</span> <span class="s1">&#39;v20b&#39;</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">B3u</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;v16b&#39;</span><span class="p">,</span> <span class="s1">&#39;v11&#39;</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">G1</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">Ag</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">G2</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span> <span class="n">Ag</span><span class="p">(),</span> <span class="n">Au</span><span class="p">(),</span> <span class="n">B1g</span><span class="p">(),</span> <span class="n">B2g</span><span class="p">(),</span> <span class="n">B3g</span><span class="p">(),</span> <span class="n">B1u</span><span class="p">(),</span> <span class="n">B2u</span><span class="p">(),</span> <span class="n">B3u</span><span class="p">()]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">G3</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">B1g</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">G4</span><span class="p">():</span>
+    <span class="n">G4i</span> <span class="o">=</span> <span class="p">[</span><span class="n">B1g</span><span class="p">(),</span> <span class="n">B2g</span><span class="p">(),</span> <span class="n">Au</span><span class="p">(),</span> <span class="n">B3u</span><span class="p">()]</span>
+    <span class="n">G4j</span> <span class="o">=</span> <span class="p">[</span><span class="n">Ag</span><span class="p">(),</span> <span class="n">B3g</span><span class="p">(),</span> <span class="n">B1u</span><span class="p">(),</span> <span class="n">B2u</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="n">G4i</span><span class="p">,</span> <span class="n">G4j</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Hamiltonian-Parameter-Definition">
+<h3>Hamiltonian Parameter Definition<a class="headerlink" href="#Hamiltonian-Parameter-Definition" title="Link to this heading"></a></h3>
+<p>Next we go ahead and define the physical parameters of the system:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[131]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">w</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;v6a&#39;</span> <span class="p">:</span> <span class="mf">0.0739</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v1&#39;</span>  <span class="p">:</span> <span class="mf">0.1258</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v9a&#39;</span> <span class="p">:</span> <span class="mf">0.1525</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v8a&#39;</span> <span class="p">:</span> <span class="mf">0.1961</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v2&#39;</span>  <span class="p">:</span> <span class="mf">0.3788</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v10a&#39;</span><span class="p">:</span> <span class="mf">0.1139</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v4&#39;</span>  <span class="p">:</span> <span class="mf">0.0937</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v5&#39;</span>  <span class="p">:</span> <span class="mf">0.1219</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v6b&#39;</span> <span class="p">:</span> <span class="mf">0.0873</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v3&#39;</span>  <span class="p">:</span> <span class="mf">0.1669</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v8b&#39;</span> <span class="p">:</span> <span class="mf">0.1891</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v7b&#39;</span> <span class="p">:</span> <span class="mf">0.3769</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v16a&#39;</span><span class="p">:</span> <span class="mf">0.0423</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v17a&#39;</span><span class="p">:</span> <span class="mf">0.1190</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v12&#39;</span> <span class="p">:</span> <span class="mf">0.1266</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v18a&#39;</span><span class="p">:</span> <span class="mf">0.1408</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v19a&#39;</span><span class="p">:</span> <span class="mf">0.1840</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v13&#39;</span> <span class="p">:</span> <span class="mf">0.3734</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v18b&#39;</span><span class="p">:</span> <span class="mf">0.1318</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v14&#39;</span> <span class="p">:</span> <span class="mf">0.1425</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v19b&#39;</span><span class="p">:</span> <span class="mf">0.1756</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v20b&#39;</span><span class="p">:</span> <span class="mf">0.3798</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v16b&#39;</span><span class="p">:</span> <span class="mf">0.0521</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="s1">&#39;v11&#39;</span> <span class="p">:</span> <span class="mf">0.0973</span><span class="o">*</span><span class="n">eV</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">ai</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.0981</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0503</span><span class="p">,</span> <span class="mf">0.1452</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0445</span><span class="p">,</span> <span class="mf">0.0247</span><span class="p">])</span><span class="o">*</span><span class="n">eV</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">bi</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="mf">0.1355</span><span class="p">,</span><span class="o">-</span><span class="mf">0.1710</span><span class="p">,</span> <span class="mf">0.0375</span><span class="p">,</span> <span class="mf">0.0168</span><span class="p">,</span> <span class="mf">0.0162</span><span class="p">])</span><span class="o">*</span><span class="n">eV</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">aij</span><span class="p">():</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.00108</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00204</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00135</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00285</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.00474</span><span class="p">,</span> <span class="mf">0.00154</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00163</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.00872</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00474</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00143</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span> <span class="mf">0.01145</span><span class="p">,</span> <span class="mf">0.00100</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.02040</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.01159</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.02252</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00049</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.01825</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.00741</span><span class="p">,</span> <span class="mf">0.01321</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00717</span><span class="p">,</span> <span class="mf">0.00515</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.05183</span><span class="p">,</span><span class="o">-</span><span class="mf">0.03942</span><span class="p">,</span> <span class="mf">0.00170</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.05733</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00204</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00333</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.04819</span><span class="p">,</span> <span class="mf">0.00525</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00485</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00326</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00792</span><span class="p">,</span> <span class="mf">0.00852</span><span class="p">,</span> <span class="mf">0.00888</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.02429</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00443</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00492</span><span class="p">]]</span>
+
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.00277</span><span class="p">,</span> <span class="mf">0.00016</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00250</span><span class="p">,</span> <span class="mf">0.00357</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.03924</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00197</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00355</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.00992</span><span class="p">,</span> <span class="mf">0.00623</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00110</span><span class="p">]]</span>
+
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.02176</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00624</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.00315</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)):</span>
+        <span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ret</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">bij</span><span class="p">():</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00298</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00189</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00203</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00128</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.00155</span><span class="p">,</span> <span class="mf">0.00311</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00600</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.01194</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00334</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00713</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.01459</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00091</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00618</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.01159</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.03445</span><span class="p">,</span> <span class="mf">0.00911</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00265</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.00385</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00661</span><span class="p">,</span> <span class="mf">0.00429</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00246</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.04842</span><span class="p">,</span><span class="o">-</span><span class="mf">0.03034</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00185</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.06332</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00388</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00040</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.00840</span><span class="p">,</span> <span class="mf">0.00536</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00097</span><span class="p">,</span> <span class="mf">0.00034</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.00429</span><span class="p">,</span> <span class="mf">0.00209</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00049</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00734</span><span class="p">,</span> <span class="mf">0.00346</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.00062</span><span class="p">]]</span>
+
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.01179</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00844</span><span class="p">,</span> <span class="mf">0.07000</span><span class="p">,</span><span class="o">-</span><span class="mf">0.01249</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.04000</span><span class="p">,</span><span class="o">-</span><span class="mf">0.05000</span><span class="p">,</span> <span class="mf">0.00265</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.01246</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00422</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span>       <span class="mi">0</span><span class="p">,</span> <span class="mf">0.00069</span><span class="p">]]</span>
+
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.02214</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00261</span><span class="p">],</span>
+             <span class="p">[</span>       <span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00496</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)):</span>
+        <span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ret</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ret</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">ci</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2080</span><span class="p">])</span><span class="o">*</span><span class="n">eV</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">cij</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.01000</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00551</span><span class="p">,</span> <span class="mf">0.00127</span><span class="p">,</span> <span class="mf">0.00799</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00512</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.01372</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00466</span><span class="p">,</span> <span class="mf">0.00329</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00031</span><span class="p">],</span>
+             <span class="p">[</span> <span class="mf">0.00598</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00914</span><span class="p">,</span> <span class="mf">0.00961</span><span class="p">,</span> <span class="mf">0.00500</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span><span class="o">-</span><span class="mf">0.01056</span><span class="p">,</span> <span class="mf">0.00559</span><span class="p">,</span> <span class="mf">0.00401</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00226</span><span class="p">],</span>
+             <span class="p">[</span><span class="o">-</span><span class="mf">0.01200</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00213</span><span class="p">,</span> <span class="mf">0.00328</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00396</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[[</span> <span class="mf">0.00118</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00009</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00285</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00095</span><span class="p">],</span>
+             <span class="p">[</span> <span class="mf">0.01281</span><span class="p">,</span><span class="o">-</span><span class="mf">0.01780</span><span class="p">,</span> <span class="mf">0.00134</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00481</span><span class="p">]]</span>
+        <span class="p">)</span><span class="o">*</span><span class="n">eV</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Hamiltonian-Definition">
+<h3>Hamiltonian Definition<a class="headerlink" href="#Hamiltonian-Definition" title="Link to this heading"></a></h3>
+<p>Having done so we can now define the Hamiltonian for the system. Here we have made use of a user defined <code class="docutils literal notranslate"><span class="pre">pyttn.operator_dictionary</span></code> to allow for specification of custom operators acting on the electronic system subspace.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[132]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="k">def</span><span class="w"> </span><span class="nf">hamiltonian</span><span class="p">():</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modes</span><span class="p">())</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">SOP</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">omegas</span> <span class="o">=</span> <span class="n">w</span><span class="p">()</span>
+    <span class="n">vs</span> <span class="o">=</span> <span class="n">modes</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">delta</span> <span class="o">=</span> <span class="mf">0.8460</span><span class="o">/</span><span class="mf">2.0</span><span class="o">*</span><span class="n">eV</span>
+
+    <span class="c1">#set up the system operator dictionary</span>
+    <span class="n">opdict</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">operator_dictionary</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="n">v</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">op</span> <span class="o">=</span>  <span class="n">pyttn</span><span class="o">.</span><span class="n">site_operator</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">optype</span><span class="o">=</span><span class="s2">&quot;matrix&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">opdict</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;|</span><span class="si">%d</span><span class="s2">&gt;&lt;</span><span class="si">%d</span><span class="s2">|&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span> <span class="n">op</span><span class="p">)</span>
+
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+    <span class="n">op</span> <span class="o">=</span>  <span class="n">pyttn</span><span class="o">.</span><span class="n">site_operator</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">optype</span><span class="o">=</span><span class="s2">&quot;matrix&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">opdict</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;sz&quot;</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+
+    <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">op</span> <span class="o">=</span>  <span class="n">pyttn</span><span class="o">.</span><span class="n">site_operator</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">optype</span><span class="o">=</span><span class="s2">&quot;matrix&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">opdict</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;sx&quot;</span><span class="p">,</span> <span class="n">op</span><span class="p">)</span>
+
+    <span class="c1">#energy spacing of the S1 and S2 state</span>
+    <span class="n">H</span> <span class="o">+=</span> <span class="o">-</span><span class="n">delta</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1">#add on the vibrational mode terms</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vs</span><span class="p">:</span>
+        <span class="n">H</span> <span class="o">+=</span> <span class="n">omegas</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="n">mode_index</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+    <span class="c1">#the linear on-diagonal couplings</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">G1</span><span class="p">()):</span>
+        <span class="n">H</span> <span class="o">+=</span> <span class="n">ai</span><span class="p">()[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;|0&gt;&lt;0|&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">mode_index</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+        <span class="n">H</span> <span class="o">+=</span> <span class="n">bi</span><span class="p">()[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;|1&gt;&lt;1|&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">mode_index</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+
+    <span class="c1">#the quadratic on-diagonal couplings</span>
+    <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">Aij</span><span class="p">,</span> <span class="n">Bij</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">G2</span><span class="p">(),</span> <span class="n">aij</span><span class="p">(),</span> <span class="n">bij</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">vi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">vj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">g</span><span class="p">):</span>
+                <span class="n">H</span> <span class="o">+=</span> <span class="n">Aij</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;|0&gt;&lt;0|&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">mode_index</span><span class="p">(</span><span class="n">vi</span><span class="p">))</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">mode_index</span><span class="p">(</span><span class="n">vj</span><span class="p">))</span>
+                <span class="n">H</span> <span class="o">+=</span> <span class="n">Bij</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;|1&gt;&lt;1|&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">mode_index</span><span class="p">(</span><span class="n">vi</span><span class="p">))</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">mode_index</span><span class="p">(</span><span class="n">vj</span><span class="p">))</span>
+
+    <span class="c1">#the linear off-diagonal couplings</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">G3</span><span class="p">()):</span>
+        <span class="n">H</span> <span class="o">+=</span> <span class="n">ci</span><span class="p">()[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">mode_index</span><span class="p">(</span><span class="n">g</span><span class="p">))</span>
+
+    <span class="c1">#the quadratic on-diagonal couplings</span>
+    <span class="n">G4i</span><span class="p">,</span> <span class="n">G4j</span> <span class="o">=</span> <span class="n">G4</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">gi</span><span class="p">,</span> <span class="n">gj</span><span class="p">,</span> <span class="n">Cij</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">G4i</span><span class="p">,</span> <span class="n">G4j</span><span class="p">,</span> <span class="n">cij</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">vi</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gi</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">vj</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gj</span><span class="p">):</span>
+                <span class="n">H</span> <span class="o">+=</span> <span class="n">Cij</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">mode_index</span><span class="p">(</span><span class="n">vi</span><span class="p">))</span><span class="o">*</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">mode_index</span><span class="p">(</span><span class="n">vj</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">H</span><span class="p">,</span> <span class="n">opdict</span>
+<br/></pre></div>
+</div>
+</div>
+</section>
+<section id="System-Definition">
+<h3>System Definition<a class="headerlink" href="#System-Definition" title="Link to this heading"></a></h3>
+<p>We now prepare the <code class="docutils literal notranslate"><span class="pre">system_modes</span></code> operators and construct the <code class="docutils literal notranslate"><span class="pre">pyttn.sOP</span></code> representation of the Hamiltonian using the functions defined above:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[133]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1">#The total number of modes in the system</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">25</span>
+
+<span class="c1">#The dimension of each of the bosonic modes</span>
+<span class="n">m</span> <span class="o">=</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+
+<span class="c1">#The composite mode definition</span>
+<span class="n">composite_modes</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">],</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">],</span> <span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">19</span><span class="p">],</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">]]</span>
+<span class="n">Nc</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">composite_modes</span><span class="p">)</span>
+
+<span class="n">composite_mode_dimensions</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1">#set up the system information object</span>
+<span class="n">sysinf</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">system_modes</span><span class="p">(</span><span class="n">Nc</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">sysinf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">generic_mode</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">ind</span><span class="p">,</span> <span class="n">comb</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">composite_modes</span><span class="p">):</span>
+    <span class="n">sysinf</span><span class="p">[</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">pyttn</span><span class="o">.</span><span class="n">boson_mode</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="n">x</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">comb</span><span class="p">]</span>
+
+<span class="c1">#set up the sum of product operator Hamiltonian and operator dictionary</span>
+<span class="n">H</span><span class="p">,</span> <span class="n">opdict</span> <span class="o">=</span> <span class="n">hamiltonian</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Preparing-the-Initial-Wavefunction">
+<h2>Preparing the Initial Wavefunction<a class="headerlink" href="#Preparing-the-Initial-Wavefunction" title="Link to this heading"></a></h2>
+<p>We now prepare the initial wavefunction. This requires a two-step process, first we define the tree topology to use for this calculation through the use of the <code class="docutils literal notranslate"><span class="pre">ntree</span></code> class (which for this example we choose to be an MPS), following which we construct the <code class="docutils literal notranslate"><span class="pre">ttn</span></code> object that actually represents the wavefunction. In this example we intend to use a subspace expansion based in order to expand bond dimension throughout the TDVP loop.</p>
+<p>In order to do this, we define an additional <code class="docutils literal notranslate"><span class="pre">ntree</span></code> object with the same structure but different values defining the maximum allowed dimension of any bond in the network. For more details one the construct of tree topologies see the <a class="reference external" href="file/../tree_topologies.ipynb">tutorial on tree topologies</a>. Here we are using a custom tree structure that was introduced in <a class="reference external" href="https://doi.org/10.1063/1.3535541">O. Vendrell, H.-D. Meyer, J. Chem. Phys. 134, 044135 (2011)</a>.</p>
+<section id="Defining-the-Tree-Structure">
+<h3>Defining the Tree Structure<a class="headerlink" href="#Defining-the-Tree-Structure" title="Link to this heading"></a></h3>
+<p>Here we present a function for constructing the Tree used for the ML-MCTDH calculations for pyrazine:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[134]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">build_topology_mode_combination</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">N4</span><span class="p">,</span> <span class="n">N5</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+    <span class="n">topo</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">ntree</span><span class="p">()</span>
+    <span class="n">topo</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1">#add electronic degrees of freedom</span>
+    <span class="n">topo</span><span class="p">()</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">topo</span><span class="p">()</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N1</span><span class="p">)</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N2</span><span class="p">)</span>
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N2</span><span class="p">)</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N1</span><span class="p">)</span>
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N3</span><span class="p">)</span>
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N4</span><span class="p">)</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N4</span><span class="p">)</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N4</span><span class="p">)</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N3</span><span class="p">)</span>
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N5</span><span class="p">)</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N5</span><span class="p">)</span>
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">N5</span><span class="p">)</span>
+    <span class="n">topo</span><span class="p">()[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">7</span><span class="p">])</span>
+    <span class="n">pyttn</span><span class="o">.</span><span class="n">ntreeBuilder</span><span class="o">.</span><span class="n">sanitise</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">topo</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Setup-the-Initial-value-of-the-ttn-Wavefunction">
+<h3>Setup the Initial value of the <code class="docutils literal notranslate"><span class="pre">ttn</span></code> Wavefunction<a class="headerlink" href="#Setup-the-Initial-value-of-the-ttn-Wavefunction" title="Link to this heading"></a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initial bond dimensions</span>
+<span class="n">N1_0</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">N2_0</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">N3_0</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">N4_0</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">N5_0</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1">#maximum bond dimensions</span>
+<span class="n">N1</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">N2</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">N3</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">N4</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">N5</span> <span class="o">=</span> <span class="mi">16</span>
+
+<span class="c1"># Vector of dimensions of the local Hilbert space in the physical nodes</span>
+<span class="n">vmode_dims</span> <span class="o">=</span> <span class="n">sysinf</span><span class="o">.</span><span class="n">mode_dimensions</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+
+<span class="c1">#now construct an ntree object storing the MPS topology using the ntreeBuilder class</span>
+<span class="n">topo</span> <span class="o">=</span> <span class="n">build_topology_mode_combination</span><span class="p">(</span><span class="n">N1_0</span><span class="p">,</span> <span class="n">N2_0</span><span class="p">,</span> <span class="n">N3_0</span><span class="p">,</span> <span class="n">N4_0</span><span class="p">,</span> <span class="n">N5_0</span><span class="p">,</span> <span class="n">vmode_dims</span><span class="p">)</span>
+<span class="n">capacity</span><span class="o">=</span> <span class="n">build_topology_mode_combination</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span class="p">,</span> <span class="n">N3</span><span class="p">,</span> <span class="n">N4</span><span class="p">,</span> <span class="n">N5</span><span class="p">,</span> <span class="n">vmode_dims</span><span class="p">)</span>
+
+<span class="c1">#now allocate the wavefunction object.  And allocate it so that each tensor is filled with random values</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">,</span> <span class="n">capacity</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_state</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vmode_dims</span><span class="p">))])</span>
+</pre></div>
+</div>
+</div>
+<p>When creating the <code class="docutils literal notranslate"><span class="pre">ttn</span></code> object, tensors will be constructed with the sizes defined in <code class="docutils literal notranslate"><span class="pre">topo</span></code> but with enough space allocated to store the tensors defined in <code class="docutils literal notranslate"><span class="pre">capacity</span></code>. We can plot the tree structure using <code class="docutils literal notranslate"><span class="pre">visualise_tree</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[136]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">visualise_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Quickstart_pyrazine_23_0.png" src="../_images/Quickstart_pyrazine_23_0.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="Preparing-the-pyttn.sop_operator-Hamiltonian">
+<h2>Preparing the <code class="docutils literal notranslate"><span class="pre">pyttn.sop_operator</span></code> Hamiltonian<a class="headerlink" href="#Preparing-the-pyttn.sop_operator-Hamiltonian" title="Link to this heading"></a></h2>
+<p>Now before we are ready to set up and perform the DMRG and TDVP loops, we first need to convert the Hamiltonian into a form that can be used to efficiently within the DMRG and TDVP algorithms. Further details on this step are provided in the <a class="reference external" href="file/../dmrg_TFIM.ipynb">tutorial on DMRG for the 1D Transverse field Ising model</a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[137]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#setup the hierarchical SOP hamiltonian</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">sop_operator</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="n">opdict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Running-the-Dynamics">
+<h2>Running the Dynamics<a class="headerlink" href="#Running-the-Dynamics" title="Link to this heading"></a></h2>
+<p>Now we can have everything we need to set up all of the objects required to perform the TDVP loop and evaluate the autocorrelation.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[138]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fs</span> <span class="o">=</span> <span class="mf">41.341374575751</span>
+
+<span class="c1">#set up the time evolution parameters</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.25</span><span class="o">*</span><span class="n">fs</span>
+<span class="n">tmax</span> <span class="o">=</span> <span class="mi">150</span><span class="o">*</span><span class="n">fs</span>
+<span class="n">nsteps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tmax</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">dt</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="c1">#buffer for storing the autocorrelation</span>
+<span class="n">auto_corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nsteps</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+<span class="c1">#set up the TDVP sweeping object to</span>
+<span class="n">sweep</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;subspace&#39;</span><span class="p">,</span> <span class="n">subspace_krylov_dim</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">subspace_neigs</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="c1">#construct the object used to plot matrix elements</span>
+<span class="n">mel</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">matrix_element</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1">#set up the subspace expansion parameters.  Here we expand bond dimension whenever a term in the</span>
+<span class="c1">#two-site energy variance (that is not captured within the single-site spaces) has singular value &gt; 1e-5,</span>
+<span class="c1">#and do not use natural populations to determine whether to spawn additional basis functions.</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">spawning_threshold</span> <span class="o">=</span> <span class="mf">1e-8</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">minimum_unoccupied</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">coefficient</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="n">j</span>
+</pre></div>
+</div>
+</div>
+<p>Now we actually run the dynamics:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[139]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="n">B</span><span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">B</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span>
+<span class="n">auto_corr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mel</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+
+<span class="n">tp</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">ninit</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dt</span><span class="o">*</span><span class="mf">1e-5</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dt</span><span class="p">),</span> <span class="n">ninit</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ninit</span><span class="p">):</span>
+    <span class="n">dti</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">tp</span>
+    <span class="n">sweep</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dti</span>
+    <span class="n">sweep</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+    <span class="n">tp</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+<span class="n">i</span><span class="o">=</span><span class="mi">1</span>
+<span class="c1">#set the values after the first timestep</span>
+<span class="n">B</span><span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">B</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span>
+<span class="n">auto_corr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">mel</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+
+<span class="n">sweep</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+
+<span class="c1">#now run the remaining steps</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">):</span>
+    <span class="n">sweep</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+
+    <span class="n">B</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>      <span class="c1">#copy A into B</span>
+    <span class="n">B</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span>                <span class="c1">#and conjugate the result</span>
+
+    <span class="n">auto_corr</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mel</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>    <span class="c1">#evaluate &lt;psi(t/2)^*|psi(t/2)&gt;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;step: </span><span class="si">%d</span><span class="s2"> of </span><span class="si">%d</span><span class="s2">.  Chimax: </span><span class="si">%d</span><span class="s2">. a(t): </span><span class="si">%f</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">nsteps</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">maximum_bond_dimension</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">auto_corr</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">])),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;                   </span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;                                        </span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">flush</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+                                        4654
+</pre></div></div>
+</div>
+<p>Now we evaluate the spectra and plot results:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[140]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">compute_spectrum</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">Ac</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">Ac</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t</span><span class="o">/</span><span class="n">tau</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">t</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1.0</span><span class="n">j</span><span class="o">*</span><span class="n">w</span><span class="o">*</span><span class="n">t</span><span class="p">)))</span><span class="o">*</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">eV</span> <span class="o">=</span> <span class="mf">27.211399</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nsteps</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dt</span><span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="n">fs</span><span class="p">)</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.8460</span><span class="o">/</span><span class="mi">2</span>
+<span class="n">Cw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">w</span><span class="p">)):</span>
+    <span class="n">Cw</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">compute_spectrum</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">auto_corr</span><span class="p">,</span> <span class="mi">150</span><span class="o">*</span><span class="n">fs</span><span class="p">,</span> <span class="n">t</span><span class="o">*</span><span class="n">fs</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">auto_corr</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">150</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$t$ (fs)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$a(t)$&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">w</span><span class="o">*</span><span class="n">eV</span><span class="p">,</span> <span class="n">Cw</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">Cw</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_label_position</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">tick_right</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="o">-</span><span class="mf">0.7</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\hbar \omega$ (eV)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$I(\omega)$ (arb. units.)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[140]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Quickstart_pyrazine_33_1.png" src="../_images/Quickstart_pyrazine_33_1.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cayley_xy_tdvp.html" class="btn btn-neutral float-left" title="Spin Dynamics of an anisotropic XY model on a Cayley Tree" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="oqs_baths.html" class="btn btn-neutral float-right" title="Handling Continuous Bosonic Baths with pyttn.oqs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

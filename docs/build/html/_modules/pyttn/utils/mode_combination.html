@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -88,9 +88,10 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">system_modes</span>
 
+
 <div class="viewcode-block" id="ModeCombination">
 <a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.mode_combination.ModeCombination">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ModeCombination</span><span class="p">:</span>    
+<span class="k">class</span><span class="w"> </span><span class="nc">ModeCombination</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for automatically combining modes of a system_modes object together to form a new system_modes </span>
 <span class="sd">    object consisting of composite modes.  The approach implemented within this class involves sweeping from left</span>
 <span class="sd">    to right and we attempt to combine the next mode into the current mode provided we have not already combined nbmax</span>
@@ -114,15 +115,15 @@
 <span class="sd">    :returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode</span>
 <span class="sd">    :rtype: list of list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nhilb</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nbmax</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">blocksize</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nhilb</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nbmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">blocksize</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nbmax</span> <span class="o">=</span> <span class="n">nbmax</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nhilb</span> <span class="o">=</span> <span class="n">nhilb</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blocksize</span> <span class="o">=</span> <span class="n">blocksize</span>
 
-
 <div class="viewcode-block" id="ModeCombination.mode_combination_array">
 <a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.mode_combination.ModeCombination.mode_combination_array">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">mode_combination_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode_dims</span><span class="p">,</span> <span class="n">mode_inds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_blocksize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>    
+    <span class="k">def</span><span class="w"> </span><span class="nf">mode_combination_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode_dims</span><span class="p">,</span> <span class="n">mode_inds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">_blocksize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform the mode combination process on a array of mode dimensions.     </span>
 
 <span class="sd">        :param mode_dims: the mode dimensions</span>
@@ -151,41 +152,41 @@
         <span class="n">chilb</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">mode</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="ow">not</span> <span class="n">all_modes_traversed</span><span class="p">:</span>
-            <span class="c1">#if the current cmode object is empty then we just add the current mode to the composite mode and increment</span>
-            <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cmode</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="c1">#add in all modes up to the blocksize</span>
+            <span class="c1"># if the current cmode object is empty then we just add the current mode to the composite mode and increment</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cmode</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="c1"># add in all modes up to the blocksize</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">blocksize</span><span class="p">):</span>
                     <span class="n">cmode</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mode_inds</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span>
                     <span class="n">chilb</span> <span class="o">=</span> <span class="n">chilb</span><span class="o">*</span><span class="n">mode_dims</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span>
                     <span class="n">mode</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="c1">#but if we get to the end of the mode dims array exit at this stage</span>
-                    <span class="k">if</span><span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">mode_dims</span><span class="p">)):</span>
+                    <span class="c1"># but if we get to the end of the mode dims array exit at this stage</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">mode_dims</span><span class="p">)):</span>
                         <span class="n">all_modes_traversed</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="n">composite_modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cmode</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="c1">#othewise we check to see if the composite mode could accept the current mode without exceeding the bounds</span>
-                <span class="c1">#then we add and increment</span>
+                <span class="c1"># othewise we check to see if the composite mode could accept the current mode without exceeding the bounds</span>
+                <span class="c1"># then we add and increment</span>
                 <span class="n">nextdims</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">blocksize</span><span class="p">):</span>
-                    <span class="k">if</span><span class="p">(</span><span class="n">mode</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">mode_dims</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">mode</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">mode_dims</span><span class="p">)):</span>
                         <span class="n">nextdims</span> <span class="o">=</span> <span class="n">nextdims</span><span class="o">*</span><span class="n">mode_dims</span><span class="p">[</span><span class="n">mode</span><span class="o">+</span><span class="n">j</span><span class="p">]</span>
 
                 <span class="k">if</span> <span class="p">(</span><span class="n">nbmax</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">cmode</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">nbmax</span><span class="p">)</span> <span class="ow">and</span> <span class="n">chilb</span><span class="o">*</span><span class="n">nextdims</span> <span class="o">&lt;=</span> <span class="n">nhilbmax</span><span class="p">:</span>
-                    <span class="c1">#add all modes in the next block</span>
+                    <span class="c1"># add all modes in the next block</span>
                     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">blocksize</span><span class="p">):</span>
                         <span class="n">cmode</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mode_inds</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span>
                         <span class="n">chilb</span> <span class="o">=</span> <span class="n">chilb</span><span class="o">*</span><span class="n">mode_dims</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span>
                         <span class="n">mode</span> <span class="o">+=</span> <span class="mi">1</span>
 
-                        <span class="c1">#bailing out early if we hit the end</span>
-                        <span class="k">if</span><span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">mode_dims</span><span class="p">)):</span>
+                        <span class="c1"># bailing out early if we hit the end</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">mode</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">mode_dims</span><span class="p">)):</span>
                             <span class="n">all_modes_traversed</span> <span class="o">=</span> <span class="kc">True</span>
                             <span class="n">composite_modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cmode</span><span class="p">))</span>
 
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="c1">#otherwise we have reached the end of the current composite mode.  We will now reset the composite </span>
-                    <span class="c1">#mode object and we will not increment the mode so that it start a new composite mode object in the</span>
-                    <span class="c1">#next iteration</span>
+                    <span class="c1"># otherwise we have reached the end of the current composite mode.  We will now reset the composite</span>
+                    <span class="c1"># mode object and we will not increment the mode so that it start a new composite mode object in the</span>
+                    <span class="c1"># next iteration</span>
                     <span class="n">composite_modes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cmode</span><span class="p">))</span>
                     <span class="n">cmode</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="n">chilb</span> <span class="o">=</span> <span class="mi">1</span>
@@ -205,13 +206,14 @@
 <span class="sd">        :returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode</span>
 <span class="sd">        :rtype: list of list</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1">#extract the composite mode dimensions from the system</span>
+        <span class="c1"># extract the composite mode dimensions from the system</span>
         <span class="n">mode_dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">system</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">lhd</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">system</span><span class="p">))]</span>
 
-        <span class="c1">#now perform the mode combination on this array</span>
-        <span class="n">composite_modes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode_combination_array</span><span class="p">(</span><span class="n">mode_dims</span><span class="p">,</span> <span class="n">_blocksize</span><span class="o">=</span><span class="n">_blocksize</span><span class="p">)</span>
+        <span class="c1"># now perform the mode combination on this array</span>
+        <span class="n">composite_modes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode_combination_array</span><span class="p">(</span>
+            <span class="n">mode_dims</span><span class="p">,</span> <span class="n">_blocksize</span><span class="o">=</span><span class="n">_blocksize</span><span class="p">)</span>
 
-        <span class="c1">#and set up a composite system object using this information</span>
+        <span class="c1"># and set up a composite system object using this information</span>
         <span class="n">composite_system</span> <span class="o">=</span> <span class="n">system_modes</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">composite_modes</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">composite_system</span><span class="p">)):</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">composite_modes</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
@@ -222,7 +224,7 @@
 
 <div class="viewcode-block" id="ModeCombination.__call__">
 <a class="viewcode-back" href="../../../pyttn/pyttn.utils.html#pyttn.utils.mode_combination.ModeCombination.__call__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">_blocksize</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">,</span> <span class="n">_blocksize</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform the mode combination process on a system_modes object.     </span>
 
 <span class="sd">        :param system: the system_modes object defining all mode data</span>

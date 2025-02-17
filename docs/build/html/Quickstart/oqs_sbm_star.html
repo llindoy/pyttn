@@ -1,0 +1,476 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zero Temperature Dynamics of the Spin-Boson Model &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Thermofield Dynamics of the Spin-Boson Model using the Star Hamiltonian" href="oqs_sbm_star_finite_T.html" />
+    <link rel="prev" title="Quickstart: Spin Boson Model" href="spin_boson_model.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Quickstart</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#ground-state-calculations">Ground State Calculations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#dynamics-calculations">Dynamics Calculations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#non-markovian-open-quantum-system-dynamics">Non-Markovian Open Quantum System Dynamics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="oqs_baths.html">Handling Continuous Bosonic Baths with <code class="docutils literal notranslate"><span class="pre">pyttn.oqs</span></code></a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="spin_boson_model.html">Spin Boson Model</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="spin_boson_model.html#unitary-dynamics">Unitary Dynamics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spin_boson_model.html#nonunitary-dynamics">Nonunitary Dynamics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#using-the-multiset-ansatz">Using the Multiset Ansatz</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pyttn/API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pyttn/index.html">API Documents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Quickstart</a></li>
+          <li class="breadcrumb-item"><a href="spin_boson_model.html">Quickstart: Spin Boson Model</a></li>
+      <li class="breadcrumb-item active">Zero Temperature Dynamics of the Spin-Boson Model</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/Quickstart/oqs_sbm_star.nblink.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Zero-Temperature-Dynamics-of-the-Spin-Boson-Model">
+<h1>Zero Temperature Dynamics of the Spin-Boson Model<a class="headerlink" href="#Zero-Temperature-Dynamics-of-the-Spin-Boson-Model" title="Link to this heading"></a></h1>
+<p>We will now demonstrate how to use pyTTN to perform OQS dynamics for a spin-boson model using unitary dynamics methods and the standard star topology form of the spin-boson model.</p>
+<section id="Contents">
+<h2>Contents<a class="headerlink" href="#Contents" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#Importing-the-Library"><span class="std std-ref">Import The Library</span></a></p></li>
+<li><p><a class="reference internal" href="#Setting-up-the-Discrete-Bosonic-Bath"><span class="std std-ref">Setting up the Discrete Bosonic Bath</span></a></p></li>
+<li><p><a class="reference internal" href="#Setting-up-the-System-Information"><span class="std std-ref">Setting up the System Information</span></a></p></li>
+<li><p><a class="reference internal" href="#Building-the-Hamiltonian"><span class="std std-ref">Building the Hamiltonian</span></a></p></li>
+<li><p><a class="reference internal" href="#Building-the-Wavefunction"><span class="std std-ref">Building the Wavefunction</span></a></p></li>
+<li><p><a class="reference internal" href="#Preparing-for-Time-Evolution"><span class="std std-ref">Preparing for Time Evolution</span></a></p></li>
+<li><p><a class="reference internal" href="#Performing-the-Time-Evolution"><span class="std std-ref">Performing the Time Evolution</span></a></p></li>
+</ol>
+</section>
+<section id="Importing-the-Library">
+<h2>Importing the Library<a class="headerlink" href="#Importing-the-Library" title="Link to this heading"></a></h2>
+<p>We start by importing the required modules:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span><span class="o">=</span><span class="s1">&#39;1&#39;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyttn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn</span><span class="w"> </span><span class="kn">import</span> <span class="n">oqs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualise_tree</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Setting-up-the-Discrete-Bosonic-Bath">
+<h2>Setting up the Discrete Bosonic Bath<a class="headerlink" href="#Setting-up-the-Discrete-Bosonic-Bath" title="Link to this heading"></a></h2>
+<p>Next we define the spectral density of the bath and set up the <code class="docutils literal notranslate"><span class="pre">pyttn.oqs.BosonicBath</span></code> and <code class="docutils literal notranslate"><span class="pre">pyttn.oqs.DiscreteBosonicBath</span></code> objects.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#set up the time evolution information</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">tmax</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="n">nstep</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tmax</span><span class="o">/</span><span class="n">dt</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nstep</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">dt</span>
+
+<span class="c1">#set up the bath spectral density</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="n">s</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">wc</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="c1"># Exponential cutoff spectral density</span>
+<span class="c1">#@jit(nopython=True)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">J</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="n">wc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">w</span><span class="o">/</span><span class="n">wc</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="o">/</span><span class="n">wc</span><span class="p">)))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">w</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="c1">#set up the BosonicBath</span>
+<span class="n">bath</span> <span class="o">=</span> <span class="n">oqs</span><span class="o">.</span><span class="n">BosonicBath</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1">#maximum frequency cutoff upper bound in units of wc</span>
+<span class="n">Nw</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1">#discretise the bath using 256 modes</span>
+<span class="n">Nb</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="n">g</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">bath</span><span class="o">.</span><span class="n">discretise</span><span class="p">(</span><span class="n">oqs</span><span class="o">.</span><span class="n">OrthopolDiscretisation</span><span class="p">(</span><span class="n">Nb</span><span class="p">,</span> <span class="n">bath</span><span class="o">.</span><span class="n">find_wmin</span><span class="p">(</span><span class="n">Nw</span><span class="o">*</span><span class="n">wc</span><span class="p">),</span> <span class="n">Nw</span><span class="o">*</span><span class="n">wc</span><span class="p">))</span>
+<span class="n">discbath</span> <span class="o">=</span> <span class="n">oqs</span><span class="o">.</span><span class="n">DiscreteBosonicBath</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Now we check the quality of the bath correlation function discretisation over the time-period of interest</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#and check the accuracy of the bath correlation function</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">bath</span><span class="o">.</span><span class="n">Ct</span><span class="p">(</span><span class="n">t</span><span class="p">)),</span> <span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">discbath</span><span class="o">.</span><span class="n">Ct</span><span class="p">(</span><span class="n">t</span><span class="p">)),</span> <span class="s1">&#39;r--&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Quickstart_oqs_sbm_star_9_0.png" src="../_images/Quickstart_oqs_sbm_star_9_0.png" />
+</div>
+</div>
+</section>
+<section id="Setting-up-the-System-Information">
+<h2>Setting up the System Information<a class="headerlink" href="#Setting-up-the-System-Information" title="Link to this heading"></a></h2>
+<p>Now we get the system information from the <code class="docutils literal notranslate"><span class="pre">pyttn.oqs.DiscreteBosonicBath</span></code> object, optionally applying mode combination to combine primitive bosonic modes into composite modes.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#set up the total system information object including both system information and bath information</span>
+<span class="c1">#here the system consists of a single two level system</span>
+<span class="n">sysinf</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">system_modes</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">sysinf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">tls_mode</span><span class="p">()</span>
+
+<span class="c1">#truncate the bosonic modes to allow for a maximum energy of 10*wc and maximum number of excitations of 25, but a minimum number of 4</span>
+<span class="n">nbose</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">discbath</span><span class="o">.</span><span class="n">truncate_modes</span><span class="p">(</span><span class="n">pyttn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">EnergyTruncation</span><span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="n">wc</span><span class="p">,</span> <span class="n">Lmax</span><span class="o">=</span><span class="n">nbose</span><span class="p">,</span> <span class="n">Lmin</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+<span class="n">use_mode_combination</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">if</span> <span class="n">use_mode_combination</span><span class="p">:</span>
+    <span class="c1">#here we allow for the combination of up to four modes provided the resultant composite Hilbert space dimension has size less than 1000</span>
+    <span class="n">nbmax</span><span class="o">=</span><span class="mi">4</span>
+    <span class="n">nhilbmax</span><span class="o">=</span><span class="mi">1000</span>
+    <span class="n">mode_comb</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">ModeCombination</span><span class="p">(</span><span class="n">nbmax</span><span class="p">,</span> <span class="n">nhilbmax</span><span class="p">)</span>
+    <span class="n">bsys</span> <span class="o">=</span> <span class="n">discbath</span><span class="o">.</span><span class="n">system_information</span><span class="p">(</span><span class="n">mode_comb</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">bsys</span> <span class="o">=</span> <span class="n">discbath</span><span class="o">.</span><span class="n">system_information</span><span class="p">()</span>
+
+<span class="c1">#now combine the system and bath information together</span>
+<span class="n">sysinf</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">combine_systems</span><span class="p">(</span><span class="n">sysinf</span><span class="p">,</span> <span class="n">bsys</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+</section>
+<section id="Building-the-Hamiltonian">
+<h2>Building the Hamiltonian<a class="headerlink" href="#Building-the-Hamiltonian" title="Link to this heading"></a></h2>
+<p>In order to simplify construction of the discrete bath Hamiltonian, the discrete bath function contains the <code class="docutils literal notranslate"><span class="pre">add_system_bath_hamiltonian</span></code> and <code class="docutils literal notranslate"><span class="pre">system_bath_hamiltonian</span></code> functions that, respectively, append to the system-bath Hamiltonian terms to an existing <code class="docutils literal notranslate"><span class="pre">SOP</span></code> object or return a new <code class="docutils literal notranslate"><span class="pre">sSOP</span></code> object containing all system-bath Hamiltonian terms.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#create the SOP object</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">SOP</span><span class="p">(</span><span class="n">Nb</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">#add on the system Hamiltonian</span>
+<span class="n">delta</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">eps</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">H</span> <span class="o">+=</span> <span class="n">delta</span> <span class="o">*</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;sx&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1">#and append all bath and system bath Hamiltonian terms</span>
+<span class="n">H</span> <span class="o">=</span> <span class="n">discbath</span><span class="o">.</span><span class="n">add_system_bath_hamiltonian</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">geom</span><span class="o">=</span><span class="s2">&quot;star&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Both the <code class="docutils literal notranslate"><span class="pre">add_system_bath_hamiltonian</span></code> and <code class="docutils literal notranslate"><span class="pre">system_bath_hamiltonian</span></code> objects can take a set of user defined indices corresponding to the bath modes (passed as the <code class="docutils literal notranslate"><span class="pre">binds</span></code> argument). If this argument is not set, the function will assume that all bath modes are in a contiguous block starting at <code class="docutils literal notranslate"><span class="pre">bskip</span></code> which defaults to 1.</p>
+<p>Note: Care must be taken when defining the <code class="docutils literal notranslate"><span class="pre">binds</span></code> argument in conjunction with the use of mode_combination. In the current release, pyTTN expects all composite modes to be formed of contiguous <code class="docutils literal notranslate"><span class="pre">primitive_modes</span></code>.</p>
+</section>
+<section id="Building-the-Wavefunction">
+<h2>Building the Wavefunction<a class="headerlink" href="#Building-the-Wavefunction" title="Link to this heading"></a></h2>
+<p>We are now in a position to prepare the wavefunction tree topology. Here, again, the <code class="docutils literal notranslate"><span class="pre">pyttn.oqs.DiscreteBosonicBath</span></code> class can help through the <code class="docutils literal notranslate"><span class="pre">add_bath_tree</span></code> function, which takes a node in an existing tree used to represent the system degrees of freedom and attaches either an MPS or balanced N-ary tree to represent the degrees of freedom handled by the discbath object.</p>
+<p>To build the tree, we first define the tree structure for system degrees of freedom, then attach the bath tree in the correct position.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#bond dimension used at start of simulation</span>
+<span class="n">chi0</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="c1">#maximum allowed bond dimension in network</span>
+<span class="n">chi</span> <span class="o">=</span> <span class="mi">32</span>
+
+<span class="c1">#the degree of the bath tree.</span>
+<span class="c1">#   degree=1 =&gt; MPS</span>
+<span class="c1">#   degree&gt;1 =&gt; balanced degree-ary tree</span>
+<span class="n">degree</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1">#set up the topology tree</span>
+<span class="n">topo</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">ntree</span><span class="p">(</span><span class="s2">&quot;(1(2(2)))&quot;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">discbath</span><span class="o">.</span><span class="n">add_bath_tree</span><span class="p">(</span><span class="n">topo</span><span class="p">(),</span> <span class="n">degree</span><span class="p">,</span> <span class="n">chi0</span><span class="p">,</span> <span class="n">chi0</span><span class="p">)</span>
+
+<span class="c1">#set up the capacity tree</span>
+<span class="n">capacity</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">ntree</span><span class="p">(</span><span class="s2">&quot;(1(2(2)))&quot;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">discbath</span><span class="o">.</span><span class="n">add_bath_tree</span><span class="p">(</span><span class="n">capacity</span><span class="p">(),</span> <span class="n">degree</span><span class="p">,</span> <span class="n">chi</span><span class="p">,</span> <span class="n">chi</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Note: For the case we are considering here this inserts the bath nodes in such a way that they agree with the ordering in the Hamiltonian. In general, the ordering of modes in the tree structure is determined by their traversal order using a pre-order depth-first search traversal. For more complex use cases, it may become necessary to set the <code class="docutils literal notranslate"><span class="pre">system_modes.mode_indices</span></code> variable of the <code class="docutils literal notranslate"><span class="pre">sysinf</span></code> object that specifies how composite mode indices in the Hamiltonian in the Hamiltonian should be
+mapped to indices in the tree structure.</p>
+<p>Now that we have constructed the tree topology, we can build the actually TTN wavefunction. For standard OQS simulations, in which we perform dynamics from a state corresponding to an initially uncorrelated system-bath density operator, with a thermal (or vacuum) bath (dependent on temperature), the initial configuration of the bath for these unitary dynamics simulations is simply the vacuum state (at finite temperature this is due to the fact that we have used the thermofield mapping to
+construct a new model where the zero-temperature dynamics reproduces the finite-temperature dynamics of our original mode). As such, creation of the initial wavefunction is straightfoward</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#build the TTN object for this system</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">ttn</span><span class="p">(</span><span class="n">topo</span><span class="p">,</span> <span class="n">capacity</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+<span class="c1">#prepare a product state where the system is in the up spin state (0) and the bath is in its vacuum state</span>
+<span class="n">state</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bsys</span><span class="p">))]</span>
+<span class="n">A</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Preparing-for-Time-Evolution">
+<h2>Preparing for Time Evolution<a class="headerlink" href="#Preparing-for-Time-Evolution" title="Link to this heading"></a></h2>
+<p>Now the final steps before preparing for the time-evolution are to:</p>
+<ol class="arabic simple">
+<li><p>set up time evolution parameters</p></li>
+<li><p>construct the <code class="docutils literal notranslate"><span class="pre">sop_operator</span></code> representation. Here we will use the hierarchical SOP representation of the Hamiltonian as it leads to considerable performance improvements compared to the SOP representation.</p></li>
+<li><p>setup any observables of interest for the system. Here, we will look at the magnetisation of the spin throughout the dynamics process, and so will set up a site_operator object to allow for evaluation of this quantity.</p></li>
+<li><p>setup the <code class="docutils literal notranslate"><span class="pre">matrix_element</span></code> object used to evaluate expectation values.</p></li>
+<li><p>create the <code class="docutils literal notranslate"><span class="pre">tdvp</span></code> object for time evolution. Here we will use the adaptive one-site algorithm for time-evolution.</p></li>
+</ol>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#set up the Hamiltonian as a sop_operator object</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">sop_operator</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">)</span>
+
+<span class="c1">#set up the observable to measure</span>
+<span class="n">op</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">site_operator</span><span class="p">(</span><span class="n">pyttn</span><span class="o">.</span><span class="n">sOP</span><span class="p">(</span><span class="s2">&quot;sz&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">sysinf</span><span class="p">)</span>
+
+<span class="c1">#set up buffers to store the observable</span>
+<span class="n">Sz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">#construct matrix_element object need for evaluating observables</span>
+<span class="n">mel</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">matrix_element</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="c1">#prepare the tdvp object</span>
+<span class="n">sweep</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">tdvp</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">krylov_dim</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">subspace_neigs</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">subspace_krylov_dim</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">expansion</span><span class="o">=</span><span class="s1">&#39;subspace&#39;</span><span class="p">)</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">spawning_threshold</span> <span class="o">=</span> <span class="mf">1e-8</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">minimum_unoccupied</span><span class="o">=</span><span class="mi">0</span>
+
+<span class="n">sweep</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">coefficient</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span><span class="n">j</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Performing-the-Time-Evolution">
+<h2>Performing the Time Evolution<a class="headerlink" href="#Performing-the-Time-Evolution" title="Link to this heading"></a></h2>
+<p>Now that everything is set up we are in a position where we can perform each of the time-evolution steps and measure the observables of interest.</p>
+<p>Here we make use of a little trick for improving the accuracy of the time-evolution at short time. For systems initially in the product state, the ttn wavefunction represents a rather constrained manifold, and the dynamics can depend strongly on the choice of initially unoccupied basis functions. To alleviate this, it can be useful to perform small steps initially in order to allow for these unoccupied functions to evolve partially under the Hamiltonian of the system before too much damage has
+been done to the wavefunction. As shown in Ref., this can dramatically improve the accuracy of the TDVP calculations with only very modest additional computational cost.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#measure the initial magnetisation</span>
+<span class="n">Sz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">mel</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">A</span><span class="p">))</span>
+
+<span class="c1">#perform the first timestep using a logarithmic discretisation of time over this period.</span>
+<span class="c1">#This can be useful to allow for suitable adaptation of weakly occupied single particle</span>
+<span class="c1">#functions through the initial time point.</span>
+<span class="n">tp</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dt</span><span class="o">*</span><span class="mf">1e-5</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dt</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">dti</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">-</span><span class="n">tp</span>
+    <span class="n">sweep</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dti</span>
+    <span class="n">sweep</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+    <span class="n">tp</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+<span class="n">i</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<p>Now that we have completed the first step, we return to time evolution as usual.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#set the values after the first timestep</span>
+<span class="n">Sz</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">mel</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">A</span><span class="p">))</span>
+<span class="n">sweep</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">dt</span>
+
+<span class="c1">#now perform standard time stepping</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">nstep</span><span class="p">):</span>
+    <span class="n">sweep</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+    <span class="n">Sz</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">mel</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">A</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;step: </span><span class="si">%d</span><span class="s2"> of </span><span class="si">%d</span><span class="s2">.  Chimax: </span><span class="si">%d</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">nstep</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">maximum_bond_dimension</span><span class="p">()),</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;                   </span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;                                                       </span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<p>And now that we have finished the time evolution we can plot the resultant magnetisation.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Sz</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Quickstart_oqs_sbm_star_27_0.png" src="../_images/Quickstart_oqs_sbm_star_27_0.png" />
+</div>
+</div>
+<p>And we can also do things like visualise how the bond dimension has expanded throughout the tensor network.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">visualise_tree</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bond_prop</span><span class="o">=</span><span class="s2">&quot;bond dimension&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/Quickstart_oqs_sbm_star_29_0.png" src="../_images/Quickstart_oqs_sbm_star_29_0.png" />
+</div>
+</div>
+<p>Where we observe that the required bond dimension varies considerably throughout the tree. Here we note that the bath modes are ordered in increasing energy here. Here we see that the largest bond dimensions necessary arise when accounting for the bath modes with frequencies in the range:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%f</span><span class="s2">, </span><span class="si">%f</span><span class="s2">]&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="n">w</span><span class="p">[</span><span class="mi">47</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[0.387185, 3.331310]
+</pre></div></div>
+</div>
+<p>That is the modes with frequency comparable to the frequency of the system transitions. For all other modes, significant correlations are not observed.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="spin_boson_model.html" class="btn btn-neutral float-left" title="Quickstart: Spin Boson Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="oqs_sbm_star_finite_T.html" class="btn btn-neutral float-right" title="Thermofield Dynamics of the Spin-Boson Model using the Star Hamiltonian" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

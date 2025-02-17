@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -87,19 +87,22 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.ESPRIT</span><span class="w"> </span><span class="kn">import</span> <span class="n">ESPRIT</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.aaa</span><span class="w"> </span><span class="kn">import</span> <span class="n">AAA_algorithm</span>
 
+
 <div class="viewcode-block" id="ExpFitDecomposition">
 <a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.expfit.ExpFitDecomposition">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ExpFitDecomposition</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for exponential fit decompositions</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for exponential fit decompositions</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-            
+
+
 <div class="viewcode-block" id="ESPRIT_support_points">
 <a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.expfit.ESPRIT_support_points">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">ESPRIT_support_points</span><span class="p">(</span><span class="n">t</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">tmax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">Nt</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function for automatically generating support points to be used within the ESPRIT algorithm.  </span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ESPRIT_support_points</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Nt</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A function for automatically generating support points to be used within the ESPRIT algorithm.  </span>
 
 <span class="sd">    :param t: Either the support points or a key word used to generate the support points. (Default: &quot;linear&quot;) This parameter can be either a</span>
 
@@ -125,10 +128,11 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tmax</span><span class="p">),</span> <span class="n">Nt</span><span class="p">)</span></div>
 
 
+
 <div class="viewcode-block" id="ESPRITDecomposition">
 <a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.expfit.ESPRITDecomposition">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ESPRITDecomposition</span><span class="p">(</span><span class="n">ExpFitDecomposition</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class providing an easy to use interface for applying the ESPRIT decomposition to </span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A class providing an easy to use interface for applying the ESPRIT decomposition to </span>
 <span class="sd">    construct a sum-of-exponential approximation for a bath correlation function</span>
 
 <span class="sd">    Constructor arguments: </span>
@@ -149,8 +153,9 @@
 <span class="sd">        - Ctres (callable) - The ESPRIT fit of the bath correlation function</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">ESPRIT_support_points</span><span class="p">(</span><span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">=</span> <span class="n">ESPRIT_support_points</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">t</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">K</span>
 
 <div class="viewcode-block" id="ESPRITDecomposition.__call__">
@@ -165,29 +170,31 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">__softmspace</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">beta</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">endpoint</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">__softmspace</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">start</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span><span class="o">*</span><span class="n">start</span><span class="p">)))</span> <span class="o">+</span> <span class="n">beta</span><span class="o">*</span><span class="n">start</span><span class="p">)</span><span class="o">/</span><span class="n">beta</span>
-    <span class="c1">#start = np.log(np.exp(beta*start)-1)/beta</span>
+    <span class="c1"># start = np.log(np.exp(beta*start)-1)/beta</span>
     <span class="n">stop</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span><span class="o">*</span><span class="n">stop</span><span class="p">)))</span> <span class="o">+</span> <span class="n">beta</span><span class="o">*</span><span class="n">stop</span><span class="p">)</span><span class="o">/</span><span class="n">beta</span>
-    <span class="c1">#stop = np.log(np.exp(beta*stop)-1)/beta</span>
+    <span class="c1"># stop = np.log(np.exp(beta*stop)-1)/beta</span>
 
     <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">stop</span><span class="o">-</span><span class="n">start</span><span class="p">)</span><span class="o">/</span><span class="n">N</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">endpoint</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">endpoint</span><span class="p">):</span>
         <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">stop</span><span class="o">-</span><span class="n">start</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">logaddexp</span><span class="p">(</span><span class="n">beta</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">*</span><span class="n">dx</span>  <span class="o">+</span> <span class="n">start</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="n">beta</span>
-    <span class="c1">#return np.log(np.exp(beta*(np.arange(N)*dx  + start))+1)/beta</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">logaddexp</span><span class="p">(</span><span class="n">beta</span><span class="o">*</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">*</span><span class="n">dx</span> <span class="o">+</span> <span class="n">start</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="n">beta</span>
+    <span class="c1"># return np.log(np.exp(beta*(np.arange(N)*dx  + start))+1)/beta</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">__generate_grid_points</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">wc</span><span class="p">,</span> <span class="n">wmin</span><span class="o">=</span><span class="mf">1e-9</span><span class="p">):</span>
-    <span class="n">Z1</span> <span class="o">=</span> <span class="n">softmspace</span><span class="p">(</span><span class="n">wmin</span><span class="p">,</span> <span class="n">wc</span><span class="p">,</span> <span class="n">N</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">Z1</span> <span class="o">=</span> <span class="n">__softmspace</span><span class="p">(</span><span class="n">wmin</span><span class="p">,</span> <span class="n">wc</span><span class="p">,</span> <span class="n">N</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">nZ1</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">Z1</span><span class="p">)</span>
     <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">nZ1</span><span class="p">,</span> <span class="n">Z1</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">Z</span>
 
+
 <div class="viewcode-block" id="AAA_support_points">
 <a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.expfit.AAA_support_points">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">AAA_support_points</span><span class="p">(</span><span class="n">w</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">wmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wmax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">Naaa</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A function for automatically generating support points to be used within the AAA algorithm.  </span>
+<span class="k">def</span><span class="w"> </span><span class="nf">AAA_support_points</span><span class="p">(</span><span class="n">w</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">wmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Naaa</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A function for automatically generating support points to be used within the AAA algorithm.  </span>
 
 <span class="sd">    :param w: Either the support points orr a key word used to generate the support points. (Default: &quot;linear&quot;) This parameter can be either a</span>
 
@@ -211,19 +218,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">w</span>
 
-    <span class="k">elif</span><span class="p">(</span><span class="n">w</span> <span class="o">==</span> <span class="s2">&quot;softm&quot;</span><span class="p">):</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">wmax</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">w</span> <span class="o">==</span> <span class="s2">&quot;softm&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">wmax</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">wmax</span> <span class="o">=</span> <span class="mi">1</span>
-    
-        <span class="k">if</span><span class="p">(</span><span class="n">wmin</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">wmin</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">wmin</span> <span class="o">==</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">wmin</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
             <span class="n">wmin</span> <span class="o">=</span> <span class="mf">1e-8</span>
-    
+
         <span class="k">return</span> <span class="n">__generate_grid_points</span><span class="p">(</span><span class="n">Naaa</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">wmin</span><span class="o">=</span><span class="n">wmin</span><span class="p">)</span>
 
-    <span class="k">elif</span><span class="p">(</span><span class="n">w</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">):</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">wmax</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">w</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">wmax</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">wmax</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">wmin</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">wmin</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">wmin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="p">,</span> <span class="n">Naaa</span><span class="p">)</span>
@@ -235,8 +242,8 @@
 
 <div class="viewcode-block" id="AAADecomposition">
 <a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.expfit.AAADecomposition">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">AAADecomposition</span><span class="p">:</span>    
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class providing an easy to use interface for applying the AAA based rational function </span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AAADecomposition</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A class providing an easy to use interface for applying the AAA based rational function </span>
 <span class="sd">    decomposition to approximate a bath spectral density.  This class includes tools used for</span>
 <span class="sd">    automatic generation of support points, as well as manually specified support points to </span>
 <span class="sd">    allow for both easy general use and flexibility when handling more complex spectral densities.</span>
@@ -245,13 +252,20 @@
 
 <span class="sd">    :param tol: The tolerance used within the AAA algorithm. (Default: 1e-4)</span>
 <span class="sd">    :type tol: float, optional</span>
+<span class="sd">    :param K: The maximum number of poles to fit. (default: None)</span>
+<span class="sd">    :type K: int or None, optional</span>
 <span class="sd">    :param w: Either the support points or a key word used to generate the support points.  For details see the AAA_support_points function.  (Default: &quot;linear&quot;)</span>
 <span class="sd">    :type w: str or np.ndarray or list, optional</span>
 <span class="sd">    :param aaa_nmax: The maximum number of poles to allow within the AAA algorithm. (Default:500)</span>
 <span class="sd">    :type aaa_nmax: int, optional</span>
 <span class="sd">    :param coeff: A coefficient to go in front of the frequency terms. (Default: 1)</span>
 <span class="sd">    :type coeff: float, optional</span>
-<span class="sd">    :param **kwargs: Keyword arguments to pass to AAA_support_points</span>
+<span class="sd">    :param wmin: The minimum allowed frequency. (Default: None)</span>
+<span class="sd">    :type wmin: float or None, optional</span>
+<span class="sd">    :param wmax: The maximum allowed frequency. (Default: None)</span>
+<span class="sd">    :type wmax: float or None, optional</span>
+<span class="sd">    :param Naaa: The number of support points used by the AAA algorithm. (Default: 1000)</span>
+<span class="sd">    :type Naaa: int or None, optional</span>
 
 <span class="sd">    Callable arguments:</span>
 
@@ -263,15 +277,21 @@
 <span class="sd">        - func (callable) - The AAA rational function fit of the spectral density</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">aaa_nmax</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Z1</span> <span class="o">=</span> <span class="n">AAA_support_points</span><span class="p">(</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">aaa_nmax</span><span class="o">=</span><span class="n">aaa_nmax</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">w</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">aaa_nmax</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">wmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Naaa</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Z1</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">w</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmin</span><span class="o">=</span><span class="n">wmin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wmax</span><span class="o">=</span><span class="n">wmax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Naaa</span> <span class="o">=</span> <span class="n">Naaa</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">aaa_nmax</span> <span class="o">=</span> <span class="n">aaa_nmax</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="o">=</span> <span class="n">coeff</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">aaa_tol</span> <span class="o">=</span> <span class="n">tol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span class="n">K</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__AAA_to_HEOM</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">coeff</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the poles and residues from the AAA algorithm into the coefficients and frequencies needed</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__AAA_to_HEOM</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert the poles and residues from the AAA algorithm into the coefficients and frequencies needed</span>
 <span class="sd">        for the HEOM algorithms</span>
 
 <span class="sd">        :param p: The poles extracted from the AAA algorithm</span>
@@ -291,7 +311,7 @@
 <div class="viewcode-block" id="AAADecomposition.__call__">
 <a class="viewcode-back" href="../../../../pyttn/pyttn.oqs.bath_fitting.html#pyttn.oqs.bath_fitting.expfit.AAADecomposition.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform the AAA decomposition on the function S.</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform the AAA decomposition on the function S.</span>
 
 <span class="sd">        :param S: The spectral density function to be decomposed.</span>
 <span class="sd">        :type S: callable</span>
@@ -301,21 +321,24 @@
 <span class="sd">            - zk (np.ndarray) - The exponents in the sum-of-exponential decomposition of the bath correlation function</span>
 <span class="sd">            - func (callable) - The AAA rational function fit of the spectral density</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1">#first compute the aaa decomposition of the spectral function</span>
-        <span class="n">func1</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">AAA_algorithm</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z1</span><span class="p">,</span> <span class="n">nmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aaa_nmax</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aaa_tol</span><span class="p">)</span>
+        <span class="c1">#generate the support points for the AAA decomposition</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z1</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Z1</span> <span class="o">=</span> <span class="n">AAA_support_points</span><span class="p">(</span><span class="n">w</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">,</span> <span class="n">wmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wmin</span><span class="p">,</span> <span class="n">wmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wmax</span><span class="p">,</span> <span class="n">Naaa</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">Naaa</span><span class="p">)</span>
 
-        
-        <span class="c1">#and convert that to the heom correlation function coefficients</span>
+        <span class="c1"># first compute the aaa decomposition of the spectral function</span>
+        <span class="n">func1</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">AAA_algorithm</span><span class="p">(</span>
+            <span class="n">S</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z1</span><span class="p">,</span> <span class="n">nmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aaa_nmax</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">aaa_tol</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">)</span>
+
+        <span class="c1"># and convert that to the heom correlation function coefficients</span>
         <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span> <span class="o">=</span> <span class="n">AAADecomposition</span><span class="o">.</span><span class="n">__AAA_to_HEOM</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">coeff</span><span class="p">)</span>
 
-        <span class="c1">#sort the arguments based on largest abs of the poles</span>
+        <span class="c1"># sort the arguments based on largest abs of the poles</span>
         <span class="n">dk</span> <span class="o">=</span> <span class="n">dk</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">zk</span><span class="p">))]</span>
         <span class="n">zk</span> <span class="o">=</span> <span class="n">zk</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">zk</span><span class="p">))]</span>
 
-        <span class="c1">#return the function for optional plotting as well as the coefficients</span>
+        <span class="c1"># return the function for optional plotting as well as the coefficients</span>
         <span class="k">return</span> <span class="n">dk</span><span class="p">,</span> <span class="n">zk</span><span class="p">,</span> <span class="n">func1</span></div>
 </div>
-
 
 </pre></div>
 

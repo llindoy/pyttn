@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -85,40 +85,42 @@
   <h1>Source code for pyttn.models.modelsExt</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+
 <div class="viewcode-block" id="AIM">
 <a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.modelsExt.AIM">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">AIM</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">AIM</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">AIM_complex</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">AIM_real</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">AIM_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
-        <span class="k">elif</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">AIM_real</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for AIM&quot;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">AIM_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for AIM&quot;</span><span class="p">)</span></div>
 
 
+
 <div class="viewcode-block" id="electronic_structure">
 <a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.modelsExt.electronic_structure">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">electronic_structure</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">electronic_structure</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">electronic_structure_complex</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">electronic_structure_real</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">electronic_structure_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">elif</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">electronic_structure_real</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for electronic_structure model&quot;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">electronic_structure_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for electronic_structure model&quot;</span><span class="p">)</span></div>
@@ -127,25 +129,26 @@
 
 <div class="viewcode-block" id="TFIM">
 <a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.modelsExt.TFIM">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">TFIM</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">TFIM</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">TFIM_complex</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">TFIM_real</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">TFIM_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
-        <span class="k">elif</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">TFIM_real</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for TFIM&quot;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">TFIM_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for TFIM&quot;</span><span class="p">)</span></div>
 
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">__init_sb_type</span><span class="p">(</span><span class="n">sbt1</span><span class="p">,</span> <span class="n">sbt2</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">if</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">sbt2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sbt1</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -157,12 +160,13 @@
         <span class="k">if</span> <span class="n">sbt2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sbt1</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">sbt1</span><span class="p">()</span>
-            <span class="k">elif</span><span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">sbt2</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for spin boson&quot;</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="spin_boson">
 <a class="viewcode-back" href="../../../pyttn/pyttn.models.html#pyttn.models.modelsExt.spin_boson">[docs]</a>
@@ -172,19 +176,18 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">spin_boson_generic_real</span><span class="p">,</span> <span class="n">spin_boson_star_real</span><span class="p">,</span> <span class="n">spin_boson_chain_real</span>
     <span class="k">except</span><span class="p">:</span>
-        <span class="n">spin_boson_generic_real</span><span class="o">=</span><span class="kc">None</span>
-        <span class="n">spin_boson_star_real</span><span class="o">=</span><span class="kc">None</span>
-        <span class="n">spin_boson_chain_real</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">spin_boson_generic_real</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">spin_boson_star_real</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">spin_boson_chain_real</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">if</span><span class="p">(</span><span class="n">geom</span> <span class="o">==</span> <span class="s2">&quot;star&quot;</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">__init_sb_type</span><span class="p">(</span><span class="n">spin_boson_star_complex</span><span class="p">,</span> <span class="n">spin_boson_star_real</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">geom</span> <span class="o">==</span> <span class="s2">&quot;star&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">__init_sb_type</span><span class="p">(</span><span class="n">spin_boson_star_complex</span><span class="p">,</span> <span class="n">spin_boson_star_real</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">geom</span> <span class="o">==</span> <span class="s2">&quot;chain&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">__init_sb_type</span><span class="p">(</span><span class="n">spin_boson_chain_complex</span><span class="p">,</span> <span class="n">spin_boson_chain_real</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">__init_sb_type</span><span class="p">(</span><span class="n">spin_boson_chain_complex</span><span class="p">,</span> <span class="n">spin_boson_chain_real</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">geom</span> <span class="o">==</span> <span class="s2">&quot;generic&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">__init_sb_type</span><span class="p">(</span><span class="n">spin_boson_generic_complex</span><span class="p">,</span> <span class="n">spin_boson_generic_real</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">__init_sb_type</span><span class="p">(</span><span class="n">spin_boson_generic_complex</span><span class="p">,</span> <span class="n">spin_boson_generic_real</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid geom for spin boson.&quot;</span><span class="p">)</span></div>
-
 
 </pre></div>
 

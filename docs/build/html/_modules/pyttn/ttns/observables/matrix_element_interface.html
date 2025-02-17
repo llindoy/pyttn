@@ -40,17 +40,17 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Introduction:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Introduction/index.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Quickstart/index.html">Quickstart</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Examples:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../Examples/index.html">Examples</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
 <ul>
@@ -86,18 +86,15 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 
-
-
-
 <div class="viewcode-block" id="matrix_element_dtype">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.matrix_element_dtype">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">matrix_element_dtype</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class defining the general interface for the pybind11 wrappers generated for the matrix_element object.  These wrapper classes are</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A class defining the general interface for the pybind11 wrappers generated for the matrix_element object.  These wrapper classes are</span>
 <span class="sd">    :class:`matrix_element_complex` and :class:`matrix_element_real` (with the real variant only present if the pybind11 wrapper has been built with support</span>
 <span class="sd">    for real valued TTNs.  These classes provide a set of functions for evaluating matrix elements of operators with respect to single and multiset TTNs</span>
 
 <span class="sd">    :param *args: A variable length list of arguments. Valid options are</span>
-<span class="sd">        </span>
+
 <span class="sd">        - none - in this case we call the default constructor of the matrix element class to construct an empty matrix element.</span>
 <span class="sd">        - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - A TTN to define the topology and size of buffers needed to evaluate the tensor network.</span>
 <span class="sd">        - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Two TTNs with the same topology defining the size of the bra and ket respectively.</span>
@@ -112,12 +109,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;The ttn_dtype class is not constructable.  This class is present to provide cleaner documentation for the pybind11 classes.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;The ttn_dtype class is not constructable.  This class is present to provide cleaner documentation for the pybind11 classes.&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="matrix_element_dtype.assign">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.matrix_element_dtype.assign">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assign the value of this matrix element from another matrix element</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assign the value of this matrix element from another matrix element</span>
 
 <span class="sd">        :param o: The other matrix_element object</span>
 <span class="sd">        :type o: matrix_element_dtype</span>
@@ -125,22 +123,20 @@
         <span class="k">pass</span></div>
 
 
-
 <div class="viewcode-block" id="matrix_element_dtype.clear">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.matrix_element_dtype.clear">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="s2">&quot;Clear and deallocate all internal buffers of the matrix element&quot;</span>
+        <span class="sa">r</span><span class="s2">&quot;Clear and deallocate all internal buffers of the matrix element&quot;</span>
         <span class="k">pass</span></div>
-
 
 
 <div class="viewcode-block" id="matrix_element_dtype.resize">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.matrix_element_dtype.resize">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resize the matrix element to fit the required wavefunctions</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resize the matrix element to fit the required wavefunctions</span>
 
 <span class="sd">        :param *args: A variable length list of arguments. Valid options are</span>
-<span class="sd">            </span>
+
 <span class="sd">            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - A TTN to define the topology and size of buffers needed to evaluate the tensor network.</span>
 <span class="sd">            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`), **B** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Two TTNs with the same topology defining the size of the bra and ket respectively.</span>
 
@@ -157,17 +153,18 @@
 <div class="viewcode-block" id="matrix_element_dtype.__call__">
 <a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.matrix_element_dtype.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">use_sparsity</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function for evaluating the inner product of tensor network states with matrix elements</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function for evaluating the inner product of tensor network states with matrix elements</span>
 
 <span class="sd">        :param *args: A variable length list of arguments. See below for a list of valid arguments.</span>
 <span class="sd">        :type *args: [Arguments (variable number and type)]</span>
 <span class="sd">        :param use_sparsity: Whether or not to exploit sparsity in the evaluation of the matrix elements. (Default: True)</span>
 <span class="sd">        :type use_sparsity: bool, optional</span>
 
+<span class="sd">        :*args options:</span>
 <span class="sd">        Valid options for the argument list depend on the type of quantity we are evaluating. </span>
 
 <span class="sd">        :math:`\langle A | A \rangle`:</span>
-<span class="sd">            </span>
+
 <span class="sd">            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the inner product of the ttn with itself. </span>
 
 <span class="sd">        :math:`\langle A | O | A \rangle`:</span>
@@ -194,6 +191,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 </div>
+
 
 
 <span class="sd">&quot;&quot;&quot;</span>
