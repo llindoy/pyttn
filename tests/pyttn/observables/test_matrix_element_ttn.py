@@ -19,7 +19,7 @@ def test_matrix_element_norm(request, state, expected_result):
     mel = matrix_element(A, nbuffers=1)
     res = mel(A)
 
-    assert pytest.approx(res, 1e-6) == expected_result
+    assert res == pytest.approx(expected_result, abs=1e-8)
 
 @pytest.mark.parametrize("a, b, expected_result", [ 
     ("ttn_1", "ttn_1", 1),("ttn_2", "ttn_1", 0),("ttn_3", "ttn_1", 0),
@@ -33,7 +33,7 @@ def test_matrix_element_overlap(request, a, b, expected_result):
     mel = matrix_element(A, nbuffers=1)
     res = np.real(mel(A, B))
 
-    assert pytest.approx(res, 1e-6) == expected_result
+    assert res == pytest.approx(expected_result, abs=1e-8)
 
 @pytest.mark.parametrize("op, state, expected_result", [ 
     ("Sz0", "ttn_1", 1),("Sz0", "ttn_2", 1),("Sz0", "ttn_3", 4), ("Sz0", "ttn_4", 0),
@@ -49,9 +49,9 @@ def test_matrix_element_expect(request, op, state, expected_result):
     A = request.getfixturevalue(state)
     op = request.getfixturevalue(op)
     mel = matrix_element(A, nbuffers=1)
-    res = mel(op, A)
+    res = np.real(mel(op, A))
 
-    assert pytest.approx(res, 1e-6) == expected_result
+    assert res == pytest.approx(expected_result, abs=1e-8)
 
 @pytest.mark.parametrize("op, state, expected_result", [ 
     ("Sztot", "ttn_1", 16),("Sztot", "ttn_2", -2), ("Sztot", "ttn_4", 0),
@@ -62,9 +62,9 @@ def test_matrix_element_expect_sop(request, op, state, expected_result):
     op, sysinf = request.getfixturevalue(op)
     op = sop_operator(op, A, sysinf)
     mel = matrix_element(A, nbuffers=1)
-    res = mel(op, A)
+    res = np.real(mel(op, A))
 
-    assert pytest.approx(res, 1e-6) == expected_result
+    assert res == pytest.approx(expected_result, abs=1e-8)
 
 @pytest.mark.parametrize("op, a, b, expected_result", [ 
     ("Sz0", "ttn_1", "ttn_1", 1),("Sz0", "ttn_2", "ttn_1", 0),("Sz0", "ttn_3", "ttn_1", 0),
@@ -90,7 +90,7 @@ def test_matrix_element_matel(request, op, a, b, expected_result):
     mel = matrix_element(A, nbuffers=1)
     res = np.real(mel(op, A, B))
 
-    assert pytest.approx(res, 1e-6) == expected_result
+    assert res == pytest.approx(expected_result, abs=1e-8)
 
 @pytest.mark.parametrize("op, a, b, expected_result", [ 
     ("Sztot", "ttn_1", "ttn_1", 16),("Sztot", "ttn_2", "ttn_1", 0),("Sztot", "ttn_3", "ttn_1", 0),
@@ -109,4 +109,4 @@ def test_matrix_element_matel_sop(request, op, a, b, expected_result):
     mel = matrix_element(A, nbuffers=1)
     res = np.real(mel(op, A, B))
 
-    assert pytest.approx(res, 1e-6) == expected_result
+    assert res == pytest.approx(expected_result, abs=1e-8)

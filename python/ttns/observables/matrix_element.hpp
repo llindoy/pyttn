@@ -28,6 +28,7 @@ void init_matrix_element(py::module &m, const std::string& label)
     using _msttn = ms_ttn<T, backend>;
     using sop_op = sop_operator<T, backend>;
     using ms_sop_op = multiset_sop_operator<T, backend>;
+    using _msttn_slice = multiset_ttn_slice<T, backend, false>;
 
     py::class_<matel>(m, (std::string("matrix_element_")+label).c_str())
         .def(py::init())
@@ -35,6 +36,11 @@ void init_matrix_element(py::module &m, const std::string& label)
         .def(py::init<const _ttn&, const _ttn&, size_t, bool>(), py::arg(), py::arg(), py::arg("nbuffers") = 1, py::arg("use_capacity") = false)
         .def(py::init<const _ttn&, const sop_op&, size_t, bool>(), py::arg(), py::arg(), py::arg("nbuffers") = 1, py::arg("use_capacity") = false)
         .def(py::init<const _ttn&, const _ttn&, const sop_op&, size_t, bool>(), py::arg(), py::arg(), py::arg(), py::arg("nbuffers") = 1, py::arg("use_capacity") = false)
+
+        .def(py::init<const _msttn_slice&, size_t, bool>(), py::arg(), py::arg("nbuffers") = 1, py::arg("use_capacity") = false)
+        .def(py::init<const _msttn_slice&, const _msttn_slice&, size_t, bool>(), py::arg(), py::arg(), py::arg("nbuffers") = 1, py::arg("use_capacity") = false)
+        .def(py::init<const _msttn_slice&, const sop_op&, size_t, bool>(), py::arg(), py::arg(), py::arg("nbuffers") = 1, py::arg("use_capacity") = false)
+        .def(py::init<const _msttn_slice&, const _msttn_slice&, const sop_op&, size_t, bool>(), py::arg(), py::arg(), py::arg(), py::arg("nbuffers") = 1, py::arg("use_capacity") = false)
 
         .def(py::init<const _msttn&, size_t, bool>(), py::arg(), py::arg("nbuffers") = 1, py::arg("use_capacity") = false)
         .def(py::init<const _msttn&, const _msttn&, size_t, bool>(), py::arg(), py::arg(), py::arg("nbuffers") = 1, py::arg("use_capacity") = false)
@@ -46,6 +52,9 @@ void init_matrix_element(py::module &m, const std::string& label)
         .def("__deepcopy__", [](const matel& o, py::dict){return matel(o);}, py::arg("memo"))
         .def("clear", &matel::clear)
 
+        /*
+         *  Functions for handling ttns
+         */
         .def(
               "resize", 
               [](matel& o, const _ttn& A, size_t nbuffers, bool use_capacity){o.resize(A, nbuffers, use_capacity);}, 
@@ -92,6 +101,58 @@ void init_matrix_element(py::module &m, const std::string& label)
         .def("__call__", [](matel& o, prodop& ops, const _ttn& A, const _ttn& B){return _T(o(ops, A, B));})
         .def("__call__", [](matel& o, sop_op& sop, const _ttn& A, const _ttn& B){return _T(o(sop, A, B));})
 
+        /*
+         * Functions for working with multiset ttn slices
+         */
+        .def(
+              "resize", 
+              [](matel& o, const _msttn_slice& A, size_t nbuffers, bool use_capacity){o.resize(A, nbuffers, use_capacity);}, 
+              py::arg(), py::arg("nbuffers") = 1, py::arg("use_capacity")=false
+            )
+        .def(
+              "resize", 
+              [](matel& o, const _msttn_slice& A, const _msttn_slice& B, size_t nbuffers, bool use_capacity){o.resize(A, B, nbuffers, use_capacity);}, 
+              py::arg(), py::arg(), py::arg("nbuffers") = 1, py::arg("use_capacity")=false
+            )
+        .def(
+              "__call__", 
+              [](matel& o, const _msttn_slice& A, bool use_sparsity){return o(A, use_sparsity);}, 
+              py::arg(), py::arg("use_sparsity")=true
+            )
+        .def(
+              "__call__", 
+              [](matel& o, siteop& op, size_t mode, const _msttn_slice& A, bool use_sparsity){return _T(o(op, mode, A, use_sparsity));}, 
+              py::arg(), py::arg(), py::arg(), py::arg("use_sparsity")=true
+            )
+        .def(
+              "__call__", 
+              [](matel& o, std::vector<siteop>& ops, const _msttn_slice& A, bool use_sparsity){return _T(o(ops, A, use_sparsity));}, 
+              py::arg(), py::arg(), py::arg("use_sparsity")=true
+            )           
+        .def(
+              "__call__", 
+              [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _msttn_slice& A, bool use_sparsity){return _T(o(ops, modes, A, use_sparsity));}, 
+              py::arg(), py::arg(), py::arg(), py::arg("use_sparsity")=true
+            )
+        .def(
+              "__call__", 
+              [](matel& o, prodop& ops, const _msttn_slice& A, bool use_sparsity){return _T(o(ops, A, use_sparsity));}, 
+              py::arg(), py::arg(), py::arg("use_sparsity")=true
+            )
+        .def("__call__", [](matel& o, sop_op& sop, const _msttn_slice& A){return _T(o(sop, A));})
+        .def("__call__", [](matel& o, const _msttn_slice& A, const _msttn_slice& B){return _T(o(A, B));})
+        .def("__call__", [](matel& o, siteop& op, const _msttn_slice& A){return _T(o(op, A));})
+        .def("__call__", [](matel& o, siteop& op, const _msttn_slice& A, const _msttn_slice& B){return _T(o(op, A, B));})
+        .def("__call__", [](matel& o, siteop& op, size_t mode, const _msttn_slice& A, const _msttn_slice& B){return _T(o(op, mode, A, B));})
+        //inline T operator()(one_body_operator<T, backend>& op, const state_type& bra, const state_type& ket)
+        .def("__call__", [](matel& o, std::vector<siteop>& ops, const _msttn_slice& A, const _msttn_slice& B){return _T(o(ops, A, B));})
+        .def("__call__", [](matel& o, std::vector<siteop>& ops, const std::vector<size_t>& modes, const _msttn_slice& A, const _msttn_slice& B){return _T(o(ops, modes, A, B));})
+        .def("__call__", [](matel& o, prodop& ops, const _msttn_slice& A, const _msttn_slice& B){return _T(o(ops, A, B));})
+        .def("__call__", [](matel& o, sop_op& sop, const _msttn_slice& A, const _msttn_slice& B){return _T(o(sop, A, B));})
+
+        /*
+         *  Functions for handling multiset ttns
+         */
         .def(
               "resize", 
               [](matel& o, const _msttn& A, size_t nbuffers, bool use_capacity){o.resize(A, nbuffers, use_capacity);}, 

@@ -481,9 +481,6 @@ public:
         }
     }
 public:
-    static size_type contraction_capacity(const node_type& a, const node_type& b){CALL_AND_RETHROW(return node_helper::contraction_capacity(a, b));}
-
-public:
     //Functions for handling subsections of the movement of the orthogonality centre up or down
     void decompose_down(orthogonality_type& orth, size_type mode, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false){CALL_AND_RETHROW(node_helper::decompose_down(*this, orth, mode, tol, nchi, save_svd));}
     void decompose_up(orthogonality_type& orth, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false){CALL_AND_RETHROW(node_helper::decompose_up(*this, orth, tol, nchi, save_svd));}

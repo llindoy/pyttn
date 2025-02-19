@@ -22,6 +22,8 @@ class single_particle_operator_engine
     using hnode = ttn_node<T, backend>;
     using hdata = ttn_node_data<T, backend>;
 
+    using ms_slice_node = multiset_ttn_node_slice<T, backend, true>;
+
     using soptype = sop_operator<T, backend>;
     using cinfnode = typename soptype::node_type;
 
@@ -40,32 +42,32 @@ class single_particle_operator_engine
     using size_type = typename backend::size_type;
 
 public:
-    template <typename spfnode>
-    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
+    template <typename spfnode, typename Atype>
+    static inline void evaluate(const soptype& h, const cinfnode& cinf, Atype&& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
         //resize the matrices in the event that the tensor objects have changed size
-        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, A, A, HA, hspf, compute_identity, update_all));}
-        else{CALL_AND_RETHROW(evaluate_branch(cinf, A, A, HA, temp, hspf, compute_identity, update_all));}
+        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf_single_set(h, cinf, std::forward<Atype>(A), std::forward<Atype>(A), HA, hspf, compute_identity, update_all));}
+        else{CALL_AND_RETHROW(evaluate_branch_single_set(cinf, std::forward<Atype>(A), std::forward<Atype>(A), HA, temp, hspf, compute_identity, update_all));}
     }
 
-    template <typename spfnode>
-    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
+    template <typename spfnode, typename Btype, typename Atype>
+    static inline void evaluate(const soptype& h, const cinfnode& cinf, Btype&& B, Atype&& A, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
         //resize the matrices in the event that the tensor objects have changed size
-        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf(h, cinf, B, A, HA, hspf, compute_identity, update_all));}
-        else{CALL_AND_RETHROW(evaluate_branch(cinf, B, A, HA, temp, hspf, compute_identity, update_all));}
+        if(A.is_leaf()){CALL_AND_RETHROW(evaluate_leaf_single_set(h, cinf, std::forward<Btype>(B), std::forward<Atype>(A), HA, hspf, compute_identity, update_all));}
+        else{CALL_AND_RETHROW(evaluate_branch_single_set(cinf, std::forward<Btype>(B), std::forward<Atype>(A), HA, temp, hspf, compute_identity, update_all));}
     }
 
-    template <typename spfnode>
-    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& A, size_t /* i */, size_t /* c */, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
+    template <typename spfnode, typename Atype>
+    static inline void evaluate(const soptype& h, const cinfnode& cinf, Atype&& A, size_t /* i */, size_t /* c */, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
-        CALL_AND_RETHROW(evaluate(h, cinf, A, A, hspf, HA, temp, compute_identity, update_all));
+        CALL_AND_RETHROW(evaluate(h, cinf, std::forward<Atype>(A), std::forward<Atype>(A), hspf, HA, temp, compute_identity, update_all));
     }
 
-    template <typename spfnode>
-    static inline void evaluate(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, size_t /* i */, size_t /* c */, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
+    template <typename spfnode, typename Btype, typename Atype>
+    static inline void evaluate(const soptype& h, const cinfnode& cinf, Btype&& B, Atype&& A, size_t /* i */, size_t /* c */, spfnode& hspf, triad& HA, triad& temp, bool compute_identity = false, bool update_all = true)
     {
-        CALL_AND_RETHROW(evaluate(h, cinf, B, A, hspf, HA, temp, compute_identity, update_all));
+        CALL_AND_RETHROW(evaluate(h, cinf, std::forward<Btype>(B), std::forward<Atype>(A), hspf, HA, temp, compute_identity, update_all));
     }
 
 
@@ -158,7 +160,25 @@ protected:
     //static inline void resize_buffer(const hnode& A, triad& HA, 
 
     template <typename spfnode>
-    static inline void evaluate_leaf(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, triad& HA, spfnode& hspf, bool compute_identity = false, bool update_all = true)
+    static inline void evaluate_leaf_single_set(const soptype& h, const cinfnode& cinf, const hnode& B, const hnode& A, triad& HA, spfnode& hspf, bool compute_identity = false, bool update_all = true)
+    {
+        CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), HA, hspf(), compute_identity, update_all));
+    }
+
+    template <typename spfnode>
+    static inline void evaluate_leaf_single_set(const soptype& h, const cinfnode& cinf, ms_slice_node&& B, ms_slice_node&& A, triad& HA, spfnode& hspf, bool compute_identity = false, bool update_all = true)
+    {
+        CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), HA, hspf(), compute_identity, update_all));
+    }
+
+    template <typename spfnode>
+    static inline void evaluate_leaf_single_set(const soptype& h, const cinfnode& cinf, ms_slice_node&& B, const hnode& A, triad& HA, spfnode& hspf, bool compute_identity = false, bool update_all = true)
+    {
+        CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), HA, hspf(), compute_identity, update_all));
+    }
+
+    template <typename spfnode>
+    static inline void evaluate_leaf_single_set(const soptype& h, const cinfnode& cinf, const hnode& B, ms_slice_node&& A, triad& HA, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
         CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), HA, hspf(), compute_identity, update_all));
     }
@@ -300,7 +320,25 @@ protected:
     }
 protected:
     template <typename spfnode>
-    static inline void evaluate_branch(const cinfnode& cinf, const hnode& B, const hnode& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool update_all = true)
+    static inline void evaluate_branch_single_set(const cinfnode& cinf, const hnode& B, const hnode& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool update_all = true)
+    {
+        CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), HA, temp, hspf, compute_identity, update_all));
+    }
+
+    template <typename spfnode>
+    static inline void evaluate_branch_single_set(const cinfnode& cinf, ms_slice_node&& B, ms_slice_node&& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool update_all = true)
+    {
+        CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), HA, temp, hspf, compute_identity, update_all));
+    }
+
+    template <typename spfnode>
+    static inline void evaluate_branch_single_set(const cinfnode& cinf, ms_slice_node&& B, const hnode& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool update_all = true)
+    {
+        CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), HA, temp, hspf, compute_identity, update_all));
+    }
+
+    template <typename spfnode>
+    static inline void evaluate_branch_single_set(const cinfnode& cinf, const hnode& B, ms_slice_node&& A, triad& HA, triad& temp, spfnode& hspf, bool compute_identity = false, bool update_all = true)
     {
         CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), HA, temp, hspf, compute_identity, update_all));
     }

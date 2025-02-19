@@ -108,8 +108,43 @@ def tfim_dmrg_ms(A):
 
     for i in range(nsteps):
         sweep(A, h)
+        E = sweep.E()
 
-    return A
+    return A, h, E
+
+
+@pytest.fixture
+def tfim_ms_mps_H():
+    """
+    Prepares the ground state of the TFIM with N=16 sites at the critical point
+    """
+    chi = 16
+    N=16
+
+    #setup the system topology
+    A = None
+    dims = [2 for i in range(N-1)]
+    topo = ntreeBuilder.mps_tree(dims, chi)
+    A = ms_ttn(2, topo, dtype=np.complex128)
+    state, H, E = tfim_dmrg_ms(A)
+    return [state, H, E]
+
+
+@pytest.fixture
+def tfim_ms_ttn_H():
+    """
+    Prepares the ground state of the TFIM with N=16 sites at the critical point
+    """
+    chi = 16
+    N=16
+
+    #setup the system topology
+    A = None
+    dims = [2 for i in range(N-1)]
+    topo = ntreeBuilder.mlmctdh_tree(dims, 2, chi)
+    A = ms_ttn(2, topo, dtype=np.complex128)
+    state, H, E = tfim_dmrg_ms(A)
+    return [state, H, E]
 
 """
 Definition of state fixtures for the single set TTN observables tests
@@ -253,7 +288,7 @@ def ms_mps_1():
 
     dims = [2 for i in range(N)]
     topo = ntreeBuilder.mps_tree(dims, chi)
-    A = ms_ttn(topo, 2, dtype=np.complex128)
+    A = ms_ttn(2, topo, dtype=np.complex128)
 
     states0 = [0 for i in range(N)]
     states1 = [0 for i in range(N)]
@@ -272,7 +307,7 @@ def ms_mps_2():
 
     dims = [2 for i in range(N)]
     topo = ntreeBuilder.mps_tree(dims, chi)
-    A = ms_ttn(topo, 2, dtype=np.complex128)
+    A = ms_ttn(2, topo, dtype=np.complex128)
 
     states0 = [0 for i in range(N)]
     states1 = [0 for i in range(N)]
@@ -294,8 +329,9 @@ def ms_mps_3():
     A = None
     dims = [2 for i in range(N-1)]
     topo = ntreeBuilder.mps_tree(dims, chi)
-    A = ms_ttn(topo, 2, dtype=np.complex128)
-    return tfim_dmrg_ms(A)
+    A = ms_ttn(2, topo, dtype=np.complex128)
+    state, H, E = tfim_dmrg_ms(A)
+    return state
 
 @pytest.fixture
 def ms_mps_4():
@@ -316,7 +352,7 @@ def ms_mps_4():
     #setup the system topology
     dims = [2 for i in range(N)]
     topo = ntreeBuilder.mps_tree(dims, chi)
-    B = ms_ttn(topo, 2, dtype=np.complex128)
+    B = ms_ttn(2, topo, dtype=np.complex128)
     B.slice(0).assign(A)
     B.slice(1).assign(A)
     return B
@@ -330,7 +366,7 @@ def ms_ttn_1():
 
     dims = [2 for i in range(N)]
     topo = ntreeBuilder.mlmctdh_tree(dims, 2, chi)
-    A = ms_ttn(topo, 2, dtype=np.complex128)
+    A = ms_ttn(2, topo, dtype=np.complex128)
 
     states0 = [0 for i in range(N)]
     states1 = [0 for i in range(N)]
@@ -339,6 +375,7 @@ def ms_ttn_1():
 
     A.set_state(coeff, states)
     return A
+
 
 @pytest.fixture
 def ms_ttn_2():
@@ -349,16 +386,16 @@ def ms_ttn_2():
 
     dims = [2 for i in range(N)]
     topo = ntreeBuilder.mlmctdh_tree(dims, 2, chi)
-    A = ms_ttn(topo, 2, dtype=np.complex128)
+    A = ms_ttn(2, topo, dtype=np.complex128)
 
     states0 = [0 for i in range(N)]
     states1 = [0 for i in range(N)]
     states1[0] = 1
     states = [states0, states1]
     coeff = [1.0, 1.0]
-
     A.set_state(coeff, states)
     return A
+
 
 @pytest.fixture
 def ms_ttn_3():
@@ -369,10 +406,11 @@ def ms_ttn_3():
     N=16
 
     #setup the system topology
-    dims = [2 for i in range(N)]
+    dims = [2 for i in range(N-1)]
     topo = ntreeBuilder.mlmctdh_tree(dims, 2, chi)
-    A = ms_ttn(topo, 2, dtype=np.complex128)
-    return tfim_dmrg_ms(A)
+    A = ms_ttn(2, topo, dtype=np.complex128)
+    state, H, E = tfim_dmrg_ms(A)
+    return state
 
 
 @pytest.fixture
@@ -393,10 +431,11 @@ def ms_ttn_4():
 
     #setup the system topology
     topo = ntreeBuilder.mlmctdh_tree(dims, 2, chi)
-    B = ms_ttn(topo, 2, dtype=np.complex128)
-    #B.slice(0).assign(A)
-    #B.slice(1).assign(A)
+    B = ms_ttn(2, topo, dtype=np.complex128)
+    B.slice(0).assign(A)
+    B.slice(1).assign(A)
     return B
+
 """
 DEFINE THE OPERATORS USED FOR TESTS AS FIXTURES
 """
@@ -491,4 +530,7 @@ def Stot():
     return op, sysinf
 
 
+
+
+#######
 

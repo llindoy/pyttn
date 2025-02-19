@@ -202,6 +202,9 @@ void init_ntree(py::module &m)
 
             )mydelim")
 
+        .def("__copy__", [](const ntree<T>& o){return ntree<T>(o);})
+        .def("__deepcopy__", [](const ntree<T>& o, py::dict){return ntree<T>(o);}, py::arg("memo"))
+
         .def("assign", &ntree<T>::operator=, R"mydelim(
             Assign the value of this ntree using another ntree
 

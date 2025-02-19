@@ -852,6 +852,20 @@ public:
         return m_nodes[i];
     }
 
+    const ttn_node_data<T, backend>&  node_slice(size_type i, size_type set) const
+    {
+        ASSERT(i < m_nodes.size() && set < m_nset, "Failed to access node data indices out of bounds.");
+        if(m_has_orthogonality_centre){m_has_orthogonality_centre = (i == m_orthogonality_centre);}
+        return m_nodes[i](set);
+    }
+
+    ttn_node_data<T, backend>& node_slice(size_type i, size_type set)
+    {
+        ASSERT(i < m_nodes.size() && set < m_nset, "Failed to access node data indices out of bounds.");
+        if(m_has_orthogonality_centre){m_has_orthogonality_centre = (i == m_orthogonality_centre);}
+        return m_nodes[i](set);
+    }
+
     //gets the path connecting two leaf nodes and additionally returns the node associated with the root of the subtree that contains these two leaves
     size_t leaf_path(size_t li, size_t lj, std::list<size_type>& path)
     {
