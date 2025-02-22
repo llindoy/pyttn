@@ -1207,10 +1207,9 @@ public:
         }
         else
         {
-            ASSERT(sop.nmodes() == A.nleaves(), "Failed to compute trivial tree bipartitioning of the SOP.  SOP and Tree do not have the same dimension.");
             bp.clear();
             bp.construct_topology(A);
-            site_ops.resize(sop.nmodes());
+            site_ops.resize(A.nleaves());
         }
         return false;
     }
