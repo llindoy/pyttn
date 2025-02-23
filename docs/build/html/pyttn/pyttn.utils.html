@@ -55,26 +55,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../Tutorials/index.html">Tutorials</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="API%20Outline.html">API Outline</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Documents</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="index.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pyttn.linalg.html">pyttn.linalg package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyttn.models.html">pyttn.models package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyttn.oqs.html">pyttn.oqs package</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pyttn.utils package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils.mode_combination">pyttn.utils.mode_combination module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils.truncate">pyttn.utils.truncate module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils.visualise_tree">pyttn.utils.visualise_tree module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.utils">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="index.html#module-pyttn">Module contents</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">API Documents</a></li>
 </ul>
 
         </div>
@@ -312,7 +295,7 @@ modes together in this mode and the local hilbert space dimension of the composi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tree</strong> (<a class="reference internal" href="index.html#pyttn.ntree" title="pyttn.ntree"><em>ntree</em></a>) – The tree to be visualised</p></li>
+<li><p><strong>tree</strong> (<a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.ntree" title="pyttn.ttnpp.ntree"><em>ntree</em></a>) – The tree to be visualised</p></li>
 <li><p><strong>prog</strong> (<em>Matplotlib Axes object</em><em>, </em><em>optional</em>) – The visualisation function used with graphviz_layout (default: “dot”)</p></li>
 <li><p><strong>ax</strong> – Draw the tree in specified Matplotlib axes</p></li>
 <li><p><strong>node_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The node size used for visualisation (default: 500)</p></li>
@@ -330,7 +313,7 @@ modes together in this mode and the local hilbert space dimension of the composi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tree</strong> (<a class="reference internal" href="index.html#pyttn.ntree" title="pyttn.ntree"><em>ntree</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.ttn_dtype" title="pyttn.ttn_dtype"><em>ttn_dtype</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.ms_ttn_dtype" title="pyttn.ms_ttn_dtype"><em>ms_ttn_dtype</em></a>) – The tree to be visualised</p></li>
+<li><p><strong>tree</strong> (<a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.ntree" title="pyttn.ttnpp.ntree"><em>ntree</em></a><em> or </em><a class="reference internal" href="pyttn.html#pyttn.ttn_dtype" title="pyttn.ttn_dtype"><em>ttn_dtype</em></a><em> or </em><a class="reference internal" href="pyttn.html#pyttn.ms_ttn_dtype" title="pyttn.ms_ttn_dtype"><em>ms_ttn_dtype</em></a>) – The tree to be visualised</p></li>
 <li><p><strong>prog</strong> (<em>str</em><em>, </em><em>optional</em>) – The visualisation function used with graphviz_layout (default: “dot”)</p></li>
 <li><p><strong>ax</strong> (<em>Matplotlib Axes object</em><em>, </em><em>optional</em>) – Draw the tree in specified Matplotlib axes</p></li>
 <li><p><strong>node_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The node size used for visualisation (default: 500)</p></li>
@@ -351,7 +334,7 @@ modes together in this mode and the local hilbert space dimension of the composi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tree</strong> (<a class="reference internal" href="index.html#pyttn.ttn_dtype" title="pyttn.ttn_dtype"><em>ttn_dtype</em></a>) – The tree to be visualised</p></li>
+<li><p><strong>tree</strong> (<a class="reference internal" href="pyttn.html#pyttn.ttn_dtype" title="pyttn.ttn_dtype"><em>ttn_dtype</em></a>) – The tree to be visualised</p></li>
 <li><p><strong>prog</strong> (<em>str</em><em>, </em><em>optional</em>) – The visualisation function used with graphviz_layout (default: “dot”)</p></li>
 <li><p><strong>ax</strong> (<em>Matplotlib Axes object</em><em>, </em><em>optional</em>) – Draw the tree in specified Matplotlib axes</p></li>
 <li><p><strong>node_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The node size used for visualisation (default: 500)</p></li>
@@ -780,7 +763,7 @@ modes together in this mode and the local hilbert space dimension of the composi
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tree</strong> (<a class="reference internal" href="index.html#pyttn.ntree" title="pyttn.ntree"><em>ntree</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.ttn_dtype" title="pyttn.ttn_dtype"><em>ttn_dtype</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.ms_ttn_dtype" title="pyttn.ms_ttn_dtype"><em>ms_ttn_dtype</em></a>) – The tree to be visualised</p></li>
+<li><p><strong>tree</strong> (<a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.ntree" title="pyttn.ttnpp.ntree"><em>ntree</em></a><em> or </em><a class="reference internal" href="pyttn.html#pyttn.ttn_dtype" title="pyttn.ttn_dtype"><em>ttn_dtype</em></a><em> or </em><a class="reference internal" href="pyttn.html#pyttn.ms_ttn_dtype" title="pyttn.ms_ttn_dtype"><em>ms_ttn_dtype</em></a>) – The tree to be visualised</p></li>
 <li><p><strong>prog</strong> (<em>str</em><em>, </em><em>optional</em>) – The visualisation function used with graphviz_layout (default: “dot”)</p></li>
 <li><p><strong>ax</strong> (<em>Matplotlib Axes object</em><em>, </em><em>optional</em>) – Draw the tree in specified Matplotlib axes</p></li>
 <li><p><strong>node_size</strong> (<em>int</em><em>, </em><em>optional</em>) – The node size used for visualisation (default: 500)</p></li>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thermofield Dynamics of the Spin-Boson Model using the Star Hamiltonian &mdash; pyTTN 0.1 documentation</title>
+  <title>Thermofield Dynamics of the Spin-Boson Model &mdash; pyTTN 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
@@ -94,7 +94,7 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Quickstart</a></li>
           <li class="breadcrumb-item"><a href="spin_boson_model.html">Quickstart: Spin Boson Model</a></li>
-      <li class="breadcrumb-item active">Thermofield Dynamics of the Spin-Boson Model using the Star Hamiltonian</li>
+      <li class="breadcrumb-item active">Thermofield Dynamics of the Spin-Boson Model</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/Quickstart/oqs_sbm_star_finite_T.nblink.txt" rel="nofollow"> View page source</a>
       </li>
@@ -104,14 +104,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="Thermofield-Dynamics-of-the-Spin-Boson-Model-using-the-Star-Hamiltonian">
-<h1>Thermofield Dynamics of the Spin-Boson Model using the Star Hamiltonian<a class="headerlink" href="#Thermofield-Dynamics-of-the-Spin-Boson-Model-using-the-Star-Hamiltonian" title="Link to this heading"></a></h1>
+  <section id="Thermofield-Dynamics-of-the-Spin-Boson-Model">
+<h1>Thermofield Dynamics of the Spin-Boson Model<a class="headerlink" href="#Thermofield-Dynamics-of-the-Spin-Boson-Model" title="Link to this heading"></a></h1>
 <p>We will now demonstrate how to use pyTTN to perform OQS dynamics for a spin-boson model using unitary dynamics methods and the standard star topology form of the spin-boson model. This example only differs from the <a class="reference internal" href="oqs_sbm_star.html"><span class="doc">Zero Temperature Spin-Boson Dynamics</span></a>, by the use of a finite-temperature bath. However, we note that this does significantly alter the bond dimensions required to perform the dynamics, and consequently, we perform dynamics over a considerably shorter
 time in this example.</p>
 <section id="Contents">
 <h2>Contents<a class="headerlink" href="#Contents" title="Link to this heading"></a></h2>
 <ol class="arabic simple">
-<li><p><a href="#id1"><span class="problematic" id="id2">`Import The Library &lt;&gt;`__</span></a></p></li>
+<li><p><a class="reference internal" href="#Importing-the-Library"><span class="std std-ref">Import The Library</span></a></p></li>
 <li><p><a class="reference internal" href="#Setting-up-the-Discrete-Bosonic-Bath"><span class="std std-ref">Setting up the Discrete Bosonic Bath</span></a></p></li>
 <li><p><a class="reference internal" href="#Setting-up-the-System-Information"><span class="std std-ref">Setting up the System Information</span></a></p></li>
 <li><p><a class="reference internal" href="#Building-the-Hamiltonian"><span class="std std-ref">Building the Hamiltonian</span></a></p></li>
@@ -124,7 +124,7 @@ time in this example.</p>
 <h2>Importing the Library<a class="headerlink" href="#Importing-the-Library" title="Link to this heading"></a></h2>
 <p>We start by importing the required modules:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -145,7 +145,7 @@ time in this example.</p>
 <h2>Setting up the Discrete Bosonic Bath<a class="headerlink" href="#Setting-up-the-Discrete-Bosonic-Bath" title="Link to this heading"></a></h2>
 <p>Next we define the spectral density of the bath and set up the <code class="docutils literal notranslate"><span class="pre">pyttn.oqs.BosonicBath</span></code> and <code class="docutils literal notranslate"><span class="pre">pyttn.oqs.DiscreteBosonicBath</span></code> objects.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#set up the time evolution information</span>
@@ -179,7 +179,7 @@ time in this example.</p>
 </div>
 <p>Now we check the quality of the bath correlation function discretisation over the time-period of interest</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#and check the accuracy of the bath correlation function</span>
@@ -201,7 +201,7 @@ time in this example.</p>
 <h2>Setting up the System Information<a class="headerlink" href="#Setting-up-the-System-Information" title="Link to this heading"></a></h2>
 <p>Now we get the system information from the <code class="docutils literal notranslate"><span class="pre">pyttn.oqs.DiscreteBosonicBath</span></code> object, optionally applying mode combination to combine primitive bosonic modes into composite modes.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[34]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#set up the total system information object including both system information and bath information</span>
@@ -233,7 +233,7 @@ time in this example.</p>
 <h2>Building the Hamiltonian<a class="headerlink" href="#Building-the-Hamiltonian" title="Link to this heading"></a></h2>
 <p>In order to simplify construction of the discrete bath Hamiltonian, the discrete bath function contains the <code class="docutils literal notranslate"><span class="pre">add_system_bath_hamiltonian</span></code> and <code class="docutils literal notranslate"><span class="pre">system_bath_hamiltonian</span></code> functions that, respectively, append to the system-bath Hamiltonian terms to an existing <code class="docutils literal notranslate"><span class="pre">SOP</span></code> object or return a new <code class="docutils literal notranslate"><span class="pre">sSOP</span></code> object containing all system-bath Hamiltonian terms.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[35]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#create the SOP object</span>
@@ -257,7 +257,7 @@ time in this example.</p>
 <p>We are now in a position to prepare the wavefunction tree topology. Here, again, the <code class="docutils literal notranslate"><span class="pre">pyttn.oqs.DiscreteBosonicBath</span></code> class can help through the <code class="docutils literal notranslate"><span class="pre">add_bath_tree</span></code> function, which takes a node in an existing tree used to represent the system degrees of freedom and attaches either an MPS or balanced N-ary tree to represent the degrees of freedom handled by the discbath object.</p>
 <p>To build the tree, we first define the tree structure for system degrees of freedom, then attach the bath tree in the correct position.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[36]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#bond dimension used at start of simulation</span>
@@ -286,7 +286,7 @@ mapped to indices in the tree structure.</p>
 <p>Now that we have constructed the tree topology, we can build the actually TTN wavefunction. For standard OQS simulations, in which we perform dynamics from a state corresponding to an initially uncorrelated system-bath density operator, with a thermal (or vacuum) bath (dependent on temperature), the initial configuration of the bath for these unitary dynamics simulations is simply the vacuum state (at finite temperature this is due to the fact that we have used the thermofield mapping to
 construct a new model where the zero-temperature dynamics reproduces the finite-temperature dynamics of our original mode). As such, creation of the initial wavefunction is straightfoward</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[37]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#build the TTN object for this system</span>
@@ -310,7 +310,7 @@ construct a new model where the zero-temperature dynamics reproduces the finite-
 <li><p>create the <code class="docutils literal notranslate"><span class="pre">tdvp</span></code> object for time evolution. Here we will use the adaptive one-site algorithm for time-evolution.</p></li>
 </ol>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[38]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#set up the Hamiltonian as a sop_operator object</span>
@@ -342,7 +342,7 @@ construct a new model where the zero-temperature dynamics reproduces the finite-
 <p>Here we make use of a little trick for improving the accuracy of the time-evolution at short time. For systems initially in the product state, the ttn wavefunction represents a rather constrained manifold, and the dynamics can depend strongly on the choice of initially unoccupied basis functions. To alleviate this, it can be useful to perform small steps initially in order to allow for these unoccupied functions to evolve partially under the Hamiltonian of the system before too much damage has
 been done to the wavefunction. As shown in Ref., this can dramatically improve the accuracy of the TDVP calculations with only very modest additional computational cost.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[39]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#measure the initial magnetisation</span>
@@ -364,7 +364,7 @@ been done to the wavefunction. As shown in Ref., this can dramatically improve t
 </div>
 <p>Now that we have completed the first step, we return to time evolution as usual.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[40]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#set the values after the first timestep</span>
@@ -390,7 +390,7 @@ been done to the wavefunction. As shown in Ref., this can dramatically improve t
 </div>
 <p>And now that we have finished the time evolution we can plot the resultant magnetisation.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[41]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Sz</span><span class="p">)</span>
@@ -407,7 +407,7 @@ been done to the wavefunction. As shown in Ref., this can dramatically improve t
 </div>
 <p>And we can also do things like visualise how the bond dimension has expanded throughout the tensor network.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[42]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">visualise_tree</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bond_prop</span><span class="o">=</span><span class="s2">&quot;bond dimension&quot;</span><span class="p">)</span>
@@ -424,7 +424,7 @@ been done to the wavefunction. As shown in Ref., this can dramatically improve t
 </div>
 <p>Where we observe that the required bond dimension varies considerably throughout the tree. Here we note that the bath modes are ordered in increasing energy here. Here we see that the largest bond dimensions necessary arise when accounting for the bath modes with frequencies:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[43]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">((</span><span class="n">w</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">]))</span>
@@ -436,8 +436,8 @@ been done to the wavefunction. As shown in Ref., this can dramatically improve t
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[-4.9422652  -4.86670242 -4.73135276 -4.53719459 -4.28566215 -3.97860149
- -3.61824225 -3.20716633]
+[ 0.1298421  -0.50398813  0.80280349 -1.11818016  1.5163602  -1.70009323
+ -2.24475598  2.26553747]
 </pre></div></div>
 </div>
 </section>

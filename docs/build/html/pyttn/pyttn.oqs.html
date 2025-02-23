@@ -58,28 +58,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../Tutorials/index.html">Tutorials</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="API%20Outline.html">API Outline</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Documents</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="index.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="pyttn.linalg.html">pyttn.linalg package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyttn.models.html">pyttn.models package</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">pyttn.oqs package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.oqs.bathFitInfo">pyttn.oqs.bathFitInfo module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.oqs.bosonic_bath">pyttn.oqs.bosonic_bath module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.oqs.exponential_fit_bath">pyttn.oqs.exponential_fit_bath module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.oqs.fermionic_bath">pyttn.oqs.fermionic_bath module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-pyttn.oqs">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="pyttn.utils.html">pyttn.utils package</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="index.html#module-pyttn">Module contents</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">API Documents</a></li>
 </ul>
 
         </div>
@@ -370,8 +351,8 @@ of the form</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>H</strong> (<em>SOP</em>) – The total Generator</p></li>
-<li><p><strong>Sp</strong> (<em>list</em><em>[</em><a class="reference internal" href="index.html#pyttn.sOP" title="pyttn.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.sPOP" title="pyttn.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>]</em>) – A list containing the left and right acting operators that couples to the bath annihilation operator terms</p></li>
-<li><p><strong>Sm</strong> (<em>list</em><em>[</em><a class="reference internal" href="index.html#pyttn.sOP" title="pyttn.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.sPOP" title="pyttn.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>, </em><em>optional</em><em>]</em>) – A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^dagger + a) (Default: None)</p></li>
+<li><p><strong>Sp</strong> (<em>list</em><em>[</em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sOP" title="pyttn.ttnpp.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sPOP" title="pyttn.ttnpp.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>]</em>) – A list containing the left and right acting operators that couples to the bath annihilation operator terms</p></li>
+<li><p><strong>Sm</strong> (<em>list</em><em>[</em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sOP" title="pyttn.ttnpp.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sPOP" title="pyttn.ttnpp.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>, </em><em>optional</em><em>]</em>) – A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^dagger + a) (Default: None)</p></li>
 <li><p><strong>method</strong> (<em>{&quot;heom&quot;</em><em>, </em><em>&quot;pseudomode&quot;}</em>) – The method used to represent the bath.</p></li>
 <li><p><strong>binds</strong> (<em>list</em><em>, </em><em>optional</em>) – A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)</p></li>
 <li><p><strong>bskip</strong> (<em>int</em><em>, </em><em>optional</em>) – The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)</p></li>
@@ -394,8 +375,8 @@ of the form</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>H</strong> (<em>SOP</em>) – The total Generator</p></li>
-<li><p><strong>Sp</strong> (<em>list</em><em>[</em><a class="reference internal" href="index.html#pyttn.sOP" title="pyttn.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.sPOP" title="pyttn.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>]</em>) – A list containing the left and right acting operators that couples to the bath annihilation operator terms</p></li>
-<li><p><strong>Sm</strong> (<em>list</em><em>[</em><a class="reference internal" href="index.html#pyttn.sOP" title="pyttn.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.sPOP" title="pyttn.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>, </em><em>optional</em><em>]</em>) – A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^dagger + a) (Default: None)</p></li>
+<li><p><strong>Sp</strong> (<em>list</em><em>[</em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sOP" title="pyttn.ttnpp.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sPOP" title="pyttn.ttnpp.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>]</em>) – A list containing the left and right acting operators that couples to the bath annihilation operator terms</p></li>
+<li><p><strong>Sm</strong> (<em>list</em><em>[</em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sOP" title="pyttn.ttnpp.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sPOP" title="pyttn.ttnpp.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>, </em><em>optional</em><em>]</em>) – A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^dagger + a) (Default: None)</p></li>
 <li><p><strong>method</strong> (<em>{&quot;heom&quot;</em><em>, </em><em>&quot;pseudomode&quot;}</em>) – The method used to represent the bath.</p></li>
 <li><p><strong>binds</strong> (<em>list</em><em>, </em><em>optional</em>) – A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)</p></li>
 <li><p><strong>bskip</strong> (<em>int</em><em>, </em><em>optional</em>) – The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)</p></li>
@@ -425,7 +406,7 @@ of the form</p>
 <dd class="field-even"><p>Bath system information</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="index.html#pyttn.system_modes" title="pyttn.system_modes">system_modes</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.system_modes" title="pyttn.ttnpp.system_modes">system_modes</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -476,8 +457,8 @@ of the form</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>H</strong> (<em>SOP</em>) – The total Generator</p></li>
-<li><p><strong>Sp</strong> (<em>list</em><em>[</em><a class="reference internal" href="index.html#pyttn.sOP" title="pyttn.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.sPOP" title="pyttn.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>]</em>) – A list containing the left and right acting operators that couples to the bath annihilation operator terms</p></li>
-<li><p><strong>Sm</strong> (<em>list</em><em>[</em><a class="reference internal" href="index.html#pyttn.sOP" title="pyttn.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.sPOP" title="pyttn.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>, </em><em>optional</em><em>]</em>) – A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^dagger + a) (Default: None)</p></li>
+<li><p><strong>Sp</strong> (<em>list</em><em>[</em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sOP" title="pyttn.ttnpp.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sPOP" title="pyttn.ttnpp.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>]</em>) – A list containing the left and right acting operators that couples to the bath annihilation operator terms</p></li>
+<li><p><strong>Sm</strong> (<em>list</em><em>[</em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sOP" title="pyttn.ttnpp.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sPOP" title="pyttn.ttnpp.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>, </em><em>optional</em><em>]</em>) – A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^dagger + a) (Default: None)</p></li>
 <li><p><strong>method</strong> (<em>{&quot;heom&quot;</em><em>, </em><em>&quot;pseudomode&quot;}</em>) – The method used to represent the bath.</p></li>
 <li><p><strong>binds</strong> (<em>list</em><em>, </em><em>optional</em>) – A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)</p></li>
 <li><p><strong>bskip</strong> (<em>int</em><em>, </em><em>optional</em>) – The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)</p></li>
@@ -500,8 +481,8 @@ of the form</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>H</strong> (<em>SOP</em>) – The total Generator</p></li>
-<li><p><strong>Sp</strong> (<em>list</em><em>[</em><a class="reference internal" href="index.html#pyttn.sOP" title="pyttn.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.sPOP" title="pyttn.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>]</em>) – A list containing the left and right acting operators that couples to the bath annihilation operator terms</p></li>
-<li><p><strong>Sm</strong> (<em>list</em><em>[</em><a class="reference internal" href="index.html#pyttn.sOP" title="pyttn.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="index.html#pyttn.sPOP" title="pyttn.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>, </em><em>optional</em><em>]</em>) – A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^dagger + a) (Default: None)</p></li>
+<li><p><strong>Sp</strong> (<em>list</em><em>[</em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sOP" title="pyttn.ttnpp.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sPOP" title="pyttn.ttnpp.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>]</em>) – A list containing the left and right acting operators that couples to the bath annihilation operator terms</p></li>
+<li><p><strong>Sm</strong> (<em>list</em><em>[</em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sOP" title="pyttn.ttnpp.sOP"><em>sOP</em></a><em> or </em><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.sPOP" title="pyttn.ttnpp.sPOP"><em>sPOP</em></a><em> or </em><em>sNBO</em><em> or </em><em>sSOP</em><em>, </em><em>optional</em><em>]</em>) – A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^dagger + a) (Default: None)</p></li>
 <li><p><strong>method</strong> (<em>{&quot;heom&quot;</em><em>, </em><em>&quot;pseudomode&quot;}</em>) – The method used to represent the bath.</p></li>
 <li><p><strong>binds</strong> (<em>list</em><em>, </em><em>optional</em>) – A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)</p></li>
 <li><p><strong>bskip</strong> (<em>int</em><em>, </em><em>optional</em>) – The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)</p></li>
@@ -531,7 +512,7 @@ of the form</p>
 <dd class="field-even"><p>Bath system information</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="index.html#pyttn.system_modes" title="pyttn.system_modes">system_modes</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.system_modes" title="pyttn.ttnpp.system_modes">system_modes</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -596,7 +577,7 @@ defined by:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>node</strong> (<a class="reference internal" href="index.html#pyttn.ntreeNode" title="pyttn.ntreeNode"><em>ntreeNode</em></a>) – The node where the subtree should be added</p></li>
+<li><p><strong>node</strong> (<a class="reference internal" href="../ttnpp/ttnpp.html#pyttn.ttnpp.ntreeNode" title="pyttn.ttnpp.ntreeNode"><em>ntreeNode</em></a>) – The node where the subtree should be added</p></li>
 <li><p><strong>degree</strong> (<em>int</em>) – The degree of the tree.  If degree = 1 this appends an MPS subtree otherwise it adds a balanced degree-ary tree.</p></li>
 <li><p><strong>chi</strong> (<em>int</em><em>, </em><em>list</em><em>[</em><em>int</em><em>]</em><em>, </em><em>(</em><em>callable</em><em>(</em><em>int</em><em>)</em><em>)</em>) – The bond dimension to insert throughout the tree.  This can accept all types supported by the ntreeBuilder objects</p></li>
 <li><p><strong>lhd</strong> (<em>int</em><em>, </em><em>list</em><em>[</em><em>int</em><em>]</em><em>, </em><em>(</em><em>callable</em><em>(</em><em>int</em><em>)</em><em>)</em><em>, </em><em>optional</em>) – The dimension of local Hilbert space transformation nodes.  This can accept all types supported by the ntreeBuilder objects. (Default: None)</p></li>

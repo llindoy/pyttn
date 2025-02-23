@@ -127,7 +127,7 @@
 <h2>Importing the Package<a class="headerlink" href="#Importing-the-Package" title="Link to this heading"></a></h2>
 <p>We start by importing the required modules for this example</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -147,7 +147,7 @@
 <h2>Setting up the System and Hamiltonian<a class="headerlink" href="#Setting-up-the-System-and-Hamiltonian" title="Link to this heading"></a></h2>
 <p>We start by setting up the <code class="docutils literal notranslate"><span class="pre">system_modes</span></code> object that tells pyTTN the type of operators to expect, and local Hilbert space dimension associated with each mode. For the case of the <span class="math notranslate nohighlight">\(N=64\)</span> spin-<span class="math notranslate nohighlight">\(\frac{1}{2}\)</span> system we are considering here. This is done as follows:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define number of modes</span>
@@ -164,7 +164,7 @@
 </div>
 <p>We now prepare the system Hamiltonian through the use of the <code class="docutils literal notranslate"><span class="pre">SOP</span></code> class. This makes use of a string representation of the Hamiltonian, that is later converted into a form necessary for performing calculations. For more details on the generation of operators see the <a class="reference external" href="file/../operator_generation.ipynb">tutorial on operator generation</a>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">J</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -189,7 +189,7 @@
 <p>We now prepare the initial wavefunction. This requires a two-step process, first we define the tree topology to use for this calculation through the use of the <code class="docutils literal notranslate"><span class="pre">ntree</span></code> class (which for this example we choose to be an MPS), following which we construct the <code class="docutils literal notranslate"><span class="pre">ttn</span></code> object that actually represents the wavefunction. In this example we intend to use a subspace expansion based in order to expand bond dimension throughout the DMRG loop. In order to do this, we define an additional <code class="docutils literal notranslate"><span class="pre">ntree</span></code> object
 with the same structure but different values defining the maximum allowed dimension of any bond in the network. For more details one the construct of tree topologies see the <a class="reference external" href="file/../tree_topologies.ipynb">tutorial on tree topologies</a>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initial bond dimension</span>
@@ -227,7 +227,7 @@ with the same structure but different values defining the maximum allowed dimens
 </ul>
 <p>By default calls to <code class="docutils literal notranslate"><span class="pre">sop_operator</span></code> will lead to the construction of Hierarchical Sum-of-Product operators.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h</span> <span class="o">=</span> <span class="n">pyttn</span><span class="o">.</span><span class="n">sop_operator</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">sysinf</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -239,7 +239,7 @@ with the same structure but different values defining the maximum allowed dimens
 <h2>Setting up and Performing the DMRG Loop<a class="headerlink" href="#Setting-up-and-Performing-the-DMRG-Loop" title="Link to this heading"></a></h2>
 <p>Now we can have everything we need to set up all of the objects required to perform the DMRG loop. Here we set up DMRG with the use of subspace expansion to expand bond dimensions throughout the update steps.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#set up the DMRG sweeping object to</span>
@@ -255,7 +255,7 @@ with the same structure but different values defining the maximum allowed dimens
 </div>
 <p>Now we have everything needed to perform the DMRG loop. Here we perform 10 steps and plot the energy per spin for each step in the DMRG sweep:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
@@ -272,21 +272,21 @@ with the same structure but different values defining the maximum allowed dimens
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-1 -1.2675382099057548 13
-2 -1.267593435039451 20
-3 -1.2675934393941446 24
-4 -1.2675934394149269 24
-5 -1.2675934394162052 24
-6 -1.2675934394163335 24
-7 -1.2675934394163881 24
-8 -1.2675934394164143 24
-9 -1.2675934394164239 24
-10 -1.2675934394164328 24
+1 -1.26754402172724 14
+2 -1.2675934348565134 20
+3 -1.2675934393873938 23
+4 -1.267593439413532 24
+5 -1.2675934394158952 24
+6 -1.2675934394161503 24
+7 -1.2675934394162707 24
+8 -1.267593439416314 24
+9 -1.2675934394163322 24
+10 -1.267593439416337 24
 </pre></div></div>
 </div>
 <p>Here we observe convergence of the result to the expected value of:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">E</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">))))</span>
@@ -304,7 +304,7 @@ with the same structure but different values defining the maximum allowed dimens
 </div>
 <p>Now finally, we will visualise what the subspace expansion scheme has done to the bond dimension of the TTN, using the <code class="docutils literal notranslate"><span class="pre">visualise_tree</span></code> function.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">visualise_tree</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">bond_prop</span><span class="o">=</span><span class="s2">&quot;bond dimension&quot;</span><span class="p">,</span> <span class="n">node_size</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
