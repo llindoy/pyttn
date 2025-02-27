@@ -5,13 +5,13 @@ before_script:
  - apt-get install --yes cmake
  - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
 
-stages:
-  - build 
-  - test
-  #- deploy
-  
 
-build:
+stages:
+  #- build 
+  #- test
+  - deploy
+  
+.build:
   stage: test
   script:
   - export CMAKE_BUILD_PARALLEL_LEVEL=4
@@ -19,7 +19,7 @@ build:
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
 
-test:
+.test:
   stage: test
   needs: 
   - build
@@ -28,14 +28,13 @@ test:
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
     
-#deploy-pages:
-#  stage: deploy
-#  script:
-#  - mkdir .public
-#  - cp -r docs/build/html/* .public
-#  artifacts:
-#    paths:
-#    - public
-#  rules:
-#    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+deploy-pages:
+  stage: deploy
+  script:
+  - cp -r docs/build/html/ public/
+  artifacts:
+    paths:
+    - public
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
