@@ -28,7 +28,7 @@ stages:
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
     
-deploy-pages:
+pages:
   stage: deploy
   script:
   - cp -r docs/build/html/ public/
