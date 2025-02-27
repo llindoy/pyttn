@@ -74,9 +74,15 @@ $ cd ${pyTTN_ROOT_DIR}
 $ python3 -m pip install .
 ```
 
-This will build the script in 
+By default, this will make use of a single threaded build for compiling the Pybind11 wrapper and can take a number of minutes to complete.  It is possible to make use of multi-threaded builds when compiling the Pybind11.  This can be done by setting the environment variable `CMAKE_BUILD_PARALLEL_LEVEL`, e.g.
+```
+export CMAKE_BUILD_PARALLEL_LEVEL=8
+```
+to allow for the use of 8 threads when compiling.
 
 ### Building with CUDA Support
+[!Note]
+Work in progress
 
 ## Using the Software
 Example python scripts showing the use of pyTTN for a range of application are provided in the ${PyTTN_ROOT_DIR}/examples.  These examples included
