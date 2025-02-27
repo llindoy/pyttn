@@ -20,7 +20,8 @@ build:
 
 test:
   stage: test
-  needs: build
+  needs: 
+  - build
   script:
   - python -m pytest
   rules:
