@@ -1,0 +1,188 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quickstart &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="DMRG: 1D Transverse Field Ising Model" href="tfim_dmrg.html" />
+    <link rel="prev" title="Installation Guide" href="../Installation/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ground-state-calculations">Ground State Calculations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tfim_dmrg.html">DMRG: 1D Transverse Field Ising Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fermi_hubbard_dmrg.html">DMRG: 1D Fermi-Hubbard Model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dynamics-calculations">Dynamics Calculations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tfim_tdvp.html">Quench Dynamics: 1D Transverse Field Ising Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cayley_xy_tdvp.html">Spin Dynamics of an anisotropic XY model on a Cayley Tree</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyrazine.html">Nonadiabatic Dynamics of 24-mode Pyrazine</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#non-markovian-open-quantum-system-dynamics">Non-Markovian Open Quantum System Dynamics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="oqs_baths.html">Handling Continuous Bosonic Baths with <code class="docutils literal notranslate"><span class="pre">pyttn.oqs</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="spin_boson_model.html">Spin Boson Model</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-multiset-ansatz">Using the Multiset Ansatz</a><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../pyttn/API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pyttn/index.html">API Documents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Quickstart</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/Quickstart/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h1>
+<p>This page provides a set of examples demonstrating the use of pyTTN in range of different contexts.</p>
+<section id="ground-state-calculations">
+<h2>Ground State Calculations<a class="headerlink" href="#ground-state-calculations" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tfim_dmrg.html">DMRG: 1D Transverse Field Ising Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fermi_hubbard_dmrg.html">DMRG: 1D Fermi-Hubbard Model</a></li>
+</ul>
+</div>
+</section>
+<section id="dynamics-calculations">
+<h2>Dynamics Calculations<a class="headerlink" href="#dynamics-calculations" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tfim_tdvp.html">Quench Dynamics: 1D Transverse Field Ising Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cayley_xy_tdvp.html">Spin Dynamics of an anisotropic XY model on a Cayley Tree</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pyrazine.html">Nonadiabatic Dynamics of 24-mode Pyrazine</a></li>
+</ul>
+</div>
+</section>
+<section id="non-markovian-open-quantum-system-dynamics">
+<h2>Non-Markovian Open Quantum System Dynamics<a class="headerlink" href="#non-markovian-open-quantum-system-dynamics" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="oqs_baths.html">Handling Continuous Bosonic Baths with <code class="docutils literal notranslate"><span class="pre">pyttn.oqs</span></code></a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="spin_boson_model.html">Spin Boson Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spin_boson_model.html#unitary-dynamics">Unitary Dynamics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spin_boson_model.html#nonunitary-dynamics">Nonunitary Dynamics</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="using-the-multiset-ansatz">
+<h2>Using the Multiset Ansatz<a class="headerlink" href="#using-the-multiset-ansatz" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../Installation/index.html" class="btn btn-neutral float-left" title="Installation Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tfim_dmrg.html" class="btn btn-neutral float-right" title="DMRG: 1D Transverse Field Ising Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

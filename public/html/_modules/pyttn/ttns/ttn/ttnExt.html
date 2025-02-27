@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyttn.ttns.ttn.ttnExt &mdash; pyTTN 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=2709fde1"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            pyTTN
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Installation/index.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quickstart:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Quickstart/index.html">Quickstart</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../Tutorials/index.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">pyTTN API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/API%20Outline.html">API Outline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../pyttn/index.html">API Documents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">pyTTN</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyttn.ttns.ttn.ttnExt</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyttn.ttns.ttn.ttnExt</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_complex</span><span class="p">,</span> <span class="n">ms_ttn_complex</span>
+<span class="c1">#and attempt to import the real ttns</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_real</span><span class="p">,</span> <span class="n">ms_ttn_real</span>
+    <span class="n">__real_ttn_import</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">ttn_real</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ms_ttn_real</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">__real_ttn_import</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="c1">#and attempt to import the cuda backend</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_complex</span> <span class="k">as</span> <span class="n">ttn_complex_cuda</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">ms_ttn_complex</span> <span class="k">as</span> <span class="n">ms_ttn_complex_cuda</span>
+
+    <span class="n">__cuda_import</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1">#and if we have imported real ttns we import the cuda versions</span>
+    <span class="k">if</span> <span class="n">__real_ttn_import</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">ttn_real</span> <span class="k">as</span> <span class="n">ttn_real_cuda</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">pyttn.ttnpp.cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">ms_ttn_real</span> <span class="k">as</span> <span class="n">ms_ttn_real_cuda</span>    
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ttn_real_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">ms_ttn_real_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">__cuda_import</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">ttn_complex_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ms_ttn_complex_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ttn_real_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ms_ttn_real_cuda</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="is_ttn">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.is_ttn">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_ttn</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A function for determining whether a given object is a ttn</span>
+<span class="sd">    :param A: The object to test</span>
+<span class="sd">    :returns: Whether or not the object is a ms_ttn</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">__real_ttn_import</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_real</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">__cuda_import</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_complex_cuda</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">__real_ttn_import</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ttn_real_cuda</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<div class="viewcode-block" id="is_ms_ttn">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.is_ms_ttn">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_ms_ttn</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A function for determining whether a given object is a multiset ttn</span>
+<span class="sd">    :param A: The object to test</span>
+<span class="sd">    :returns: Whether or not the object is a ms_ttn</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">__real_ttn_import</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_real</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">__cuda_import</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_complex_cuda</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">__real_ttn_import</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">ret</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">ms_ttn_real_cuda</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ret</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">is_multiset_ttn</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;A function for determining whether a given object is a multiset ttn</span>
+<span class="sd">    :param A: The object to test</span>
+<span class="sd">    :returns: Whether or not the object is a ms_ttn</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">is_ms_ttn</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__ttn_blas</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ttn_complex</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ttn_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">__real_ttn_import</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ttn_real</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">ttn_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ttn_real</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span>  <span class="ow">or</span> <span class="ow">not</span> <span class="n">__real_ttn_import</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ttn_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ttn_real</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for ttn&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">__real_ttn_import</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ttn_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ttn_real</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for ttn&quot;</span><span class="p">)</span>
+        
+<span class="k">def</span><span class="w"> </span><span class="nf">__ttn_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ttn_complex_cuda</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ttn_complex_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">__real_ttn_import</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ttn_real_cuda</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">ttn_complex_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ttn_real_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span>  <span class="ow">or</span> <span class="ow">not</span> <span class="n">__real_ttn_import</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ttn_complex_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ttn_real_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for ttn&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">__real_ttn_import</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ttn_complex_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ttn_real_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for ttn&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ttn">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ttn">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ttn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;blas&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factory function for constructing a tree tensor network state operator</span>
+
+<span class="sd">    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
+
+<span class="sd">        - Default construct TTN object</span>
+<span class="sd">        - ttn (ttn_dtype) - Copy construct TTN object</span>
+<span class="sd">        - slice (ms_ttn_slice_dtype) - Construct TTN object from slice of multiset ttn</span>
+<span class="sd">        - tree (ntree) - Construct TTN from an Ntree object</span>
+<span class="sd">        - string (str) - Construct TTN from an string defining an Ntree object </span>
+
+<span class="sd">    :param dtype: The dtype to use for the ttn.  (Default: np.complex128) </span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+<span class="sd">    :param backend: The computational backend to use for the ttn.  (Default: &quot;blas&quot;) </span>
+<span class="sd">    :type backend: {&quot;blas&quot;, &quot;cuda&quot;}, optional</span>
+<span class="sd">    :param **kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
+
+<span class="sd">    :returns: The Tree Tensor Network State object</span>
+<span class="sd">    :rtype: ttn_dtype (dtype=complex or real)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;blas&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">__ttn_blas</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">__cuda_import</span> <span class="ow">and</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;cuda&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">__ttn_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid backend type for ttn&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">__ms_ttn_blas</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ms_ttn_complex</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ms_ttn_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">__real_ttn_import</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ms_ttn_real</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">ms_ttn_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ms_ttn_real</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span>  <span class="ow">or</span> <span class="ow">not</span> <span class="n">__real_ttn_import</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">ms_ttn_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ms_ttn_real</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for ms_ttn&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span>  <span class="ow">or</span> <span class="ow">not</span> <span class="n">__real_ttn_import</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ms_ttn_complex</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ms_ttn_real</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for ms_ttn&quot;</span><span class="p">)</span>
+        
+<span class="k">def</span><span class="w"> </span><span class="nf">__ms_ttn_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ms_ttn_complex_cuda</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ms_ttn_complex_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">__real_ttn_import</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ms_ttn_real</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">ms_ttn_complex_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ms_ttn_real_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span>  <span class="ow">or</span> <span class="ow">not</span> <span class="n">__real_ttn_import</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">ms_ttn_complex_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ms_ttn_real_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for ms_ttn&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span>  <span class="ow">or</span> <span class="ow">not</span> <span class="n">__real_ttn_import</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ms_ttn_complex_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ms_ttn_real_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid dtype for ms_ttn&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="multiset_ttn">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.multiset_ttn">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">multiset_ttn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;blas&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factory function for constructing a multiset tree tensor network state operator</span>
+
+<span class="sd">    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
+
+<span class="sd">        - Default construct a multiset TTN object</span>
+<span class="sd">        - msttn (ms_ttn_dtype) - Copy construct a multiset TTN object</span>
+<span class="sd">        - tree (ntree), nset (int) - Construct a multiset TTN from an Ntree object and the number of set variables</span>
+<span class="sd">        - string (str), nset (int) - Construct multiset TTN from an string defining an Ntree object and the number of set variables</span>
+
+<span class="sd">    :param dtype: The dtype to use for the ttn.  (Default: np.complex128) </span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+<span class="sd">    :param backend: The computational backend to use for the ttn.  (Default: &quot;blas&quot;) </span>
+<span class="sd">    :type backend: {&quot;blas&quot;, &quot;cuda&quot;}, optional</span>
+<span class="sd">    :param **kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
+
+<span class="sd">    :returns: The Multiset Tree Tensor Network State object</span>
+<span class="sd">    :rtype: ms_ttn_dtype (dtype=complex or real)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;blas&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">__ms_ttn_blas</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">__cuda_import</span> <span class="ow">and</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">&#39;cuda&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">__ms_ttn_cuda</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Invalid backend type for multiset_ttn&quot;</span><span class="p">)</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="ms_ttn">
+<a class="viewcode-back" href="../../../../pyttn/index.html#pyttn.ms_ttn">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ms_ttn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;blas&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Factory function for constructing a multiset tree tensor network state operator</span>
+
+<span class="sd">    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments</span>
+
+<span class="sd">        - Default construct a multiset TTN object</span>
+<span class="sd">        - msttn (ms_ttn_dtype) - Copy construct a multiset TTN object</span>
+<span class="sd">        - tree (ntree), nset (int) - Construct a multiset TTN from an Ntree object and the number of set variables</span>
+<span class="sd">        - string (str), nset (int) - Construct multiset TTN from an string defining an Ntree object and the number of set variables</span>
+
+<span class="sd">    :param dtype: The dtype to use for the ttn.  (Default: np.complex128) </span>
+<span class="sd">    :type dtype: {np.float64, np.complex128}, optional</span>
+<span class="sd">    :param backend: The computational backend to use for the ttn.  (Default: &quot;blas&quot;) </span>
+<span class="sd">    :type backend: {&quot;blas&quot;, &quot;cuda&quot;}, optional</span>
+<span class="sd">    :param **kwargs: Additional keyword arguments that are based to the ttn object constructor</span>
+
+<span class="sd">    :returns: The Multiset Tree Tensor Network State object</span>
+<span class="sd">    :rtype: ms_ttn_dtype (dtype=complex or real)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">multiset_ttn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Lachlan Lindoy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
