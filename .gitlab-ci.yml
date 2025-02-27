@@ -1,14 +1,27 @@
 image: python:latest
 
+before_script:
+ - apt-get update --yes
+ - apt-get install --yes cmake
+
 stages:
+  - build 
   - test
   #- deploy
+  
+
+build:
+  stage: test
+  script:
+  - apt
+  - python -m pip install ./
+  rules:
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
 
 test:
   stage: test
   script:
-  - python -m pip install ./
-  - pytest
+  - pytest .
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
     
