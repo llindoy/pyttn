@@ -13,7 +13,8 @@
 ## Links
 
 <!-- Add links when complete -->
-* Gitlab:         <>
+* National Physical Laboratory: <https://www.npl.co.uk/>
+* Gitlab:         <https://gitlab.npl.co.uk/quantum-software/pyttn>
 * Documentation:  <>
 * PyPI:           <>
 
@@ -33,7 +34,7 @@ This open source project aims to provide an easy to use python interface for wor
 <!-- Add hyperlinks to the examples here -->
 pyTTN implements a range of numerically exact methods (methods that are systematically convergable to the exact results) for the dynamics of quantum system, and provides several example applications to
 - Non-adiabatic dynamics of 24-mode pyrazine
-- Exciton dynamics in a $n$-oligothiophene donor-C$_{60}$ fullerene acceptor system
+- Exciton dynamics in a $n$-oligothiophene donor-C<sub>60</sub> fullerene acceptor system
 - Dynamics of quantum systems coupled to a single or multiple bosonic or fermionic environment
 - Interacting chains and trees of open quantum systems
 
@@ -59,7 +60,7 @@ External Libraries:
 
 The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${PyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from github.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
 
-pyTTN also supports the use of a CUDA backend to accelerate the internal tensor operations.  When compiling the CUDA backend, pyTTN gains the following additional dependencies:
+pyTTN also offers experimental support for the use of a CUDA backend to accelerate the internal tensor operations.  When compiling the CUDA backend, pyTTN gains the following additional dependencies:
 External Libraries:
 - [CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) 
 - [cuTENSOR](https://developer.nvidia.com/cutensor)
@@ -72,6 +73,8 @@ You can install pyTTN using pip like this:
 $ cd ${pyTTN_ROOT_DIR}
 $ python3 -m pip install .
 ```
+
+This will build the script in 
 
 ### Building with CUDA Support
 

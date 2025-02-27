@@ -2,22 +2,22 @@ import numpy as np
 
 
 class ms_ttn_dtype:
-    """A class defining the general interface for the pybind11 wrappers generated for the multiset ttn object.  These wrapper classes are
-    :class:`ttn_complex` and :class:`ttn_real` (with the real variant only present if the pybind11 wrapper has been built with support
+    r"""A class defining the general interface for the pybind11 wrappers generated for the multiset ttn object.  These wrapper classes are
+    :class:`ms_ttn_complex` and :class:`ms_ttn_real` (with the real variant only present if the pybind11 wrapper has been built with support
     for real valued multiset TTNs.
 
-    :param \\*args: A variable length list of arguments. Valid options are
+    :param *args: A variable length list of arguments. Valid options are
 
         - none - in this case we call the default constructor of the multiset ttn class to construct an empty ttn.
         - **A** (:class:`ms_ttn_complex` or :class:`ms_ttn_real`) - Construct the multiset ttn object from another multiset multiset ttn object potentially converting the dtype
         - **topology** (:class:`ntree` or str), **nset** (int) - Construct a ms multiset ttn from a ntree object defining the topology and bond dimensions of the ms multiset ttn and a variable specifying the number of sets
         - **topology** (:class:`ntree` or str), **capacity** (:class:`ntree` or str ), **nset** (int) - Construct a multiset ttn from an ntree object defining the topology, a capacity defining the maximum bond dimensions, and a variable specifying the number of set
 
-    :type \\*args: [Arguments (variable number and type)]
-    :param \\*\\*kwargs: A dictionary containing optional input arguments.
+    :type *args: [Arguments (variable number and type)]
+    :param **kwargs: A dictionary containing optional input arguments.
 
         - **purification** (bool) - Whether or not this state should represent a purification of a state.
-    :type \\*\\*kwargs: dict(Arguments (variable number and type))
+    :type **kwargs: dict(Arguments (variable number and type))
     """
 
     def __init__(self, *args, dtype=np.complex128, **kwargs):
@@ -26,7 +26,7 @@ class ms_ttn_dtype:
 
     @property
     def complex_dtype(self):
-        """Return the data type stored in the multiset ttn
+        r"""Return the data type stored in the multiset ttn
 
         :returns: dtype
         :rtype: {np.complex128 or np.float64}
@@ -35,7 +35,7 @@ class ms_ttn_dtype:
 
     @property
     def nthreads(self):
-        """Stores the number of threads that can be used to attempt to parallelise updates over the set variables
+        r"""Stores the number of threads that can be used to attempt to parallelise updates over the set variables
 
         :returns: dtype
         :rtype: {np.complex128 or np.float64}
@@ -43,7 +43,7 @@ class ms_ttn_dtype:
         pass
 
     def assign(self, o):
-        """Assign the value of this multiset ttn from another multiset ttn
+        r"""Assign the value of this multiset ttn from another multiset ttn
 
         :param o: The other multiset ttn object
         :type o: ms_ttn_dtype or ms_ttn_real
@@ -51,7 +51,7 @@ class ms_ttn_dtype:
         pass
 
     def slice(self, i):
-        """Returns a slice object that allows for easy accessing of the multiset ttn correspond to a single set variable i
+        r"""Returns a slice object that allows for easy accessing of the multiset ttn correspond to a single set variable i
 
         :param i: The set index of the slice
         :type i: int
@@ -62,7 +62,7 @@ class ms_ttn_dtype:
         """
 
     def bond(self):
-        """Return a list of all bonds in the network
+        r"""Return a list of all bonds in the network
 
         :returns: All bonds in the network
         :rtype: list[int, int]
@@ -70,7 +70,7 @@ class ms_ttn_dtype:
         pass
 
     def bond_dimensions(self):
-        """Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network
+        r"""Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network
 
         :returns: All bond dimensions in the network
         :rtype: dict([int, int], list[int])
@@ -78,7 +78,7 @@ class ms_ttn_dtype:
         pass
 
     def bond_capacities(self):
-        """Return a dictionary containing the bond (the two sites forming the bond) and maximum bond dimension of all bonds in the network
+        r"""Return a dictionary containing the bond (the two sites forming the bond) and maximum bond dimension of all bonds in the network
 
         :returns: All maximum bond dimensions in the network
         :rtype: dict([int, int], list[int])
@@ -86,17 +86,17 @@ class ms_ttn_dtype:
         pass
 
     def reset_orthogonality_centre(self):
-        """Resets the orthogonality centre of the multiset TTN to the root node of the tree."""
+        r"""Resets the orthogonality centre of the multiset TTN to the root node of the tree."""
         pass
 
     def resize(self, *args, nset, purification=False):
-        """Resize the multiset TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction
+        r"""Resize the multiset TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction
 
-        :param \\*args: A variable length list of arguments. Valid options are
+        :param *args: A variable length list of arguments. Valid options are
 
             - **topology** (:class:`ntree` or str) - Construct a multiset ttn from a ntree object defining the topology and bond dimensions of the ttn
             - **topology** (:class:`ntree` or str), **capacity** (ntree or str ) - Construct a multiset ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions
-        :type \\*args: [Arguments (variable number and type)]
+        :type *args: [Arguments (variable number and type)]
         :param nset: The number of set variables to use for the ms_ttn
         :type nset: int
         :param purification: Whether or not the buffers should be resized to store a purification of the requested state size.  (Default: False)
@@ -105,7 +105,7 @@ class ms_ttn_dtype:
         pass
 
     def set_seed(self, seed):
-        """Set the value of the random number generate seed used for internal operations requiring random sampling
+        r"""Set the value of the random number generate seed used for internal operations requiring random sampling
 
         :param seed: The new value of the seed
         :type seed: int
@@ -113,14 +113,14 @@ class ms_ttn_dtype:
         pass
 
     def set_state(self, *args, random_unoccupied_initialisation=False):
-        """Set the coefficients in the multiset TTN so that it represents a user specified product state
+        r"""Set the coefficients in the multiset TTN so that it represents a user specified product state
 
-        :param \\*args: A variable length list of arguments. Valid options are
+        :param *args: A variable length list of arguments. Valid options are
 
             - **set_index** (int), **state** (list[int]) - For setting the state to be a product state vector acting on a specific set index
-            - **coeff** (list[dtype]), **state** (list[list[int]]) - For setting the system to be the state :math:`\\sum_i c_i \\|i\\rangle \\bigotimes \\mathrm{state}_i`
+            - **coeff** (list[dtype]), **state** (list[list[int]]) - For setting the system to be the state :math:`\sum_i c_i \|i\rangle \bigotimes \mathrm{state}_i`
 
-        :type \\*args: [Arguments (variable number and type)]
+        :type *args: [Arguments (variable number and type)]
         :param random_unoccupied_initialisation: Whether or not to set all other elements of the multiset TTN not determining the product state to random values or not. (Default: False)
         :type random_unoccupied_initialisation: bool, optional
         """
@@ -129,10 +129,10 @@ class ms_ttn_dtype:
     # def set_product(self, state):
     #    """Set the coefficients in the multiset TTN so that it represents a product of a set of one body states
 
-    #    :param \\*args: A variable length list of arguments. Valid options are
+    #    :param *args: A variable length list of arguments. Valid options are
     #
     #        - **set_index** (int), **state** (list[list[dtype]]) - For setting the state to be a product state vector acting on a specific set index
-    #        - **coeff** (list[dtype]), **state** (list[list[list[dtype]]]) - For setting the system to be the state :math:`\\sum_i c_i \\|i\\rangle \\bigotimes \mathrm{state}_i`
+    #        - **coeff** (list[dtype]), **state** (list[list[list[dtype]]]) - For setting the system to be the state :math:`\sum_i c_i \|i\rangle \bigotimes \mathrm{state}_i`
 
     #    """
     #    pass
@@ -151,7 +151,7 @@ class ms_ttn_dtype:
     #    pass
 
     def __imul__(self, b):
-        """Inplace multiplication of the multiset TTN object by a scalar
+        r"""Inplace multiplication of the multiset TTN object by a scalar
 
         :param b: Scalar value to multiply multiset TTN by
         :type b: number
@@ -159,7 +159,7 @@ class ms_ttn_dtype:
         pass
 
     def __idiv__(self, b):
-        """Inplace division of the multiset TTN object by a scalar
+        r"""Inplace division of the multiset TTN object by a scalar
 
         :param b: Scalar value to divide multiset TTN by
         :type b: number
@@ -167,37 +167,37 @@ class ms_ttn_dtype:
         pass
 
     def conj(self):
-        "Take the complex conjugate of the multiset TTN.  Here this is evaluated lazily"
+        r"Take the complex conjugate of the multiset TTN.  Here this is evaluated lazily"
         pass
 
     def random(self):
-        "Sample the coefficients in the multiset TTN randomly from a normal distribution"
+        r"Sample the coefficients in the multiset TTN randomly from a normal distribution"
         pass
 
     def zero(self):
-        "Set all coefficients in the multiset TTN to zero"
+        r"Set all coefficients in the multiset TTN to zero"
         pass
 
     def clear(self):
-        "Clear and deallocate all internal buffers of the multiset TTN"
+        r"Clear and deallocate all internal buffers of the multiset TTN"
         pass
 
     def __iter__(self):
-        """
+        r"""
         :returns: Iterator object over nodes in multiset TTN
         :rtype: iterator
         """
         pass
 
     def mode_dimensions(self):
-        """
+        r"""
         :returns: List of local Hilbert space dimensions
         :rtype: list[int]
         """
         pass
 
     def dim(self, i):
-        """Returns the local Hilbert space dimension of mode i
+        r"""Returns the local Hilbert space dimension of mode i
 
         :param i: The index of the mode
         :type i: int
@@ -208,49 +208,49 @@ class ms_ttn_dtype:
         pass
 
     def nmodes(self):
-        """
+        r"""
         :returns: The number of modes in the multiset TTN
         :rtype: int
         """
         pass
 
     def is_purification(self):
-        """
+        r"""
         :returns: Whether or not the state represents a purification
         :rtype: bool
         """
         pass
 
     def ntensors(self):
-        """
+        r"""
         :returns: The total number of tensors in the tensor network
         :rtype: int
         """
         pass
 
     def nsites(self):
-        """
+        r"""
         :returns: The total number of tensors in the tensor network
         :rtype: int
         """
         pass
 
     def nset(self):
-        """
+        r"""
         :returns: The number of set variables for the multiset TTN.  Here it is one
         :rtype: int
         """
         pass
 
     def nelem(self):
-        """
+        r"""
         :returns: The total number of elements in all tensors of the network.
         :rtype: int
         """
         pass
 
     def __len__(self):
-        """
+        r"""
         :returns: The number of modes in the multiset TTN
         :rtype: int
         """
@@ -302,7 +302,7 @@ class ms_ttn_dtype:
     #    pass
 
     def has_orthogonality_centre(self):
-        """            
+        r"""            
         :returns: Whether or not the multiset TTN has an active orthogonality centre
         :rtype: bool
 
@@ -310,7 +310,7 @@ class ms_ttn_dtype:
         pass
 
     def orthogonality_centre(self):
-        """            
+        r"""            
         :returns: The index of the current orthogonality centre
         :rtype: int
 
@@ -318,7 +318,7 @@ class ms_ttn_dtype:
         pass
 
     def is_orthogonalised(self):
-        """            
+        r"""            
         :returns: Whether or not the multiset TTN has an orthogonality centre at the root
         :rtype: bool
 
@@ -326,7 +326,7 @@ class ms_ttn_dtype:
         pass
 
     def force_set_orthogonality_centre(self, i):
-        """Sets the orthogonality centre of the tensor network to index i but does not modify the tensor to ensure that this is a
+        r"""Sets the orthogonality centre of the tensor network to index i but does not modify the tensor to ensure that this is a
         valid orthogonality centre
 
         :param i: The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre
@@ -336,7 +336,7 @@ class ms_ttn_dtype:
         pass
 
     def shift_orthogonality_centre(self, i, tol=0, nchi=0):
-        """Shift the orthogonality centre down the ith bond of the current orthogonality centre with possible truncation. 
+        r"""Shift the orthogonality centre down the ith bond of the current orthogonality centre with possible truncation. 
         Where for all nodes but the root 0 corresponds to the parent of the current orthogonality centre and its children are then 1-nchild
         For the root i just indexes the children
 
@@ -351,7 +351,7 @@ class ms_ttn_dtype:
         pass
 
     def set_orthogonality_centre(self, i, tol=0, nchi=0):
-        """Sets the orthogonality centre of the tensor network to index i either introducing an orthogonality centre if there is none
+        r"""Sets the orthogonality centre of the tensor network to index i either introducing an orthogonality centre if there is none
         or simply shifting the orthogonality centre from its current location to the required location
 
         :param i: The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre
@@ -365,7 +365,7 @@ class ms_ttn_dtype:
         pass
 
     def orthogonalise(self, force=False):
-        """Shifts the orthogonality centre to the root node of the multiset TTN
+        r"""Shifts the orthogonality centre to the root node of the multiset TTN
 
         :param force: Whether or not to force a full reorthogonalisation of the multiset TTN regardless of whether or not it believes it has an orthogonality centre
         :type force: bool, optional
@@ -373,7 +373,7 @@ class ms_ttn_dtype:
         """
 
     def truncate(self, tol=0, nchi=0):
-        """Ensures the tensor network is in an orthogonalised form.  Then performs an euler tour truncating each bond according to the user
+        r"""Ensures the tensor network is in an orthogonalised form.  Then performs an euler tour truncating each bond according to the user
         specified tol and nchi parameters
 
         :param tol: A truncation tolerance for the singular values to discard weight.  (Default: 0)
@@ -385,7 +385,7 @@ class ms_ttn_dtype:
         pass
 
     def normalise(self):
-        """Ensures the multiset TTN is a normalised to one and returns the previous value of the norm of the tensor
+        r"""Ensures the multiset TTN is a normalised to one and returns the previous value of the norm of the tensor
 
         :returns: The previous 2-norm of the multiset TTN
         :rtype: float
@@ -393,14 +393,14 @@ class ms_ttn_dtype:
         pass
 
     def norm(self):
-        """
+        r"""
         :returns: The 2-norm of the multiset TTN
         :rtype: float
         """
         pass
 
     def __setitem__(self, i, v):
-        """Sets the value of a site tensor in the tensor network
+        r"""Sets the value of a site tensor in the tensor network
 
         :param i: Index of the node to set
         :type i: int
@@ -411,7 +411,7 @@ class ms_ttn_dtype:
         pass
 
     def __getitem__(self, i, v):
-        """Access tensor data at node i
+        r"""Access tensor data at node i
 
         :param i: Index of the node to access data from
         :type i: int
@@ -434,7 +434,7 @@ class ms_ttn_dtype:
     #    pass
 
     def site_tensor(self, i, v):
-        """Access tensor data at node i
+        r"""Access tensor data at node i
 
         :param i: Index of the node to access data from
         :type i: int
@@ -491,11 +491,11 @@ class ms_ttn_dtype:
     # def apply_one_body_operator(self, *args, shift_orthogonality=True):
     #    """Apply a one-body operator to the multiset TTN updating its value
 
-    #    :param \\*args: A variable length list of arguments. Valid options are
+    #    :param *args: A variable length list of arguments. Valid options are
     #
     #        - **op** (linalg.matrix or np.ndarray or site_operator_dtype), **mode** (int) -  Apply the operator op to mode mode
     #        - **op** (site_operator_dtype) - Apply the operator op to the mode specified by op
-    #    :type \\*args: [Arguments (variable number and type)]
+    #    :type *args: [Arguments (variable number and type)]
     #    :param shift_orthogonality: Whether or not to shift the orthogonality centre of the multiset TTN to the leaf node that will be updated by this one-body operator.  (Default: True)
     #    :type shift_orthogonality: bool, optional
     #    """

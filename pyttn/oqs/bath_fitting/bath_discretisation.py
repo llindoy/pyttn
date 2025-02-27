@@ -4,7 +4,7 @@ import numpy as np
 
 
 class BathDiscretisation:
-    """Base class for bath discretisations
+    r"""Base class for bath discretisations
 
     :param Nb: The number of discrete points to find
     :type Nb: int
@@ -21,16 +21,16 @@ class BathDiscretisation:
 
 
 class DensityDiscretisation(BathDiscretisation):
-    """A class wrapping the density based discretisation approach.  Selects frequencies from a density of frequencies :math:`\\rho(\\omega)`
+    r"""A class wrapping the density based discretisation approach.  Selects frequencies from a density of frequencies :math:`\rho(\omega)`
     according to the expression
 
     .. math::
-        \\int_{\\omega_{\\mathrm{min}}}^{\\omega_k} \\rho(\omega)\\mathrm{d} \\omega = k, 
+        \int_{\omega_{\mathrm{min}}}^{\omega_k} \rho(\omega)\mathrm{d} \omega = k, 
 
     with coupling constants then determined by
 
     .. math::
-        g_k^2 = \\frac{1}{\pi} \\frac{S(\\omega_k)}{\\rho(\\omega_k)}. 
+        g_k^2 = \frac{1}{\pi} \frac{S(\omega_k)}{\rho(\omega_k)}. 
 
     Constructor arguments
 
@@ -100,11 +100,11 @@ class DensityDiscretisation(BathDiscretisation):
 
 
 class OrthopolDiscretisation:
-    """A class wrapping the orthonormal polynomial based discretisation scheme.  This scheme constructs a set of orthonormal polynomials
+    r"""A class wrapping the orthonormal polynomial based discretisation scheme.  This scheme constructs a set of orthonormal polynomials
     satisfying the orthogonality constraint
 
     .. math::
-        \\int_{\\omega_{\\mathrm{min}}}^{\\omega_\\mathrm{max}} S(\\omega) \\pi_i(\\omega) \\pi_j(\\omega) \\mathrm{d}\\omega = \\delta_{ij}.
+        \int_{\omega_{\mathrm{min}}}^{\omega_\mathrm{max}} S(\omega) \pi_i(\omega) \pi_j(\omega) \mathrm{d}\omega = \delta_{ij}.
 
     The coupling constants and frequencies are then obtained from the weights and nodes, respectively, of the Gaussian quadrature rule associated
     with these orthonormal polynomials.
@@ -152,7 +152,7 @@ class OrthopolDiscretisation:
         self.nquad = nquad
 
     def find_moment_scaling_factor(S, wmin, wmax, Nb, atol=0, rtol=1e-10, minbound=1e-30, maxbound=1e30, Nsteps=5, nquad=100):
-        """Finds a constant to scale the frequency axis by in order to ensure well defined scaling of the modified moments as we go to very high moments.
+        r"""Finds a constant to scale the frequency axis by in order to ensure well defined scaling of the modified moments as we go to very high moments.
         here this is done by computing the modified moments up to varying orders (with early termination if the values leave some min and max bounds)
         and fitting the resultant decay or growth to an exponential function.  Based on this fitting we extract a constant that aims to minimise the 
         decay or growth, and repeats this process with growing orders (up to the maximum order we need for the discretisation) until it reaches a

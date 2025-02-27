@@ -28,18 +28,18 @@ except ImportError:
 
 
 def product_operator(h, sysinf, *args, dtype=np.complex128, backend="blas", **kwargs):
-    """Function for constructing a product_operator
+    r"""Function for constructing a product_operator
 
     :param h: The product operator representation of the Hamiltonian
     :type h: sOP or sPOP or sNBO_real or sNBO_complex
     :param sysinf: The composition of the system defining the default dictionary to be considered for each node
     :type sysinf: system_modes
-    :type \*args: Variable length list of arguments. See product_operator_real/product_operator_complex for options
+    :type *args: Variable length list of arguments. See product_operator_real/product_operator_complex for options
     :param dtype: The internal variable type for the product operator.(Default: np.complex128) 
     :type dtype: {np.float64, np.complex128}, optional
     :param backend: The computational backend to use for the product operator  (Default: "blas") 
     :type backend: {"blas", "cuda"}, optional
-    :type \*\*kwargs: Additional keyword arguments. See product_operator_real/product_operator_complex for options
+    :type **kwargs: Additional keyword arguments. See product_operator_real/product_operator_complex for options
     """
     if backend == "blas":
         if (dtype == np.complex128 or not __real_ttn_import):

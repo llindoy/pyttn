@@ -7,7 +7,7 @@ import sys
 import h5py
 import scipy
 
-sys.path.append("../../ttns_lib/")
+sys.path.append("../../")
 import pyttn
 from pyttn import *
 from pyttn import oqs, utils
@@ -56,6 +56,8 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
     Vk = np.real(np.sqrt(dk))
     Mk = -np.imag(np.sqrt(dk))
 
+    dk = np.sqrt(dk)
+
     Nb = bsys.nprimitive_modes()
     N = Nb+2
 
@@ -96,14 +98,21 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin = None, beta = No
         #H += (Vk[i]-1.0j*Mk[i])*sOP("sz", 0)*sOP("a", i1) - (Vk[i]+1.0j*Mk[i])*sOP("sz", 1)*sOP("a", i2)
         H += complex(Ek[i])*(sOP("n", i1)-sOP("n", i2))
         H += 2.0j*complex(gk[i])*(sOP("a", i1)*sOP("a", i2)-0.5*(sOP("n", i1)+sOP("n", i2)))
-        H += complex(Vk[i])*(sOP("sz", 0)*(sOP("adag", i1)+sOP("a", i1)) - sOP("sz", 1)*(sOP("adag", i2)+sOP("a", i2)))
-        H += 2.0j*complex(Mk[i])*(sOP("sz", 1)*sOP("a", i1) - 0.5*(sOP("sz", 0)*sOP("a", i1) + sOP("sz", 1)*sOP("adag", i2)))
-        H += 2.0j*complex(np.conj(Mk[i]))*(sOP("sz", 0)*sOP("a", i2) - 0.5*(sOP("sz", 0)*sOP("adag", i1) + sOP("sz", 1)*sOP("a", i2)))
+        
+        H += 2.0j*complex(Mk[i])*(sOP("sz", 1)*sOP("a", i1)) 
+        H += 2.0j*complex(np.conj(Mk[i]))*(sOP("sz", 0)*sOP("a", i2))
+
+        H += complex(dk[i])*sOP("sz", 0)*sOP("adag", i1) - complex(np.conj(dk[i]))*sOP("sz", 1)*sOP("adag", i2)                                  
+        H += complex(dk[i])*sOP("sz", 0)*sOP("a", i1) - complex(np.conj(dk[i]))*sOP("sz", 1)*sOP("a", i2)
+
+        #H += complex(Vk[i])*(sOP("sz", 0)*(sOP("adag", i1)+sOP("a", i1)) - sOP("sz", 1)*(sOP("adag", i2)+sOP("a", i2)))
+        #H += 2.0j*complex(Mk[i])*(sOP("sz", 1)*sOP("a", i1) - 0.5*(sOP("sz", 0)*sOP("a", i1) + sOP("sz", 1)*sOP("adag", i2)))
+        #H += 2.0j*complex(np.conj(Mk[i]))*(sOP("sz", 0)*sOP("a", i2) - 0.5*(sOP("sz", 0)*sOP("adag", i1) + sOP("sz", 1)*sOP("a", i2)))
 
     #construct the topology and capacity trees used for constructing 
     chi0 = chi
     if adaptive:
-        chi0 = 4
+        chi0 = 16
 
     topo = build_topology(sysinf[0].lhd(), chi0, L, b_mode_dims, degree)
     capacity = build_topology(sysinf[0].lhd(), chi, L, b_mode_dims, degree)
@@ -190,7 +199,7 @@ if __name__ == "__main__":
     parser.add_argument('--s', type = float, default=1)
 
     #number of bath modes
-    parser.add_argument('--K', type=int, default=6)
+    parser.add_argument('--K', type=int, default=2)
 
     #maximum bosonic hilbert space dimension
     parser.add_argument('--L', type=int, default=30)
@@ -209,8 +218,8 @@ if __name__ == "__main__":
     parser.add_argument('--beta', type = float, default=None)
 
     #maximum bond dimension
-    parser.add_argument('--chi', type=int, default=64)
-    parser.add_argument('--degree', type=int, default=1)
+    parser.add_argument('--chi', type=int, default=24)
+    parser.add_argument('--degree', type=int, default=2)
 
     
 
@@ -219,12 +228,12 @@ if __name__ == "__main__":
     parser.add_argument('--tmax', type=float, default=10)
 
     #output file name
-    parser.add_argument('--fname', type=str, default='sbm_pm.h5')
+    parser.add_argument('--fname', type=str, default='sbm_pm_b.h5')
 
     #the minimum number of unoccupied modes for the dynamics
     parser.add_argument('--subspace', type=bool, default = True)
     parser.add_argument('--nunoccupied', type=int, default=0)
-    parser.add_argument('--spawning_threshold', type=float, default=1e-7)
+    parser.add_argument('--spawning_threshold', type=float, default=1e-6)
     parser.add_argument('--unoccupied_threshold', type=float, default=1e-4)
 
     args = parser.parse_args()

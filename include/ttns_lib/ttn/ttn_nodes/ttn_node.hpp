@@ -34,7 +34,6 @@ protected:
     friend tree_node<tree_base<std::vector<ttn_node_data<T, backend> > > >;
 
     template <typename U, typename be> friend class ttn_node_data;
-
 public:
     ttn_node_data() : matrix_type(), m_mode_dims(), m_mode_capacity(), m_max_hrank(0), m_max_dimen(0) {}
     ttn_node_data(ttn_node_data&& o) = default;
@@ -720,23 +719,6 @@ public:
     using r2l_core = orthogonality::root_to_leaf_decomposition_engine<T, backend>;
     using l2r_core = orthogonality::leaf_to_root_decomposition_engine<T, backend>;
 
-
-public:
-    static size_type contraction_capacity(const node_type& a, const node_type& b)
-    {
-        size_type mcap = 0;
-        for(size_type i = 0; i < a.nset(); ++i)
-        {
-            size_type capacity = 1;
-            for(size_type nm = 0; nm < a.dataview(i).nmodes(); ++nm)
-            {
-                capacity *= std::max(a.dataview(i).max_dim(nm), b.dataview(i).max_dim(nm));
-            }
-            if(capacity > mcap){mcap = capacity;}
-        }
-        return mcap;
-    }
-
 public:
     /*
      * Functions for handling subsections of the movement of the orthogonality centre up or down
@@ -1207,9 +1189,6 @@ public:
     {
         this->m_data.conj();
     }
-public:
-    static size_type contraction_capacity(const node_type& a, const node_type& b){CALL_AND_RETHROW(return node_helper::contraction_capacity(a, b));}
-
 public:
     //Functions for handling subsections of the movement of the orthogonality centre up or down
     void decompose_down(orthogonality_type& orth, size_type mode, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false){CALL_AND_RETHROW(node_helper::decompose_down(*this, orth, mode, tol, nchi, save_svd));}

@@ -37,6 +37,7 @@ public:
     using type = std::complex<double>;
 };
 
+
 template <typename T> 
 void pybuffer_to_vector(const py::buffer& b, std::vector<T>& res)
 {

@@ -852,6 +852,20 @@ public:
         return m_nodes[i];
     }
 
+    const ttn_node_data<T, backend>&  node_slice(size_type i, size_type set) const
+    {
+        ASSERT(i < m_nodes.size() && set < m_nset, "Failed to access node data indices out of bounds.");
+        if(m_has_orthogonality_centre){m_has_orthogonality_centre = (i == m_orthogonality_centre);}
+        return m_nodes[i](set);
+    }
+
+    ttn_node_data<T, backend>& node_slice(size_type i, size_type set)
+    {
+        ASSERT(i < m_nodes.size() && set < m_nset, "Failed to access node data indices out of bounds.");
+        if(m_has_orthogonality_centre){m_has_orthogonality_centre = (i == m_orthogonality_centre);}
+        return m_nodes[i](set);
+    }
+
     //gets the path connecting two leaf nodes and additionally returns the node associated with the root of the subtree that contains these two leaves
     size_t leaf_path(size_t li, size_t lj, std::list<size_type>& path)
     {
@@ -1047,8 +1061,14 @@ protected:
     template <typename INTEGER, typename Alloc>
     void construct_topology(const ntree<INTEGER, Alloc>& __tree, const ntree<INTEGER, Alloc>& _capacity, size_type nset = 1)
     {
+        ntree<INTEGER, Alloc> _tree(__tree);
+        ntree<INTEGER, Alloc> capacity(_capacity);
+
+        ntree_builder<INTEGER>::sanitise_tree(_tree, true);
+        ntree_builder<INTEGER>::sanitise_tree(capacity, true);
+
         ASSERT(__tree.size() > 2, "Failed to build ttn from topology tree.  The input topology must contain at least 3 elements.  If it contains fewer than 3 elements then this is just a vector and we won't want to use the full TTN structure.");
-        ASSERT(__tree.size() == _capacity.size(), "Failed to construct ttn topology with capacity.");
+        ASSERT(_tree.size() == capacity.size(), "Failed to construct ttn topology with capacity.");
 
         m_nset = nset;
         m_nset_lhd = nset;
@@ -1057,13 +1077,6 @@ protected:
             m_nset = nset*nset;
             m_nset_lhd = nset;
         }
-
-
-        ntree<INTEGER, Alloc> _tree(__tree);
-        ntree<INTEGER, Alloc> capacity(_capacity);
-
-        ntree_builder<INTEGER>::sanitise_tree(_tree, true);
-        ntree_builder<INTEGER>::sanitise_tree(capacity, true);
 
         //otherwise if the topology tree contains more than 2 more elements we will attempt to interpret it as a (hierarchical) tucker tensor
         //and solve the problem in this space.

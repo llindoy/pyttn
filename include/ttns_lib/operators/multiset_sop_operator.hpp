@@ -122,7 +122,7 @@ public:
     multiset_sop_operator& operator=(const multiset_sop_operator& o) = default;
     multiset_sop_operator& operator=(multiset_sop_operator&& o) = default;
 
-    //resize this object from a tree structure, a SOP object, a system info class and an optional operator dictionary.
+    //resize this objec4 from a tree structure, a SOP object, a system info class and an optional operator dictionary.
     //This implementation does not support composite modes currently.  To do add mode combination
     void initialise(multiset_SOP<T>& sop, const ttn_type& A, const system_modes& sys, bool compress = true, bool exploit_identity = true, bool use_sparse = true)
     {

@@ -1,2 +1,0 @@
-Spin Boson Model Dynamics
-=========================

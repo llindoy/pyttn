@@ -1,103 +1,108 @@
 import numpy as np
 import copy
 
-
-"""
-from .chain_map import chain_map
 from pyttn import sOP, coeff
 
-#functions for setting up the bath hamiltonian in several different geometries. 
-
-#setup the star Hamiltonian for the spin boson model
-def add_star_bath_hamiltonian(H, Sp, g, w, Sm = None, binds = None):
-    Nb = g.shape[0]
+def __generate_binds(binds, bskip, Nb):
     if not isinstance(binds, np.ndarray):
         if binds is None:
-            binds = [i+1 for i in range(Nb)]
-    for i in range(Nb):
-        if Sm is None:
-            H += np.sqrt(2.0)*g[i] * Sp * sOP("q", binds[i])
-        else:
-            H += g[i] * Sp * sOP("a", binds[i])
-            H += g[i] * Sm * sOP("adag", binds[i])
-        H += w[i] * sOP("n", binds[i])
+            binds = [i+bskip for i in range(Nb)]
+    return binds
 
-    return H
+def add_heom_bath_generator(H, Sp, dks, zks, Sm=None, binds = None, bskip=2):
+    Nb = 0
+    for dk in dks:
+        Nb = Nb + len(dk)
+        if not (len(dk)==1 or len(dk)==2) :
+            raise Exception("Cannot add HEOM  bath unless each unexpected mode size")
+    binds =  __generate_binds(binds, bskip, Nb)
 
-#setup the chain hamiltonian for the spin boson model - this is the tedopa method
-def add_chain_bath_hamiltonian(H, Sp, t, e, Sm=None, binds = None):
-    Nb = e.shape[0]
-    if not isinstance(binds, np.ndarray):
-        if binds is None:
-            binds = [i+1 for i in range(Nb)]
+    #set up the system bath operator
+    c = 0
+    for dk, zk in zip(dks, zks):
+        #if we are dealing with a single terms.  This corresponds to the case that we have a single real value frequency
+        if len(dk) == 1:
+            #add on the bath terms
+            H += -1.0j*zk[0]*sOP("n", binds[c])
 
-    for i in range(Nb):
-        if i == 0:
-            if Sm is None:
-                H += np.sqrt(2.0)*t[i] * Sp * sOP("q", binds[i])
+            #add on the bath annihilation terms
+
+            #add on the bath creation terms
+
+            c = c+1
+        #otherwise we need to add on modes corresponding to forward and backward paths
+        elif len(dk) == 2:
+            #add on the bath terms
+            H += -1.0j*zk[0]*sOP("n", binds[c])
+            H += -1.0j*zk[1]*sOP("n", binds[c+1])
+
+            #add on the bath annihilation terms
+            H += complex(dk[0])*(Sp[0] - Sp[1])*sOP("a", binds[c])
+            H += complex(dk[1])*(Sp[0] - Sp[1])*sOP("a", binds[c+1])
+                
+            #add on the bath creation terms
+            #if the Sm operator is correctly defined use it
+            if isinstance(Sm, list) and len(Sm) == 2:
+                H +=  dk[0]*Sm[0]*sOP("adag", binds[c])
+                H += -dk[1]*Sm[1]*sOP("adag", binds[c+1])
+
+            #otherwise just use the Sp operators
             else:
-                H += t[i]*Sp * sOP("a", binds[i])
-                H += t[i]*Sm * sOP("adag", binds[i])
-        else:
-            H += t[i]*sOP("adag", binds[i-1])*sOP("a", binds[i])  
-            H += t[i]*sOP("a", binds[i-1])*sOP("adag", binds[i]) 
-        H += e[i] * sOP("n", binds[i])
+                H +=  dk[0]*Sp[0]*sOP("adag", binds[c])
+                H += -dk[1]*Sp[1]*sOP("adag", binds[c+1])
+            c = c+2
 
     return H
 
-#setup the chain hamiltonian for the spin boson model - that is this implements the method described in Nuomin, Beratan, Zhang, Phys. Rev. A 105, 032406
-def add_ipchain_bath_hamiltonian(H, Sp, t0, w, P, Sm = None, binds = None):
-    Nb = w.shape[0]
-    if not isinstance(binds, np.ndarray):
-        if binds is None:
-            binds = [i+1 for i in range(Nb)]
+def add_pseudomode_bath_generator(H, Sp, dks, zks, Sm=None, binds = None, bskip=2):
+    Nb = 0
+    for dk in dks:
+        Nb = Nb + len(dk)
+        if not (len(dk)==2):
+            raise Exception("Cannot add pseudomode bath unless each mode corresponds to forward and backward paths")
+        
+    binds =  __generate_binds(binds, bskip, Nb)
 
-    class func_class:
-        def __init__(self, i, t0, e0, U0, conj = False):
-            self.i = copy.deepcopy(i)
-            self.conj=conj
-            self.t0 = copy.deepcopy(t0)
-            self.e = copy.deepcopy(e0)
-            self.U = copy.deepcopy(U0)
+    c = 0
+    for dk, zk in zip(dks, zks):
+        gk = np.real(zk[0])
+        Ek = np.imag(zk[0])
+        Mk = -np.imag(dk[0])
 
-        def __call__(self, ti):
-            val = self.t0*np.conj(self.U[:, 0])@(np.exp(-1.0j*ti*self.e)*self.U[:, self.i])
+        i1 = binds[c]
+        i2 = binds[c+1]
 
-            if(self.conj):
-                val = np.conj(val)
+        #add on the bath only terms
+        H += complex(Ek)*(sOP("n", i1)-sOP("n", i2))                                         #the energy terms
+        H += 2.0j*complex(gk)*(sOP("a", i1)*sOP("a", i2)-0.5*(sOP("n", i1)+sOP("n", i2)))    #the dissipators
 
-            return val
+        #now add on the system bath coupling terms
+        #if the Sm operator is correctly defined use it
+        if isinstance(Sm, list) and len(Sm) == 2:
+            H += 2.0j*complex(Mk)*(Sp[1]*sOP("a", i1)) 
+            H += 2.0j*complex(np.conj(Mk))*(Sp[0]*sOP("a", i2))
 
-    for i in range(Nb):
-        if Sm is None:
-            H += coeff(func_class(i, t0, w, P, conj=False))*Sp*sOP("a", binds[i]) 
-            H += coeff(func_class(i, t0, w, P, conj=True))*Sp*sOP("adag", binds[i]) 
+            H += complex(dk[0])*Sm[0]*sOP("adag", i1) - complex(dk[1])*Sm[1]*sOP("adag", i2)                                  
+            H += complex(dk[0])*Sp[0]*sOP("a", i1) - complex(dk[1])*Sp[1]*sOP("a", i2)
+            
+        #otherwise just use the Sp operators
         else:
-            H += coeff(func_class(i, t0, w, P, conj=False))*Sp*sOP("a", binds[i]) 
-            H += coeff(func_class(i, t0, w, P, conj=True ))*Sm*sOP("adag", binds[i])  
+            H += 2.0j*complex(Mk)*(Sp[1]*sOP("a", i1)) 
+            H += 2.0j*complex(np.conj(Mk))*(Sp[0]*sOP("a", i2))
+
+            H += complex(dk[0])*Sp[0]*sOP("adag", i1) - complex(dk[1])*Sp[1]*sOP("adag", i2)                                  
+            H += complex(dk[0])*Sp[0]*sOP("a", i1) - complex(dk[1])*Sp[1]*sOP("a", i2)
+
+        c = c+2
 
     return H
 
-def add_bosonic_bath_hamiltonian(H, Sp, g, w, Sm = None, binds = None, geom='star', return_frequencies=False):
-    if geom == 'star':
-        if not return_frequencies:
-            return add_star_bath_hamiltonian(H, Sp, g, w, Sm=Sm, binds=binds)
-        else:
-            return add_star_bath_hamiltonian(H, Sp, g, w, Sm=Sm, binds=binds), w
-    elif geom == 'chain':
-        t, e = chain_map(g, w)
-        if not return_frequencies:
-            return add_chain_bath_hamiltonian(H, Sp, t, e, Sm=Sm, binds=binds)
-        else:
-            return add_chain_bath_hamiltonian(H, Sp, t, e, Sm=Sm, binds=binds), e
-    elif geom == 'ipchain':
-        w2 = copy.deepcopy(w)
-        t, e, U = chain_map(g, w, return_unitary = True)
-        if not return_frequencies:
-            return add_ipchain_bath_hamiltonian(H, Sp, e.shape[0], t[0], w2, U, Sm = Sm, binds=binds)
-        else:
-            return add_ipchain_bath_hamiltonian(H, Sp, e.shape[0], t[0], w2, U, Sm = Sm, binds=binds), e
+def add_bosonic_bath_generator(H, Sp, dks, zks, Sm=None, binds=None, bskip=2, method="heom"):
+    if not isinstance(Sp, list):
+        raise RuntimeError("Invalid Sp operator for heom.add_bosonic_bath_generator")
+    if method == "heom":
+        return add_heom_bath_generator(H, Sp, dks, zks, Sm=Sm, binds=binds, bskip=bskip)
+    elif method == "pseudomode":
+        return add_pseudomode_bath_generator(H, Sp, dks, zks, Sm=Sm, binds=binds, bskip=bskip)
     else:
-        raise RuntimeError("Cannot add bath Hamiltonian geometry not recognised.")
-
-"""
+        raise RuntimeError("Pseudomode based bath method not recognised.")

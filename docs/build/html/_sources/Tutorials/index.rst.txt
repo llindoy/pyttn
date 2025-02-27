@@ -1,8 +1,8 @@
-pyTTN Tutorials
-===============
+Tutorials
+=========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    tree_topologies
    operator_generation

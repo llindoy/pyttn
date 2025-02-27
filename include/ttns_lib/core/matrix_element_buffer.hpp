@@ -7,6 +7,44 @@
 namespace ttns
 {
 
+namespace helper
+{
+
+struct contraction_capacity
+{
+protected:
+    template <typename T, typename U, typename BE1, typename BE2>
+    static size_t _contraction_capacity(const ttn_node_data<T, BE1>& a, const ttn_node_data<U, BE2>& b)
+    {
+        size_t capacity = 1;
+        for(size_t nm = 0; nm < a.nmodes(); ++nm)
+        {
+            capacity *= std::max(a.max_dim(nm), b.max_dim(nm));
+        }
+        return capacity;
+    }
+
+public:
+    template <typename Atype, typename Btype>
+    static inline size_t evaluate(const Atype& A, const Btype & B)
+    {
+        size_t capacity = 0;
+        ASSERT(A.nset() == B.nset(), "Cannot compute contraction capacity of two objects with different set sizes.");
+        for(size_t i = 0; i < A.nset(); ++i)
+        {
+            size_t mcap = _contraction_capacity(A(i), B(i));
+            if(mcap > capacity)
+            {
+                capacity = mcap;
+            }
+        }
+        return capacity;
+
+    }
+};
+
+}
+
 //TODO: Implement matrix element evaluation for sop_operator.  This will require a modification of the underlying datastructures for storing elements slightly
 template <typename T, typename backend=linalg::blas_backend>
 struct matrix_element_buffer
@@ -88,33 +126,32 @@ struct matrix_element_buffer
         return maxcapacity;
     }
 
-    template <typename state_type>
-    static size_t get_maximum_capacity(const state_type& A, const state_type& B)
+    template <typename state_type_A, typename state_type_B>
+    static size_t get_maximum_capacity(const state_type_A& A, const state_type_B& B)
     {
         size_t maxcapacity = 0;
-        for(auto z : zip(A, B))
+        for(size_t ind = 0; ind < A.size(); ++ind)
         {
-            const auto& a = std::get<0>(z);     const auto& b = std::get<1>(z);
-            size_t capacity = typename state_type::node_type::contraction_capacity(a, b);
-            for(size_t i = 0; i < a.nmodes(); ++i)
+            size_t capacity = helper::contraction_capacity::evaluate(A[ind], B[ind]);
+            for(size_t i = 0; i < A[ind].nmodes(); ++i)
             {
-                capacity *= std::max(a.max_dim( i), b.max_dim(i));
+                capacity *= std::max(A[ind].max_dim(i), B[ind].max_dim(i));
             }                                     
             if(capacity > maxcapacity){maxcapacity = capacity;}
         }                                         
         return maxcapacity;                       
     }
 
-    template <typename node_type>
-    static size_t get_size(const node_type& a, const node_type& b)
+    template <typename node_type_A, typename node_type_B>
+    static size_t get_size(const node_type_A& a, const node_type_B& b)
     {
         return a.maxsize() > b.maxsize() ? a.maxsize() : b.maxsize();
     }
 
-    template <typename node_type>
-    static size_t get_capacity(const node_type& a, const node_type& b, bool use_capacity = false)
+    template <typename node_type_A, typename node_type_B>
+    static size_t get_capacity(const node_type_A& a, const node_type_B& b, bool use_capacity = false)
     {
-        size_t capacity = node_type::contraction_capacity(a, b);
+        size_t capacity = helper::contraction_capacity::evaluate(a, b);
         for(size_t i = 0; i < a.nmodes(); ++i)
         {
             capacity *= std::max(a.max_dim(i), b.max_dim(i));

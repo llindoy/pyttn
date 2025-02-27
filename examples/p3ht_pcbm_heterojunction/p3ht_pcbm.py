@@ -54,9 +54,9 @@ def build_ttn_tree(mdims, chi1, chi2, ldims, degree=2, use_multiset=False):
     chim2 = min(chi2, 8)
     if(use_multiset):
         topo = ntree("(1(%d(%d(128)))(%d(%d)(%d)))"%(chi1, ldims[0], chi1, chi1,  chi1))
-        ntreeBuilder.mlmctdh_subtree(topo()[0], mdims[mode_F[:]], 2, exp_step(chi2, chim2, len(mode_F)), ldims[mode_F[:]])
-        ntreeBuilder.mlmctdh_subtree(topo()[1][0], mdims[modeOT_lf[:]], 2, exp_step(chi1, chim1, len(modeOT_lf)), ldims[modeOT_lf[:]])
-        ntreeBuilder.mlmctdh_subtree(topo()[1][1], mdims[modeOT_hf[:]], 2, exp_step(chi2, chim2, len(modeOT_hf)), ldims[modeOT_hf[:]])
+        ntreeBuilder.mlmctdh_subtree(topo()[0], mdims[mode_F[:]], 2, chi_step(chi2, chim2, len(mode_F)), ldims[mode_F[:]])
+        ntreeBuilder.mlmctdh_subtree(topo()[1][0], mdims[modeOT_lf[:]], 2, chi_step(chi1, chim1, len(modeOT_lf)), ldims[modeOT_lf[:]])
+        ntreeBuilder.mlmctdh_subtree(topo()[1][1], mdims[modeOT_hf[:]], 2, chi_step(chi2, chim2, len(modeOT_hf)), ldims[modeOT_hf[:]])
     else:
         topo = ntree("(1(%d(26))(%d(%d(128)))(%d(%d)(%d)))"%(mdims[0], chi1, ldims[1], chi1, chi1, chi1))
         ntreeBuilder.mlmctdh_subtree(topo()[1], mdims[mode_F[:]], 2, chi_step(chi2, chim2, len(mode_F)), ldims[mode_F[:]])
@@ -240,37 +240,21 @@ def p3ht_pcbm_multiset(topo, mode_dims, tmax=200, dt=0.25, ofname='p3ht_pcbm.h5'
     
     #setup buffers for storing the results
     res = np.zeros((nsteps+1, 26), dtype=np.complex128)
-    maxchi = np.zeros(nsteps+1)
+    maxchi = np.zeros((nsteps+1))
     
-    mchi=0
     for j in range(26):
-        As = ttn(A.slice(j))
-        if(As.maximum_bond_dimension()> mchi):
-            mchi = As.maximum_bond_dimension()
-        res[0, j] = mel(As)
+        res[0, j] = mel(A.slice(j))
 
-    maxchi[0] = mchi
-    
-    
     t1 = time.time()
     
     #perform a set of steps with a logarithmic timestep discretisation
     A, h, sweep = run_initial_step(A, h, sweep, dt)
     
-    mchi=0
     for j in range(26):
-        As = ttn(A.slice(j))
-        if(As.maximum_bond_dimension()> mchi):
-            mchi = As.maximum_bond_dimension()
-        res[1, j] = mel(As)
+        res[1, j] = mel(A.slice(j))
 
-    maxchi[1] = mchi
-    
-    mchi = 0
     for j in range(26):
-        As = ttn(A.slice(j))
-        res[1, j] = mel(As)
-    maxchi[1] = mchi
+        res[1, j] = mel(A.slice(j))
     sweep.dt = dt
     
     timepoints = (np.arange(nsteps+1)*dt/fs)
@@ -283,13 +267,8 @@ def p3ht_pcbm_multiset(topo, mode_dims, tmax=200, dt=0.25, ofname='p3ht_pcbm.h5'
         
         t2 = time.time()
     
-        mchi=0
         for j in range(26):
-            As = ttn(A.slice(j))
-            if(As.maximum_bond_dimension()> mchi):
-                mchi = As.maximum_bond_dimension()
-            res[i+1, j] = mel(As)
-        maxchi[i+1] = mchi
+            res[i+1, j] = mel(A.slice(j))
     
         if(i % output_skip == 0):
             output_results(ofname, timepoints, res, maxchi, (t2-t1))
@@ -360,7 +339,7 @@ if __name__ == "__main__":
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.125)
-    parser.add_argument('--tmax', type=float, default=150)
+    parser.add_argument('--tmax', type=float, default=200)
 
     parser.add_argument('--output_skip', type=int, default=1)
     args = parser.parse_args()
@@ -369,6 +348,7 @@ if __name__ == "__main__":
             args.ansatz, 
             args.chi, 
             chi2=args.chi2, 
+            tmax=args.tmax*fs,
             dt=args.dt*fs,
             use_multiset=args.use_multiset, 
             adaptive=args.adaptive, 

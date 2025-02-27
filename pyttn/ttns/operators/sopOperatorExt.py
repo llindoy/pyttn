@@ -74,7 +74,7 @@ def __sop_operator_cuda(h, A, sysinf, *args, **kwargs):
                 "Invalid argument for the creation of a sop_operator.")
 
 def sop_operator(h, A, sysinf, *args, **kwargs):
-    """Function for constructing the hierarchical sum of product operator of a string operator
+    r"""Function for constructing the hierarchical sum of product operator of a string operator
 
     :param h: The sum of product operator representation of the Hamiltonian
     :type h: SOP_real or SOP_complex
@@ -82,8 +82,8 @@ def sop_operator(h, A, sysinf, *args, **kwargs):
     :type A: ttn_real or ttn_complex
     :param sysinf: The composition of the system defining the default dictionary to be considered for each node
     :type sysinf: system_modes
-    :type \\*args: Variable length list of arguments. See sop_operator_complex/sop_operator_real for options
-    :type \\*\\*kwargs: Additional keyword arguments. See sop_operator_complex/sop_operator_real for options
+    :type *args: Variable length list of arguments. See sop_operator_complex/sop_operator_real for options
+    :type **kwargs: Additional keyword arguments. See sop_operator_complex/sop_operator_real for options
     """
 
     if len(args) > 0:

@@ -14,6 +14,43 @@
 namespace ttns
 {
 
+namespace helper
+{
+    template <typename state_type>
+    struct matel_buffers;
+
+    template <typename T, typename backend>
+    struct matel_buffers<ttn<T, backend>>
+    {
+        template <typename U> 
+        static void resize(const ttn<T, backend>& a, U& r)
+        {
+            CALL_AND_HANDLE(r.construct_topology(a), "Failed to construct the topology.");
+        }
+    };
+
+    template <typename T, typename backend>
+    struct matel_buffers<ms_ttn<T, backend>>
+    {
+        template <typename U> 
+        static void resize(const ms_ttn<T, backend>& a, U& r)
+        {
+            CALL_AND_HANDLE(r.construct_topology(a), "Failed to construct the topology.");
+        }
+    };
+
+
+    template <typename T, typename backend, bool CONST>
+    struct matel_buffers<multiset_ttn_slice<T, backend, CONST>>
+    {
+        template <typename U> 
+        static void resize(const multiset_ttn_slice<T, backend, CONST>& a, U& r)
+        {
+            CALL_AND_HANDLE(r.construct_topology(a.obj()), "Failed to construct the topology.");
+        }
+    };
+}
+
 
 template <typename ttn_type>
 struct ttn_sop_type;
@@ -28,6 +65,7 @@ template <typename T, typename backend, bool CONST>
 struct ttn_sop_type<multiset_ttn_slice<T, backend, CONST> >{using sop_type = sop_operator<T, backend>;};
 
 //TODO: Need to add support for multiset ttn slices.
+//          - to do this need to provide a way for multiset ttn slices to provide information about whether or not the nodes are leaves
 //TODO: Extend each function taking two vectors to allow for different left and right types assuming they have
 //      the same backend and dtype.
 template <typename T, typename backend=linalg::blas_backend>
@@ -98,7 +136,6 @@ public:
     {
         try
         {
-            using common::zip;   using common::rzip;
             ASSERT(has_same_structure(A, B), "The input hierarchical tucker tensors do not have the same topology.");
 
             CALL_AND_RETHROW(resize_to_fit(A, B, numbuff, use_capacity));
@@ -121,7 +158,6 @@ public:
     {
         try
         {
-            using common::zip;   using common::rzip;
             ASSERT(has_same_structure(A, B), "The input hierarchical tucker tensors do not have the same topology.");
             ASSERT(has_same_structure(A, sop.contraction_info()), "The input state and sop operator do not have the same topology.");
 
@@ -141,7 +177,6 @@ protected:
     {
         try
         {
-            using common::zip;   using common::rzip;
             CALL_AND_RETHROW(resize_to_fit(psi, psi));
 
             if(use_sparsity && psi.has_orthogonality_centre())
@@ -167,10 +202,9 @@ protected:
             }
             else
             {
-                for(auto z : rzip(psi, m_matel, m_is_identity))
+                for(size_t i = 0; i < psi.size(); ++i)
                 {
-                    const auto& p = std::get<0>(z); auto& mel = std::get<1>(z); auto& is_id = std::get<2>(z); 
-                    update_expectation_value(p, set_index, mel, r, is_id, m_buf);
+                    update_expectation_value(psi[i], set_index, m_matel[i], r, m_is_identity[i], m_buf);
                 }
             }
         }
@@ -194,7 +228,6 @@ public:
     {
         try
         {
-            using common::zip;   using common::rzip;
             CALL_AND_RETHROW(resize_to_fit(psi, psi));
 
             real_type retval = 0.0;
@@ -229,10 +262,10 @@ public:
             {
                 for(size_type set_index = 0; set_index < psi.nset(); ++set_index)
                 {
-                    for(auto z : rzip(psi, m_matel, m_is_identity))
+                    for(size_t i = 0; i <psi.size(); ++i)
                     {
-                        const auto& p = std::get<0>(z); auto& mel = std::get<1>(z); auto& is_id = std::get<2>(z); 
-                        update_expectation_value(p, set_index, mel, r, is_id, m_buf);
+                        size_t ind = psi.size() - (i+1);
+                        update_expectation_value(psi[ind], set_index, m_matel[ind], r, m_is_identity[ind], m_buf);
                     }
                     CALL_AND_HANDLE(retval += linalg::real(gather_result(m_matel[0]()[r])), "Failed to return result.");
                 }
@@ -273,7 +306,6 @@ protected:
     template <typename state_type, typename optype, typename mode_type>
     inline T expectation_value_internal(optype&& op, const mode_type& mode, const state_type& psi, bool use_sparsity = true)
     {
-        using common::zip;   using common::rzip;
         ASSERT(validate_operator(std::forward<optype>(op), mode, psi), "The mode that the input operator acts on is out of bounds.");
         CALL_AND_RETHROW(resize_to_fit(psi, psi));
 
@@ -311,10 +343,10 @@ protected:
         {
             for(size_type set_index = 0; set_index < psi.nset(); ++set_index)
             {
-                for(auto z : rzip(psi, m_matel, m_is_identity))
+                for(size_t i = 0; i < psi.size(); ++i)
                 {
-                    const auto& p = std::get<0>(z); auto& mel = std::get<1>(z); auto& is_id = std::get<2>(z); 
-                    CALL_AND_HANDLE(update_expectation_value(p, set_index, mel, r, is_id, std::forward<optype>(op), mode, m_buf), "Failed to update expectation value.");
+                    size_t ind = psi.size() - (i+1);
+                    CALL_AND_HANDLE(update_expectation_value(psi[ind], set_index, m_matel[ind], r, m_is_identity[ind], std::forward<optype>(op), mode, m_buf), "Failed to update expectation value.");
                 }
                 CALL_AND_HANDLE(retval += gather_result(m_matel[0]()[r]), "Failed to return result.");
             }
@@ -408,7 +440,6 @@ public:
     {
         try
         {
-            using common::zip;   using common::rzip;
             if(&bra == &ket){CALL_AND_RETHROW(return operator()(bra));}
             ASSERT(bra.nset() == ket.nset(), "Cannot compute matrix element between tensor networks with different set sizes.");
             CALL_AND_RETHROW(resize_to_fit(bra, ket));
@@ -417,11 +448,11 @@ public:
             T retval = T(0.0)*0.0;
             for(size_type set_index = 0; set_index < bra.nset(); ++set_index)
             {
-                for(auto z : rzip(bra, ket, m_matel))
+                for(size_t i = 0; i < bra.size(); ++i)
                 {
-                    const auto& b = std::get<0>(z); const auto& k = std::get<1>(z); auto& mel = std::get<2>(z);
-                    CALL_AND_RETHROW(m_buf.resize(k(set_index).shape(0), k(set_index).shape(1)));
-                    CALL_AND_HANDLE(update_matrix_element(b, set_index, k, set_index, mel, r, m_buf), "Failed to update matrix element.");
+                    size_t ind = bra.size() - (i+1);
+                    CALL_AND_RETHROW(m_buf.resize(ket[ind](set_index).shape(0), ket[ind](set_index).shape(1)));
+                    CALL_AND_HANDLE(update_matrix_element(bra[ind], set_index, ket[ind], set_index, m_matel[ind], r, m_buf), "Failed to update matrix element.");
                 }
 
                 CALL_AND_HANDLE(retval += gather_result(m_matel[0]()[r]), "Failed to return result.");
@@ -444,7 +475,6 @@ protected:
     template <typename state_type, typename mode_type, typename optype>
     inline T matrix_element_internal(optype&& op, const mode_type& mode, const state_type& bra, const state_type& ket)
     {
-        using common::zip;   using common::rzip;
         if(&bra == &ket){CALL_AND_RETHROW(return expectation_value_internal(op, mode, bra));}
         ASSERT(bra.nset() == ket.nset(), "Cannot compute matrix element between tensor networks with different set sizes.");
 
@@ -455,10 +485,10 @@ protected:
         T retval = T(0.0)*0.0;
         for(size_type set_index = 0; set_index < bra.nset(); ++set_index)
         {
-            for(auto z : rzip(bra, ket, m_matel))
+            for(size_t i = 0; i < bra.size(); ++i)
             {
-                const auto& b = std::get<0>(z); const auto& k = std::get<1>(z); auto& mel = std::get<2>(z);
-                update_matrix_element(b, set_index, k, set_index, mel, r, std::forward<optype>(op), mode, m_buf);
+                size_t ind = bra.size() - (i+1);
+                update_matrix_element(bra[ind], set_index, ket[ind], set_index, m_matel[ind], r, std::forward<optype>(op), mode, m_buf);
             }
 
             CALL_AND_HANDLE(retval += gather_result(m_matel[0]()[r]), "Failed to return result.");
@@ -511,17 +541,18 @@ protected:
     inline T accum_root(const sttn_node_data<T>& hr, T Eshift = T(0), bool use_identity = false)
     {
         T retval = T(0.0)*0.0;
-        if(!use_identity)
+
+        if(use_identity)
         {
             retval = Eshift;
+        }
+        else if(!use_identity)
+        {
+            CALL_AND_HANDLE(retval = Eshift*gather_result(m_matel[0]().id()), "Failed to return result.");
         }
         for(size_t j = 0; j < hr.nterms(); ++j)
         {
             CALL_AND_HANDLE(retval += hr[j].coeff()*gather_result(m_matel[0]()[j]), "Failed to return result.");
-            if(use_identity && linalg::abs(Eshift) > 1e-14)
-            {
-                CALL_AND_HANDLE(retval += Eshift*gather_result(m_matel[0]().id()), "Failed to return result.");
-            }
         }
         return retval;
     }
@@ -544,12 +575,10 @@ public:
         try
         {
             using spo = single_particle_operator_engine<T, backend>;
-            using common::zip;   using common::rzip;
             ASSERT(has_same_structure(psi, sop.contraction_info()), "The input hiearchical tucker tensors do not both have the same topology as the matrix_element object.");
             ASSERT(psi.nset() == sop.nset(), "Cannot compute matrix element between tensor networks with different set sizes.");
             CALL_AND_RETHROW(resize_to_fit(psi, psi, sop));
 
-            bool compute_identity = !(psi.is_orthogonalised());
             T retval = T(0.0)*0.0;
 
             //to do modify this code to handle multiset sops
@@ -557,9 +586,9 @@ public:
             {
                 for(size_t nr = 0; nr < sop.nrow(set_index); ++nr)
                 {
-                    bool use_identity = false;
                     T Eshift = sop.Eshift_val(set_index, nr);
                     size_t col = sop.column_index(set_index, nr);
+                    bool compute_identity = !(psi.is_orthogonalised()) || (set_index != col);
                     if(col == set_index && sop.is_scalar(set_index, nr) && linalg::abs(Eshift) > 1e-14)
                     {
                         CALL_AND_HANDLE(this->compute_norm_internal(psi, true, set_index, 0), "Failed to compute norm of diagonal term.");
@@ -569,15 +598,17 @@ public:
                     }
                     else
                     {
-                        for(auto z : rzip(psi, m_matel, sop.contraction_info()))
-                        {
-                            const auto& p = std::get<0>(z); auto& mel = std::get<1>(z);  const auto& h = std::get<2>(z);
-                            CALL_AND_RETHROW(m_buf.resize(p(set_index).shape(0), p(set_index).shape(1)));
 
-                            CALL_AND_HANDLE(spo::evaluate(sop, h, p, p, set_index, nr, mel, m_buf.HA, m_buf.temp, compute_identity), "Failed to compute expectation value.");
+                        for(size_t i = 0; i < psi.size(); ++i)
+                        {
+                            size_t ind = psi.size() - (i+1);
+                            const auto& h = sop.contraction_info()[ind]; 
+                            CALL_AND_RETHROW(m_buf.resize(psi[ind](set_index).shape(0), psi[ind](set_index).shape(1)));
+
+                            CALL_AND_HANDLE(spo::evaluate(sop, h, psi[ind], psi[ind], set_index, nr, m_matel[ind], m_buf.HA, m_buf.temp, compute_identity ), "Failed to compute expectation value.");
                         }
                         const auto& hr = sop.contraction_info().root()();
-                        CALL_AND_HANDLE(retval += accum_root(hr, set_index, nr, Eshift, use_identity), "Failed to return result.");
+                        CALL_AND_HANDLE(retval += accum_root(hr, set_index, nr, Eshift, !compute_identity), "Failed to return result.");
                     }
 
                 }
@@ -604,28 +635,29 @@ public:
         try
         {
             using spo = single_particle_operator_engine<T, backend>;
-            using common::zip;   using common::rzip;
             ASSERT(has_same_structure(bra, sop.contraction_info()) && has_same_structure(ket, bra), "The input hiearchical tucker tensors do not both have the same topology as the matrix_element object.");
             ASSERT(ket.nset() == sop.nset() && bra.nset() == ket.nset(), "Cannot compute matrix element between tensor networks with different set sizes.");
             CALL_AND_RETHROW(resize_to_fit(bra, ket, sop));
 
-            bool compute_identity = !(bra.is_orthogonalised() && ket.is_orthogonalised());
+            bool compute_identity = true;
             T retval = T(0.0)*0.0;
             //to do modify this code to handle multiset sops
             for(size_type set_index = 0; set_index <ket.nset(); ++set_index)
             {
                 for(size_t nr = 0; nr < sop.nrow(set_index); ++nr)
                 {
-                    for(auto z : rzip(bra, ket, m_matel, sop.contraction_info()))
+                    for(size_t i = 0; i < bra.size(); ++i)
                     {
-                        const auto& b = std::get<0>(z); const auto& k = std::get<1>(z); auto& mel = std::get<2>(z);  const auto& h = std::get<3>(z);
-                        CALL_AND_RETHROW(m_buf.resize(k(set_index).shape(0), k(set_index).shape(1)));
-                        CALL_AND_HANDLE(spo::evaluate(sop, h, b, k, set_index, nr, mel, m_buf.HA, m_buf.temp, compute_identity), "Failed to compute expectation value.");
+                        size_t ind = bra.size() - (i+1);
+
+                        const auto& h = sop.contraction_info()[ind];
+                        CALL_AND_RETHROW(m_buf.resize(ket[ind](set_index).shape(0), ket[ind](set_index).shape(1)));
+                        CALL_AND_HANDLE(spo::evaluate(sop, h, bra[ind], ket[ind], set_index, nr, m_matel[ind], m_buf.HA, m_buf.temp, compute_identity), "Failed to compute expectation value.");
                     }
 
                     const auto& hr = sop.contraction_info().root()();
                     T Eshift = sop.Eshift_val(set_index, nr);
-                    CALL_AND_HANDLE(retval += accum_root(hr, set_index, nr, Eshift, true), "Failed to return result.");
+                    CALL_AND_HANDLE(retval += accum_root(hr, set_index, nr, Eshift, !compute_identity), "Failed to return result.");
                 }
             }
             return retval;
@@ -879,25 +911,25 @@ protected:
     {
         try
         {
-            using common::zip;   using common::rzip;
             ASSERT(has_same_structure(A, B), "The input hierarchical tucker tensors do not have the same topology.");
             ASSERT(has_same_structure(A, sop.contraction_info()), "The input state and sop operator do not have the same topology.");
 
+            using ibuf = helper::matel_buffers<state_type>;
             if(!has_same_structure(A, m_matel))
             {
                 m_matel.clear();
                 m_is_identity.clear();
-                CALL_AND_HANDLE(m_matel.construct_topology(B), "Failed to construct the topology of the matrix element buffer tree.");
-                CALL_AND_HANDLE(m_is_identity.construct_topology(B), "Failed to construct the topology of the is_identity matrix tree.");
+                CALL_AND_HANDLE(ibuf::resize(B, m_matel), "Failed to construct the topology of the matrix element buffer tree.");
+                CALL_AND_HANDLE(ibuf::resize(B, m_is_identity), "Failed to construct the topology of the is_identity matrix tree.");
             }
 
             size_t maxcapacity = 0;
-            for(auto z : zip(m_matel, m_is_identity, A, B, sop.contraction_info()))
+            for(size_t ind = 0; ind < A.size(); ++ind)
             {
-                auto& mel = std::get<0>(z); auto& is_id = std::get<1>(z); const auto& a = std::get<2>(z); const auto& b = std::get<3>(z);   const auto& h = std::get<4>(z);
-                is_id() = false;
+                const auto& h = sop.contraction_info()[ind];
+                m_is_identity[ind]() = false;
 
-                mel().has_identity() = (&A != &B) && A.is_orthogonalised() && B.is_orthogonalised();
+                m_matel[ind]().has_identity() = (&A != &B) && A.is_orthogonalised() && B.is_orthogonalised();
 
                 size_t nterms = 0;
 
@@ -910,28 +942,28 @@ protected:
                         if(nt > nterms){nterms = nt;}
 
                         size_t jset = sop.column_index(iset, j);
-                        if(iset != jset){mel().has_identity() = true;}
+                        if(iset != jset){m_matel[ind]().has_identity() = true;}
                     }
                 }
-                if(nterms > mel().size())
+                if(nterms > m_matel[ind]().size())
                 {
-                    if(mel().size() == 0)
+                    if(m_matel[ind]().size() == 0)
                     {
-                        CALL_AND_HANDLE(mel().resize(nterms), "Failed to resize matrix element container.");
+                        CALL_AND_HANDLE(m_matel[ind]().resize(nterms), "Failed to resize matrix element container.");
                     }
                     else
                     {
-                        CALL_AND_HANDLE(mel().expand_buffer(nterms), "Failed to resize matrix element container.");
+                        CALL_AND_HANDLE(m_matel[ind]().expand_buffer(nterms), "Failed to resize matrix element container.");
                     }
                 }
-                size_t capacity = b.maxhrank(use_capacity)*a.maxhrank(use_capacity);
-                if(capacity > mel().matrix_capacity())
+                size_t capacity = B[ind].maxhrank(use_capacity)*A[ind].maxhrank(use_capacity);
+                if(capacity > m_matel[ind]().matrix_capacity())
                 {
-                    CALL_AND_HANDLE(mel().reallocate_matrices(capacity), "Failed to reallocate mel tensors.")
+                    CALL_AND_HANDLE(m_matel[ind]().reallocate_matrices(capacity), "Failed to reallocate mel tensors.")
                 }
-                mel().store_identity();
+                m_matel[ind]().store_identity();
 
-                capacity = matrix_element_buffer<T, backend>::get_capacity(a, b, use_capacity);
+                capacity = matrix_element_buffer<T, backend>::get_capacity(A[ind], B[ind], use_capacity);
                 if(capacity > maxcapacity){maxcapacity = capacity;}
             }
 
@@ -948,53 +980,54 @@ protected:
         }
     }
 
+
     template <typename state_type>
     void resize_to_fit(const state_type& A, const state_type& B, size_type numbuff = 1, bool use_capacity = false)
     {
         try
         {
-            using common::zip;   using common::rzip;
             ASSERT(has_same_structure(A, B), "The input hierarchical tucker tensors do not have the same topology.");
+            using ibuf = helper::matel_buffers<state_type>;
             if(!has_same_structure(A, m_matel))
             {
                 m_matel.clear();
                 m_is_identity.clear();
-                CALL_AND_HANDLE(m_matel.construct_topology(B), "Failed to construct the topology of the matrix element buffer tree.");
-                CALL_AND_HANDLE(m_is_identity.construct_topology(B), "Failed to construct the topology of the is_identity matrix tree.");
+                CALL_AND_HANDLE(ibuf::resize(B, m_matel), "Failed to construct the topology of the matrix element buffer tree.");
+                CALL_AND_HANDLE(ibuf::resize(B, m_is_identity), "Failed to construct the topology of the is_identity matrix tree.");
             }
 
             size_t maxcapacity = 0;
-            for(auto z : zip(m_matel, m_is_identity, A, B))
-            {
-                auto& mel = std::get<0>(z); auto& is_id = std::get<1>(z); const auto& a = std::get<2>(z); const auto& b = std::get<3>(z);
-                is_id() = false;
 
-                if(numbuff > mel().size())
+            for(size_t ind = 0; ind < A.size(); ++ind)
+            {
+                m_is_identity[ind]() = false;
+
+                if(numbuff > m_matel[ind]().size())
                 {
-                    if(mel().size() == 0)
+                    if(m_matel[ind]().size() == 0)
                     {
-                        CALL_AND_HANDLE(mel().resize(numbuff), "Failed to resize matrix element container.");
+                        CALL_AND_HANDLE(m_matel[ind]().resize(numbuff), "Failed to resize matrix element container.");
                     }
                     else
                     {
-                        CALL_AND_HANDLE(mel().expand_buffer(numbuff), "Failed to resize matrix element container.");
+                        CALL_AND_HANDLE(m_matel[ind]().expand_buffer(numbuff), "Failed to resize matrix element container.");
                     }
                 }
 
-                size_t ncap = a.maxhrank(use_capacity)*b.maxhrank(use_capacity);
-                if(mel().matrix_capacity() < ncap)
+                size_t ncap = A[ind].maxhrank(use_capacity)*B[ind].maxhrank(use_capacity);
+                if(m_matel[ind]().matrix_capacity() < ncap)
                 {
-                    CALL_AND_HANDLE(mel().reallocate_matrices(ncap), "Failed to reallocate mel tensors.")
+                    CALL_AND_HANDLE(m_matel[ind]().reallocate_matrices(ncap), "Failed to reallocate mel tensors.")
                 }
 
-                auto melsize = mel().matrix_size();
-                if(melsize[0] < a.maxhrank() && melsize[1] < b.maxhrank())
+                auto melsize = m_matel[ind]().matrix_size();
+                if(melsize[0] < A[ind].maxhrank() && melsize[1] < B[ind].maxhrank())
                 {
-                    CALL_AND_HANDLE(mel().resize_matrices(a.maxhrank(), b.maxhrank()), "Failed to reallocate mel tensors.");
+                    CALL_AND_HANDLE(m_matel[ind]().resize_matrices(A[ind].maxhrank(), B[ind].maxhrank()), "Failed to reallocate mel tensors.");
                 }
 
-                mel().store_identity();
-                size_t capacity = matrix_element_buffer<T, backend>::get_capacity(a, b, use_capacity);
+                m_matel[ind]().store_identity();
+                size_t capacity = matrix_element_buffer<T, backend>::get_capacity(A[ind], B[ind], use_capacity);
                 if(capacity > maxcapacity){maxcapacity = capacity;}
             }
 

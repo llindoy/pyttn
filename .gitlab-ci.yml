@@ -1,25 +1,38 @@
 image: python:latest
 
-stages:
-  #  - test
-  - deploy
+before_script:
+ - apt-get update --yes
+ - apt-get install --yes cmake
+ - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
 
- #test:
- #   stage: test
- #   script:
- #   - python -m pip install -U sphinx
- #   - python -m pip install -U nbsphinx
- #   - python -m pip install -U nbsphinx-link
- #   - python -m pip install -U sphinx-rtd-theme
- #   - sphinx-build -b html docs/source docs/build/public
- #   rules:
- #     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+
+stages:
+  #- build 
+  #- test
+  - deploy
+  
+.build:
+  stage: test
+  script:
+  - export CMAKE_BUILD_PARALLEL_LEVEL=4
+  - python -m pip -v install ./
+  rules:
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+
+.test:
+  stage: test
+  needs: 
+  - build
+  script:
+  - python -m pytest
+  rules:
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
     
-deploy-pages:
+pages:
   stage: deploy
   script:
-  - mkdir .public
-  - cp -r docs/build/html/* .public
+  - mkdir -p public
+  - cp -r docs/build/html/ public/
   artifacts:
     paths:
     - public

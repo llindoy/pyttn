@@ -92,9 +92,9 @@ def __site_operator_cuda(*args, mode=None, optype=None, dtype=np.complex128, **k
     return ret
 
 def site_operator(*args, mode=None, optype=None, dtype=np.complex128, backend = "blas", **kwargs):
-    """Factory function for constructing a one site operator.
+    r"""Factory function for constructing a one site operator.
 
-    :param \*args: Variable length list of arguments. There are several valid options for the \*args parameters.  If the optype variable is None the allowed options are
+    :param *args: Variable length list of arguments. There are several valid options for the *args parameters.  If the optype variable is None the allowed options are
 
         - site_op (site_operator_real or site_operato_complex) - Construct a new site_operator object from the existing object
         - op (sOP), sysinf (system_modes) - Construct a new site_operator from the string operator and system information
@@ -110,7 +110,7 @@ def site_operator(*args, mode=None, optype=None, dtype=np.complex128, backend = 
     :type dtype: {np.float64, np.complex128}, optional
     :param backend: The computational backend to use for the product operator  (Default: "blas") 
     :type backend: {"blas", "cuda"}, optional
-    :param \*\*kwargs: Additional keyword arguments. To construct the site_operator object
+    :param **kwargs: Additional keyword arguments. To construct the site_operator object
     """
     if backend == 'blas':
         return __site_operator_blas(*args, mode=mode, optype=optype, dtype=dtype, **kwargs)

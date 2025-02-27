@@ -4,7 +4,7 @@ import numpy as np
 
 
 def single_set_dmrg(A, H, expansion='onesite', **kwargs):
-    """A factory method for constructing an object used for performing single set dmrg calculations
+    r"""A factory method for constructing an object used for performing single set dmrg calculations
 
     :param A: Tree Tensor Network that the DMRG algorithm will act on
     :type A: ttn_complex
@@ -12,7 +12,7 @@ def single_set_dmrg(A, H, expansion='onesite', **kwargs):
     :type H: sop_operator_complex
     :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
     :type expansion: {'onesite', 'subspace'}, optional
-    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_dmrg_complex
+    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_dmrg_complex
 
     :returns: The DMRG evaluation object
     :rtype: one_site_dmrg_complex or adaptive_one_site_dmrg_complex
@@ -28,7 +28,7 @@ def single_set_dmrg(A, H, expansion='onesite', **kwargs):
 
 
 def multiset_dmrg(A, H, expansion='onesite', **kwargs):
-    """A factory method for constructing an object used for performing multiset dmrg calculations
+    r"""A factory method for constructing an object used for performing multiset dmrg calculations
 
     :param A: Tree Tensor Network that the DMRG algorithm will act on
     :type A: ttn_complex
@@ -36,7 +36,7 @@ def multiset_dmrg(A, H, expansion='onesite', **kwargs):
     :type H: sop_operator_complex
     :param expansion: A string determining the type of bond dimension expansion to be used.  (Default: 'onesite')
     :type expansion: {'onesite'}, optional
-    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see multiset_one_site_dmrg_complex 
+    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see multiset_one_site_dmrg_complex 
 
     :returns: The DMRG evaluation object
     :rtype: multiset_one_site_dmrg_complex
@@ -52,7 +52,7 @@ def multiset_dmrg(A, H, expansion='onesite', **kwargs):
 
 
 def dmrg(A, H, expansion='onesite', **kwargs):
-    """A factory method for constructing an object used for performing either single or multi set dmrg calculations. 
+    r"""A factory method for constructing an object used for performing either single or multi set dmrg calculations. 
     Which type to construct is determined by the types of the input A and h matrices.  For details on the use of these
     DMRG objects please see the documentation associated with the possible return types.
 
@@ -62,7 +62,7 @@ def dmrg(A, H, expansion='onesite', **kwargs):
     :type H: sop_operator_complex
     :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
     :type expansion: {'onesite', 'subspace'}, optional
-    :param \*\*kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_dmrg_complex
+    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_dmrg_complex
 
     :returns: The DMRG evaluation object
     :rtype: one_site_dmrg_complex or adaptive_one_site_dmrg_complex or multiset_one_site_dmrg_complex

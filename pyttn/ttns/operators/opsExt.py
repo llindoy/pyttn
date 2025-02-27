@@ -27,9 +27,9 @@ def __identity_cuda(*args, dtype=np.complex128):
         raise RuntimeError("Invalid dtype for identity operator")
     
 def identity(*args, dtype=np.complex128, backend="blas"):
-    """Factory function for constructing an identity matrix site operator
+    r"""Factory function for constructing an identity matrix site operator
 
-    :type \*args: Variable length list of arguments. Allowed options are
+    :type *args: Variable length list of arguments. Allowed options are
         - empty - Default construct identity operator
         - size (int) - Construct an identity operator of a specified size
     :param dtype: The dtype to use for the site operator.  (Default: np.complex128) 
@@ -65,9 +65,9 @@ def __matrix_cuda(*args, dtype=np.complex128):
         raise RuntimeError("Invalid dtype for matrix operator")
 
 def matrix(*args, dtype=np.complex128, backend="blas"):
-    """Factory function for constructing a matrix site operator
+    r"""Factory function for constructing a matrix site operator
 
-    :type \*args: Variable length list of arguments. For details see the dense matrix constructors.
+    :type *args: Variable length list of arguments. For details see the dense matrix constructors.
     :param dtype: The dtype to use for the site operator.  (Default: np.complex128) 
     :type dtype: {np.float64, np.complex128}, optional
     :param backend: The computational backend to use for the matrix operator  (Default: "blas") 
@@ -139,9 +139,9 @@ def __sparse_matrix_cuda(*args, dtype=np.complex128):
 
 
 def sparse_matrix(*args, dtype=np.complex128, backend="blas"):
-    """Factory function for constructing a sparse matrix site operator
+    r"""Factory function for constructing a sparse matrix site operator
 
-    :type \*args: Variable length list of arguments. For details see the sparse matrix constructors
+    :type *args: Variable length list of arguments. For details see the sparse matrix constructors
     :param dtype: The dtype to use for the site operator.  (Default: np.complex128) 
     :type dtype: {np.float64, np.complex128}, optional
     :param backend: The computational backend to use for the sparse_matrix operator  (Default: "blas") 
@@ -175,9 +175,9 @@ def __diagonal_matrix_cuda(*args, dtype=np.complex128):
         raise RuntimeError("Invalid dtype for diagonal_matrix operator")
 
 def diagonal_matrix(*args, dtype=np.complex128):
-    """Factory function for constructing an diagonal matrix site operator
+    r"""Factory function for constructing an diagonal matrix site operator
 
-    :type \*args: Variable length list of arguments. For details see the diagonal matrix constructors
+    :type *args: Variable length list of arguments. For details see the diagonal matrix constructors
     :param dtype: The dtype to use for the site operator.  (Default: np.complex128) 
     :type dtype: {np.float64, np.complex128}, optional
     :param backend: The computational backend to use for the diagonal_matrix operator  (Default: "blas") 

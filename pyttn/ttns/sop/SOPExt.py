@@ -4,9 +4,9 @@ import numpy as np
 
 
 def SOP(*args, dtype=np.complex128):
-    """Factory function for constructing a sum-of-product compact string operator.
+    r"""Factory function for constructing a sum-of-product compact string operator.
 
-    :param \*args: Variable length list of arguments. This function can handle two possible lists of arguments
+    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
 
         - N (int) - The number of modes of the SOP
         - N (int), label (str) - The number of modes of the SOP and a label for the SOP
@@ -34,9 +34,9 @@ def SOP(*args, dtype=np.complex128):
 
 
 def multiset_SOP(*args, dtype=np.complex128):
-    """Factory function for constructing a multiset sum-of-product compact string operator.
+    r"""Factory function for constructing a multiset sum-of-product compact string operator.
 
-    :param \*args: Variable length list of arguments. This function can handle two possible lists of arguments
+    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
 
         - nset( int), N (int) - The number of set variables, The number of modes of the SOP
         - nset( int), N (int), label (str) - The number of set varibles. The number of modes of the SOP and a label for the SOP
@@ -64,11 +64,11 @@ def multiset_SOP(*args, dtype=np.complex128):
 
 
 def sum_of_product(nset, *args, dtype=np.complex128):
-    """Factory function for constructing a generic sum-of-product compact string operator.
+    r"""Factory function for constructing a generic sum-of-product compact string operator.
 
     :param nset: The number of set variables to use
     :type nset: int
-    :param \*args: Variable length list of arguments. This function can handle two possible lists of arguments
+    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
 
         - N (int) - The number of modes of the SOP
         - N (int), label (str) - The number of modes of the SOP and a label for the SOP

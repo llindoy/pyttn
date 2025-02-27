@@ -78,6 +78,11 @@ void init_sop_operator(py::module &m, const std::string& label)
         .def("assign", [](_mssop& self, const _mssop& o){self=o;})
         .def("__copy__",[](const _mssop& o){return _mssop(o);})
         .def("__deepcopy__", [](const _mssop& o, py::dict){return _mssop(o);}, py::arg("memo"))
+        .def
+            (
+                "Eshift", 
+                static_cast<const T& (_mssop::*)(size_t, size_t) const>(&_mssop::Eshift)
+            )
         .def(
               "initialise", 
               [](_mssop& o, multiset_SOP<T>& sop, const ms_ttn_type& A, const system_modes& sys, bool compress, bool exploit_identity, bool use_sparse)

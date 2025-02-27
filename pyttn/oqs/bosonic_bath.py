@@ -4,7 +4,7 @@ import scipy as sp
 
 
 class BosonicBath:
-    """A class for managing a continuous bosonic gaussian bath.  This provides
+    r"""A class for managing a continuous bosonic gaussian bath.  This provides
     functions for computing non-interacting bath correlation functions, as well as
     decomposing the correlation function into a linear combination of
     complex valued exponentials (expfit) or oscillator terms (discretise)
@@ -31,7 +31,7 @@ class BosonicBath:
         self.wmax = wmax
 
     def find_wmin(self, wmax, npoints=1000):
-        """Computes an estimate of the minimum frequency used for discretising a bath.
+        r"""Computes an estimate of the minimum frequency used for discretising a bath.
         Here this is done by taking the maximum frequency and finding the largest value in 
         the range from [-wmax, 0] that has the same spectral weight as the upper bound.
 
@@ -52,7 +52,7 @@ class BosonicBath:
                 return wrange[np.argmax(Swmin > Swmax)-1]
 
     def estimate_bounds(self, wmax=None):
-        """Returns estimates for the upper and lower bounds of the spectral density to be used for the
+        r"""Returns estimates for the upper and lower bounds of the spectral density to be used for the
         discretisation function
 
         :param wmax: the maximum frequency bound, defaults to self.wmax
@@ -69,11 +69,11 @@ class BosonicBath:
 
     # improve this code to make it all work a bit better
     def Ct(self, t, epsabs=1.49e-12, epsrel=1.49e-12, limit=2000, epsomega=1e-6):
-        """Returns the value of the non-interacting bath correlation function evaluated at the time points t, 
+        r"""Returns the value of the non-interacting bath correlation function evaluated at the time points t, 
         defined by:
 
         .. math::
-            C(t) = \\frac{1}{\\pi}\int_{\\omega_{\\mathrm{min}}}^{\\omega_{\\mathrm{max}}} J(\\omega) f_B(\\beta\\omega) \\exp(- i \\omega t)
+            C(t) = \frac{1}{\pi}\int_{\omega_{\mathrm{min}}}^{\omega_{\mathrm{max}}} J(\omega) f_B(\beta\omega) \exp(- i \omega t)
 
         :param t: time
         :type t: np.ndarray
@@ -167,7 +167,7 @@ class BosonicBath:
         return (Ctr - 1.0j*Cti)/np.pi
 
     def Ctexp(t, dk, zk):
-        """Returns the value of the non-interacting bath correlation function evaluated 
+        r"""Returns the value of the non-interacting bath correlation function evaluated 
         at the time points t using the results of discretisation or expfit:
 
         :param t: time
@@ -185,7 +185,7 @@ class BosonicBath:
         return ret
 
     def Sw(self, w):
-        """Returns the non-interacting bath spectral function at w
+        r"""Returns the non-interacting bath spectral function at w
 
         :param w: frequency
         :type w: np.ndarray
@@ -198,7 +198,7 @@ class BosonicBath:
             return np.where(w > 0, self.Jw(w), -self.Jw(-w))*0.5*(1.0+1.0/np.tanh(self.beta*w/2.0))
 
     def discretise(self, discretisation_engine):
-        """Returns the coupling constants and frequencies associated with a discretised representation of the bath
+        r"""Returns the coupling constants and frequencies associated with a discretised representation of the bath
 
         :param discretisation_engine: An object defining how to discretise a continuous bath
         :type discretisation_engine: np.ndarray
@@ -217,7 +217,7 @@ class BosonicBath:
         return discretisation_engine(self.Sw)
 
     def expfit(self, fitting_engine):
-        """Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
+        r"""Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
 
         :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition
         :type fitting_engine: np.ndarray

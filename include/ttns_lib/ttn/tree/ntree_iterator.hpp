@@ -69,7 +69,7 @@ public:
     };
 
 private:
-    typedef typename std::allocator_traits<Alloc>::template rebind_alloc<stack_elem>  stack_elem_allocator_type;
+typedef typename std::allocator_traits<Alloc>::template rebind_alloc<stack_elem>  stack_elem_allocator_type;
     std::stack<stack_elem, std::deque<stack_elem, stack_elem_allocator_type> > m_stack;
 
 public:

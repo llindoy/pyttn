@@ -5,7 +5,7 @@ from pyttn.utils import orthopol
 
 
 class FermionicBath:
-    """A class for managing a continuous fermionic gaussian bath.  This provides
+    r"""A class for managing a continuous fermionic gaussian bath.  This provides
     functions for computing non-interacting bath correlation functions, as well as
     decomposing the correlation function into a linear combination of
     complex valued exponentials (expfit) or oscillator terms (discretise)
@@ -31,11 +31,11 @@ class FermionicBath:
         self.wtol = wtol
 
     def Ct(self, t, Ef=0, sigma='+', epsabs=1.49e-12, epsrel=1.49e-12, limit=2000):
-        """Returns the value of the non-interacting bath correlation function evaluated 
+        r"""Returns the value of the non-interacting bath correlation function evaluated 
         at the time points t:
 
         .. math::
-            C^{\\sigma}(t) = \\frac{1}{pi}\int_{wmin}^{wmax} J(\\omega) f_F(\\sigma\\beta(\\omega - Ef)) exp(\\sigma i \\omega t)
+            C^{\sigma}(t) = \frac{1}{pi}\int_{wmin}^{wmax} J(\omega) f_F(\sigma\beta(\omega - Ef)) exp(\sigma i \omega t)
 
         :param t: time
         :type t: np.ndarray
@@ -69,7 +69,7 @@ class FermionicBath:
         return Ct/np.pi
 
     def Ctexp(t, dk, zk, sigma='+'):
-        """Returns the value of the non-interacting bath correlation function evaluated 
+        r"""Returns the value of the non-interacting bath correlation function evaluated 
         at the time points t using the results of discretisation or expfit:
 
         :param t: time
@@ -93,7 +93,7 @@ class FermionicBath:
         return ret
 
     def fermi_distrib(self, w, Ef):
-        """Returns the value fermi function at w and fermi energy Ef:
+        r"""Returns the value fermi function at w and fermi energy Ef:
 
         :param w: frequency
         :type w: np.ndarray
@@ -119,10 +119,10 @@ class FermionicBath:
             return res
 
     def Sw(self, w, Ef=0, sigma='+'):
-        """Returns the non-interacting bath spectral function at w and fermi energy Ef
+        r"""Returns the non-interacting bath spectral function at w and fermi energy Ef
 
         .. math::
-            S^{\\sigma}(\\omega) = J(\\omega) f_{f}(\\sigma \\omega; \\beta)
+            S^{\sigma}(\omega) = J(\omega) f_{f}(\sigma \omega; \beta)
 
 
         :param w: frequency
@@ -140,7 +140,7 @@ class FermionicBath:
             return self.Jw(w)*(1-self.fermi_distrib(w, Ef))
 
     def estimate_bounds(self, wmax=None, Ef=0, sigma='+'):
-        """Returns estimates for the upper and lower bounds of the spectral density to be used for the
+        r"""Returns estimates for the upper and lower bounds of the spectral density to be used for the
         discretisation function
 
         :param wmax: the maximum frequency bound, defaults to self.wmax
@@ -176,7 +176,7 @@ class FermionicBath:
         return wmin, wmax
 
     def discretise(self, discretisation_engine, Ef=0, sigma='+'):
-        """Returns the coupling constants and frequencies associated with a discretised representation of the bath
+        r"""Returns the coupling constants and frequencies associated with a discretised representation of the bath
 
         :param discretisation_engine: An object defining how to discretise a continuous bath
         :type discretisation_engine: np.ndarray
@@ -196,7 +196,7 @@ class FermionicBath:
         return discretisation_engine(lambda x: self.Sw(x, Ef=Ef, sigma=sigma))
 
     def expfit(self, fitting_engine, Ef=0, sigma='+'):
-        """Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
+        r"""Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
 
         :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition
         :type fitting_engine: np.ndarray

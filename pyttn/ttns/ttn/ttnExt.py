@@ -33,7 +33,7 @@ except ImportError:
 
 
 def is_ttn(A):
-    """A function for determining whether a given object is a ttn
+    r"""A function for determining whether a given object is a ttn
     :param A: The object to test
     :returns: Whether or not the object is a ms_ttn
     :rtype: bool
@@ -51,7 +51,7 @@ def is_ttn(A):
     return ret
 
 def is_ms_ttn(A):
-    """A function for determining whether a given object is a multiset ttn
+    r"""A function for determining whether a given object is a multiset ttn
     :param A: The object to test
     :returns: Whether or not the object is a ms_ttn
     :rtype: bool
@@ -69,7 +69,7 @@ def is_ms_ttn(A):
     return ret
 
 def is_multiset_ttn(A):
-    """A function for determining whether a given object is a multiset ttn
+    r"""A function for determining whether a given object is a multiset ttn
     :param A: The object to test
     :returns: Whether or not the object is a ms_ttn
     :rtype: bool
@@ -125,9 +125,9 @@ def __ttn_cuda(*args, dtype = np.complex128, **kwargs):
             raise RuntimeError("Invalid dtype for ttn")
 
 def ttn(*args, dtype=np.complex128, backend="blas", **kwargs):
-    """Factory function for constructing a tree tensor network state operator
+    r"""Factory function for constructing a tree tensor network state operator
 
-    :param \\*args: Variable length list of arguments. This function can handle two possible lists of arguments
+    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
 
         - Default construct TTN object
         - ttn (ttn_dtype) - Copy construct TTN object
@@ -139,7 +139,7 @@ def ttn(*args, dtype=np.complex128, backend="blas", **kwargs):
     :type dtype: {np.float64, np.complex128}, optional
     :param backend: The computational backend to use for the ttn.  (Default: "blas") 
     :type backend: {"blas", "cuda"}, optional
-    :param \\*\\*kwargs: Additional keyword arguments that are based to the ttn object constructor
+    :param **kwargs: Additional keyword arguments that are based to the ttn object constructor
 
     :returns: The Tree Tensor Network State object
     :rtype: ttn_dtype (dtype=complex or real)
@@ -202,9 +202,9 @@ def __ms_ttn_cuda(*args, dtype=np.complex128, **kwargs):
             raise RuntimeError("Invalid dtype for ms_ttn")
 
 def multiset_ttn(*args, dtype=np.complex128, backend="blas", **kwargs):
-    """Factory function for constructing a multiset tree tensor network state operator
+    r"""Factory function for constructing a multiset tree tensor network state operator
 
-    :param \\*args: Variable length list of arguments. This function can handle two possible lists of arguments
+    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
 
         - Default construct a multiset TTN object
         - msttn (ms_ttn_dtype) - Copy construct a multiset TTN object
@@ -215,7 +215,7 @@ def multiset_ttn(*args, dtype=np.complex128, backend="blas", **kwargs):
     :type dtype: {np.float64, np.complex128}, optional
     :param backend: The computational backend to use for the ttn.  (Default: "blas") 
     :type backend: {"blas", "cuda"}, optional
-    :param \\*\\*kwargs: Additional keyword arguments that are based to the ttn object constructor
+    :param **kwargs: Additional keyword arguments that are based to the ttn object constructor
 
     :returns: The Multiset Tree Tensor Network State object
     :rtype: ms_ttn_dtype (dtype=complex or real)
@@ -231,9 +231,9 @@ def multiset_ttn(*args, dtype=np.complex128, backend="blas", **kwargs):
 
 
 def ms_ttn(*args, dtype=np.complex128, backend="blas", **kwargs):
-    """Factory function for constructing a multiset tree tensor network state operator
+    r"""Factory function for constructing a multiset tree tensor network state operator
 
-    :param \\*args: Variable length list of arguments. This function can handle two possible lists of arguments
+    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
 
         - Default construct a multiset TTN object
         - msttn (ms_ttn_dtype) - Copy construct a multiset TTN object
@@ -244,7 +244,7 @@ def ms_ttn(*args, dtype=np.complex128, backend="blas", **kwargs):
     :type dtype: {np.float64, np.complex128}, optional
     :param backend: The computational backend to use for the ttn.  (Default: "blas") 
     :type backend: {"blas", "cuda"}, optional
-    :param \\*\\*kwargs: Additional keyword arguments that are based to the ttn object constructor
+    :param **kwargs: Additional keyword arguments that are based to the ttn object constructor
 
     :returns: The Multiset Tree Tensor Network State object
     :rtype: ms_ttn_dtype (dtype=complex or real)
