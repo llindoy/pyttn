@@ -266,7 +266,7 @@ if __name__ == "__main__":
 
     #integration time parameters
     parser.add_argument('--dt', type=float, default=0.05)
-    parser.add_argument('--tmax', type=float, default=5)
+    parser.add_argument('--tmax', type=float, default=3)
 
     parser.add_argument('--output_skip', type=int, default=10)
     args = parser.parse_args()

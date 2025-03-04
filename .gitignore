@@ -44,3 +44,6 @@ share/python-wheels/
 .pytest_cache
 MANIFEST
 
+!tutorials/*.h5
+!tutorial/multiset_ansatz/*.h5
+!tutorial/open_quantum_systems/*.h5
