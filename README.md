@@ -50,15 +50,15 @@ The core C++ library relies and [Pybind11](https://github.com/pybind/pybind11) m
 
 
 ### Dependencies
-The core C++ library (ttnpp) and the python wrapper (pyTTN) have the following key dependencies.  
+The core C++ library (ttnpp) and the python wrapper (pyTTN) have the following key dependencies. 
 
 External Libraries:
 - [Pybind11](https://github.com/pybind/pybind11) Python bindings
-- [Catch2](https://github.com/catchorg/Catch2) C++ Unit Tests
 - [BLAS](https://netlib.org/blas/) linear algebra
 - [Lapack](https://netlib.org/lapack/) linear algebra
+- [Catch2](https://github.com/catchorg/Catch2) C++ Unit Tests (Only required when running C++ test)
 
-The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${PyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from github.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
+The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${pyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from github.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
 
 pyTTN also offers experimental support for the use of a CUDA backend to accelerate the internal tensor operations.  When compiling the CUDA backend, pyTTN gains the following additional dependencies:
 External Libraries:
@@ -80,15 +80,17 @@ export CMAKE_BUILD_PARALLEL_LEVEL=8
 ```
 to allow for the use of 8 threads when compiling.
 
+<!-- Add badges when complete 
 ### Building with CUDA Support
 [!Note]
 Work in progress
+-->
 
 ## Using the Software
-Example python scripts showing the use of pyTTN for a range of application are provided in the ${PyTTN_ROOT_DIR}/examples.  These examples included
+Example python scripts showing the use of pyTTN for a range of application are provided in the ${pyTTN_ROOT_DIR}/examples.  These examples included
 
 ## TTNPP Library
-It is possible to compile pure C++ programs that make use of the core C++ library (ttnpp) and currently a cmake script has been provided that can conditionally compile against 
+It is possible to compile pure C++ programs that make use of the core C++ library (ttnpp).  Example C++ programs are provided in the ${pyTTN_ROOT_DIR}/src directory.
 
 ### Compile Instructions
 This code requires cmake version 3.11 in order to compile. From the pyTTN base directory (${pyTTN_ROOT_DIR}) run:
