@@ -1,6 +1,6 @@
 #ignore everything except for the root directory to allows us to access things
 *
-*/*
+*/external/*
 !*/
 
 #now include the required files in the pyTTN_ROOT_DIR
