@@ -1,3 +1,0 @@
-{
-  "path": "../../../tutorials/dmrg_fermi_Hubbard.ipynb"
-}
