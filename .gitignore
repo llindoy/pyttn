@@ -1,6 +1,7 @@
 #ignore everything except for the root directory to allows us to access things
 *
-*/*
+**
+**/**
 **/*
 !*/
 
