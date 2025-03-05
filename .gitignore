@@ -1,57 +1,49 @@
-#ignore everything except for the root directory to allows us to access things
-*
-*/
-**/
-**
-**/**
-**/*
+*.swo
+*.swp
+external
+build
+build*
+bin
+temp
+*.h5
+*.pdf
 
-#now include the required files in the pyTTN_ROOT_DIR
-!/.gitignore
-!/CMakeLists.txt
-!/LICENSE.txt
-!/pyproject.toml
-!/pytest.ini
-!/README.md
-!/setup.py
+# Byte-compiled / optimized / DLL files
+__pycache__
+__pycache__/
+*.py[cod]
+*$py.class
 
-#now we add the cmake folder and its files
-!cmake
-!cmake/FindCUTENSOR.cmake
+# C extensions
+*.so
 
-#now we add the docs folder and its required folders
-!docs
-!docs/make.bat
-!docs/MakeFile
-!docs/source
-!docs/source/*
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+*.egg-info
+.installed.cfg
+*.egg
+.vscode
+.vscode/
+.venv
+.venv/
+.pytest_cache/
+.pytest_cache
+MANIFEST
 
-#now we include the examples folder
-!examples
-!examples/*
-
-
-#now we include the actual library include files
-!include
-!include/*
-
-#now we include the python bindings
-!python
-!python/*
-
-#now we include the pyttn python source files
-!pyttn
-!pyttn/*
-
-
-#now we include the c++ src files
-!src
-!src/*
-
-#now we include the tests file
-!tests
-!test/*
-
-#now we include the tutorials
-!tutorials
-!tutorials/*
+!tutorials/*.h5
+!tutorial/multiset_ansatz/*.h5
+!tutorial/open_quantum_systems/*.h5
