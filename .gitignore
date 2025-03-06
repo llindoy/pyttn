@@ -29,14 +29,17 @@
 #now we include the actual library include files
 !include
 !include/*
+!include/**
 
 #now we include the python bindings
 !python
 !python/*
+!python/**
 
 #now we include the pyttn python source files
 !pyttn
 !pyttn/*
+!pyttn/**
 
 
 #now we include the c++ src files
@@ -46,7 +49,9 @@
 #now we include the tests file
 !tests
 !test/*
+!test/**
 
 #now we include the tutorials
 !tutorials
 !tutorials/*
+!tutorials/**
