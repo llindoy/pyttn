@@ -1,7 +1,0 @@
-#ifndef LINALG_DECOMPOSITIONS_TRIDIAGONALISATION_CORE_HPP
-#define LINALG_DECOMPOSITIONS_TRIDIAGONALISATION_CORE_HPP
-
-#include "tridiagonalisation_hermitian.hpp"
-
-#endif
-

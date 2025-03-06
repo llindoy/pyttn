@@ -1,8 +1,0 @@
-#ifndef LINALG_DECOMPOSITIONS_GENERALISED_EIGENSOLVER_CORE_HPP
-#define LINALG_DECOMPOSITIONS_GENERALISED_EIGENSOLVER_CORE_HPP
-
-
-#include "generalised_eigensolver_general.hpp"
-
-#endif
-

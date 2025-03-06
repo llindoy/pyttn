@@ -1,1 +1,0 @@
-from .pyttn import *
