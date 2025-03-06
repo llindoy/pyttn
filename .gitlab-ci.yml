@@ -1,0 +1,41 @@
+image: python:latest
+
+before_script:
+ - apt-get update --yes
+ - apt-get install --yes cmake
+ - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
+
+
+stages:
+  - build 
+  - test
+    #- deploy
+  
+.build:
+  stage: test
+  script:
+  - export CMAKE_BUILD_PARALLEL_LEVEL=4
+  - python -m pip -v install ./
+  rules:
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+
+.test:
+  stage: test
+  needs: 
+  - build
+  script:
+  - python -m pytest
+  rules:
+    - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
+    
+pages:
+  stage: deploy
+  script:
+  - mkdir -p public
+  - cp -r docs/build/html/ public/
+  artifacts:
+    paths:
+    - public
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+

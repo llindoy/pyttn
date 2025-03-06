@@ -3,6 +3,7 @@
 
 #now include the required files in the pyTTN_ROOT_DIR
 !/.gitignore
+!/.gitlab-ci.yml
 !/CMakeLists.txt
 !/LICENSE.txt
 !/pyproject.toml
