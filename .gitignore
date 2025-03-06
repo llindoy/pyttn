@@ -25,6 +25,7 @@
 #now we include the examples folder
 !examples
 !examples/*.py
+!examples/*/
 !examples/anderson_impurity_models/*.py
 !examples/dissipative_spin_models/*.py
 !examples/holstein/*.py
@@ -48,15 +49,18 @@
 
 #now we include the pyttn python source files
 !pyttn
+!pyttn/*/
 !pyttn/*.py
 !pyttn/linalg/*.py
 !pyttn/models/*.py
 !pyttn/oqs/*.py
+!pyttn/oqs/*/
 !pyttn/oqs/bath_fitting/*.py
 !pyttn/oqs/heom/*.py
 !pyttn/oqs/unitary/*.py
 
 !pyttn/ttns/*.py
+!pyttn/ttns/*/
 !pyttn/ttns/algorithms/*.py
 !pyttn/ttns/observables/*.py
 !pyttn/ttns/operators/*.py
