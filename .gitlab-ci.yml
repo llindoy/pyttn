@@ -10,7 +10,7 @@ stages:
   - build 
   - test
   
-.build:
+build:
   stage: build
   script:
   - export CMAKE_BUILD_PARALLEL_LEVEL=4
@@ -18,7 +18,7 @@ stages:
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
 
-.test:
+test:
   stage: test
   needs: 
   - build
