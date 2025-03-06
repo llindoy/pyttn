@@ -82,5 +82,7 @@
 #now we include the tutorials
 !tutorials
 !tutorials/*.ipynb
+!tutorials/multiset_ansatz/
 !tutorials/multiset_ansatz/*.ipynb
+!tutorials/open_quantum_systems/
 !tutorials/open_quantum_systems/*.ipynb

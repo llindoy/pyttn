@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 from cayley_helper import get_spin_connectivity, build_topology
 
 
-def xychain_dynamics(Nl, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_min = None, beta = None, nstep = 1, Nw=4.0, geom='ipchain', ofname='xychain.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024, cayley_degree=3):
+def xytree_dynamics(Nl, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_min = None, beta = None, nstep = 1, Nw=4.0, geom='ipchain', ofname='xytree.h5', degree = 2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024, cayley_degree=3):
     t = np.arange(nstep+1)*dt
 
     #setup the function for evaluating the exponential cutoff spectral density
@@ -260,5 +260,5 @@ if __name__ == "__main__":
 
     nstep = int(args.tmax/args.dt)+1
 
-    xychain_dynamics(args.Nl, args.N, args.alpha, args.wc, args.eta, args.chi, args.chiS, args.chiB, args.nbose, args.dt, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree, nbose_min=args.nbose_min, use_mode_combination=True, nbmax=args.nbmax, nhilbmax=args.nhilbmax)
+    xytree_dynamics(args.Nl, args.N, args.alpha, args.wc, args.eta, args.chi, args.chiS, args.chiB, args.nbose, args.dt, beta = args.beta, nstep = nstep, geom=args.geom, ofname = args.fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, unoccupied_threshold = args.unoccupied_threshold, adaptive = args.subspace, degree = args.degree, nbose_min=args.nbose_min, use_mode_combination=True, nbmax=args.nbmax, nhilbmax=args.nhilbmax)
 
