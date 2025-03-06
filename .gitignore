@@ -27,7 +27,10 @@
 !examples/*.py
 !examples/*/
 !examples/anderson_impurity_models/*.py
-!examples/dissipative_spin_models/*.py
+!examples/dissipative_spin_models/cayley_tree/
+!examples/dissipative_spin_models/cayley_tree/*.py
+!examples/dissipative_spin_models/chain/
+!examples/dissipative_spin_models/chain/*.py
 !examples/holstein/*.py
 !examples/p3ht_pcbm_heterojunction/*.py
 !examples/pyrazine/*.py

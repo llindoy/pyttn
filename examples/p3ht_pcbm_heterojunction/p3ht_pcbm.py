@@ -18,7 +18,7 @@ fs = 41.341374575751
 
 
 def build_ttn_tree(mdims, chi1, chi2, ldims, degree=2, use_multiset=False):
-    from model_B_hamiltonian import ot_mode_index
+    from p3ht_pcbm_hamiltonian import ot_mode_index
     class chi_step:
         def __init__(self, chimax, chimin, N, degree = degree):
             self.chimin = chimin
@@ -118,7 +118,7 @@ def output_results(ofname, timepoints, res, maxchi, runtime):
 
 
 def p3ht_pcbm_single_set(topo, capacity, mode_dims, tmax=200, dt=0.25, adaptive=True, spawning_threshold=1e-6, unoccupied_threshold=1e-4, nunoccupied=0, ofname='p3ht_pcbm.h5', output_skip=1):
-    from model_B_hamiltonian import hamiltonian
+    from p3ht_pcbm_hamiltonian import hamiltonian
     """Function for performing the dynamics of the single set p3ht_pcbm model
     """
     nsteps = int(tmax/(dt))+1
@@ -205,7 +205,7 @@ def p3ht_pcbm_single_set(topo, capacity, mode_dims, tmax=200, dt=0.25, adaptive=
 
 def p3ht_pcbm_multiset(topo, mode_dims, tmax=200, dt=0.25, ofname='p3ht_pcbm.h5', output_skip=1):
     from pyttn import ms_ttn, ms_sop_operator
-    from model_B_hamiltonian import multiset_hamiltonian
+    from p3ht_pcbm_hamiltonian import multiset_hamiltonian
     """Function for performing the dynamics of the multiset p3ht_pcbm model
     """
     nsteps = int(tmax/(dt))+1
