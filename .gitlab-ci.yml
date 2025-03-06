@@ -4,6 +4,7 @@ before_script:
  - apt-get update --yes
  - apt-get install --yes cmake
  - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
+ - python -m pip install pytest
 
 
 stages:
