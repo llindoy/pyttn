@@ -20,16 +20,26 @@
 !docs/MakeFile
 !docs/source
 !docs/source/*
+!docs/source/**
 
 #now we include the examples folder
 !examples
-!examples/*
+!examples/*.py
+!examples/anderson_impurity_models/*.py
+!examples/dissipative_spin_models/*.py
+!examples/holstein/*.py
+!examples/p3ht_pcbm_heterojunction/*.py
+!examples/pyrazine/*.py
+!examples/spin_boson_model/*.py
+!examples/**
 
 
 #now we include the actual library include files
 !include
 !include/*
 !include/**
+
+
 
 #now we include the python bindings
 !python
@@ -38,20 +48,33 @@
 
 #now we include the pyttn python source files
 !pyttn
-!pyttn/*
-!pyttn/**
+!pyttn/*.py
+!pyttn/linalg/*.py
+!pyttn/models/*.py
+!pyttn/oqs/*.py
+!pyttn/oqs/bath_fitting/*.py
+!pyttn/oqs/heom/*.py
+!pyttn/oqs/unitary/*.py
+
+!pyttn/ttns/*.py
+!pyttn/ttns/algorithms/*.py
+!pyttn/ttns/observables/*.py
+!pyttn/ttns/operators/*.py
+!pyttn/ttns/sop/*.py
+!pyttn/ttns/ttn/*.py
 
 
 #now we include the c++ src files
 !src
-!src/*
+!src/*.cpp
 
 #now we include the tests file
 !tests
-!test/*
-!test/**
+!tests/*
+!tests/**
 
 #now we include the tutorials
 !tutorials
-!tutorials/*
-!tutorials/**
+!tutorials/*.ipynb
+!tutorials/multiset_ansatz/*.ipynb
+!tutorials/open_quantum_systems/*.ipynb
