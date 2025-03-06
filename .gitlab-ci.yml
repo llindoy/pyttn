@@ -9,10 +9,9 @@ before_script:
 stages:
   - build 
   - test
-    #- deploy
   
 .build:
-  stage: test
+  stage: build
   script:
   - export CMAKE_BUILD_PARALLEL_LEVEL=4
   - python -m pip -v install ./
@@ -27,15 +26,4 @@ stages:
   - python -m pytest
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
-    
-pages:
-  stage: deploy
-  script:
-  - mkdir -p public
-  - cp -r docs/build/html/ public/
-  artifacts:
-    paths:
-    - public
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
