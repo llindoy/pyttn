@@ -26,6 +26,7 @@ test:
   needs: 
   - build
   script:
+  - cd tests
   - python -m pytest
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
