@@ -70,6 +70,8 @@
 !pyttn/ttns/sop/*.py
 !pyttn/ttns/ttn/*.py
 
+!pyttn/utils/*.py
+
 
 #now we include the c++ src files
 !src
