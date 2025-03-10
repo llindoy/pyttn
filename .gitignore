@@ -79,8 +79,18 @@
 
 #now we include the tests file
 !tests
-!tests/*
-!tests/**
+!tests/*/
+!tests/*.py
+!tests/CMakeLists.txt
+!tests/linalg/CMakeLists.txt
+!tests/pyttn/*/
+!tests/pyttn/algorithms/*.py
+!tests/pyttn/observables/*.py
+!tests/pyttn/oqs/*.py
+!tests/pyttn/ttns/*
+!tests/pyttn/ttns/**
+!tests/pyttn/utils/*
+!tests/pyttn/utils/**
 
 #now we include the tutorials
 !tutorials
