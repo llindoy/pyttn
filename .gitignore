@@ -87,10 +87,10 @@
 !tests/pyttn/algorithms/*.py
 !tests/pyttn/observables/*.py
 !tests/pyttn/oqs/*.py
-!tests/pyttn/ttns/*
-!tests/pyttn/ttns/**
-!tests/pyttn/utils/*
-!tests/pyttn/utils/**
+!tests/ttns/*
+!tests/ttns/**
+!tests/utils/*
+!tests/utils/**
 
 #now we include the tutorials
 !tutorials
