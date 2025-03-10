@@ -10,38 +10,28 @@
 [![Codecov]()
 -->
 
-## Links
-
-<!-- Add links when complete -->
-* National Physical Laboratory: <https://www.npl.co.uk/>
-* Gitlab:         <https://gitlab.npl.co.uk/quantum-software/pyttn>
-* Documentation:  <>
-* PyPI:           <>
-
 <!-- TABLE OF CONTENTS -->
 
-# Table of Contents
+## Table of Contents
 
 - [About The Project](#about-the-project)
 - [Getting Started](#getting-started)
 - [Tutorials](#tutorials)
 
+-------------------------------------------------------------------------------
 
-# About the Project
+## About the Project (User Requirements)
 
 This open source project aims to provide an easy to use python interface for working with generic Tree Tensor Networks States to efficiently compute dynamics properties of quantum systems.  A key focus of this library is the easy setup of calculations employing either single or multiset tensor networks with generic tree structured connectivity.  Easy setup of Hamiltonians for arbitrary problems, with the ability to automatically apply techniques such as mode combination to reduce the total number of modes present in the system. Additionally, this library includes several tools to help facilitate applications of these approaches to study the dynamics of quantum systems that are strongly coupled to structured environment using both unitary methods (e.g. TEDOPA, T-TEDOPA and other representations of the system-bath Hamiltonian) as well as non-unitary approaches (e.g. Hierarchical Equations of Motion and Generalised Pseudomode method). 
 
 <!-- Add hyperlinks to the examples here -->
-pyTTN implements a range of numerically exact methods (methods that are systematically convergable to the exact results) for the dynamics of quantum system, and provides several example applications to
+pyTTN implements a range of numerically exact methods (methods that are systematically convergable to the exact results) for the dynamics of quantum system  and provides several example applications to
 - Non-adiabatic dynamics of 24-mode pyrazine
 - Exciton dynamics in a $n$-oligothiophene donor-C<sub>60</sub> fullerene acceptor system
 - Dynamics of quantum systems coupled to a single or multiple bosonic or fermionic environment
 - Interacting chains and trees of open quantum systems
 
-The core Tree Tensor Network Library (ttnpp) has been developed in C++ with pyTTN using a pybind11 based python wrapper to expose the core functionality to python.  The core ttnpp library is a header only C++ library and it is straightforward to compile pure C++ programs using this library.  For details see [TTNPP Library](#ttnpp-library-compilation).
-
 -------------------------------------------------------------------------------
-
 
 # Getting Started
 
@@ -104,16 +94,64 @@ make install
 
 This will build all .cpp files in the ${pyTTN_ROOT_DIR}/src folder.  Typical installation times are $\lesssim$ 2 minutes.
 
+-------------------------------------------------------------------------------
+
+
 # Tutorials
 
 The pyTTN repository contains several 
 
+-------------------------------------------------------------------------------
 
+# Software Overview
 
+## Objectives (Functional Requirements + User Requirements)
 
+## General Software Layout (Functional Requirements)
 
+## Implementation Details (Code Design)
 
+The core Tree Tensor Network Library (ttnpp) has been developed in C++ with pyTTN using a pybind11 based python wrapper to expose the core functionality to python.  The core ttnpp library is a header only C++ library and it is straightforward to compile pure C++ programs using this library.  For details see [TTNPP Library](#ttnpp-library-compilation).
 
+-------------------------------------------------------------------------------
 
+# Code Development Practices
 
+The software will be developed iteratively with testing to progressively improve efficiency, build upon implementated functionality, and to ensure stability of the developed tools.
 
+The software will be developed to NPL Software Integrity Level 3.
+
+To adhere to the necessary requirements, please follow the following software development practices:
+
+## Git
+
+## Documentation
+
+## Coding Style
+
+Please adhere to standard python coding conventions, [PEP-8](https://peps.python.org/pep-0008/).  The use of a linter (e.g. [Ruff](https://docs.astral.sh/ruff/)), and a formatter (e.g. [black](https://github.com/psf/black)) are recommended to ensure consistency.
+
+## Testing (including validation and verification)
+To ensure continuous testing of the functional units of the software separate tests are added to the ``\tests`` subfolder.  When adding/updating functionality, please ensure the functional uniis are testied appropriately and corresponing tests are added to the subfolders.  Currently, this software makes use of CI hooks to enable automated testing of components, however, we recommend that all developers should run tests locally.
+
+To test the overall functionality, we have additionally provided a set of example applications enabling the validation of core features of the pyTTN library
+- Non-adiabatic dynamics of 24-mode pyrazine
+- Exciton dynamics in a $n$-oligothiophene donor-C<sub>60</sub> fullerene acceptor system
+- Dynamics of quantum systems coupled to a single or multiple bosonic or fermionic environment
+- Interacting chains and trees of open quantum systems
+
+The expected results obtained from running these examples are presented in the [pyTTN paper](), and all datasets producing these results are available in the [data repository]().
+
+## Code Review
+
+Code review will be performed regularly by members of the team and will be led by the lead developer.  Code reviews are performed via GitLab pull requests.  Previous code reviews can be found via.
+
+-------------------------------------------------------------------------------
+
+## Links
+
+<!-- Add links when complete -->
+* National Physical Laboratory: <https://www.npl.co.uk/>
+* Gitlab:         <https://gitlab.npl.co.uk/quantum-software/pyttn>
+* Documentation:  <>
+* PyPI:           <>
