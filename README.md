@@ -2,16 +2,16 @@
 
 # pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks
 
-[![pipeline status](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
+<!-- Populate Badges when complete -->
 
-<!-- Add badges when complete -->
-<!--
+
+[![Tests status](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
+
+<!-- 
 [![ArXiv]()
-[![Documentation Status]()
 [![DOI]()
-[![Tests status]()]()
-[![Codecov]()
--->
+[![Documentation Status]()
+ -->
 
 <!-- TABLE OF CONTENTS -->
 
@@ -26,6 +26,8 @@
 # About the Project
 
 This open source project aims to provide an easy to use python interface for working with generic Tree Tensor Networks States to efficiently compute dynamics properties of quantum systems.  A key focus of this library is the easy setup of calculations employing either single or multiset tensor networks with generic tree structured connectivity.  Easy setup of Hamiltonians for arbitrary problems, with the ability to automatically apply techniques such as mode combination to reduce the total number of modes present in the system. Additionally, this library includes several tools to help facilitate applications of these approaches to study the dynamics of quantum systems that are strongly coupled to structured environment using both unitary methods (e.g. TEDOPA, T-TEDOPA and other representations of the system-bath Hamiltonian) as well as non-unitary approaches (e.g. Hierarchical Equations of Motion and Generalised Pseudomode method). 
+
+![Schematic illustrating key features of the pyTTN software package](./docs/media/pyttn%20schematic%20figure.svg)
 
 ## Links
 

@@ -11,7 +11,7 @@ endif()
 add_library(ttns_lib INTERFACE)
 target_include_directories(ttns_lib INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ttnpp>
-    $<INSTALL_INTERFACE:ttnpp>
+    $<INSTALL_INTERFACE:include>
 )
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
