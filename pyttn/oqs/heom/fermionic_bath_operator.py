@@ -3,8 +3,12 @@ import copy
 
 from pyttn import sOP, coeff
 
-def add_fermionic_bath_generator(H, Sp, dks, zks, Sm=None, binds=None, bskip=1, method="heom"):
+
+def add_fermionic_bath_generator(
+    H, Sp, dks, zks, Sm=None, binds=None, bskip=1, method="heom"
+):
     raise RuntimeError("Fermionic HEOM and Pseudofermion not yet implemented.")
+
 
 """
 from .chain_map import chain_map

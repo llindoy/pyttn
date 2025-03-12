@@ -3,16 +3,18 @@ import numpy as np
 
 def AIM(*args, dtype=np.complex128):
     from pyttn.ttnpp.models import AIM_complex
+
     try:
         from pyttn.ttnpp.models import AIM_real
-        if (dtype == np.complex128):
+
+        if dtype == np.complex128:
             return AIM_complex(*args)
-        elif (dtype == np.float64):
+        elif dtype == np.float64:
             return AIM_real(*args)
         else:
             raise RuntimeError("Invalid dtype for AIM")
     except ImportError:
-        if (dtype == np.complex128):
+        if dtype == np.complex128:
             return AIM_complex(*args)
         else:
             raise RuntimeError("Invalid dtype for AIM")
@@ -23,14 +25,15 @@ def electronic_structure(*args, dtype=np.complex128, **kwargs):
 
     try:
         from pyttn.ttnpp.models import electronic_structure_real
-        if (dtype == np.complex128):
+
+        if dtype == np.complex128:
             return electronic_structure_complex(*args, **kwargs)
-        elif (dtype == np.float64):
+        elif dtype == np.float64:
             return electronic_structure_real(*args, **kwargs)
         else:
             raise RuntimeError("Invalid dtype for electronic_structure model")
     except ImportError:
-        if (dtype == np.complex128):
+        if dtype == np.complex128:
             return electronic_structure_complex(*args, **kwargs)
         else:
             raise RuntimeError("Invalid dtype for electronic_structure model")
@@ -38,23 +41,25 @@ def electronic_structure(*args, dtype=np.complex128, **kwargs):
 
 def TFIM(*args, dtype=np.complex128):
     from pyttn.ttnpp.models import TFIM_complex
+
     try:
         from pyttn.ttnpp.models import TFIM_real
-        if (dtype == np.complex128):
+
+        if dtype == np.complex128:
             return TFIM_complex(*args)
-        elif (dtype == np.float64):
+        elif dtype == np.float64:
             return TFIM_real(*args)
         else:
             raise RuntimeError("Invalid dtype for TFIM")
     except ImportError:
-        if (dtype == np.complex128):
+        if dtype == np.complex128:
             return TFIM_complex(*args)
         else:
             raise RuntimeError("Invalid dtype for TFIM")
 
 
 def __init_sb_type(sbt1, sbt2, *args, dtype=None):
-    if (args):
+    if args:
         if sbt2 is None:
             return sbt1(*args)
         else:
@@ -66,29 +71,44 @@ def __init_sb_type(sbt1, sbt2, *args, dtype=None):
         if sbt2 is None:
             return sbt1()
         else:
-            if (dtype == np.complex128):
+            if dtype == np.complex128:
                 return sbt1()
-            elif (dtype == np.float64):
+            elif dtype == np.float64:
                 return sbt2()
             else:
                 raise RuntimeError("Invalid dtype for spin boson")
 
 
 def spin_boson(*args, geom="star", dtype=np.complex128):
-    from pyttn.ttnpp.models import spin_boson_generic_complex, spin_boson_star_complex, spin_boson_chain_complex, spin_boson_chain_real
+    from pyttn.ttnpp.models import (
+        spin_boson_generic_complex,
+        spin_boson_star_complex,
+        spin_boson_chain_complex,
+        spin_boson_chain_real,
+    )
 
     try:
-        from pyttn.ttnpp.models import spin_boson_generic_real, spin_boson_star_real, spin_boson_chain_real
+        from pyttn.ttnpp.models import (
+            spin_boson_generic_real,
+            spin_boson_star_real,
+            spin_boson_chain_real,
+        )
     except:
         spin_boson_generic_real = None
         spin_boson_star_real = None
         spin_boson_chain_real = None
 
-    if (geom == "star"):
-        return __init_sb_type(spin_boson_star_complex, spin_boson_star_real, *args, dtype=dtype)
+    if geom == "star":
+        return __init_sb_type(
+            spin_boson_star_complex, spin_boson_star_real, *args, dtype=dtype
+        )
     elif geom == "chain":
-        return __init_sb_type(spin_boson_chain_complex, spin_boson_chain_real, *args, dtype=dtype)
+        return __init_sb_type(
+            spin_boson_chain_complex, spin_boson_chain_real, *args, dtype=dtype
+        )
     elif geom == "generic":
-        return __init_sb_type(spin_boson_generic_complex, spin_boson_generic_real, *args, dtype=dtype)
+        return __init_sb_type(
+            spin_boson_generic_complex, spin_boson_generic_real, *args, dtype=dtype
+        )
     else:
         raise RuntimeError("Invalid geom for spin boson.")

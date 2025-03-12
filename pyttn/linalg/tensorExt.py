@@ -1,14 +1,15 @@
-#import the blas backend
-from .. import ttnpp.linalg as la
+# import the blas backend
+import pyttn.ttnpp.linalg as la
 
-#and attempt to import the cuda backend
+# and attempt to import the cuda backend
 try:
-    from .. import ttnpp.cuda.linalg as cula
+    import pyttn.ttnpp.cuda.linalg as cula
     __cuda_import = True
 except ImportError:
     __cuda_import = False
 
 import numpy as np
+
 
 def __vector_blas(v):
     if v.dtype == np.float64:
@@ -19,7 +20,8 @@ def __vector_blas(v):
         return la.vector_complex(v)
     else:
         raise RuntimeError("Invalid dtype for linalg.vector")
-    
+
+
 def __vector_cuda(v):
     if v.dtype == np.float64:
         return cula.vector_real(v)
@@ -29,6 +31,7 @@ def __vector_cuda(v):
         return cula.vector_complex(v)
     else:
         raise RuntimeError("Invalid dtype for linalg.vector")
+
 
 def vector(v, backend='blas'):
     r"""
@@ -52,25 +55,27 @@ def vector(v, backend='blas'):
         raise RuntimeError("Invalid backend type for linalg.vector")
 
 
-def __matrix_blas(v):
+def __matrix_blas(M):
     if M.dtype == np.float64:
         return la.matrix_real(M)
-    elif v.dtype == int:
-        return la.matrix_real(np.array(v, dtype=np.float64))
+    elif M.dtype == int:
+        return la.matrix_real(np.array(M, dtype=np.float64))
     elif M.dtype == np.complex128:
         return la.matrix_complex(M)
     else:
         raise RuntimeError("Invalid dtype for linalg.matrix")
 
-def __matrix_cuda(v):
+
+def __matrix_cuda(M):
     if M.dtype == np.float64:
         return cula.matrix_real(M)
-    elif v.dtype == int:
-        return cula.matrix_real(np.array(v, dtype=np.float64))
+    elif M.dtype == int:
+        return cula.matrix_real(np.array(M, dtype=np.float64))
     elif M.dtype == np.complex128:
         return cula.matrix_complex(M)
     else:
         raise RuntimeError("Invalid dtype for linalg.matrix")
+
 
 def matrix(M, backend='blas'):
     r"""
@@ -87,39 +92,42 @@ def matrix(M, backend='blas'):
     """
 
     if backend == 'blas':
-        return __matrix_blas(v)
+        return __matrix_blas(M)
     elif __cuda_import and backend == 'cuda':
-        return __matrix_cuda(v)
+        return __matrix_cuda(M)
     else:
         raise RuntimeError("Invalid backend type for linalg.matrix")
-    
-def __tensor_3_blas(v):
-    if M.dtype == np.float64:
-        return la.tensor_3_real(M)
-    elif v.dtype == int:
-        return la.tensor_3_real(np.array(v, dtype=np.float64))
-    elif M.dtype == np.complex128:
-        return la.tensor_3_complex(M)
+
+
+def __tensor_3_blas(T):
+    if T.dtype == np.float64:
+        return la.tensor_3_real(T)
+    elif T.dtype == int:
+        return la.tensor_3_real(np.array(T, dtype=np.float64))
+    elif T.dtype == np.complex128:
+        return la.tensor_3_complex(T)
     else:
         raise RuntimeError("Invalid dtype for linalg.tensor_3")
 
-def __tensor_3_cuda(v):
-    if M.dtype == np.float64:
-        return cula.tensor_3_real(M)
-    elif v.dtype == int:
-        return cula.tensor_3_real(np.array(v, dtype=np.float64))
-    elif M.dtype == np.complex128:
-        return cula.tensor_3_complex(M)
+
+def __tensor_3_cuda(T):
+    if T.dtype == np.float64:
+        return cula.tensor_3_real(T)
+    elif T.dtype == int:
+        return cula.tensor_3_real(np.array(T, dtype=np.float64))
+    elif T.dtype == np.complex128:
+        return cula.tensor_3_complex(T)
     else:
         raise RuntimeError("Invalid dtype for linalg.tensor_3")
 
-def tensor_3(M, backend='blas'):
+
+def tensor_3(T, backend='blas'):
     r"""
     A function for converting from a numpy array to a C++ linalg::tensor<T,3> type
     used by the C++ layer of pyTTN.
 
-    :param M: The numpy tensor 
-    :type M: np.ndarray
+    :param T: The numpy tensor 
+    :type T: np.ndarray
     :param backend: The backend to use for calculation. Either blas or cuda. (Default: "blas")
     :type backend: {"blas", "cuda"}, optional
 
@@ -128,40 +136,42 @@ def tensor_3(M, backend='blas'):
     """
 
     if backend == 'blas':
-        return __tensor_3_blas(v)
+        return __tensor_3_blas(T)
     elif __cuda_import and backend == 'cuda':
-        return __tensor_3_cuda(v)
+        return __tensor_3_cuda(T)
     else:
         raise RuntimeError("Invalid backend type for linalg.tensor_3")
-    
 
-def __tensor_4_blas(v):
-    if M.dtype == np.float64:
-        return la.tensor_4_real(M)
-    elif v.dtype == int:
-        return la.tensor_4_real(np.array(v, dtype=np.float64))
-    elif M.dtype == np.complex128:
-        return la.tensor_4_complex(M)
+
+def __tensor_4_blas(T):
+    if T.dtype == np.float64:
+        return la.tensor_4_real(T)
+    elif T.dtype == int:
+        return la.tensor_4_real(np.array(T, dtype=np.float64))
+    elif T.dtype == np.complex128:
+        return la.tensor_4_complex(T)
     else:
         raise RuntimeError("Invalid dtype for linalg.tensor_4")
 
-def __tensor_4_cuda(v):
-    if M.dtype == np.float64:
-        return cula.tensor_4_real(M)
-    elif v.dtype == int:
-        return cula.tensor_4_real(np.array(v, dtype=np.float64))
-    elif M.dtype == np.complex128:
-        return cula.tensor_4_complex(M)
+
+def __tensor_4_cuda(T):
+    if T.dtype == np.float64:
+        return cula.tensor_4_real(T)
+    elif T.dtype == int:
+        return cula.tensor_4_real(np.array(T, dtype=np.float64))
+    elif T.dtype == np.complex128:
+        return cula.tensor_4_complex(T)
     else:
         raise RuntimeError("Invalid dtype for linalg.tensor_4")
 
-def tensor_4(M, backend='blas'):
+
+def tensor_4(T, backend='blas'):
     r"""
     A function for converting from a numpy array to a C++ linalg::tensor<T,4> type
     used by the C++ layer of pyTTN.
 
-    :param M: The numpy tensor 
-    :type M: np.ndarray
+    :param T: The numpy tensor 
+    :type T: np.ndarray
     :param backend: The backend to use for calculation. Either blas or cuda. (Default: "blas")
     :type backend: {"blas", "cuda"}, optional
 
@@ -170,9 +180,9 @@ def tensor_4(M, backend='blas'):
     """
 
     if backend == 'blas':
-        return __tensor_4_blas(v)
+        return __tensor_4_blas(T)
     elif __cuda_import and backend == 'cuda':
-        return __tensor_4_cuda(v)
+        return __tensor_4_cuda(T)
     else:
         raise RuntimeError("Invalid backend type for linalg.tensor_4")
 
@@ -186,7 +196,7 @@ def tensor(T, backend='blas'):
     :type M: np.ndarray
     :param backend: The backend to use for calculation. Either blas or cuda. (Default: "blas")
     :type backend: str, optional
-    
+
     :returns: A pybind11 wrapped linalg::tensor<T, D> object
     :rtype: pybind11 wrapped linalg::tensor<T,D> object
     """

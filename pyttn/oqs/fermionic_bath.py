@@ -12,7 +12,7 @@ class FermionicBath:
 
     :param Jw: The bath spectral function defining the non-interacting correlation function
     :param beta: The inverse temperature of the bath, defaults to None
-    :type beta: float, optional 
+    :type beta: float, optional
     :param wmax: the maximum frequency bound, default to np.inf
     :type wmax: float, optional
     :param wmin: the minimum frequency bound, default to np.inf
@@ -21,7 +21,9 @@ class FermionicBath:
     :type wtol: float, optional
     """
 
-    def __init__(self, Jw, Sp=None, Sm=None, beta=None, wmax=np.inf, wmin=None, wtol=None):
+    def __init__(
+        self, Jw, Sp=None, Sm=None, beta=None, wmax=np.inf, wmin=None, wtol=None
+    ):
         self.Jw = Jw
         self.Sp = Sp
         self.Sm = Sm
@@ -30,8 +32,8 @@ class FermionicBath:
         self.wmax = wmax
         self.wtol = wtol
 
-    def Ct(self, t, Ef=0, sigma='+', epsabs=1.49e-12, epsrel=1.49e-12, limit=2000):
-        r"""Returns the value of the non-interacting bath correlation function evaluated 
+    def Ct(self, t, Ef=0, sigma="+", epsabs=1.49e-12, epsrel=1.49e-12, limit=2000):
+        r"""Returns the value of the non-interacting bath correlation function evaluated
         at the time points t:
 
         .. math::
@@ -50,26 +52,54 @@ class FermionicBath:
         Ct = np.zeros(t.shape, dtype=np.complex128)
 
         coeff = 1
-        if sigma == '-':
+        if sigma == "-":
             coeff = -1
 
-        if (wmax == np.inf or wmin == -np.inf):
-            ctr = sp.integrate.quad_vec(lambda x: self.Sw(
-                x, Ef=Ef, sigma=sigma)*np.cos(x*t), wmin, wmax, epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
-            cti = sp.integrate.quad_vec(lambda x: self.Sw(
-                x, Ef=Ef, sigma=sigma)*np.sin(x*t), wmin, wmax, epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
-            Ct = ctr + coeff*1.0j*cti
+        if wmax == np.inf or wmin == -np.inf:
+            ctr = sp.integrate.quad_vec(
+                lambda x: self.Sw(x, Ef=Ef, sigma=sigma) * np.cos(x * t),
+                wmin,
+                wmax,
+                epsabs=epsabs,
+                epsrel=epsrel,
+                limit=limit,
+            )[0]
+            cti = sp.integrate.quad_vec(
+                lambda x: self.Sw(x, Ef=Ef, sigma=sigma) * np.sin(x * t),
+                wmin,
+                wmax,
+                epsabs=epsabs,
+                epsrel=epsrel,
+                limit=limit,
+            )[0]
+            Ct = ctr + coeff * 1.0j * cti
         else:
             for ti in range(t.shape[0]):
-                ctr = sp.integrate.quad(lambda x: self.Sw(x, Ef=Ef, sigma=sigma), wmin, wmax,
-                                        weight='cos', wvar=t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
-                cti = sp.integrate.quad(lambda x: self.Sw(x, Ef=Ef, sigma=sigma), wmin, wmax,
-                                        weight='sin', wvar=t[ti], epsabs=epsabs, epsrel=epsrel, limit=limit)[0]
-                Ct[ti] = ctr + coeff*1.0j*cti
-        return Ct/np.pi
+                ctr = sp.integrate.quad(
+                    lambda x: self.Sw(x, Ef=Ef, sigma=sigma),
+                    wmin,
+                    wmax,
+                    weight="cos",
+                    wvar=t[ti],
+                    epsabs=epsabs,
+                    epsrel=epsrel,
+                    limit=limit,
+                )[0]
+                cti = sp.integrate.quad(
+                    lambda x: self.Sw(x, Ef=Ef, sigma=sigma),
+                    wmin,
+                    wmax,
+                    weight="sin",
+                    wvar=t[ti],
+                    epsabs=epsabs,
+                    epsrel=epsrel,
+                    limit=limit,
+                )[0]
+                Ct[ti] = ctr + coeff * 1.0j * cti
+        return Ct / np.pi
 
-    def Ctexp(t, dk, zk, sigma='+'):
-        r"""Returns the value of the non-interacting bath correlation function evaluated 
+    def Ctexp(t, dk, zk, sigma="+"):
+        r"""Returns the value of the non-interacting bath correlation function evaluated
         at the time points t using the results of discretisation or expfit:
 
         :param t: time
@@ -84,12 +114,12 @@ class FermionicBath:
         :rtype: np.ndarray
         """
         coeff = 1
-        if sigma == '-':
+        if sigma == "-":
             coeff = -1
 
         ret = np.zeros(t.shape, dtype=np.complex128)
         for i in range(len(dk)):
-            ret += dk[i]*np.exp(coeff*1.0j*zk[i]*t)
+            ret += dk[i] * np.exp(coeff * 1.0j * zk[i] * t)
         return ret
 
     def fermi_distrib(self, w, Ef):
@@ -106,19 +136,22 @@ class FermionicBath:
             return np.where(w <= Ef, 1.0, 0.0)
         else:
             if isinstance(w, np.ndarray):
-                res = 0.0*w
-                res[w < Ef] = 1/(1+np.exp(self.beta*(w[w < Ef]-Ef)))
-                res[w >= Ef] = np.exp(-self.beta*(w[w >= Ef]-Ef)) / \
-                    (1+np.exp(-self.beta*(w[w >= Ef]-Ef)))
+                res = 0.0 * w
+                res[w < Ef] = 1 / (1 + np.exp(self.beta * (w[w < Ef] - Ef)))
+                res[w >= Ef] = np.exp(-self.beta * (w[w >= Ef] - Ef)) / (
+                    1 + np.exp(-self.beta * (w[w >= Ef] - Ef))
+                )
             else:
-                if (w < Ef):
-                    return 1/(1+np.exp(self.beta*(w-Ef)))
+                if w < Ef:
+                    return 1 / (1 + np.exp(self.beta * (w - Ef)))
                 else:
-                    return np.exp(-self.beta*(w-Ef))/(1+np.exp(-self.beta*(w-Ef)))
+                    return np.exp(-self.beta * (w - Ef)) / (
+                        1 + np.exp(-self.beta * (w - Ef))
+                    )
 
             return res
 
-    def Sw(self, w, Ef=0, sigma='+'):
+    def Sw(self, w, Ef=0, sigma="+"):
         r"""Returns the non-interacting bath spectral function at w and fermi energy Ef
 
         .. math::
@@ -134,12 +167,12 @@ class FermionicBath:
         :return: The bath correlation function
         :rtype: np.ndarray
         """
-        if (sigma == '+'):
-            return self.Jw(w)*self.fermi_distrib(w, Ef)
+        if sigma == "+":
+            return self.Jw(w) * self.fermi_distrib(w, Ef)
         else:
-            return self.Jw(w)*(1-self.fermi_distrib(w, Ef))
+            return self.Jw(w) * (1 - self.fermi_distrib(w, Ef))
 
-    def estimate_bounds(self, wmax=None, Ef=0, sigma='+'):
+    def estimate_bounds(self, wmax=None, Ef=0, sigma="+"):
         r"""Returns estimates for the upper and lower bounds of the spectral density to be used for the
         discretisation function
 
@@ -150,7 +183,7 @@ class FermionicBath:
         :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green's Function, default to +
         :type sigma: str, optional
         :return: the maximum and minimum frequency bounds
-        :rtype: float, float 
+        :rtype: float, float
         """
         if wmax is None:
             wmax = self.wmax
@@ -158,24 +191,24 @@ class FermionicBath:
         wtol = self.wtol
         wmax = np.abs(wmax)
         if self.beta is None:
-            if (sigma == '+'):
+            if sigma == "+":
                 wmin = -wmax
                 wmax = Ef
             else:
                 wmin = Ef
         else:
-            if (wtol == None):
+            if wtol == None:
                 wmin = -wmax
             else:
-                if (sigma == '+'):
+                if sigma == "+":
                     wmin = -wmax
-                    wmax = min(wmax, (1.0/self.beta*np.log(1/wtol-1)) + Ef)
+                    wmax = min(wmax, (1.0 / self.beta * np.log(1 / wtol - 1)) + Ef)
                 else:
-                    wmin = min(wmax, (Ef-1.0/self.beta*np.log(1/wtol-1)))
+                    wmin = min(wmax, (Ef - 1.0 / self.beta * np.log(1 / wtol - 1)))
 
         return wmin, wmax
 
-    def discretise(self, discretisation_engine, Ef=0, sigma='+'):
+    def discretise(self, discretisation_engine, Ef=0, sigma="+"):
         r"""Returns the coupling constants and frequencies associated with a discretised representation of the bath
 
         :param discretisation_engine: An object defining how to discretise a continuous bath
@@ -188,14 +221,15 @@ class FermionicBath:
         :rtype: np.ndarray, np.ndarray
         """
         from .bath_fitting import OrthopolDiscretisation, DensityDiscretisation
+
         wmin, wmax = self.estimate_bounds(Ef=Ef, sigma=sigma)
-        if (discretisation_engine.wmin is None):
+        if discretisation_engine.wmin is None:
             discretisation_engine.wmin = wmin
-        if (discretisation_engine.wmax is None):
+        if discretisation_engine.wmax is None:
             discretisation_engine.wmin = wmax
         return discretisation_engine(lambda x: self.Sw(x, Ef=Ef, sigma=sigma))
 
-    def expfit(self, fitting_engine, Ef=0, sigma='+'):
+    def expfit(self, fitting_engine, Ef=0, sigma="+"):
         r"""Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
 
         :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition
@@ -208,19 +242,18 @@ class FermionicBath:
         :rtype: np.ndarray, np.ndarray
         """
         from .bath_fitting import AAADecomposition, ESPRITDecomposition
+
         dk = None
         zk = None
         if isinstance(fitting_engine, AAADecomposition):
             wmin, wmax = self.estimate_bounds(Ef=Ef, sigma=sigma)
-            wav = (wmax-wmin)/2
-            if (fitting_engine.wmin is None):
-                fitting_engine.wmin = wav - 2*(wav - wmin)
-            if (fitting_engine.wmax is None):
-                fitting_engine.wmin = wav + 2*(wmax-wav)
-            dk, zk, _ = fitting_engine(
-                lambda x: self.Sw(x, Ef=Ef, sigma=sigma))
+            wav = (wmax - wmin) / 2
+            if fitting_engine.wmin is None:
+                fitting_engine.wmin = wav - 2 * (wav - wmin)
+            if fitting_engine.wmax is None:
+                fitting_engine.wmin = wav + 2 * (wmax - wav)
+            dk, zk, _ = fitting_engine(lambda x: self.Sw(x, Ef=Ef, sigma=sigma))
 
         elif isinstance(fitting_engine, ESPRITDecomposition):
-            dk, zk, _ = fitting_engine(
-                lambda x: self.Ct(x, Ef=Ef, sigma=sigma))
+            dk, zk, _ = fitting_engine(lambda x: self.Ct(x, Ef=Ef, sigma=sigma))
         return dk, zk
