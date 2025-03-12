@@ -1,14 +1,14 @@
 <a id="readme-top"></a>
 
 # pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks
-<!-- Add badges when complete -->
-<!--
+
+<!-- Populate Badges when complete -->
+
 [![ArXiv]()
-[![Documentation Status]()
 [![DOI]()
-[![Tests status]()]()
-[![Codecov]()
--->
+[![Tests status](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
+[![Documentation Status]()
+
 
 <!-- TABLE OF CONTENTS -->
 
