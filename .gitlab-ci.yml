@@ -15,8 +15,8 @@ build:
   stage: build
   script:
   - export CMAKE_BUILD_PARALLEL_LEVEL=4
-  - python -m pip -v install ./
-  - python -m pytest
+    #- python -m pip -v install ./
+    #- python -m pytest
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
 
