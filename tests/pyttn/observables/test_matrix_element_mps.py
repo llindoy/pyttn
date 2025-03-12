@@ -3,13 +3,8 @@ import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
 import numpy as np
-import sys
-import copy
-import h5py
 
-from pyttn import system_modes, tls_mode, SOP, sOP, ntreeBuilder
-from pyttn import ttn, matrix_element, dmrg
-from pyttn import site_operator, product_operator, sop_operator
+from pyttn import matrix_element, sop_operator
 
 import pytest
 

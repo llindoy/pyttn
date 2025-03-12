@@ -3,12 +3,10 @@ import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
 import numpy as np
-import sys
-import copy
-import h5py
 
 
-from pyttn import oqs, utils
+
+from pyttn import oqs
 from numba import jit
 
 import pytest
@@ -119,7 +117,6 @@ def test_ESPRIT(beta, expected_error):
     wc = 5
     s = 1
     Nb = 10
-    Nw = 10
 
     nstep = int(tmax / dt) + 1
     t = np.arange(nstep + 1) * dt

@@ -3,14 +3,19 @@ import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
 import numpy as np
-import sys
-import copy
-import h5py
-
-from pyttn import system_modes, tls_mode, SOP, sOP, ntreeBuilder
-from pyttn import ttn, sop_operator, matrix_element, dmrg
-
 import pytest
+
+from pyttn import (
+    SOP,
+    dmrg,
+    matrix_element,
+    ntreeBuilder,
+    sOP,
+    sop_operator,
+    system_modes,
+    tls_mode,
+    ttn,
+)
 
 
 @pytest.mark.parametrize(

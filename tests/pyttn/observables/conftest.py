@@ -3,17 +3,23 @@ import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
 import numpy as np
-import sys
-import copy
-import h5py
-
-from pyttn import system_modes, tls_mode, multiset_SOP, SOP, sOP, ntreeBuilder
-from pyttn import ttn, ms_ttn
-from pyttn import matrix_element, dmrg
-from pyttn import site_operator, product_operator, sop_operator, multiset_sop_operator
-
-
 import pytest
+
+from pyttn import (
+    SOP,
+    dmrg,
+    ms_ttn,
+    multiset_SOP,
+    multiset_sop_operator,
+    ntreeBuilder,
+    product_operator,
+    site_operator,
+    sOP,
+    sop_operator,
+    system_modes,
+    tls_mode,
+    ttn,
+)
 
 
 def tfim_hamiltonian():
