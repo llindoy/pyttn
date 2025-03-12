@@ -4,11 +4,14 @@
 
 <!-- Populate Badges when complete -->
 
+
+[![Tests status](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
+
+<!-- 
 [![ArXiv]()
 [![DOI]()
-[![Tests status](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
 [![Documentation Status]()
-
+ -->
 
 <!-- TABLE OF CONTENTS -->
 
