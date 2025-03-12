@@ -1,16 +1,16 @@
 import numpy as np
 from scipy import sparse
 from scipy import linalg as splinalg
-from scipy.integrate import quad, quad_vec
+from scipy.integrate import quad_vec
 
 
 def __residue_integrand(theta, r, rs, poles):
-    zvs = rs*np.exp(1.0j*theta)
-    vals = r(poles+zvs)*zvs
+    zvs = rs * np.exp(1.0j * theta)
+    vals = r(poles + zvs) * zvs
     return vals
 
 
-def __compute_residues_integ(r,  poles, tol):
+def __compute_residues_integ(r, poles, tol):
     r"""Compute the poles and residues given the baryocentric representation of a rational function
 
     :param r: The rational function object
@@ -24,12 +24,15 @@ def __compute_residues_integ(r,  poles, tol):
     :rtype: np.ndarray
     """
     # find the distance between pole i and the nearest pole to it - this ensures that we can evaluate the pole using
-    vals = np.abs([xs - poles[np.argpartition(np.abs(poles - xs), 1)[1]]
-                  for xs in poles])/10.0
+    vals = (
+        np.abs([xs - poles[np.argpartition(np.abs(poles - xs), 1)[1]] for xs in poles])
+        / 10.0
+    )
     rs = vals
 
-    res = quad_vec(lambda x: __residue_integrand(
-        x, r, rs, poles), 0, 2.0*np.pi, epsrel=tol)[0]
+    res = quad_vec(
+        lambda x: __residue_integrand(x, r, rs, poles), 0, 2.0 * np.pi, epsrel=tol
+    )[0]
     return res
 
 
@@ -47,7 +50,7 @@ def __prz(r, z, f, w, tol):
     :param tol: Integration tolerance for computing residues
     :type tol: float
 
-    :returns: 
+    :returns:
         - poles(np.ndarray) - The poles of the rational function
         - residues(np.ndarray) - The residues of the rational function decomposition
         - zeros(np.ndarray) - The zeros of the rational function
@@ -56,9 +59,9 @@ def __prz(r, z, f, w, tol):
     m = w.shape[0]
 
     # setup the generalised eigenproblem suitable for obtaining the poles of this function
-    B = np.identity(m+1, dtype=np.complex128)
+    B = np.identity(m + 1, dtype=np.complex128)
     B[0, 0] = 0
-    M = np.zeros((m+1, m+1), dtype=np.complex128)
+    M = np.zeros((m + 1, m + 1), dtype=np.complex128)
     M[1:, 1:] = np.diag(z)
     M[0, 1:] = w
     M[1:, 0] = np.ones(m, dtype=np.complex128)
@@ -67,7 +70,7 @@ def __prz(r, z, f, w, tol):
     poles = poles[~np.isinf(poles)]
 
     # setup the generalised eigenproblem suitable for obtaining the zeros of this function
-    M[0, 1:] = w*f
+    M[0, 1:] = w * f
 
     zeros = splinalg.eigvals(M, B)
     zeros = zeros[~np.isinf(zeros)]
@@ -75,6 +78,7 @@ def __prz(r, z, f, w, tol):
     res = __compute_residues_integ(r, poles, tol)
 
     return poles, res, zeros
+
 
 # function for evaluating the baryocentric form of the rational function approximation of another function
 
@@ -98,12 +102,12 @@ def __evaluate_function(z, Z, f, w):
     :rtype: np.ndarray
     """
     ZZ, zz = np.meshgrid(Z, z)
-    CC = 1.0/(zz-ZZ)
-    r = (CC@(w*f))/(CC@w)
+    CC = 1.0 / (zz - ZZ)
+    r = (CC @ (w * f)) / (CC @ w)
     return r
 
 
-def AAA_algorithm(F, Z, tol=1e-13, K = None, nmax=100, *args, **kwargs):
+def AAA_algorithm(F, Z, tol=1e-13, K=None, nmax=100, *args, **kwargs):
     r"""Implementation of the adaptive Antoulas-Anderson (AAA) algorithm for rational approximation
     Y. Nakatsukasa, O. Sète, and L. N. Trefethen, SIAM Journal on Scientific Computing 40, A1494 (2018).
 
@@ -133,8 +137,6 @@ def AAA_algorithm(F, Z, tol=1e-13, K = None, nmax=100, *args, **kwargs):
     # evaluate the function at the sample points
     Fz = np.array(F(Z, *args, **kwargs), dtype=np.complex128)
     Z = np.array(Z, dtype=np.complex128)
-    Z0 = Z
-    F0 = Fz
 
     R = np.mean(Fz)
     SF = sparse.diags(Fz)
@@ -143,7 +145,7 @@ def AAA_algorithm(F, Z, tol=1e-13, K = None, nmax=100, *args, **kwargs):
     C = np.zeros((M, nmax), dtype=np.complex128)
     w = None
     for i in range(nmax):
-        ind = np.argmax(np.abs(Fz-R))
+        ind = np.argmax(np.abs(Fz - R))
         z.append(Z[ind])
         f.append(Fz[ind])
 
@@ -154,25 +156,27 @@ def AAA_algorithm(F, Z, tol=1e-13, K = None, nmax=100, *args, **kwargs):
 
         SF = sparse.diags(Fz)
 
-        C[:, i] = (1.0/(Z-z[i]))
+        C[:, i] = 1.0 / (Z - z[i])
         Sf = np.diag(f)
-        A = SF @ C[:, :i+1] - C[:, :i+1] @ Sf
+        A = SF @ C[:, : i + 1] - C[:, : i + 1] @ Sf
 
         U, S, V = np.linalg.svd(A, full_matrices=False)
         V = np.conjugate(np.transpose(V))
         w = V[:, i]
-        N = C[:, :i+1] @ (w*f)
-        D = C[:, :i+1] @ w
-        R = N/D
-        err = np.linalg.norm(Fz-R, np.inf)
-        if (err <= tol*np.linalg.norm(Fz, np.inf) or len(z) == K):
+        N = C[:, : i + 1] @ (w * f)
+        D = C[:, : i + 1] @ w
+        R = N / D
+        err = np.linalg.norm(Fz - R, np.inf)
+        if err <= tol * np.linalg.norm(Fz, np.inf) or len(z) == K:
             break
 
     z1 = np.array(z, dtype=np.complex128)
     f1 = np.array(f, dtype=np.complex128)
     w1 = np.array(w, dtype=np.complex128)
 
-    def func(x): return __evaluate_function(x, z1, f1, w1)
+    def func(x):
+        return __evaluate_function(x, z1, f1, w1)
+
     poles, residues, zeros = __prz(func, z, f, w, tol)
 
     return func, poles, residues, zeros

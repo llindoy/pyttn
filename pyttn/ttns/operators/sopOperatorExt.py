@@ -1,5 +1,3 @@
-import numpy as np
-
 from pyttn.ttnpp import sop_operator_complex
 from pyttn.ttnpp import ttn_complex
 from pyttn.ttnpp import SOP_complex

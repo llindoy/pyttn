@@ -4,18 +4,20 @@ before_script:
  - apt-get update --yes
  - apt-get install --yes cmake
  - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
+ - python -m pip install pytest
+ - python -m pip install numpy
+ - python -m pip install h5py
 
 
 stages:
-  #- build 
-  #- test
-  - deploy
+  - build 
   
-.build:
-  stage: test
+build:
+  stage: build
   script:
   - export CMAKE_BUILD_PARALLEL_LEVEL=4
   - python -m pip -v install ./
+  - python -m pytest
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
 
@@ -24,18 +26,8 @@ stages:
   needs: 
   - build
   script:
+  - cd tests
   - python -m pytest
   rules:
     - if: $CI_COMMIT_REF_NAME != $CI_DEFAULT_BRANCH
-    
-pages:
-  stage: deploy
-  script:
-  - mkdir -p public
-  - cp -r docs/build/html/ public/
-  artifacts:
-    paths:
-    - public
-  rules:
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 

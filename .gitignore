@@ -1,46 +1,101 @@
-*.swo
-*.swp
-external
-build
-build*
-bin
-temp
-*.h5
-*.pdf
+#ignore everything except for the root directory to allows us to access things
+*
 
-# Byte-compiled / optimized / DLL files
-__pycache__
-__pycache__/
-*.py[cod]
-*$py.class
+#now include the required files in the pyTTN_ROOT_DIR
+!/.gitignore
+!/.gitlab-ci.yml
+!/CMakeLists.txt
+!/LICENSE.txt
+!/pyproject.toml
+!/pytest.ini
+!/README.md
+!/setup.py
 
-# C extensions
-*.so
+#now we add the cmake folder and its files
+!cmake
+!cmake/FindCUTENSOR.cmake
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-*.egg-info
-.installed.cfg
-*.egg
-.vscode
-.vscode/
-.venv
-.venv/
-.pytest_cache/
-.pytest_cache
-MANIFEST
+#now we add the docs folder and its required folders
+!docs
+!docs/make.bat
+!docs/Makefile
+!docs/source
+!docs/source/*
+!docs/source/**
 
+#now we include the examples folder
+!examples
+!examples/*.py
+!examples/*/
+!examples/anderson_impurity_models/*.py
+!examples/dissipative_spin_models/cayley_tree/
+!examples/dissipative_spin_models/cayley_tree/*.py
+!examples/dissipative_spin_models/chain/
+!examples/dissipative_spin_models/chain/*.py
+!examples/holstein/*.py
+!examples/p3ht_pcbm_heterojunction/*.py
+!examples/pyrazine/*.py
+!examples/spin_boson_model/*.py
+
+
+#now we include the actual library include files
+!include
+!include/*
+!include/**
+
+
+
+#now we include the python bindings
+!python
+!python/*
+!python/**
+
+#now we include the pyttn python source files
+!pyttn
+!pyttn/*/
+!pyttn/*.py
+!pyttn/linalg/*.py
+!pyttn/models/*.py
+!pyttn/oqs/*.py
+!pyttn/oqs/*/
+!pyttn/oqs/bath_fitting/*.py
+!pyttn/oqs/heom/*.py
+!pyttn/oqs/unitary/*.py
+
+!pyttn/ttns/*.py
+!pyttn/ttns/*/
+!pyttn/ttns/algorithms/*.py
+!pyttn/ttns/observables/*.py
+!pyttn/ttns/operators/*.py
+!pyttn/ttns/sop/*.py
+!pyttn/ttns/ttn/*.py
+
+!pyttn/utils/*.py
+
+
+#now we include the c++ src files
+!src
+!src/*.cpp
+
+#now we include the tests file
+!tests
+!tests/*/
+!tests/*.py
+!tests/CMakeLists.txt
+!tests/linalg/CMakeLists.txt
+!tests/pyttn/*/
+!tests/pyttn/algorithms/*.py
+!tests/pyttn/observables/*.py
+!tests/pyttn/oqs/*.py
+!tests/ttns/*
+!tests/ttns/**
+!tests/utils/*
+!tests/utils/**
+
+#now we include the tutorials
+!tutorials
+!tutorials/*.ipynb
+!tutorials/multiset_ansatz/
+!tutorials/multiset_ansatz/*.ipynb
+!tutorials/open_quantum_systems/
+!tutorials/open_quantum_systems/*.ipynb

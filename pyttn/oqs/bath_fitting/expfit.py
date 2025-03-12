@@ -4,15 +4,14 @@ from .aaa import AAA_algorithm
 
 
 class ExpFitDecomposition:
-    r"""Base class for exponential fit decompositions
-    """
+    r"""Base class for exponential fit decompositions"""
 
     def __init__(self):
         pass
 
 
 def ESPRIT_support_points(t="linear", tmax=None, Nt=1000):
-    r"""A function for automatically generating support points to be used within the ESPRIT algorithm.  
+    r"""A function for automatically generating support points to be used within the ESPRIT algorithm.
 
     :param t: Either the support points or a key word used to generate the support points. (Default: "linear") This parameter can be either a
 
@@ -39,10 +38,10 @@ def ESPRIT_support_points(t="linear", tmax=None, Nt=1000):
 
 
 class ESPRITDecomposition(ExpFitDecomposition):
-    r"""A class providing an easy to use interface for applying the ESPRIT decomposition to 
+    r"""A class providing an easy to use interface for applying the ESPRIT decomposition to
     construct a sum-of-exponential approximation for a bath correlation function
 
-    Constructor arguments: 
+    Constructor arguments:
 
     :param K: The number of terms in the sum-of-exponential decomposition
     :type K: int
@@ -66,36 +65,36 @@ class ESPRITDecomposition(ExpFitDecomposition):
         self.K = K
 
     def __call__(self, Ct):
-        dt = self.t[1]-self.t[0]
+        dt = self.t[1] - self.t[0]
         C = Ct(self.t)
         dk, zk, Ctres = ESPRIT(C, self.K)
-        zk = zk/dt
+        zk = zk / dt
         return dk, zk, Ctres
 
 
 def __softmspace(start, stop, N, beta=1, endpoint=True):
-    start = (np.log(1-(np.exp(-beta*start))) + beta*start)/beta
+    start = (np.log(1 - (np.exp(-beta * start))) + beta * start) / beta
     # start = np.log(np.exp(beta*start)-1)/beta
-    stop = (np.log(1-(np.exp(-beta*stop))) + beta*stop)/beta
+    stop = (np.log(1 - (np.exp(-beta * stop))) + beta * stop) / beta
     # stop = np.log(np.exp(beta*stop)-1)/beta
 
-    dx = (stop-start)/N
-    if (endpoint):
-        dx = (stop-start)/(N-1)
+    dx = (stop - start) / N
+    if endpoint:
+        dx = (stop - start) / (N - 1)
 
-    return np.logaddexp(beta*(np.arange(N)*dx + start), 0)/beta
+    return np.logaddexp(beta * (np.arange(N) * dx + start), 0) / beta
     # return np.log(np.exp(beta*(np.arange(N)*dx  + start))+1)/beta
 
 
 def __generate_grid_points(N, wc, wmin=1e-9):
-    Z1 = __softmspace(wmin, wc, N//2)
+    Z1 = __softmspace(wmin, wc, N // 2)
     nZ1 = -np.flip(Z1)
     Z = np.concatenate((nZ1, Z1))
     return Z
 
 
 def AAA_support_points(w="linear", wmin=None, wmax=None, Naaa=1000):
-    r"""A function for automatically generating support points to be used within the AAA algorithm.  
+    r"""A function for automatically generating support points to be used within the AAA algorithm.
 
     :param w: Either the support points orr a key word used to generate the support points. (Default: "linear") This parameter can be either a
 
@@ -119,19 +118,19 @@ def AAA_support_points(w="linear", wmin=None, wmax=None, Naaa=1000):
         else:
             return w
 
-    elif (w == "softm"):
-        if (wmax == None):
+    elif w == "softm":
+        if wmax is None:
             wmax = 1
 
-        if (wmin == None or wmin <= 0):
+        if wmin is None or wmin <= 0:
             wmin = 1e-8
 
         return __generate_grid_points(Naaa, wmax, wmin=wmin)
 
-    elif (w == "linear"):
-        if (wmax == None):
+    elif w == "linear":
+        if wmax is None:
             wmax = 1
-        if (wmin == None):
+        if wmin is None:
             wmin = -1
 
         return np.linspace(wmin, wmax, Naaa)
@@ -141,12 +140,12 @@ def AAA_support_points(w="linear", wmin=None, wmax=None, Naaa=1000):
 
 
 class AAADecomposition:
-    r"""A class providing an easy to use interface for applying the AAA based rational function 
+    r"""A class providing an easy to use interface for applying the AAA based rational function
     decomposition to approximate a bath spectral density.  This class includes tools used for
-    automatic generation of support points, as well as manually specified support points to 
+    automatic generation of support points, as well as manually specified support points to
     allow for both easy general use and flexibility when handling more complex spectral densities.
 
-    Constructor arguments: 
+    Constructor arguments:
 
     :param tol: The tolerance used within the AAA algorithm. (Default: 1e-4)
     :type tol: float, optional
@@ -176,11 +175,21 @@ class AAADecomposition:
 
     """
 
-    def __init__(self, tol=1e-4, K = None, w="linear", aaa_nmax=500, coeff=1.0, wmin=None, wmax=None, Naaa=1000):
+    def __init__(
+        self,
+        tol=1e-4,
+        K=None,
+        w="linear",
+        aaa_nmax=500,
+        coeff=1.0,
+        wmin=None,
+        wmax=None,
+        Naaa=1000,
+    ):
         self.Z1 = None
         self.w = w
-        self.wmin=wmin
-        self.wmax=wmax
+        self.wmin = wmin
+        self.wmax = wmax
         self.Naaa = Naaa
 
         self.aaa_nmax = aaa_nmax
@@ -199,8 +208,8 @@ class AAADecomposition:
         :param coeff: A coefficient to go in front of the frequency terms. (Default: 1)
         :type coeff: float, optional
         """
-        pp = coeff*p*1.0j
-        rr = -1.0j*r/(np.pi)
+        pp = coeff * p * 1.0j
+        rr = -1.0j * r / (np.pi)
         inds = pp.real > 0
         pp = pp[inds]
         rr = rr[inds]
@@ -217,13 +226,16 @@ class AAADecomposition:
             - zk (np.ndarray) - The exponents in the sum-of-exponential decomposition of the bath correlation function
             - func (callable) - The AAA rational function fit of the spectral density
         """
-        #generate the support points for the AAA decomposition
+        # generate the support points for the AAA decomposition
         if not isinstance(self.Z1, (np.ndarray, list)):
-            self.Z1 = AAA_support_points(w=self.w, wmin=self.wmin, wmax=self.wmax, Naaa=self.Naaa)
+            self.Z1 = AAA_support_points(
+                w=self.w, wmin=self.wmin, wmax=self.wmax, Naaa=self.Naaa
+            )
 
         # first compute the aaa decomposition of the spectral function
         func1, p, r, z = AAA_algorithm(
-            S, self.Z1, nmax=self.aaa_nmax, tol=self.aaa_tol, K = self.K)
+            S, self.Z1, nmax=self.aaa_nmax, tol=self.aaa_tol, K=self.K
+        )
 
         # and convert that to the heom correlation function coefficients
         dk, zk = AAADecomposition.__AAA_to_HEOM(p, r, coeff=self.coeff)

@@ -1,9 +1,11 @@
 from pyttn.ttnpp import liouville_space
-from .SOPExt import SOP
-from .opdictExt import *
+from .SOPExt import SOP, __is_SOP
+from .opdictExt import __is_operator_dictionary
 
 
-def liouville_space_superoperator(Op, sys, optype, opdict=None, Lopdict=None, coeff=1.0):
+def liouville_space_superoperator(
+    Op, sys, optype, opdict=None, Lopdict=None, coeff=1.0
+):
     r"""A function for taking a Hilbert space operator and system information object and constructing a Liouville space operator
     object rdependent on the argument optype.  Here we support the automatic generation of 4 different types of Liouville space operator
     these are left acting operators, right acting operators, commutator operators and anticommutator operators.
@@ -12,33 +14,37 @@ def liouville_space_superoperator(Op, sys, optype, opdict=None, Lopdict=None, co
     """
     Lop = None
     if __is_SOP(Op):
-        Lop = SOP(sys.nprimitive_modes()*2)
+        Lop = SOP(sys.nprimitive_modes() * 2)
     else:
         otype = type(Op)
         Lop = otype()
 
-    if optype == '-':
-        if is_operator_dictionary(opdict):
+    if optype == "-":
+        if __is_operator_dictionary(opdict):
             liouville_space.commutator_superoperator(
-                Op, sys, opdict, Lop, Lopdict, coeff=coeff)
+                Op, sys, opdict, Lop, Lopdict, coeff=coeff
+            )
         else:
             liouville_space.commutator_superoperator(Op, sys, Lop, coeff=coeff)
-    elif optype == '+':
-        if is_operator_dictionary(opdict):
+    elif optype == "+":
+        if __is_operator_dictionary(opdict):
             liouville_space.anticommutator_superoperator(
-                Op, sys, opdict, Lop, Lopdict, coeff=coeff)
+                Op, sys, opdict, Lop, Lopdict, coeff=coeff
+            )
         else:
             liouville_space.commutator_superoperator(Op, sys, Lop, coeff=coeff)
-    elif optype == 'L' or optype == 'l':
-        if is_operator_dictionary(opdict):
+    elif optype == "L" or optype == "l":
+        if __is_operator_dictionary(opdict):
             liouville_space.left_superoperator(
-                Op, sys, opdict, Lop, Lopdict, coeff=coeff)
+                Op, sys, opdict, Lop, Lopdict, coeff=coeff
+            )
         else:
             liouville_space.left_superoperator(Op, sys, Lop, coeff=coeff)
-    elif optype == 'R' or optype == 'r':
-        if is_operator_dictionary(opdict):
+    elif optype == "R" or optype == "r":
+        if __is_operator_dictionary(opdict):
             liouville_space.right_superoperator(
-                Op, sys, opdict, Lop, Lopdict, coeff=coeff)
+                Op, sys, opdict, Lop, Lopdict, coeff=coeff
+            )
         else:
             liouville_space.right_superoperator(Op, sys, Lop, coeff=coeff)
     else:

@@ -16,14 +16,15 @@ class matrix_element_dtype:
     :type *args: [Arguments (variable number and type)]
     :param **kwargs: A dictionary containing optional input arguments.
 
-        - **nbuffers** (int, optional) - The number of buffers to allocate.   
+        - **nbuffers** (int, optional) - The number of buffers to allocate.
         - **use_capacity** (bool, optional) - Whether or not to use the capacity of the TTNs to determine the size of the buffers.
     :type **kwargs: dict(Arguments (variable number and type))
     """
 
     def __init__(self, *args, dtype=np.complex128, **kwargs):
         raise RuntimeError(
-            r"The ttn_dtype class is not constructable.  This class is present to provide cleaner documentation for the pybind11 classes.")
+            r"The ttn_dtype class is not constructable.  This class is present to provide cleaner documentation for the pybind11 classes."
+        )
 
     def assign(self, o):
         r"""Assign the value of this matrix element from another matrix element
@@ -48,7 +49,7 @@ class matrix_element_dtype:
         :type *args: [Arguments (variable number and type)]
         :param **kwargs: A dictionary containing optional input arguments.
 
-            - **nbuffers** (int, optional) - The number of buffers to allocate.   
+            - **nbuffers** (int, optional) - The number of buffers to allocate.
             - **use_capacity** (bool, optional) - Whether or not to use the capacity of the TTNs to determine the size of the buffers.
         :type **kwargs: dict(Arguments (variable number and type))
         """
@@ -63,11 +64,11 @@ class matrix_element_dtype:
         :type use_sparsity: bool, optional
 
         :*args options:
-        Valid options for the argument list depend on the type of quantity we are evaluating. 
+        Valid options for the argument list depend on the type of quantity we are evaluating.
 
         :math:`\langle A | A \rangle`:
 
-            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the inner product of the ttn with itself. 
+            - **A** (:class:`ttn_dtype` or :class:`ms_ttn_dtype`) - Compute the inner product of the ttn with itself.
 
         :math:`\langle A | O | A \rangle`:
 

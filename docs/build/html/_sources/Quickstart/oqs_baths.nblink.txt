@@ -1,3 +1,0 @@
-{
-  "path": "../../../tutorials/open_quantum_systems/oqs_baths.ipynb"
-}

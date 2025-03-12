@@ -5,10 +5,10 @@ from pyttn import system_modes
 
 
 class ModeCombination:
-    """A class for automatically combining modes of a system_modes object together to form a new system_modes 
+    """A class for automatically combining modes of a system_modes object together to form a new system_modes
     object consisting of composite modes.  The approach implemented within this class involves sweeping from left
     to right and we attempt to combine the next mode into the current mode provided we have not already combined nbmax
-    modes together in this mode and the local hilbert space dimension of the composite mode is less than nbmax.   
+    modes together in this mode and the local hilbert space dimension of the composite mode is less than nbmax.
 
     Constructor arguments
 
@@ -35,7 +35,7 @@ class ModeCombination:
         self.blocksize = blocksize
 
     def mode_combination_array(self, mode_dims, mode_inds=None, _blocksize=None):
-        """Perform the mode combination process on a array of mode dimensions.     
+        """Perform the mode combination process on a array of mode dimensions.
 
         :param mode_dims: the mode dimensions
         :type mode_dims: list or np.ndarray
@@ -53,7 +53,7 @@ class ModeCombination:
         nbmax = self.nbmax
         nhilbmax = self.nhilb
         blocksize = self.blocksize
-        if not _blocksize is None:
+        if _blocksize is not None:
             blocksize = _blocksize
 
         composite_modes = []
@@ -64,14 +64,14 @@ class ModeCombination:
         mode = 0
         while not all_modes_traversed:
             # if the current cmode object is empty then we just add the current mode to the composite mode and increment
-            if (len(cmode) == 0):
+            if len(cmode) == 0:
                 # add in all modes up to the blocksize
                 for j in range(blocksize):
                     cmode.append(mode_inds[mode])
-                    chilb = chilb*mode_dims[mode]
+                    chilb = chilb * mode_dims[mode]
                     mode += 1
                     # but if we get to the end of the mode dims array exit at this stage
-                    if (mode == len(mode_dims)):
+                    if mode == len(mode_dims):
                         all_modes_traversed = True
                         composite_modes.append(copy.deepcopy(cmode))
             else:
@@ -79,18 +79,20 @@ class ModeCombination:
                 # then we add and increment
                 nextdims = 1
                 for j in range(blocksize):
-                    if (mode < len(mode_dims)):
-                        nextdims = nextdims*mode_dims[mode+j]
+                    if mode < len(mode_dims):
+                        nextdims = nextdims * mode_dims[mode + j]
 
-                if (nbmax == None or len(cmode) < nbmax) and chilb*nextdims <= nhilbmax:
+                if (
+                    nbmax is None or len(cmode) < nbmax
+                ) and chilb * nextdims <= nhilbmax:
                     # add all modes in the next block
                     for j in range(blocksize):
                         cmode.append(mode_inds[mode])
-                        chilb = chilb*mode_dims[mode]
+                        chilb = chilb * mode_dims[mode]
                         mode += 1
 
                         # bailing out early if we hit the end
-                        if (mode == len(mode_dims)):
+                        if mode == len(mode_dims):
                             all_modes_traversed = True
                             composite_modes.append(copy.deepcopy(cmode))
 
@@ -105,7 +107,7 @@ class ModeCombination:
         return composite_modes
 
     def mode_combination_system(self, system, _blocksize=None):
-        """Perform the mode combination process on a system_modes object.     
+        """Perform the mode combination process on a system_modes object.
 
         :param system: the system_modes object defining all mode data
         :type mode_dims: system_modes
@@ -118,8 +120,7 @@ class ModeCombination:
         mode_dims = [system[i].lhd() for i in range(len(system))]
 
         # now perform the mode combination on this array
-        composite_modes = self.mode_combination_array(
-            mode_dims, _blocksize=_blocksize)
+        composite_modes = self.mode_combination_array(mode_dims, _blocksize=_blocksize)
 
         # and set up a composite system object using this information
         composite_system = system_modes(len(composite_modes))
@@ -130,7 +131,7 @@ class ModeCombination:
         return composite_system
 
     def __call__(self, system, _blocksize=None):
-        """Perform the mode combination process on a system_modes object.     
+        """Perform the mode combination process on a system_modes object.
 
         :param system: the system_modes object defining all mode data
         :type mode_dims: system_modes

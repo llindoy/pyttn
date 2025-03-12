@@ -1,5 +1,3 @@
-import numpy as np
-
 from pyttn.ttnpp import multiset_sop_operator_complex
 from pyttn.ttnpp import ms_ttn_complex
 from pyttn.ttnpp import multiset_SOP_complex
@@ -18,16 +16,20 @@ except ImportError:
     multiset_SOP_real = None
 
 
-#and attempt to import the cuda backend
+# and attempt to import the cuda backend
 try:
-    from pyttn.ttnpp.cuda import multiset_sop_operator_complex as multiset_sop_operator_complex_cuda
+    from pyttn.ttnpp.cuda import (
+        multiset_sop_operator_complex as multiset_sop_operator_complex_cuda,
+    )
     from pyttn.ttnpp.cuda import ms_ttn_complex as ms_ttn_complex_cuda
 
     __cuda_import = True
 
-    #and if we have imported real ttns we import the cuda versions
+    # and if we have imported real ttns we import the cuda versions
     if __real_ttn_import:
-        from pyttn.ttnpp.cuda import multiset_sop_operator_real as multiset_sop_operator_real_cuda
+        from pyttn.ttnpp.cuda import (
+            multiset_sop_operator_real as multiset_sop_operator_real_cuda,
+        )
         from pyttn.ttnpp.cuda import ms_ttn_real as ms_ttn_real_cuda
 
     else:
@@ -48,31 +50,45 @@ def __multiset_sop_operator_blas(h, A, sysinf, *args, **kwargs):
             return multiset_sop_operator_complex(h, A, sysinf, *args, **kwargs)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a multiset_sop_operator.")
+                "Invalid argument for the creation of a multiset_sop_operator."
+            )
     else:
-        if isinstance(A, ms_ttn_real) and isinstance(h, multiset_SOP_real) and not multiset_SOP_real is None:
+        if (
+            isinstance(A, ms_ttn_real)
+            and isinstance(h, multiset_SOP_real)
+            and multiset_SOP_real is not None
+        ):
             return multiset_sop_operator_real(h, A, sysinf, *args, **kwargs)
         elif isinstance(A, ms_ttn_complex) and isinstance(h, multiset_SOP_complex):
             return multiset_sop_operator_complex(h, A, sysinf, *args, **kwargs)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a multiset_sop_operator.")
-        
+                "Invalid argument for the creation of a multiset_sop_operator."
+            )
+
+
 def __multiset_sop_operator_cuda(h, A, sysinf, *args, **kwargs):
     if not __real_ttn_import:
         if isinstance(A, ms_ttn_complex_cuda) and isinstance(h, multiset_SOP_complex):
             return multiset_sop_operator_complex_cuda(h, A, sysinf, *args, **kwargs)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a multiset_sop_operator.")
+                "Invalid argument for the creation of a multiset_sop_operator."
+            )
     else:
-        if isinstance(A, ms_ttn_real_cuda) and isinstance(h, multiset_SOP_real) and not multiset_SOP_real is None:
+        if (
+            isinstance(A, ms_ttn_real_cuda)
+            and isinstance(h, multiset_SOP_real)
+            and multiset_SOP_real is not None
+        ):
             return multiset_sop_operator_real_cuda(h, A, sysinf, *args, **kwargs)
         elif isinstance(A, ms_ttn_complex_cuda) and isinstance(h, multiset_SOP_complex):
             return multiset_sop_operator_complex_cuda(h, A, sysinf, *args, **kwargs)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a multiset_sop_operator.")
+                "Invalid argument for the creation of a multiset_sop_operator."
+            )
+
 
 def multiset_sop_operator(h, A, sysinf, *args, **kwargs):
     r"""Function for constructing the multiset hierarchical sum of product operator of a string operator
@@ -87,16 +103,17 @@ def multiset_sop_operator(h, A, sysinf, *args, **kwargs):
     :type **kwargs: Additional keyword arguments. See /multiset_sop_operator_complex/multiset_sop_operator_real for options
     """
     if len(args) > 0:
-        if(args[0].backend() != A.backend()):
-            raise RuntimeError("Attempted to construct multiset_sop_operator with opdict but opdict backend is not compatible with ms_ttn backend.")
-        
-    if(A.backend() == "blas"):
+        if args[0].backend() != A.backend():
+            raise RuntimeError(
+                "Attempted to construct multiset_sop_operator with opdict but opdict backend is not compatible with ms_ttn backend."
+            )
+
+    if A.backend() == "blas":
         return __multiset_sop_operator_blas(h, A, sysinf, *args, **kwargs)
-    elif __cuda_import and A.backend()== "cuda":
+    elif __cuda_import and A.backend() == "cuda":
         return __multiset_sop_operator_cuda(h, A, sysinf, *args, **kwargs)
     else:
         raise RuntimeError("Invalid backend type for multiset_sop_operator")
-
 
 
 def ms_sop_operator(h, A, sysinf, *args, **kwargs):

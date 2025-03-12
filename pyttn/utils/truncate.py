@@ -2,15 +2,14 @@ import numpy as np
 
 
 class TruncationBase:
-    """Base class for local Hilbert space mode decomposition
-    """
+    """Base class for local Hilbert space mode decomposition"""
 
     def __init__(self):
         return
 
 
 class DepthTruncation(TruncationBase):
-    """A class for truncating system modes to a fixed number of levels   
+    """A class for truncating system modes to a fixed number of levels
 
     Constructor arguments
 
@@ -28,7 +27,7 @@ class DepthTruncation(TruncationBase):
     :type is_fermion: bool
 
     :returns: A list containing the local Hilbert space dimension of each mode
-    :rtype: list 
+    :rtype: list
     """
 
     def __init__(self, Lmax=2):
@@ -42,7 +41,7 @@ class DepthTruncation(TruncationBase):
 
 
 class EnergyTruncation(TruncationBase):
-    """A class for truncating system modes to a fixed number of levels   
+    """A class for truncating system modes to a fixed number of levels
 
     Constructor arguments
 
@@ -66,17 +65,17 @@ class EnergyTruncation(TruncationBase):
     :type is_fermion: bool
 
     :returns: A list containing the local Hilbert space dimension of each mode
-    :rtype: list 
+    :rtype: list
     """
 
-    def __init__(self, ecut=0, Lmax=2, Lmin=1, func='abs'):
+    def __init__(self, ecut=0, Lmax=2, Lmin=1, func="abs"):
         self.ecut = ecut
         self.Lmax = Lmax
         self.Lmin = Lmin
         self.func = func
 
     def truncate_bosonic(self, gk, wk):
-        """Truncate a bosonic mode using coupling constants and frequencies   
+        """Truncate a bosonic mode using coupling constants and frequencies
 
         :param gk: The interaction strength
         :type gk: np.ndarray
@@ -84,10 +83,10 @@ class EnergyTruncation(TruncationBase):
         :type wk: np.ndarray
 
         :returns: A list containing the local Hilbert space dimension of each mode
-        :rtype: list 
+        :rtype: list
         """
         _wk = np.zeros(wk.shape, dtype=float)
-        if self.func == 'abs':
+        if self.func == "abs":
             for i in range(len(wk)):
                 _wk[i] = np.abs(wk[i])
         else:
@@ -97,12 +96,12 @@ class EnergyTruncation(TruncationBase):
         Nb = []
         for i in range(len(wk)):
             nbose = self.Lmax
-            if not self.ecut is None:
-                nbose = int(self.ecut/np.real(_wk[i]))
+            if self.ecut is not None:
+                nbose = int(self.ecut / np.real(_wk[i]))
             if nbose < self.Lmin:
                 nbose = self.Lmin
 
-            if (nbose > self.Lmax):
+            if nbose > self.Lmax:
                 nbose = self.Lmax
             Nb.append(nbose)
         return Nb
