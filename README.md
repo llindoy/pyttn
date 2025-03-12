@@ -268,7 +268,7 @@ To test the overall functionality, we have additionally provided a set of exampl
 - Dynamics of quantum systems coupled to a [bosonic](examples/spin_boson_model/) or [fermionic](examples/anderson_impurity_model) environment
 - Interacting [chains](examples/dissipative_spin_models/chain/) and [trees](examples/dissipative_spin_models/cayley_tree/) of open quantum systems
 
-The expected results obtained from running these examples are presented in the [pyTTN paper](), and all datasets producing these results are available in the [data repository]().
+The results generated through these example scripts have, where possible, been verified against literature results. The iterature results may be viewed by following the appropriate references in both the example scripts and the [pyTTN paper](). The expected results obtained from running these examples are presented in the [pyTTN paper](), and all datasets producing these results are available in the [data repository]().
 
 ## Code Review
 
