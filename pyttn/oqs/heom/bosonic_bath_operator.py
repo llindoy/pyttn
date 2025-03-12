@@ -1,7 +1,5 @@
 import numpy as np
-import copy
-
-from pyttn import sOP, coeff
+from pyttn import sOP
 
 
 def __generate_binds(binds, bskip, Nb):

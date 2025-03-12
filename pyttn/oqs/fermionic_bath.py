@@ -1,8 +1,5 @@
 import numpy as np
-from numba import jit
 import scipy as sp
-from pyttn.utils import orthopol
-
 
 class FermionicBath:
     r"""A class for managing a continuous fermionic gaussian bath.  This provides
@@ -132,7 +129,7 @@ class FermionicBath:
         :return: The bath correlation function
         :rtype: np.ndarray
         """
-        if self.beta == None:
+        if self.beta is None:
             return np.where(w <= Ef, 1.0, 0.0)
         else:
             if isinstance(w, np.ndarray):
@@ -197,7 +194,7 @@ class FermionicBath:
             else:
                 wmin = Ef
         else:
-            if wtol == None:
+            if wtol is None:
                 wmin = -wmax
             else:
                 if sigma == "+":
@@ -220,7 +217,6 @@ class FermionicBath:
         :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`
         :rtype: np.ndarray, np.ndarray
         """
-        from .bath_fitting import OrthopolDiscretisation, DensityDiscretisation
 
         wmin, wmax = self.estimate_bounds(Ef=Ef, sigma=sigma)
         if discretisation_engine.wmin is None:

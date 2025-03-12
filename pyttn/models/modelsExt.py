@@ -93,7 +93,7 @@ def spin_boson(*args, geom="star", dtype=np.complex128):
             spin_boson_star_real,
             spin_boson_chain_real,
         )
-    except:
+    except ImportError:
         spin_boson_generic_real = None
         spin_boson_star_real = None
         spin_boson_chain_real = None

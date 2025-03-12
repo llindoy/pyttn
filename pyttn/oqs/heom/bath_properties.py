@@ -1,6 +1,4 @@
 import numpy as np
-import scipy as sp
-
 
 def bosonic_bath_properties(
     dk, zk, L, Lmin=None, combine_real=False, tol=1e-12, nbmax=1, nhilbmax=1000
@@ -19,7 +17,7 @@ def bosonic_bath_properties(
     # in the case of a purely real mode we will only append a single term
     counter = 0
     for i in range(len(dk)):
-        if Lmin == None:
+        if Lmin is None:
             nb = L
         else:
             nb = max(int(L * minzk / np.real(zk[i])), Lmin)

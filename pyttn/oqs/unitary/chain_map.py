@@ -1,5 +1,4 @@
 import numpy as np
-import scipy as sp
 import copy
 
 
@@ -34,8 +33,6 @@ def householder_tridiagonalise(M):
 
 def gram_schmidt(U):
     nv = U.shape[0]
-    nd = U.shape[1]
-
     V = np.zeros(U.shape, dtype=U.dtype)
 
     for i in range(0, nv):

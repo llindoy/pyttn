@@ -9,8 +9,8 @@ from pyttn.ttnpp import (
     ms_ttn_complex,
     multiset_sop_operator_complex,
 )
-import numpy as np
 
+#TODO: Need to add on cuda backend functionality here
 
 def single_set_dmrg(A, H, expansion="onesite", **kwargs):
     r"""A factory method for constructing an object used for performing single set dmrg calculations

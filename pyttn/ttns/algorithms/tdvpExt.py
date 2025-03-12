@@ -9,8 +9,6 @@ from pyttn.ttnpp import (
     ms_ttn_complex,
     multiset_sop_operator_complex,
 )
-import numpy as np
-
 
 # and attempt to import the cuda backend
 try:
@@ -28,7 +26,7 @@ try:
 
     __cuda_import = True
 
-except:
+except ImportError:
     __cuda_import = False
 
 

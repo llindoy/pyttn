@@ -1,6 +1,4 @@
 import numpy as np
-import scipy as sp
-
 
 def commutator(L):
     return np.kron(L, np.identity(L.shape[0])) - np.kron(np.identity(L.shape[0]), L.T)
@@ -76,7 +74,7 @@ def compute_dimensions(S, dk, zk, L, Lmin=None):
     ds[0] = S.shape[0] * S.shape[1]
 
     minzk = np.amin(np.real(zk))
-    if Lmin == None:
+    if Lmin is None:
         for i in range(len(dk)):
             nb = L
             ds[2 * i + 1] = nb

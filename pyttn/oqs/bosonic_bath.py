@@ -1,5 +1,4 @@
 import numpy as np
-from numba import jit
 import scipy as sp
 
 
@@ -24,7 +23,7 @@ class BosonicBath:
         self.Jw = Jw
         self.S = S
         self.beta = beta
-        if wmin == None:
+        if wmin is None:
             wmin = self.find_wmin(wmax)
 
         self.wmin = wmin
@@ -91,7 +90,7 @@ class BosonicBath:
         wmin = self.wmin
         wmax = self.wmax
 
-        if self.beta == None and wmin < 0:
+        if self.beta is None and wmin < 0:
             wmin = 0
         Ctr = np.zeros(t.shape, dtype=np.complex128)
         Cti = np.zeros(t.shape, dtype=np.complex128)
@@ -316,7 +315,7 @@ class BosonicBath:
         :return: The bath correlation function
         :rtype: np.ndarray
         """
-        if self.beta == None:
+        if self.beta is None:
             return self.Jw(np.abs(w)) * np.where(w > 0, 1.0, 0.0)
         else:
             return (
@@ -333,8 +332,6 @@ class BosonicBath:
         :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`
         :rtype: np.ndarray, np.ndarray
         """
-
-        from .bath_fitting import OrthopolDiscretisation, DensityDiscretisation
 
         if discretisation_engine.wmin is None:
             if self.wmin is None:

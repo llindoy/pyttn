@@ -1,10 +1,7 @@
 import numpy as np
-from .fermionic_bath import *
-from .bosonic_bath import *
-
-from pyttn.utils.truncate import *
-from pyttn import system_modes, boson_mode, fermion_mode
-
+from .fermionic_bath import FermionicBath
+from .bosonic_bath import BosonicBath
+from .exponential_fit_bath import ExpFitBosonicBath, ExpFitFermionicBath
 
 class FermionicBathFit:
     def __init__(self, bath, expbath, t):
@@ -26,7 +23,7 @@ class FermionicBathFit:
             plt.semilogy(
                 self._t, np.abs(self._Ctm - self._Ctmfit), label=r"$\Delta C^{-}(t)$"
             )
-        except:
+        except ImportError:
             return
 
 
@@ -44,7 +41,7 @@ class BosonicBathFit:
 
             # plt.plot(self._t, (self._Ct), label=r'$\Delta C(t)$')
             plt.plot(self._t, (self._Ctfit), label=r"$\Delta C(t)$")
-        except:
+        except ImportError:
             return
 
     # def save(self, filename, tag="bath_fitting", ftype='h5', append=False):

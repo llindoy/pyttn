@@ -1,8 +1,6 @@
 import numpy as np
-from .fermionic_bath import *
-from .bosonic_bath import *
 
-from pyttn.utils.truncate import *
+from pyttn.utils.truncate import DepthTruncation
 from pyttn import system_modes, boson_mode, fermion_mode, sSOP, ntreeBuilder
 
 
@@ -86,12 +84,12 @@ class DiscreteOQSBath:
         nindex = node.index()
 
         if degree == 1:
-            if isinstance(lhd, list) or not lhd is None:
+            if isinstance(lhd, list) or lhd is not None:
                 ntreeBuilder.mps_subtree(node, lmode_dims, chi, lhd)
             else:
                 ntreeBuilder.mps_subtree(node, lmode_dims, chi)
         elif degree > 1:
-            if isinstance(lhd, list) or not lhd is None:
+            if isinstance(lhd, list) or lhd is not None:
                 ntreeBuilder.mlmctdh_subtree(node, lmode_dims, degree, chi, lhd)
             else:
                 ntreeBuilder.mlmctdh_subtree(node, lmode_dims, degree, chi)
@@ -173,7 +171,7 @@ class DiscreteBosonicBath(DiscreteOQSBath):
             for ind in range(len(self._mode_dims)):
                 self._sysinf[ind] = boson_mode(self._mode_dims[ind])
 
-            if not mode_comb is None:
+            if mode_comb is not None:
                 self._sysinf = mode_comb(self._sysinf)
         return self._sysinf
 
@@ -325,10 +323,10 @@ class DiscreteFermionicBath(DiscreteOQSBath):
         """
         if self._sysinf is None or force_evaluate:
             self._sysinf = system_modes(len(self._mode_dims))
-            for ind in rang(len(self._mode_dims)):
+            for ind in range(len(self._mode_dims)):
                 self._sysinf[ind] = fermion_mode()
 
-            if not mode_comb is None:
+            if mode_comb is not None:
                 self._sysinf = mode_comb(self._sysinf)
         return self._sysinf
 

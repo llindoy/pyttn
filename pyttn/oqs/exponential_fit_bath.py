@@ -1,9 +1,7 @@
 import numpy as np
-from .fermionic_bath import *
-from .bosonic_bath import *
 
-from pyttn.utils.truncate import *
-from pyttn import system_modes, boson_mode, fermion_mode, ntreeBuilder
+from pyttn.utils.truncate import DepthTruncation
+from pyttn import system_modes, boson_mode, fermion_mode, ntreeBuilder, sSOP
 
 
 class ExpFitOQSBath:
@@ -122,12 +120,12 @@ class ExpFitOQSBath:
         nindex = node.index()
 
         if degree == 1:
-            if isinstance(lhd, list) or not lhd is None:
+            if isinstance(lhd, list) or lhd is not None:
                 ntreeBuilder.mps_subtree(node, lmode_dims, chi, lhd)
             else:
                 ntreeBuilder.mps_subtree(node, lmode_dims, chi)
         elif degree > 1:
-            if isinstance(lhd, list) or not lhd is None:
+            if isinstance(lhd, list) or lhd is not None:
                 ntreeBuilder.mlmctdh_subtree(node, lmode_dims, degree, chi, lhd)
             else:
                 ntreeBuilder.mlmctdh_subtree(node, lmode_dims, degree, chi)
@@ -252,7 +250,7 @@ class ExpFitBosonicBath(ExpFitOQSBath):
             for ind, cmode in enumerate(self._composite_modes):
                 self._sysinf[ind] = [boson_mode(self._mode_dims[x]) for x in cmode]
 
-            if not mode_comb is None:
+            if mode_comb is not None:
                 self._sysinf = mode_comb(self._sysinf)
         return self._sysinf
 
@@ -396,7 +394,7 @@ class ExpFitFermionicBath(ExpFitOQSBath):
             for ind, cmode in enumerate(self._composite_modes):
                 self._sysinf[ind] = [fermion_mode() for x in cmode]
 
-            if not mode_comb is None:
+            if mode_comb is not None:
                 self._sysinf = mode_comb(self._sysinf)
         return self._sysinf
 

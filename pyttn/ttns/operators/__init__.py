@@ -6,6 +6,7 @@ from . import opsExt as ops
 
 
 __all__ = [
+        "ops",
         "site_operator",
         "product_operator",
         "sop_operator",

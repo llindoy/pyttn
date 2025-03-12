@@ -119,18 +119,18 @@ def AAA_support_points(w="linear", wmin=None, wmax=None, Naaa=1000):
             return w
 
     elif w == "softm":
-        if wmax == None:
+        if wmax is None:
             wmax = 1
 
-        if wmin == None or wmin <= 0:
+        if wmin is None or wmin <= 0:
             wmin = 1e-8
 
         return __generate_grid_points(Naaa, wmax, wmin=wmin)
 
     elif w == "linear":
-        if wmax == None:
+        if wmax is None:
             wmax = 1
-        if wmin == None:
+        if wmin is None:
             wmin = -1
 
         return np.linspace(wmin, wmax, Naaa)

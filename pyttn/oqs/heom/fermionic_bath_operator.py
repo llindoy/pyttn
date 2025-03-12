@@ -1,7 +1,6 @@
 import numpy as np
-import copy
 
-from pyttn import sOP, coeff
+from pyttn import sOP
 
 
 def add_fermionic_bath_generator(

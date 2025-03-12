@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import sparse
 from scipy import linalg as splinalg
-from scipy.integrate import quad, quad_vec
+from scipy.integrate import quad_vec
 
 
 def __residue_integrand(theta, r, rs, poles):
@@ -137,8 +137,6 @@ def AAA_algorithm(F, Z, tol=1e-13, K=None, nmax=100, *args, **kwargs):
     # evaluate the function at the sample points
     Fz = np.array(F(Z, *args, **kwargs), dtype=np.complex128)
     Z = np.array(Z, dtype=np.complex128)
-    Z0 = Z
-    F0 = Fz
 
     R = np.mean(Fz)
     SF = sparse.diags(Fz)

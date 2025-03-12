@@ -1,5 +1,4 @@
 from pyttn.ttnpp.utils import orthopol_discretisation, density_discretisation
-from numba import jit
 import numpy as np
 
 
