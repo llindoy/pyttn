@@ -36,9 +36,6 @@ This open source project aims to provide an easy to use python interface for wor
 
 # Getting Started
 
-## Prerequisites
-The core C++ library relies and [Pybind11](https://github.com/pybind/pybind11) make use of the [CMake](https://cmake.org/) build system and require Version 3.11 or onwards.
-
 ### Dependencies
 The core C++ library (ttnpp) and the python wrapper (pyTTN) have the following key dependencies. 
 
@@ -50,13 +47,32 @@ External Libraries:
 
 The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${pyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from github.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
 
+Additional python dependencies introduced by the core functionality of the pyTTN wrapper are:
+ - [scipy](https://scipy.org/)
+ - [numpy](https://numpy.org/)
+
+ Additionally, some of the examples depend upon the python packages:
+ - [h5py](https://www.h5py.org/) 
+ - [numba](https://numba.pydata.org/)
+
+  Finally, full tree visualisation functionality provided by the `visualise_tree` function depends upon the packages
+ - [networkx](https://networkx.org/)
+ - [matplotlib](https://matplotlib.org/)
+ - [pydot](https://github.com/pydot/pydot)
+ - [graphviz](https://graphviz.org/)
+
+With the final two dependencies only required for use of improved tree plotting functionality, e.g. when using `prog = "dot"`.
+
+<!--
+Add back in when cuda support is finished
+
 pyTTN also offers experimental support for the use of a CUDA backend to accelerate the internal tensor operations.  When compiling the CUDA backend, pyTTN gains the following additional dependencies:
 External Libraries:
 - [CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit) 
 - [cuTENSOR](https://developer.nvidia.com/cutensor)
 
-By default pyTTN does not build the CUDA backend.  For details on how to do so see ...
-
+By default pyTTN does not build the CUDA backend.  For details on how to do so see ...)
+ -->
 ## Installation
 You can install pyTTN using pip like this:
 ```
@@ -70,7 +86,7 @@ export CMAKE_BUILD_PARALLEL_LEVEL=8
 ```
 to allow for the use of 8 threads when compiling.
 
-<!-- Add badges when complete 
+<!-- 
 ### Building with CUDA Support
 [!Note]
 Work in progress
@@ -161,8 +177,6 @@ A typical calculation will use implementations of each of these base objects as 
 
 Below we discuss each component and additional tooling associated with it in more detail.
 
-
-
 ### The ``ntree`` class
 
 Within pyTTN the specification of tree topologies is controlled by the ``ntree`` class.  This class represents a general tree where each node (an ``ntreeNode`` object) stores a single data value and has an arbitrary number of child nodes.  This class provides functions for accessing nodes in the tree, inserting nodes at various positions, and traversing the nodes in various objects.  When combined with the ``ntreeBuilder`` class, which provides several helper functions for constructing trees with certain structures, the `ntree` class provides a convenient interface for defining connectivities of tree tensor networks, and additionally defining the bond dimension associated with the bonds connecting the nodes. For further details on the use of ``ntree`` objects within the pyTTN Python interface please see the tutorial on [tree topologies](tutorials/tree_topologies.ipynb).
@@ -200,13 +214,28 @@ Within the `ttnpp` library two classes deriving from ``ttn_base`` are provided n
 
 ### The ``sop_operator`` class
 
-Provides an efficient representation of a generic operator for use within the various updating schemes used for Tree Tensor Network states.  This object optimise the representation of a `SOP` object given a `ttn` to provide a reduced bond dimension representation of the `SOP`.  This is done using the bipartite graph decomposition approach that is implemented within the `autoSOP` class.  An analogous class exists for handling multiset Hamiltonian objects, namely the `multis
+Provides an efficient representation of a generic operator for use within the various updating schemes used for Tree Tensor Network states.  This object optimise the representation of a `SOP` object given a `ttn` to provide a reduced bond dimension representation of the `SOP`.  This is done using the bipartite graph decomposition approach that is implemented within the `autoSOP` class.  An analogous class exists for handling multiset Hamiltonian objects, namely the `multiset_sop_operator` class.
 
 ### The ``sweeping_algorithm`` class
-template class that accepts as template parameters functions implementing core functionality required for implementing sweeping algorithms on tree tensor networks
+
+The ``sweeping_algorithm`` class provides the core functionality for classes that sweep over a Tree Tensor Network and update individual site tensors, and through template specialisation provides a convenient tool for defining various common algorithms for updating a TTN.  This class takes four template parameters:
+1. The template class representing the TTN object the specific instantiation of the class can be applied to.
+2. A callable template class that implements the action to be applied to each site tensor in the TTN.
+3. A template class for storing the environment tensors of the system, this allows for substitution of the sum-of-product form used as standard with alternative Hamiltonian representations.
+4. A callable template class for updating the tensors across a bond when shifting the orthogonality between sites, allowing for expansion of bond dimension at this step.
+
+Within the ``ttnpp`` library several specialisations of this base class are provided.  In particular, the single and adaptive single-site DMRG and TDVP algorithms for both TTNs and multiset TTNs are provided as specific instantiations of these classes.  
 
 ### The ``matrix_element`` class 
-that provides efficient evaluation of generic expectation values of operators using Tree Tensor Network States
+The final core class within the `ttnpp` package is the ``matrix_element`` class.  This class handles all temporary storage and logic required to efficiently evaluate expectation values involving tensor networks and sop_operators.  In particular, this class has been implemented to where possible (and in particular when there is an orthogonality centre within the Tensor Networks being considered) to exploit sparsity in the representation of operators to avoid evaluation of trivial contractions.  For the evaluation of expectation values of single-body interactions this is essential for efficiency, leading to asymptotic improvements in cost over direct contractions.  
+
+For details on the use of this class within the pyTTN Python library please see the tutorial on [ttn operations](tutorials/ttn_operations.ipynb) that provides an overview of the evaluation of generic expectation values within pyTTN.
+
+
+## The ``pyTTN`` Wrapper (Code Design)
+
+In order to provide a convenient scripting interface for the `ttnpp` library and to simplify the use of these tools, we have provided a Python wrapper for the core functionality outlined above, the [``pyTTN``](pyttn/) package.  This package has been designed to expose the core functionality of the ``ttnpp`` library required for useful calculations with Tree Tensor Networks.  In particular, specialisations of all the core ``ttnpp`` features are exposed through this wrapper allowing for both real (``double``) and complex (``complex<double>``) data types throughout.  Within the ``pyTTN`` interface several factory functions have been provided to provide a more pythonic interface for accessing these classes.  In particular, when multiple class specialisations are exposed through Pybind11, we have provided a factory function that allows as optional keywords arguments allowing for specification of specific instances.  
+As an example the creation of Tree Tensor Networks is controlled through the ``ttn`` function, which expose all constructors of the base `ttn<T>` class and allows for selection of different data types `T` through the specification of the dtype = {`np.float64`, `np.complex128`} to select between real and complex `ttn`s.
 
 -------------------------------------------------------------------------------
 
