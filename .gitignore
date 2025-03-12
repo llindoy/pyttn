@@ -18,7 +18,7 @@
 #now we add the docs folder and its required folders
 !docs
 !docs/make.bat
-!docs/MakeFile
+!docs/Makefile
 !docs/source
 !docs/source/*
 !docs/source/**
