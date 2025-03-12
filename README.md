@@ -272,7 +272,7 @@ The results generated through these example scripts have, where possible, been v
 
 ## Code Review
 
-Code review will be performed regularly by members of the team and will be led by the lead developer.  Code reviews are performed via GitLab pull requests.  Previous code reviews can be found via.
+Code review will be performed regularly by members of the team and will be led by the lead developer.  Code reviews are performed via GitLab pull requests.  Previous code reviews can be found via the [gitlab interface](https://gitlab.npl.co.uk/quantum-software/pyttn/-/merge_requests?scope=all&state=merged).
 
 -------------------------------------------------------------------------------
 
