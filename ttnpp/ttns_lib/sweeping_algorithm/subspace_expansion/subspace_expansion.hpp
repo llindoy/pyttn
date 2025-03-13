@@ -656,7 +656,7 @@ namespace ttns
         size_type m_maxcapacity;
         size_type m_max_dim = 0;
 
-        orthogonality::truncation_mode m_trunc_mode = orthogonality::truncation_mode::second_order_truncation;
+        orthogonality::truncation_mode m_trunc_mode = orthogonality::truncation_mode::singular_values_truncation;
 
         mat_type m_U;
         linalg::diagonal_matrix<T, backend> m_S;
