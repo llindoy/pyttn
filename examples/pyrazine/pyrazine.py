@@ -9,13 +9,11 @@ import copy
 import h5py
 
 from pyttn import system_modes, generic_mode, boson_mode
-
 from pyttn import ttn, sop_operator, matrix_element, tdvp
 from pyrazine_tree import build_topology_mode_combination
 from pyrazine_hamiltonian import hamiltonian
 
 fs = 41.341374575751
-
 
 def run_initial_step(A, h, sweep, dt, nstep=10):
     tp = 0
@@ -70,36 +68,8 @@ def pyrazine_dynamics(
     # Here we half the total integration time as we are computing a(t) = <\psi(t/2)^*|\psi(t/2)>
     nsteps = int(tmax / (2 * dt)) + 1
 
-    # The total number of modes in the system
-    N = 25
-
     # The dimension of each of the bosonic modes
-    m = [
-        40,
-        32,
-        20,
-        12,
-        8,
-        4,
-        8,
-        24,
-        24,
-        8,
-        8,
-        24,
-        20,
-        4,
-        72,
-        80,
-        6,
-        20,
-        6,
-        6,
-        6,
-        32,
-        6,
-        4,
-    ]
+    m = [40, 32, 20, 12, 8, 4, 8, 24, 24, 8, 8, 24, 20, 4, 72, 80, 6, 20, 6, 6, 6, 32, 6, 4]
 
     # The composite mode definition
     composite_modes = [
