@@ -3,10 +3,6 @@ os.environ['OMP_NUM_THREADS']='1'
 
 import numpy as np
 import time
-import sys
-import h5py
-import scipy
-import copy
 
 import pyttn
 from pyttn import oqs, utils
@@ -70,7 +66,6 @@ def sbm_dynamics_timing(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = Non
     :rtype: list
     """
 
-    t = np.arange(nstep+1)*dt
     """
     Set up the system information
     """
@@ -122,7 +117,7 @@ def sbm_dynamics_timing(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = Non
     # build the trees for the system mode and
     topo = pyttn.ntree("(1(2(2)))")
     capacity = pyttn.ntree("(1(2(2)))")
-    linds = discbath.add_bath_tree(topo(), degree, chi, min(chi, nbose))
+    _ = discbath.add_bath_tree(topo(), degree, chi, min(chi, nbose))
     discbath.add_bath_tree(capacity(), degree, chi, min(chi, nbose))
 
     #construct and initialise the ttn wavefunction

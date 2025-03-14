@@ -2,12 +2,13 @@ import os
 os.environ['OMP_NUM_THREADS']='1'
 
 import numpy as np
-import matplotlib.pyplot as plt
 import time
-import sys
 import copy
-
+import argparse
 import memory_profiler as mp
+
+import pyttn
+
 
 def do_step(A, h, sweep, nstep):
     timings = np.zeros(nstep)
@@ -55,7 +56,6 @@ def electronic_structure_hamiltonian_test(t, U, chi, dt, nstep = 1, degree = 2, 
 
     start_mem = mp.memory_usage(max_usage=True, interval=.00001)
     h = pyttn.sop_operator(H, A, sysinf, compress=compress)
-    mel = pyttn.matrix_element(A)
 
     sweep = pyttn.tdvp(A, h, krylov_dim = 12)
 
@@ -89,8 +89,6 @@ def sop_timing(N, compress, nstep=10):
     m, std, mem = electronic_structure_hamiltonian_test(t, U, chi, 0.001, nstep=nstep, compress = compress)
     return m, std, mem
 
-
-import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog = "Molecular Hamiltonian Scaling Test.")
     parser.add_argument('N', type=int)

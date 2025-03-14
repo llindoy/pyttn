@@ -35,7 +35,9 @@
 !examples/holstein/*.py
 !examples/p3ht_pcbm_heterojunction/*.py
 !examples/pyrazine/*.py
-!examples/spin_boson_model/*.py
+!examples/oqs/
+!examples/oqs/spin_boson/
+!examples/oqs/spin_boson/*.py
 !examples/scaling/*.py
 !examples/scaling/spin_boson_model/
 !examples/scaling/spin_boson_model/*.py

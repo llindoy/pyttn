@@ -1,7 +1,5 @@
 import numpy as np
-import time
 import h5py
-import sys
 
 from sbm_timing_helper import sbm_dynamics_timing
 
