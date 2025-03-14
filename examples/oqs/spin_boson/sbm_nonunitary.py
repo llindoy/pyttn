@@ -28,7 +28,9 @@ def run_first_step(sweep, A, h, dt, nstep=5, nscale=1e-5):
         sweep.step(A, h)
         tp = ts[i]
 
-def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin=None, beta=None, nstep=1, ofname="sbm_nonunitary.h5", degree=2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, nbmax=2, nhilbmax=1024, method = "heom"):
+def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin=None, beta=None, nstep=1, 
+                 ofname="sbm_nonunitary.h5", degree=2, adaptive=True, spawning_threshold=2e-4, 
+                 unoccupied_threshold=1e-4, nunoccupied=0, nbmax=2, nhilbmax=1024, method = "heom"):
     r"""A function for setting up and running dynamics of the spin boson model using the non-unitary methods (HEOM or Pseudomode)
     Here we consider a Hamiltonian of the form
 
@@ -258,7 +260,6 @@ if __name__ == "__main__":
         adaptive=args.subspace,
         degree=args.degree,
         Lmin=args.Lmin,
-        use_mode_combination=True,
         nbmax=args.nbmax,
         nhilbmax=args.nhilbmax,
         method = args.method

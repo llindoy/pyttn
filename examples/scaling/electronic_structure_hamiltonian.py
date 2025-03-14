@@ -8,6 +8,7 @@ import argparse
 import memory_profiler as mp
 
 import pyttn
+from pyttn import models
 
 
 def do_step(A, h, sweep, nstep):
@@ -41,7 +42,7 @@ def electronic_structure_hamiltonian_test(t, U, chi, dt, nstep = 1, degree = 2, 
     :param compress: Whether or not to compress the SOP Hamiltonian (default: True)
     :type param: bool, optional
     """
-    sys = pyttn.models.electronic_structure(t, U)
+    sys = models.electronic_structure(t, U)
     H = sys.hamiltonian()
     sysinf = sys.system_info()
 

@@ -157,19 +157,9 @@ def output_results(ofname, timepoints, res, maxchi, runtime):
     h5.close()
 
 
-def p3ht_pcbm_single_set(
-    topo,
-    capacity,
-    mode_dims,
-    tmax=200,
-    dt=0.25,
-    adaptive=True,
-    spawning_threshold=1e-6,
-    unoccupied_threshold=1e-4,
-    nunoccupied=0,
-    ofname="p3ht_pcbm.h5",
-    output_skip=1,
-):
+def p3ht_pcbm_single_set(topo, capacity, mode_dims, tmax=200, dt=0.25, adaptive=True,
+                         spawning_threshold=1e-6, unoccupied_threshold=1e-4, nunoccupied=0,
+                         ofname="p3ht_pcbm.h5", output_skip=1):
     from p3ht_pcbm_hamiltonian import hamiltonian
 
     """Function for performing the dynamics of the single set p3ht_pcbm model

@@ -9,7 +9,8 @@ from pyttn import oqs, utils
 from numba import jit
 
 
-def sbm_dynamics_timing(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, nstep = 1, Nw = 10.0, degree = 2, compress=True, adaptive=False, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, nbmax=1, nhilbmax=1024):
+def sbm_dynamics_timing(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, nstep = 1, Nw = 10.0, degree = 2, 
+                        compress=True, adaptive=False, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, nbmax=1, nhilbmax=1024):
     r"""A function for setting up and running dynamics of the spin boson model using the Star Hamiltonian and timing the results.
     Here we consider a Hamiltonian of the form
 

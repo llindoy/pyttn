@@ -122,7 +122,7 @@ def output_results(ofname, timepoints, res, runtime):
     h5.close()
 
 
-def holstein_dynamics(g, w0, J, N, chi1, beta=None, chi2=None, tmax=200, dt=0.25, nbose=10, ofname="holstein_1d.h5", output_skip=1):
+def holstein_dynamics(g, w0, J, N, chi1, chi2, beta=None, tmax=200, dt=0.25, nbose=10, ofname="holstein_1d.h5", output_skip=1):
     # set up the time evolution parameters
     nsteps = int(tmax / (dt)) + 1
 
@@ -272,6 +272,10 @@ if __name__ == "__main__":
     parser.add_argument("--output_skip", type=int, default=10)
     args = parser.parse_args()
 
+    chi2 = args.chi2
+    if chi2 is None:
+        chi2 = args.chi
+
     holstein_dynamics(
         args.g,
         args.w0,
@@ -280,7 +284,7 @@ if __name__ == "__main__":
         args.chi,
         nbose=args.nbose,
         beta=args.beta,
-        chi2=args.chi2,
+        chi2=chi2,
         tmax=args.tmax,
         dt=args.dt,
         output_skip=args.output_skip,

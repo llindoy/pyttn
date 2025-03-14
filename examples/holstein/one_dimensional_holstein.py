@@ -32,8 +32,8 @@ def output_results(ofname, timepoints, res, runtime):
     h5.close()
 
 
-def holstein_dynamics(ansatz, g, w0, J, N, chi1, beta=None, chi2=None, tmax=200, dt=0.25, nbose=10, ofname="holstein_1d.h5", output_skip=1, nbmax=2, nhilbmax=1024,
-):
+def holstein_dynamics(ansatz, g, w0, J, N, chi1, beta=None, chi2=None, tmax=200, dt=0.25, nbose=10, 
+                      ofname="holstein_1d.h5", output_skip=1, nbmax=2, nhilbmax=1024):
     # set up the time evolution parameters
     nsteps = int(tmax / (dt)) + 1
     if beta is None:

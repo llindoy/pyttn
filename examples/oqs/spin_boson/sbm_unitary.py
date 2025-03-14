@@ -26,7 +26,9 @@ def run_first_step(sweep, A, h, dt, nstep=5, nscale=1e-5):
         sweep.step(A, h)
         tp = ts[i]
 
-def sbm_dynamics(Nb,alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep=1, Nw=10.0, geom="star", ofname="sbm_unitary.h5", degree=2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, nbmax=2, nhilbmax=1024):
+def sbm_dynamics(Nb,alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep=1, Nw=10.0, geom="star", 
+                 ofname="sbm_unitary.h5", degree=2, adaptive=True, spawning_threshold=2e-4, 
+                 unoccupied_threshold=1e-4, nunoccupied=0, nbmax=2, nhilbmax=1024):
     r"""A function for setting up and running dynamics of the spin boson model using the a Hamiltonian with a user specified geometry.
     Here we consider a Hamiltonian of the form
 
@@ -102,8 +104,7 @@ def sbm_dynamics(Nb,alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep=1
     # truncate the system bath modes
     discbath.truncate_modes(utils.EnergyTruncation(10 * wc, Lmax=nbose, Lmin=4))
 
-    # and get the bath information
-
+    bsys=None
     # set up the mode combination informatino
     if nbmax > 1:
         mode_comb = utils.ModeCombination(nbmax, nhilbmax)

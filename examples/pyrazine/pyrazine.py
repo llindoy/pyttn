@@ -50,21 +50,8 @@ def output_results(ofname, timepoints, res, maxchi, runtime):
     h5.close()
 
 
-def pyrazine_dynamics(
-    N1,
-    N2,
-    N3,
-    N4,
-    N5,
-    tmax,
-    dt,
-    adaptive=True,
-    spawning_threshold=1e-6,
-    unoccupied_threshold=1e-4,
-    nunoccupied=0,
-    ofname="pyrazine.h5",
-    output_skip=1,
-):
+def pyrazine_dynamics(N1, N2, N3, N4, N5, tmax, dt, adaptive=True, spawning_threshold=1e-6, 
+                      unoccupied_threshold=1e-4, nunoccupied=0, ofname="pyrazine.h5",output_skip=1):
     # Here we half the total integration time as we are computing a(t) = <\psi(t/2)^*|\psi(t/2)>
     nsteps = int(tmax / (2 * dt)) + 1
 
