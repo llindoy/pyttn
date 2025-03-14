@@ -18,75 +18,25 @@ from pyttn.utils import visualise_tree
 import matplotlib.pyplot as plt
 
 
-def setup_topology(chi, nbose, mode_dims, degree):
-    topo = ntree("(1(2(2))(2))")
-
-    if degree > 1:
-        ntreeBuilder.mlmctdh_subtree(topo()[1], mode_dims, degree, chi)
-    else:
-        ntreeBuilder.mps_subtree(topo()[1], mode_dims, chi, min(chi, nbose))
-    ntreeBuilder.sanitise(topo)
-    return topo
-
-
-def sbm_dynamics(
-    Nb,
-    alpha,
-    wc,
-    s,
-    eps,
-    delta,
-    chi,
-    nbose,
-    dt,
-    beta=None,
-    Ncut=20,
-    nstep=1,
-    Nw=10.0,
-    geom="star",
-    ofname="sbm.h5",
-    degree=2,
-    adaptive=True,
-    spawning_threshold=2e-4,
-    unoccupied_threshold=1e-4,
-    nunoccupied=0,
-    use_mode_combination=True,
-    nbmax=2,
-    nhilbmax=1024,
-):
+def sbm_dynamics(Nb,alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, Ncut=20, nstep=1, Nw=10.0, geom="star", ofname="sbm.h5", degree=2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, use_mode_combination=True, nbmax=2, nhilbmax=1024):
     t = np.arange(nstep + 1) * dt
 
     """
-    Set up the system bath Hamiltonian
+    Set up the system information
     """
-
     # setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
     def J(w):
-        return np.abs(
-            np.pi / 2 * alpha * wc * np.power(w / wc, s) * np.exp(-np.abs(w / wc))
-        ) * np.where(w > 0, 1.0, -1.0)
+        return np.abs(np.pi / 2 * alpha * wc * np.power(w / wc, s) * np.exp(-np.abs(w / wc))) * np.where(w > 0, 1.0, -1.0)
 
     # set up the open quantum system bath object
     bath = oqs.BosonicBath(J, beta=beta)
 
     # discretise the bath correleation function using the orthonormal polynomial based cutoff
-    g, w = bath.discretise(
-        oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw * wc), Nw * wc)
-    )
-
-    # set up the total Hamiltonian
-    N = Nb + 1
-    H = SOP(N)
-
-    # add on the system part of the system bath Hamiltonian
-    H += eps * sOP("sz", 0) + delta * sOP("sx", 0)
+    g, w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw * wc), Nw * wc) )
 
     # set up the discretised bath object
     discbath = oqs.DiscreteBosonicBath(g, w)
-
-    # add the system bath Hamiltonian terms to the Hamiltonian
-    H = discbath.add_system_bath_hamiltonian(H, sOP("sz", 0), geom=geom)
 
     # truncate the system bath modes
     discbath.truncate_modes(utils.EnergyTruncation(10 * wc, Lmax=nbose, Lmin=4))
@@ -104,6 +54,18 @@ def sbm_dynamics(
     sysinf = system_modes(1)
     sysinf[0] = tls_mode()
     sysinf = combine_systems(sysinf, bsys)
+
+    """
+    Set up the Hamiltonian for the discretised model
+    """
+    # set up the total Hamiltonian
+    H = SOP(sysinf.nprimitive_modes())
+
+    # add on the system part of the system bath Hamiltonian
+    H += eps * sOP("sz", 0) + delta * sOP("sx", 0)
+
+    # add the system bath Hamiltonian terms to the Hamiltonian
+    H = discbath.add_system_bath_hamiltonian(H, sOP("sz", 0), geom=geom)
 
     """
     Set up the TTN structures and initial state of the wavefunction. 
