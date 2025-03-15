@@ -1,33 +1,18 @@
 import os
+
 os.environ["OMP_NUM_THREADS"] = "1"
 
 import numpy as np
 import time
+import argparse
 import h5py
 import copy
-import argparse
-
 
 import pyttn
 from pyttn import oqs, utils
+from cayley_helper import get_spin_connectivity, build_topology, get_mode_reordering
+
 from numba import jit
-
-
-def build_topology(Ns, ds, chi, chiS, chiB, nbose, expbath, degree):
-    lchi = [chiS for i in range(Ns)]
-    topo = pyttn.ntreeBuilder.mps_tree(lchi, chi)
-
-    leaf_indices = topo.leaf_indices()
-    for li in leaf_indices:
-        topo.at(li).insert(ds)
-
-        #now if the discrete bath object has been created we add the bath modes to the tre
-        if expbath is not None:
-            _ = expbath.add_bath_tree(topo.at(li), degree, chiB, min(chiB, nbose))
-
-    pyttn.ntreeBuilder.sanitise(topo)
-    return topo
-
 
 def output_results(ofname, t, res, Rnorm, norm, maxchi, timing):
     h5 = h5py.File(ofname, "w")
@@ -52,10 +37,8 @@ def run_first_step(sweep, A, h, dt, nstep=5, nscale=1e-5):
         tp = ts[i]
 
 
-def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, Ecut=10, beta=None, nstep=1, 
-                     ofname="xychain.h5", degree=2, adaptive=True, spawning_threshold=2e-4, 
-                     unoccupied_threshold=1e-4, nunoccupied=0, nbmax=2, nhilbmax=1024, method="heom"):
-    t = np.arange(nstep + 1) * dt
+def xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, Ecut = 10, beta=None, nstep=1, ofname="xychain.h5", method="heom",
+                     degree=2, adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, nbmax=2, nhilbmax=1024):
 
     # setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
@@ -68,6 +51,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
     sysinf[0] = [pyttn.spin_mode(2), pyttn.spin_mode(2)]
 
     expbath=None
+    Nb = 0
     if K != 0:
         # set up the open quantum system bath object
         bath = oqs.BosonicBath(J, beta=beta, wmax=wc * Ecut)
@@ -86,16 +70,19 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
         if nbmax>1:
             mode_comb = utils.ModeCombination(nhilbmax, nbmax)
             bsys = mode_comb(bsys)
-
+        
         sysinf = pyttn.combine_systems(sysinf, bsys)
 
 
+    hiterms, Ns = get_spin_connectivity(Nl, d=3)
     # set the total system information object to just be a single spin
     sysinfo = copy.deepcopy(sysinf)
     site_info = copy.deepcopy(sysinf)
     # and add on the system information objects for the remaining spins
     for i in range(Ns - 1):
         sysinfo = pyttn.combine_systems(sysinfo, sysinf)
+
+    sysinfo.mode_indices = get_mode_reordering(Nl, bsys.nmodes(), site_size=1)
 
     # set up the total Hamiltonian
     H = pyttn.SOP(sysinfo.nprimitive_modes())
@@ -107,13 +94,14 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
         # the onsite energy terms
         H += pyttn.sOP("sz", skip) - pyttn.sOP("sz", skip + 1)
 
-        # add on the HEOM bath Hamiltonian
-        H = expbath.add_system_bath_generator(H, [pyttn.sOP("sz", skip+0), pyttn.sOP("sz", skip+1)], method=method, bskip = skip+2)
+        if(bsys.nprimitive_modes() > 0):
+            # add on the HEOM bath Hamiltonian
+            H = expbath.add_system_bath_generator(H, [pyttn.sOP("sz", skip+0), pyttn.sOP("sz", skip+1)], method=method, bskip = skip+2)
 
     # now we add on the spin-spin coupling terms
-    for si in range(Ns - 1):
-        s1 = si * (site_info.nprimitive_modes())
-        s2 = (si + 1) * (site_info.nprimitive_modes())
+    for ind in hiterms:
+        s1 = (ind[0]) * (site_info.nprimitive_modes())
+        s2 = (ind[1]) * (site_info.nprimitive_modes())
 
         H += (1.0 - eta) * (pyttn.sOP("sx", s1) * pyttn.sOP("sx", s2) - pyttn.sOP("sx", s1 + 1) * pyttn.sOP("sx", s2 + 1))
         H += (1.0 + eta) * (pyttn.sOP("sy", s1) * pyttn.sOP("sy", s2) - pyttn.sOP("sy", s1 + 1) * pyttn.sOP("sy", s2 + 1))
@@ -123,23 +111,25 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
     chiS0 = chiS
     chiB0 = chiB
     if adaptive:
-        chi0 = min(16, chi)
-        chiS0 = min(16, chiS)
-        chiB0 = min(16, chiB)
+        chi0 = min(chi0, 4)
+        chiS0 = min(chiS0, 4)
+        chiB0 = min(chiB0, 4)
 
-    topo = build_topology(Ns, sysinfo[0].lhd(), chi0, chiS0, chiB0, L, expbath, degree)
-    capacity = build_topology(Ns, sysinfo[0].lhd(), chi, chiS, chiB, L, expbath, degree)
+    topo = build_topology(Nl, sysinfo[0].lhd(), chi0, chiS0, chiB0, L, expbath, degree)
+    capacity = build_topology(Nl, sysinfo[0].lhd(), chi, chiS, chiB, L, expbath, degree)
 
     A = pyttn.ttn(topo, capacity, dtype=np.complex128)
 
     state = [0 for i in range(Ns * (site_info.nmodes()))]
-    state[(Ns - 1) // 2 * (site_info.nmodes())] = 3
+    state[0] = 3
     A.set_state(state)
 
+    print("building Hamiltonian")
     h = pyttn.sop_operator(H, A, sysinfo)
+    print("Hamiltonian built")
     # set up ttns storing the observable to be measured.  Here these are just system observables
     # so we form a tree with the same topology as A but with all bath bond dimensions set to 1
-    obstree = build_topology(Ns, sysinfo[0].lhd(), 1, 1, 1, L, expbath, degree)
+    obstree = build_topology(Nl, sysinfo[0].lhd(), chi0, chiS0, chiB0, L, expbath, degree)
     trace_ttn = pyttn.ttn(obstree, dtype=np.complex128)
 
     #now set this up 
@@ -153,7 +143,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
 
     ops = []
     for si in range(Ns):
-        skip = si * (site_info.nprimitive_modes())
+        skip = si * (site_info.nprimitive_modes() )
         ops.append(pyttn.site_operator(pyttn.sOP("sz", skip), sysinfo))
 
     mel = pyttn.matrix_element(A)
@@ -163,7 +153,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
     if not adaptive:
         sweep = pyttn.tdvp(A, h, krylov_dim=16)
     else:
-        sweep = pyttn.tdvp(A, h, krylov_dim=16, expansion="subspace", subspace_neigs=6, subspace_krylov_dim=12)
+        sweep = pyttn.tdvp(A, h, krylov_dim=16, expansion="subspace")
         sweep.spawning_threshold = spawning_threshold
         sweep.unoccupied_threshold = unoccupied_threshold
         sweep.minimum_unoccupied = nunoccupied
@@ -184,68 +174,71 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
     # perform the dynamics
     renorm = mel(trace_ttn, A)
     i = 0
-    print((i) * dt, res[Ns // 2, i], renorm, maxchi[i], np.real(mel(A, A)))
+    print((i) * dt, res[0, i], np.real(renorm), maxchi[i], np.real(mel(A, A)))
     norm[i] = np.real(mel(A, A))
 
-    #perform the first timestep using a logarithmic discretisation of time over this period.  
-    #This can be useful to allow for suitable adaptation of weakly occupied single particle 
-    #functions through the initial time point.
+    # perform the first timestep using a logarithmic discretisation of time over this period.
+    # This can be useful to allow for suitable adaptation of weakly occupied single particle
+    # functions through the initial time point.
     run_first_step(sweep, A, h, dt, nstep=5)
     sweep.dt = dt
 
-    #evaluate all of the properties
+    #evaluate all properties
     for si in range(Ns):
         res[si, 1] = mel(ops[si], A, trace_ttn)
     maxchi[1] = A.maximum_bond_dimension()
-    norm[1] = np.real(mel(A, A))
+    norm[i] = np.real(mel(A, A))
     Rnorm[1] = 1 / renorm
 
     #print result
     i=1
-    print((i) * dt, res[Ns // 2, i], renorm, maxchi[i], np.real(mel(A, A)))
+    print((i) * dt, res[0, i], renorm, maxchi[i], np.real(mel(A, A)))
 
-    t=(np.arange(nstep + 1) * dt)
+    t = np.arange(nstep + 1) * dt
     for i in range(1, nstep):
-        #perform the time step
+        #perform timestep
         sweep.step(A, h)
 
-        #and evaluate all of the properties
+        #evaluate all properties
         renorm = mel(trace_ttn, A)
         for si in range(Ns):
             res[si, i + 1] = mel(ops[si], A, trace_ttn)
         maxchi[i + 1] = A.maximum_bond_dimension()
         norm[i + 1] = np.real(mel(A, A))
-        Rnorm[i + 1] = renorm
-    
+        Rnorm[i + 1] = 1 / renorm
+        
         #print result
-        print((i + 1) * dt, res[Ns // 2, i + 1], renorm, maxchi[i + 1], np.real(mel(A, A)))
+        print((i + 1) * dt, res[0, i + 1], np.real(renorm), maxchi[i + 1], np.real(mel(A, A)))
 
         t2 = time.time()
         output_results(ofname, t, res, Rnorm, norm, maxchi, t2-t1)
 
-
+        if i % 10 ==0 :
+            import matplotlib.pyplot as plt
+            utils.visualise_tree(A, prog="twopi", bond_prop="bond dimension")
+            plt.show()
     t2 = time.time()
     output_results(ofname, t, res, Rnorm, norm, maxchi, t2-t1)
 
 
-if __name__ == "__main__":
+def run_from_inputs():
     parser = argparse.ArgumentParser(
         description="Dynamics of the zero temperature spin boson model with"
     )
 
     # number of spins in the system
-    parser.add_argument("--Ns", type=int, default=21)
+    parser.add_argument("--Nl", type=int, default=3)
 
     # exponential bath cutoff parameters
     parser.add_argument("--alpha", type=float, default=0.32)
     parser.add_argument("--wc", type=float, default=4)
 
     # number of bath modes
-    parser.add_argument("--K", type=int, default=6)
+    parser.add_argument("--K", type=int, default=4)
 
     # maximum bosonic hilbert space dimension
-    parser.add_argument("--L", type=int, default=30)
-    parser.add_argument("--Lmin", type=int, default=6)
+    parser.add_argument("--L", type=int, default=25)
+    parser.add_argument("--Lmin", type=int, default=4)
     parser.add_argument("--ecut", type=float, default=10)
 
     # mode combination parameters
@@ -253,28 +246,30 @@ if __name__ == "__main__":
     parser.add_argument("--nhilbmax", type=int, default=1000)
 
     # system hamiltonian parameters
-    parser.add_argument("--eta", type=float, default=0.02)
+    parser.add_argument("--eta", type=float, default=0.04)
 
     # bath inverse temperature
     parser.add_argument("--beta", type=float, default=None)
 
     # maximum bond dimension
-    parser.add_argument("--chi", type=int, default=32)
-    parser.add_argument("--chiS", type=int, default=32)
-    parser.add_argument("--chiB", type=int, default=32)
+    parser.add_argument("--chi", type=int, default=16)
+    parser.add_argument("--chiS", type=int, default=12)
+    parser.add_argument("--chiB", type=int, default=8)
     parser.add_argument("--degree", type=int, default=1)
 
     # integration time parameters
-    parser.add_argument("--dt", type=float, default=0.025)
-    parser.add_argument("--tmax", type=float, default=40)
-    parser.add_argument("--fname", type=str, default=None)
+    parser.add_argument("--dt", type=float, default=0.05)
+    parser.add_argument("--tmax", type=float, default=10)
 
     parser.add_argument("--method", type=str, default="heom")
 
+    # output file name
+    parser.add_argument("--fname", type=str, default=None)
+
     # the minimum number of unoccupied modes for the dynamics
     parser.add_argument("--subspace", type=bool, default=True)
-    parser.add_argument("--nunoccupied", type=int, default=0)
-    parser.add_argument("--spawning_threshold", type=float, default=1e-6)
+    parser.add_argument("--nunoccupied", type=int, default=2)
+    parser.add_argument("--spawning_threshold", type=float, default=1e-7)
     parser.add_argument("--unoccupied_threshold", type=float, default=1e-4)
 
     args = parser.parse_args()
@@ -286,28 +281,11 @@ if __name__ == "__main__":
 
     nstep = int(args.tmax / args.dt) + 1
 
-    xychain_dynamics(
-        args.Ns,
-        args.alpha,
-        args.wc,
-        args.eta,
-        args.chi,
-        args.chiS,
-        args.chiB,
-        args.L,
-        args.K,
-        args.dt,
-        beta=args.beta,
-        nstep=nstep,
-        ofname=fname,
-        Ecut = args.ecut,
-        nunoccupied=args.nunoccupied,
-        spawning_threshold=args.spawning_threshold,
-        unoccupied_threshold=args.unoccupied_threshold,
-        adaptive=args.subspace,
-        degree=args.degree,
-        Lmin=args.Lmin,
-        nbmax=args.nbmax,
-        nhilbmax=args.nhilbmax,
-        method=args.method
-    )
+    xychain_dynamics(args.Nl, args.alpha, args.wc, args.eta, args.chi, args.chiS, args.chiB, args.L, args.K, args.dt, beta=args.beta, nstep=nstep, 
+                     Ecut=args.ecut, method=args.method, ofname=fname, nunoccupied=args.nunoccupied, spawning_threshold=args.spawning_threshold, 
+                     unoccupied_threshold=args.unoccupied_threshold, adaptive=args.subspace, degree=args.degree, Lmin=args.Lmin, 
+                     nbmax=args.nbmax, nhilbmax=args.nhilbmax)
+
+
+if __name__ == "__main__":
+    run_from_inputs()

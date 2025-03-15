@@ -121,12 +121,9 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_m
     chiS0 = chiS
     chiB0 = chiB
     if adaptive:
-        chi0 = 8
-        chiS0 = 8
-        chiB0 = 8
-    chi0 = min(chi0, chi)
-    chiS0 = min(chiS0, chiS)
-    chiB0 = min(chiB0, chiB)
+        chi0 = min(8, chi0)
+        chiS0 = min(8, chiS0)
+        chiB0 = min(8, chiB0)
 
     # now build the topology and capacity arrays
     topo = build_topology(Ns, 2, chi0, chiS0, chiB0, nbose, discbath, degree)
@@ -261,28 +258,7 @@ if __name__ == "__main__":
 
     nstep = int(args.tmax / args.dt) + 1
 
-    xychain_dynamics(
-        args.Ns,
-        args.N,
-        args.alpha,
-        args.wc,
-        args.eta,
-        args.chi,
-        args.chiS,
-        args.chiB,
-        args.nbose,
-        args.dt,
-        beta=args.beta,
-        nstep=nstep,
-        Ecut=args.ecut,
-        geom=args.geom,
-        ofname=args.fname,
-        nunoccupied=args.nunoccupied,
-        spawning_threshold=args.spawning_threshold,
-        unoccupied_threshold=args.unoccupied_threshold,
-        adaptive=args.subspace,
-        degree=args.degree,
-        nbose_min=args.nbose_min,
-        nbmax=args.nbmax,
-        nhilbmax=args.nhilbmax,
-    )
+    xychain_dynamics(args.Ns, args.N, args.alpha, args.wc, args.eta, args.chi, args.chiS, args.chiB, args.nbose, args.dt, 
+                     beta=args.beta, nstep=nstep, Ecut=args.ecut, geom=args.geom, ofname=args.fname, nunoccupied=args.nunoccupied,
+                     spawning_threshold=args.spawning_threshold, unoccupied_threshold=args.unoccupied_threshold, adaptive=args.subspace,
+                     degree=args.degree, nbose_min=args.nbose_min, nbmax=args.nbmax, nhilbmax=args.nhilbmax)
