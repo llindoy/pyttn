@@ -148,32 +148,32 @@ void init_ttn(py::module &m, const std::string& label)
         .def("resize", static_cast<void (_ttn::*)(const std::string&, const std::string&, size_t, bool)>(&_ttn::resize), py::arg(), py::arg(), py::arg("nset")=1, py::arg("purification") = false, "For details see :meth:`pyttn.ttn_dtype.resize`")
         .def("set_seed", &_ttn::template set_seed<int>, "For details see :meth:`pyttn.ttn_dtype.set_seed`")
 
-        .def("set_state", &_ttn::template set_state<int>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
-        .def("set_state", &_ttn::template set_state<size_t>, py::arg(), py::arg("random_unoccupied_initialisation")=false, "For details see :meth:`pyttn.ttn_dtype.set_state`")
-        .def("set_state_purification", &_ttn::template set_state<int>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
-        .def("set_state_purification", &_ttn::template set_state<size_t>, py::arg(), py::arg("random_unoccupied_initialisation")=false, "For details see :meth:`pyttn.ttn_dtype.set_state_purification`")
+        .def("set_state", &_ttn::template set_state<int>, py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true)
+        .def("set_state", &_ttn::template set_state<size_t>, py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true, "For details see :meth:`pyttn.ttn_dtype.set_state`")
+        .def("set_state_purification", &_ttn::template set_state<int>, py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true)
+        .def("set_state_purification", &_ttn::template set_state<size_t>, py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true, "For details see :meth:`pyttn.ttn_dtype.set_state_purification`")
 
-        .def("set_product", &_ttn::template set_product<real_type, backend>)
-        .def("set_product", &_ttn::template set_product<T, backend>)
-        .def("set_product", [](_ttn& self, std::vector<py::buffer>& ps)
+        .def("set_product", &_ttn::template set_product<real_type, backend>, py::arg(), py::arg("random_internal")=true)
+        .def("set_product", &_ttn::template set_product<T, backend>, py::arg(), py::arg("random_internal")=true)
+        .def("set_product", [](_ttn& self, std::vector<py::buffer>& ps, bool random_internal)
                             {
                                 std::vector<linalg::vector<T, backend>> _ps(ps.size());
                                 for(size_t i = 0; i < ps.size(); ++i)
                                 {
                                     conv::copy_to_tensor(ps[i], _ps[i]);
                                 }
-                                self.set_product(_ps);
-                            }, "For details see :meth:`pyttn.ttn_dtype.set_product`"
+                                self.set_product(_ps, random_internal);
+                            }, py::arg(), py::arg("random_internal")=true, "For details see :meth:`pyttn.ttn_dtype.set_product`"
             )
-        .def("set_identity_purification", &_ttn::set_identity_purification, "For details see :meth:`pyttn.ttn_dtype.set_identity_purification`")
+        .def("set_identity_purification", &_ttn::set_identity_purification, py::arg("random_internal")=true, "For details see :meth:`pyttn.ttn_dtype.set_identity_purification`")
         .def(
                 "sample_product_state", 
-                [](_ttn& o, const std::vector<std::vector<real_type>>& x)
+                [](_ttn& o, const std::vector<std::vector<real_type>>& x, bool random_internal)
                 {
                     std::vector<size_t> state;
-                    o.sample_product_state(state, x); 
+                    o.sample_product_state(state, x, random_internal); 
                     return state;
-                }, "For details see :meth:`pyttn.ttn_dtype.sample_product_state`"
+                }, py::arg(), py::arg("random_internal")=true, "For details see :meth:`pyttn.ttn_dtype.sample_product_state`"
             )        
 
         .def("__imul__", [](_ttn& a, const real_type& b){return a*=b;})

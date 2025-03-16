@@ -218,20 +218,20 @@ public:
 
 public:
     template <typename int_type> 
-    void set_state(const std::vector<int_type>& si, bool random_unoccupied_initialisation=true){CALL_AND_RETHROW(this->_set_state(si, 0, false, random_unoccupied_initialisation));}
+    void set_state(const std::vector<int_type>& si, bool random_unoccupied_initialisation=true, bool randomise_internal=true){CALL_AND_RETHROW(this->_set_state(si, 0, false, random_unoccupied_initialisation, randomise_internal));}
 
     template <typename int_type> 
-    void set_state_purification(const std::vector<int_type>& si, bool random_initialisation=true){CALL_AND_RETHROW(this->_set_state(si, 0, true, random_initialisation));}
+    void set_state_purification(const std::vector<int_type>& si, bool random_initialisation=true, bool randomise_internal=true){CALL_AND_RETHROW(this->_set_state(si, 0, true, random_initialisation, randomise_internal));}
 
     template <typename U, typename be> 
-    void set_product(const std::vector<linalg::vector<U, be> >& ps){CALL_AND_RETHROW(this->_set_product(ps));}
+    void set_product(const std::vector<linalg::vector<U, be> >& ps, bool randomise_internal=true){CALL_AND_RETHROW(this->_set_product(ps, 0, randomise_internal));}
 
     template <typename Rvec> 
-    void sample_product_state(std::vector<size_t>& state, const std::vector<Rvec>& relval){CALL_AND_RETHROW(this->_sample_product_state(state, relval));}
+    void sample_product_state(std::vector<size_t>& state, const std::vector<Rvec>& relval, bool randomise_internal=true){CALL_AND_RETHROW(this->_sample_product_state(state, relval, 0, randomise_internal));}
 
-    void set_identity_purification()
+    void set_identity_purification(bool randomise_internal=true)
     {
-        CALL_AND_RETHROW(this->_set_purification());
+        CALL_AND_RETHROW(this->_set_purification(0, randomise_internal));
     }
 public:
     

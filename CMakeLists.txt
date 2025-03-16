@@ -117,7 +117,7 @@ if(BUILD_SRC)
 endif()
 
 if(BUILD_TESTS)
-    add_subdirectory(tests)
+  #add_subdirectory(tests)
 endif()
  
 

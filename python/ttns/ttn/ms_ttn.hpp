@@ -100,16 +100,16 @@ void init_msttn(py::module &m, const std::string& label)
         .def("set_seed", &_msttn::template set_seed<int>)
         .def("reset_orthogonality_centre", &_msttn::reset_orthogonality_centre)
 
-        .def("set_state", &_msttn::template set_state<int>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
-        .def("set_state", &_msttn::template set_state<size_t>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
+        .def("set_state", &_msttn::template set_state<int>, py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true)
+        .def("set_state", &_msttn::template set_state<size_t>, py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true)
         
-        .def("set_state", &_msttn::template set_state<numpy_type, int>, py::arg(), py::arg(), py::arg("random_unoccupied_initialisation")=false)
-        .def("set_state", &_msttn::template set_state<numpy_type, size_t>, py::arg(), py::arg(), py::arg("random_unoccupied_initialisation")=false)
+        .def("set_state", &_msttn::template set_state<numpy_type, int>, py::arg(), py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true)
+        .def("set_state", &_msttn::template set_state<numpy_type, size_t>, py::arg(), py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true)
 
-        .def("set_state", &_msttn::template set_state<real_type, int>, py::arg(), py::arg(), py::arg("random_unoccupied_initialisation")=false)
-        .def("set_state", &_msttn::template set_state<real_type, size_t>, py::arg(), py::arg(), py::arg("random_unoccupied_initialisation")=false)
-        .def("set_state_purification", &_msttn::template set_state<int>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
-        .def("set_state_purification", &_msttn::template set_state<size_t>, py::arg(), py::arg("random_unoccupied_initialisation")=false)
+        .def("set_state", &_msttn::template set_state<real_type, int>, py::arg(), py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true)
+        .def("set_state", &_msttn::template set_state<real_type, size_t>, py::arg(), py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true)
+        .def("set_state_purification", &_msttn::template set_state<int>, py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true)
+        .def("set_state_purification", &_msttn::template set_state<size_t>, py::arg(), py::arg("random_primitive")=false, py::arg("random_internal")=true)
 
         /*
         //.def("set_product", &_msttn::template set_product<real_type, backend>)
