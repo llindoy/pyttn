@@ -327,7 +327,7 @@ public:
 
 protected:
     template <typename int_type> 
-    void _set_state(const std::vector<int_type>& si, size_type set_index = 0, bool use_purification_info = false, bool random_unoccupied_initialisation=true)
+    void _set_state(const std::vector<int_type>& si, size_type set_index = 0, bool use_purification_info = false, bool random_unoccupied_initialisation=true, bool randomise_internal=true)
     {
         //if we aren't using the set_state_purification function or we don't have a purification then we just set as usual
         if(!use_purification_info || !m_purification)
@@ -342,7 +342,7 @@ protected:
             
             //now zero the state
             this->zero();
-            this->initialise_logical_tensors_product_state(set_index);
+            this->initialise_logical_tensors_product_state(set_index, randomise_internal);
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
@@ -363,7 +363,7 @@ protected:
             
             //now zero the state
             this->zero();
-            this->initialise_logical_tensors_product_state(set_index);
+            this->initialise_logical_tensors_product_state(set_index, randomise_internal);
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
@@ -376,7 +376,7 @@ protected:
     }
 
     template <typename U, typename be> 
-    void _set_product(const std::vector<linalg::vector<U, be> >& ps, size_type set_index = 0)
+    void _set_product(const std::vector<linalg::vector<U, be> >& ps, size_type set_index = 0, bool randomise_internal=true)
     {
         ASSERT(set_index < this->nset(), "Cannot set ttnbase to specified state.  Set index out of bounds.");
         ASSERT(ps.size() == this->nmodes(), "Cannot set ttn to specified state.  The state does not have the required numbers of modes.");
@@ -388,7 +388,7 @@ protected:
 
         //now zero the state
         this->zero();
-        this->initialise_logical_tensors_product_state(set_index);
+        this->initialise_logical_tensors_product_state(set_index, randomise_internal);
 
         m_has_orthogonality_centre = false;
         for(size_type i = 0; i < this->nmodes(); ++i)
@@ -399,7 +399,7 @@ protected:
     }
 
     template <typename Rvec> 
-    void _sample_product_state(std::vector<size_t>& state, const std::vector<Rvec>& relval, size_type set_index = 0)
+    void _sample_product_state(std::vector<size_t>& state, const std::vector<Rvec>& relval, size_type set_index = 0, bool randomise_internal=true)
     {
         ASSERT(set_index < this->nset(), "Cannot set ttnbase to specified state.  Set index out of bounds.");
         ASSERT(relval.size() == this->nmodes(), "Cannot set ttn to specified state.  The state does not have the required numbers of modes.");
@@ -412,7 +412,7 @@ protected:
 
         //now zero the state
         this->zero();
-        this->initialise_logical_tensors_product_state(set_index);
+        this->initialise_logical_tensors_product_state(set_index, randomise_internal);
 
         m_has_orthogonality_centre = false;
         for(size_type i = 0; i < this->nmodes(); ++i)
@@ -427,11 +427,11 @@ protected:
         this->force_set_orthogonality_centre(0);
     }
 
-    void _set_purification(size_type set_index = 0)
+    void _set_purification(size_type set_index = 0, bool randomise_internal=true)
     {
         //now zero the state
         this->zero();
-        this->initialise_logical_tensors_product_state(set_index);
+        this->initialise_logical_tensors_product_state(set_index, randomise_internal);
 
         for(size_type i = 0; i < this->nmodes(); ++i)
         {
@@ -443,13 +443,23 @@ protected:
     }
 
 protected:
-    void initialise_logical_tensors_product_state(size_type set_index = 0)
+    void initialise_logical_tensors_product_state(size_type set_index = 0, bool randomise_internal = true)
     {
         for(auto& c : m_nodes)
         {
             if(c.is_leaf()){}
             //if its an interior node fill it with the identity matrix
-            else{CALL_AND_HANDLE(c.set_node_identity(set_index), "Failed to set interior nodes to identity.");}
+            else
+            {
+                if(!randomise_internal)
+                {
+                    CALL_AND_HANDLE(c.set_node_identity(set_index), "Failed to set interior nodes to identity.");
+                }
+                else
+                {
+                    CALL_AND_HANDLE(c.set_interior_identity_random(set_index, m_rengine), "Failed to set interior nodes to identity.");
+                }
+            }
         }
     }
 

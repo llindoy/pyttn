@@ -1,11 +1,8 @@
 import numpy as np
-import sys
-
 from pyttn import operator_dictionary, SOP, sOP, site_operator
 
 # convert from eV to hartree
 eV = 0.0367493049512081
-
 
 def modes():
     return [

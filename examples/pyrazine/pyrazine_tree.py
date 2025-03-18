@@ -1,5 +1,6 @@
+from pyttn import ntree, ntreeBuilder
+
 def build_topology_mode_combination(N1, N2, N3, N4, N5, m):
-    from pyttn import ntree, ntreeBuilder
 
     """ Construct the pyrazine ML-MCTDH tree structure used in O. Vendrell and H.-D. Meyer, J. Chem. Phys. 134, 044135 (2011).
     This structure makes use of mode combination to treat a set of 8 composite vibrational modes rather than the full 24 modes 

@@ -5,11 +5,11 @@ os.environ["OMP_NUM_THREADS"] = "1"
 import numpy as np
 import time
 import h5py
+import argparse
 
-from pyttn import ntree, ntreeBuilder
+from pyttn import ntreeBuilder
 from pyttn import system_modes, boson_mode
-from pyttn import ttn, sop_operator, matrix_element, tdvp, site_operator, sOP
-from pyttn.utils import visualise_tree, ModeCombination
+from pyttn import matrix_element, tdvp, sOP
 from pyttn import ms_ttn, ms_sop_operator, multiset_SOP
 
 import matplotlib.pyplot as plt
@@ -122,23 +122,9 @@ def output_results(ofname, timepoints, res, runtime):
     h5.close()
 
 
-def holstein_dynamics(
-    g,
-    w0,
-    J,
-    N,
-    chi1,
-    beta=None,
-    chi2=None,
-    tmax=200,
-    dt=0.25,
-    nbose=10,
-    ofname="holstein_1d.h5",
-    output_skip=1,
-):
+def holstein_dynamics(g, w0, J, N, chi1, chi2, beta=None, tmax=200, dt=0.25, nbose=10, ofname="holstein_1d.h5", output_skip=1):
     # set up the time evolution parameters
     nsteps = int(tmax / (dt)) + 1
-    t = np.arange(nsteps + 1) * dt
 
     # set up the system information
     sysinf = system_modes(N * N)
@@ -196,13 +182,11 @@ def holstein_dynamics(
 
             self.nx = int((chimax - chimin) // (self.Nl - 1))
 
-        def __call__(self, l):
-            ret = int((self.Nl - l) * self.nx + self.chimin)
+        def __call__(self, li):
+            ret = int((self.Nl - li) * self.nx + self.chimin)
             return ret
 
-    topo = ntreeBuilder.mlmctdh_tree(
-        sysinf.mode_dimensions(), 2, chi_step(chi1, chi2, N * N)
-    )
+    topo = ntreeBuilder.mlmctdh_tree(sysinf.mode_dimensions(), 2, chi_step(chi1, chi2, N * N))
 
     # generate the mapping from square lattice to tree indices
     x = gen_lattice(N)
@@ -232,7 +216,6 @@ def holstein_dynamics(
 
     # setup buffers for storing the results
     res = np.zeros((nsteps + 1, N * N), dtype=np.complex128)
-    maxchi = np.zeros((nsteps + 1))
 
     for j in range(N * N):
         res[0, j] = mel(A.slice(j))
@@ -267,9 +250,6 @@ def holstein_dynamics(
     t2 = time.time()
     output_results(ofname, timepoints, res, (t2 - t1))
 
-
-import argparse
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pyttn test")
 
@@ -292,6 +272,10 @@ if __name__ == "__main__":
     parser.add_argument("--output_skip", type=int, default=10)
     args = parser.parse_args()
 
+    chi2 = args.chi2
+    if chi2 is None:
+        chi2 = args.chi
+
     holstein_dynamics(
         args.g,
         args.w0,
@@ -300,7 +284,7 @@ if __name__ == "__main__":
         args.chi,
         nbose=args.nbose,
         beta=args.beta,
-        chi2=args.chi2,
+        chi2=chi2,
         tmax=args.tmax,
         dt=args.dt,
         output_skip=args.output_skip,

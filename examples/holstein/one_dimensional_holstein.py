@@ -5,13 +5,13 @@ os.environ["OMP_NUM_THREADS"] = "1"
 import numpy as np
 import time
 import h5py
+import argparse
 
-from pyttn import ntree, ntreeBuilder
+from pyttn import ntreeBuilder
 from pyttn import system_modes, boson_mode
-from pyttn import ttn, sop_operator, matrix_element, tdvp, site_operator, sOP
-from pyttn.utils import visualise_tree, ModeCombination
+from pyttn import matrix_element, tdvp, sOP
+from pyttn.utils import ModeCombination
 from pyttn import ms_ttn, ms_sop_operator, multiset_SOP
-
 
 def run_initial_step(A, h, sweep, dt, nstep=10):
     tp = 0
@@ -23,7 +23,6 @@ def run_initial_step(A, h, sweep, dt, nstep=10):
         tp = ts[i]
     return A, h, sweep
 
-
 def output_results(ofname, timepoints, res, runtime):
     h5 = h5py.File(ofname, "w")
     h5.create_dataset("t", data=timepoints)
@@ -33,28 +32,10 @@ def output_results(ofname, timepoints, res, runtime):
     h5.close()
 
 
-def holstein_dynamics(
-    ansatz,
-    g,
-    w0,
-    J,
-    N,
-    chi1,
-    beta=None,
-    chi2=None,
-    tmax=200,
-    dt=0.25,
-    nbose=10,
-    ofname="holstein_1d.h5",
-    output_skip=1,
-    use_mode_combination=True,
-    nbmax=2,
-    nhilbmax=1024,
-):
+def holstein_dynamics(ansatz, g, w0, J, N, chi1, beta=None, chi2=None, tmax=200, dt=0.25, nbose=10, 
+                      ofname="holstein_1d.h5", output_skip=1, nbmax=2, nhilbmax=1024):
     # set up the time evolution parameters
     nsteps = int(tmax / (dt)) + 1
-    t = np.arange(nsteps + 1) * dt
-
     if beta is None:
         Nmodes = N
     else:
@@ -66,7 +47,7 @@ def holstein_dynamics(
         sysinf[i] = boson_mode(nbose)
 
     # use mode combination on the bosonic modes
-    if use_mode_combination:
+    if nbmax>1:
         mode_comb = ModeCombination(nbmax, nhilbmax)
         sysinf = mode_comb(sysinf)
 
@@ -116,17 +97,15 @@ def holstein_dynamics(
 
                     self.nx = int((chimax - chimin) // self.Nl)
 
-                def __call__(self, l):
-                    ret = int((self.Nl - l) * self.nx + self.chimin)
+                def __call__(self, li):
+                    ret = int((self.Nl - li) * self.nx + self.chimin)
                     return ret
 
             topo = ntreeBuilder.mlmctdh_tree(
                 sysinf.mode_dimensions(), 2, chi_step(chi1, chi2, N)
             )
     else:
-        raise RuntimeError(
-            'Ansatz argument not recognized.  Valid options are "mps" or"ttn"'
-        )
+        raise RuntimeError('Ansatz argument not recognized.  Valid options are "mps" or"ttn"')
 
     # set up the wavefunction for simulating the dynamics
     A = ms_ttn(N, topo, dtype=np.complex128)
@@ -149,7 +128,6 @@ def holstein_dynamics(
 
     # setup buffers for storing the results
     res = np.zeros((nsteps + 1, N), dtype=np.complex128)
-    maxchi = np.zeros((nsteps + 1))
 
     for j in range(N):
         res[0, j] = mel(A.slice(j))
@@ -183,9 +161,6 @@ def holstein_dynamics(
 
     t2 = time.time()
     output_results(ofname, timepoints, res, (t2 - t1))
-
-
-import argparse
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pyttn test")

@@ -28,14 +28,21 @@
 !examples/*.py
 !examples/*/
 !examples/anderson_impurity_models/*.py
-!examples/dissipative_spin_models/cayley_tree/
-!examples/dissipative_spin_models/cayley_tree/*.py
-!examples/dissipative_spin_models/chain/
-!examples/dissipative_spin_models/chain/*.py
+!examples/spin_models/
+!examples/spin_models/dissipative_xy/
+!examples/spin_models/dissipative_xy/cayley_tree/
+!examples/spin_models/dissipative_xy/cayley_tree/*.py
+!examples/spin_models/dissipative_xy/chain/
+!examples/spin_models/dissipative_xy/chain/*.py
 !examples/holstein/*.py
 !examples/p3ht_pcbm_heterojunction/*.py
 !examples/pyrazine/*.py
-!examples/spin_boson_model/*.py
+!examples/oqs/
+!examples/oqs/spin_boson/
+!examples/oqs/spin_boson/*.py
+!examples/scaling/*.py
+!examples/scaling/spin_boson_model/
+!examples/scaling/spin_boson_model/*.py
 
 #now we include the actual library include files
 !ttnpp

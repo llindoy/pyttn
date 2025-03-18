@@ -1,5 +1,5 @@
 import numpy as np
-import sys
+from pyttn import SOP, sOP
 
 # convert from eV to hartree
 eV = 0.0367493049512081
@@ -40,11 +40,11 @@ g_otle = (
 )
 
 
-def ot_mode_index(Nf, n, l):
-    if l < 6:
-        return n * 6 + l
+def ot_mode_index(Nf, n, li):
+    if li < 6:
+        return n * 6 + li
     else:
-        return Nf * 6 + 2 * n + l - 6
+        return Nf * 6 + 2 * n + li - 6
 
 
 def build_operator_dictionary(N, Nfragments):
@@ -89,7 +89,6 @@ def build_operator_dictionary(N, Nfragments):
 
 
 def hamiltonian():
-    from pyttn import SOP, sOP
 
     N = Nfragments * Not + Nf + 1 + 1
     # construct the operator dictionary
@@ -104,8 +103,8 @@ def hamiltonian():
         H += wf[i] * sOP("n", 1 + 1 + i)
 
     for n in range(Nfragments):
-        for l in range(Not):
-            H += wot[l] * sOP("n", 1 + 1 + Nf + ot_mode_index(Nfragments, n, l))
+        for li in range(Not):
+            H += wot[li] * sOP("n", 1 + 1 + Nf + ot_mode_index(Nfragments, n, li))
 
     # add on the purely electronic terms
     # the onsite energies
@@ -126,30 +125,26 @@ def hamiltonian():
 
     # now we add on the vibronic couplings to the fullerene super-particle modes
     for n in range(Nfragments):
-        for l in range(Nf):
-            H += (
-                gf[l]
-                * sOP("|CS%d><CS%d|" % (n, n), 0)
-                * (sOP("adag", 1 + 1 + l) + sOP("a", 1 + 1 + l))
-            )
+        for li in range(Nf):
+            H += ( gf[li] * sOP("|CS%d><CS%d|" % (n, n), 0) * (sOP("adag", 1 + 1 + li) + sOP("a", 1 + 1 + li)))
 
     # now we add on the oligothiophene modes
     for n in range(Nfragments):
-        for l in range(Not):
+        for li in range(Not):
             H += (
-                g_otcs[l]
+                g_otcs[li]
                 * sOP("|CS%d><CS%d|" % (n, n), 0)
                 * (
-                    sOP("adag", 1 + 1 + Nf + ot_mode_index(Nfragments, n, l))
-                    + sOP("a", 1 + 1 + Nf + ot_mode_index(Nfragments, n, l))
+                    sOP("adag", 1 + 1 + Nf + ot_mode_index(Nfragments, n, li))
+                    + sOP("a", 1 + 1 + Nf + ot_mode_index(Nfragments, n, li))
                 )
             )
             H += (
-                g_otle[l]
+                g_otle[li]
                 * sOP("|LE%d><LE%d|" % (n, n), 0)
                 * (
-                    sOP("adag", 1 + 1 + Nf + ot_mode_index(Nfragments, n, l))
-                    + sOP("a", 1 + 1 + Nf + ot_mode_index(Nfragments, n, l))
+                    sOP("adag", 1 + 1 + Nf + ot_mode_index(Nfragments, n, li))
+                    + sOP("a", 1 + 1 + Nf + ot_mode_index(Nfragments, n, li))
                 )
             )
 
@@ -171,9 +166,9 @@ def multiset_hamiltonian():
             H[msind, msind] += wf[i] * sOP("n", 1 + i)
 
         for n in range(Nfragments):
-            for l in range(Not):
-                H[msind, msind] += wot[l] * sOP(
-                    "n", 1 + Nf + ot_mode_index(Nfragments, n, l)
+            for li in range(Not):
+                H[msind, msind] += wot[li] * sOP(
+                    "n", 1 + Nf + ot_mode_index(Nfragments, n, li)
                 )
 
     # add on the purely electronic terms
@@ -204,24 +199,24 @@ def multiset_hamiltonian():
 
     # now we add on the vibronic couplings to the fullerene super-particle modes
     for n in range(Nfragments):
-        for l in range(Nf):
-            H[2 * n + 1, 2 * n + 1] += gf[l] * sOP("adag", 1 + l)
-            H[2 * n + 1, 2 * n + 1] += gf[l] * sOP("a", 1 + l)
+        for li in range(Nf):
+            H[2 * n + 1, 2 * n + 1] += gf[li] * sOP("adag", 1 + li)
+            H[2 * n + 1, 2 * n + 1] += gf[li] * sOP("a", 1 + li)
 
     # now we add on the oligothiophene modes
     for n in range(Nfragments):
-        for l in range(Not):
-            H[2 * n + 1, 2 * n + 1] += g_otcs[l] * sOP(
-                "adag", 1 + Nf + ot_mode_index(Nfragments, n, l)
+        for li in range(Not):
+            H[2 * n + 1, 2 * n + 1] += g_otcs[li] * sOP(
+                "adag", 1 + Nf + ot_mode_index(Nfragments, n, li)
             )
-            H[2 * n + 1, 2 * n + 1] += g_otcs[l] * sOP(
-                "a", 1 + Nf + ot_mode_index(Nfragments, n, l)
+            H[2 * n + 1, 2 * n + 1] += g_otcs[li] * sOP(
+                "a", 1 + Nf + ot_mode_index(Nfragments, n, li)
             )
-            H[2 * n, 2 * n] += g_otle[l] * sOP(
-                "adag", 1 + Nf + ot_mode_index(Nfragments, n, l)
+            H[2 * n, 2 * n] += g_otle[li] * sOP(
+                "adag", 1 + Nf + ot_mode_index(Nfragments, n, li)
             )
-            H[2 * n, 2 * n] += g_otle[l] * sOP(
-                "a", 1 + Nf + ot_mode_index(Nfragments, n, l)
+            H[2 * n, 2 * n] += g_otle[li] * sOP(
+                "a", 1 + Nf + ot_mode_index(Nfragments, n, li)
             )
 
     return H

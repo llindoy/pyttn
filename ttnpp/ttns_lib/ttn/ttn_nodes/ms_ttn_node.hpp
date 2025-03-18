@@ -451,6 +451,11 @@ public:
 public:
     void set_node_identity(){for(auto& data : m_data){data.set_identity();}}
     void set_node_identity(size_type i){m_data[i].set_identity();}
+    void set_interior_identity_random(size_type i, linalg::random_engine<backend>& rng)
+    {
+        ASSERT(!this->is_leaf(), "Function is only applicable for leaf state nodes.");
+        this->m_data[i].set_node_state(0, rng, true);
+    }
     void set_node_random(linalg::random_engine<backend>& rng){for(size_type i = 0; i < this->nset(); ++i){m_data[i].set_random(rng);}}
     void set_node_random(size_type i, linalg::random_engine<backend>& rng){rng.fill_random(m_data[i]);}
 

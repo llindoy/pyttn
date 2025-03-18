@@ -186,16 +186,16 @@ public:
 
 
     template <typename int_type> 
-    void set_state(size_type sind, const std::vector<int_type>& si){CALL_AND_RETHROW(this->_set_state(si, sind));}
+    void set_state(size_type sind, const std::vector<int_type>& si, bool randomise_internal=true){CALL_AND_RETHROW(this->_set_state(si, sind, randomise_internal, randomise_internal));}
 
     template <typename U, typename be> 
-    void set_product(size_type sind, const std::vector<linalg::vector<U, be> >& ps){CALL_AND_RETHROW(this->_set_product(ps, sind));}
+    void set_product(size_type sind, const std::vector<linalg::vector<U, be> >& ps, bool randomise_internal=true){CALL_AND_RETHROW(this->_set_product(ps, sind, randomise_internal));}
 
     template <typename Rvec> 
-    void sample_product_state(size_type sind, std::vector<size_t>& state, const std::vector<Rvec>& relval){CALL_AND_RETHROW(this->_sample_product_state(state, relval, sind));}
+    void sample_product_state(size_type sind, std::vector<size_t>& state, const std::vector<Rvec>& relval, bool randomise_internal=true){CALL_AND_RETHROW(this->_sample_product_state(state, relval, sind));}
 
     template <typename U, typename int_type> 
-    void set_state(const std::vector<U>& coeff, const std::vector<std::vector<int_type>>& si, bool random_unoccupied_initialisation=false)
+    void set_state(const std::vector<U>& coeff, const std::vector<std::vector<int_type>>& si, bool random_unoccupied_initialisation=false, bool randomise_internal=true)
     {
         ASSERT(coeff.size() == si.size() && coeff.size() == this->nset(), "Cannot set ttnbase to specified state.  Input arrays are not the correct size.");
 
@@ -215,7 +215,7 @@ public:
         for(size_type set_index = 0; set_index < this->nset(); ++set_index)
         {
             //set each of the states
-            this->initialise_logical_tensors_product_state(set_index);
+            this->initialise_logical_tensors_product_state(set_index, randomise_internal);
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
@@ -231,7 +231,7 @@ public:
     }
 
     template <typename V, typename U, typename be> 
-    void set_product(const std::vector<U>& coeff, const std::vector<std::vector<linalg::vector<V, be> > >& ps)
+    void set_product(const std::vector<U>& coeff, const std::vector<std::vector<linalg::vector<V, be> > >& ps, bool randomise_internal=true)
     {
         ASSERT(coeff.size() == ps.size() && coeff.size() == this->nset(), "Cannot set ttnbase to specified state.  Input arrays are not the correct size.");
 
@@ -246,7 +246,7 @@ public:
         for(size_type set_index = 0; set_index < this->nset(); ++set_index)
         {
             //set each of the states
-            this->initialise_logical_tensors_product_state(set_index);
+            this->initialise_logical_tensors_product_state(set_index, randomise_internal);
 
             for(size_type i = 0; i < this->nmodes(); ++i)
             {
@@ -261,7 +261,7 @@ public:
         this->force_set_orthogonality_centre(0);
     }
 
-    void set_purification()
+    void set_purification(bool randomise_internal=true)
     {
         ASSERT(this->is_purification(), "Set state requires a purification state.");
         this->zero();
@@ -275,7 +275,7 @@ public:
             size_type set_index = i*ns+j;
 
             //set each of the states
-            this->initialise_logical_tensors_product_state(set_index);
+            this->initialise_logical_tensors_product_state(set_index, randomise_internal);
 
             for(size_type mode = 0; mode < this->nmodes(); ++mode)
             {

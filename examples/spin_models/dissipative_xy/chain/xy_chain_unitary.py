@@ -2,142 +2,115 @@ import os
 
 os.environ["OMP_NUM_THREADS"] = "1"
 
+import argparse
 import numpy as np
 import time
-import sys
 import h5py
-import scipy
 import copy
 
-sys.path.append("../../../")
-from pyttn import *
+import pyttn
 from pyttn import oqs, utils
 from numba import jit
 
 
-def build_topology(Ns, ds, chi, chiS, chiB, nbose, b_mode_dims, degree):
+def build_topology(Ns, ds, chi, chiS, chiB, nbose, discbath, degree):
     lchi = [chiS for i in range(Ns)]
-    topo = ntreeBuilder.mps_tree(lchi, chi)
+    topo = pyttn.ntreeBuilder.mps_tree(lchi, chi)
 
     leaf_indices = topo.leaf_indices()
     for li in leaf_indices:
         topo.at(li).insert(ds)
-        if len(b_mode_dims) != 0:
-            if degree == 1:
-                ntreeBuilder.mps_subtree(
-                    topo.at(li), b_mode_dims, chiB, min(chiB, nbose)
-                )
-            else:
-                ntreeBuilder.mlmctdh_subtree(topo.at(li), b_mode_dims, degree, chiB)
 
-    ntreeBuilder.sanitise(topo)
+        #now if the discrete bath object has been created we add the bath modes to the tre
+        if discbath is not None:
+            _ = discbath.add_bath_tree(topo.at(li), degree, chiB, min(chiB, nbose))
+
+    pyttn.ntreeBuilder.sanitise(topo)
     return topo
 
 
-def xychain_dynamics(
-    Ns,
-    Nb,
-    alpha,
-    wc,
-    eta,
-    chi,
-    chiS,
-    chiB,
-    nbose,
-    dt,
-    nbose_min=None,
-    beta=None,
-    nstep=1,
-    Nw=4.0,
-    geom="ipchain",
-    ofname="xychain.h5",
-    degree=2,
-    adaptive=True,
-    spawning_threshold=2e-4,
-    unoccupied_threshold=1e-4,
-    nunoccupied=0,
-    use_mode_combination=True,
-    nbmax=2,
-    nhilbmax=1024,
-):
-    t = np.arange(nstep + 1) * dt
+def output_results(ofname, t, res, maxchi, timing):
+    h5 = h5py.File(ofname, "w")
+    h5.create_dataset("t", data=t)
+    for si in range(res.shape[0]):
+        h5.create_dataset("Sz" + str(si), data=np.real(res[si, :]))
+    h5.create_dataset("maxchi", data=maxchi)
+    h5.create_dataset("time", data=np.array([timing]))
+    h5.close()
 
+def run_first_step(sweep, A, h, dt, nstep=5, nscale=1e-5):
+    tp = 0
+    ts = np.logspace(np.log10(dt * nscale), np.log10(dt), nstep)
+    for i in range(nstep):
+        dti = ts[i] - tp
+        print(ts, dt)
+        sweep.dt = dti
+        sweep.step(A, h)
+        tp = ts[i]
+
+def xychain_dynamics(Ns, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_min=4, beta=None, 
+                     nstep=1, Nw=4.0, Ecut=10.0, geom="ipchain", ofname="xychain.h5", degree=2, 
+                     adaptive=True, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0, nbmax=2, nhilbmax=1024):
     # setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
     def J(w):
         return 2 * np.pi * alpha * w * np.exp(-np.abs(w / wc) ** 2)
 
     # setup the system information object.  Additionally work out the local hilbert space dimensions os that we can set up the system mode informmation
-    tree_mode_dims = []
-    sysinf = system_modes(1)
-    sysinf[0] = spin_mode(2)
+    sysinf = pyttn.system_modes(1)
+    sysinf[0] = pyttn.spin_mode(2)
 
-    Nbc = 0
+    discbath=None
+    bsys=None
+
     if Nb != 0:
         # set up the open quantum system bath object
         bath = oqs.BosonicBath(J, beta=beta)
 
         # discretise the bath correleation function using the orthonormal polynomial based cutoff
-        g, w = bath.discretise(
-            oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw * wc), Nw * wc)
-        )
+        g, w = bath.discretise(oqs.OrthopolDiscretisation(Nb, bath.find_wmin(Nw * wc), Nw * wc))
+
+        # set up the discretised bath object
+        discbath = oqs.DiscreteBosonicBath(g, w)
+
+        # truncate the system bath modes
+        discbath.truncate_modes(utils.EnergyTruncation(Ecut * wc, Lmax=nbose, Lmin=nbose_min))
+
+        # set up the mode combination informatino
+        if nbmax > 1:
+            mode_comb = utils.ModeCombination(nbmax, nhilbmax)
+            bsys = discbath.system_information(mode_comb)
+        else:
+            bsys = discbath.system_information()
 
     # set up the total Hamiltonian
     N = Nb + 1
-    H = SOP(Ns * N)
+    H = pyttn.SOP(Ns * N)
 
-    frequencies = None
     # add on the system part of the system bath Hamiltonian
     for si in range(Ns):
         skip = si * (Nb + 1)
-        H += sOP("sz", skip)
-        print("adding spin " + str(si))
+        H += pyttn.sOP("sz", skip)
 
         if si + 1 != Ns:
             skip2 = (si + 1) * (Nb + 1)
-            H += (1 - eta) * sOP("sx", skip) * sOP("sx", skip2) + (1 + eta) * sOP(
-                "sy", skip
-            ) * sOP("sy", skip2)
-
-        binds = [skip + 1 + i for i in range(Nb)]
+            H += (1 - eta) * pyttn.sOP("sx", skip) * pyttn.sOP("sx", skip2) + (1 + eta) * pyttn.sOP("sy", skip) * pyttn.sOP("sy", skip2)
 
         if Nb != 0:
             # add on the bath and system bath contributions of the bath hamiltonian
-            H, frequencies = oqs.unitary.add_bosonic_bath_hamiltonian(
-                H,
-                sOP("sz", skip),
-                g,
-                w,
-                geom=geom,
-                return_frequencies=True,
-                binds=binds,
-            )
+            H = discbath.add_system_bath_hamiltonian(H, pyttn.sOP("sz", 0), geom=geom, bskip=skip+1)
 
     print("hamiltonian string setup")
 
+    #set up the total system information object
     if Nb != 0:
-        # set up the local hilbert space dimensions of the bosonic modes
-        b_mode_dims = [
-            min(max(4, int(wc * 20 / frequencies[i])), nbose) for i in range(Nb)
-        ]
-        bsys = system_modes(Nb)
-        for i in range(Nb):
-            bsys[i] = boson_mode(b_mode_dims[i])
+        sysinf = pyttn.combine_systems(sysinf, bsys)
 
-        # set up the mode combination informatino
-        mode_comb = utils.ModeCombination(nbmax, nhilbmax)
-        bsys = mode_comb(bsys)
-        sysinf = combine_systems(sysinf, bsys)
-
-        for ind in range(len(bsys)):
-            tree_mode_dims.append(bsys[ind].lhd())
-
-        Nbc = len(bsys)
-
+    site_info = copy.deepcopy(sysinf)
     sysinfo = copy.deepcopy(sysinf)
     # and add on the system information objects for the remaining spins
     for i in range(Ns - 1):
-        sysinfo = combine_systems(sysinfo, sysinf)
+        sysinfo = pyttn.combine_systems(sysinfo, sysinf)
 
     sysinf = sysinfo
 
@@ -148,48 +121,43 @@ def xychain_dynamics(
     chiS0 = chiS
     chiB0 = chiB
     if adaptive:
-        chi0 = 8
-        chiS0 = 8
-        chiB0 = 8
-    chi0 = min(chi0, chi)
-    chiS0 = min(chiS0, chiS)
-    chiB0 = min(chiB0, chiB)
+        chi0 = min(8, chi0)
+        chiS0 = min(8, chiS0)
+        chiB0 = min(8, chiB0)
 
     # now build the topology and capacity arrays
-    topo = build_topology(Ns, 2, chi0, chiS0, chiB0, nbose, tree_mode_dims, degree)
-    capacity = build_topology(Ns, 2, chi, chiS, chiB, nbose, tree_mode_dims, degree)
+    topo = build_topology(Ns, 2, chi0, chiS0, chiB0, nbose, discbath, degree)
+    capacity = build_topology(Ns, 2, chi, chiS, chiB, nbose, discbath, degree)
 
     print("topology built")
 
-    # utils.visualise_tree(topo)
-    # plt.show()
-
     # construct and initialise the ttn wavefunction
-    A = ttn(topo, capacity, dtype=np.complex128)
-    state = [0 for i in range(Ns * (Nbc + 1))]
-    state[(Ns - 1) // 2 * (Nbc + 1)] = 1
+    A = pyttn.ttn(topo, capacity, dtype=np.complex128)
+    #set up the spin excitation on just the central site of the chain
+    state = [0 for i in range(Ns * (site_info.nmodes()))]
+    state[(Ns - 1) // 2 * (site_info.nmodes())] = 1
     A.set_state(state)
 
     print("psi0 built")
     # set up the Hamiltonian as a sop object
-    h = sop_operator(H, A, sysinf)
+    h = pyttn.sop_operator(H, A, sysinf)
     print("H built")
 
     # construct objects need for evaluating observables
-    mel = matrix_element(A)
+    mel = pyttn.matrix_element(A)
 
     # set up the observable to measure
     ops = []
     for si in range(Ns):
-        skip = si * (Nb + 1)
-        ops.append(site_operator(sOP("sz", skip), sysinf))
+        skip = si * (site_info.nprimitive_modes())
+        ops.append(pyttn.site_operator(pyttn.sOP("sz", skip), sysinf))
 
     # set up tdvp sweeping algorithm parameters
     sweep = None
     if not adaptive:
-        sweep = tdvp(A, h, krylov_dim=12)
+        sweep = pyttn.tdvp(A, h, krylov_dim=12)
     else:
-        sweep = tdvp(A, h, krylov_dim=12, subspace_neigs=6, expansion="subspace")
+        sweep = pyttn.tdvp(A, h, krylov_dim=12, subspace_neigs=6, expansion="subspace")
         sweep.spawning_threshold = spawning_threshold
         sweep.unoccupied_threshold = unoccupied_threshold
         sweep.minimum_unoccupied = nunoccupied
@@ -197,6 +165,7 @@ def xychain_dynamics(
     sweep.dt = dt
     sweep.coefficient = -1.0j
 
+    t = np.arange(nstep + 1) * dt
     t1 = time.time()
     # run dynamics and measure properties storing them in a file
     res = np.zeros((Ns, nstep + 1), dtype=np.complex128)
@@ -208,14 +177,7 @@ def xychain_dynamics(
     # perform the first timestep using a logarithmic discretisation of time over this period.
     # This can be useful to allow for suitable adaptation of weakly occupied single particle
     # functions through the initial time point.
-    tp = 0
-    ts = np.logspace(np.log10(dt * 1e-5), np.log10(dt), 5)
-    for i in range(5):
-        dti = ts[i] - tp
-        sweep.dt = dti
-        sweep.step(A, h)
-        tp = ts[i]
-    i = 1
+    run_first_step(sweep, A, h, dt, nstep=5)
 
     # set the values after the first timestep
     for si in range(Ns):
@@ -234,29 +196,15 @@ def xychain_dynamics(
         t2 = time.time()
         # outputting results to files every 10 steps
         if i % 1 == 0:
-            h5 = h5py.File(ofname, "w")
-            h5.create_dataset("t", data=(np.arange(nstep + 1) * dt))
-            for si in range(Ns):
-                h5.create_dataset("Sz" + str(si), data=np.real(res[si, :]))
-            h5.create_dataset("maxchi", data=maxchi)
-            h5.create_dataset("time", data=np.array([t2 - t1]))
-            h5.close()
+            output_results(ofname, t, res, maxchi, t2-t1)
+
 
     t2 = time.time()
     # and finally dump everything to file at the end of the simulation
-    h5 = h5py.File(ofname, "w")
-    h5.create_dataset("t", data=(np.arange(nstep + 1) * dt))
-    for si in range(Ns):
-        h5.create_dataset("Sz" + str(si), data=np.real(res[si, :]))
-    h5.create_dataset("maxchi", data=maxchi)
-    h5.create_dataset("time", data=np.array([t2 - t1]))
-    h5.close()
+    output_results(ofname, t, res, maxchi, t2-t1)
 
 
 if __name__ == "__main__":
-
-    import argparse
-
     parser = argparse.ArgumentParser(
         description="Dynamics of the zero temperature spin boson model with"
     )
@@ -275,6 +223,7 @@ if __name__ == "__main__":
     # maximum bosonic hilbert space dimension
     parser.add_argument("--nbose", type=int, default=30)
     parser.add_argument("--nbose_min", type=int, default=6)
+    parser.add_argument("--ecut", type=float, default=10)
 
     # mode combination parameters
     parser.add_argument("--nbmax", type=int, default=4)
@@ -309,28 +258,7 @@ if __name__ == "__main__":
 
     nstep = int(args.tmax / args.dt) + 1
 
-    xychain_dynamics(
-        args.Ns,
-        args.N,
-        args.alpha,
-        args.wc,
-        args.eta,
-        args.chi,
-        args.chiS,
-        args.chiB,
-        args.nbose,
-        args.dt,
-        beta=args.beta,
-        nstep=nstep,
-        geom=args.geom,
-        ofname=args.fname,
-        nunoccupied=args.nunoccupied,
-        spawning_threshold=args.spawning_threshold,
-        unoccupied_threshold=args.unoccupied_threshold,
-        adaptive=args.subspace,
-        degree=args.degree,
-        nbose_min=args.nbose_min,
-        use_mode_combination=True,
-        nbmax=args.nbmax,
-        nhilbmax=args.nhilbmax,
-    )
+    xychain_dynamics(args.Ns, args.N, args.alpha, args.wc, args.eta, args.chi, args.chiS, args.chiB, args.nbose, args.dt, 
+                     beta=args.beta, nstep=nstep, Ecut=args.ecut, geom=args.geom, ofname=args.fname, nunoccupied=args.nunoccupied,
+                     spawning_threshold=args.spawning_threshold, unoccupied_threshold=args.unoccupied_threshold, adaptive=args.subspace,
+                     degree=args.degree, nbose_min=args.nbose_min, nbmax=args.nbmax, nhilbmax=args.nhilbmax)
