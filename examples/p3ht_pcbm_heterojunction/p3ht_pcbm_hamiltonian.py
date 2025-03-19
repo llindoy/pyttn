@@ -1,3 +1,16 @@
+# This files is part of the pyTTN package.
+#(C) Copyright 2025 NPL Management Limited
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License
+
+
 import numpy as np
 from pyttn import SOP, sOP
 
@@ -126,11 +139,7 @@ def hamiltonian():
     # now we add on the vibronic couplings to the fullerene super-particle modes
     for n in range(Nfragments):
         for li in range(Nf):
-            H += (
-                gf[li]
-                * sOP("|CS%d><CS%d|" % (n, n), 0)
-                * (sOP("adag", 1 + 1 + li) + sOP("a", 1 + 1 + li))
-            )
+            H += ( gf[li] * sOP("|CS%d><CS%d|" % (n, n), 0) * (sOP("adag", 1 + 1 + li) + sOP("a", 1 + 1 + li)))
 
     # now we add on the oligothiophene modes
     for n in range(Nfragments):

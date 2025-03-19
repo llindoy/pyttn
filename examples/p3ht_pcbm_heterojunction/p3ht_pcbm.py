@@ -1,3 +1,16 @@
+# This files is part of the pyTTN package.
+#(C) Copyright 2025 NPL Management Limited
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License
+
+
 import os
 
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -51,9 +64,7 @@ def build_ttn_tree(mdims, chi1, chi2, ldims, degree=2, use_multiset=False):
     chim1 = min(chi1, 8)
     chim2 = min(chi2, 8)
     if use_multiset:
-        topo = ntree(
-            "(1(%d(%d(128)))(%d(%d)(%d)))" % (chi1, ldims[0], chi1, chi1, chi1)
-        )
+        topo = ntree("(1(%d(%d(128)))(%d(%d)(%d)))" % (chi1, ldims[0], chi1, chi1, chi1))
 
         ntreeBuilder.mlmctdh_subtree(
             topo()[0],
@@ -159,19 +170,9 @@ def output_results(ofname, timepoints, res, maxchi, runtime):
     h5.close()
 
 
-def p3ht_pcbm_single_set(
-    topo,
-    capacity,
-    mode_dims,
-    tmax=200,
-    dt=0.25,
-    adaptive=True,
-    spawning_threshold=1e-6,
-    unoccupied_threshold=1e-4,
-    nunoccupied=0,
-    ofname="p3ht_pcbm.h5",
-    output_skip=1,
-):
+def p3ht_pcbm_single_set(topo, capacity, mode_dims, tmax=200, dt=0.25, adaptive=True,
+                         spawning_threshold=1e-6, unoccupied_threshold=1e-4, nunoccupied=0,
+                         ofname="p3ht_pcbm.h5", output_skip=1):
     from p3ht_pcbm_hamiltonian import hamiltonian
 
     """Function for performing the dynamics of the single set p3ht_pcbm model
@@ -415,7 +416,6 @@ def p3ht_pcbm_dynamics(
         p3ht_pcbm_multiset(
             topo, mode_dims, tmax=tmax, dt=dt, ofname=ofname, output_skip=output_skip
         )
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pyttn test")
