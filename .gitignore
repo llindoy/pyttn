@@ -29,8 +29,8 @@
 !examples
 !examples/*.py
 !examples/*/
-!examples/anderson_impurity_models/
-!examples/anderson_impurity_models/*.py
+!examples/anderson_impurity_model/
+!examples/anderson_impurity_model/*.py
 !examples/spin_models/
 !examples/spin_models/dissipative_xy/
 !examples/spin_models/dissipative_xy/cayley_tree/
