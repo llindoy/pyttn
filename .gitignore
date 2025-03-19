@@ -29,6 +29,7 @@
 !examples
 !examples/*.py
 !examples/*/
+!examples/anderson_impurity_models/
 !examples/anderson_impurity_models/*.py
 !examples/spin_models/
 !examples/spin_models/dissipative_xy/
