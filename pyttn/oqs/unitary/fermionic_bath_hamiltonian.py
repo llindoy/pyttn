@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -52,21 +52,28 @@ def add_fermionic_chain_bath_hamiltonian(H, Sp, Sm, t, e, binds=None, bskip=1):
     return H
 
 
-def add_fermionic_bath_hamiltonian(H, Sp, Sm, g, w, binds=None, geom="star", bskip=1):
+def add_fermionic_bath_hamiltonian(
+    H, Sp, Sm, g, w, binds=None, geom="star", bskip=1, return_frequencies=False
+):
     if geom == "star":
-        return (
-            add_fermionic_star_bath_hamiltonian(
+        if not return_frequencies:
+            return add_fermionic_star_bath_hamiltonian(
                 H, Sp, Sm, g, w, binds=binds, bskip=bskip
-            ),
-            w,
-        )
+            )
+        else:
+            return add_fermionic_star_bath_hamiltonian(
+                H, Sp, Sm, g, w, binds=binds, bskip=bskip
+            ), w
+
     elif geom == "chain":
         t, e = chain_map(g, w)
-        return (
-            add_fermionic_chain_bath_hamiltonian(
+        if not return_frequencies:
+            return add_fermionic_chain_bath_hamiltonian(
                 H, Sp, Sm, t, e, binds=binds, bskip=bskip
-            ),
-            e,
-        )
+            )
+        else:
+            return add_fermionic_chain_bath_hamiltonian(
+                H, Sp, Sm, t, e, binds=binds, bskip=bskip
+            ), e
     else:
         raise RuntimeError("Cannot add bath Hamiltonian geometry not recognised.")

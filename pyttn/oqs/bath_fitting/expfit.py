@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,6 +13,7 @@
 import numpy as np
 from .ESPRIT import ESPRIT
 from .aaa import AAA_algorithm
+from .softmspace import softmspace
 
 
 class ExpFitDecomposition:
@@ -84,22 +85,8 @@ class ESPRITDecomposition(ExpFitDecomposition):
         return dk, zk, Ctres
 
 
-def __softmspace(start, stop, N, beta=1, endpoint=True):
-    start = (np.log(1 - (np.exp(-beta * start))) + beta * start) / beta
-    # start = np.log(np.exp(beta*start)-1)/beta
-    stop = (np.log(1 - (np.exp(-beta * stop))) + beta * stop) / beta
-    # stop = np.log(np.exp(beta*stop)-1)/beta
-
-    dx = (stop - start) / N
-    if endpoint:
-        dx = (stop - start) / (N - 1)
-
-    return np.logaddexp(beta * (np.arange(N) * dx + start), 0) / beta
-    # return np.log(np.exp(beta*(np.arange(N)*dx  + start))+1)/beta
-
-
 def __generate_grid_points(N, wc, wmin=1e-9):
-    Z1 = __softmspace(wmin, wc, N // 2)
+    Z1 = softmspace(wmin, wc, N // 2)
     nZ1 = -np.flip(Z1)
     Z = np.concatenate((nZ1, Z1))
     return Z

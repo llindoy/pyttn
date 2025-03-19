@@ -37,9 +37,8 @@ def plot(fnames, params):
         for par, label in zip(pars, params):
             try:
                 plt.plot(
-                    t, np.real(par) / np.real(par[0]), "-", label=label + "_" + fname
+                    t, np.real(par) , "-", label=label + "_" + fname
                 )
-                # plt.plot(t, np.real(par)/np.amax(np.real(par)), '-', label=label+'_'+fname)
             except:
                 print("Failed to plot: " + label)
         c += 1
