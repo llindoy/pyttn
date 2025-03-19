@@ -5,10 +5,12 @@
 !/.gitignore
 !/.gitlab-ci.yml
 !/CMakeLists.txt
-!/LICENSE.txt
+!/LICENSE
 !/pyproject.toml
 !/pytest.ini
 !/README.md
+!/CODE_OF_CONDUCT.md
+!/CONTRIBUTING.md
 !/setup.py
 
 #now we add the cmake folder and its files
@@ -27,7 +29,8 @@
 !examples
 !examples/*.py
 !examples/*/
-!examples/anderson_impurity_models/*.py
+!examples/anderson_impurity_model/
+!examples/anderson_impurity_model/*.py
 !examples/spin_models/
 !examples/spin_models/dissipative_xy/
 !examples/spin_models/dissipative_xy/cayley_tree/
@@ -40,6 +43,8 @@
 !examples/oqs/
 !examples/oqs/spin_boson/
 !examples/oqs/spin_boson/*.py
+!examples/oqs/spin_boson/METTS/
+!examples/oqs/spin_boson/METTS/*.py
 !examples/scaling/*.py
 !examples/scaling/spin_boson_model/
 !examples/scaling/spin_boson_model/*.py

@@ -1,5 +1,19 @@
-#ifndef TTNS_OPERATOR_NODE_CONTRACTION_INFO_HPP
-#define TTNS_OPERATOR_NODE_CONTRACTION_INFO_HPP
+/**
+ * This files is part of the pyTTN package.
+ * (C) Copyright 2025 NPL Management Limited
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
+ */
+
+#ifndef PYTTN_TTNS_LIB_OPERATORS_OPERATOR_CONTRACTION_INFO_HPP_
+#define PYTTN_TTNS_LIB_OPERATORS_OPERATOR_CONTRACTION_INFO_HPP_
 
 #include <common/exception_handling.hpp>
 #include "mf_index.hpp"
@@ -8,174 +22,182 @@
 namespace ttns
 {
 
-template <typename T> 
-class operator_contraction_info 
-{
-public:
-    using size_type = size_t;
-    using real_type = typename tmp::get_real_type<T>::type; 
-
-    using accum_coeff_int_type = std::vector<literal::coeff<T>>;
-    using accum_coeff_type = std::vector<T>;
-
-    using spf_index_type = std::vector<std::vector<std::array<size_type, 2>>>;
-    using mf_index_type = std::vector<mf_index<size_type>>;
-
-    template <typename Y, typename V> friend class operator_info;
-public:
-    operator_contraction_info() : m_is_identity_spf(false), m_is_identity_mf(false), m_is_time_dependent(false) {}
-    operator_contraction_info(const operator_contraction_info& o) = default;
-    operator_contraction_info(operator_contraction_info&& o) = default;
-
-
-    operator_contraction_info(const spf_index_type& spf, const mf_index_type& mf, const literal::coeff<T>& c, const accum_coeff_int_type& spf_c, const accum_coeff_int_type& mf_c, bool idspf, bool idmf) 
-      :  m_is_identity_spf(idspf), m_is_identity_mf(idmf), m_is_time_dependent(false), m_spf_index(spf), m_mf_index(mf), _m_coeff(c), _m_spf_coeff(spf_c), _m_mf_coeff(mf_c)
+    template <typename T>
+    class operator_contraction_info
     {
-        ASSERT(m_spf_index.size() == _m_spf_coeff.size() || m_mf_index.size() == _m_mf_coeff.size(), 
-             "Failed to construct operator contraction info object.");
+    public:
+        using size_type = size_t;
+        using real_type = typename tmp::get_real_type<T>::type;
 
-        m_spf_coeff.resize(_m_spf_coeff.size());
-        m_mf_coeff.resize(_m_mf_coeff.size());
+        using accum_coeff_int_type = std::vector<literal::coeff<T>>;
+        using accum_coeff_type = std::vector<T>;
 
-        real_type t(0.0);
-        update_coefficients(t, true);
-    }
+        using spf_index_type = std::vector<std::vector<std::array<size_type, 2>>>;
+        using mf_index_type = std::vector<mf_index<size_type>>;
 
-    operator_contraction_info& operator=(const operator_contraction_info& o) = default;
-    operator_contraction_info& operator=(operator_contraction_info&& o) = default;
+        template <typename Y, typename V>
+        friend class operator_info;
 
-    void resize_indexing(size_type nspfterms, size_type nmfterms)
-    {
-        m_spf_index.resize(nspfterms);
-        m_mf_index.resize(nmfterms);  
-    }
-    void resize_indexing(const std::vector<size_type>& spfsize, const std::vector<size_type>& mfsize)
-    {
-        m_spf_index.resize(spfsize.size());   for(size_type i=0; i<spfsize.size(); ++i){m_spf_index.resize(spfsize[i]);}
-        m_mf_index.resize(mfsize.size());   for(size_type i=0; i<mfsize.size(); ++i){m_mf_index[i].resize(mfsize[i]);}
-    }
+    public:
+        operator_contraction_info() : m_is_identity_spf(false), m_is_identity_mf(false), m_is_time_dependent(false) {}
+        operator_contraction_info(const operator_contraction_info &o) = default;
+        operator_contraction_info(operator_contraction_info &&o) = default;
 
-    void clear() 
-    {
-        CALL_AND_HANDLE(_m_spf_coeff.clear(), "Failed to clear the coefficient array.");
-        CALL_AND_HANDLE(_m_mf_coeff.clear(), "Failed to clear the coefficient array.");
-        CALL_AND_HANDLE(m_spf_coeff.clear(), "Failed to clear the coefficient array.");
-        CALL_AND_HANDLE(m_mf_coeff.clear(), "Failed to clear the coefficient array.");
-        CALL_AND_HANDLE(m_spf_index.clear(), "Failed to clear spf object.");
-        CALL_AND_HANDLE(m_mf_index.clear(), "Failed to clear mf object.");
-        m_is_identity_spf = false;
-        m_is_identity_mf = false;
-    }
-
-    void update_coefficients(real_type t, bool force_update = true)
-    {
-        if(_m_coeff.is_time_dependent() || force_update)
+        operator_contraction_info(const spf_index_type &spf, const mf_index_type &mf, const literal::coeff<T> &c, const accum_coeff_int_type &spf_c, const accum_coeff_int_type &mf_c, bool idspf, bool idmf)
+            : m_is_identity_spf(idspf), m_is_identity_mf(idmf), m_is_time_dependent(false), m_spf_index(spf), m_mf_index(mf), _m_coeff(c), _m_spf_coeff(spf_c), _m_mf_coeff(mf_c)
         {
-            m_coeff = _m_coeff(t);
+            ASSERT(m_spf_index.size() == _m_spf_coeff.size() || m_mf_index.size() == _m_mf_coeff.size(),
+                   "Failed to construct operator contraction info object.");
+
+            m_spf_coeff.resize(_m_spf_coeff.size());
+            m_mf_coeff.resize(_m_mf_coeff.size());
+
+            real_type t(0.0);
+            update_coefficients(t, true);
         }
-        for(size_t i = 0; i < m_spf_coeff.size(); ++i)
+
+        operator_contraction_info &operator=(const operator_contraction_info &o) = default;
+        operator_contraction_info &operator=(operator_contraction_info &&o) = default;
+
+        void resize_indexing(size_type nspfterms, size_type nmfterms)
         {
-            if(_m_spf_coeff[i].is_time_dependent() || force_update)
+            m_spf_index.resize(nspfterms);
+            m_mf_index.resize(nmfterms);
+        }
+        void resize_indexing(const std::vector<size_type> &spfsize, const std::vector<size_type> &mfsize)
+        {
+            m_spf_index.resize(spfsize.size());
+            for (size_type i = 0; i < spfsize.size(); ++i)
             {
-                m_spf_coeff[i] = _m_spf_coeff[i](t);
+                m_spf_index.resize(spfsize[i]);
+            }
+            m_mf_index.resize(mfsize.size());
+            for (size_type i = 0; i < mfsize.size(); ++i)
+            {
+                m_mf_index[i].resize(mfsize[i]);
             }
         }
-        for(size_t i = 0; i < m_mf_coeff.size(); ++i)
+
+        void clear()
         {
-            if(_m_mf_coeff[i].is_time_dependent() || force_update)
+            CALL_AND_HANDLE(_m_spf_coeff.clear(), "Failed to clear the coefficient array.");
+            CALL_AND_HANDLE(_m_mf_coeff.clear(), "Failed to clear the coefficient array.");
+            CALL_AND_HANDLE(m_spf_coeff.clear(), "Failed to clear the coefficient array.");
+            CALL_AND_HANDLE(m_mf_coeff.clear(), "Failed to clear the coefficient array.");
+            CALL_AND_HANDLE(m_spf_index.clear(), "Failed to clear spf object.");
+            CALL_AND_HANDLE(m_mf_index.clear(), "Failed to clear mf object.");
+            m_is_identity_spf = false;
+            m_is_identity_mf = false;
+        }
+
+        void update_coefficients(real_type t, bool force_update = true)
+        {
+            if (_m_coeff.is_time_dependent() || force_update)
             {
-                m_mf_coeff[i] = _m_mf_coeff[i](t);
+                m_coeff = _m_coeff(t);
+            }
+            for (size_t i = 0; i < m_spf_coeff.size(); ++i)
+            {
+                if (_m_spf_coeff[i].is_time_dependent() || force_update)
+                {
+                    m_spf_coeff[i] = _m_spf_coeff[i](t);
+                }
+            }
+            for (size_t i = 0; i < m_mf_coeff.size(); ++i)
+            {
+                if (_m_mf_coeff[i].is_time_dependent() || force_update)
+                {
+                    m_mf_coeff[i] = _m_mf_coeff[i](t);
+                }
             }
         }
-    }
 
-    const T& coeff() const{return m_coeff;}
+        const T &coeff() const { return m_coeff; }
 
-    const accum_coeff_type& spf_coeff() const{return m_spf_coeff;}
-    const T& spf_coeff(size_type i) const{return m_spf_coeff[i];}
-    bool time_dependent_spf_coeff(size_type i) const{return _m_spf_coeff[i].is_time_dependent();}
-    bool time_dependent_mf_coeff(size_type i) const{return _m_mf_coeff[i].is_time_dependent();}
-    bool time_dependent_coeff() const{return _m_coeff.is_time_dependent();}
+        const accum_coeff_type &spf_coeff() const { return m_spf_coeff; }
+        const T &spf_coeff(size_type i) const { return m_spf_coeff[i]; }
+        bool time_dependent_spf_coeff(size_type i) const { return _m_spf_coeff[i].is_time_dependent(); }
+        bool time_dependent_mf_coeff(size_type i) const { return _m_mf_coeff[i].is_time_dependent(); }
+        bool time_dependent_coeff() const { return _m_coeff.is_time_dependent(); }
 
-    const accum_coeff_type& mf_coeff() const{return m_mf_coeff;}
-    const T& mf_coeff(size_type i) const{return m_mf_coeff[i];}
+        const accum_coeff_type &mf_coeff() const { return m_mf_coeff; }
+        const T &mf_coeff(size_type i) const { return m_mf_coeff[i]; }
 
-    const spf_index_type& spf_indexing() const{return m_spf_index;}
-    const mf_index_type& mf_indexing() const{return m_mf_index;}
-    
-    size_type nspf_terms() const{return m_spf_index.size();}
-    size_type nmf_terms() const{return m_mf_index.size();}
-    size_type nterms() const{return m_spf_index.size() > m_mf_index.size() ? m_spf_index.size() : m_mf_index.size();}
+        const spf_index_type &spf_indexing() const { return m_spf_index; }
+        const mf_index_type &mf_indexing() const { return m_mf_index; }
 
-    bool is_identity_spf() const{return m_is_identity_spf;}
-    bool is_identity_mf() const{return m_is_identity_mf;}
-    bool is_time_dependent() const{return m_is_time_dependent;}
-    void set_is_time_dependent(bool val){m_is_time_dependent = val;}
+        size_type nspf_terms() const { return m_spf_index.size(); }
+        size_type nmf_terms() const { return m_mf_index.size(); }
+        size_type nterms() const { return m_spf_index.size() > m_mf_index.size() ? m_spf_index.size() : m_mf_index.size(); }
+
+        bool is_identity_spf() const { return m_is_identity_spf; }
+        bool is_identity_mf() const { return m_is_identity_mf; }
+        bool is_time_dependent() const { return m_is_time_dependent; }
+        void set_is_time_dependent(bool val) { m_is_time_dependent = val; }
 
 #ifdef CEREAL_LIBRARY_FOUND
-public:
-    template <typename archive>
-    void serialize(archive& ar)
-    {
-        CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", m_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
-        CALL_AND_HANDLE(ar(cereal::make_nvp("spf_coeff", m_spf_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
-        CALL_AND_HANDLE(ar(cereal::make_nvp("mf_coeff", m_mf_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
+    public:
+        template <typename archive>
+        void serialize(archive &ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", m_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("spf_coeff", m_spf_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("mf_coeff", m_mf_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
 
-        CALL_AND_HANDLE(ar(cereal::make_nvp("eval_coeff", _m_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
-        CALL_AND_HANDLE(ar(cereal::make_nvp("eval_spf_coeff", _m_spf_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
-        CALL_AND_HANDLE(ar(cereal::make_nvp("eval_mf_coeff", _m_mf_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eval_coeff", _m_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eval_spf_coeff", _m_spf_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eval_mf_coeff", _m_mf_coeff)), "Failed to serialise operator term object.  Error when serialising the coefficient.");
 
-        CALL_AND_HANDLE(ar(cereal::make_nvp("is_identity_spf", m_is_identity_spf)), "Failed to serialise operator term object.  Error when serialising whether the spf matrix is the identity.");
-        CALL_AND_HANDLE(ar(cereal::make_nvp("is_identity_mf", m_is_identity_mf)), "Failed to serialise operator term object.  Error when serialising whether the mf matrix is the identity.");
-        CALL_AND_HANDLE(ar(cereal::make_nvp("is_time_dependent", m_is_time_dependent)), "Failed to serialise operator term object.  Error when serialising whether the mf matrix is the identity.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("is_identity_spf", m_is_identity_spf)), "Failed to serialise operator term object.  Error when serialising whether the spf matrix is the identity.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("is_identity_mf", m_is_identity_mf)), "Failed to serialise operator term object.  Error when serialising whether the mf matrix is the identity.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("is_time_dependent", m_is_time_dependent)), "Failed to serialise operator term object.  Error when serialising whether the mf matrix is the identity.");
 
-        CALL_AND_HANDLE(ar(cereal::make_nvp("spf_index", m_spf_index)), "Failed to serialise operator term object.  Error when serialising the spf indexing info.");
-        CALL_AND_HANDLE(ar(cereal::make_nvp("mf_index", m_mf_index)), "Failed to serialise operator term object.  Error when serialising the mf indexing info.");
-    }
+            CALL_AND_HANDLE(ar(cereal::make_nvp("spf_index", m_spf_index)), "Failed to serialise operator term object.  Error when serialising the spf indexing info.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("mf_index", m_mf_index)), "Failed to serialise operator term object.  Error when serialising the mf indexing info.");
+        }
 #endif
 
-protected:
-    bool m_is_identity_spf;
-    bool m_is_identity_mf;
-    bool m_is_time_dependent;
+    protected:
+        bool m_is_identity_spf;
+        bool m_is_identity_mf;
+        bool m_is_time_dependent;
 
-    spf_index_type m_spf_index;
-    mf_index_type m_mf_index;
+        spf_index_type m_spf_index;
+        mf_index_type m_mf_index;
 
-    T m_coeff;
-    literal::coeff<T> _m_coeff;
+        T m_coeff;
+        literal::coeff<T> _m_coeff;
 
-    accum_coeff_type m_spf_coeff;
-    accum_coeff_type m_mf_coeff;
-    accum_coeff_int_type _m_spf_coeff;
-    accum_coeff_int_type _m_mf_coeff;
-};
+        accum_coeff_type m_spf_coeff;
+        accum_coeff_type m_mf_coeff;
+        accum_coeff_int_type _m_spf_coeff;
+        accum_coeff_int_type _m_mf_coeff;
+    };
 
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const operator_contraction_info<T>& t)
-{
-    os << "cr: " << t.coeff() << std::endl;
-    for(size_t i = 0; i < t.spf_coeff().size(); ++i)
+    template <typename T>
+    std::ostream &operator<<(std::ostream &os, const operator_contraction_info<T> &t)
     {
-        os << "c: " << t.spf_coeff(i) << " " << t.mf_coeff(i) << std::endl;
-    }
-    for(size_t i = 0; i < t.spf_indexing().size(); ++i)
-    {
-        os << "spf: ";
-        for(size_t j = 0; j < t.spf_indexing()[i].size(); ++j)
+        os << "cr: " << t.coeff() << std::endl;
+        for (size_t i = 0; i < t.spf_coeff().size(); ++i)
         {
-            os << "(" << t.spf_indexing()[i][j][0] << ", " << t.spf_indexing()[i][j][1] << ")" << " ";
-        }   
-        os << std::endl;
+            os << "c: " << t.spf_coeff(i) << " " << t.mf_coeff(i) << std::endl;
+        }
+        for (size_t i = 0; i < t.spf_indexing().size(); ++i)
+        {
+            os << "spf: ";
+            for (size_t j = 0; j < t.spf_indexing()[i].size(); ++j)
+            {
+                os << "(" << t.spf_indexing()[i][j][0] << ", " << t.spf_indexing()[i][j][1] << ")" << " ";
+            }
+            os << std::endl;
+        }
+        for (size_t i = 0; i < t.mf_indexing().size(); ++i)
+        {
+            os << "mf: " << t.mf_indexing()[i] << std::endl;
+        }
+        return os;
     }
-    for(size_t i = 0; i < t.mf_indexing().size(); ++i)
-    {
-        os << "mf: " << t.mf_indexing()[i] << std::endl;
-    }
-    return os;
-}
 
-}   //namespace ttns
+} // namespace ttns
 
-#endif  //TTNS_OPERATOR_NODE_DATA_HPP
-
+#endif // PYTTN_TTNS_LIB_OPERATORS_OPERATOR_CONTRACTION_INFO_HPP_

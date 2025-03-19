@@ -1,5 +1,19 @@
-#ifndef UTILS_IO_INPUT_WRAPPER_HPP_
-#define UTILS_IO_INPUT_WRAPPER_HPP_
+/**
+ * This files is part of the pyTTN package.
+ * (C) Copyright 2025 NPL Management Limited
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
+ */
+
+ #ifndef PYTTN_UTILS_IO_INPUT_WRAPPER_HPP_
+ #define PYTTN_UTILS_IO_INPUT_WRAPPER_HPP_
 
 #include <iostream>
 #include <sstream>
@@ -951,6 +965,6 @@ using IOWRAPPER = utils::io::input_wrapper<io::rapidjson_tag>;
 
 #endif //USE_RAPIDJSON//
 
-#endif
+#endif // PYTTN_UTILS_IO_INPUT_WRAPPER_HPP_
 
 

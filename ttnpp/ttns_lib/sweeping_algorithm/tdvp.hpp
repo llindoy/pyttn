@@ -1,5 +1,19 @@
-#ifndef TTNS_LIB_SWEEPING_ALGORITHM_TDVP_HPP
-#define TTNS_LIB_SWEEPING_ALGORITHM_TDVP_HPP
+/**
+ * This files is part of the pyTTN package.
+ * (C) Copyright 2025 NPL Management Limited
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
+ */
+
+#ifndef PYTTN_TTNS_LIB_SWEEPING_ALGORITHM_UPDATE_TDVP_HPP_
+#define PYTTN_TTNS_LIB_SWEEPING_ALGORITHM_UPDATE_TDVP_HPP_
 
 #include "sweeping_algorithm.hpp"
 
@@ -11,158 +25,154 @@
 namespace ttns
 {
 
-template <typename T, typename backend, template <typename, typename> class ttn_class>
-class _one_site_tdvp : public sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, single_site>
-{
-public:
-    using base_type =  sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, single_site>;
-
-    using update_type = typename base_type::update_type;
-    using subspace_type = typename base_type::subspace_type;
-    using environment_type = typename base_type::environment_type;
-
-    using update_params = typename update_type::parameter_list;
-    using subspace_params = typename subspace_type::parameter_list;
-    using environment_params = typename environment_type::parameter_list;
-
-    using size_type = typename base_type::size_type;
-    using real_type = typename base_type::real_type;
-
-    using ttn_type = ttn_class<T, backend>;
-    using env_container_type = typename base_type::env_container_type;
-    using env_node_type = typename base_type::env_node_type;
-    using env_data_type = typename base_type::env_data_type;
-    using env_type = typename base_type::env_type;
-
-public:
-    _one_site_tdvp() : base_type() {}
-    _one_site_tdvp(const ttn_type& A, const env_type& ham, size_type krylov_dim = 16, size_type nstep = 1, size_type num_threads = 1)   : base_type(A, ham, {krylov_dim, nstep}, {}, {}, num_threads){}
-
-    _one_site_tdvp(const _one_site_tdvp& o) = default;
-    _one_site_tdvp(_one_site_tdvp&& o) = default;
-
-    _one_site_tdvp& operator=(const _one_site_tdvp& o) = default;
-    _one_site_tdvp& operator=(_one_site_tdvp&& o) = default;
-
-    void initialise(const ttn_type& A, const env_type& ham, size_type krylov_dim = 16, size_type nstep = 1, size_type num_threads = 1)
+    template <typename T, typename backend, template <typename, typename> class ttn_class>
+    class _one_site_tdvp : public sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, single_site>
     {
-        CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, nstep}, {}, {}, num_threads));
-    }
-};
+    public:
+        using base_type = sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, single_site>;
 
-template <typename T, typename backend>
-using one_site_tdvp = _one_site_tdvp<T, backend, ttn>;
+        using update_type = typename base_type::update_type;
+        using subspace_type = typename base_type::subspace_type;
+        using environment_type = typename base_type::environment_type;
 
-template <typename T, typename backend>
-using multiset_one_site_tdvp = _one_site_tdvp<T, backend, ms_ttn>;
+        using update_params = typename update_type::parameter_list;
+        using subspace_params = typename subspace_type::parameter_list;
+        using environment_params = typename environment_type::parameter_list;
 
+        using size_type = typename base_type::size_type;
+        using real_type = typename base_type::real_type;
 
+        using ttn_type = ttn_class<T, backend>;
+        using env_container_type = typename base_type::env_container_type;
+        using env_node_type = typename base_type::env_node_type;
+        using env_data_type = typename base_type::env_data_type;
+        using env_type = typename base_type::env_type;
 
-template <typename T, typename backend, template <typename, typename> class ttn_class>
-class _adaptive_one_site_tdvp : public sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, variance_subspace_expansion>
-{
-public:
-    using base_type =  sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, variance_subspace_expansion>;
+    public:
+        _one_site_tdvp() : base_type() {}
+        _one_site_tdvp(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type num_threads = 1) : base_type(A, ham, {krylov_dim, nstep}, {}, {}, num_threads) {}
 
-    using update_type = typename base_type::update_type;
-    using subspace_type = typename base_type::subspace_type;
-    using environment_type = typename base_type::environment_type;
+        _one_site_tdvp(const _one_site_tdvp &o) = default;
+        _one_site_tdvp(_one_site_tdvp &&o) = default;
 
-    using update_params = typename update_type::parameter_list;
-    using subspace_params = typename subspace_type::parameter_list;
-    using environment_params = typename environment_type::parameter_list;
+        _one_site_tdvp &operator=(const _one_site_tdvp &o) = default;
+        _one_site_tdvp &operator=(_one_site_tdvp &&o) = default;
 
-    using size_type = typename base_type::size_type;
-    using real_type = typename base_type::real_type;
+        void initialise(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type num_threads = 1)
+        {
+            CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, nstep}, {}, {}, num_threads));
+        }
+    };
 
-    using ttn_type = ttn_class<T, backend>;
-    using env_container_type = typename base_type::env_container_type;
-    using env_node_type = typename base_type::env_node_type;
-    using env_data_type = typename base_type::env_data_type;
-    using env_type = typename base_type::env_type;
+    template <typename T, typename backend>
+    using one_site_tdvp = _one_site_tdvp<T, backend, ttn>;
 
-public:
-    _adaptive_one_site_tdvp() : base_type() {}
-    _adaptive_one_site_tdvp(const ttn_type& A, const env_type& ham, size_type krylov_dim = 16, size_type nstep = 1, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2, size_type num_threads = 1)   : base_type(A, ham, {krylov_dim, nstep}, {}, {eigensolver_krylov_dim, neigenvalues}, num_threads){}
+    template <typename T, typename backend>
+    using multiset_one_site_tdvp = _one_site_tdvp<T, backend, ms_ttn>;
 
-    _adaptive_one_site_tdvp(const _adaptive_one_site_tdvp& o) = default;
-    _adaptive_one_site_tdvp(_adaptive_one_site_tdvp&& o) = default;
-
-    _adaptive_one_site_tdvp& operator=(const _adaptive_one_site_tdvp& o) = default;
-    _adaptive_one_site_tdvp& operator=(_adaptive_one_site_tdvp&& o) = default;
-
-    void initialise(const ttn_type& A, const env_type& ham, size_type krylov_dim = 16, size_type nstep = 1, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2, size_type num_threads = 1)
+    template <typename T, typename backend, template <typename, typename> class ttn_class>
+    class _adaptive_one_site_tdvp : public sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, variance_subspace_expansion>
     {
-        CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, nstep}, {}, {eigensolver_krylov_dim, neigenvalues}, num_threads));
-    }
+    public:
+        using base_type = sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, variance_subspace_expansion>;
 
-    template <typename ... Args>
-    bool operator()(Args&& ... args)
+        using update_type = typename base_type::update_type;
+        using subspace_type = typename base_type::subspace_type;
+        using environment_type = typename base_type::environment_type;
+
+        using update_params = typename update_type::parameter_list;
+        using subspace_params = typename subspace_type::parameter_list;
+        using environment_params = typename environment_type::parameter_list;
+
+        using size_type = typename base_type::size_type;
+        using real_type = typename base_type::real_type;
+
+        using ttn_type = ttn_class<T, backend>;
+        using env_container_type = typename base_type::env_container_type;
+        using env_node_type = typename base_type::env_node_type;
+        using env_data_type = typename base_type::env_data_type;
+        using env_type = typename base_type::env_type;
+
+    public:
+        _adaptive_one_site_tdvp() : base_type() {}
+        _adaptive_one_site_tdvp(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2, size_type num_threads = 1) : base_type(A, ham, {krylov_dim, nstep}, {}, {eigensolver_krylov_dim, neigenvalues}, num_threads) {}
+
+        _adaptive_one_site_tdvp(const _adaptive_one_site_tdvp &o) = default;
+        _adaptive_one_site_tdvp(_adaptive_one_site_tdvp &&o) = default;
+
+        _adaptive_one_site_tdvp &operator=(const _adaptive_one_site_tdvp &o) = default;
+        _adaptive_one_site_tdvp &operator=(_adaptive_one_site_tdvp &&o) = default;
+
+        void initialise(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2, size_type num_threads = 1)
+        {
+            CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, nstep}, {}, {eigensolver_krylov_dim, neigenvalues}, num_threads));
+        }
+
+        template <typename... Args>
+        bool operator()(Args &&...args)
+        {
+            // for the time evolution scheme we set the subspace weighting factor to be equal to the timestep through the partial step dt/2
+            this->subspace_weighting_factor() = this->dt() / 2.0;
+            CALL_AND_RETHROW(return static_cast<base_type *>(this)->operator()(std::forward<Args>(args)...));
+        }
+    };
+
+    template <typename T, typename backend>
+    using adaptive_one_site_tdvp = _adaptive_one_site_tdvp<T, backend, ttn>;
+
+    // template <typename T, typename backend>
+    // using multiset_adaptive_one_site_tdvp = _adaptive_one_site_tdvp<T, backend, ms_ttn>;
+
+    template <typename T, typename backend, template <typename, typename> class ttn_class>
+    class _subspace_two_site_cost_tdvp : public sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, variance_subspace_expansion_full_two_site>
     {
-        //for the time evolution scheme we set the subspace weighting factor to be equal to the timestep through the partial step dt/2
-        this->subspace_weighting_factor() = this->dt()/2.0;
-        CALL_AND_RETHROW(return static_cast<base_type*>(this)->operator()(std::forward<Args>(args)...));
-    }
-};
+    public:
+        using base_type = sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, variance_subspace_expansion_full_two_site>;
 
-template <typename T, typename backend>
-using adaptive_one_site_tdvp = _adaptive_one_site_tdvp<T, backend, ttn>;
+        using update_type = typename base_type::update_type;
+        using subspace_type = typename base_type::subspace_type;
+        using environment_type = typename base_type::environment_type;
 
-//template <typename T, typename backend>
-//using multiset_adaptive_one_site_tdvp = _adaptive_one_site_tdvp<T, backend, ms_ttn>;
+        using update_params = typename update_type::parameter_list;
+        using subspace_params = typename subspace_type::parameter_list;
+        using environment_params = typename environment_type::parameter_list;
 
+        using size_type = typename base_type::size_type;
+        using real_type = typename base_type::real_type;
 
-template <typename T, typename backend, template <typename, typename> class ttn_class>
-class _subspace_two_site_cost_tdvp : public sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, variance_subspace_expansion_full_two_site>
-{
-public:
-    using base_type =  sweeping_algorithm<T, backend, ttn_class, tdvp_engine, sop_environment, variance_subspace_expansion_full_two_site>;
+        using ttn_type = ttn_class<T, backend>;
+        using env_container_type = typename base_type::env_container_type;
+        using env_node_type = typename base_type::env_node_type;
+        using env_data_type = typename base_type::env_data_type;
+        using env_type = typename base_type::env_type;
 
-    using update_type = typename base_type::update_type;
-    using subspace_type = typename base_type::subspace_type;
-    using environment_type = typename base_type::environment_type;
+    public:
+        _subspace_two_site_cost_tdvp() : base_type() {}
+        _subspace_two_site_cost_tdvp(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type num_threads = 1) : base_type(A, ham, {krylov_dim, nstep}, {}, {}, num_threads) {}
 
-    using update_params = typename update_type::parameter_list;
-    using subspace_params = typename subspace_type::parameter_list;
-    using environment_params = typename environment_type::parameter_list;
+        _subspace_two_site_cost_tdvp(const _subspace_two_site_cost_tdvp &o) = default;
+        _subspace_two_site_cost_tdvp(_subspace_two_site_cost_tdvp &&o) = default;
 
-    using size_type = typename base_type::size_type;
-    using real_type = typename base_type::real_type;
+        _subspace_two_site_cost_tdvp &operator=(const _subspace_two_site_cost_tdvp &o) = default;
+        _subspace_two_site_cost_tdvp &operator=(_subspace_two_site_cost_tdvp &&o) = default;
 
-    using ttn_type = ttn_class<T, backend>;
-    using env_container_type = typename base_type::env_container_type;
-    using env_node_type = typename base_type::env_node_type;
-    using env_data_type = typename base_type::env_data_type;
-    using env_type = typename base_type::env_type;
+        void initialise(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type num_threads = 1)
+        {
+            CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, nstep}, {}, {}, num_threads));
+        }
 
-public:
-    _subspace_two_site_cost_tdvp() : base_type() {}
-    _subspace_two_site_cost_tdvp(const ttn_type& A, const env_type& ham, size_type krylov_dim = 16, size_type nstep = 1, size_type num_threads = 1)   : base_type(A, ham, {krylov_dim, nstep}, {}, {}, num_threads){}
+        template <typename... Args>
+        bool operator()(Args &&...args)
+        {
+            // for the time evolution scheme we set the subspace weighting factor to be equal to the timestep through the partial step dt/2
+            this->subspace_weighting_factor() = this->dt() / 2.0;
+            CALL_AND_RETHROW(return static_cast<base_type *>(this)->operator()(std::forward<Args>(args)...));
+        }
+    };
 
-    _subspace_two_site_cost_tdvp(const _subspace_two_site_cost_tdvp& o) = default;
-    _subspace_two_site_cost_tdvp(_subspace_two_site_cost_tdvp&& o) = default;
-
-    _subspace_two_site_cost_tdvp& operator=(const _subspace_two_site_cost_tdvp& o) = default;
-    _subspace_two_site_cost_tdvp& operator=(_subspace_two_site_cost_tdvp&& o) = default;
-
-    void initialise(const ttn_type& A, const env_type& ham, size_type krylov_dim = 16, size_type nstep = 1, size_type num_threads = 1)
-    {
-        CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, nstep}, {}, {}, num_threads));
-    }
-
-    template <typename ... Args>
-    bool operator()(Args&& ... args)
-    {
-        //for the time evolution scheme we set the subspace weighting factor to be equal to the timestep through the partial step dt/2
-        this->subspace_weighting_factor() = this->dt()/2.0;
-        CALL_AND_RETHROW(return static_cast<base_type*>(this)->operator()(std::forward<Args>(args)...));
-    }
-};
-
-template <typename T, typename backend>
-using subspace_two_site_cost_tdvp = _subspace_two_site_cost_tdvp<T, backend, ttn>;
+    template <typename T, typename backend>
+    using subspace_two_site_cost_tdvp = _subspace_two_site_cost_tdvp<T, backend, ttn>;
 
 }
 
-#endif
-
+#endif // PYTTN_TTNS_LIB_SWEEPING_ALGORITHM_UPDATE_TDVP_HPP_
