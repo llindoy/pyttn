@@ -5,11 +5,12 @@
 <!-- Populate Badges when complete -->
 
 
+[![ArXiv](https://img.shields.io/badge/arXiv-2503.xxxxx-red)](https://arxiv.org/abs/2503.xxxxx)<!-- [![DOI](https://www.zenodo.org/badge/xxxxxx.svg)](https://www.zenodo.org/badge/latestdoi/xxxxx) -->
 [![Tests tatus](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main/CODE_OF_CONDUCT.md)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 <!-- 
-[![ArXiv]()
+
 [![DOI]()
 [![Documentation Status]()
  -->
@@ -18,9 +19,11 @@
 
 <!-- Add links when complete -->
 ## Links
-* National Physical Laboratory: <https://www.npl.co.uk/>
+* Documentation:  Coming Soon!<!-- <https://qsm.gitlab-docs.npl.co.uk/pyttn> -->
+* arXiv: <https://arxiv.org/abs/2503.xxxxx>
 * Gitlab:         <https://gitlab.npl.co.uk/quantum-software/pyttn>
-* Documentation:  <https://qsm.gitlab-docs.npl.co.uk/pyttn>
+* National Physical Laboratory: <https://www.npl.co.uk/>
+
 <!-- * PyPI:           <> -->
 
 # About pyTTN
@@ -43,7 +46,10 @@ This open source project aims to provide an easy to use python interface for wor
 - [Contributing](#contributing)
 - [Citing pyTTN](#citing-pyttn)
 - [Software Overview](#software-overview)
-
+    - [Overview](#objectives-functional-requirements--user-requirements)
+    - [General Layout](#general-software-layout-functional-requirements)
+    - [Details](#implementation-details-code-design)
+    - [The pyTTN Wrapper](#the-pyttn-wrapper-code-design)
 
 -------------------------------------------------------------------------------
 
@@ -152,12 +158,14 @@ make install
 This will build all .cpp files in the [src](src/) folder.  Typical installation times are $\lesssim$ 2 minutes.
 
 # Contributing
-In order 
+Contributions of all kinds are welcome.  Please get in touch if you have any suggestions, comments or questions regarding the code or documentaiton. Unfortunately, we are unable to provide direct access to Issues and Merge Requests on the NPL Gitlab. As such, please feel free to reach out to [Lachlan Lindoy](mailto:lachlan.lindoy@npl.co.uk).  Also, check out [`CONTRIBUTING.md`](CONTRIBUTING.md) if you want to get involved in the development.
+
+
 
 # Citing pyTTN
 If you publish working using pyTTN, please cite the paper
 
- - **[pyTTN]** L.P. Lindoy, D. Rodrigo-Albert, Y. Rath, I. Rungger *pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks*, [arXiv:]() 
+ - **[pyTTN]** L.P. Lindoy, D. Rodrigo-Albert, Y. Rath, I. Rungger *pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks*, [arXiv:2503.xxxxx](https://arxiv.org/abs/2503.xxxxx).
 
 ## BibTeX:
 
@@ -166,9 +174,10 @@ If you publish working using pyTTN, please cite the paper
   title = {pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Network},
   author = {Lindoy, Lachlan P. and Rodrigo-Albert, Daniel. and Rath, Yannic and Rungger, Ivan},
   year = {2025},
-  eprint = {}, 
+  eprint = {2503.xxxxx}, 
+  primaryClass={quant-ph},
   archivePrefix={arXiv}, 
-  doig = {}
+  url={https://arxiv.org/abs/2503.xxxxx}
 }
 ```
 
@@ -275,41 +284,3 @@ In order to provide a convenient scripting interface for the `ttnpp` library and
 As an example the creation of Tree Tensor Networks is controlled through the ``ttn`` function, which expose all constructors of the base `ttn<T>` class and allows for selection of different data types `T` through the specification of the dtype = {`np.float64`, `np.complex128`} to select between real and complex `ttn`s.
 
 -------------------------------------------------------------------------------
-
-# Code Development Practices
-
-The software will be developed iteratively with testing to progressively improve efficiency, build upon implementated functionality, and to ensure stability of the developed tools.
-
-The software will be developed to NPL Software Integrity Level 3.
-
-To adhere to the necessary requirements, please follow the following software development practices:
-
-## Git
-
-This software is developed based on standard git workflows (clearly documenting the version history and development cycles of the software).  This means that the code and repository are used as the main point of entry to track the development of the software and document the requirements.  Changes/updates to the codebase should be documented via atomic git commits with explanatory git commit messages.  If this refers to a bugfix, this should be explicitly noted in the git commit messages.  Changes to functional requirements (including extended functionality) may be documented via issues, also allowing for the reporting of bugs.
-
-## Documentation
-
-This software is documented directly within the code through easy-to-follow docstrings for the different functional units of the code (in particular classes and functions).  When implementing new/changing  functionality, please add/update the docstrings accordingly and add further comments if necessary to follow the implementation.  Additionally, this software makes of the [Sphinx](https://www.sphinx-doc.org/en/master) for generation of user documentation.  In addition to providing a complete collection of the documentation for all functional units of the code, this documentation provides a central location for additional IPython notebook tutorial files describing usage of the code with explanation of the functionality and expected outcomes.  When implementing new functionality please consider whether it would be appropriate to add additional tutorials documenting the usage of this new functionality.
-
-## Coding Style
-
-Please adhere to standard python coding conventions, [PEP-8](https://peps.python.org/pep-0008/).  The use of a linter (e.g. [Ruff](https://docs.astral.sh/ruff/)), and a formatter (e.g. [black](https://github.com/psf/black)) are recommended to ensure consistency.
-
-## Testing (including validation and verification)
-To ensure continuous testing of the functional units of the software separate tests are added to the ``\tests`` subfolder.  When adding/updating functionality, please ensure the functional units are tested appropriately and corresponing tests are added to the subfolders.  Currently, this software makes use of CI hooks to enable automated testing of components, however, we recommend that all developers should run tests locally.
-
-To test the overall functionality, we have additionally provided a set of example applications enabling the validation of core features of the pyTTN library
-- [Non-adiabatic dynamics of 24-mode pyrazine](examples/pyrazine/)
-- [Exciton dynamics in a $n$-oligothiophene donor-C<sub>60</sub> fullerene acceptor system](examples/p3ht_pcbm_heterojunction/)
-- Dynamics of quantum systems coupled to a [bosonic](examples/spin_boson_model/) or [fermionic](examples/anderson_impurity_model) environment
-- Interacting [chains](examples/dissipative_spin_models/chain/) and [trees](examples/dissipative_spin_models/cayley_tree/) of open quantum systems
-
-The results generated through these example scripts have, where possible, been verified against literature results. The iterature results may be viewed by following the appropriate references in both the example scripts and the [pyTTN paper](). The expected results obtained from running these examples are presented in the [pyTTN paper](), and all datasets producing these results are available in the [data repository]().
-
-## Code Review
-
-Code review will be performed regularly by members of the team and will be led by the lead developer.  Code reviews are performed via GitLab pull requests.  Previous code reviews can be found via the [gitlab interface](https://gitlab.npl.co.uk/quantum-software/pyttn/-/merge_requests?scope=all&state=merged).
-
--------------------------------------------------------------------------------
-
