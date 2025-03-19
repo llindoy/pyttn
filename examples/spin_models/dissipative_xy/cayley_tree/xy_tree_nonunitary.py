@@ -51,7 +51,6 @@ def xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
     sysinf[0] = [pyttn.spin_mode(2), pyttn.spin_mode(2)]
 
     expbath=None
-    Nb = 0
     if K != 0:
         # set up the open quantum system bath object
         bath = oqs.BosonicBath(J, beta=beta, wmax=wc * Ecut)

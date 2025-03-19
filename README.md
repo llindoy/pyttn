@@ -5,7 +5,8 @@
 <!-- Populate Badges when complete -->
 
 
-[![Tests status](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
+[![Tests tatus](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main/CODE_OF_CONDUCT.md)
 
 <!-- 
 [![ArXiv]()
@@ -15,27 +16,34 @@
 
 <!-- TABLE OF CONTENTS -->
 
-## Table of Contents
+<!-- Add links when complete -->
+## Links
+* National Physical Laboratory: <https://www.npl.co.uk/>
+* Gitlab:         <https://gitlab.npl.co.uk/quantum-software/pyttn>
+* Documentation:  <https://qsm.gitlab-docs.npl.co.uk/pyttn>
+<!-- * PyPI:           <> -->
 
-- [About The Project](#about-the-project)
-- [Getting Started](#getting-started)
-- [Software Overview](#software-overview)
-
--------------------------------------------------------------------------------
-
-# About the Project
+# About pyTTN
 
 This open source project aims to provide an easy to use python interface for working with generic Tree Tensor Networks States to efficiently compute dynamics properties of quantum systems.  A key focus of this library is the easy setup of calculations employing either single or multiset tensor networks with generic tree structured connectivity.  Easy setup of Hamiltonians for arbitrary problems, with the ability to automatically apply techniques such as mode combination to reduce the total number of modes present in the system. Additionally, this library includes several tools to help facilitate applications of these approaches to study the dynamics of quantum systems that are strongly coupled to structured environment using both unitary methods (e.g. TEDOPA, T-TEDOPA and other representations of the system-bath Hamiltonian) as well as non-unitary approaches (e.g. Hierarchical Equations of Motion and Generalised Pseudomode method). 
 
 ![Schematic illustrating key features of the pyTTN software package](./docs/media/pyttn%20schematic%20figure.svg)
 
-## Links
+-------------------------------------------------------------------------------
 
-<!-- Add links when complete -->
-* National Physical Laboratory: <https://www.npl.co.uk/>
-* Gitlab:         <https://gitlab.npl.co.uk/quantum-software/pyttn>
-* Documentation:  <>
-* PyPI:           <>
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+    - [Dependencies](#dependencies)
+    - [Installation](#installation)
+    - [Using the Software](#using-the-software)
+    - [Tutorials](#tutorials)
+    - [The TTNPP library](#the-ttnpp-library)
+- [Contributing](#contributing)
+- [Citing pyTTN](#citing-pyttn)
+- [Software Overview](#software-overview)
+
 
 -------------------------------------------------------------------------------
 
@@ -50,7 +58,7 @@ External Libraries:
 - [Lapack](https://netlib.org/lapack/) linear algebra
 - [Catch2](https://github.com/catchorg/Catch2) C++ Unit Tests (Only required when running C++ test)
 
-The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${pyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from github.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
+The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${pyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from their respective Github repositories.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
 
 Additional python dependencies introduced by the core functionality of the pyTTN wrapper are:
  - [scipy](https://scipy.org/)
@@ -68,6 +76,7 @@ Additional python dependencies introduced by the core functionality of the pyTTN
 
 With the final two dependencies only required for use of improved tree plotting functionality, e.g. when using `prog = "dot"`.
 
+All python packages are installed automatically when installing using pip, however, it is necessary to manually install graphviz to enable this functionality.
 <!--
 Add back in when cuda support is finished
 
@@ -85,11 +94,15 @@ $ cd ${pyTTN_ROOT_DIR}
 $ python3 -m pip install .
 ```
 
-By default, this will make use of a single threaded build for compiling the Pybind11 wrapper and can take a number of minutes to complete.  It is possible to make use of multi-threaded builds when compiling the Pybind11.  This can be done by setting the environment variable `CMAKE_BUILD_PARALLEL_LEVEL`, e.g.
+### Multithreaded Build
+
+By default, this will make use of a single threaded build for compiling the Pybind11 wrapper and can take a number of minutes to complete.  It is recommended to make use of multi-threaded builds when compiling the Pybind11.  This can be done by setting the environment variable `CMAKE_BUILD_PARALLEL_LEVEL`, e.g.
 ```
 export CMAKE_BUILD_PARALLEL_LEVEL=8
 ```
 to allow for the use of 8 threads when compiling.
+
+### Selecting BLAS 
 
 <!-- 
 ### Building with CUDA Support
@@ -123,7 +136,7 @@ Finally, a set of more advanced tutorials are provided including:
  - [A set of tutorials applying pyTTN to simulate Open Quantum System Dynamics](tutorials/open_quantum_systems/)
  - [A set of tutorials applying pyTTN to simulate exciton dynamics in Holstein models using multiset Tensor Network Ansatze](tutorials/multiset_ansatz/)
 
-## TTNPP Library
+## The TTNPP Library
 It is possible to compile pure C++ programs that make use of the core C++ library (`ttnpp`).  Example C++ programs are provided in the [src](src/) directory.
 
 ### Compile Instructions
@@ -138,7 +151,26 @@ make install
 
 This will build all .cpp files in the [src](src/) folder.  Typical installation times are $\lesssim$ 2 minutes.
 
--------------------------------------------------------------------------------
+# Contributing
+In order 
+
+# Citing pyTTN
+If you publish working using pyTTN, please cite the paper
+
+ - **[pyTTN]** L.P. Lindoy, D. Rodrigo-Albert, Y. Rath, I. Rungger *pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks*, [arXiv:]() 
+
+## BibTeX:
+
+```
+@misc{Lindoy2025,
+  title = {pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Network},
+  author = {Lindoy, Lachlan P. and Rodrigo-Albert, Daniel. and Rath, Yannic and Rungger, Ivan},
+  year = {2025},
+  eprint = {}, 
+  archivePrefix={arXiv}, 
+  doig = {}
+}
+```
 
 # Software Overview
 

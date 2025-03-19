@@ -126,7 +126,11 @@ def hamiltonian():
     # now we add on the vibronic couplings to the fullerene super-particle modes
     for n in range(Nfragments):
         for li in range(Nf):
-            H += ( gf[li] * sOP("|CS%d><CS%d|" % (n, n), 0) * (sOP("adag", 1 + 1 + li) + sOP("a", 1 + 1 + li)))
+            H += (
+                gf[li]
+                * sOP("|CS%d><CS%d|" % (n, n), 0)
+                * (sOP("adag", 1 + 1 + li) + sOP("a", 1 + 1 + li))
+            )
 
     # now we add on the oligothiophene modes
     for n in range(Nfragments):

@@ -51,7 +51,9 @@ def build_ttn_tree(mdims, chi1, chi2, ldims, degree=2, use_multiset=False):
     chim1 = min(chi1, 8)
     chim2 = min(chi2, 8)
     if use_multiset:
-        topo = ntree("(1(%d(%d(128)))(%d(%d)(%d)))" % (chi1, ldims[0], chi1, chi1, chi1))
+        topo = ntree(
+            "(1(%d(%d(128)))(%d(%d)(%d)))" % (chi1, ldims[0], chi1, chi1, chi1)
+        )
 
         ntreeBuilder.mlmctdh_subtree(
             topo()[0],
@@ -157,9 +159,19 @@ def output_results(ofname, timepoints, res, maxchi, runtime):
     h5.close()
 
 
-def p3ht_pcbm_single_set(topo, capacity, mode_dims, tmax=200, dt=0.25, adaptive=True,
-                         spawning_threshold=1e-6, unoccupied_threshold=1e-4, nunoccupied=0,
-                         ofname="p3ht_pcbm.h5", output_skip=1):
+def p3ht_pcbm_single_set(
+    topo,
+    capacity,
+    mode_dims,
+    tmax=200,
+    dt=0.25,
+    adaptive=True,
+    spawning_threshold=1e-6,
+    unoccupied_threshold=1e-4,
+    nunoccupied=0,
+    ofname="p3ht_pcbm.h5",
+    output_skip=1,
+):
     from p3ht_pcbm_hamiltonian import hamiltonian
 
     """Function for performing the dynamics of the single set p3ht_pcbm model
@@ -403,6 +415,7 @@ def p3ht_pcbm_dynamics(
         p3ht_pcbm_multiset(
             topo, mode_dims, tmax=tmax, dt=dt, ofname=ofname, output_skip=output_skip
         )
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="pyttn test")

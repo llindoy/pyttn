@@ -9,7 +9,9 @@ build-backend="setuptools.build_meta"
 where=["pyttn"]
 
 [project]
-name = "pyTTN"
+name = "pyttn"
+description="An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks"
+authors=[ {name="Lachlan P Lindoy", email="lachlan.lindoy@npl.co.uk"}]
 
 keywords = [
     "tensor network",
@@ -21,7 +23,7 @@ keywords = [
 
 version="0.0.1"
 readme="README.md"
-license= { file="LICENSE.txt"}
+license= { file="LICENSE"}
 requires-python = ">=3.8"
 dependencies = [
     "scipy",

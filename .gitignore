@@ -5,10 +5,12 @@
 !/.gitignore
 !/.gitlab-ci.yml
 !/CMakeLists.txt
-!/LICENSE.txt
+!/LICENSE
 !/pyproject.toml
 !/pytest.ini
 !/README.md
+!/CODE_OF_CONDUCT.md
+!/CONTRIBUTING.md
 !/setup.py
 
 #now we add the cmake folder and its files
@@ -40,6 +42,8 @@
 !examples/oqs/
 !examples/oqs/spin_boson/
 !examples/oqs/spin_boson/*.py
+!examples/oqs/spin_boson/METTS/
+!examples/oqs/spin_boson/METTS/*.py
 !examples/scaling/*.py
 !examples/scaling/spin_boson_model/
 !examples/scaling/spin_boson_model/*.py
