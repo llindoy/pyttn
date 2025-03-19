@@ -103,7 +103,7 @@ else()
 
             #additional compilation flags for GNU compilers
             if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-                SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcx-fortran-rules -march=native -mtune=native")
+                SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcx-fortran-rules -march=native -mtune=native -flto=auto")
                 if(USE_OPENMP)
                     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
                 endif()
@@ -141,7 +141,7 @@ else()
 
 
                 if(USE_OPENMP)
-                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp=libomp")
+                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp=libomp -flto=thin")
                 endif()
             endif()
             

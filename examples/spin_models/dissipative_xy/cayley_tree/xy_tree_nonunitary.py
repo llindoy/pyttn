@@ -51,7 +51,6 @@ def xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
     sysinf[0] = [pyttn.spin_mode(2), pyttn.spin_mode(2)]
 
     expbath=None
-    Nb = 0
     if K != 0:
         # set up the open quantum system bath object
         bath = oqs.BosonicBath(J, beta=beta, wmax=wc * Ecut)
@@ -61,15 +60,14 @@ def xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
         # extract the system information object from this.
         expbath = oqs.ExpFitBosonicBath(dk, zk)
         expbath.truncate_modes(utils.EnergyTruncation(Ecut * wc, Lmax=L, Lmin=Lmin))
-        bsys = expbath.system_information()
-
-        dk = expbath.dk
-        zk = expbath.zk
 
         # now attempt mode combination on the bath modes
+        bsys=None
         if nbmax>1:
             mode_comb = utils.ModeCombination(nhilbmax, nbmax)
-            bsys = mode_comb(bsys)
+            bsys = expbath.system_information(mode_comb)
+        else:
+            bsys = expbath.system_information()
         
         sysinf = pyttn.combine_systems(sysinf, bsys)
 
@@ -122,6 +120,7 @@ def xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
 
     state = [0 for i in range(Ns * (site_info.nmodes()))]
     state[0] = 3
+    print(site_info.nmodes(), len(state), A.nmodes())
     A.set_state(state)
 
     print("building Hamiltonian")
@@ -213,10 +212,10 @@ def xychain_dynamics(Nl, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
         t2 = time.time()
         output_results(ofname, t, res, Rnorm, norm, maxchi, t2-t1)
 
-        if i % 10 ==0 :
-            import matplotlib.pyplot as plt
-            utils.visualise_tree(A, prog="twopi", bond_prop="bond dimension")
-            plt.show()
+        #if i % 10 ==0 :
+        #    import matplotlib.pyplot as plt
+        #    utils.visualise_tree(A, prog="twopi", bond_prop="bond dimension")
+        #    plt.show()
     t2 = time.time()
     output_results(ofname, t, res, Rnorm, norm, maxchi, t2-t1)
 
@@ -258,7 +257,7 @@ def run_from_inputs():
     parser.add_argument("--degree", type=int, default=1)
 
     # integration time parameters
-    parser.add_argument("--dt", type=float, default=0.05)
+    parser.add_argument("--dt", type=float, default=0.025)
     parser.add_argument("--tmax", type=float, default=10)
 
     parser.add_argument("--method", type=str, default="heom")
@@ -268,8 +267,8 @@ def run_from_inputs():
 
     # the minimum number of unoccupied modes for the dynamics
     parser.add_argument("--subspace", type=bool, default=True)
-    parser.add_argument("--nunoccupied", type=int, default=2)
-    parser.add_argument("--spawning_threshold", type=float, default=1e-7)
+    parser.add_argument("--nunoccupied", type=int, default=1)
+    parser.add_argument("--spawning_threshold", type=float, default=5e-7)
     parser.add_argument("--unoccupied_threshold", type=float, default=1e-4)
 
     args = parser.parse_args()

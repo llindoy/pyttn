@@ -53,7 +53,6 @@ def get_spin_connectivity(Nl, d=3):
                     y = get_index(li + [i])
                     inds.append([x, y])
 
-    print(inds)
     return inds, topo.size()
 
 
@@ -82,7 +81,6 @@ def build_system_topology(Nl, chi, d=3):
 
 def build_topology(Nl, ds, chi, chiS, chiB, nbose, discbath, degree, d=3):
     topo = build_system_topology(Nl, chi, d=d)
-    print(topo)
 
     # now get each site using a depth first search traversal and determine the indices associated with the site
     indices = []
@@ -105,7 +103,6 @@ def build_topology(Nl, ds, chi, chiS, chiB, nbose, discbath, degree, d=3):
 def get_mode_reordering(Nl, Nb, d=3, site_size=1):
     #first get the system tree.  
     topo = build_system_topology(Nl, 1, d=d)
-    print(topo)
 
     #traverse the nodes in depth first search order and create a dictionary storing the node and the index the order in which it was reach
     dict_dfs = {}
@@ -114,12 +111,9 @@ def get_mode_reordering(Nl, Nb, d=3, site_size=1):
         dict_dfs[i] = c
         c=c+1
 
-    print(len(dict_dfs))
-
     ordering = []
     #now iterate over it in bfs ordering and for the ith leaf in bfs order set it to point to the index in dfs order.
     #Additionally we set all the bath modes to be ordered correctly
     for i in topo.bfs():
         ordering += [dict_dfs[i]*(Nb+site_size) + j for j in range(Nb+site_size)]
-    print(ordering)
     return ordering

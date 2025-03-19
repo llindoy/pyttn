@@ -122,19 +122,20 @@ class CMakeBuild(build_ext):
             ["cmake", "--build", ".", "--target", "install"], cwd=build_temp, check=True
         )
 
+
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="pyttn",
     version=__version__,
     author="Lachlan Lindoy",
-    author_email="lplindoy@gmail.com",
+    author_email="lachlan.lindoy@npl.co.uk",
     description="python bindings of ttns_lib using pybind11",
     long_description="",
     ext_modules=[CMakeExtension("pyttn._pyttn")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
-    extras_require={"test": ["pytest>=6.0"]},
+    extras_require={},
     python_requires=">=3.7",
-    packages = find_packages(),
+    packages=find_packages(),
 )

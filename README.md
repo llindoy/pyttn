@@ -5,37 +5,51 @@
 <!-- Populate Badges when complete -->
 
 
-[![Tests status](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
+[![ArXiv](https://img.shields.io/badge/arXiv-2503.xxxxx-red)](https://arxiv.org/abs/2503.xxxxx)<!-- [![DOI](https://www.zenodo.org/badge/xxxxxx.svg)](https://www.zenodo.org/badge/latestdoi/xxxxx) -->
+[![Tests tatus](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 <!-- 
-[![ArXiv]()
+
 [![DOI]()
 [![Documentation Status]()
  -->
 
 <!-- TABLE OF CONTENTS -->
 
-## Table of Contents
+<!-- Add links when complete -->
+## Links
+* Documentation:  Coming Soon!<!-- <https://qsm.gitlab-docs.npl.co.uk/pyttn> -->
+* arXiv: <https://arxiv.org/abs/2503.xxxxx>
+* Gitlab:         <https://gitlab.npl.co.uk/quantum-software/pyttn>
+* National Physical Laboratory: <https://www.npl.co.uk/>
 
-- [About The Project](#about-the-project)
-- [Getting Started](#getting-started)
-- [Software Overview](#software-overview)
+<!-- * PyPI:           <> -->
 
--------------------------------------------------------------------------------
-
-# About the Project
+# About pyTTN
 
 This open source project aims to provide an easy to use python interface for working with generic Tree Tensor Networks States to efficiently compute dynamics properties of quantum systems.  A key focus of this library is the easy setup of calculations employing either single or multiset tensor networks with generic tree structured connectivity.  Easy setup of Hamiltonians for arbitrary problems, with the ability to automatically apply techniques such as mode combination to reduce the total number of modes present in the system. Additionally, this library includes several tools to help facilitate applications of these approaches to study the dynamics of quantum systems that are strongly coupled to structured environment using both unitary methods (e.g. TEDOPA, T-TEDOPA and other representations of the system-bath Hamiltonian) as well as non-unitary approaches (e.g. Hierarchical Equations of Motion and Generalised Pseudomode method). 
 
 ![Schematic illustrating key features of the pyTTN software package](./docs/media/pyttn%20schematic%20figure.svg)
 
-## Links
+-------------------------------------------------------------------------------
 
-<!-- Add links when complete -->
-* National Physical Laboratory: <https://www.npl.co.uk/>
-* Gitlab:         <https://gitlab.npl.co.uk/quantum-software/pyttn>
-* Documentation:  <>
-* PyPI:           <>
+
+## Table of Contents
+
+- [Getting Started](#getting-started)
+    - [Dependencies](#dependencies)
+    - [Installation](#installation)
+    - [Using the Software](#using-the-software)
+    - [Tutorials](#tutorials)
+    - [The TTNPP library](#the-ttnpp-library)
+- [Contributing](#contributing)
+- [Citing pyTTN](#citing-pyttn)
+- [Software Overview](#software-overview)
+    - [Overview](#objectives-functional-requirements--user-requirements)
+    - [General Layout](#general-software-layout-functional-requirements)
+    - [Details](#implementation-details-code-design)
+    - [The pyTTN Wrapper](#the-pyttn-wrapper-code-design)
 
 -------------------------------------------------------------------------------
 
@@ -50,7 +64,7 @@ External Libraries:
 - [Lapack](https://netlib.org/lapack/) linear algebra
 - [Catch2](https://github.com/catchorg/Catch2) C++ Unit Tests (Only required when running C++ test)
 
-The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${pyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from github.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
+The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${pyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from their respective Github repositories.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
 
 Additional python dependencies introduced by the core functionality of the pyTTN wrapper are:
  - [scipy](https://scipy.org/)
@@ -68,6 +82,7 @@ Additional python dependencies introduced by the core functionality of the pyTTN
 
 With the final two dependencies only required for use of improved tree plotting functionality, e.g. when using `prog = "dot"`.
 
+All python packages are installed automatically when installing using pip, however, it is necessary to manually install graphviz to enable this functionality.
 <!--
 Add back in when cuda support is finished
 
@@ -85,11 +100,15 @@ $ cd ${pyTTN_ROOT_DIR}
 $ python3 -m pip install .
 ```
 
-By default, this will make use of a single threaded build for compiling the Pybind11 wrapper and can take a number of minutes to complete.  It is possible to make use of multi-threaded builds when compiling the Pybind11.  This can be done by setting the environment variable `CMAKE_BUILD_PARALLEL_LEVEL`, e.g.
+### Multithreaded Build
+
+By default, this will make use of a single threaded build for compiling the Pybind11 wrapper and can take a number of minutes to complete.  It is recommended to make use of multi-threaded builds when compiling the Pybind11.  This can be done by setting the environment variable `CMAKE_BUILD_PARALLEL_LEVEL`, e.g.
 ```
 export CMAKE_BUILD_PARALLEL_LEVEL=8
 ```
 to allow for the use of 8 threads when compiling.
+
+### Selecting BLAS 
 
 <!-- 
 ### Building with CUDA Support
@@ -123,7 +142,7 @@ Finally, a set of more advanced tutorials are provided including:
  - [A set of tutorials applying pyTTN to simulate Open Quantum System Dynamics](tutorials/open_quantum_systems/)
  - [A set of tutorials applying pyTTN to simulate exciton dynamics in Holstein models using multiset Tensor Network Ansatze](tutorials/multiset_ansatz/)
 
-## TTNPP Library
+## The TTNPP Library
 It is possible to compile pure C++ programs that make use of the core C++ library (`ttnpp`).  Example C++ programs are provided in the [src](src/) directory.
 
 ### Compile Instructions
@@ -138,7 +157,29 @@ make install
 
 This will build all .cpp files in the [src](src/) folder.  Typical installation times are $\lesssim$ 2 minutes.
 
--------------------------------------------------------------------------------
+# Contributing
+Contributions of all kinds are welcome.  Please get in touch if you have any suggestions, comments or questions regarding the code or documentaiton. Unfortunately, we are unable to provide direct access to Issues and Merge Requests on the NPL Gitlab. As such, please feel free to reach out to [Lachlan Lindoy](mailto:lachlan.lindoy@npl.co.uk).  Also, check out [`CONTRIBUTING.md`](CONTRIBUTING.md) if you want to get involved in the development.
+
+
+
+# Citing pyTTN
+If you publish working using pyTTN, please cite the paper
+
+ - **[pyTTN]** L.P. Lindoy, D. Rodrigo-Albert, Y. Rath, I. Rungger *pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks*, [arXiv:2503.xxxxx](https://arxiv.org/abs/2503.xxxxx).
+
+## BibTeX:
+
+```
+@misc{Lindoy2025,
+  title = {pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Network},
+  author = {Lindoy, Lachlan P. and Rodrigo-Albert, Daniel. and Rath, Yannic and Rungger, Ivan},
+  year = {2025},
+  eprint = {2503.xxxxx}, 
+  primaryClass={quant-ph},
+  archivePrefix={arXiv}, 
+  url={https://arxiv.org/abs/2503.xxxxx}
+}
+```
 
 # Software Overview
 
@@ -243,41 +284,3 @@ In order to provide a convenient scripting interface for the `ttnpp` library and
 As an example the creation of Tree Tensor Networks is controlled through the ``ttn`` function, which expose all constructors of the base `ttn<T>` class and allows for selection of different data types `T` through the specification of the dtype = {`np.float64`, `np.complex128`} to select between real and complex `ttn`s.
 
 -------------------------------------------------------------------------------
-
-# Code Development Practices
-
-The software will be developed iteratively with testing to progressively improve efficiency, build upon implementated functionality, and to ensure stability of the developed tools.
-
-The software will be developed to NPL Software Integrity Level 3.
-
-To adhere to the necessary requirements, please follow the following software development practices:
-
-## Git
-
-This software is developed based on standard git workflows (clearly documenting the version history and development cycles of the software).  This means that the code and repository are used as the main point of entry to track the development of the software and document the requirements.  Changes/updates to the codebase should be documented via atomic git commits with explanatory git commit messages.  If this refers to a bugfix, this should be explicitly noted in the git commit messages.  Changes to functional requirements (including extended functionality) may be documented via issues, also allowing for the reporting of bugs.
-
-## Documentation
-
-This software is documented directly within the code through easy-to-follow docstrings for the different functional units of the code (in particular classes and functions).  When implementing new/changing  functionality, please add/update the docstrings accordingly and add further comments if necessary to follow the implementation.  Additionally, this software makes of the [Sphinx](https://www.sphinx-doc.org/en/master) for generation of user documentation.  In addition to providing a complete collection of the documentation for all functional units of the code, this documentation provides a central location for additional IPython notebook tutorial files describing usage of the code with explanation of the functionality and expected outcomes.  When implementing new functionality please consider whether it would be appropriate to add additional tutorials documenting the usage of this new functionality.
-
-## Coding Style
-
-Please adhere to standard python coding conventions, [PEP-8](https://peps.python.org/pep-0008/).  The use of a linter (e.g. [Ruff](https://docs.astral.sh/ruff/)), and a formatter (e.g. [black](https://github.com/psf/black)) are recommended to ensure consistency.
-
-## Testing (including validation and verification)
-To ensure continuous testing of the functional units of the software separate tests are added to the ``\tests`` subfolder.  When adding/updating functionality, please ensure the functional units are tested appropriately and corresponing tests are added to the subfolders.  Currently, this software makes use of CI hooks to enable automated testing of components, however, we recommend that all developers should run tests locally.
-
-To test the overall functionality, we have additionally provided a set of example applications enabling the validation of core features of the pyTTN library
-- [Non-adiabatic dynamics of 24-mode pyrazine](examples/pyrazine/)
-- [Exciton dynamics in a $n$-oligothiophene donor-C<sub>60</sub> fullerene acceptor system](examples/p3ht_pcbm_heterojunction/)
-- Dynamics of quantum systems coupled to a [bosonic](examples/spin_boson_model/) or [fermionic](examples/anderson_impurity_model) environment
-- Interacting [chains](examples/dissipative_spin_models/chain/) and [trees](examples/dissipative_spin_models/cayley_tree/) of open quantum systems
-
-The results generated through these example scripts have, where possible, been verified against literature results. The iterature results may be viewed by following the appropriate references in both the example scripts and the [pyTTN paper](). The expected results obtained from running these examples are presented in the [pyTTN paper](), and all datasets producing these results are available in the [data repository]().
-
-## Code Review
-
-Code review will be performed regularly by members of the team and will be led by the lead developer.  Code reviews are performed via GitLab pull requests.  Previous code reviews can be found via the [gitlab interface](https://gitlab.npl.co.uk/quantum-software/pyttn/-/merge_requests?scope=all&state=merged).
-
--------------------------------------------------------------------------------
-
