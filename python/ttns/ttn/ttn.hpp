@@ -113,6 +113,10 @@ void init_ttn(py::module &m, const std::string &label)
         .def("__len__", &_ttn_node::size)
         .def("__str__", [](const _ttn_node &o)
              {std::ostringstream oss; oss << o; return oss.str(); })
+
+
+        .def("child", [](_ttn_node& i, size_t ind){return i.at(ind);}, py::return_value_policy::reference)
+
         .def(
             "__iter__",
             [](_ttn_node &s)
@@ -132,10 +136,10 @@ void init_ttn(py::module &m, const std::string &label)
         .def(py::init<const multiset_ttn_slice<real_type, backend, false> &>())
         .def(py::init<const multiset_ttn_slice<T, backend, false> &>())
 
-        .def(py::init<const ntree<size_t> &, bool>(), py::arg(), py::arg("purification") = false)
-        .def(py::init<const ntree<size_t> &, const ntree<size_t> &, bool>(), py::arg(), py::arg(), py::arg("purification") = false)
-        .def(py::init<const std::string &, bool>(), py::arg(), py::arg("purification") = false)
-        .def(py::init<const std::string &, const std::string, bool &>(), py::arg(), py::arg(), py::arg("purification") = false, "For details see :class:`ttn_dtype`")
+        .def(py::init<const ntree<size_t> &, bool, bool>(), py::arg(), py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
+        .def(py::init<const ntree<size_t> &, const ntree<size_t> &, bool, bool>(), py::arg(), py::arg(), py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
+        .def(py::init<const std::string &, bool, bool>(), py::arg(), py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
+        .def(py::init<const std::string &, const std::string, bool, bool>(), py::arg(), py::arg(), py::arg("collapse_bond_matrices") = true, py::arg("purification") = false, "For details see :class:`ttn_dtype`")
 
         .def("complex_dtype", [](const _ttn &)
              { return !std::is_same<T, real_type>::value; }, "For details see :class:`pyttn.ttn_dtype`")
@@ -171,10 +175,10 @@ void init_ttn(py::module &m, const std::string &label)
         //.def("reset_orthogonality", &_ttn::reset_orthogonality)
         .def("reset_orthogonality_centre", &_ttn::reset_orthogonality_centre)
 
-        .def("resize", static_cast<void (_ttn::*)(const ntree<size_t, std::allocator<size_t>> &, size_t, bool)>(&_ttn::resize), py::arg(), py::arg("nset") = 1, py::arg("purification") = false)
-        .def("resize", static_cast<void (_ttn::*)(const ntree<size_t, std::allocator<size_t>> &, const ntree<size_t, std::allocator<size_t>> &, size_t, bool)>(&_ttn::resize), py::arg(), py::arg(), py::arg("nset") = 1, py::arg("purification") = false)
-        .def("resize", static_cast<void (_ttn::*)(const std::string &, size_t, bool)>(&_ttn::resize), py::arg(), py::arg("nset") = 1, py::arg("purification") = false)
-        .def("resize", static_cast<void (_ttn::*)(const std::string &, const std::string &, size_t, bool)>(&_ttn::resize), py::arg(), py::arg(), py::arg("nset") = 1, py::arg("purification") = false, "For details see :meth:`pyttn.ttn_dtype.resize`")
+        .def("resize", static_cast<void (_ttn::*)(const ntree<size_t, std::allocator<size_t>> &, size_t, bool, bool)>(&_ttn::resize), py::arg(), py::arg("nset") = 1, py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
+        .def("resize", static_cast<void (_ttn::*)(const ntree<size_t, std::allocator<size_t>> &, const ntree<size_t, std::allocator<size_t>> &, size_t, bool, bool)>(&_ttn::resize), py::arg(), py::arg(), py::arg("nset") = 1, py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
+        .def("resize", static_cast<void (_ttn::*)(const std::string &, size_t, bool, bool)>(&_ttn::resize), py::arg(), py::arg("nset") = 1, py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
+        .def("resize", static_cast<void (_ttn::*)(const std::string &, const std::string &, size_t, bool, bool)>(&_ttn::resize), py::arg(), py::arg(), py::arg("nset") = 1, py::arg("collapse_bond_matrices") = true, py::arg("purification") = false, "For details see :meth:`pyttn.ttn_dtype.resize`")
         .def("set_seed", &_ttn::template set_seed<int>, "For details see :meth:`pyttn.ttn_dtype.set_seed`")
 
         .def("set_state", &_ttn::template set_state<int>, py::arg(), py::arg("random_primitive") = false, py::arg("random_internal") = true)
@@ -267,6 +271,10 @@ void init_ttn(py::module &m, const std::string &label)
              { i[ind]() = o; }, "For details see :meth:`pyttn.ttn_dtype.__setitem__`")
         .def("__getitem__", [](_ttn &i, size_t ind) -> _ttn_node_data &
              { return i[ind](); }, py::return_value_policy::reference, "For details see :meth:`pyttn.ttn_dtype.resize`")
+        .def("at", [](_ttn& i, const std::vector<size_t> & ind) -> _ttn_node_data &{ return i.at(ind)(); }, py::return_value_policy::reference, "For details see :meth:`pyttn.ttn_dtype.resize`")
+
+
+        .def("node", [](_ttn& i, size_t ind) -> _ttn_node&{return i[ind];}, py::return_value_policy::reference)
         .def("site_tensor", static_cast<const _ttn_node_data &(_ttn::*)(size_t) const>(&_ttn::site_tensor), py::return_value_policy::reference, "For details see :meth:`pyttn.ttn_dtype.site_tensor`")
 #ifdef PYTTN_BUILD_CUDA
         .def("set_site_tensor", [](_ttn &self, size_t i, const linalg::matrix<T, otherbackend> &mat)

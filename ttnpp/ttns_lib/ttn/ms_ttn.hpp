@@ -98,8 +98,8 @@ namespace ttns
         }
 
         template <typename INTEGER, typename Alloc>
-        ms_ttn(size_type nset, const ntree<INTEGER, Alloc> &topology, bool purification = false)
-        try : base_type(topology, nset, purification) {}
+        ms_ttn(size_type nset, const ntree<INTEGER, Alloc> &topology, bool collapse_bond_matrices=true, bool purification = false)
+        try : base_type(topology, nset, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
             std::cerr << ex.what() << std::endl;
@@ -107,24 +107,24 @@ namespace ttns
         }
 
         template <typename INTEGER, typename Alloc>
-        ms_ttn(size_type nset, const ntree<INTEGER, Alloc> &topology, const ntree<INTEGER, Alloc> &capacity, bool purification = false)
-        try : base_type(topology, capacity, nset, purification) {}
+        ms_ttn(size_type nset, const ntree<INTEGER, Alloc> &topology, const ntree<INTEGER, Alloc> &capacity, bool collapse_bond_matrices=true, bool purification = false)
+        try : base_type(topology, capacity, nset, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
         }
 
-        ms_ttn(size_type nset, const std::string &_topology, bool purification = false)
-        try : base_type(_topology, nset, purification) {}
+        ms_ttn(size_type nset, const std::string &_topology, bool collapse_bond_matrices=true, bool purification = false)
+        try : base_type(_topology, nset, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
         }
 
-        ms_ttn(size_type nset, const std::string &_topology, const std::string &_capacity, bool purification = false)
-        try : base_type(_topology, _capacity, nset, purification) {}
+        ms_ttn(size_type nset, const std::string &_topology, const std::string &_capacity, bool collapse_bond_matrices=true, bool purification = false)
+        try : base_type(_topology, _capacity, nset, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
             std::cerr << ex.what() << std::endl;
