@@ -12,8 +12,41 @@
 
 import numpy as np
 from .ESPRIT import ESPRIT
-from .aaa import AAA_algorithm
 from .softmspace import softmspace
+
+try:
+    from scipy.interpolate import AAA
+
+    def AAA_algorithm(func, Z, tol=1e-13, K=100, *args, **kwargs):
+        """A wrapper for scipy.interpolate.AAA that includes evaluation of the function at the support points
+
+        :param F: The function to be fit
+        :type F: callable
+        :param Z: The set of support points used for interpolating the function
+        :type Z: np.ndarray
+        :param tol: The convergence tolerance for the AAA algorithm. (default: 1e-13)
+        :type tol: float, optional
+        :param K: The maximum number of poles to fit. (default: 100)
+        :type K: int or None, optional
+        :param nmax: The maximum number of poles to use in the AAA fit. (default: 100)
+        :type nmax: int, optional
+        :param *args: Variable length argument list to be passed to the F function
+        :param **kwargs: Arbitrary keyword arguments to be passed to the F function
+
+        :returns:
+            - func - A function defining the rational function approximation
+            - poles(np.ndarray) - The poles of the rational function
+            - residues(np.ndarray) - The residues of the rational function decomposition
+            - zeros(np.ndarray) - The zeros of the rational function
+        """
+        Fz = np.array(F(Z, *args, **kwargs), dtype=np.complex128)
+        Z = np.array(Z, dtype=np.complex128)
+
+        func1 = AAA(Z, Y, rtol=tol, max_terms)
+        return func1, func1.poles(), func1.residues(), func1.roots()
+
+except ImportError:
+    from .aaa import AAA_algorithm
 
 
 class ExpFitDecomposition:
@@ -152,8 +185,6 @@ class AAADecomposition:
     :type K: int or None, optional
     :param w: Either the support points or a key word used to generate the support points.  For details see the AAA_support_points function.  (Default: "linear")
     :type w: str or np.ndarray or list, optional
-    :param aaa_nmax: The maximum number of poles to allow within the AAA algorithm. (Default:500)
-    :type aaa_nmax: int, optional
     :param coeff: A coefficient to go in front of the frequency terms. (Default: 1)
     :type coeff: float, optional
     :param wmin: The minimum allowed frequency. (Default: None)
@@ -179,7 +210,6 @@ class AAADecomposition:
         tol=1e-4,
         K=None,
         w="linear",
-        aaa_nmax=500,
         coeff=1.0,
         wmin=None,
         wmax=None,
@@ -191,7 +221,6 @@ class AAADecomposition:
         self.wmax = wmax
         self.Naaa = Naaa
 
-        self.aaa_nmax = aaa_nmax
         self.coeff = coeff
         self.aaa_tol = tol
         self.K = K
@@ -233,7 +262,7 @@ class AAADecomposition:
 
         # first compute the aaa decomposition of the spectral function
         func1, p, r, z = AAA_algorithm(
-            S, self.Z1, nmax=self.aaa_nmax, tol=self.aaa_tol, K=self.K
+            S, self.Z1, tol=self.aaa_tol, K=self.K
         )
 
         # and convert that to the heom correlation function coefficients

@@ -377,7 +377,6 @@ namespace ttns
     std::ostream &operator<<(std::ostream &os, const SOP<T> &op);
 
     // the string sum of product operator class used for storing the representation of the Hamiltonian of interest.
-    // TODO: Ensure correctness of the Jordan-Wigner Mapping code
     template <typename T>
     class SOP
     {
@@ -730,15 +729,6 @@ namespace ttns
             this->jordan_wigner(is_fermion_mode, tol);
             return *this;
         }
-
-        // SOP& jordan_wigner(double tol = 1e-15)
-        //{
-        //     size_t nmodes = this->nmodes();
-        //     std::vector<bool> is_fermion_mode(nmodes);      std::fill(is_fermion_mode.begin(), is_fermion_mode.end(), false);
-        //     this->set_is_fermionic_mode(is_fermion_mode);
-        //     this->jordan_wigner(is_fermion_mode, tol);
-        //     return *this;
-        // }
 
         sSOP<T> expand() const
         {
