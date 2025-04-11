@@ -218,6 +218,8 @@ namespace ttns
                 {std::string("sigma+"), std::make_shared<sigma_p<T>>()},
                 {std::string("sigmap"), std::make_shared<sigma_p<T>>()},
                 // bind the pauli lower operators
+                {std::string("s-"), std::make_shared<sigma_m<T>>()},
+                {std::string("sm"), std::make_shared<sigma_m<T>>()},
                 {std::string("sigma-"), std::make_shared<sigma_m<T>>()},
                 {std::string("sigmam"), std::make_shared<sigma_m<T>>()},
                 // bind the pauli x operators

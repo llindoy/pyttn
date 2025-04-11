@@ -5,6 +5,8 @@ include(CheckIPOSupported)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 
+set(CMAKE_BUILD_TYPE "Release")
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 #compiler flags
 option(USE_CUDA "Compile with cuda" OFF)
@@ -208,8 +210,6 @@ add_library(restore_default_visibility INTERFACE)
 target_compile_options(restore_default_visibility INTERFACE -fvisibility=default)
 target_link_libraries(ttnpp PRIVATE restore_default_visibility)
 
-#set_target_properties(ttnpp PROPERTIES
-#        VISIBILITY_INLINES_HIDDEN ON)
 check_ipo_supported(RESULT ipo)
 if(ipo)
 set_property(TARGET ttnpp PROPERTY VISIBILITY_INLINES_HIDDEN TRUE)

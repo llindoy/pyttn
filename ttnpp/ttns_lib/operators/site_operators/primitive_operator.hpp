@@ -161,7 +161,7 @@ namespace ttns
             linalg::matrix<T> todense() const
             {
                 linalg::matrix<T> ret(base_type::m_size, base_type::m_size, [](size_type i, size_type j)
-                                      { return i == j ? T(1) : T(1); });
+                                      { return i == j ? T(1) : T(0); });
                 return ret;
             }
 

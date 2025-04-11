@@ -287,6 +287,33 @@ namespace ttns
             return ret;
         }
 
+        linalg::matrix<T> todense(const std::vector<size_type>& mode_dims) const
+        {
+            ASSERT(mode_dims.size() > m_mode, "Cannot convert siteoperator to dense matrix if the operator is not the correct size.");
+            ASSERT(mode_dims[m_mode] == m_op->size(), "Cannot convert site operator to dense matrix.  The specified mode dims are not compatible with the current size.");
+            std::vector<linalg::matrix<T>> mats;
+            for(size_type i=0; i<mode_dims.size(); ++i)
+            {
+                if (i != m_mode)
+                {
+                    mats[i] = linalg::matrix<T>(mode_dims[i], mode_dims[i], [](size_t x, size_t y){return x==y ? T(1.0) : T(0.0);});
+                }
+                else
+                {
+                    mats[m_mode] = m_op->todense();
+                }
+            }
+
+            //now construct the dense matrix from these operators
+            linalg::matrix<T> ret;
+            CALL_AND_HANDLE(kron::eval(mats, ret), "Failed to evaluate kron prod");
+            return ret;
+        }
+
+        linalg::matrix<T> todense() const
+        {
+            return m_op->todense();
+        }
 #ifdef CEREAL_LIBRARY_FOUND
     public:
         template <typename archive>

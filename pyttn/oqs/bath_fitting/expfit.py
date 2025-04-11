@@ -14,10 +14,11 @@ import numpy as np
 from .ESPRIT import ESPRIT
 from .softmspace import softmspace
 
+from .aaa import AAA_algorithm
 try:
     from scipy.interpolate import AAA
 
-    def AAA_algorithm(func, Z, tol=1e-13, K=100, *args, **kwargs):
+    def AAA_algorithm_scipy(func, Z, tol=1e-13, K=100, *args, **kwargs):
         """A wrapper for scipy.interpolate.AAA that includes evaluation of the function at the support points
 
         :param F: The function to be fit
@@ -39,14 +40,14 @@ try:
             - residues(np.ndarray) - The residues of the rational function decomposition
             - zeros(np.ndarray) - The zeros of the rational function
         """
-        Fz = np.array(F(Z, *args, **kwargs), dtype=np.complex128)
+        Fz = np.array(func(Z, *args, **kwargs), dtype=np.complex128)
         Z = np.array(Z, dtype=np.complex128)
 
-        func1 = AAA(Z, Y, rtol=tol, max_terms)
+        func1 = AAA(Z, Fz, rtol=tol, max_terms=K)
         return func1, func1.poles(), func1.residues(), func1.roots()
-
+    use_scipy_AAA=True
 except ImportError:
-    from .aaa import AAA_algorithm
+    use_scipy_AAA=False
 
 
 class ExpFitDecomposition:
@@ -193,6 +194,7 @@ class AAADecomposition:
     :type wmax: float or None, optional
     :param Naaa: The number of support points used by the AAA algorithm. (Default: 1000)
     :type Naaa: int or None, optional
+    :param use_scipy:
 
     Callable arguments:
 
@@ -214,6 +216,7 @@ class AAADecomposition:
         wmin=None,
         wmax=None,
         Naaa=1000,
+        use_scipy = use_scipy_AAA
     ):
         self.Z1 = None
         self.w = w
@@ -224,6 +227,7 @@ class AAADecomposition:
         self.coeff = coeff
         self.aaa_tol = tol
         self.K = K
+        self.use_scipy = use_scipy
 
     def __AAA_to_HEOM(p, r, coeff=1.0):
         r"""Convert the poles and residues from the AAA algorithm into the coefficients and frequencies needed
@@ -260,10 +264,17 @@ class AAADecomposition:
                 w=self.w, wmin=self.wmin, wmax=self.wmax, Naaa=self.Naaa
             )
 
-        # first compute the aaa decomposition of the spectral function
-        func1, p, r, z = AAA_algorithm(
-            S, self.Z1, tol=self.aaa_tol, K=self.K
-        )
+        if self.use_scipy:
+            # first compute the aaa decomposition of the spectral function
+            func1, p, r, _ = AAA_algorithm_scipy(
+                S, self.Z1, tol=self.aaa_tol, K=self.K
+            )
+            r = r*2*np.pi
+        else:
+            # first compute the aaa decomposition of the spectral function
+            func1, p, r, _ = AAA_algorithm(
+                S, self.Z1, tol=self.aaa_tol, K=self.K
+            )
 
         # and convert that to the heom correlation function coefficients
         dk, zk = AAADecomposition.__AAA_to_HEOM(p, r, coeff=self.coeff)
