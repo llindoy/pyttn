@@ -179,7 +179,7 @@ If you publish working using pyTTN, please cite the paper
   archivePrefix={arXiv}, 
   url={https://arxiv.org/abs/2503.15460}
 }
-
+```
 
 # Software Overview
 
