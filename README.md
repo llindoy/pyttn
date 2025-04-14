@@ -5,7 +5,7 @@
 <!-- Populate Badges when complete -->
 
 
-[![ArXiv](https://img.shields.io/badge/arXiv-2503.xxxxx-red)](https://arxiv.org/abs/2503.xxxxx)<!-- [![DOI](https://www.zenodo.org/badge/xxxxxx.svg)](https://www.zenodo.org/badge/latestdoi/xxxxx) -->
+[![ArXiv](https://img.shields.io/badge/arXiv-2503.15460-red)](https://arxiv.org/abs/2503.15460)<!-- [![DOI](https://www.zenodo.org/badge/xxxxxx.svg)](https://www.zenodo.org/badge/latestdoi/xxxxx) -->
 [![Tests tatus](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
@@ -20,8 +20,8 @@
 <!-- Add links when complete -->
 ## Links
 * Documentation:  Coming Soon!<!-- <https://qsm.gitlab-docs.npl.co.uk/pyttn> -->
-* arXiv: <https://arxiv.org/abs/2503.xxxxx>
-* Gitlab:         <https://gitlab.npl.co.uk/quantum-software/pyttn>
+* arXiv: <https://arxiv.org/abs/2503.15460>
+* Gitlab: <https://gitlab.npl.co.uk/quantum-software/pyttn>
 * National Physical Laboratory: <https://www.npl.co.uk/>
 
 <!-- * PyPI:           <> -->
@@ -165,7 +165,7 @@ Contributions of all kinds are welcome.  Please get in touch if you have any sug
 # Citing pyTTN
 If you publish working using pyTTN, please cite the paper
 
- - **[pyTTN]** L.P. Lindoy, D. Rodrigo-Albert, Y. Rath, I. Rungger *pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks*, [arXiv:2503.xxxxx](https://arxiv.org/abs/2503.xxxxx).
+ - **[pyTTN]** L.P. Lindoy, D. Rodrigo-Albert, Y. Rath, I. Rungger *pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks*, [arXiv:2503.15460](https://arxiv.org/abs/2503.15460).
 
 ## BibTeX:
 
@@ -174,12 +174,12 @@ If you publish working using pyTTN, please cite the paper
   title = {pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Network},
   author = {Lindoy, Lachlan P. and Rodrigo-Albert, Daniel. and Rath, Yannic and Rungger, Ivan},
   year = {2025},
-  eprint = {2503.xxxxx}, 
+  eprint = {2503.15460}, 
   primaryClass={quant-ph},
   archivePrefix={arXiv}, 
-  url={https://arxiv.org/abs/2503.xxxxx}
+  url={https://arxiv.org/abs/2503.15460}
 }
-```
+
 
 # Software Overview
 
