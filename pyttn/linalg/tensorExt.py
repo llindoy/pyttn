@@ -23,6 +23,11 @@ except ImportError:
 
 import numpy as np
 
+def available_backends():
+    if __cuda_import:
+            return ["blas", "cuda"]
+    else:
+        return ["blas"]
 
 def __is_vector(O):
     is_bla_vector = isinstance(O, (la.vector_real, la.vector_complex))

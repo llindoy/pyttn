@@ -10,8 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .tensorExt import vector, matrix, tensor_3, tensor_4, tensor
+from .tensorExt import vector, matrix, tensor_3, tensor_4, tensor, available_backends
 from .sparseMatrixExt import csr_matrix
+
+
 
 __all__ = [
         "vector",
@@ -19,5 +21,6 @@ __all__ = [
         "tensor_3",
         "tensor_4",
         "tensor",
-        "csr_matrix"
+        "csr_matrix",
+        "available_backends"
         ]

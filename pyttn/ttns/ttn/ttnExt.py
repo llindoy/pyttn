@@ -43,6 +43,12 @@ except ImportError:
     ttn_real_cuda = None
     ms_ttn_real_cuda = None
 
+def available_backends():
+    if __cuda_import:
+            return ["blas", "cuda"]
+    else:
+        return ["blas"]
+
 
 def is_ttn(A):
     r"""A function for determining whether a given object is a ttn
