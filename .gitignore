@@ -81,6 +81,8 @@
 
 !pyttn/utils/*.py
 
+!tree_gen.ipynb
+
 #now we include the c++ src files
 !src
 !src/*.cpp
