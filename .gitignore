@@ -78,6 +78,7 @@
 !pyttn/ttns/operators/*.py
 !pyttn/ttns/sop/*.py
 !pyttn/ttns/ttn/*.py
+!pyttn/ttns/topology/*.py
 
 !pyttn/utils/*.py
 
