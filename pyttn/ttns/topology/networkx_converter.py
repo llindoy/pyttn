@@ -17,9 +17,9 @@ from pyttn.ttnpp import ntree
 
 def convert_nx_to_subtree(tree, root, root_ind=0):
     """A function for converting a networkx graph storing a tree structure into a subtree
-    of an ntree object with root at node root.   
+    of an ntree object with root at node root.
 
-    :param tree: The networkx graph object representing the topology tree.  This 
+    :param tree: The networkx graph object representing the topology tree.  This
     :type tree: nx.Graph
     :param root: The ntreeNode object that will be used as the root node to attach the current subtree to
     :type root: ntreeNode
@@ -32,7 +32,8 @@ def convert_nx_to_subtree(tree, root, root_ind=0):
 
     if not nx.is_tree(tree):
         raise RuntimeError(
-            "Failed to convert networkx graph to subtree.  The input graph is not a tree.")
+            "Failed to convert networkx graph to subtree.  The input graph is not a tree."
+        )
 
     root_skip = root.size()
     node_dict = {root_ind: [root_skip]}
@@ -54,13 +55,17 @@ def convert_nx_to_subtree(tree, root, root_ind=0):
         node_dict[edge[1]] = node_dict[edge[0]] + [edge_counter[edge[0]]]
         root.at(node_dict[edge[0]]).insert(edge[1])
 
-    return [root.at(leaf_inds).value for leaf_inds in root.leaf_indices()]
+    subtree_root = root.at([root_skip])
+    return [
+        subtree_root.at(leaf_inds).value
+        for leaf_inds in subtree_root.leaf_indices()
+    ]
 
 
 def convert_nx_to_tree(tree, root_ind=0):
-    """A function for constructing an ntree object from a networkx object.  
+    """A function for constructing an ntree object from a networkx object.
 
-    :param tree: The networkx graph object representing the topology tree.  This 
+    :param tree: The networkx graph object representing the topology tree.  This
     :type tree: nx.Graph
     :param root_ind: The index in the tree object that should be connected to root, defaults to 0
     :type root_ind: int, optional
@@ -70,15 +75,15 @@ def convert_nx_to_tree(tree, root_ind=0):
 
     if not nx.is_tree(tree):
         raise RuntimeError(
-            "Failed to convert networkx graph to subtree.  The input graph is not a tree.")
+            "Failed to convert networkx graph to subtree.  The input graph is not a tree."
+        )
 
-    res = ntree(str(tree.number_of_nodes()))
+    res = ntree(str(tree.number_of_nodes() - 1))
 
     node_dict = {root_ind: []}
     edge_counter = {}
 
     for edge in nx.dfs_edges(tree, source=root_ind):
-
         if edge[0] not in edge_counter.keys():
             edge_counter[edge[0]] = 0
         else:
