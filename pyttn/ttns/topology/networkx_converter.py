@@ -78,7 +78,11 @@ def convert_nx_to_tree(tree, root_ind=0):
             "Failed to convert networkx graph to subtree.  The input graph is not a tree."
         )
 
-    res = ntree(str(tree.number_of_nodes() - 1))
+    edges = list(nx.dfs_edges(tree, source=root_ind))
+    if len(edges) == 0:
+        return ntree(), []
+    
+    res = ntree(str(edges[0][0]))
 
     node_dict = {root_ind: []}
     edge_counter = {}

@@ -11,8 +11,6 @@
 # limitations under the License
 
 from .tensorExt import vector, matrix, tensor
-from .sparseMatrixExt import *
-
 
 __all__ = [
         "vector",

@@ -12,6 +12,7 @@
 
 import networkx as nx
 import numpy as np
+from math import ceil
 
 
 def distance_matrix_to_graph(M):
@@ -25,21 +26,129 @@ def __insert_physical_nodes(spanning_tree, N, root_ind):
     # and the new children nodes have the label that their parent used to have
     nindex = spanning_tree.number_of_nodes()
 
-    mapping = {}
+    # iterate over each node in the tree and determine whether we need to insert the child node
+    # this is done by iterating over the tree in a depth first search order and determining if it
+    # is a leaf node in the tree.  If it is we don't need to do anything, if it is not, then we will
+    # insert a node beneath the present node and update its index
+
+    #get a list of all nodes in the tree
+    edges = sorted([edge for edge in nx.dfs_edges(
+        spanning_tree, source=root_ind)], key=lambda x: np.abs(x[0]-root_ind))
+    
+    #determine the number of children each node has
+    nchildren = [0 for x in range(N)]
+    for i, e in enumerate(edges):
+        if e[0] < N:
+            nchildren[e[0]] += 1
+
+    #and the total number of nodes that aren't leaf nodes
+
+    mapping = {}      
+    counter = 0  
     for i in range(nindex):
-        mapping[i] = N + i
+        if(i < N):
+            if nchildren[i] == 0:
+                mapping[i] = i
+            else:
+                mapping[i] = nindex+counter
+                counter = counter+1
+        else:
+            mapping[i] = i
+
 
     # iterate over the tree and add nodes to any n
     nx.relabel_nodes(spanning_tree, mapping=mapping, copy=False)
 
     for i in range(N):
-        spanning_tree.add_edge(N + i, i)
+        if nchildren[i] > 0:
+            spanning_tree.add_edge(mapping[i], i)
+    print(mapping)
+    return spanning_tree, mapping[root_ind]
 
-    return spanning_tree, N + root_ind
+
+def chunks(nodes, n):
+    N = ceil(len(nodes)/n)
+    for i in range(0, len(nodes), N):
+        yield nodes[i:i + N]
 
 
-def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None):
-    if max_nchild is None:
+def __split_node_mps(T, node, children, nindex, handle_leaves = False):
+    curr_node = node
+    if handle_leaves:
+        if len(children) == 1:
+            T.add_edge(curr_node, children[0])
+        elif len(children) == 2:
+            T.add_edge(curr_node, nindex)
+            T.add_edge(nindex, children[0])
+            T.add_edge(nindex, children[1])
+            nindex += 1
+        elif len(children) > 2:
+            T.add_edge(curr_node, nindex)
+            curr_node = nindex
+            nindex += 1
+            for cind in range(len(children)-2):
+                T.add_edge(curr_node, children[cind])
+                T.add_edge(curr_node, nindex)
+                curr_node = nindex
+                nindex += 1
+            T.add_edge(curr_node, children[-2])
+            T.add_edge(curr_node, children[-1])
+    else:
+        if len(children) > 0:
+            for cind in range(len(children)-1):
+                T.add_edge(curr_node, children[cind])
+                T.add_edge(curr_node, nindex)
+                curr_node = nindex
+                nindex += 1
+            T.add_edge(curr_node, children[-1])
+    return T, nindex
+
+def __split_node_branching(T, node, children, max_nchild, nindex, handle_leaves = False):
+    curr_node = node
+    if len(children) > max_nchild:
+        if handle_leaves:
+            T.add_edge(curr_node, nindex)
+            curr_node = nindex
+            nindex += 1
+        # if the children list is longer than the maximum degree, iterate over creating up to max degree chunks
+        for chunk in chunks(children, max_nchild):
+            if len(chunk) == 1:
+                T.add_edge(curr_node, chunk[0])
+            else:
+                # for each chunk
+                nlabel = nindex
+                T.add_edge(curr_node, nlabel)
+                nindex += 1
+                T, nindex = __split_node_branching(T, nlabel, chunk, max_nchild, nindex)
+    else:
+        if len(children) > 1 and handle_leaves:
+            T.add_edge(curr_node, nindex)
+            curr_node = nindex
+            nindex += 1
+            for child in children:
+                T.add_edge(curr_node, child)           
+        else:
+            for child in children:
+                T.add_edge(curr_node, child)
+    return T, nindex
+
+def __split_node(T, node, children, max_nchild, nindex, handle_leaves = False):
+    if max_nchild is None: 
+        for i in range(len(children)):
+            T.add_edge(node, children[i])
+    elif max_nchild > 1:
+        T, nindex = __split_node_branching(T, node, children, max_nchild, nindex, handle_leaves=handle_leaves)
+    elif max_nchild == 1:
+        T, nindex = __split_node_mps(T, node, children, nindex, handle_leaves=handle_leaves)
+    else:
+        for i in range(len(children)):
+            T.add_edge(node, children[i])
+
+    return T, nindex
+
+
+def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None, max_nleaves=None):
+    if max_nchild is None and max_nleaves is None:
         # if max degree has not been specified we just return the current tree
         return spanning_tree
     else:
@@ -47,10 +156,8 @@ def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None):
         # the node into sets of the correct size.  To do this we get a DFS edges list and if there are any instances
         # of nodes with more than max_nchild children we insert sufficiently many logical nodes so that we have the
         # correct degree of connectivity
-        edges = sorted(
-            [edge for edge in nx.dfs_edges(spanning_tree, source=root_index)],
-            key=lambda x: np.abs(x[0] - root_index),
-        )
+        edges = sorted([edge for edge in nx.dfs_edges(
+            spanning_tree, source=root_index)], key=lambda x: np.abs(x[0]-root_index))
 
         nchildren = {}
         nodes_to_split = {}
@@ -65,14 +172,21 @@ def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None):
                 curr_node = e[0]
                 sind = i
 
-            if e[0] not in nchildren.keys():
-                nchildren[e[0]] = 1
+            if curr_node not in nchildren.keys():
+                nchildren[curr_node] = 1
             else:
-                nchildren[e[0]] += 1
+                nchildren[curr_node] += 1
 
-            if nchildren[e[0]] > max_nchild:
-                if e[0] not in nodes_to_split.keys():
-                    nodes_to_split[e[0]] = sind
+            if nchildren[curr_node] > max_nchild:
+                if curr_node not in nodes_to_split.keys():
+                    nodes_to_split[curr_node] = sind
+
+        for i, e in enumerate(edges):
+            if curr_node != e[1]:
+                curr_node = e[1]
+
+            if curr_node not in nchildren.keys():
+                nchildren[curr_node]=0
 
         # if none of the nodes are high degree we don't need to do anything
         if len(nodes_to_split) == 0:
@@ -87,25 +201,21 @@ def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None):
             for node, ind in nodes_to_split.items():
                 nchild = nchildren[node]
 
-                # insert floor(nchild/max_nchild) logical nodes that will be full connecting
-                for j in range(nchild // max_nchild):
-                    T.add_edge(node, counter)
-                    for k in range(max_nchild):
-                        T.add_edge(counter, edges[ind + j * max_nchild + k][1])
+                print([nchildren[edges[ind+i][1]] for i in range(nchild)])
+                # get a list containing all of its children
+                leaf_children = [edges[ind+i][1] for i in range(nchild) if nchildren[edges[ind+i][1]]==0]
 
-                    counter = counter + 1
+                internal_children = [edges[ind+i][1] for i in range(nchild) if nchildren[edges[ind+i][1]]>0]
+                print(edges[ind], leaf_children, internal_children)
 
-                if nchild % max_nchild == 1:
-                    for j in range((nchild // max_nchild) * max_nchild, nchild):
-                        T.add_edge(node, edges[ind + j][1])
+                if max_nchild is None:
+                    max_nchild = max_nleaves    
 
-                elif nchild % max_nchild > 1:
-                    T.add_edge(node, counter)
-
-                    for k in range((nchild // max_nchild) * max_nchild, nchild):
-                        T.add_edge(counter, edges[ind + j][1])
-
-                    counter = counter + 1
+                if max_nleaves is None:
+                    T, counter = __split_node(T, node, leaf_children+internal_children, max_nchild, counter)
+                else:           
+                    T, counter = __split_node(T, node, internal_children, max_nchild, counter)
+                    T, counter = __split_node(T, node, leaf_children, max_nleaves, counter, handle_leaves=True)
 
             for e in edges:
                 if e[0] not in nodes_to_split.keys():
@@ -113,15 +223,17 @@ def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None):
             return T
 
 
-def generate_spanning_tree(M, max_nchild=None, root_index=0):
+def generate_spanning_tree(M, max_internal_children=None, max_leaf_children=None, root_index=0):
     """Construct a networkx graph object from the maximum weight spanning tree of some matrix M.  This function
     can optionally insert logical nodes to prevent any node having a more children than max_nchild, and can be chosen
     so that any node is the root index of the tree.
 
     :param M: The "distance" matrix used to define a weighted graph of the nodes to be represented as a tree
     :type M: np.ndarray
-    :param max_nchild: The maximum allowed number of children.  If this is none, the number of children is not constrained, defaults to None
-    :type max_nchild: int, None, optional
+    :param max_internal_children: The maximum allowed number of internal node children.  If this is none, the number of internal node children will be set to the value of max_leaf_children, defaults to None
+    :type max_internal_children: int, None, optional
+    :param max_leaf_children: The maximum allowed number of leaf node children.  If this is none, then we don't treat leaf and internal node children separately, defaults to None
+    :type max_leaf_children: int, None, optional
     :param root_index: The index of the nodes that will be set as the root of this tree, defaults to 0
     :type root_index: int, optional
     :return: A networkx graph containing the generated tree and the index of the root of the tree.
@@ -135,7 +247,7 @@ def generate_spanning_tree(M, max_nchild=None, root_index=0):
 
     spanning_tree = nx.maximum_spanning_tree(G)
     spanning_tree = __split_high_degree_nodes(
-        spanning_tree, M.shape[0], root_index, max_nchild=max_nchild
+        spanning_tree, M.shape[0], root_index, max_nchild=max_internal_children, max_nleaves=max_leaf_children
     )
 
     return __insert_physical_nodes(spanning_tree, M.shape[0], root_index)
