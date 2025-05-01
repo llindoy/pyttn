@@ -17,6 +17,7 @@
 
 #include "SOP.hpp"
 
+#include <map>
 #include <tuple>
 #include <vector>
 #include <algorithm>

@@ -76,6 +76,13 @@ template <typename T> void init_ntree_node(py::module &m) {
             :rtype: bool
 
             )mydelim")
+      .def("is_local_basis_transformation", &node_type::is_local_basis_transformation, R"mydelim(
+            Return whether or not a node is a local basis transformation node, that is a node that is the parent of a leaf and only has one child.
+
+            :returns: Whether or not the node is a local basis transformation node.
+            :rtype: bool
+
+            )mydelim")
       .def("leaf_indices", &node_type::leaf_indices, py::arg(),
            py::arg("resize") = true)
       .def(
@@ -93,6 +100,7 @@ template <typename T> void init_ntree_node(py::module &m) {
              n.index(linds);
              return linds;
            })
+      .def("depth", &node_type::depth)
 
       .def("parent", &node_type::parent)
       .def("clear", &node_type::clear)
@@ -112,12 +120,11 @@ template <typename T> void init_ntree_node(py::module &m) {
            py::return_value_policy::reference)
       .def("at",
            static_cast<const node_type &(
-               node_type::*)(const std::vector<size_t> &, size_t) const>(
+               node_type::*)(const std::vector<size_t> &) const>(
                &node_type::at),
            py::return_value_policy::reference)
       .def("at",
-           static_cast<node_type &(node_type::*)(const std::vector<size_t> &,
-                                                 size_t)>(&node_type::at),
+           static_cast<node_type &(node_type::*)(const std::vector<size_t> &)>(&node_type::at),
            py::return_value_policy::reference)
       .def("__getitem__",
            static_cast<node_type &(node_type::*)(size_t)>(

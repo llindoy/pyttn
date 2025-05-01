@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,10 +15,10 @@ from .tdvpExt import single_set_tdvp, multiset_tdvp, tdvp
 
 
 __all__ = [
-        "single_set_dmrg",
-        "multiset_dmrg",
-        "dmrg",
-        "single_set_tdvp",
-        "multiset_tdvp",
-        "tdvp"
+    "single_set_dmrg",
+    "multiset_dmrg",
+    "dmrg",
+    "single_set_tdvp",
+    "multiset_tdvp",
+    "tdvp"
 ]
