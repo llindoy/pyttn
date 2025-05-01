@@ -166,7 +166,7 @@ Contributions of all kinds are welcome.  Please get in touch if you have any sug
 # Citing pyTTN
 If you publish working using pyTTN, please cite the paper
 
- - **[pyTTN]** L.P. Lindoy, D. Rodrigo-Albert, Y. Rath, I. Rungger *pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks*, [arXiv:2503.xxxxx](https://arxiv.org/abs/2503.xxxxx).
+ - **[pyTTN]** L.P. Lindoy, D. Rodrigo-Albert, Y. Rath, I. Rungger *pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks*, [arXiv:2503.15460](https://arxiv.org/abs/2503.15460).
 
 ## BibTeX:
 
