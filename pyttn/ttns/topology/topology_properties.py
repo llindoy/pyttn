@@ -27,17 +27,18 @@ def __get_value(chi, level):
         return chi
 
 
-def __setup_bond_properties_internal(node, chi, dims, level, chi_local_transform, node_list, nindex, update_leaves = True, update_internal_nodes = True):
-    if node.is_leaf() and update_leaves:
-        if isinstance(dims, (list, np.ndarray)):
-            node.value = dims[node.value]
-        elif isinstance(dims, int):
-            node.value = dims
-        else:
-            raise RuntimeError("Invalid dims argument.")
+def __setup_bond_properties_internal(node, chi, dims, level, chi_local_transform, node_list, nindex, update_leaves=True, update_internal_nodes=True):
+    if node.is_leaf():
+        if update_leaves:
+            if isinstance(dims, (list, np.ndarray)):
+                node.value = dims[node.value]
+            elif isinstance(dims, int):
+                node.value = dims
+            else:
+                raise RuntimeError("Invalid dims argument.")
     elif node.is_root() and update_internal_nodes:
         node.value = 1
-    elif node.is_local_basis_transformation() and update_internal_nodes :
+    elif node.is_local_basis_transformation() and update_internal_nodes:
         chiv = __get_value(chi_local_transform, node.at(0).value)
         if chiv is None:
             if isinstance(dims, (list, np.ndarray)):
@@ -53,7 +54,7 @@ def __setup_bond_properties_internal(node, chi, dims, level, chi_local_transform
 
     for i in range(node.size()):
         __setup_bond_properties_internal(
-            node.at(i), chi, dims, level+1, chi_local_transform, node_list, nindex + [i])
+            node.at(i), chi, dims, level+1, chi_local_transform, node_list, nindex + [i], update_leaves=update_leaves, update_internal_nodes=update_internal_nodes)
 
 
 def __update_interior_nodes(root, chi, node_list):
@@ -61,6 +62,7 @@ def __update_interior_nodes(root, chi, node_list):
         node = root.at(nind)
         if (not node.is_leaf()) and (not node.is_root()) and (not node.is_local_basis_transformation()):
             chi(node)
+
 
 def set_dims(root, dims):
     """Set the the local hilbert space dimension in the topology tree (or in a subtree with root defined by the node root).

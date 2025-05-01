@@ -11,7 +11,7 @@
 # limitations under the License
 
 from .bond_setter import NodeSumSetter, NodeIncrementSetter
-from .topology_properties import set_topology_properties
+from .topology_properties import set_topology_properties, set_bond_dimensions, set_dims
 from .spanning_tree import generate_spanning_tree
 from .hierarchical_clustering import generate_hierarchical_clustering_tree
 from .networkx_converter import convert_nx_to_subtree, convert_nx_to_tree
@@ -20,6 +20,8 @@ __all__ = [
     "NodeSumSetter",
     "NodeIncrementSetter",
     "set_topology_properties",
+    "set_bond_dimensions",
+    "set_dims",
     "generate_spanning_tree",
     "generate_hierarchical_clustering_tree",
     "convert_nx_to_subtree",

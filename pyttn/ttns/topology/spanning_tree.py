@@ -164,7 +164,9 @@ def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None, max
 
         curr_node = None
         sind = 0
-
+        if max_nchild is None:
+            max_nchild = max_nleaves   
+            
         # iterate over the edges getting the number of children associated with each node and the location of the
         # first edge associated with a nodes children in the list
         for i, e in enumerate(edges):
@@ -208,8 +210,7 @@ def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None, max
                 internal_children = [edges[ind+i][1] for i in range(nchild) if nchildren[edges[ind+i][1]]>0]
                 print(edges[ind], leaf_children, internal_children)
 
-                if max_nchild is None:
-                    max_nchild = max_nleaves    
+ 
 
                 if max_nleaves is None:
                     T, counter = __split_node(T, node, leaf_children+internal_children, max_nchild, counter)
