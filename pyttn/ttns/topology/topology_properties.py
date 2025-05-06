@@ -27,7 +27,17 @@ def __get_value(chi, level):
         return chi
 
 
-def __setup_bond_properties_internal(node, chi, dims, level, chi_local_transform, node_list, nindex, update_leaves=True, update_internal_nodes=True):
+def __setup_bond_properties_internal(
+    node,
+    chi,
+    dims,
+    level,
+    chi_local_transform,
+    node_list,
+    nindex,
+    update_leaves=True,
+    update_internal_nodes=True,
+):
     if node.is_leaf():
         if update_leaves:
             if isinstance(dims, (list, np.ndarray)):
@@ -54,22 +64,35 @@ def __setup_bond_properties_internal(node, chi, dims, level, chi_local_transform
 
     for i in range(node.size()):
         __setup_bond_properties_internal(
-            node.at(i), chi, dims, level+1, chi_local_transform, node_list, nindex + [i], update_leaves=update_leaves, update_internal_nodes=update_internal_nodes)
+            node.at(i),
+            chi,
+            dims,
+            level + 1,
+            chi_local_transform,
+            node_list,
+            nindex + [i],
+            update_leaves=update_leaves,
+            update_internal_nodes=update_internal_nodes,
+        )
 
 
 def __update_interior_nodes(root, chi, node_list):
     for nind in reversed(node_list):
         node = root.at(nind)
-        if (not node.is_leaf()) and (not node.is_root()) and (not node.is_local_basis_transformation()):
+        if (
+            (not node.is_leaf())
+            and (not node.is_root())
+            and (not node.is_local_basis_transformation())
+        ):
             chi(node)
 
 
 def set_dims(root, dims):
     """Set the the local hilbert space dimension in the topology tree (or in a subtree with root defined by the node root).
 
-    :param root: The topology tree (or subtree) for which properties are to be set.  
+    :param root: The topology tree (or subtree) for which properties are to be set.
 
-       * If root is a ntree we will edit the properties of all nodes in the entire tree.  
+       * If root is a ntree we will edit the properties of all nodes in the entire tree.
        * If root is a ntreeNode we will edit the properties of all nodes in the subtree that root is the root of.
 
     :type root: ntree or ntreeNode
@@ -79,10 +102,12 @@ def set_dims(root, dims):
     node_list = []
     if isinstance(root, ntree):
         __setup_bond_properties_internal(
-            root(), None, dims, 0, None, node_list, [], update_internal_nodes=False)
+            root(), None, dims, 0, None, node_list, [], update_internal_nodes=False
+        )
     elif isinstance(root, ntreeNode):
         __setup_bond_properties_internal(
-            root, None, dims, 0, None, node_list, [], update_internal_nodes=False)
+            root, None, dims, 0, None, node_list, [], update_internal_nodes=False
+        )
     else:
         raise RuntimeError("Invalid root type for setup bond properties")
 
@@ -91,13 +116,13 @@ def set_bond_dimensions(root, chi, chi_local_transform=None):
     """Set the the internal values stored in the topology tree (or in a subtree with root defined by the node root).
     This function will set the bond dimension and dimensionality of the local Hilbert space isometry.
 
-    :param root: The topology tree (or subtree) for which properties are to be set.  
+    :param root: The topology tree (or subtree) for which properties are to be set.
 
-       * If root is a ntree we will edit the properties of all nodes in the entire tree.  
+       * If root is a ntree we will edit the properties of all nodes in the entire tree.
        * If root is a ntreeNode we will edit the properties of all nodes in the subtree that root is the root of.
 
     :type root: ntree or ntreeNode
-    :param chi: The bond dimension information to be set for internal nodes of the tree.  The manner in whichthe bond dimensions are set depends on the type passed to chi. 
+    :param chi: The bond dimension information to be set for internal nodes of the tree.  The manner in whichthe bond dimensions are set depends on the type passed to chi.
 
        * If chi is an integer then all interior bond dimensions are set to this value
        * If chi is Callable then the interior bond dimension are set to chi(L) where L is the depth of the tree from the root
@@ -117,10 +142,19 @@ def set_bond_dimensions(root, chi, chi_local_transform=None):
     node_list = []
     if isinstance(root, ntree):
         __setup_bond_properties_internal(
-            root(), chi, None, 0, chi_local_transform, node_list, [], update_leaves=False)
+            root(),
+            chi,
+            None,
+            0,
+            chi_local_transform,
+            node_list,
+            [],
+            update_leaves=False,
+        )
     elif isinstance(root, ntreeNode):
         __setup_bond_properties_internal(
-            root, chi, None, 0, chi_local_transform, node_list, [], update_leaves=False)
+            root, chi, None, 0, chi_local_transform, node_list, [], update_leaves=False
+        )
     else:
         raise RuntimeError("Invalid root type for setup bond properties")
 
@@ -138,13 +172,13 @@ def set_topology_properties(root, chi, dims, chi_local_transform=None):
     This function can set the bond dimension, local hilbert space dimension and dimensionality
     of the local Hilbert space isometry.
 
-    :param root: The topology tree (or subtree) for which properties are to be set.  
+    :param root: The topology tree (or subtree) for which properties are to be set.
 
-       * If root is a ntree we will edit the properties of all nodes in the entire tree.  
+       * If root is a ntree we will edit the properties of all nodes in the entire tree.
        * If root is a ntreeNode we will edit the properties of all nodes in the subtree that root is the root of.
 
     :type root: ntree or ntreeNode
-    :param chi: The bond dimension information to be set for internal nodes of the tree.  The manner in whichthe bond dimensions are set depends on the type passed to chi. 
+    :param chi: The bond dimension information to be set for internal nodes of the tree.  The manner in whichthe bond dimensions are set depends on the type passed to chi.
 
        * If chi is an integer then all interior bond dimensions are set to this value
        * If chi is Callable then the interior bond dimension are set to chi(L) where L is the depth of the tree from the root
@@ -166,10 +200,12 @@ def set_topology_properties(root, chi, dims, chi_local_transform=None):
     node_list = []
     if isinstance(root, ntree):
         __setup_bond_properties_internal(
-            root(), chi, dims, 0, chi_local_transform, node_list, [])
+            root(), chi, dims, 0, chi_local_transform, node_list, []
+        )
     elif isinstance(root, ntreeNode):
         __setup_bond_properties_internal(
-            root, chi, dims, 0, chi_local_transform, node_list, [])
+            root, chi, dims, 0, chi_local_transform, node_list, []
+        )
     else:
         raise RuntimeError("Invalid root type for setup bond properties")
 

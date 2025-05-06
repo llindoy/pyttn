@@ -121,8 +121,8 @@ def test_set_dims(request, tree, dims, expected):
         assert tree.at(li).value == expected[i]
 
 
-def func(l):
-    return l + 5
+def func(value):
+    return value + 5
 
 
 @pytest.mark.parametrize(
