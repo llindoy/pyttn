@@ -23,8 +23,10 @@ def test_hierarchical_clustering_tree():
         for j in range(len(X)):
             M[i, j] = np.abs(X[i]-X[j])
 
+    M = np.max(M) - M
+
     # build the networkx tree from this
-    nxtree, root_ind = generate_hierarchical_clustering_tree(M)
+    nxtree, root_ind = generate_hierarchical_clustering_tree(M, distance_metric='sub')
 
     assert root_ind == 14
     assert nxtree.number_of_nodes() == 15
@@ -83,8 +85,10 @@ def test_hierarchical_clustering_subtree():
         for j in range(len(X)):
             M[i, j] = np.abs(X[i]-X[j])
 
+    M = np.max(M) - M
+
     # build the networkx tree from this
-    nxtree, root_ind = generate_hierarchical_clustering_tree(M)
+    nxtree, root_ind = generate_hierarchical_clustering_tree(M, distance_metric='sub')
 
     assert root_ind == 14
     assert nxtree.number_of_nodes() == 15
