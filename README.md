@@ -6,7 +6,7 @@
 
 
 [![ArXiv](https://img.shields.io/badge/arXiv-2503.15460-red)](https://arxiv.org/abs/2503.15460)<!-- [![DOI](https://www.zenodo.org/badge/xxxxxx.svg)](https://www.zenodo.org/badge/latestdoi/xxxxx) -->
-[![Testsstatus](https://gitlab.npl.co.uk/%{project_path}/-/commits/%{default_branch})](https://gitlab.npl.co.uk/%{project_path}/badges/%{default_branch}/pipeline.svg) 
+[![Testsstatus](https://gitlab.npl.co.uk/pyttn/-/commits/main})](https://gitlab.npl.co.uk/pyttn/badges/main/pipeline.svg) 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
