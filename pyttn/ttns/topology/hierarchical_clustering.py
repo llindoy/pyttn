@@ -53,16 +53,50 @@ def __linkage_to_nxtree(Z):
     return T, root_index
 
 
-def generate_hierarchical_clustering_tree(M):
+def __weight_to_distance(M, distance_metric, **kwargs):
+    if distance_metric == 'sub':
+        return np.max(M)-M
+    elif distance_metric == 'exp':
+        if 'eps' in kwargs:
+            eps = kwargs['eps']
+            return np.exp(-eps*M)
+        else:
+            return np.exp(-M)
+    elif distance_metric == 'gauss':
+        if 'eps' in kwargs:
+            eps = kwargs['eps']
+            return np.exp(-eps*M*M)
+        else:
+            return np.exp(-M*M)
+    elif distance_metric == 'lorentz':
+        if 'eps' in kwargs:
+            eps = kwargs['eps']
+            return eps/(eps*eps+M*M)
+        else:
+            return 1/(1+M*M)
+    else:
+        raise RuntimeError("Failed to recognised distance metric parameter.")
+    
+
+def generate_hierarchical_clustering_tree(M, distance_metric='gauss', **kwargs):
     """Construct a networkx graph object from the maximum weight spanning tree of some matrix M.  This function
     can optionally insert logical nodes to prevent any node having a more children than max_nchild, and can be chosen
     so that any node is the root index of the tree.
 
-    :param M: The "distance" matrix used to define a weighted graph of the nodes to be represented as a tree
+    :param M: The weight matrix used to define a weighted graph of the nodes to be represented as a tree. 
     :type M: np.ndarray
+    :param distance_metric: An arguments specifying how to transform the weight matrix to a distance matrix (default: 'gauss')
+    :type distance_metric: {'sub', 'exp', 'gauss', 'lorentz'}, optional
+
+    :param **kwargs:  Additional keyword arguments that depend on the choice of distance metric. 
+
+        - For distance_metric = 'sub': This argument is ignored 
+        - For distance_metric={'exp', 'gauss', 'lorentz'}: an optional eps argument can be specified defining the width of the function.
+
     :return: A networkx graph containing the generated tree and the index of the root of the tree.
     :rtype: nx.Graph, int
     """
     dist = __condense_distance_matrix(M)
+    dist = __weight_to_distance(dist, distance_metric, **kwargs)
     Z = linkage(dist, method='ward')
     return __linkage_to_nxtree(Z,)
