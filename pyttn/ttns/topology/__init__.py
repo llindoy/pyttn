@@ -10,10 +10,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .matrixElementExt import matrix_element
-from .matrix_element_interface import matrix_element_dtype
+from .bond_setter import NodeSumSetter, NodeIncrementSetter
+from .topology_properties import set_topology_properties, set_bond_dimensions, set_dims
+from .spanning_tree import generate_spanning_tree
+from .hierarchical_clustering import generate_hierarchical_clustering_tree
+from .networkx_converter import convert_nx_to_subtree, convert_nx_to_tree
 
 __all__ = [
-    "matrix_element",
-    "matrix_element_dtype"
+    "NodeSumSetter",
+    "NodeIncrementSetter",
+    "set_topology_properties",
+    "set_bond_dimensions",
+    "set_dims",
+    "generate_spanning_tree",
+    "generate_hierarchical_clustering_tree",
+    "convert_nx_to_subtree",
+    "convert_nx_to_tree"
 ]

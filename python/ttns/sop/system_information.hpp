@@ -39,6 +39,7 @@ inline void init_system_info(py::module &m)
         .value("spin_mode", mode_type::SPIN_MODE, "Flag for setting a mode to be a spin degree of freedom")
         .value("tls_mode", mode_type::QUBIT_MODE, "Flag for setting a mode to be a two-level system degree of freedom")
         .value("generic_mode", mode_type::GENERIC_MODE, "Flag for setting a mode to be an unknown generic mode")
+        .value("nlevel_mode", mode_type::NLEVEL_MODE, "Flag for setting a mode to be an unknown generic mode")
         .def("__str__", [](const mode_type &o)
              {std::stringstream oss;   oss << o; return oss.str(); });
 
@@ -251,7 +252,16 @@ inline void init_system_info(py::module &m)
       :returns: generic mode data object
       :rtype: mode_data
       )mydelim");
+    m.def("nlevel_mode", &generic_mode, R"mydelim(
+      Create a new nlevel system mode mode_data object with arbitrary Hilbert space dimension.  When using such a mode it is necessary
+      for the user to define all operators acting on this mode.
 
+      :param N: The local Hilbert space dimension to use for the mode
+      :type N: int
+
+      :returns: nlevel mode data object
+      :rtype: mode_data
+      )mydelim");
     py::class_<system_modes>(m, "system_modes")
         .def(py::init(), "Construct an empty system_modes object.")
         .def(py::init<size_t>(), R"mydelim(

@@ -145,7 +145,7 @@ def __ttn_cuda(*args, dtype = np.complex128, **kwargs):
 def ttn(*args, dtype=np.complex128, backend="blas", **kwargs):
     r"""Factory function for constructing a tree tensor network state operator
 
-    :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
+    :param *args: Variable length list of arguments. This function can handle the following lists of arguments
 
         - Default construct TTN object
         - ttn (ttn_dtype) - Copy construct TTN object

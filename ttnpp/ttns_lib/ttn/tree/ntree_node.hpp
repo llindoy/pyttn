@@ -307,7 +307,42 @@ namespace ttns
             return *(this->m_children[n]);
         }
 
-        node_type &at(const std::vector<size_type> &inds, size_type index = 0)
+        node_type &at(const std::vector<size_type> &inds)
+        {
+            if (inds.size() == 0)
+            {
+                return *this;
+            }
+            ASSERT(inds[0] < m_children.size(), "Unable to access element of tree.  Element is out of bounds.");
+            if (1 == inds.size())
+            {
+                CALL_AND_RETHROW(return this->operator[](inds[0]));
+            }
+            else
+            {
+                CALL_AND_RETHROW(return this->operator[](inds[0]).at(inds, 1));
+            }
+        }
+
+        const node_type &at(const std::vector<size_type> &inds) const
+        {
+            if (inds.size() == 0)
+            {
+                return *this;
+            }
+            ASSERT(inds[0] < m_children.size(), "Unable to access element of tree.  Element is out of bounds.");
+
+            if (1 == inds.size())
+            {
+                CALL_AND_RETHROW(return this->operator[](inds[0]));
+            }
+            else
+            {
+                CALL_AND_RETHROW(return this->operator[](inds[0]).at(inds, 1));
+            }
+        }
+
+        node_type &at(const std::vector<size_type> &inds, size_type index)
         {
             if (inds.size() == 0)
             {
@@ -325,7 +360,7 @@ namespace ttns
             }
         }
 
-        const node_type &at(const std::vector<size_type> &inds, size_type index = 0) const
+        const node_type &at(const std::vector<size_type> &inds, size_type index) const
         {
             if (inds.size() == 0)
             {
@@ -537,6 +572,27 @@ namespace ttns
             ind.clear();
             this->index_internal(ind);
             std::reverse(ind.begin(), ind.end());
+        }
+
+        size_type depth() const
+        {
+            if(this->is_root())
+            {
+                return 0;
+            }
+            else
+            {
+                return this->m_parent->depth()+1;
+            }
+        }
+
+        bool is_local_basis_transformation() const
+        {
+            if(this->m_children.size()==1){return this->m_children[0]->is_leaf();}
+            else
+            {
+                return false;
+            }
         }
 
     protected:

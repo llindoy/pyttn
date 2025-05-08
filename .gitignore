@@ -63,14 +63,18 @@
 !pyttn
 !pyttn/*/
 !pyttn/*.py
+!pyttn/linalg
 !pyttn/linalg/*.py
+!pyttn/models
 !pyttn/models/*.py
+!pyttn/oqs
 !pyttn/oqs/*.py
 !pyttn/oqs/*/
 !pyttn/oqs/bath_fitting/*.py
 !pyttn/oqs/heom/*.py
 !pyttn/oqs/unitary/*.py
 
+!pyttn/ttns
 !pyttn/ttns/*.py
 !pyttn/ttns/*/
 !pyttn/ttns/algorithms/*.py
@@ -78,7 +82,9 @@
 !pyttn/ttns/operators/*.py
 !pyttn/ttns/sop/*.py
 !pyttn/ttns/ttn/*.py
+!pyttn/ttns/topology/*.py
 
+!pyttn/utils
 !pyttn/utils/*.py
 
 #now we include the c++ src files
@@ -99,10 +105,12 @@
 !tests/pyttn/state/*.py
 !tests/pyttn/linalg/*.py
 !tests/pyttn/oqs/*.py
+!tests/pyttn/topology/*.py
 !tests/ttns/*
 !tests/ttns/**
 !tests/utils/*
 !tests/utils/**
+
 
 #now we include the tutorials
 !tutorials

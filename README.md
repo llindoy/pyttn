@@ -6,8 +6,9 @@
 
 
 [![ArXiv](https://img.shields.io/badge/arXiv-2503.15460-red)](https://arxiv.org/abs/2503.15460)<!-- [![DOI](https://www.zenodo.org/badge/xxxxxx.svg)](https://www.zenodo.org/badge/latestdoi/xxxxx) -->
-[![Tests tatus](https://gitlab.npl.co.uk/quantum-software/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/quantum-software/pyttn/-/commits/main) 
+[![Testsstatus](https://gitlab.npl.co.uk/qsm/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/qsm/pyttn/-/commits/main) 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 <!-- 
 
@@ -21,7 +22,7 @@
 ## Links
 * Documentation:  Coming Soon!<!-- <https://qsm.gitlab-docs.npl.co.uk/pyttn> -->
 * arXiv: <https://arxiv.org/abs/2503.15460>
-* Gitlab: <https://gitlab.npl.co.uk/quantum-software/pyttn>
+* Gitlab:         <https://gitlab.npl.co.uk/quantum-software/pyttn>
 * National Physical Laboratory: <https://www.npl.co.uk/>
 
 <!-- * PyPI:           <> -->
