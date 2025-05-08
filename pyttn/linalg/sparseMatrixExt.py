@@ -10,6 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Union, TypeAlias, Optional
+
 # import the blas backend
 import pyttn.ttnpp.linalg as la
 
@@ -17,19 +19,36 @@ import pyttn.ttnpp.linalg as la
 try:
     import pyttn.ttnpp.cuda.linalg as cula
 
+    CSR_Matrix: TypeAlias = (
+        la.csr_matrix_real
+        | la.csr_matrix_complex
+        | cula.csr_matrix_real
+        | cula.csr_matrix_complex
+    )
+    Diagonal_Matrix: TypeAlias = (
+        la.diagonal_matrix_real
+        | la.diagonal_matrix_complex
+        | cula.diagonal_matrix_real
+        | cula.diagonal_matrix_complex
+    )
+
     __cuda_import = True
 except ImportError:
+    type CSR_Matrix = la.csr_matrix_real | la.csr_matrix_complex
+    type Diagonal_Matrix = la.diagonal_matrix_real | la.diagonal_matrix_complex
+
     __cuda_import = False
 
 import numpy as np
 from scipy.sparse import csr_matrix as spcsr
 
 
-def __is_csr_la(O):
-    is_bla_csr = isinstance(O, (la.csr_matrix_real, la.csr_matrix_complex))
+def __is_csr_la(Op):
+    is_bla_csr = isinstance(Op, (la.csr_matrix_real, la.csr_matrix_complex))
     if __cuda_import:
         is_csr = is_bla_csr or isinstance(
-            O, (cula.csr_matrix_real, cula.csr_matrix_complex))
+            Op, (cula.csr_matrix_real, cula.csr_matrix_complex)
+        )
     else:
         is_csr = is_bla_csr
     return is_csr
@@ -46,27 +65,37 @@ def __csr_matrix(mod, *args, dtype=None, **kwargs):
                     else:
                         dtype = np.float64
 
-                if dtype == np.float64:
+                if dtype == np.float64 or dtype is float:
                     return mod.csr_matrix_real(args[0])
-                elif dtype == np.complex128:
+                elif dtype == np.complex128 or dtype is complex:
                     return mod.csr_matrix_complex(args[0])
                 else:
                     raise RuntimeError("Invalid dtype for csr matrix")
-            #if we are working with a scipy csr matrix we build the csr matrix object using its data, indices and indptr arrays
+            # if we are working with a scipy csr matrix we build the csr matrix object using its data, indices and indptr arrays
             elif isinstance(args[0], spcsr):
                 if dtype is None:
                     dtype = args[0].dtype
 
                 if dtype is int:
-                    dtype = np.float64   
+                    dtype = np.float64
 
-                if dtype == np.float64:
-                    return mod.csr_matrix_real(np.array(args[0].data, dtype=dtype), args[0].indices, args[0].indptr, ncols=args[0].shape[1])
-                elif dtype == np.complex128:
-                    return mod.csr_matrix_complex(np.array(args[0].data, dtype=dtype), args[0].indices, args[0].indptr, ncols=args[0].shape[1])
+                if dtype == np.float64 or dtype is float:
+                    return mod.csr_matrix_real(
+                        np.array(args[0].data, dtype=dtype),
+                        args[0].indices,
+                        args[0].indptr,
+                        ncols=args[0].shape[1],
+                    )
+                elif dtype == np.complex128 or dtype is complex:
+                    return mod.csr_matrix_complex(
+                        np.array(args[0].data, dtype=dtype),
+                        args[0].indices,
+                        args[0].indptr,
+                        ncols=args[0].shape[1],
+                    )
                 else:
                     raise RuntimeError("Invalid dtype for csr matrix")
-            #if this is a list of tuples it is a coo format array and we can build it
+            # if this is a list of tuples it is a coo format array and we can build it
             elif isinstance(args[0], list):
                 if dtype is None:
                     dtype = type(args[0][0][0])
@@ -78,23 +107,29 @@ def __csr_matrix(mod, *args, dtype=None, **kwargs):
                 for t in args[0]:
                     if not isinstance(t, tuple):
                         raise RuntimeError(
-                            "Invalid type for csr matrix coo constructor")
+                            "Invalid type for csr matrix coo constructor"
+                        )
                     if not (len(t) == 3):
-                        raise RuntimeError("Invalid type for csr matrix coo constructor")
+                        raise RuntimeError(
+                            "Invalid type for csr matrix coo constructor"
+                        )
                     inputs.append((t[0], t[1], dtype(t[2])))
 
-
-                if dtype == np.float64:
+                if dtype == np.float64 or dtype is float:
                     return mod.csr_matrix_real(inputs, **kwargs)
-                elif dtype == np.complex128:
+                elif dtype == np.complex128 or dtype is complex:
                     return mod.csr_matrix_complex(inputs, **kwargs)
                 else:
                     raise RuntimeError("Invalid dtype")
             else:
                 raise RuntimeError("Invalid argument list option")
-        #if there are three arguments we have data, indices, indptr and we can build
+        # if there are three arguments we have data, indices, indptr and we can build
         elif len(args) == 3:
-            if isinstance(args[0], (list, np.ndarray)) and isinstance(args[1], (list, np.ndarray)) and isinstance(args[2], (list, np.ndarray)):
+            if (
+                isinstance(args[0], (list, np.ndarray))
+                and isinstance(args[1], (list, np.ndarray))
+                and isinstance(args[2], (list, np.ndarray))
+            ):
                 if dtype is None:
                     if isinstance(args[0], np.ndarray):
                         dtype = args[0].dtype
@@ -102,14 +137,25 @@ def __csr_matrix(mod, *args, dtype=None, **kwargs):
                         dtype = type(args[0][0])
                     else:
                         raise RuntimeError(
-                            "Failed to extract dtype from variable array.")
+                            "Failed to extract dtype from variable array."
+                        )
                 if dtype is int:
                     dtype = np.float64
 
-                if dtype == np.float64:
-                    return mod.csr_matrix_real(np.array(args[0], dtype=dtype), np.array(args[1], dtype=int), np.array(args[2], dtype=int), **kwargs)
-                elif dtype == np.complex128:
-                    return mod.csr_matrix_complex(np.array(args[0], dtype=dtype), np.array(args[1], dtype=int), np.array(args[2], dtype=int), **kwargs)
+                if dtype == np.float64 or dtype is float:
+                    return mod.csr_matrix_real(
+                        np.array(args[0], dtype=dtype),
+                        np.array(args[1], dtype=int),
+                        np.array(args[2], dtype=int),
+                        **kwargs,
+                    )
+                elif dtype == np.complex128 or dtype is complex:
+                    return mod.csr_matrix_complex(
+                        np.array(args[0], dtype=dtype),
+                        np.array(args[1], dtype=int),
+                        np.array(args[2], dtype=int),
+                        **kwargs,
+                    )
                 else:
                     raise RuntimeError("Invalid dtype")
             else:
@@ -120,8 +166,13 @@ def __csr_matrix(mod, *args, dtype=None, **kwargs):
         raise RuntimeError("Default constructor not supported for csr_matrix")
 
 
-def csr_matrix(*args, dtype=np.complex128, backend="blas", **kwargs):
-    r"""
+def csr_matrix(
+    *args,
+    dtype: Optional[Union[float, complex, np.float64, np.complex128]] = np.complex128,
+    backend: str = "blas",
+    **kwargs,
+):
+    """
     A function for converting from a numpy array to a C++ linalg::csr_matrix<T> type
      used by the C++ layer of pyTTN.
 

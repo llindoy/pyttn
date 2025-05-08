@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,8 +12,9 @@
 
 import copy
 import numpy as np
+from typing import Optional, List
 
-from pyttn import system_modes
+from pyttn.ttnpp import system_modes
 
 
 class ModeCombination:
@@ -41,12 +42,17 @@ class ModeCombination:
     :rtype: list of list
     """
 
-    def __init__(self, nhilb=1, nbmax=1, blocksize=1):
+    def __init__(self, nhilb: int = 1, nbmax: int = 1, blocksize: int = 1):
         self.nbmax = nbmax
         self.nhilb = nhilb
         self.blocksize = blocksize
 
-    def mode_combination_array(self, mode_dims, mode_inds=None, _blocksize=None):
+    def mode_combination_array(
+        self,
+        mode_dims: List[int] | np.ndarray,
+        mode_inds: Optional[List[int] | np.ndarray] = None,
+        _blocksize: Optional[int] = None,
+    ) -> List[List[int]]:
         """Perform the mode combination process on a array of mode dimensions.
 
         :param mode_dims: the mode dimensions
@@ -118,7 +124,9 @@ class ModeCombination:
 
         return composite_modes
 
-    def mode_combination_system(self, system, _blocksize=None):
+    def mode_combination_system(
+        self, system: system_modes, _blocksize: Optional[int] = None
+    ) -> List[List[int]]:
         """Perform the mode combination process on a system_modes object.
 
         :param system: the system_modes object defining all mode data
@@ -142,7 +150,9 @@ class ModeCombination:
 
         return composite_system
 
-    def __call__(self, system, _blocksize=None):
+    def __call__(
+        self, system: system_modes, _blocksize: Optional[int] = None
+    ) -> List[List[int]]:
         """Perform the mode combination process on a system_modes object.
 
         :param system: the system_modes object defining all mode data

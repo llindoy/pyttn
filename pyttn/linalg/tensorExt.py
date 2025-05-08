@@ -10,99 +10,133 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+import numpy as np
+from typing import Union, Optional, TypeAlias
+
 # import the blas backend
 import pyttn.ttnpp.linalg as la
+
 
 # and attempt to import the cuda backend
 try:
     import pyttn.ttnpp.cuda.linalg as cula
 
+    Vector: TypeAlias = (
+        la.vector_real | la.vector_complex | cula.vector_real | cula.vector_complex
+    )
+    Matrix: TypeAlias = (
+        la.matrix_real | la.matrix_complex | cula.matrix_real | cula.matrix_complex
+    )
+    Tensor3: TypeAlias = (
+        la.tensor_3_real
+        | la.tensor_3_complex
+        | cula.tensor_3_real
+        | cula.tensor_3_complex
+    )
+    Tensor4: TypeAlias = (
+        la.tensor_4_real
+        | la.tensor_4_complex
+        | cula.tensor_4_real
+        | cula.tensor_4_complex
+    )
+
     __cuda_import = True
 except ImportError:
+    Vector: TypeAlias = la.vector_real | la.vector_complex
+    Matrix: TypeAlias = la.matrix_real | la.matrix_complex
+    Tensor3: TypeAlias = la.tensor_3_real | la.tensor_3_complex
+    Tensor4: TypeAlias = la.tensor_4_real | la.tensor_4_complex
+
     __cuda_import = False
 
-import numpy as np
 
 def available_backends():
     if __cuda_import:
-            return ["blas", "cuda"]
+        return ["blas", "cuda"]
     else:
         return ["blas"]
 
-def __is_vector(O):
-    is_bla_vector = isinstance(O, (la.vector_real, la.vector_complex))
+
+def __is_vector(Op):
+    is_bla_vector = isinstance(Op, (la.vector_real, la.vector_complex))
     if __cuda_import:
-        is_vector = is_bla_vector or isinstance(O, (cula.vector_real, cula.vector_complex))
+        is_vector = is_bla_vector or isinstance(
+            Op, (cula.vector_real, cula.vector_complex)
+        )
     else:
         is_vector = is_bla_vector
     return is_vector
 
 
-def __is_matrix(O):
-    is_bla_matrix = isinstance(O, (la.matrix_real, la.matrix_complex))
+def __is_matrix(Op):
+    is_bla_matrix = isinstance(Op, (la.matrix_real, la.matrix_complex))
     if __cuda_import:
         is_matrix = is_bla_matrix or isinstance(
-            O, (cula.matrix_real, cula.matrix_complex)
+            Op, (cula.matrix_real, cula.matrix_complex)
         )
     else:
         is_matrix = is_bla_matrix
     return is_matrix
 
 
-def __is_tensor_3(O):
-    is_bla_tensor_3 = isinstance(O, (la.tensor_3_real, la.tensor_3_complex))
+def __is_tensor_3(Op):
+    is_bla_tensor_3 = isinstance(Op, (la.tensor_3_real, la.tensor_3_complex))
     if __cuda_import:
-        is_tensor_3 = is_bla_tensor_3 or isinstance(O, (cula.tensor_3_real, cula.tensor_3_complex))
+        is_tensor_3 = is_bla_tensor_3 or isinstance(
+            Op, (cula.tensor_3_real, cula.tensor_3_complex)
+        )
     else:
         is_tensor_3 = is_bla_tensor_3
     return is_tensor_3
 
 
-def __is_tensor_4(O):
-    is_bla_tensor_4 = isinstance(O, (la.tensor_4_real, la.tensor_4_complex))
+def __is_tensor_4(Op):
+    is_bla_tensor_4 = isinstance(Op, (la.tensor_4_real, la.tensor_4_complex))
     if __cuda_import:
-        is_tensor_4 = is_bla_tensor_4 or isinstance(O, (cula.tensor_4_real, cula.tensor_4_complex))
+        is_tensor_4 = is_bla_tensor_4 or isinstance(
+            Op, (cula.tensor_4_real, cula.tensor_4_complex)
+        )
     else:
         is_tensor_4 = is_bla_tensor_4
     return is_tensor_4
 
 
-def __is_tensor(O):
-    return __is_vector(O) or __is_matrix(O) or __is_tensor_3(O) or __is_tensor_4(O)
+def __is_tensor(Op):
+    return __is_vector(Op) or __is_matrix(Op) or __is_tensor_3(Op) or __is_tensor_4(Op)
 
 
-def __build_vector(O, mod, dtype):
-    if dtype == np.float64:
-        return mod.vector_real(O)
-    elif dtype == np.complex128:
-        return mod.vector_complex(O)
+def __build_vector(Op, mod, dtype):
+    if dtype == np.float64 or dtype is float:
+        return mod.vector_real(Op)
+    elif dtype == np.complex128 or dtype is complex:
+        return mod.vector_complex(Op)
     else:
         raise RuntimeError("Invalid dtype for tensor build obj")
 
 
-def __build_matrix(O, mod, dtype):
-    if dtype == np.float64:
-        return mod.matrix_real(O)
-    elif dtype == np.complex128:
-        return mod.matrix_complex(O)
+def __build_matrix(Op, mod, dtype):
+    if dtype == np.float64 or dtype is float:
+        return mod.matrix_real(Op)
+    elif dtype == np.complex128 or dtype is complex:
+        return mod.matrix_complex(Op)
     else:
         raise RuntimeError("Invalid dtype for tensor build obj")
 
 
-def __build_tensor_3(O, mod, dtype):
-    if dtype == np.float64:
-        return mod.tensor_3_real(O)
-    elif dtype == np.complex128:
-        return mod.tensor_3_complex(O)
+def __build_tensor_3(Op, mod, dtype):
+    if dtype == np.float64 or dtype is float:
+        return mod.tensor_3_real(Op)
+    elif dtype == np.complex128 or dtype is complex:
+        return mod.tensor_3_complex(Op)
     else:
         raise RuntimeError("Invalid dtype for tensor build obj")
 
 
-def __build_tensor_4(O, mod, dtype):
-    if dtype == np.float64:
-        return mod.tensor_4_real(O)
-    elif dtype == np.complex128:
-        return mod.tensor_4_complex(O)
+def __build_tensor_4(Op, mod, dtype):
+    if dtype == np.float64 or dtype is float:
+        return mod.tensor_4_real(Op)
+    elif dtype == np.complex128 or dtype is complex:
+        return mod.tensor_4_complex(Op)
     else:
         raise RuntimeError("Invalid dtype for tensor build obj")
 
@@ -129,20 +163,22 @@ def __get_dtype_la(v, dtype=None):
     return dtype
 
 
-def vector(v, dtype=None, backend="blas"):
-    r"""
+def vector(
+    v: np.ndarray | Vector,
+    dtype: Optional[Union[float, complex, np.float64, np.complex128]] = None,
+    backend: str = "blas",
+) -> Vector:
+    """
     A function for converting from a 1 dimensional numpy array to a C++ linalg::tensor<T,1> type
     used by the C++ layer of pyTTN.
 
-    :param M: The numpy array
-    :type M: np.ndarray
+    :param M: The input vector type
     :param dtype: The dtype to use for the site operator.  If this is None this function attempts to infer the dtype from v (Default: None)
     :type dtype: {None, np.float64, np.complex128}, optional
     :param backend: The backend to use for calculation. (Default: "blas")
     :type backend: {"blas", "cuda"}, optional
 
     :returns: A pybind11 wrapped linalg::tensor<T, 1> object
-    :rtype: vector_real, vector_complex
     """
 
     if backend == "blas":
@@ -170,8 +206,12 @@ def vector(v, dtype=None, backend="blas"):
         raise RuntimeError("Invalid backend type for linalg.vector")
 
 
-def matrix(M, dtype=None, backend="blas"):
-    r"""
+def matrix(
+    M: np.ndarray | Matrix,
+    dtype: Optional[Union[float, complex, np.float64, np.complex128]] = None,
+    backend: str = "blas",
+) -> Matrix:
+    """
     A function for converting from a numpy array to a C++ linalg::tensor<T,2> type
     used by the C++ layer of pyTTN.
 
@@ -211,8 +251,12 @@ def matrix(M, dtype=None, backend="blas"):
         raise RuntimeError("Invalid backend type for linalg.matrix")
 
 
-def tensor_3(T, dtype=None, backend="blas"):
-    r"""
+def tensor_3(
+    T: np.ndarray | Tensor3,
+    dtype: Optional[Union[float, complex, np.float64, np.complex128]] = None,
+    backend: str = "blas",
+):
+    """
     A function for converting from a numpy array to a C++ linalg::tensor<T,3> type
     used by the C++ layer of pyTTN.
 
@@ -252,8 +296,12 @@ def tensor_3(T, dtype=None, backend="blas"):
         raise RuntimeError("Invalid backend type for linalg.tensor_3")
 
 
-def tensor_4(T, dtype=None, backend="blas"):
-    r"""
+def tensor_4(
+    T: np.ndarray | Tensor4,
+    dtype: Optional[Union[float, complex, np.float64, np.complex128]] = None,
+    backend: str = "blas",
+):
+    """
     A function for converting from a numpy array to a C++ linalg::tensor<T,4> type
     used by the C++ layer of pyTTN.
 
@@ -293,8 +341,12 @@ def tensor_4(T, dtype=None, backend="blas"):
         raise RuntimeError("Invalid backend type for linalg.tensor_4")
 
 
-def tensor(T, dtype=None, backend="blas"):
-    r"""
+def tensor(
+    T: np.ndarray | Vector | Matrix | Tensor3 | Tensor4,
+    dtype=None,
+    backend: str = "blas",
+):
+    """
     A function for converting from a numpy array to a C++ linalg::tensor<T,D> type
     for D<=4 used by the C++ layer of pyTTN.
 

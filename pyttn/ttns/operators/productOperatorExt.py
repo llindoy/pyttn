@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,6 +11,10 @@
 # limitations under the License
 
 import numpy as np
+from typing import TypeAlias, Optional, Union
+
+from pyttn.ttns.sop.sSOPExt import sOP, sPOP, sNBO_type
+from pyttn.ttnpp import system_modes
 
 from pyttn.ttnpp import product_operator_complex
 
@@ -18,10 +22,11 @@ try:
     from pyttn.ttnpp import product_operator_real
 
     __real_ttn_import = True
+    product_operator_type: TypeAlias = product_operator_complex | product_operator_real
 
 except ImportError:
     __real_ttn_import = False
-    product_operator_real = None
+    product_operator_type: TypeAlias = product_operator_complex
 
 
 # and attempt to import the cuda backend
@@ -35,20 +40,34 @@ try:
     # and if we have imported real ttns we import the cuda versions
     if __real_ttn_import:
         from pyttn.ttnpp.cuda import product_operator_real as product_operator_real_cuda
+
+        product_operator_type: TypeAlias = (
+            product_operator_type
+            | product_operator_complex_cuda
+            | product_operator_real_cuda
+        )
+
     else:
-        product_operator_real_cuda = None
+        product_operator_type: TypeAlias = (
+            product_operator_type | product_operator_complex_cuda
+        )
 
 except ImportError:
     __cuda_import = False
-    product_operator_real_cuda = None
-    product_operator_complex_cuda = None
 
 
-def product_operator(h, sysinf, *args, dtype=np.complex128, backend="blas", **kwargs):
-    r"""Function for constructing a product_operator
+def product_operator(
+    h: sOP | sPOP | sNBO_type,
+    sysinf: system_modes,
+    *args,
+    dtype: Optional[Union[float, complex, np.float64, np.complex128]] = np.complex128,
+    backend: str = "blas",
+    **kwargs,
+) -> product_operator_type:
+    """Function for constructing a product_operator
 
     :param h: The product operator representation of the Hamiltonian
-    :type h: sOP or sPOP or sNBO_real or sNBO_complex
+    :type h: sOP or sPOP or sNBO_type
     :param sysinf: The composition of the system defining the default dictionary to be considered for each node
     :type sysinf: system_modes
     :type *args: Variable length list of arguments. See product_operator_real/product_operator_complex for options

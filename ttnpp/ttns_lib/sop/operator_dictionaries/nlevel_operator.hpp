@@ -18,35 +18,33 @@
 #include <linalg/linalg.hpp>
 #include "single_site_operator.hpp"
 
-
 #include <regex>
-#include <string> 
+#include <string>
 #include <tuple>
-
 
 namespace ttns
 {
     namespace nlevel
     {
-        inline std::tuple<size_t, size_t, bool> extract_indices(const std::string& str)
+        inline std::tuple<size_t, size_t, bool> extract_indices(const std::string &str)
         {
             std::regex r("\\|(\\d+)\\>\\<(\\d+)\\|");
             std::smatch m;
             bool match = std::regex_search(str, m, r);
-            if(match)
+            if (match)
             {
-                return std::tuple<size_t, size_t, bool>(std::stoi(m[1].str()), std::stoi(m[2].str()), true);        
+                return std::tuple<size_t, size_t, bool>(std::stoi(m[1].str()), std::stoi(m[2].str()), true);
             }
             else
             {
-                return std::tuple<size_t, size_t, bool>(0, 0, false);        
+                return std::tuple<size_t, size_t, bool>(0, 0, false);
             }
         }
 
-        inline bool valid_two_level(const std::string& str)
+        inline bool valid_two_level(const std::string &str)
         {
             std::tuple<size_t, size_t, bool> inds = extract_indices(str);
-            if(std::get<0>(inds) < 2 && std::get<1>(inds) < 2 && std::get<2>(inds))
+            if (std::get<0>(inds) < 2 && std::get<1>(inds) < 2 && std::get<2>(inds))
             {
                 return true;
             }
@@ -65,7 +63,7 @@ namespace ttns
 
         public:
             nlevel_op(size_t i, size_t j) : m_i(i), m_j(j) {}
-            nlevel_op(const std::string& label) 
+            nlevel_op(const std::string &label)
             {
                 std::tuple<size_t, size_t, bool> inds = extract_indices(label);
                 ASSERT(std::get<2>(inds), "Failed to construct nlevel_op.  The input string is not valid.");
@@ -75,17 +73,17 @@ namespace ttns
             }
             virtual bool is_sparse() const { return true; }
 
-            virtual void as_diagonal(const std::shared_ptr<utils::occupation_number_basis>& op, size_t index , linalg::diagonal_matrix<T> & mat) const
+            virtual void as_diagonal(const std::shared_ptr<utils::occupation_number_basis> &op, size_t index, linalg::diagonal_matrix<T> &mat) const
             {
-                if(m_i == m_j)
+                if (m_i == m_j)
                 {
                     ASSERT(m_i < op->dim(index) && m_j < op->dim(index), "Cannot form matrix representation of operator.  State indices are out of bounds.");
                     ASSERT(index < op->nmodes(), "Index out of bounds.");
 
-                    for(size_t i = 0; i < op->nstates(); ++i)
+                    for (size_t i = 0; i < op->nstates(); ++i)
                     {
                         size_t n = op->get_occupation(i, index);
-                        if(n == m_i)
+                        if (n == m_i)
                         {
                             mat(i, i) = 1.0;
                         }
@@ -105,29 +103,31 @@ namespace ttns
                     ASSERT(index < op->nmodes(), "Index out of bounds.");
                     mat.resize(op->nstates(), op->nstates());
 
-                    std::vector<size_t> state_i(op->nmodes());    std::fill(state_i.begin(), state_i.end(), 0);
-                    std::vector<size_t> state_j(op->nmodes());    std::fill(state_j.begin(), state_j.end(), 0);
+                    std::vector<size_t> state_i(op->nmodes());
+                    std::fill(state_i.begin(), state_i.end(), 0);
+                    std::vector<size_t> state_j(op->nmodes());
+                    std::fill(state_j.begin(), state_j.end(), 0);
 
                     size_t nnz = 0;
                     for (size_t i = 0; i < op->nstates(); ++i)
                     {
                         op->get_state(i, state_i);
-                        if(state_i[index] == m_i)
+                        if (state_i[index] == m_i)
                         {
-                            for(size_t j = 0; j < op->nstates(); ++j)
+                            for (size_t j = 0; j < op->nstates(); ++j)
                             {
                                 op->get_state(j, state_j);
-                                if(state_j[index] == m_j)
+                                if (state_j[index] == m_j)
                                 {
                                     bool all_same = true;
-                                    for(size_t k=0; k < op->nmodes(); ++k)
+                                    for (size_t k = 0; k < op->nmodes(); ++k)
                                     {
-                                        if(k != index && state_i[k] != state_j[k])
+                                        if (k != index && state_i[k] != state_j[k])
                                         {
                                             all_same = false;
                                         }
                                     }
-                                    if(all_same)
+                                    if (all_same)
                                     {
                                         ++nnz;
                                     }
@@ -146,22 +146,22 @@ namespace ttns
                     for (size_t i = 0; i < op->nstates(); ++i)
                     {
                         op->get_state(i, state_i);
-                        if(state_i[index] == m_i)
+                        if (state_i[index] == m_i)
                         {
-                            for(size_t j = 0; j < op->nstates(); ++j)
+                            for (size_t j = 0; j < op->nstates(); ++j)
                             {
                                 op->get_state(j, state_j);
-                                if(state_j[index] == m_j)
+                                if (state_j[index] == m_j)
                                 {
                                     bool all_same = true;
-                                    for(size_t k=0; k < op->nmodes(); ++k)
+                                    for (size_t k = 0; k < op->nmodes(); ++k)
                                     {
-                                        if(k != index && state_i[k] != state_j[k])
+                                        if (k != index && state_i[k] != state_j[k])
                                         {
                                             all_same = false;
                                         }
                                     }
-                                    if(all_same)
+                                    if (all_same)
                                     {
                                         buffer[counter] = 1.0;
                                         colind[counter] = j;
@@ -187,28 +187,30 @@ namespace ttns
                 mat.resize(op->nstates(), op->nstates());
                 mat.fill_zeros();
 
-                std::vector<size_t> state_i(op->nmodes());    std::fill(state_i.begin(), state_i.end(), 0);
-                std::vector<size_t> state_j(op->nmodes());    std::fill(state_j.begin(), state_j.end(), 0);
+                std::vector<size_t> state_i(op->nmodes());
+                std::fill(state_i.begin(), state_i.end(), 0);
+                std::vector<size_t> state_j(op->nmodes());
+                std::fill(state_j.begin(), state_j.end(), 0);
 
                 for (size_t i = 0; i < op->nstates(); ++i)
                 {
                     op->get_state(i, state_i);
-                    if(state_i[index] == m_i)
+                    if (state_i[index] == m_i)
                     {
-                        for(size_t j = 0; j < op->nstates(); ++j)
+                        for (size_t j = 0; j < op->nstates(); ++j)
                         {
                             op->get_state(j, state_j);
-                            if(state_j[index] == m_j)
+                            if (state_j[index] == m_j)
                             {
                                 bool all_same = true;
-                                for(size_t k=0; k < op->nmodes(); ++k)
+                                for (size_t k = 0; k < op->nmodes(); ++k)
                                 {
-                                    if(k != index && state_i[k] != state_j[k])
+                                    if (k != index && state_i[k] != state_j[k])
                                     {
                                         all_same = false;
                                     }
                                 }
-                                if(all_same)
+                                if (all_same)
                                 {
                                     mat(i, j) = 1.0;
                                 }
@@ -216,17 +218,14 @@ namespace ttns
                         }
                     }
                 }
-                
-
             }
             virtual std::pair<T, std::string> transpose() const
             {
-                std::pair<T, std::string> ret = std::make_pair(T(1), std::string("|")+std::to_string(m_j)+std::string("><")+std::to_string(m_i)+std::string("|"));
+                std::pair<T, std::string> ret = std::make_pair(T(1), std::string("|") + std::to_string(m_j) + std::string("><") + std::to_string(m_i) + std::string("|"));
                 return ret;
             }
         };
 
-    
     } // namespace nlevel
 
 } // namespace ttns

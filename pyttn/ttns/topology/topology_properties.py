@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-
+from typing import List, Callable, Optional
 import numpy as np
 from pyttn.ttnpp import ntree, ntreeNode
 from .bond_setter import BondDimensionSetter
@@ -87,7 +87,7 @@ def __update_interior_nodes(root, chi, node_list):
             chi(node)
 
 
-def set_dims(root, dims):
+def set_dims(root: ntree | ntreeNode, dims: int | List[int] | np.ndarray) -> None:
     """Set the the local hilbert space dimension in the topology tree (or in a subtree with root defined by the node root).
 
     :param root: The topology tree (or subtree) for which properties are to be set.
@@ -112,7 +112,13 @@ def set_dims(root, dims):
         raise RuntimeError("Invalid root type for setup bond properties")
 
 
-def set_bond_dimensions(root, chi, chi_local_transform=None):
+def set_bond_dimensions(
+    root: ntree | ntreeNode,
+    chi: int | Callable[[int], int] | List[int] | np.ndarray | BondDimensionSetter,
+    chi_local_transform: Optional[
+        int | Callable[[int], int] | List[int] | np.ndarray
+    ] = None,
+) -> None:
     """Set the the internal values stored in the topology tree (or in a subtree with root defined by the node root).
     This function will set the bond dimension and dimensionality of the local Hilbert space isometry.
 
@@ -167,7 +173,14 @@ def set_bond_dimensions(root, chi, chi_local_transform=None):
             __update_interior_nodes(root, chi, node_list)
 
 
-def set_topology_properties(root, chi, dims, chi_local_transform=None):
+def set_topology_properties(
+    root: ntree | ntreeNode,
+    chi: int | Callable[[int], int] | List[int] | np.ndarray | BondDimensionSetter,
+    dims: int | List[int] | np.ndarray,
+    chi_local_transform: Optional[
+        int | Callable[[int], int] | List[int] | np.ndarray
+    ] = None,
+) -> None:
     """Set the values stored in a topology tree (or in a subtree with root defined by the node root).
     This function can set the bond dimension, local hilbert space dimension and dimensionality
     of the local Hilbert space isometry.

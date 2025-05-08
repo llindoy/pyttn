@@ -12,15 +12,17 @@
 
 import abc
 import numpy as np
+from pyttn.ttnpp import ntreeNode
 
 
 class BondDimensionSetter(metaclass=abc.ABCMeta):
     """Abstract base class for objects that set the bond dimension variables
     stored in an ntree object dependent on the values in the children of the node.
     """
+
     @abc.abstractmethod
-    def __call__(self, node):
-        """The default call function 
+    def __call__(self, node: ntreeNode):
+        """The default call function
 
         :param node: The node which will have its bond dimension set
         :type node: ntreeNode
@@ -33,8 +35,8 @@ class NodeSumSetter(BondDimensionSetter):
     value based on the values of the nodes below the current node
     """
 
-    def __call__(self, node):
-        """Set the value of the bond dimension variable in the current node to the sum 
+    def __call__(self, node: ntreeNode):
+        """Set the value of the bond dimension variable in the current node to the sum
         of the bond dimensions associated with the child nodes
 
         :param node: The node which will have its bond dimension set
@@ -47,7 +49,7 @@ class NodeSumSetter(BondDimensionSetter):
 
 
 class NodeIncrementSetter(BondDimensionSetter):
-    def __init__(self, increment_value, combination="mean"):
+    def __init__(self, increment_value: int, combination: str = "mean"):
         """An implementation of the BondDimensionSetter abstract base class that set a given node
         as an incremented value of a function of the children of the nodes
 
@@ -59,11 +61,10 @@ class NodeIncrementSetter(BondDimensionSetter):
         """
         self.__increment_value = increment_value
         if combination not in ["mean", "min", "max"]:
-            raise RuntimeError(
-                "Invalid combination rule for NodeIncrementSetter")
+            raise RuntimeError("Invalid combination rule for NodeIncrementSetter")
         self.__child_combination = combination
 
-    def __call__(self, node):
+    def __call__(self, node: ntreeNode):
         """Set the value of the bond dimension variable in the current node to be
         bond_dim = func(child_bond_dims) + inc
 
@@ -80,5 +81,4 @@ class NodeIncrementSetter(BondDimensionSetter):
         elif self.__child_combination == "max":
             node.value = max(vars) + self.__increment_value
         else:
-            raise RuntimeError(
-                "Invalid combination rule for NodeIncrementSetter")
+            raise RuntimeError("Invalid combination rule for NodeIncrementSetter")

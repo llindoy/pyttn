@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -9,6 +9,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License
+
+from typing import TypeAlias
+
+from pyttn.ttns.sop.SOPExt import ms_SOP_type
+from pyttn.ttns.ttn.ttnExt import ms_ttn_type
+from pyttn.ttnpp import system_modes
 
 from pyttn.ttnpp import multiset_sop_operator_complex
 from pyttn.ttnpp import ms_ttn_complex
@@ -20,12 +26,12 @@ try:
     from pyttn.ttnpp import multiset_SOP_real
 
     __real_ttn_import = True
-
+    ms_sop_operator_type: TypeAlias = (
+        multiset_sop_operator_real | multiset_sop_operator_complex
+    )
 except ImportError:
     __real_ttn_import = False
-    multiset_sop_operator_real = None
-    ms_ttn_real = None
-    multiset_SOP_real = None
+    ms_sop_operator_type: TypeAlias = multiset_sop_operator_complex
 
 
 # and attempt to import the cuda backend
@@ -44,16 +50,20 @@ try:
         )
         from pyttn.ttnpp.cuda import ms_ttn_real as ms_ttn_real_cuda
 
+        ms_sop_operator_type: TypeAlias = (
+            ms_sop_operator_type
+            | multiset_sop_operator_real
+            | multiset_sop_operator_complex
+        )
+
     else:
-        multiset_sop_operator_real_cuda = None
-        ms_ttn_real_cuda = None
+        ms_sop_operator_type: TypeAlias = (
+            ms_sop_operator_type | multiset_sop_operator_complex
+        )
+
 
 except ImportError:
     __cuda_import = False
-    multiset_sop_operator_real_cuda = None
-    multiset_sop_operator_complex_cuda = None
-    ms_ttn_real_cuda = None
-    ms_ttn_complex_cuda = None
 
 
 def __multiset_sop_operator_blas(h, A, sysinf, *args, **kwargs):
@@ -102,13 +112,15 @@ def __multiset_sop_operator_cuda(h, A, sysinf, *args, **kwargs):
             )
 
 
-def multiset_sop_operator(h, A, sysinf, *args, **kwargs):
+def multiset_sop_operator(
+    h: ms_SOP_type, A: ms_ttn_type, sysinf: system_modes, *args, **kwargs
+) -> ms_sop_operator_type:
     r"""Function for constructing the multiset hierarchical sum of product operator of a string operator
 
     :param h: The sum of product operator representation of the Hamiltonian
-    :type h: multiset_SOP_real or multiset_SOP_complex
+    :type h: ms_SOP_type
     :param A: A TTN object with defining the topology of output hierarchical SOP object
-    :type A: ms_ttn_real or ms_ttn_complex
+    :type A: ms_ttn_type
     :param sysinf: The composition of the system defining the default dictionary to be considered for each node
     :type sysinf: system_modes
     :type *args: Variable length list of arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options
@@ -128,13 +140,15 @@ def multiset_sop_operator(h, A, sysinf, *args, **kwargs):
         raise RuntimeError("Invalid backend type for multiset_sop_operator")
 
 
-def ms_sop_operator(h, A, sysinf, *args, **kwargs):
+def ms_sop_operator(
+    h: ms_SOP_type, A: ms_ttn_type, sysinf: system_modes, *args, **kwargs
+) -> ms_sop_operator_type:
     r"""Function for constructing the multiset hierarchical sum of product operator of a string operator
 
     :param h: The sum of product operator representation of the Hamiltonian
-    :type h: multiset_SOP_real or multiset_SOP_complex
+    :type h: ms_SOP_type
     :param A: A TTN object with defining the topology of output hierarchical SOP object
-    :type A: ms_ttn_real or ms_ttn_complex
+    :type A: ms_ttn_type
     :param sysinf: The composition of the system defining the default dictionary to be considered for each node
     :type sysinf: system_modes
     :type *args: Variable length list of arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options

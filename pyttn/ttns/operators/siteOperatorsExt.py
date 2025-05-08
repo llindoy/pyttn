@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,9 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import TypeAlias, Optional, Union
+
 from .opsExt import __site_op_dict__
 import numpy as np
-
 
 from pyttn.ttnpp.ops import site_operator_complex
 
@@ -21,9 +22,11 @@ try:
 
     __real_ttn_import = True
 
+    site_operator_type: TypeAlias = site_operator_real | site_operator_complex
+
 except ImportError:
     __real_ttn_import = False
-    site_operator_real = None
+    site_operator_type: TypeAlias = site_operator_complex
 
 
 # and attempt to import the cuda backend
@@ -35,13 +38,16 @@ try:
     # and if we have imported real ttns we import the cuda versions
     if __real_ttn_import:
         from pyttn.ttnpp.cuda.ops import site_operator_real as site_operator_real_cuda
+
+        site_operator_type: TypeAlias = (
+            site_operator_type | site_operator_complex_cuda | site_operator_real_cuda
+        )
+
     else:
-        site_operator_real_cuda = None
+        site_operator_type: TypeAlias = site_operator_type | site_operator_complex_cuda
 
 except ImportError:
     __cuda_import = False
-    site_operator_real_cuda = None
-    site_operator_complex_cuda = None
 
 
 def __site_operator_blas(*args, mode=None, optype=None, dtype=np.complex128, **kwargs):
@@ -53,7 +59,7 @@ def __site_operator_blas(*args, mode=None, optype=None, dtype=np.complex128, **k
             else:
                 ret = site_operator_real(args[0])
         elif (args and len(args) <= 3) or (not args):
-            if dtype == np.complex128 or not __real_ttn_import:
+            if dtype == np.complex128 or dtype is complex or not __real_ttn_import:
                 ret = site_operator_complex(*args, **kwargs)
             else:
                 ret = site_operator_real(*args, **kwargs)
@@ -86,7 +92,7 @@ def __site_operator_cuda(*args, mode=None, optype=None, dtype=np.complex128, **k
             else:
                 ret = site_operator_real_cuda(args[0])
         elif args and len(args) <= 3:
-            if dtype == np.complex128 or not __real_ttn_import:
+            if dtype == np.complex128 or dtype is complex or not __real_ttn_import:
                 ret = site_operator_complex_cuda(*args, **kwargs)
             else:
                 ret = site_operator_real_cuda(*args, **kwargs)
@@ -111,13 +117,18 @@ def __site_operator_cuda(*args, mode=None, optype=None, dtype=np.complex128, **k
 
 
 def site_operator(
-    *args, mode=None, optype=None, dtype=np.complex128, backend="blas", **kwargs
-):
-    r"""Factory function for constructing a one site operator.
+    *args,
+    mode: Optional[int] = None,
+    optype: Optional[str] = None,
+    dtype: Optional[Union[float, complex, np.float64, np.complex128]] = np.complex128,
+    backend: str = "blas",
+    **kwargs,
+) -> site_operator_type:
+    """Factory function for constructing a one site operator.
 
     :param *args: Variable length list of arguments. There are several valid options for the *args parameters.  If the optype variable is None the allowed options are
 
-        - site_op (site_operator_real or site_operato_complex) - Construct a new site_operator object from the existing object
+        - site_op (site_operator_type) - Construct a new site_operator object from the existing object
         - op (sOP), sysinf (system_modes) - Construct a new site_operator from the string operator and system information
         - op (sOP), sysinf (system_modes), opdict (operator_dictionary_real or operator_dictionary_complex) -  Construct a new site_operator from the string operator, system information and used defined operator dictionary.
 

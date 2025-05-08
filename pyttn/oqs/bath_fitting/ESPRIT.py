@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,7 +17,7 @@ import scipy
 # This will be left as future updates.
 
 
-def ESPRIT(Ct, K):
+def ESPRIT(Ct: np.ndarray, K: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     r"""Implementation of the Estimation of Signal Parameters via Rotational Invariant Techniques (ESPRIT)
     method for decomposing a signal into the form
 
@@ -56,7 +56,7 @@ def ESPRIT(Ct, K):
 # fit using this approach.
 
 
-def ESPRIT_frequencies(Ct, K):
+def ESPRIT_frequencies(Ct: np.ndarray, K: np.ndarray) -> np.ndarray:
     r"""Extract the frequencies to be used in the ESPRIT algorithm
 
     :param Ct: An array containing the values to be fit

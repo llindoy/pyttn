@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,9 +10,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Optional
+
+from pyttn.ttnpp import ntree
+from pyttn.ttns.ttn.ttnExt import ttn_type, ms_ttn_type
+
+
 def visualise_ntree(
-    tree, prog="dot", ax=None, node_size=300, linewidth=3, add_labels=True
-):
+    tree: ntree,
+    prog: str = "dot",
+    ax=None,
+    node_size: int = 300,
+    linewidth: int = 3,
+    add_labels: bool = True,
+) -> None:
     """A function for plotting an ntree object
 
     :param tree: The tree to be visualised
@@ -55,19 +66,19 @@ def visualise_ntree(
 
 
 def visualise_ttn(
-    tree,
-    prog="dot",
+    tree: ttn_type,
+    prog: str = "dot",
     ax=None,
-    node_size=300,
-    linewidth=3,
-    bond_prop=None,
-    colourmap="viridis",
-    label_all_bonds=False,
-):
+    node_size: int = 300,
+    linewidth: int = 3,
+    bond_prop: Optional[str] = None,
+    colourmap: str = "viridis",
+    label_all_bonds: bool = False,
+) -> None:
     """A function for plotting an ttn object
 
     :param tree: The tree to be visualised
-    :type tree: ttn_dtype
+    :type tree: ttn_type
     :param prog: The visualisation function used with graphviz_layout (default: "dot")
     :type prog: str, optional
     :param ax: Draw the tree in specified Matplotlib axes
@@ -157,20 +168,20 @@ def visualise_ttn(
 
 
 def visualise_tree(
-    tree,
-    prog="dot",
+    tree: ntree | ttn_type | ms_ttn_type,
+    prog: str = "dot",
     ax=None,
-    node_size=300,
-    linewidth=3,
-    add_labels=True,
-    bond_prop=None,
-    colourmap="viridis",
-    label_all_bonds=False,
-):
+    node_size: int = 300,
+    linewidth: int = 3,
+    add_labels: bool = True,
+    bond_prop: Optional[str] = None,
+    colourmap: str = "viridis",
+    label_all_bonds: bool = False,
+) -> None:
     """A function for plotting a tree structured object
 
     :param tree: The tree to be visualised
-    :type tree: ntree or ttn_dtype or ms_ttn_dtype
+    :type tree: ntree | ttn_type | ms_ttn_type
     :param prog: The visualisation function used with graphviz_layout (default: "dot")
     :type prog: str, optional
     :param ax: Draw the tree in specified Matplotlib axes
@@ -188,7 +199,7 @@ def visualise_tree(
     :type label_all_bonds: bool, optional
     """
 
-    from pyttn import ntree, is_ttn
+    from pyttn import is_ttn
 
     if isinstance(tree, ntree):
         visualise_ntree(
@@ -199,7 +210,7 @@ def visualise_tree(
             linewidth=linewidth,
             add_labels=add_labels,
         )
-    elif is_ttn(tree):
+    elif isinstance(tree, ttn_type):
         visualise_ttn(
             tree,
             prog=prog,
