@@ -27,7 +27,8 @@ namespace ttns
         BOSON_MODE,
         SPIN_MODE,
         QUBIT_MODE,
-        GENERIC_MODE
+        GENERIC_MODE, 
+        NLEVEL_MODE
     };
 
     class primitive_mode_data
@@ -208,6 +209,8 @@ namespace ttns
     inline primitive_mode_data qubit_mode() { return primitive_mode_data(2, mode_type::QUBIT_MODE); }
     inline primitive_mode_data spin_mode(size_t N) { return primitive_mode_data(N, mode_type::SPIN_MODE); }
     inline primitive_mode_data generic_mode(size_t N) { return primitive_mode_data(N, mode_type::GENERIC_MODE); }
+    inline primitive_mode_data nlevel_mode(size_t N) { return primitive_mode_data(N, mode_type::NLEVEL_MODE); }
+
 
     class system_modes
     {
@@ -541,6 +544,9 @@ inline std::ostream &operator<<(std::ostream &o, const ttns::mode_type &m)
         break;
     case ttns::mode_type::GENERIC_MODE:
         o << "generic";
+        break;
+    case ttns::mode_type::NLEVEL_MODE:
+        o << "nlevel";
         break;
     }
     return o;

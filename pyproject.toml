@@ -5,9 +5,6 @@ requires = [
 ]
 build-backend="setuptools.build_meta"
 
-[tools.setuptools.packages]
-where=["pyttn"]
-
 [project]
 name = "pyttn"
 description="An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Networks"

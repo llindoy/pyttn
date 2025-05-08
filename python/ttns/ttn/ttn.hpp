@@ -377,7 +377,8 @@ void init_ttn(py::module &m, const std::string &label)
     m.def("apply_sop_to_ttn", [](const sop &Op, const _ttn &A, _ttn &B, numpy_type coeff, real_type cutoff)
           {
                 using cont_eng = sop_ttn_contraction_engine<T, backend>;
-                CALL_AND_RETHROW(cont_eng::sop_ttn_contraction(Op, A, B, T(coeff), cutoff)); }, py::arg(), py::arg(), py::arg(), py::arg("coeff") = numpy_type(1), py::arg("cutoff") = real_type(1e-12));
+                CALL_AND_RETHROW(cont_eng::sop_ttn_contraction(Op, A, B, T(coeff), cutoff)); 
+          }, py::arg(), py::arg(), py::arg(), py::arg("coeff") = numpy_type(1), py::arg("cutoff") = real_type(1e-12));
 }
 
 template <typename real_type, typename backend>

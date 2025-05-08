@@ -19,6 +19,7 @@
 #include "bosonic_operator.hpp"
 #include "spin_operator.hpp"
 #include "pauli_operator.hpp"
+#include "nlevel_operator.hpp"
 #include <unordered_map>
 
 #include "../system_information.hpp"
@@ -201,8 +202,21 @@ namespace ttns
             static op_type query(const std::string &key)
             {
                 auto it = s_dict.find(key);
-                ASSERT(it != s_dict.end(), "Failed to query default pauli operator.  Operator not recognised.");
-                return (*it).second;
+                if(it == s_dict.end())
+                {
+                    if(nlevel::valid_two_level(key))
+                    {
+                        CALL_AND_RETHROW(return std::make_shared<nlevel::nlevel_op<T>>(key));
+                    }
+                    else
+                    {
+                        RAISE_EXCEPTION("Failed to query default pauli operator.  Operator not recognised.")
+                    }
+                }
+                else
+                {
+                    return (*it).second;
+                }
             }
 
         protected:
@@ -256,9 +270,13 @@ namespace ttns
 
         case mode_type::SPIN_MODE:
             CALL_AND_RETHROW(return spin_dict::query(label));
+        
+        case mode_type::NLEVEL_MODE:
+            CALL_AND_RETHROW(return std::make_shared<nlevel::nlevel_op<T>>(label));
 
         case mode_type::GENERIC_MODE:
             RAISE_EXCEPTION("No default mode dictionary for generic mode types.");
+
         };
         return std::shared_ptr<single_site_operator<T>>(nullptr);
     }
