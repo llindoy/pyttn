@@ -52,7 +52,7 @@ def __site_operator_blas(*args, mode=None, optype=None, dtype=np.complex128, **k
                 ret = site_operator_complex(args[0])
             else:
                 ret = site_operator_real(args[0])
-        elif args and len(args) <= 3:
+        elif (args and len(args) <= 3) or (not args):
             if dtype == np.complex128 or not __real_ttn_import:
                 ret = site_operator_complex(*args, **kwargs)
             else:

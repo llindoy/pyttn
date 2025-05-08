@@ -98,8 +98,12 @@
 !tests/CMakeLists.txt
 !tests/linalg/CMakeLists.txt
 !tests/pyttn/*/
+!tests/pyttn/linalg/*.py
 !tests/pyttn/algorithms/*.py
 !tests/pyttn/observables/*.py
+!tests/pyttn/operators/*.py
+!tests/pyttn/state/*.py
+!tests/pyttn/linalg/*.py
 !tests/pyttn/oqs/*.py
 !tests/pyttn/topology/*.py
 !tests/ttns/*

@@ -14,6 +14,7 @@ from .SOPExt import SOP, multiset_SOP, sum_of_product
 from .sSOPExt import coeff, sNBO, sSOP
 from .opdictExt import operator_dictionary
 from .liouvilleSpaceExt import liouville_space_superoperator
+from .stateExt import stateStr, sepState, ket, isSepState, isKet
 
 
 from pyttn.ttnpp import sOP, sPOP, fOP, fermion_operator
@@ -39,6 +40,11 @@ __all__ = [
     "coeff",
     "sNBO",
     "sSOP",
+    "stateStr",
+    "sepState",
+    "ket",
+    "isSepState",
+    "isKet",
     "operator_dictionary",
     "liouville_space_superoperator",
     "sOP",

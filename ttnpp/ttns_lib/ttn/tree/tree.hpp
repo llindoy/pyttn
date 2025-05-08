@@ -227,6 +227,27 @@ namespace ttns
             return m_nodes[i];
         }
 
+
+        node_reference at(const std::vector<size_type> &inds)
+        {
+            ASSERT(!empty(), "Failed to access node in the tree.  An empty tree has no root.");
+            if (inds.size() == 0)
+            {
+                CALL_AND_RETHROW(return m_nodes[0]);
+            };
+            CALL_AND_HANDLE(return m_nodes[0].at(inds, 0), "Failed to access node in the tree.");
+        }
+
+        const_node_reference at(const std::vector<size_type> &inds) const
+        {
+            ASSERT(!empty(), "Failed to access node in the tree.  An empty tree has no root.");
+            if (inds.size() == 0)
+            {
+                CALL_AND_RETHROW(return m_nodes[0]);
+            };
+            CALL_AND_HANDLE(return m_nodes[0].at(inds, 0), "Failed to access node in the tree.");
+        }
+
         node_reference operator()(const std::list<size_type> &tree_index)
         {
             ASSERT(m_nodes.size() != 0, "Failed to access root node of tree. The tree is empty.");

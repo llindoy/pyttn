@@ -377,7 +377,6 @@ namespace ttns
     std::ostream &operator<<(std::ostream &os, const SOP<T> &op);
 
     // the string sum of product operator class used for storing the representation of the Hamiltonian of interest.
-    // TODO: Ensure correctness of the Jordan-Wigner Mapping code
     template <typename T>
     class SOP
     {
@@ -419,7 +418,7 @@ namespace ttns
             this->Eshift() *= a;
             for (auto &t : m_terms)
             {
-                t.second *= a;
+                std::get<1>(t) *= a;
             }
             return *this;
         }
@@ -430,7 +429,7 @@ namespace ttns
             this->Eshift() /= a;
             for (auto &t : m_terms)
             {
-                t.second /= a;
+                std::get<1>(t) /= a;
             }
             return *this;
         }
@@ -640,7 +639,7 @@ namespace ttns
             // first verify that the input sSOP is valid
             for (const auto &pop : m_terms)
             {
-                for (const auto &op : pop.first)
+                for (const auto &op : std::get<0>(pop))
                 {
                     size_t mode = std::get<1>(op);
                     // if we have set the mode properties of this mode already ensure that the new properties we have obtained from this operator are consistent.
@@ -692,10 +691,10 @@ namespace ttns
                 }
                 for (auto &a : m_terms)
                 {
-                    bool flip_sign = a.first.jordan_wigner(m_opdict, is_fermion_mode);
+                    bool flip_sign = std::get<0>(a).jordan_wigner(m_opdict, is_fermion_mode);
                     if (flip_sign)
                     {
-                        a.second *= T(-1.);
+                        std::get<1>(a) *= T(-1.);
                     }
                 }
             }
@@ -706,7 +705,7 @@ namespace ttns
         {
             for (auto it = m_terms.begin(); it != m_terms.end();)
             {
-                if (it->second.is_zero(tol))
+                if (std::get<1>(*it).is_zero(tol))
                 {
                     it = m_terms.erase(it);
                 }
@@ -731,21 +730,12 @@ namespace ttns
             return *this;
         }
 
-        // SOP& jordan_wigner(double tol = 1e-15)
-        //{
-        //     size_t nmodes = this->nmodes();
-        //     std::vector<bool> is_fermion_mode(nmodes);      std::fill(is_fermion_mode.begin(), is_fermion_mode.end(), false);
-        //     this->set_is_fermionic_mode(is_fermion_mode);
-        //     this->jordan_wigner(is_fermion_mode, tol);
-        //     return *this;
-        // }
-
         sSOP<T> expand() const
         {
             sSOP<T> ret;
             for (const auto &t : *this)
             {
-                ret += t.second * t.first.as_prod_op(this->m_opdict);
+                ret += std::get<1>(t) * std::get<0>(t).as_prod_op(this->m_opdict);
             }
             return ret;
         }
@@ -764,9 +754,9 @@ namespace ttns
         const auto plus = "+";
         for (const auto &t : op)
         {
-            sep = t.second.is_positive() ? plus : separator;
-            os << sep << t.second << " ";
-            t.first.label(os, op.m_opdict) << std::endl;
+            sep = std::get<1>(t).is_positive() ? plus : separator;
+            os << sep << std::get<1>(t) << " ";
+            std::get<0>(t).label(os, op.m_opdict) << std::endl;
         }
         return os;
     }

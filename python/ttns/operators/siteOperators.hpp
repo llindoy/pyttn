@@ -76,6 +76,8 @@ void init_site_operators(py::module &m, const std::string &label)
              { return !std::is_same<T, real_type>::value; })
 
         .def("transpose", &siteop::transpose)
+        .def("todense", [](const siteop& op){return op.todense();})
+        .def("todense", [](const siteop& op, const std::vector<size_type>& mode_dims){return op.todense(mode_dims);})
 
         .def("assign", [](siteop &op, const siteop &o)
              { return op = o; })

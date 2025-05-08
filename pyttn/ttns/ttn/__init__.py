@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .ttnExt import ttn, ms_ttn, multiset_ttn, is_ttn, is_ms_ttn
+from .ttnExt import ttn, ms_ttn, multiset_ttn, is_ttn, is_ms_ttn, available_backends
 from .ttn_interface import ttn_dtype
 from .ms_ttn_interface import ms_ttn_dtype
 from pyttn.ttnpp import ntree, ntreeBuilder, ntreeNode
@@ -25,6 +25,8 @@ __all__ = [
         "ntreeBuilder",
         "ntreeNode",
         "is_ttn",
-        "is_ms_ttn"
+        "is_ms_ttn", 
+        "available_backends"
         ]
+
 

@@ -24,10 +24,11 @@ from pyttn import oqs, utils
 from numba import jit
 
 
-def output_results(ofname, t, Sz, maxchi):
+def output_results(ofname, t, Sz, norm, maxchi):
     h5 = h5py.File(ofname, "w")
     h5.create_dataset("t", data=t)
     h5.create_dataset("Sz", data=Sz)
+    h5.create_dataset("norm", data=norm)
     h5.create_dataset("maxchi", data=maxchi)
     h5.close()
 
@@ -139,7 +140,7 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin=None, beta=None, 
     # construct the topology and capacity trees used for constructing
     chi0 = chi
     if adaptive:
-        chi0 = 4
+        chi0 = 16
 
     topo = pyttn.ntree("(1(4(4)))")
     capacity = pyttn.ntree("(1(4(4)))")
@@ -176,8 +177,10 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin=None, beta=None, 
 
     Sz = np.zeros(nstep + 1)
     maxchi = np.zeros(nstep + 1)
+    norm = np.zeros(nstep + 1)
     Sz[0] = np.real(mel(szop, A, trace_ttn))
     maxchi[0] = A.maximum_bond_dimension()
+    norm[0] = np.real(mel(A))
 
     #perform the first timestep using a logarithmic discretisation of time over this period.  
     #This can be useful to allow for suitable adaptation of weakly occupied single particle 
@@ -187,6 +190,7 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin=None, beta=None, 
     i=1
     #set the values after the first timestep
     Sz[i] =np.real(mel(szop, A, trace_ttn))
+    norm[i] = np.real(mel(A))
     sweep.dt = dt
 
     for i in range(1,nstep):
@@ -194,11 +198,12 @@ def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin=None, beta=None, 
         Sz[i + 1] = np.real(mel(szop, A, trace_ttn))
         maxchi[i + 1] = A.maximum_bond_dimension()
         print((i + 1) * dt, Sz[i + 1], maxchi[i + 1], np.real(mel(A, A)))
+        norm[i+1] = np.real(mel(A))
         sys.stdout.flush()
         if i % 10 == 0:
-            output_results(ofname, t, Sz, maxchi)
+            output_results(ofname, t, Sz, norm, maxchi)
 
-    output_results(ofname, t, Sz, maxchi)
+    output_results(ofname, t, Sz, norm, maxchi)
 
 
 if __name__ == "__main__":

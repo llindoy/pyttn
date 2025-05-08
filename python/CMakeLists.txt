@@ -5,6 +5,8 @@ include(CheckIPOSupported)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 
+set(CMAKE_BUILD_TYPE "Release")
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 #compiler flags
 option(USE_CUDA "Compile with cuda" OFF)
@@ -57,6 +59,7 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
           linalg/tensor.cpp linalg/sparseMatrix.cpp linalg/backend.cpp linalg/orthogonal_vector_gen.cpp
           utils/orthopol.cpp utils/discretisation.cpp
           ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
+          ttns/sop/state.cpp
           ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp ttns/ttn/ms_ttn.cpp
           ttns/observables/matrix_element.cpp 
           ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp
@@ -84,6 +87,7 @@ else()
           linalg/sparseMatrix.cpp linalg/tensor.cpp linalg/backend.cpp
           ttns/observables/matrix_element.cpp 
           ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp
+          ttns/sop/state.cpp
           ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
           ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp ttns/ttn/ms_ttn.cpp
           ttns/algorithms/tdvp.cpp ttns/algorithms/dmrg.cpp
@@ -206,8 +210,6 @@ add_library(restore_default_visibility INTERFACE)
 target_compile_options(restore_default_visibility INTERFACE -fvisibility=default)
 target_link_libraries(ttnpp PRIVATE restore_default_visibility)
 
-#set_target_properties(ttnpp PROPERTIES
-#        VISIBILITY_INLINES_HIDDEN ON)
 check_ipo_supported(RESULT ipo)
 if(ipo)
 set_property(TARGET ttnpp PROPERTY VISIBILITY_INLINES_HIDDEN TRUE)
