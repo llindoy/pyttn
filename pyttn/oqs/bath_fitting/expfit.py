@@ -10,10 +10,59 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Callable, Optional
 import numpy as np
 from .ESPRIT import ESPRIT
-from .aaa import AAA_algorithm
 from .softmspace import softmspace
+
+from .aaa import AAA_algorithm
+
+try:
+    from scipy.interpolate import AAA
+
+    def AAA_algorithm_scipy(
+        func: Callable[[np.ndarray | float], np.ndarray | np.complex128 | float],
+        Z: np.ndarray,
+        tol: float = 1e-13,
+        K: int = 100,
+        *args,
+        **kwargs,
+    ) -> tuple[
+        Callable[[np.ndarray | float], np.ndarray | np.complex128 | float],
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+    ]:
+        """A wrapper for scipy.interpolate.AAA that includes evaluation of the function at the support points
+
+        :param F: The function to be fit
+        :type F: callable
+        :param Z: The set of support points used for interpolating the function
+        :type Z: np.ndarray
+        :param tol: The convergence tolerance for the AAA algorithm. (default: 1e-13)
+        :type tol: float, optional
+        :param K: The maximum number of poles to fit. (default: 100)
+        :type K: int or None, optional
+        :param nmax: The maximum number of poles to use in the AAA fit. (default: 100)
+        :type nmax: int, optional
+        :param *args: Variable length argument list to be passed to the F function
+        :param **kwargs: Arbitrary keyword arguments to be passed to the F function
+
+        :returns:
+            - func - A function defining the rational function approximation
+            - poles(np.ndarray) - The poles of the rational function
+            - residues(np.ndarray) - The residues of the rational function decomposition
+            - zeros(np.ndarray) - The zeros of the rational function
+        """
+        Fz = np.array(func(Z, *args, **kwargs), dtype=np.complex128)
+        Z = np.array(Z, dtype=np.complex128)
+
+        func1 = AAA(Z, Fz, rtol=tol, max_terms=K)
+        return func1, func1.poles(), func1.residues(), func1.roots()
+
+    use_scipy_AAA = True
+except ImportError:
+    use_scipy_AAA = False
 
 
 class ExpFitDecomposition:
@@ -23,7 +72,11 @@ class ExpFitDecomposition:
         pass
 
 
-def ESPRIT_support_points(t="linear", tmax=None, Nt=1000):
+def ESPRIT_support_points(
+    t: str | list | np.ndarray = "linear",
+    tmax: Optional[float] = None,
+    Nt: Optional[int] = 1000,
+):
     r"""A function for automatically generating support points to be used within the ESPRIT algorithm.
 
     :param t: Either the support points or a key word used to generate the support points. (Default: "linear") This parameter can be either a
@@ -73,11 +126,17 @@ class ESPRITDecomposition(ExpFitDecomposition):
 
     """
 
-    def __init__(self, K, t="linear", **kwargs):
+    def __init__(self, K: int, t: str | list | np.ndarray = "linear", **kwargs):
         self.t = ESPRIT_support_points(t=t, **kwargs)
         self.K = K
 
-    def __call__(self, Ct):
+    def __call__(
+        self, Ct: Callable[[np.ndarray | float], np.ndarray | np.complex128]
+    ) -> tuple[
+        np.ndarray,
+        np.ndarray,
+        Callable[[np.ndarray | float], np.ndarray | np.complex128],
+    ]:
         dt = self.t[1] - self.t[0]
         C = Ct(self.t)
         dk, zk, Ctres = ESPRIT(C, self.K)
@@ -92,7 +151,12 @@ def __generate_grid_points(N, wc, wmin=1e-9):
     return Z
 
 
-def AAA_support_points(w="linear", wmin=None, wmax=None, Naaa=1000):
+def AAA_support_points(
+    w: list | np.ndarray | str = "linear",
+    wmin: Optional[float] = None,
+    wmax: Optional[float] = None,
+    Naaa: Optional[int] = 1000,
+):
     r"""A function for automatically generating support points to be used within the AAA algorithm.
 
     :param w: Either the support points orr a key word used to generate the support points. (Default: "linear") This parameter can be either a
@@ -152,8 +216,6 @@ class AAADecomposition:
     :type K: int or None, optional
     :param w: Either the support points or a key word used to generate the support points.  For details see the AAA_support_points function.  (Default: "linear")
     :type w: str or np.ndarray or list, optional
-    :param aaa_nmax: The maximum number of poles to allow within the AAA algorithm. (Default:500)
-    :type aaa_nmax: int, optional
     :param coeff: A coefficient to go in front of the frequency terms. (Default: 1)
     :type coeff: float, optional
     :param wmin: The minimum allowed frequency. (Default: None)
@@ -162,6 +224,7 @@ class AAADecomposition:
     :type wmax: float or None, optional
     :param Naaa: The number of support points used by the AAA algorithm. (Default: 1000)
     :type Naaa: int or None, optional
+    :param use_scipy:
 
     Callable arguments:
 
@@ -176,14 +239,14 @@ class AAADecomposition:
 
     def __init__(
         self,
-        tol=1e-4,
-        K=None,
-        w="linear",
-        aaa_nmax=500,
-        coeff=1.0,
-        wmin=None,
-        wmax=None,
-        Naaa=1000,
+        tol: Optional[float] = 1e-4,
+        K: Optional[int] = None,
+        w: list | np.ndarray | str = "linear",
+        coeff: Optional[float] = 1.0,
+        wmin: Optional[float] = None,
+        wmax: Optional[float] = None,
+        Naaa: Optional[int] = 1000,
+        use_scipy: bool = use_scipy_AAA,
     ):
         self.Z1 = None
         self.w = w
@@ -191,10 +254,10 @@ class AAADecomposition:
         self.wmax = wmax
         self.Naaa = Naaa
 
-        self.aaa_nmax = aaa_nmax
         self.coeff = coeff
         self.aaa_tol = tol
         self.K = K
+        self.use_scipy = use_scipy
 
     def __AAA_to_HEOM(p, r, coeff=1.0):
         r"""Convert the poles and residues from the AAA algorithm into the coefficients and frequencies needed
@@ -214,7 +277,9 @@ class AAADecomposition:
         rr = rr[inds]
         return rr, pp
 
-    def __call__(self, S):
+    def __call__(
+        self, S: Callable[[np.ndarray | float], np.ndarray | np.complex128 | float]
+    ):
         r"""Perform the AAA decomposition on the function S.
 
         :param S: The spectral density function to be decomposed.
@@ -231,10 +296,13 @@ class AAADecomposition:
                 w=self.w, wmin=self.wmin, wmax=self.wmax, Naaa=self.Naaa
             )
 
-        # first compute the aaa decomposition of the spectral function
-        func1, p, r, z = AAA_algorithm(
-            S, self.Z1, nmax=self.aaa_nmax, tol=self.aaa_tol, K=self.K
-        )
+        if self.use_scipy:
+            # first compute the aaa decomposition of the spectral function
+            func1, p, r, _ = AAA_algorithm_scipy(S, self.Z1, tol=self.aaa_tol, K=self.K)
+            r = r * 2 * np.pi
+        else:
+            # first compute the aaa decomposition of the spectral function
+            func1, p, r, _ = AAA_algorithm(S, self.Z1, tol=self.aaa_tol, K=self.K)
 
         # and convert that to the heom correlation function coefficients
         dk, zk = AAADecomposition.__AAA_to_HEOM(p, r, coeff=self.coeff)

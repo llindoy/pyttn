@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,12 +11,13 @@
 # limitations under the License
 
 import numpy as np
+from typing import List, Optional
 
 
 class TruncationBase:
     """Base class for local Hilbert space mode decomposition"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         return
 
 
@@ -42,10 +43,10 @@ class DepthTruncation(TruncationBase):
     :rtype: list
     """
 
-    def __init__(self, Lmax=2):
+    def __init__(self, Lmax: int = 2) -> None:
         self.Lmax = Lmax
 
-    def __call__(self, gk, wk, is_fermion):
+    def __call__(self, gk: np.ndarray, wk: np.ndarray, is_fermion: bool) -> List[int]:
         if is_fermion:
             return [2 for i in range(len(wk))]
         else:
@@ -80,13 +81,15 @@ class EnergyTruncation(TruncationBase):
     :rtype: list
     """
 
-    def __init__(self, ecut=0, Lmax=2, Lmin=1, func="abs"):
+    def __init__(
+        self, ecut: float = 0, Lmax: int = 2, Lmin: int = 1, func: str = "abs"
+    ):
         self.ecut = ecut
         self.Lmax = Lmax
         self.Lmin = Lmin
         self.func = func
 
-    def truncate_bosonic(self, gk, wk):
+    def truncate_bosonic(self, gk: np.ndarray, wk: np.ndarray) -> List[int]:
         """Truncate a bosonic mode using coupling constants and frequencies
 
         :param gk: The interaction strength
@@ -118,7 +121,7 @@ class EnergyTruncation(TruncationBase):
             Nb.append(nbose)
         return Nb
 
-    def __call__(self, gk, wk, is_fermion):
+    def __call__(self, gk: np.ndarray, wk: np.ndarray, is_fermion: bool) -> List[int]:
         if is_fermion:
             return [2 for i in range(len(wk))]
         else:

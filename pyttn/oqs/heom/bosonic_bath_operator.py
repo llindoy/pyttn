@@ -22,6 +22,30 @@ def __generate_binds(binds, bskip, Nb):
 
 
 def add_heom_bath_generator(H, Sp, dks, zks, Sm=None, binds=None, bskip=2):
+    """A function for adding the HEOM dynamics system+bath terms to the SOP object generator.  This function
+    optionally allows for separate system raising and lowering operators, however, in the instance that the 
+    lowering operator is not defined it uses the raising operator for both.
+
+    Additionally this function allows for user specified indices for the bath modes, or by default uses 
+    contiguous set of bath modes starting at index bskip.
+
+    :param H: The input sum-of-product operator that the generator is to be added to
+    :type H: SOP_dtype
+    :param Sp: The system part of the system bath coupling term corresponding to the system raising operator
+    :type Sp: {sOP, sPOP, sNBO, sSOP}
+    :param dks: The coefficients in the bath correlation function expansion
+    :type dks: np.ndarray
+    :param zks:  The exponents in the bath correlation function expansion
+    :type zks: np.ndarray
+    :param Sm: The system part of the system bath coupling term corresponding to the system lowering operator, defaults to None
+    :type Sm: {sOP, sPOP, sNBO, sSOP}, optional
+    :param binds: The indices of the HEOM bath modes, defaults to None
+    :type binds: {list, np.ndarray}, optional
+    :param bskip: The number of sites to skip when define a contiguous set of bath mode indices, defaults to 2
+    :type bskip: int, optional
+    :return: The HEOM system bath generator
+    :rtype: SOP_dtype
+    """
     Nb = 0
     for dk in dks:
         Nb = Nb + len(dk)
@@ -68,6 +92,31 @@ def add_heom_bath_generator(H, Sp, dks, zks, Sm=None, binds=None, bskip=2):
 
 
 def add_pseudomode_bath_generator(H, Sp, dks, zks, Sm=None, binds=None, bskip=2):
+    """A function for adding the pseudomode dynamics system+bath terms to the SOP object generator.  This function
+    optionally allows for separate system raising and lowering operators, however, in the instance that the 
+    lowering operator is not defined it uses the raising operator for both.
+
+    Additionally this function allows for user specified indices for the bath modes, or by default uses 
+    contiguous set of bath modes starting at index bskip.
+
+    :param H: The input sum-of-product operator that the generator is to be added to
+    :type H: SOP_dtype
+    :param Sp: The system part of the system bath coupling term corresponding to the system raising operator
+    :type Sp: {sOP, sPOP, sNBO, sSOP}
+    :param dks: The coefficients in the bath correlation function expansion
+    :type dks: np.ndarray
+    :param zks:  The exponents in the bath correlation function expansion
+    :type zks: np.ndarray
+    :param Sm: The system part of the system bath coupling term corresponding to the system lowering operator, defaults to None
+    :type Sm: {sOP, sPOP, sNBO, sSOP}, optional
+    :param binds: The indices of the HEOM bath modes, defaults to None
+    :type binds: {list, np.ndarray}, optional
+    :param bskip: The number of sites to skip when define a contiguous set of bath mode indices, defaults to 2
+    :type bskip: int, optional
+    :return: The pseudomode system bath generator
+    :rtype: SOP_dtype
+    """
+
     Nb = 0
     for dk in dks:
         Nb = Nb + len(dk)
@@ -128,6 +177,32 @@ def add_pseudomode_bath_generator(H, Sp, dks, zks, Sm=None, binds=None, bskip=2)
 def add_bosonic_bath_generator(
     H, Sp, dks, zks, Sm=None, binds=None, bskip=2, method="heom"
 ):
+    """A function for adding either HEOM or pseudomode dynamics system+bath terms to the SOP object generator.  This function
+    optionally allows for separate system raising and lowering operators, however, in the instance that the 
+    lowering operator is not defined it uses the raising operator for both.
+
+    Additionally this function allows for user specified indices for the bath modes, or by default uses 
+    contiguous set of bath modes starting at index bskip.
+
+    :param H: The input sum-of-product operator that the generator is to be added to
+    :type H: SOP_dtype
+    :param Sp: The system part of the system bath coupling term corresponding to the system raising operator
+    :type Sp: {sOP, sPOP, sNBO, sSOP}
+    :param dks: The coefficients in the bath correlation function expansion
+    :type dks: np.ndarray
+    :param zks:  The exponents in the bath correlation function expansion
+    :type zks: np.ndarray
+    :param Sm: The system part of the system bath coupling term corresponding to the system lowering operator, defaults to None
+    :type Sm: {sOP, sPOP, sNBO, sSOP}, optional
+    :param binds: The indices of the HEOM bath modes, defaults to None
+    :type binds: {list, np.ndarray}, optional
+    :param bskip: The number of sites to skip when define a contiguous set of bath mode indices, defaults to 2
+    :type bskip: int, optional
+    :param method: The method to use, defaults to "heom"
+    :type method: {"heom", "pseudomode"}, optional
+    :return: The HEOM/pseudomode system bath generator
+    :rtype: SOP_dtype
+    """
     if not isinstance(Sp, list):
         raise RuntimeError("Invalid Sp operator for heom.add_bosonic_bath_generator")
     if method == "heom":

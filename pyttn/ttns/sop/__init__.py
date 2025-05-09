@@ -10,11 +10,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .SOPExt import SOP, multiset_SOP, sum_of_product
-from .sSOPExt import coeff, sNBO, sSOP
-from .opdictExt import operator_dictionary
+from .SOPExt import SOP, multiset_SOP, ms_SOP, sum_of_product, ms_SOP_type, SOP_type
+from .sSOPExt import (
+    coeff,
+    sNBO,
+    sSOP,
+    sOP_type,
+    sPOP_type,
+    sNBO_type,
+    sSOP_type,
+    coeff_type,
+)
+from .opdictExt import operator_dictionary, operator_dictionary_type
 from .liouvilleSpaceExt import liouville_space_superoperator
-
+from .stateExt import stateStr, sepState, ket, isSepState, isKet
 
 from pyttn.ttnpp import sOP, sPOP, fOP, fermion_operator
 from pyttn.ttnpp import (
@@ -27,19 +36,34 @@ from pyttn.ttnpp import (
     tls_mode,
     spin_mode,
     generic_mode,
+    nlevel_mode,
     system_modes,
     combine_systems,
 )
 
 
-__all__ = [
+__all__: list[str] = [
     "SOP",
     "multiset_SOP",
+    "ms_SOP",
     "sum_of_product",
+    "SOP_type",
+    "ms_SOP_type",
     "coeff",
     "sNBO",
     "sSOP",
+    "sOP_type",
+    "sPOP_type",
+    "sNBO_type",
+    "sSOP_type",
+    "coeff_type",
+    "stateStr",
+    "sepState",
+    "ket",
+    "isSepState",
+    "isKet",
     "operator_dictionary",
+    "operator_dictionary_type",
     "liouville_space_superoperator",
     "sOP",
     "sPOP",
@@ -52,6 +76,7 @@ __all__ = [
     "boson_mode",
     "qubit_mode",
     "tls_mode",
+    "nlevel_mode",
     "spin_mode",
     "generic_mode",
     "system_modes",

@@ -17,6 +17,7 @@
 
 #include <linalg/linalg.hpp>
 #include "primitive_operator.hpp"
+#include "../kron.hpp"
 
 namespace ttns
 {
@@ -162,35 +163,68 @@ namespace ttns
 
             linalg::matrix<T> todense() const
             {
-                linalg::matrix<T> ret(base_type::m_size, base_type::m_size, T(0));
-                return ret;
-                // std::vector<linalg::matrix<T, backend>> matrices(m_dims.size());
+                // if there are no operators bound then we just return an identity matrix of the correct size
+                if (m_operators.size() == 0)
+                {
+                    return linalg::matrix<T>(this->size(), this->size(), [](size_t i, size_t j)
+                                             { return i == j ? T(1.0) : T(0.0); });
+                }
+                else
+                {
+                    // if there are operators we start by getting a vector of matrices acting on each mode
+                    std::vector<linalg::matrix<T>> matrices(m_dims.size());
 
-                ////set up a vector of identity matrices
-                // for(size_type i = 0; i < matrices.size(); ++i)
-                //{
-                //     identity<T, backend> idop(m_dims[i]);
-                //     matrices[i] = idop->todense();
-                // }
+                    size_t counter = 0;
+                    for (size_type i = 0; i < matrices.size(); ++i)
+                    {
+                        bool fill_identity = false;
+                        if(counter < m_operators.size())
+                        {
+                            size_type mode = m_operators[counter].first;
+                            if (mode == i)
+                            {
+                                if (m_operators[counter].second.size() == 1)
+                                {
+                                    matrices[i] = m_operators[counter].second[0]->todense();
+                                }
+                                // here we need to multiply all the operators acting on the mode in the correct order
+                                else
+                                {
+                                    size_type Nm = m_operators[counter].second.size();
+                                    matrices[i] = m_operators[counter].second[Nm-1]->todense();
+                                    linalg::matrix<T> temp1, temp2;
+                                    for(size_type j = 0; j < Nm; ++j)
+                                    {
+                                        temp1 = m_operators[counter].second[Nm-(j+1)]->todense();
+                                        temp2 = temp1*matrices[i];
+                                        matrices[i]=temp2;
+                                    }
+                                }
+                                ++counter;
+                            }
+                            else
+                            {
+                                fill_identity = true;
+                            }
+                        }
+                        else
+                        {
+                            fill_identity = true;
+                        }
+                        if(fill_identity)
+                        {
+                            matrices[i] = linalg::matrix<T>(m_dims[i], m_dims[i], [](size_t x, size_t y)
+                                                            { return x == y ? T(1.0) : T(0.0); });
+                        }
+                    }
 
-                ////now iterate over each term and apply all operators to the matrices.
-                // for(size_type i = 0; i < m_operators.size(); ++i)
-                //{
-                //     size_type mode = m_operators[i].first;
-                //     //reserve storage for the operator elements
-                //     matrices[mode].reserve(m_operators[i].second.size());
-                //     linalg::matrix<T> temp;
+                    //we now have a vector of each of the operators acting on the individual primitive modes
+                    //now we have to kron each of the matrices in order and return the result
+                    linalg::matrix<T> ret(this->size(), this->size());
 
-                //    //now iterate through all operators acting on this mode and bind
-                //    for(size_type j = 0; j < m_operators[i].second.size(); ++j)
-                //    {
-                //        size_t ind = m_operators[i].second.size() - (j+1);
-                //        temp = m_operators[i].second[ind]->apply(matrices[i]);
-                //        matrices[i] = temp;
-                //    }
-                //}
-
-                ////now we need to do the kronecker product of all of the matrices
+                    CALL_AND_HANDLE(kron::eval(matrices, ret), "Failed to evaluate kron prod");
+                    return ret;
+                }
             }
 
             void apply(const resview &A, resview &HA) final { CALL_AND_RETHROW(apply_rank_2(A, HA)); }
@@ -354,7 +388,6 @@ namespace ttns
             }
 #endif
         };
-
     }
 }
 

@@ -44,6 +44,7 @@
 #include "utils/discretisation.hpp"
 #include "utils/orthopol.hpp"
 
+#include "ttns/sop/state.hpp"
 #include "ttns/sop/SOP.hpp"
 #include "ttns/sop/liouville_space.hpp"
 #include "ttns/sop/operator_dictionary.hpp"
@@ -142,6 +143,7 @@ PYBIND11_MODULE(ttnpp, m)
     //
     initialise_sSOP<pyttn_real_type>(m);
     initialise_system_info(m);
+    initialise_state<pyttn_real_type>(m);
     initialise_SOP<pyttn_real_type>(m);
     initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
     initialise_liouville_space<pyttn_real_type>(m);

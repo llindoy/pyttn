@@ -37,18 +37,33 @@ void init_orthogonal_vector(py::module &m, const std::string &label)
     using mattype = linalg::matrix<T, backend>;
 
     py::class_<ttype>(m, label.c_str())
-        .def_static("pad_random",
-                    [](mattype &a, size_type i, random_engine<backend> &rng)
-                    {
-                        ttype::pad_random(a, i, rng);
-                    })
-        .def_static("generate",
-                    [](const mattype &a, random_engine<backend> &rng)
+        .def_static("pad_random", [](mattype &a, size_type i, random_engine<backend> &rng)
+                    { ttype::pad_random(a, i, rng); }, R"mydelim(
+                    Pad the columns of the matrix starting at row index i with random vectors that are set to be orthogonal to all
+                    current vectors using Gram schmidt
+
+                    :param a: Matrix to be padded
+                    :type a: Matrix
+                    :param i: Starting row to be filled with random vectors
+                    :type i: int
+                    :param rng: The random number generate used to fill the vector
+                    :type rng: random_engine
+                    )mydelim")
+        .def_static("generate", [](const mattype &a, random_engine<backend> &rng)
                     {
                         vectype b(a.shape(1));
                         ttype::generate(a, b, rng);
-                        return b;
-                    })
+                        return b; }, R"mydelim(
+                    Generate a vector that is orthogonal to the rows of the matrix a
+
+                    :param a: Matrix to be padded
+                    :type a: Matrix
+                    :param rng: The random number generate used to fill the vector
+                    :type rng: random_engine
+
+                    :returns: The newly generated matrix with random orthogonal rows that are also orthogonal to all rows of matrix a
+                    :rtype: Vector
+                    )mydelim")
         .def("backend", [](const ttype &)
              { return backend::label(); });
 }
@@ -60,9 +75,13 @@ void init_random_engine(py::module &m, const std::string &label)
     using ttype = random_engine<backend>;
 
     py::class_<ttype>(m, label.c_str())
-        .def(py::init())
+        .def(py::init(), R"mydelim(
+                    Python wrapper of the C++ random number generator object
+                    )mydelim")
         .def("backend", [](const ttype &)
-             { return backend::label(); });
+             { return backend::label(); }, R"mydelim(
+                    Returns the backend type of the C++ random number generator.
+                    )mydelim");
 }
 
 template <typename real_type, typename backend>

@@ -37,13 +37,15 @@ void init_csr_matrix(py::module &m, const std::string &label)
     using index_type = typename ttype::index_type;
     using coo_type = std::vector<std::tuple<index_type, index_type, T>>;
     using real_type = typename get_real_type<T>::type;
-
+    
 #ifdef PYTTN_BUILD_CUDA
     using obackend = typename other_backend<backend>::type;
 #endif
     // to do figure out a way of exposing the c++ buffers to python
     py::class_<ttype>(m, (label).c_str())
         .def(py::init<ttype>())
+        .def(py::init<csr_matrix<real_type, backend>>())
+
 #ifdef PYTTN_BUILD_CUDA
         .def(py::init<csr_matrix<T, obackend>>())
 #endif

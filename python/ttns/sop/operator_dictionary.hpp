@@ -77,7 +77,7 @@ void init_operator_dictionary(py::module &m, const std::string &label)
                 oss << "mode: " << i << std::endl;
                 for(const auto& t : o[i])
                 {
-                    oss << t.first << " " << t.second.to_string() << std::endl;
+                    oss << std::get<0>(t) << " " << std::get<1>(t).to_string() << std::endl;
                 }
             }
             return oss.str(); })

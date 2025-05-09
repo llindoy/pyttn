@@ -13,9 +13,10 @@
 import networkx as nx
 import numpy as np
 from math import ceil
+from typing import Generator, Any, List, Optional
 
 
-def distance_matrix_to_graph(M):
+def distance_matrix_to_graph(M: np.ndarray) -> nx.Graph:
     return nx.from_numpy_array(np.abs(M - np.diag(np.diag(M))))
 
 
@@ -31,30 +32,31 @@ def __insert_physical_nodes(spanning_tree, N, root_ind):
     # is a leaf node in the tree.  If it is we don't need to do anything, if it is not, then we will
     # insert a node beneath the present node and update its index
 
-    #get a list of all nodes in the tree
-    edges = sorted([edge for edge in nx.dfs_edges(
-        spanning_tree, source=root_ind)], key=lambda x: np.abs(x[0]-root_ind))
-    
-    #determine the number of children each node has
+    # get a list of all nodes in the tree
+    edges = sorted(
+        [edge for edge in nx.dfs_edges(spanning_tree, source=root_ind)],
+        key=lambda x: np.abs(x[0] - root_ind),
+    )
+
+    # determine the number of children each node has
     nchildren = [0 for x in range(N)]
     for i, e in enumerate(edges):
         if e[0] < N:
             nchildren[e[0]] += 1
 
-    #and the total number of nodes that aren't leaf nodes
+    # and the total number of nodes that aren't leaf nodes
 
-    mapping = {}      
-    counter = 0  
+    mapping = {}
+    counter = 0
     for i in range(nindex):
-        if(i < N):
+        if i < N:
             if nchildren[i] == 0:
                 mapping[i] = i
             else:
-                mapping[i] = nindex+counter
-                counter = counter+1
+                mapping[i] = nindex + counter
+                counter = counter + 1
         else:
             mapping[i] = i
-
 
     # iterate over the tree and add nodes to any n
     nx.relabel_nodes(spanning_tree, mapping=mapping, copy=False)
@@ -66,13 +68,13 @@ def __insert_physical_nodes(spanning_tree, N, root_ind):
     return spanning_tree, mapping[root_ind]
 
 
-def chunks(nodes, n):
-    N = ceil(len(nodes)/n)
+def chunks(nodes: List[int], n: int) -> Generator[Any, Any, None]:
+    N = ceil(len(nodes) / n)
     for i in range(0, len(nodes), N):
-        yield nodes[i:i + N]
+        yield nodes[i : i + N]
 
 
-def __split_node_mps(T, node, children, nindex, handle_leaves = False):
+def __split_node_mps(T, node, children, nindex, handle_leaves=False):
     curr_node = node
     if handle_leaves:
         if len(children) == 1:
@@ -86,7 +88,7 @@ def __split_node_mps(T, node, children, nindex, handle_leaves = False):
             T.add_edge(curr_node, nindex)
             curr_node = nindex
             nindex += 1
-            for cind in range(len(children)-2):
+            for cind in range(len(children) - 2):
                 T.add_edge(curr_node, children[cind])
                 T.add_edge(curr_node, nindex)
                 curr_node = nindex
@@ -95,7 +97,7 @@ def __split_node_mps(T, node, children, nindex, handle_leaves = False):
             T.add_edge(curr_node, children[-1])
     else:
         if len(children) > 0:
-            for cind in range(len(children)-1):
+            for cind in range(len(children) - 1):
                 T.add_edge(curr_node, children[cind])
                 T.add_edge(curr_node, nindex)
                 curr_node = nindex
@@ -103,7 +105,8 @@ def __split_node_mps(T, node, children, nindex, handle_leaves = False):
             T.add_edge(curr_node, children[-1])
     return T, nindex
 
-def __split_node_branching(T, node, children, max_nchild, nindex, handle_leaves = False):
+
+def __split_node_branching(T, node, children, max_nchild, nindex, handle_leaves=False):
     curr_node = node
     if len(children) > max_nchild:
         if handle_leaves:
@@ -126,20 +129,25 @@ def __split_node_branching(T, node, children, max_nchild, nindex, handle_leaves 
             curr_node = nindex
             nindex += 1
             for child in children:
-                T.add_edge(curr_node, child)           
+                T.add_edge(curr_node, child)
         else:
             for child in children:
                 T.add_edge(curr_node, child)
     return T, nindex
 
-def __split_node(T, node, children, max_nchild, nindex, handle_leaves = False):
-    if max_nchild is None: 
+
+def __split_node(T, node, children, max_nchild, nindex, handle_leaves=False):
+    if max_nchild is None:
         for i in range(len(children)):
             T.add_edge(node, children[i])
     elif max_nchild > 1:
-        T, nindex = __split_node_branching(T, node, children, max_nchild, nindex, handle_leaves=handle_leaves)
+        T, nindex = __split_node_branching(
+            T, node, children, max_nchild, nindex, handle_leaves=handle_leaves
+        )
     elif max_nchild == 1:
-        T, nindex = __split_node_mps(T, node, children, nindex, handle_leaves=handle_leaves)
+        T, nindex = __split_node_mps(
+            T, node, children, nindex, handle_leaves=handle_leaves
+        )
     else:
         for i in range(len(children)):
             T.add_edge(node, children[i])
@@ -147,7 +155,9 @@ def __split_node(T, node, children, max_nchild, nindex, handle_leaves = False):
     return T, nindex
 
 
-def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None, max_nleaves=None):
+def __split_high_degree_nodes(
+    spanning_tree, N, root_index, max_nchild=None, max_nleaves=None
+):
     if max_nchild is None and max_nleaves is None:
         # if max degree has not been specified we just return the current tree
         return spanning_tree
@@ -156,8 +166,10 @@ def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None, max
         # the node into sets of the correct size.  To do this we get a DFS edges list and if there are any instances
         # of nodes with more than max_nchild children we insert sufficiently many logical nodes so that we have the
         # correct degree of connectivity
-        edges = sorted([edge for edge in nx.dfs_edges(
-            spanning_tree, source=root_index)], key=lambda x: np.abs(x[0]-root_index))
+        edges = sorted(
+            [edge for edge in nx.dfs_edges(spanning_tree, source=root_index)],
+            key=lambda x: np.abs(x[0] - root_index),
+        )
 
         nchildren = {}
         nodes_to_split = {}
@@ -165,8 +177,8 @@ def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None, max
         curr_node = None
         sind = 0
         if max_nchild is None:
-            max_nchild = max_nleaves   
-            
+            max_nchild = max_nleaves
+
         # iterate over the edges getting the number of children associated with each node and the location of the
         # first edge associated with a nodes children in the list
         for i, e in enumerate(edges):
@@ -188,7 +200,7 @@ def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None, max
                 curr_node = e[1]
 
             if curr_node not in nchildren.keys():
-                nchildren[curr_node]=0
+                nchildren[curr_node] = 0
 
         # if none of the nodes are high degree we don't need to do anything
         if len(nodes_to_split) == 0:
@@ -203,20 +215,32 @@ def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None, max
             for node, ind in nodes_to_split.items():
                 nchild = nchildren[node]
 
-                print([nchildren[edges[ind+i][1]] for i in range(nchild)])
+                print([nchildren[edges[ind + i][1]] for i in range(nchild)])
                 # get a list containing all of its children
-                leaf_children = [edges[ind+i][1] for i in range(nchild) if nchildren[edges[ind+i][1]]==0]
+                leaf_children = [
+                    edges[ind + i][1]
+                    for i in range(nchild)
+                    if nchildren[edges[ind + i][1]] == 0
+                ]
 
-                internal_children = [edges[ind+i][1] for i in range(nchild) if nchildren[edges[ind+i][1]]>0]
+                internal_children = [
+                    edges[ind + i][1]
+                    for i in range(nchild)
+                    if nchildren[edges[ind + i][1]] > 0
+                ]
                 print(edges[ind], leaf_children, internal_children)
 
- 
-
                 if max_nleaves is None:
-                    T, counter = __split_node(T, node, leaf_children+internal_children, max_nchild, counter)
-                else:           
-                    T, counter = __split_node(T, node, internal_children, max_nchild, counter)
-                    T, counter = __split_node(T, node, leaf_children, max_nleaves, counter, handle_leaves=True)
+                    T, counter = __split_node(
+                        T, node, leaf_children + internal_children, max_nchild, counter
+                    )
+                else:
+                    T, counter = __split_node(
+                        T, node, internal_children, max_nchild, counter
+                    )
+                    T, counter = __split_node(
+                        T, node, leaf_children, max_nleaves, counter, handle_leaves=True
+                    )
 
             for e in edges:
                 if e[0] not in nodes_to_split.keys():
@@ -224,7 +248,12 @@ def __split_high_degree_nodes(spanning_tree, N, root_index, max_nchild=None, max
             return T
 
 
-def generate_spanning_tree(M, max_internal_children=None, max_leaf_children=None, root_index=0):
+def generate_spanning_tree(
+    M: np.ndarray,
+    max_internal_children: Optional[int] = None,
+    max_leaf_children: Optional[int] = None,
+    root_index: int = 0,
+) -> tuple[nx.Graph, int]:
     """Construct a networkx graph object from the maximum weight spanning tree of some matrix M.  This function
     can optionally insert logical nodes to prevent any node having a more children than max_nchild, and can be chosen
     so that any node is the root index of the tree.
@@ -248,7 +277,11 @@ def generate_spanning_tree(M, max_internal_children=None, max_leaf_children=None
 
     spanning_tree = nx.maximum_spanning_tree(G)
     spanning_tree = __split_high_degree_nodes(
-        spanning_tree, M.shape[0], root_index, max_nchild=max_internal_children, max_nleaves=max_leaf_children
+        spanning_tree,
+        M.shape[0],
+        root_index,
+        max_nchild=max_internal_children,
+        max_nleaves=max_leaf_children,
     )
 
     return __insert_physical_nodes(spanning_tree, M.shape[0], root_index)

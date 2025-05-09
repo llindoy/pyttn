@@ -11,17 +11,21 @@
 # limitations under the License
 
 from . import opsExt as ops
-from .siteOperatorsExt import site_operator
-from .productOperatorExt import product_operator
-from .sopOperatorExt import sop_operator
-from . mssopOperatorExt import multiset_sop_operator, ms_sop_operator
+from .siteOperatorsExt import site_operator, site_operator_type
+from .productOperatorExt import product_operator, product_operator_type
+from .sopOperatorExt import sop_operator, sop_operator_type
+from . mssopOperatorExt import multiset_sop_operator, ms_sop_operator, ms_sop_operator_type
 
 
-__all__ = [
+__all__: list[str] = [
     "ops",
     "site_operator",
     "product_operator",
     "sop_operator",
     "multiset_sop_operator",
-    "ms_sop_operator"
+    "ms_sop_operator",
+    "site_operator_type",
+    "product_operator_type",
+    "sop_operator_type",
+    "ms_sop_operator_type"
 ]

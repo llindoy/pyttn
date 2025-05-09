@@ -203,11 +203,11 @@ if __name__ == "__main__":
     # subspace expansion parameters
     parser.add_argument("--subspace", type=bool, default=True)
     parser.add_argument("--nunoccupied", type=int, default=0)
-    parser.add_argument("--spawning_threshold", type=float, default=1e-12)
+    parser.add_argument("--spawning_threshold", type=float, default=1e-7)
     parser.add_argument("--unoccupied_threshold", type=float, default=1e-4)
 
     # integration time parameters
-    parser.add_argument("--dt", type=float, default=0.25)
+    parser.add_argument("--dt", type=float, default=0.125)
     parser.add_argument("--tmax", type=float, default=150)
 
     parser.add_argument("--output_skip", type=int, default=1)

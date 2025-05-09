@@ -10,10 +10,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Union, TypeAlias
 import numpy as np
 
+from pyttn.ttnpp import operator_dictionary_complex
 
-def operator_dictionary(*args, dtype=np.complex128):
+try:
+    from pyttn.ttnpp import operator_dictionary_real
+    __real_opdict = True
+    operator_dictionary_type: TypeAlias = operator_dictionary_real | operator_dictionary_complex
+except ImportError:
+    __real_opdict = False
+    operator_dictionary_type: TypeAlias =  operator_dictionary_complex
+
+def operator_dictionary(*args, dtype: Union[float, complex, np.float64, np.complex128]=np.complex128)-> operator_dictionary_type:
     r"""Factory function for constructing a user defined operator dictionary.
 
     :param *args: Variable length list of arguments.
@@ -23,34 +33,29 @@ def operator_dictionary(*args, dtype=np.complex128):
     :returns: The operator dictionary object
     :rtype: operator_dictionary_real or operator_dictionary_complex
     """
-    from pyttn.ttnpp import operator_dictionary_complex
 
-    try:
-        from pyttn.ttnpp import operator_dictionary_real
+    if __real_opdict:
 
-        if dtype == np.complex128:
+        if dtype == np.complex128 or dtype is complex:
             return operator_dictionary_complex(*args)
-        elif dtype == np.float64:
+        elif dtype == np.float64 or dtype is float:
             return operator_dictionary_real(*args)
         else:
             raise RuntimeError("Invalid dtype for operator_dictionary")
 
-    except ImportError:
-        if dtype == np.complex128:
+    else:
+        if dtype == np.complex128 or dtype is complex:
             return operator_dictionary_complex(*args)
         else:
             raise RuntimeError("Invalid dtype for operator_dictionary")
 
 
-def __is_operator_dictionary(a):
-    from pyttn.ttnpp import operator_dictionary_complex
-
-    try:
-        from pyttn.ttnpp import operator_dictionary_real
-
+def __is_operator_dictionary(a) -> bool:
+    if __real_opdict:
         return isinstance(a, operator_dictionary_complex) or isinstance(
             a, operator_dictionary_real
         )
 
-    except ImportError:
+    else:
         return isinstance(a, operator_dictionary_complex)
+

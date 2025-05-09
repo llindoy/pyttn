@@ -122,8 +122,8 @@ namespace ttns
         // }
 
         template <typename INTEGER, typename Alloc>
-        ttn(const ntree<INTEGER, Alloc> &topology, bool purification = false)
-        try : base_type(topology, 1, purification) {}
+        ttn(const ntree<INTEGER, Alloc> &topology, bool collapse_bond_matrices=true, bool purification = false)
+        try : base_type(topology, 1, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
             std::cerr << ex.what() << std::endl;
@@ -131,24 +131,24 @@ namespace ttns
         }
 
         template <typename INTEGER, typename Alloc>
-        ttn(const ntree<INTEGER, Alloc> &topology, const ntree<INTEGER, Alloc> &capacity, bool purification = false)
-        try : base_type(topology, capacity, 1, purification) {}
+        ttn(const ntree<INTEGER, Alloc> &topology, const ntree<INTEGER, Alloc> &capacity, bool collapse_bond_matrices=true, bool purification = false)
+        try : base_type(topology, capacity, 1, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct TTN object.");
         }
 
-        ttn(const std::string &_topology, bool purification = false)
-        try : base_type(_topology, 1, purification) {}
+        ttn(const std::string &_topology, bool collapse_bond_matrices=true, bool purification = false)
+        try : base_type(_topology, 1, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
             std::cerr << ex.what() << std::endl;
             RAISE_EXCEPTION("Failed to construct TTN object.");
         }
 
-        ttn(const std::string &_topology, const std::string &_capacity, bool purification = false)
-        try : base_type(_topology, _capacity, 1, purification) {}
+        ttn(const std::string &_topology, const std::string &_capacity, bool collapse_bond_matrices=true, bool purification = false)
+        try : base_type(_topology, _capacity, 1, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
             std::cerr << ex.what() << std::endl;

@@ -12,10 +12,10 @@
 
 import networkx as nx
 
-from pyttn.ttnpp import ntree
+from pyttn.ttnpp import ntree, ntreeNode
 
 
-def convert_nx_to_subtree(tree, root, root_ind=0):
+def convert_nx_to_subtree(tree: nx.Graph, root: ntreeNode, root_ind: int = 0) -> list:
     """A function for converting a networkx graph storing a tree structure into a subtree
     of an ntree object with root at node root.
 
@@ -57,12 +57,11 @@ def convert_nx_to_subtree(tree, root, root_ind=0):
 
     subtree_root = root.at([root_skip])
     return [
-        subtree_root.at(leaf_inds).value
-        for leaf_inds in subtree_root.leaf_indices()
+        subtree_root.at(leaf_inds).value for leaf_inds in subtree_root.leaf_indices()
     ]
 
 
-def convert_nx_to_tree(tree, root_ind=0):
+def convert_nx_to_tree(tree: nx.Graph, root_ind: int = 0) -> tuple[ntree, list]:
     """A function for constructing an ntree object from a networkx object.
 
     :param tree: The networkx graph object representing the topology tree.  This
@@ -81,7 +80,7 @@ def convert_nx_to_tree(tree, root_ind=0):
     edges = list(nx.dfs_edges(tree, source=root_ind))
     if len(edges) == 0:
         return ntree(), []
-    
+
     res = ntree(str(edges[0][0]))
 
     node_dict = {root_ind: []}

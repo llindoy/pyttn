@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -9,6 +9,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License
+
+from typing import TypeAlias
 
 from pyttn.ttnpp import (
     one_site_tdvp_complex,
@@ -21,6 +23,14 @@ from pyttn.ttnpp import (
     ms_ttn_complex,
     multiset_sop_operator_complex,
 )
+
+from pyttn.ttns.ttn.ttnExt import ttn_type, ms_ttn_type
+from pyttn.ttns.operators.sopOperatorExt import sop_operator_type
+from pyttn.ttns.operators.mssopOperatorExt import ms_sop_operator_type
+
+
+tdvp_type: TypeAlias = one_site_tdvp_complex | adaptive_one_site_tdvp_complex
+ms_tdvp_type: TypeAlias = multiset_one_site_tdvp_complex
 
 # and attempt to import the cuda backend
 try:
@@ -37,6 +47,8 @@ try:
     )
 
     __cuda_import = True
+    tdvp_type: TypeAlias = tdvp_type | one_site_tdvp_complex_cuda
+    ms_tdvp_type: TypeAlias = ms_tdvp_type | multiset_one_site_tdvp_complex_cuda
 
 except ImportError:
     __cuda_import = False
@@ -60,19 +72,21 @@ def __single_set_tdvp_cuda(A, H, expansion="onesite", **kwargs):
         raise RuntimeError("Invalid input types for single set tdvp.")
 
 
-def single_set_tdvp(A, H, expansion="onesite", **kwargs):
-    r"""A factory method for constructing an object used for performing single set TDVP calculations
+def single_set_tdvp(
+    A: ttn_type, H: sop_operator_type, expansion: str = "onesite", **kwargs
+) -> tdvp_type:
+    """A factory method for constructing an object used for performing single set TDVP calculations
 
     :param A: Tree Tensor Network that the DMRG algorithm will act on
-    :type A: ttn_complex
+    :type A: ttn_type
     :param H: The Hamiltonian sop operator object
-    :type H: sop_operator_complex
+    :type H: sop_operator_type
     :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
     :type expansion: {'onesite', 'subspace'}, optional
     :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_tdvp_complex
 
     :returns: The TDVP evaluation object
-    :rtype: one_site_tdvp_complex or adaptive_one_site_tdvp_complex
+    :rtype: tdvp_type
     """
     if A.backend() == H.backend():
         if A.backend() == "blas":
@@ -96,28 +110,28 @@ def __multiset_tdvp_blas(A, H, expansion="onesite", **kwargs):
 
 
 def __multiset_tdvp_cuda(A, H, expansion="onesite", **kwargs):
-    if isinstance(A, ms_ttn_complex_cuda) and isinstance(
-        H, multiset_sop_operator_cuda
-    ):
+    if isinstance(A, ms_ttn_complex_cuda) and isinstance(H, multiset_sop_operator_cuda):
         if expansion == "onesite":
             return multiset_one_site_tdvp_complex_cuda(A, H, **kwargs)
     else:
         raise RuntimeError("Invalid input types for multiset tdvp.")
 
 
-def multiset_tdvp(A, H, expansion="onesite", **kwargs):
+def multiset_tdvp(
+    A: ms_ttn_type, H: ms_sop_operator_type, expansion: str = "onesite", **kwargs
+) -> ms_tdvp_type:
     r"""A factory method for constructing an object used for performing multiset tdvp calculations
 
     :param A: Tree Tensor Network that the TDVP algorithm will act on
-    :type A: ttn_complex
+    :type A: ms_ttn_type
     :param H: The Hamiltonian sop operator object
-    :type H: sop_operator_complex
+    :type H: ms_sop_operator_type
     :param expansion: A string determining the type of bond dimension expansion to be used.  (Default: 'onesite')
     :type expansion: {'onesite'}, optional
     :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see multiset_one_site_dmrg_complex
 
     :returns: The TDVP evaluation object
-    :rtype: multiset_one_site_tdvp_complex
+    :rtype: ms_tdvp_type
     """
     if A.backend() == H.backend():
         if A.backend() == "blas":
@@ -128,20 +142,25 @@ def multiset_tdvp(A, H, expansion="onesite", **kwargs):
             raise RuntimeError("Invalid backend for multiset set tdvp")
 
 
-def tdvp(A, H, expansion="onesite", **kwargs):
+def tdvp(
+    A: ttn_type | ms_ttn_type,
+    H: sop_operator_type | ms_sop_operator_type,
+    expansion: str = "onesite",
+    **kwargs,
+) -> tdvp_type | ms_tdvp_type:
     r"""A factory method for constructing an object used for performing either single or multi set tdvp calculations.
     Which type to construct is determined by the types of the input A and h matrices.
 
     :param A: Tree Tensor Network that the DMRG algorithm will act on
-    :type A: ttn_complex or ms_ttn_complex
+    :type A: ttn_type | ms_ttn_type
     :param H: The Hamiltonian sop operator object
-    :type H: sop_operator_complex
+    :type H: sop_operator_type | ms_sop_operator_type
     :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
     :type expansion: {'onesite', 'subspace'}, optional
     :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_tdvp_complex or adaptive_one_site_tdvp_complex
 
     :returns: The TDVP evaluation object
-    :rtype: one_site_tdvp_complex or adaptive_one_site_tdvp_complex or multiset_one_site_tdvp_complex
+    :rtype: tdvp_type | ms_tdvp_type
     """
     if isinstance(A, ttn_complex) and isinstance(H, sop_operator_complex):
         return single_set_tdvp(A, H, expansion=expansion, **kwargs)

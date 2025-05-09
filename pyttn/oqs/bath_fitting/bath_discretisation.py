@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,6 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Callable, Optional
 from pyttn.ttnpp.utils import orthopol_discretisation, density_discretisation
 import numpy as np
 
@@ -25,7 +26,7 @@ class BathDiscretisation:
     :type wmax: float
     """
 
-    def __init__(self, Nb, wmin, wmax):
+    def __init__(self, Nb: int, wmin: float, wmax: float):
         self.Nb = Nb
         self.wmin = wmin
         self.wmax = wmax
@@ -79,17 +80,19 @@ class DensityDiscretisation(BathDiscretisation):
 
     def __init__(
         self,
-        Nb,
-        wmin,
-        wmax,
-        rho=None,
-        atol=0,
-        rtol=1e-10,
-        nquad=100,
-        wtol=1e-10,
-        ftol=1e-10,
-        niters=100,
-        wcut=1e-8,
+        Nb: int,
+        wmin: float,
+        wmax: float,
+        rho: Optional[
+            Callable[[np.ndarray | float], np.ndarray | float | np.complex128]
+        ] = None,
+        atol: float = 0,
+        rtol: float = 1e-10,
+        nquad: int = 100,
+        wtol: float = 1e-10,
+        ftol: float = 1e-10,
+        niters: float = 100,
+        wcut: float = 1e-8,
     ):
         BathDiscretisation.__init__(self, Nb, wmin, wmax)
         self.rho = rho
@@ -104,7 +107,9 @@ class DensityDiscretisation(BathDiscretisation):
     # discretise a bosonic bath using the density algorithm.  Here we allow for specification of the density of frequencies (rho), if this isn't specified we use a density of frequencies
     # that is given by S(w)/w for np.abs(w) > 1e-12 and S(w)/1e-12 for np.abs(w) < 1e-12.
     # this currently doesn't seem to work
-    def __call__(self, S):
+    def __call__(
+        self, S: Callable[[np.ndarray | float], np.ndarray | float | np.complex128]
+    ) -> tuple[np.ndarray, np.ndarray]:
         g = None
         w = None
 
@@ -189,16 +194,16 @@ class OrthopolDiscretisation:
 
     def __init__(
         self,
-        Nb,
-        wmin,
-        wmax,
-        moment_scaling=None,
-        atol=0,
-        rtol=1e-10,
-        minbound=1e-25,
-        maxbound=1e25,
-        moment_scaling_steps=4,
-        nquad=100,
+        Nb: int,
+        wmin: float,
+        wmax: float,
+        moment_scaling: Optional[float] = None,
+        atol: float = 0,
+        rtol: float = 1e-10,
+        minbound: float = 1e-25,
+        maxbound: float = 1e25,
+        moment_scaling_steps: float = 4,
+        nquad: int = 100,
     ):
         BathDiscretisation.__init__(self, Nb, wmin, wmax)
         self.moment_scaling = moment_scaling
@@ -210,17 +215,17 @@ class OrthopolDiscretisation:
         self.nquad = nquad
 
     def find_moment_scaling_factor(
-        S,
-        wmin,
-        wmax,
-        Nb,
-        atol=0,
-        rtol=1e-10,
-        minbound=1e-30,
-        maxbound=1e30,
-        Nsteps=5,
-        nquad=100,
-    ):
+        S: Callable[[np.ndarray | float], np.ndarray | float | np.complex128],
+        wmin: float,
+        wmax: float,
+        Nb: int,
+        atol: float = 0,
+        rtol: float = 1e-10,
+        minbound: float = 1e-30,
+        maxbound: float = 1e30,
+        Nsteps: int = 5,
+        nquad: int = 100,
+    ) -> float:
         r"""Finds a constant to scale the frequency axis by in order to ensure well defined scaling of the modified moments as we go to very high moments.
         here this is done by computing the modified moments up to varying orders (with early termination if the values leave some min and max bounds)
         and fitting the resultant decay or growth to an exponential function.  Based on this fitting we extract a constant that aims to minimise the
@@ -263,8 +268,8 @@ class OrthopolDiscretisation:
                     moment_scaling=ms,
                     atol=atol,
                     rtol=rtol,
-                    minbound=1e-30,
-                    maxbound=1e30,
+                    minbound=minbound,
+                    maxbound=maxbound,
                     nquad=nquad,
                 )
             )
@@ -275,7 +280,9 @@ class OrthopolDiscretisation:
                 return ms
         return ms
 
-    def __call__(self, S):
+    def __call__(
+        self, S: Callable[[np.ndarray | float], np.ndarray | float | np.complex128]
+    ) -> tuple[np.ndarray, np.ndarray]:
         g = None
         w = None
 

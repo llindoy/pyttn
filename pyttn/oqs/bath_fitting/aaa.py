@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,6 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Callable
 import numpy as np
 from scipy import sparse
 from scipy import linalg as splinalg
@@ -23,7 +24,7 @@ def __residue_integrand(theta, r, rs, poles):
 
 
 def __compute_residues_integ(r, poles, tol):
-    r"""Compute the poles and residues given the baryocentric representation of a rational function
+    """Compute the poles and residues given the baryocentric representation of a rational function
 
     :param r: The rational function object
     :type r: callable
@@ -49,7 +50,7 @@ def __compute_residues_integ(r, poles, tol):
 
 
 def __prz(r, z, f, w, tol):
-    r"""Compute the poles and residues given the baryocentric representation of a rational function
+    """Compute the poles and residues given the baryocentric representation of a rational function
 
     :param r: The rational function object
     :type r: callable
@@ -96,7 +97,7 @@ def __prz(r, z, f, w, tol):
 
 
 def __evaluate_function(z, Z, f, w):
-    r"""Evaluate the baryocentric form of the rational function approximation
+    """Evaluate the baryocentric form of the rational function approximation
 
     .. math:
         r(z) = \frac{\sum_{j=1}^N \frac{w_j f_j}{z-Z_j}}{\sum_{j=1}^N \frac{w_j}{z-Z_j}}
@@ -119,8 +120,20 @@ def __evaluate_function(z, Z, f, w):
     return r
 
 
-def AAA_algorithm(F, Z, tol=1e-13, K=None, nmax=100, *args, **kwargs):
-    r"""Implementation of the adaptive Antoulas-Anderson (AAA) algorithm for rational approximation
+def AAA_algorithm(
+    F: Callable[..., np.ndarray | list],
+    Z: np.ndarray,
+    tol: float = 1e-13,
+    K: int = 100,
+    *args,
+    **kwargs,
+) -> tuple[
+    Callable[[np.ndarray | float], np.ndarray | np.complex128 | float],
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+]:
+    """Implementation of the adaptive Antoulas-Anderson (AAA) algorithm for rational approximation
     Y. Nakatsukasa, O. Sète, and L. N. Trefethen, SIAM Journal on Scientific Computing 40, A1494 (2018).
 
     :param F: The function to be fit
@@ -129,7 +142,7 @@ def AAA_algorithm(F, Z, tol=1e-13, K=None, nmax=100, *args, **kwargs):
     :type Z: np.ndarray
     :param tol: The convergence tolerance for the AAA algorithm. (default: 1e-13)
     :type tol: float, optional
-    :param K: The maximum number of poles to fit. (default: None)
+    :param K: The maximum number of poles to fit. (default: 100)
     :type K: int or None, optional
     :param nmax: The maximum number of poles to use in the AAA fit. (default: 100)
     :type nmax: int, optional
@@ -154,9 +167,9 @@ def AAA_algorithm(F, Z, tol=1e-13, K=None, nmax=100, *args, **kwargs):
     SF = sparse.diags(Fz)
     z = []
     f = []
-    C = np.zeros((M, nmax), dtype=np.complex128)
+    C = np.zeros((M, K), dtype=np.complex128)
     w = None
-    for i in range(nmax):
+    for i in range(K):
         ind = np.argmax(np.abs(Fz - R))
         z.append(Z[ind])
         f.append(Fz[ind])
@@ -179,14 +192,14 @@ def AAA_algorithm(F, Z, tol=1e-13, K=None, nmax=100, *args, **kwargs):
         D = C[:, : i + 1] @ w
         R = N / D
         err = np.linalg.norm(Fz - R, np.inf)
-        if err <= tol * np.linalg.norm(Fz, np.inf) or len(z) == K:
+        if err <= tol * np.linalg.norm(Fz, np.inf):
             break
 
     z1 = np.array(z, dtype=np.complex128)
     f1 = np.array(f, dtype=np.complex128)
     w1 = np.array(w, dtype=np.complex128)
 
-    def func(x):
+    def func(x: np.ndarray):
         return __evaluate_function(x, z1, f1, w1)
 
     poles, residues, zeros = __prz(func, z, f, w, tol)

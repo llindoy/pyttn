@@ -58,6 +58,11 @@ void init_matrix_cpu(py::module &m, const std::string &label)
             Construct an empty linear algebra tensor object.  This is the internal type used for linear
             algebra operations by the pyTTN package.
             )mydelim")
+        .def(py::init<const linalg::tensor<real_type, 2, backend> &>(),
+             R"mydelim(
+            Construct an empty linear algebra tensor object.  This is the internal type used for linear
+            algebra operations by the pyTTN package.
+            )mydelim")
 #ifdef PYTTN_BUILD_CUDA
         .def(py::init<const tensor<T, 2, linalg::cuda_backend> &>(),
              R"mydelim(
@@ -92,13 +97,28 @@ void init_matrix_cpu(py::module &m, const std::string &label)
                 o.set_subblock(tens); })
         .def("complex_dtype", [](const ttype &)
              { return !std::is_same<T, real_type>::value; })
+        .def("__matmul__",
+             [](const ttype &a, ttype &b)
+             {
+                 ttype ret;
+                 ret = a * b;
+                 return ret;
+             })
         .def("__str__", [](const ttype &o)
              {std::stringstream oss;   oss << o; return oss.str(); })
+        .def("shape", [](const ttype& o, size_t i){return o.shape(i);})
+        .def("ndim", [](const ttype&){return 2;})
         .def("clear", &ttype::clear)
         .def("transpose",
              [](const ttype &o, const std::vector<int> &inds)
              {
                  ttype b = linalg::transpose(o, inds);
+                 return b;
+             })
+        .def("transpose",
+             [](const ttype &o)
+             {
+                 ttype b = linalg::trans(o);
                  return b;
              })
         .def("backend", [](const ttype &)
@@ -134,6 +154,11 @@ void init_tensor_cpu(py::module &m, const std::string &label)
             Construct an empty linear algebra tensor object.  This is the internal type used for linear
             algebra operations by the pyTTN package.
             )mydelim")
+        .def(py::init<const linalg::tensor<real_type, D, backend> &>(),
+             R"mydelim(
+            Construct an empty linear algebra tensor object.  This is the internal type used for linear
+            algebra operations by the pyTTN package.
+            )mydelim")
 #ifdef PYTTN_BUILD_CUDA
         .def(py::init<const tensor<T, D, linalg::cuda_backend> &>(),
              R"mydelim(
@@ -165,7 +190,10 @@ void init_tensor_cpu(py::module &m, const std::string &label)
              { return !std::is_same<T, real_type>::value; })
         .def("__str__", [](const ttype &o)
              {std::stringstream oss;   oss << o; return oss.str(); })
+        .def("ndim", [](const ttype&){return D;})
         .def("clear", &ttype::clear)
+        .def("shape", [](const ttype& o, size_t i){return o.shape(i);})
+
         .def("transpose",
              [](const ttype &o, const std::vector<int> &inds)
              {
@@ -229,8 +257,17 @@ void init_matrix_gpu(py::module &m, const std::string &label)
             )mydelim")
         .def("complex_dtype", [](const ttype &)
              { return !std::is_same<T, real_type>::value; })
+        .def("__matmul__",
+             [](const ttype &a, ttype &b)
+             {
+                 ttype ret;
+                 ret = a * b;
+                 return ret;
+             })
         .def("__str__", [](const ttype &o)
              {std::stringstream oss;   oss << o; return oss.str(); })
+        .def("shape", [](const ttype& o, size_t i){return o.shape(i);})
+        .def("ndim", [](const ttype&){return 2;})
         .def("set_subblock", [](ttype &o, py::buffer &b)
              {
                 ttype tens;
@@ -240,6 +277,12 @@ void init_matrix_gpu(py::module &m, const std::string &label)
              [](const ttype &o, const std::vector<int> &inds)
              {
                  ttype b = linalg::transpose(o, inds);
+                 return b;
+             })
+        .def("transpose",
+             [](const ttype &o)
+             {
+                 ttype b = linalg::trans(o);
                  return b;
              })
         .def("backend", [](const ttype &)
@@ -285,6 +328,9 @@ void init_tensor_gpu(py::module &m, const std::string &label)
              { return !std::is_same<T, real_type>::value; })
         .def("__str__", [](const ttype &o)
              {std::stringstream oss;   oss << o; return oss.str(); })
+        .def("ndim", [](const ttype&){return D;})
+
+        .def("shape", [](const ttype& o, size_t i){return o.shape(i);})
         .def("transpose",
              [](const ttype &o, const std::vector<int> &inds)
              {

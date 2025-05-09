@@ -140,28 +140,28 @@ namespace ttns
         }
 
         template <typename INTEGER, typename Alloc>
-        ttn_base(const ntree<INTEGER, Alloc> &topology, size_type nset = 1, bool purification = false) : m_nset(nset), m_purification(purification)
+        ttn_base(const ntree<INTEGER, Alloc> &topology, size_type nset = 1, bool collapse_bond_matrices=true, bool purification = false) : m_nset(nset), m_purification(purification)
         {
-            CALL_AND_HANDLE(construct_topology(topology, nset), "Failed to construct the ttn object.  Failed to allocate tree structure from topology ntree.");
+            CALL_AND_HANDLE(construct_topology(topology, nset, collapse_bond_matrices), "Failed to construct the ttn object.  Failed to allocate tree structure from topology ntree.");
         }
 
         template <typename INTEGER, typename Alloc>
-        ttn_base(const ntree<INTEGER, Alloc> &topology, const ntree<INTEGER, Alloc> &capacity, size_type nset = 1, bool purification = false) : m_nset(nset), m_purification(purification)
+        ttn_base(const ntree<INTEGER, Alloc> &topology, const ntree<INTEGER, Alloc> &capacity, size_type nset = 1, bool collapse_bond_matrices=true, bool purification = false) : m_nset(nset), m_purification(purification)
         {
-            CALL_AND_HANDLE(construct_topology(topology, capacity, nset), "Failed to construct the ttn object.  Failed to allocate tree structure from topology ntree.");
+            CALL_AND_HANDLE(construct_topology(topology, capacity, nset, collapse_bond_matrices), "Failed to construct the ttn object.  Failed to allocate tree structure from topology ntree.");
         }
 
-        ttn_base(const std::string &_topology, size_type nset = 1, bool purification = false) : m_nset(nset), m_purification(purification)
+        ttn_base(const std::string &_topology, size_type nset = 1, bool collapse_bond_matrices=true, bool purification = false) : m_nset(nset), m_purification(purification)
         {
             ntree<size_type> topology(_topology);
-            CALL_AND_HANDLE(construct_topology(topology, nset), "Failed to construct the ttn object.  Failed to allocate tree structure from topology ntree.");
+            CALL_AND_HANDLE(construct_topology(topology, nset, collapse_bond_matrices), "Failed to construct the ttn object.  Failed to allocate tree structure from topology ntree.");
         }
 
-        ttn_base(const std::string &_topology, const std::string &_capacity, size_type nset = 1, bool purification = false) : m_nset(nset), m_purification(purification)
+        ttn_base(const std::string &_topology, const std::string &_capacity, size_type nset = 1, bool collapse_bond_matrices=true, bool purification = false) : m_nset(nset), m_purification(purification)
         {
             ntree<size_type> topology(_topology);
             ntree<size_type> capacity(_capacity);
-            CALL_AND_HANDLE(construct_topology(topology, capacity, nset), "Failed to construct the ttn object.  Failed to allocate tree structure from topology ntree.");
+            CALL_AND_HANDLE(construct_topology(topology, capacity, nset, collapse_bond_matrices), "Failed to construct the ttn object.  Failed to allocate tree structure from topology ntree.");
         }
 
     protected:
@@ -268,32 +268,32 @@ namespace ttns
         }
 
         template <typename INTEGER, typename Alloc>
-        void resize(const ntree<INTEGER, Alloc> &topology, size_type nset = 1, bool purification = false)
+        void resize(const ntree<INTEGER, Alloc> &topology, size_type nset = 1, bool collapse_bond_matrices=true, bool purification = false)
         {
             CALL_AND_HANDLE(clear(), "Failed to resize ttn object.  Failed to clear currently allocated data.");
             m_purification = purification;
-            CALL_AND_HANDLE(construct_topology(topology, nset), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
+            CALL_AND_HANDLE(construct_topology(topology, nset, collapse_bond_matrices), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
         }
 
         template <typename INTEGER, typename Alloc>
-        void resize(const ntree<INTEGER, Alloc> &topology, const ntree<INTEGER, Alloc> &capacity, size_type nset = 1, bool purification = false)
+        void resize(const ntree<INTEGER, Alloc> &topology, const ntree<INTEGER, Alloc> &capacity, size_type nset = 1, bool collapse_bond_matrices=true, bool purification = false)
         {
             CALL_AND_HANDLE(clear(), "Failed to resize ttn object.  Failed to clear currently allocated data.");
             m_purification = purification;
-            CALL_AND_HANDLE(construct_topology(topology, capacity, nset), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
+            CALL_AND_HANDLE(construct_topology(topology, capacity, nset, collapse_bond_matrices), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
         }
 
-        void resize(const std::string &_topology, size_type nset = 1, bool purification = false)
+        void resize(const std::string &_topology, size_type nset = 1, bool collapse_bond_matrices=true, bool purification = false)
         {
             ntree<size_type> topology(_topology);
-            CALL_AND_HANDLE(resize(topology, nset, purification), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
+            CALL_AND_HANDLE(resize(topology, nset, collapse_bond_matrices, purification), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
         }
 
-        void resize(const std::string &_topology, const std::string &_capacity, size_type nset = 1, bool purification = false)
+        void resize(const std::string &_topology, const std::string &_capacity, size_type nset = 1, bool collapse_bond_matrices=true, bool purification = false)
         {
             ntree<size_type> topology(_topology);
             ntree<size_type> capacity(_capacity);
-            CALL_AND_HANDLE(resize(topology, capacity, nset, purification), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
+            CALL_AND_HANDLE(resize(topology, capacity, nset, collapse_bond_matrices, purification), "Failed to resize the ttn object.  Failed to allocate tree structure from topology ntree.");
         }
 
         std::mt19937 &rng() { return m_hrengine.rng(); }
@@ -1135,25 +1135,25 @@ namespace ttns
 
     protected:
         template <typename INTEGER, typename Alloc>
-        void construct_topology(const ntree<INTEGER, Alloc> &_tree)
+        void construct_topology(const ntree<INTEGER, Alloc> &_tree, bool collapse_bond_matrices = true)
         {
-            CALL_AND_RETHROW(construct_topology(_tree, _tree));
+            CALL_AND_RETHROW(construct_topology(_tree, _tree, collapse_bond_matrices));
         }
 
         template <typename INTEGER, typename Alloc>
-        void construct_topology(const ntree<INTEGER, Alloc> &_tree, size_type nset = 1)
+        void construct_topology(const ntree<INTEGER, Alloc> &_tree, size_type nset = 1, bool collapse_bond_matrices = true)
         {
-            CALL_AND_RETHROW(construct_topology(_tree, _tree, nset));
+            CALL_AND_RETHROW(construct_topology(_tree, _tree, nset, collapse_bond_matrices));
         }
 
         template <typename INTEGER, typename Alloc>
-        void construct_topology(const ntree<INTEGER, Alloc> &__tree, const ntree<INTEGER, Alloc> &_capacity, size_type nset = 1)
+        void construct_topology(const ntree<INTEGER, Alloc> &__tree, const ntree<INTEGER, Alloc> &_capacity, size_type nset = 1, bool collapse_bond_matrices = true)
         {
             ntree<INTEGER, Alloc> _tree(__tree);
             ntree<INTEGER, Alloc> capacity(_capacity);
 
-            ntree_builder<INTEGER>::sanitise_tree(_tree, true);
-            ntree_builder<INTEGER>::sanitise_tree(capacity, true);
+            ntree_builder<INTEGER>::sanitise_tree(_tree, collapse_bond_matrices);
+            ntree_builder<INTEGER>::sanitise_tree(capacity, collapse_bond_matrices);
 
             ASSERT(__tree.size() > 2, "Failed to build ttn from topology tree.  The input topology must contain at least 3 elements.  If it contains fewer than 3 elements then this is just a vector and we won't want to use the full TTN structure.");
             ASSERT(_tree.size() == capacity.size(), "Failed to construct ttn topology with capacity.");

@@ -185,15 +185,28 @@ namespace ttns
             m_clear(m_data);
         }
 
-        tree_node_base &operator=(const tree_node_base &other) = delete;
+        //tree_node_base &operator=(const tree_node_base &other) = delete;
 
     public:
         tree_node_base() : m_parent(nullptr), m_clear(), m_id(0), m_child_id(0), m_level(0) {}
+        tree_node_base(const tree_node_base &other) : m_clear() { operator=(other); }
         tree_node_base(tree_node_base &&other) : m_clear() { operator=(std::forward<tree_node_base>(other)); }
         ~tree_node_base()
         {
             m_parent = nullptr;
             m_tree = nullptr;
+        }
+
+        tree_node_base &operator=(const tree_node_base &other)
+        {
+            m_parent = other.m_parent;
+            m_children = other.m_children;
+            m_id = other.m_id;
+            m_child_id = other.m_child_id;
+            m_level = other.m_level;
+            m_index = other.m_index;
+            m_data = other.m_data;
+            return *this;
         }
 
         tree_node_base &operator=(tree_node_base &&other)
@@ -290,6 +303,36 @@ namespace ttns
             ASSERT(n < m_children.size(), "Unable to access child of node.  Index is out of bounds.");
             return *(m_children[n]);
         }
+
+        node_reference at(const std::vector<size_type> &inds, size_type index = 0)
+        {
+            ASSERT(index < inds.size(), "Invalid index argument.");
+            ASSERT(inds[index] < m_children.size(), "Unable to access element of tree.  Element is out of bounds.");
+            if (index + 1 == inds.size())
+            {
+                CALL_AND_RETHROW(return this->operator[](inds[index]));
+            }
+            else
+            {
+                CALL_AND_RETHROW(return this->operator[](inds[index]).at(inds, index + 1));
+            }
+        }
+
+        const_node_reference at(const std::vector<size_type> &inds, size_type index = 0) const
+        {
+            ASSERT(index < inds.size(), "Invalid index argument.");
+            ASSERT(inds[index] < m_children.size(), "Unable to access element of tree.  Element is out of bounds.");
+
+            if (index + 1 == inds.size())
+            {
+                CALL_AND_RETHROW(return this->operator[](inds[index]));
+            }
+            else
+            {
+                CALL_AND_RETHROW(return this->operator[](inds[index]).at(inds, index + 1));
+            }
+        }
+
         node_reference front()
         {
             ASSERT(m_children.size() != 0, "Unable to access the front child node.  This node has no children.");

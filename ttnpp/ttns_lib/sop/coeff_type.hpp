@@ -203,7 +203,7 @@ namespace ttns
                     {
                         for (size_t i = 0; i < o.m_funcs.size(); ++i)
                         {
-                            m_funcs[i] = std::make_pair(m_constant * std::get<0>(o.m_funcs[i]), std::get<1>(o.m_funcs[i]));
+                            m_funcs.push_back(std::make_pair(m_constant * std::get<0>(o.m_funcs[i]), std::get<1>(o.m_funcs[i])));
                         }
 
                         m_constant *= o.m_constant;
