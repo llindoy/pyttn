@@ -177,29 +177,41 @@ namespace ttns
                     size_t counter = 0;
                     for (size_type i = 0; i < matrices.size(); ++i)
                     {
-                        size_type mode = m_operators[counter].first;
-                        if (mode == i)
+                        bool fill_identity = false;
+                        if(counter < m_operators.size())
                         {
-                            if (m_operators[counter].second.size() == 1)
+                            size_type mode = m_operators[counter].first;
+                            if (mode == i)
                             {
-                                matrices[i] = m_operators[counter].second[0]->todense();
+                                if (m_operators[counter].second.size() == 1)
+                                {
+                                    matrices[i] = m_operators[counter].second[0]->todense();
+                                }
+                                // here we need to multiply all the operators acting on the mode in the correct order
+                                else
+                                {
+                                    size_type Nm = m_operators[counter].second.size();
+                                    matrices[i] = m_operators[counter].second[Nm-1]->todense();
+                                    linalg::matrix<T> temp1, temp2;
+                                    for(size_type j = 0; j < Nm; ++j)
+                                    {
+                                        temp1 = m_operators[counter].second[Nm-(j+1)]->todense();
+                                        temp2 = temp1*matrices[i];
+                                        matrices[i]=temp2;
+                                    }
+                                }
+                                ++counter;
                             }
-                            // here we need to multiply all the operators acting on the mode in the correct order
                             else
                             {
-                                size_type Nm = m_operators[counter].second.size();
-                                matrices[i] = m_operators[counter].second[Nm-1]->todense();
-                                linalg::matrix<T> temp1, temp2;
-                                for(size_type j = 0; j < Nm; ++j)
-                                {
-                                    temp1 = m_operators[counter].second[Nm-(j+1)]->todense();
-                                    temp2 = temp1*matrices[i];
-                                    matrices[i]=temp2;
-                                }
+                                fill_identity = true;
                             }
-                            ++counter;
                         }
                         else
+                        {
+                            fill_identity = true;
+                        }
+                        if(fill_identity)
                         {
                             matrices[i] = linalg::matrix<T>(m_dims[i], m_dims[i], [](size_t x, size_t y)
                                                             { return x == y ? T(1.0) : T(0.0); });

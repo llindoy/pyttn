@@ -1,9 +1,9 @@
 from pyttn import site_operator, sOP
-from pyttn import system_modes, boson_mode, fermion_mode, spin_mode, tls_mode
+from pyttn import system_modes, boson_mode, fermion_mode, spin_mode, tls_mode, nlevel_mode
 import pytest
 import numpy as np
 import os
-
+import random
 
 os.environ["OMP_NUM_THREADS"] = "1"
 
@@ -359,3 +359,62 @@ def test_tls():
         test_2("|0><1|", s01, mi)
         test_2("|1><0|", s10, mi)
         test_2("|1><1|", s11, mi)
+
+@pytest.mark.parametrize("N", [2, 3, 4])
+def test_nlevel(N) -> None:
+    # test whether it works when we are dealing with a single mode
+    def test_1(label, mat):
+        sysinf = system_modes(1)
+        sysinf[0] = nlevel_mode(N)
+
+        H = sOP(label, 0)
+        siteop = site_operator(H, sysinf)
+        assert not siteop.is_identity()
+        assert siteop.size() == N
+        assert siteop.mode == 0
+
+        mat2 = siteop.todense()
+        assert np.allclose(np.array(mat2), mat)
+
+    # test whether it works when we are dealing with a single mode
+    def test_2(label, mat, mi):
+        mi = mi % 3
+        sysinf = system_modes(1)
+        sysinf[0] = [nlevel_mode(N), nlevel_mode(2*N), nlevel_mode(N)]
+
+        Id1 = np.identity(N)
+        Id2 = np.identity(2*N)
+        Id3 = np.identity(N)
+        if mi == 0:
+            mat = np.kron(mat, np.kron(Id2, Id3))
+        elif mi == 1:
+            mat = np.kron(Id1, np.kron(mat, Id3))
+        elif mi == 2:
+            mat = np.kron(Id1, np.kron(Id2, mat))
+
+        H = sOP(label, mi)
+        siteop = site_operator(H, sysinf)
+        assert not siteop.is_identity()
+        assert siteop.size() == 2*N**3
+        assert siteop.mode == 0
+
+        mat2 = siteop.todense()
+        print(mat2)
+        assert np.allclose(np.array(mat2), mat)
+
+    random.seed(0)
+
+    for test_ind in range(10):
+        i = random.randint(0, N-1)
+        j = random.randint(0, N-1)
+        label = "|"+str(i)+"><"+str(j)+"|"
+        op = np.zeros((N, N))
+        op[i, j]=1
+
+        test_1(label, op)
+
+        dims = [N, 2*N, N]
+        for mi in range(3):
+            op2 = np.zeros((dims[mi], dims[mi]))
+            op2[i, j]=1
+            test_2(label, op2, mi)

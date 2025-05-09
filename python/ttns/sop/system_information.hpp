@@ -252,7 +252,7 @@ inline void init_system_info(py::module &m)
       :returns: generic mode data object
       :rtype: mode_data
       )mydelim");
-    m.def("nlevel_mode", &generic_mode, R"mydelim(
+    m.def("nlevel_mode", &nlevel_mode, R"mydelim(
       Create a new nlevel system mode mode_data object with arbitrary Hilbert space dimension.  When using such a mode it is necessary
       for the user to define all operators acting on this mode.
 
