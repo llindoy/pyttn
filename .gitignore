@@ -90,6 +90,7 @@
 #now we include the c++ src files
 !src
 !src/*.cpp
+!src/CMakeLists.txt
 
 #now we include the tests file
 !tests

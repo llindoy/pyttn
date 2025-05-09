@@ -85,12 +85,12 @@ int main(int argc, char* argv[])
     test_1<complex_type>(std::string("sy"));
     test_1<complex_type>(std::string("sz"));
 
-/*
+
     test_1<complex_type>(std::string("|0><0|"));
-    test_1<complex_type>(std::string("|0><1|"));
-    test_1<complex_type>(std::string("|1><0|"));
-    test_1<complex_type>(std::string("|1><1|"));
-    */
+    //test_1<complex_type>(std::string("|0><1|"));
+    //test_1<complex_type>(std::string("|1><0|"));
+    //test_1<complex_type>(std::string("|1><1|"));
+    
 
     for (size_t i = 0; i < 3; ++i)
     {
