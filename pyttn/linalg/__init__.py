@@ -12,7 +12,8 @@
 
 from .tensorExt import vector, matrix, tensor_3, tensor_4, tensor, available_backends, Vector, Matrix, Tensor3, Tensor4
 from .sparseMatrixExt import csr_matrix, CSR_Matrix, Diagonal_Matrix
-
+from .orthogonalVectorExt import orthogonal_vector
+from .randomEngineExt import random_engine, RandomEngine
 
 
 __all__ = [
@@ -28,5 +29,8 @@ __all__ = [
         "Tensor3",
         "Tensor4",
         "CSR_Matrix",
-        "Diagonal_Matrix"
+        "Diagonal_Matrix",
+        "orthogonal_vector",
+        "random_engine",
+        "RandomEngine"
         ]

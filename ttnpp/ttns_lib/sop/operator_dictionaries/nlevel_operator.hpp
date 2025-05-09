@@ -96,7 +96,9 @@ namespace ttns
             }
 
             virtual void as_csr(const std::shared_ptr<utils::occupation_number_basis> &op, size_t index, linalg::csr_matrix<T> &mat) const
-            {
+            {               
+                std::cerr << "running sparse" << std::endl;
+
                 try
                 {
                     ASSERT(m_i < op->dim(index) && m_j < op->dim(index), "Cannot form matrix representation of operator.  State indices are out of bounds.");
@@ -191,10 +193,11 @@ namespace ttns
                 std::fill(state_i.begin(), state_i.end(), 0);
                 std::vector<size_t> state_j(op->nmodes());
                 std::fill(state_j.begin(), state_j.end(), 0);
-
+                std::cerr << "running dense" << std::endl;
                 for (size_t i = 0; i < op->nstates(); ++i)
                 {
                     op->get_state(i, state_i);
+                    /*
                     if (state_i[index] == m_i)
                     {
                         for (size_t j = 0; j < op->nstates(); ++j)
@@ -217,6 +220,7 @@ namespace ttns
                             }
                         }
                     }
+                    */
                 }
             }
             virtual std::pair<T, std::string> transpose() const
