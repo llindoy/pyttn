@@ -739,6 +739,12 @@ namespace ttns
             }
             return ret;
         }
+
+        sNBO<T> expand_term(size_t i) const
+        {
+            ASSERT(i < nterms(), "Failed to expand term index out of bounds.");
+            return std::get<1>(m_terms[i]) * std::get<0>(m_terms[i]).as_prod_op(this->m_opdict);
+        }
     };
 
     template <typename T>
