@@ -42,8 +42,8 @@ namespace ttns
         }
 
     public:
-        template <typename T>
-        static inline void eval(const std::vector<linalg::matrix<T>> &x, linalg::matrix<T> &r)
+        template <typename T, typename U>
+        static inline void eval(const U& _coeff, const std::vector<linalg::matrix<T>> &x, linalg::matrix<T> &r)
         {
             std::vector<size_t> mdims(x.size());
             std::vector<size_t> mind(x.size());     std::fill(mind.begin(), mind.end(), 0);
@@ -67,7 +67,7 @@ namespace ttns
                 std::fill(nind.begin(), nind.end(), 0);
                 for (size_t n = 0; n < ndim; ++n)
                 {
-                    T coeff(1.0);
+                    T coeff(_coeff);
                     for(size_t k=0; k < x.size(); ++k)
                     {
                         coeff *= x[k](mind[k], nind[k]);

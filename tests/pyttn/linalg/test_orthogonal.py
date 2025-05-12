@@ -1,6 +1,5 @@
 import numpy as np
 import os
-
 os.environ["OMP_NUM_THREADS"] = "1"
 
 from pyttn.linalg import matrix

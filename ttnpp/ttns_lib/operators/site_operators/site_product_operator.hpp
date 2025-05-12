@@ -222,7 +222,8 @@ namespace ttns
                     //now we have to kron each of the matrices in order and return the result
                     linalg::matrix<T> ret(this->size(), this->size());
 
-                    CALL_AND_HANDLE(kron::eval(matrices, ret), "Failed to evaluate kron prod");
+                    T coeff(1.0);
+                    CALL_AND_HANDLE(kron::eval(coeff, matrices, ret), "Failed to evaluate kron prod");
                     return ret;
                 }
             }

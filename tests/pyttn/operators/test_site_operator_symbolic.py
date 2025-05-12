@@ -1,11 +1,12 @@
+import os
+os.environ["OMP_NUM_THREADS"] = "1"
+
 from pyttn import site_operator, sOP
 from pyttn import system_modes, boson_mode, fermion_mode, spin_mode, tls_mode, nlevel_mode
 import pytest
 import numpy as np
-import os
 import random
 
-os.environ["OMP_NUM_THREADS"] = "1"
 
 
 def test_fermionic():

@@ -50,6 +50,7 @@
 #include "ttns/sop/operator_dictionary.hpp"
 #include "ttns/sop/sSOP.hpp"
 #include "ttns/sop/system_information.hpp"
+#include "ttns/sop/toDense.hpp"
 
 #include "ttns/sop/models/models.hpp"
 
@@ -147,6 +148,7 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_SOP<pyttn_real_type>(m);
     initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
     initialise_liouville_space<pyttn_real_type>(m);
+    initialise_convert_to_dense<pyttn_real_type>(m);
 
     //
     // Wrap the models functionality included in SOP

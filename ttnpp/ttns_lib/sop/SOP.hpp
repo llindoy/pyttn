@@ -742,6 +742,12 @@ namespace ttns
     };
 
     template <typename T>
+    sNBO<T> expand_term(const std::pair<const prodOP, literal::coeff<T>>& t, const std::vector<std::vector<std::string>>& opdict)
+    {
+        return std::get<1>(t) * std::get<0>(t).as_prod_op(opdict);
+    }
+
+    template <typename T>
     std::ostream &operator<<(std::ostream &os, const ttns::SOP<T> &op)
     {
         if (!op.label().empty())

@@ -25,6 +25,7 @@ from .opdictExt import operator_dictionary, operator_dictionary_type
 from .liouvilleSpaceExt import liouville_space_superoperator
 from .stateExt import stateStr, sepState, ket, isSepState, isKet
 
+from pyttn.ttnpp import convert_to_dense
 from pyttn.ttnpp import sOP, sPOP, fOP, fermion_operator
 from pyttn.ttnpp import (
     mode_type,
@@ -81,4 +82,5 @@ __all__: list[str] = [
     "generic_mode",
     "system_modes",
     "combine_systems",
+    "convert_to_dense"
 ]
