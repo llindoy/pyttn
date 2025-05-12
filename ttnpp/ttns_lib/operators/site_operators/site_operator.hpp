@@ -287,11 +287,11 @@ namespace ttns
             return ret;
         }
 
-        linalg::matrix<T> todense(const std::vector<size_type>& mode_dims) const
+        void todense(const std::vector<size_type>& mode_dims, linalg::matrix<T>& ret) const
         {
             ASSERT(mode_dims.size() > m_mode, "Cannot convert siteoperator to dense matrix if the operator is not the correct size.");
             ASSERT(mode_dims[m_mode] == m_op->size(), "Cannot convert site operator to dense matrix.  The specified mode dims are not compatible with the current size.");
-            std::vector<linalg::matrix<T>> mats;
+            std::vector<linalg::matrix<T>> mats(mode_dims.size());
             for(size_type i=0; i<mode_dims.size(); ++i)
             {
                 if (i != m_mode)
@@ -303,10 +303,37 @@ namespace ttns
                     mats[m_mode] = m_op->todense();
                 }
             }
-
+            T coeff(1.0);
             //now construct the dense matrix from these operators
+            CALL_AND_HANDLE(kron::eval(coeff, mats, ret), "Failed to evaluate kron prod");
+        }
+
+        void todense(linalg::matrix<T>& ret) const
+        {
+            ret = m_op->todense();
+        }
+
+        linalg::matrix<T> todense(const std::vector<size_type>& mode_dims) const
+        {
+            ASSERT(mode_dims.size() > m_mode, "Cannot convert siteoperator to dense matrix if the operator is not the correct size.");
+            ASSERT(mode_dims[m_mode] == m_op->size(), "Cannot convert site operator to dense matrix.  The specified mode dims are not compatible with the current size.");
+            std::vector<linalg::matrix<T>> mats(mode_dims.size());
+            for(size_type i=0; i<mode_dims.size(); ++i)
+            {
+                if (i != m_mode)
+                {
+                    mats[i] = linalg::matrix<T>(mode_dims[i], mode_dims[i], [](size_t x, size_t y){return x==y ? T(1.0) : T(0.0);});
+                }
+                else
+                {
+                    mats[m_mode] = m_op->todense();
+                }
+            }
             linalg::matrix<T> ret;
-            CALL_AND_HANDLE(kron::eval(mats, ret), "Failed to evaluate kron prod");
+
+            T coeff(1.0);
+            //now construct the dense matrix from these operators
+            CALL_AND_HANDLE(kron::eval(coeff, mats, ret), "Failed to evaluate kron prod");
             return ret;
         }
 

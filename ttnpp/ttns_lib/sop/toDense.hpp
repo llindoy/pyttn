@@ -24,53 +24,39 @@
 namespace ttns
 {
 
-template <typename T, typename backend>
-inline void toDense(const site_operator<T>& op, const system_modes& sysinf)
-{
-    std::vector<size_t> dims;
-    sysinf.get_mode_dimensions(dims);    
-    CALL_AND_HANDLE(return op.todense(dims), "Failed to convert site operator to dense matrix.");
-}
-
-template <typename T, typename backend>
-inline void toDense(const product_operator<T>& op, const system_modes& sysinf)
-{
-    std::vector<size_t> dims;
-    sysinf.get_mode_dimensions(dims);    
-    CALL_AND_HANDLE(return op.todense(dims), "Failed to convert product operator to dense matrix.");
-}
-
-/*
 template <typename T>
-inline void toDense(const sOP& op, const system_modes& sysinf)
+inline void convert_to_dense(const sOP& op, const system_modes& sysinf, linalg::matrix<T>& ret)
 {
     std::vector<size_t> dims;
     sysinf.get_mode_dimensions(dims);    
-    site_operator<T> _op(op, system_modes);
-    CALL_AND_HANDLE(return _op.todense(dims), "Failed to convert sOP operator to dense matrix.");
+    for(size_t i = 0; i < dims.size(); ++i)
+    {
+        std::cout << dims[i] << std::endl;
+    }
+    site_operator<T> _op(op, sysinf);
+    CALL_AND_HANDLE(_op.todense(dims, ret), "Failed to convert sOP operator to dense matrix.");
 }
 
 template <typename T>
-inline void toDense(const sPOP& op, const system_modes& sysinf)
+inline void convert_to_dense(const sPOP& op, const system_modes& sysinf, linalg::matrix<T>& ret)
 {
     std::vector<size_t> dims;
     sysinf.get_mode_dimensions(dims);    
-    product_operator<T> _op(op, system_modes);
-    CALL_AND_HANDLE(return _op.todense(dims), "Failed to convert sOP operator to dense matrix.");
+    product_operator<T> _op(op, sysinf);
+    CALL_AND_HANDLE(_op.todense(dims, ret), "Failed to convert sOP operator to dense matrix.");
 }
-*/
 
-template <typename T>
-inline void toDense(const sNBO<T>& op, const system_modes& sysinf)
+template <typename T, typename U>
+inline void convert_to_dense(const sNBO<T>& op, const system_modes& sysinf, linalg::matrix<U>& ret)
 {
     std::vector<size_t> dims;
     sysinf.get_mode_dimensions(dims);    
-    product_operator<T> _op(op, system_modes);
-    CALL_AND_HANDLE(return _op.todense(dims), "Failed to convert sOP operator to dense matrix.");
+    product_operator<U> _op(op, sysinf);
+    CALL_AND_HANDLE(_op.todense(dims, ret), "Failed to convert sOP operator to dense matrix.");
 }
 
-template <typename T>
-inline void toDense(const sSOP<T>& op, const system_modes& sysinf)
+template <typename T, typename U>
+inline void convert_to_dense(const sSOP<T>& op, const system_modes& sysinf, linalg::matrix<U>& ret)
 {
     std::vector<size_t> dims;
     sysinf.get_mode_dimensions(dims);    
@@ -80,18 +66,21 @@ inline void toDense(const sSOP<T>& op, const system_modes& sysinf)
         nhilb *= dims[i];
     }
 
-    linalg::matrix<T> ret(nhilb, nhilb);
+    linalg::matrix<U> ret2(nhilb, nhilb);
+    ret.resize(nhilb, nhilb);
     ret.fill_zeros();
     for (auto& t : op)
     {
-        product_operator<T> _op(op, system_modes);
-        CALL_AND_HANDLE(ret += _op.todense(dims), "Failed to convert sOP operator to dense matrix.");
+        ret2.fill_zeros();
+        product_operator<U> _op(t, sysinf);
+        CALL_AND_HANDLE(_op.todense(dims, ret2), "Failed to convert sOP operator to dense matrix.");
+        ret += ret2;
+
     }
-    return ret;
 }
 
-template <typename T>
-inline void toDense(const SOP<T>& op, const system_modes& sysinf)
+template <typename T, typename U>
+inline void convert_to_dense(const SOP<T>& op, const system_modes& sysinf, linalg::matrix<U>& ret)
 {
     std::vector<size_t> dims;
     sysinf.get_mode_dimensions(dims);    
@@ -101,14 +90,16 @@ inline void toDense(const SOP<T>& op, const system_modes& sysinf)
         nhilb *= dims[i];
     }
 
-    linalg::matrix<T> ret(nhilb, nhilb);
+    linalg::matrix<U> ret2(nhilb, nhilb);
+    ret.resize(nhilb, nhilb);
     ret.fill_zeros();
-    for (size_t i = 0; i < op.nterms(); ++i)
+    for (const auto& t : op)
     {
-        product_operator<T> _op(op.expand_term(i), system_modes);
-        CALL_AND_HANDLE(ret += _op.todense(dims), "Failed to convert sOP operator to dense matrix.");
+        ret2.fill_zeros();
+        product_operator<U> _op(expand_term(t, op.operator_dictionary()), sysinf);
+        CALL_AND_HANDLE(_op.todense(dims, ret2), "Failed to convert sOP operator to dense matrix.");
+        ret += ret2;
     }
-    return ret;
 }
 
 

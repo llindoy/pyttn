@@ -416,6 +416,38 @@ namespace ttns
         const_reverse_iterator rbegin() const { return const_reverse_iterator(m_mode_operators.rbegin()); }
         const_reverse_iterator rend() const { return const_reverse_iterator(m_mode_operators.rend()); }
 
+
+        void todense(const std::vector<size_type>& mode_dims, linalg::matrix<T>& ret) const
+        {
+            std::vector<linalg::matrix<T>> mats(mode_dims.size());
+
+            size_t counter = 0;
+            for(size_type i=0; i<mode_dims.size(); ++i)
+            {
+                if(counter > m_mode_operators.size())
+                {
+                    mats[i] = linalg::matrix<T>(mode_dims[i], mode_dims[i], [](size_t x, size_t y){return x==y ? T(1.0) : T(0.0);});
+                }
+                else
+                {
+                    if (i == m_mode_operators[counter].mode())
+                    {
+                        ASSERT(mode_dims[i] == m_mode_operators[counter].mode_dimension(), "Cannot convert site operator to dense matrix.  The specified mode dims are not compatible with the current size.");
+                        CALL_AND_HANDLE(m_mode_operators[counter].todense(mats[i]), "Failed to construct dense matrix from product operator.  Failed to convert a site operator.");
+                        ++counter;
+                    }
+                    else
+                    {
+                        mats[i] = linalg::matrix<T>(mode_dims[i], mode_dims[i], [](size_t x, size_t y){return x==y ? T(1.0) : T(0.0);});
+                    }
+                }
+            }
+            ASSERT(counter == m_mode_operators.size(), "Invalid conversion of mode operator to dense matrix.  Likely insufficient mode dimensions passed to function.");
+
+            //now construct the dense matrix from these operators
+            CALL_AND_HANDLE(kron::eval(m_coeff, mats, ret), "Failed to evaluate kron prod");
+        }
+
 #ifdef CEREAL_LIBRARY_FOUND
     public:
         template <typename archive>

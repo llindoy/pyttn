@@ -29,12 +29,82 @@
 
 namespace py = pybind11;
 
-template <typename real_type>
-void initialise_liouville_space(py::module &m)
+template <typename T, typename U>
+void init_convert_to_dense(py::module &m)
 {
-  using namespace ttns;
-  using complex_type = linalg::complex<real_type>;
-  using _T = typename linalg::numpy_converter<complex_type>::type;
+    using namespace ttns;
+    m.def("convert_to_dense", [](const sOP &op, const system_modes &sysinf)
+          {
+        linalg::matrix<U> mat;
+        CALL_AND_HANDLE(convert_to_dense(op, sysinf, mat), "Failed to convert sOP to dense matrix.");
+        return mat; }, R"mydelim(
+        Create a dense matrix representation of an sOP.
 
+        :param op: The string site operator object
+        :type op: sOP
+
+        :returns: The dense matrix representation of the operator
+        :rtype: Matrix
+      )mydelim");
+
+    m.def("convert_to_dense", [](const sPOP &op, const system_modes &sysinf)
+          {
+        linalg::matrix<U> mat;
+        CALL_AND_HANDLE(convert_to_dense(op, sysinf, mat), "Failed to convert sPOP to dense matrix.");
+        return mat; }, R"mydelim(
+        Create a dense matrix representation of an sPOP.
+
+        :param op: The string product operator object
+        :type op: sPOP
+
+        :returns: The dense matrix representation of the operator
+        :rtype: Matrix
+      )mydelim");
+
+    m.def("convert_to_dense", [](const sNBO<T> &op, const system_modes &sysinf)
+          {
+        linalg::matrix<U> mat;
+        CALL_AND_HANDLE(convert_to_dense(op, sysinf, mat), "Failed to convert sNBO to dense matrix.");
+        return mat; }, R"mydelim(
+        Create a dense matrix representation of an sNBO.
+
+        :param op: The string operator object
+        :type op: sNBO_type
+
+        :returns: The dense matrix representation of the operator
+        :rtype: Matrix
+      )mydelim");
+
+    m.def("convert_to_dense", [](const sSOP<T> &op, const system_modes &sysinf)
+          {
+        linalg::matrix<U> mat;
+        CALL_AND_HANDLE(convert_to_dense(op, sysinf, mat), "Failed to convert sSOP to dense matrix.");
+        return mat; }, R"mydelim(
+        Create a dense matrix representation of an sSOP.
+
+        :param op: The string operator object
+        :type op: sSOP_type
+
+        :returns: The dense matrix representation of the operator
+        :rtype: Matrix
+      )mydelim");
+
+    m.def("convert_to_dense", [](const SOP<T> &op, const system_modes &sysinf)
+          {
+        linalg::matrix<U> mat;
+        CALL_AND_HANDLE(convert_to_dense(op, sysinf, mat), "Failed to convert SOP to dense matrix.");
+        return mat; }, R"mydelim(
+        Create a dense matrix representation of an SOP.
+
+        :param op: The string operator object
+        :type op: SOP_type
+
+        :returns: The dense matrix representation of the operator
+        :rtype: Matrix
+      )mydelim");
 }
+
+template <typename T>
+void initialise_convert_to_dense(py::module &m);
+
 #endif
