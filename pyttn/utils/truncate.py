@@ -11,8 +11,6 @@
 # limitations under the License
 
 import numpy as np
-from typing import List, Optional
-
 
 class TruncationBase:
     """Base class for local Hilbert space mode decomposition"""
@@ -46,7 +44,7 @@ class DepthTruncation(TruncationBase):
     def __init__(self, Lmax: int = 2) -> None:
         self.Lmax = Lmax
 
-    def __call__(self, gk: np.ndarray, wk: np.ndarray, is_fermion: bool) -> List[int]:
+    def __call__(self, gk: np.ndarray, wk: np.ndarray, is_fermion: bool) -> list[int]:
         if is_fermion:
             return [2 for i in range(len(wk))]
         else:
@@ -89,7 +87,7 @@ class EnergyTruncation(TruncationBase):
         self.Lmin = Lmin
         self.func = func
 
-    def truncate_bosonic(self, gk: np.ndarray, wk: np.ndarray) -> List[int]:
+    def truncate_bosonic(self, gk: np.ndarray, wk: np.ndarray) -> list[int]:
         """Truncate a bosonic mode using coupling constants and frequencies
 
         :param gk: The interaction strength
@@ -121,7 +119,7 @@ class EnergyTruncation(TruncationBase):
             Nb.append(nbose)
         return Nb
 
-    def __call__(self, gk: np.ndarray, wk: np.ndarray, is_fermion: bool) -> List[int]:
+    def __call__(self, gk: np.ndarray, wk: np.ndarray, is_fermion: bool) -> list[int]:
         if is_fermion:
             return [2 for i in range(len(wk))]
         else:

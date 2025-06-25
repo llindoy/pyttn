@@ -12,6 +12,8 @@
 !/CODE_OF_CONDUCT.md
 !/CONTRIBUTING.md
 !/setup.py
+!tox.ini
+!MANIFEST.in
 
 #now we add the cmake folder and its files
 !cmake
@@ -73,6 +75,8 @@
 !pyttn/oqs/bath_fitting/*.py
 !pyttn/oqs/heom/*.py
 !pyttn/oqs/unitary/*.py
+!pyttn/oqs/baths/*.py
+!pyttn/oqs/spectral_density/*.py
 
 !pyttn/ttns
 !pyttn/ttns/*.py
@@ -81,7 +85,7 @@
 !pyttn/ttns/observables/*.py
 !pyttn/ttns/operators/*.py
 !pyttn/ttns/sop/*.py
-!pyttn/ttns/ttn/*.py
+!pyttn/ttns/ttns/*.py
 !pyttn/ttns/topology/*.py
 
 !pyttn/utils

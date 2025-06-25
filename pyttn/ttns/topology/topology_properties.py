@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from typing import List, Callable, Optional
+from typing import Callable, Optional, Union
 import numpy as np
 from pyttn.ttnpp import ntree, ntreeNode
 from .bond_setter import BondDimensionSetter
@@ -87,7 +87,7 @@ def __update_interior_nodes(root, chi, node_list):
             chi(node)
 
 
-def set_dims(root: ntree | ntreeNode, dims: int | List[int] | np.ndarray) -> None:
+def set_dims(root: Union[ntree, ntreeNode], dims: Union[int, list[int], np.ndarray]) -> None:
     """Set the the local hilbert space dimension in the topology tree (or in a subtree with root defined by the node root).
 
     :param root: The topology tree (or subtree) for which properties are to be set.
@@ -113,10 +113,10 @@ def set_dims(root: ntree | ntreeNode, dims: int | List[int] | np.ndarray) -> Non
 
 
 def set_bond_dimensions(
-    root: ntree | ntreeNode,
-    chi: int | Callable[[int], int] | List[int] | np.ndarray | BondDimensionSetter,
+    root: Union[ntree, ntreeNode],
+    chi: Union[int, Callable[[int], int], list[int], np.ndarray, BondDimensionSetter],
     chi_local_transform: Optional[
-        int | Callable[[int], int] | List[int] | np.ndarray
+        Union[int, Callable[[int], int], list[int], np.ndarray]
     ] = None,
 ) -> None:
     """Set the the internal values stored in the topology tree (or in a subtree with root defined by the node root).
@@ -174,11 +174,11 @@ def set_bond_dimensions(
 
 
 def set_topology_properties(
-    root: ntree | ntreeNode,
-    chi: int | Callable[[int], int] | List[int] | np.ndarray | BondDimensionSetter,
-    dims: int | List[int] | np.ndarray,
+    root: Union[ntree, ntreeNode],
+    chi: Union[int, Callable[[int], int], list[int], np.ndarray, BondDimensionSetter],
+    dims: Union[int, list[int], np.ndarray],
     chi_local_transform: Optional[
-        int | Callable[[int], int] | List[int] | np.ndarray
+        Union[int, Callable[[int], int], list[int], np.ndarray]
     ] = None,
 ) -> None:
     """Set the values stored in a topology tree (or in a subtree with root defined by the node root).

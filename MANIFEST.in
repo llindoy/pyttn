@@ -1,0 +1,16 @@
+include CMakeLists.txt
+
+recursive-include python *
+recursive-include ttnpp *
+recursive-include docs/ *
+recursive-include cmake *
+recursive-include tests/pyttn *
+
+global-exclude */__pycache__/*
+
+recursive-exclude docs/build *
+recursive-exclude build *
+
+prune docs/build
+prune build
+prune */___pycache__

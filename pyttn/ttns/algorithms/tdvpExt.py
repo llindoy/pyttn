@@ -10,161 +10,454 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from typing import TypeAlias
+from typing import Union
+from abc import ABCMeta
 
 from pyttn.ttnpp import (
     one_site_tdvp_complex,
-    ttn_complex,
-    sop_operator_complex,
     adaptive_one_site_tdvp_complex,
 )
 from pyttn.ttnpp import (
     multiset_one_site_tdvp_complex,
-    ms_ttn_complex,
-    multiset_sop_operator_complex,
 )
 
-from pyttn.ttns.ttn.ttnExt import ttn_type, ms_ttn_type
-from pyttn.ttns.operators.sopOperatorExt import sop_operator_type
-from pyttn.ttns.operators.mssopOperatorExt import ms_sop_operator_type
+from pyttn.ttns.ttns.ttnExt import ttn
+from pyttn.ttns.ttns.msttnExt import ms_ttn
 
+from pyttn.ttns.operators.sopOperatorExt import sop_operator
+from pyttn.ttns.operators.mssopOperatorExt import ms_sop_operator
 
-tdvp_type: TypeAlias = one_site_tdvp_complex | adaptive_one_site_tdvp_complex
-ms_tdvp_type: TypeAlias = multiset_one_site_tdvp_complex
 
 # and attempt to import the cuda backend
 try:
     from pyttn.ttnpp.cuda import one_site_tdvp_complex as one_site_tdvp_complex_cuda
-    from pyttn.ttnpp.cuda import ttn_complex as ttn_complex_cuda
-    from pyttn.ttnpp.cuda import sop_operator_complex as sop_operator_cuda
-
     from pyttn.ttnpp.cuda import (
         mulitset_one_site_tdvp_complex as multiset_one_site_tdvp_complex_cuda,
     )
-    from pyttn.ttnpp.cuda import ms_ttn_complex as ms_ttn_complex_cuda
-    from pyttn.ttnpp.cuda import (
-        multiset_sop_operator_complex as multiset_sop_operator_cuda,
-    )
 
-    __cuda_import = True
-    tdvp_type: TypeAlias = tdvp_type | one_site_tdvp_complex_cuda
-    ms_tdvp_type: TypeAlias = ms_tdvp_type | multiset_one_site_tdvp_complex_cuda
+    _cuda_import = True
 
 except ImportError:
-    __cuda_import = False
+    _cuda_import = False
 
 
-def __single_set_tdvp_blas(A, H, expansion="onesite", **kwargs):
-    if isinstance(A, ttn_complex) and isinstance(H, sop_operator_complex):
-        if expansion == "onesite":
-            return one_site_tdvp_complex(A, H, **kwargs)
-        elif expansion == "subspace":
-            return adaptive_one_site_tdvp_complex(A, H, **kwargs)
+def _one_site_tdvp_blas(A, H, **kwargs):
+    if isinstance(A, ttn) and isinstance(H, sop_operator):
+        return one_site_tdvp_complex(A, H, **kwargs)
+    elif isinstance(A, ms_ttn) and isinstance(H, ms_sop_operator):
+        return multiset_one_site_tdvp_complex(A, H, **kwargs)
     else:
-        raise RuntimeError("Invalid input types for single set tdvp.")
+        raise RuntimeError("Invalid inputs for one site tdvp")
 
 
-def __single_set_tdvp_cuda(A, H, expansion="onesite", **kwargs):
-    if isinstance(A, ttn_complex_cuda) and isinstance(H, sop_operator_cuda):
-        if expansion == "onesite":
-            return one_site_tdvp_complex_cuda(A, H, **kwargs)
+def _one_site_tdvp_cuda(A, H, **kwargs):
+    if isinstance(A, ttn) and isinstance(H, sop_operator):
+        return one_site_tdvp_complex_cuda(A, H, **kwargs)
+    elif isinstance(A, ms_ttn) and isinstance(H, ms_sop_operator):
+        return multiset_one_site_tdvp_complex_cuda(A, H, **kwargs)
     else:
-        raise RuntimeError("Invalid input types for single set tdvp.")
+        raise RuntimeError("Invalid inputs for one site tdvp")
 
 
-def single_set_tdvp(
-    A: ttn_type, H: sop_operator_type, expansion: str = "onesite", **kwargs
-) -> tdvp_type:
-    """A factory method for constructing an object used for performing single set TDVP calculations
-
-    :param A: Tree Tensor Network that the DMRG algorithm will act on
-    :type A: ttn_type
-    :param H: The Hamiltonian sop operator object
-    :type H: sop_operator_type
-    :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
-    :type expansion: {'onesite', 'subspace'}, optional
-    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_tdvp_complex
-
-    :returns: The TDVP evaluation object
-    :rtype: tdvp_type
-    """
-    if A.backend() == H.backend():
-        if A.backend() == "blas":
-            return __single_set_tdvp_blas(A, H, expansion=expansion, **kwargs)
-        elif A.backend() == "cuda":
-            return __single_set_tdvp_blas(A, H, expansion=expansion, **kwargs)
-        else:
-            raise RuntimeError("Invalid backend for single set tdvp")
+def _one_site_tdvp(A, H, **kwargs):
+    if A.backend() == "blas" and H.backend() == "blas":
+        return _one_site_tdvp_blas(A, H, **kwargs)
+    elif A.backend() == "cuda" and H.backend() == "cuda":
+        return _one_site_tdvp_cuda(A, H, **kwargs)
+    else:
+        raise RuntimeError("Invalid backend arguments.")
 
 
-def __multiset_tdvp_blas(A, H, expansion="onesite", **kwargs):
-    if isinstance(A, ms_ttn_complex) and isinstance(H, multiset_sop_operator_complex):
-        if expansion == "onesite":
-            return multiset_one_site_tdvp_complex(A, H, **kwargs)
-        elif expansion == "subspace":
-            raise ValueError(
-                "subspace expansion algorithm has not yet been implemented for multiset TTNs."
+def _subspace_tdvp_blas(A, H, **kwargs):
+    if isinstance(A, ttn) and isinstance(H, sop_operator):
+        return adaptive_one_site_tdvp_complex(A, H, **kwargs)
+    elif isinstance(A, ms_ttn) and isinstance(H, ms_sop_operator):
+        raise RuntimeError(
+            "Subspace expansion based integrator has not yet been implemented for Multiset TTNs"
+        )
+    else:
+        raise RuntimeError("Invalid inputs for one site tdvp")
+
+
+def _subspace_tdvp_cuda(A, H, **kwargs):
+    if isinstance(A, ttn) and isinstance(H, sop_operator):
+        raise RuntimeError(
+            "Subspace expansion based integrator has not yet been implemented for CUDA"
+        )
+    elif isinstance(A, ms_ttn) and isinstance(H, ms_sop_operator):
+        raise RuntimeError(
+            "Subspace expansion based integrator has not yet been implemented for Multiset TTNs"
+        )
+    else:
+        raise RuntimeError("Invalid inputs for one site tdvp")
+
+
+def _subspace_tdvp(A, H, **kwargs):
+    if A.backend() == "blas":
+        return _subspace_tdvp_blas(A, H, **kwargs)
+    elif A.backend() == "cuda":
+        return _subspace_tdvp_cuda(A, H, **kwargs)
+    else:
+        raise RuntimeError("Backend not recognised.")
+
+
+class tdvp(metaclass=ABCMeta):
+    """The base class for all Time Dependent Variational Principle implementations."""
+
+    def __new__(
+        cls,
+        A: Union[ttn, ms_ttn],
+        H: Union[sop_operator, ms_sop_operator],
+        expansion: str = "onesite",
+        **kwargs,
+    ) -> "tdvp":
+        """A factory method for constructing an object used for performing either single or multi set tdvp calculations.
+        Which type to construct is determined by the types of the input A and h matrices.
+
+        :param A: Tree Tensor Network that the tdvp algorithm will act on
+        :type A: ttn | ms_ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator | ms_sop_operator
+        :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
+        :type expansion: {'onesite', 'subspace'}, optional
+        :param **kwargs: Keyword arguments to pass to the tdvp engine constructor. The allowed values depend on the choice of expansion:
+    
+            - **krylov_dim** (int, optional): The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            - **numthreads** (int, optional): The number of openmp threads to be used by the solver. (Default: 1)
+            - **nstep** (int, optional): The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)
+            - **subspace_krylov_dim** (int, optional): Only when expansion="subspace". The subspace expansion based krylov subspace dimension. This is only used if expansion="subspace". (Default: 6)
+            - **subspace_neigs** (int, optional): Only when expansion="subspace".The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
+
+        :returns: The tdvp evaluation object
+        :rtype: tdvp
+        """
+        if A.backend() != H.backend():
+            raise RuntimeError(
+                "Hamiltonian and operator do not have compatible backends."
             )
-    else:
-        raise RuntimeError("Invalid input types for multiset tdvp.")
 
-
-def __multiset_tdvp_cuda(A, H, expansion="onesite", **kwargs):
-    if isinstance(A, ms_ttn_complex_cuda) and isinstance(H, multiset_sop_operator_cuda):
         if expansion == "onesite":
-            return multiset_one_site_tdvp_complex_cuda(A, H, **kwargs)
-    else:
-        raise RuntimeError("Invalid input types for multiset tdvp.")
-
-
-def multiset_tdvp(
-    A: ms_ttn_type, H: ms_sop_operator_type, expansion: str = "onesite", **kwargs
-) -> ms_tdvp_type:
-    r"""A factory method for constructing an object used for performing multiset tdvp calculations
-
-    :param A: Tree Tensor Network that the TDVP algorithm will act on
-    :type A: ms_ttn_type
-    :param H: The Hamiltonian sop operator object
-    :type H: ms_sop_operator_type
-    :param expansion: A string determining the type of bond dimension expansion to be used.  (Default: 'onesite')
-    :type expansion: {'onesite'}, optional
-    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see multiset_one_site_dmrg_complex
-
-    :returns: The TDVP evaluation object
-    :rtype: ms_tdvp_type
-    """
-    if A.backend() == H.backend():
-        if A.backend() == "blas":
-            return __multiset_tdvp_blas(A, H, expansion=expansion, **kwargs)
-        elif A.backend() == "cuda":
-            return __multiset_tdvp_blas(A, H, expansion=expansion, **kwargs)
+            return _one_site_tdvp(A, H, **kwargs)
+        elif expansion == "subspace":
+            return _subspace_tdvp(A, H, **kwargs)
         else:
-            raise RuntimeError("Invalid backend for multiset set tdvp")
+            raise RuntimeError("Invalid input types for tdvp.")
+
+    def assign(self, o: "tdvp"):
+        """Assign the value of the tdvp engine from another
+
+        :param o: The tdvp object to copy into this one
+        :type o: tdvp
+        """
+        pass
+
+    def __copy__(self):
+        """Function implementing shallow copy of the tdvp object"""
+        pass
+
+    def __deepcopy__(self, memo):
+        """Function implementing deep copy of the tdvp object"""
+        pass
+
+    @property
+    def coefficient(self) -> Union[float, complex]:
+        """A coefficient used to scale the timestep."""
+        pass
+
+    @property
+    def t(self) -> float:
+        """The current time point reached by the integrator."""
+        pass
+
+    @property
+    def dt(self) -> float:
+        """The timestep used for integration of the dynamics."""
+        pass
+
+    @property
+    def expmv_tol(self) -> float:
+        """The tolerance used for the krylov subspace matrix exponential."""
+        pass
+
+    @property
+    def krylov_steps(self) -> int:
+        """The number of internal substeps used by the krylov subspace integrator for each real step."""
+        pass
+
+    @property
+    def use_time_dependent_hamiltonian(self) -> bool:
+        """Whether or not to update the time variable of the Hamiltonian object throughout integration."""
+        pass
+
+    def clear(self):
+        """Clear and deallocate all internal buffers of the tdvp object"""
+        pass
+
+    def step(self, A: ttn, H: sop_operator, update_env: bool = False):
+        """Performs a single step of the single site tdvp algorithm
+
+        :param A: The Tree Tensor Network Object that will be optimised using the tdvp algorithm
+        :type A: ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator
+        :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+        :type update_env: bool, optional
+        """
+        pass
+
+    def __call__(self, A: ttn, H: sop_operator, update_env: bool = False):
+        """Performs a single step of the single site tdvp algorithm
+
+        :param A: The Tree Tensor Network Object that will be optimised using the tdvp algorithm
+        :type A: ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator
+        :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+        :type update_env: bool, optional
+        """
+        pass
+
+    def prepare_environment(
+        self, A: ttn, H: sop_operator, attempt_expansion: bool = False
+    ):
+        """Update all Single Particle Function environment tensors to prepare the system for performing a tdvp sweep.
+
+        :param A: The Tree Tensor Network Object that will be optimised using the tdvp algorithm
+        :type A: ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator
+        :param attempt_expansion: Whether or not attempt to expand bond dimensions throughout this step.  (Default: False)
+        :type attempt_expansion: bool, optional
+        """
+        pass
+
+    def backend(self) -> str:
+        """Returns the backend type of the tdvp
+
+        :return: The backend type of the object
+        :rtype: str
+        """
+        pass
 
 
-def tdvp(
-    A: ttn_type | ms_ttn_type,
-    H: sop_operator_type | ms_sop_operator_type,
-    expansion: str = "onesite",
-    **kwargs,
-) -> tdvp_type | ms_tdvp_type:
-    r"""A factory method for constructing an object used for performing either single or multi set tdvp calculations.
-    Which type to construct is determined by the types of the input A and h matrices.
+class one_site_tdvp(tdvp):
+    """The base class for all one-site tdvp algorithm implementations."""
 
-    :param A: Tree Tensor Network that the DMRG algorithm will act on
-    :type A: ttn_type | ms_ttn_type
-    :param H: The Hamiltonian sop operator object
-    :type H: sop_operator_type | ms_sop_operator_type
-    :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
-    :type expansion: {'onesite', 'subspace'}, optional
-    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_tdvp_complex or adaptive_one_site_tdvp_complex
+    def __new__(
+        cls,
+        A: Union[ttn, ms_ttn],
+        H: Union[sop_operator, ms_sop_operator],
+        krylov_dim: int = 16,
+        num_threads: int = 1,
+        nstep: int = 1
+    ) -> "one_site_tdvp":
+        """A factory method for constructing an object used for performing single set tdvp calculations
 
-    :returns: The TDVP evaluation object
-    :rtype: tdvp_type | ms_tdvp_type
+        :param A: Tree Tensor Network that the tdvp algorithm will act on
+        :type A: Union[ttn, ms_ttn]
+        :param H: The Hamiltonian sop operator object
+        :type H: Union[sop_operator, ms_sop_operator]
+        :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+        :type krylov_dim: int, optional
+        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+        :type numthreads: int, optional
+        :param nstep: The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)
+        :type nstep: (int, optional)
+
+        :returns: The tdvp evaluation object
+        :rtype: one_site_tdvp
+        """
+        if A.backend() != H.backend():
+            raise RuntimeError(
+                "Hamiltonian and operator do not have compatible backends."
+            )
+
+        return _one_site_tdvp(A, H, krylov_dim=krylov_dim, num_threads=num_threads, nstep=nstep,)
+
+    def initialise(
+        A: Union[ttn, ms_ttn],
+        H: Union[sop_operator, ms_sop_operator],
+        krylov_dim: int = 16,
+        num_threads: int = 1,
+        nstep: int = 1,
+    ) -> "one_site_tdvp":
+        """Initialise the internal buffers of the tdvp object needed to perform tdvp on a Tree Tensor Network A, with Hamiltonian H.
+
+        :param A: Tree Tensor Network that the tdvp algorithm will act on
+        :type A: Union[ttn, ms_ttn]
+        :param H: The Hamiltonian sop operator object
+        :type H: Union[sop_operator, ms_sop_operator]
+        :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+        :type krylov_dim: int, optional
+        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+        :type numthreads: int, optional
+        :param nstep: The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)
+        :type nstep: (int, optional)
+
+        :returns: The tdvp evaluation object
+        :rtype: one_site_tdvp
+        """
+        if A.backend() != H.backend():
+            raise RuntimeError(
+                "Hamiltonian and operator do not have compatible backends."
+            )
+
+        return _one_site_tdvp(A, H, krylov_dim=krylov_dim, num_threads=num_threads, nstep=nstep,)
+
+
+one_site_tdvp.register(one_site_tdvp_complex)
+one_site_tdvp.register(multiset_one_site_tdvp_complex)
+tdvp_type = one_site_tdvp
+if _cuda_import:
+    one_site_tdvp.register(one_site_tdvp_complex_cuda)
+    one_site_tdvp.register(multiset_one_site_tdvp_complex_cuda)
+
+
+class subspace_expansion_tdvp(tdvp):
+    """The base class for all subspace expansion based tdvp implementations.  This set of implementations
+    allows for adaptive growth of the bond dimensions used throughout the tensor network throughout the
+    optimisation process.  In order to do this, the code uses two metrics:
+
+    :Two-site Energy Variance:
+        This criteria expands the basis based on the use of the variance of the two-site energy.  In particular,
+        this finds the dominant contribution to the two-site energy variance that does not lay in the current
+        one-site manifold and expands the one-site tensors in these directions, if the weighting of these through
+        an update step is larger than some user defined tolerance.
+
+    :One-site Natural Population:
+        This criteria expands the basis based on the occupancy of the one-site energy density matrix.  This spawns
+        new random basis functions if there are not sufficiently many (a parameter controllued by the user)
+        unoccupied basis functions, with the threshold for unoccupied being set by the user.
     """
-    if isinstance(A, ttn_complex) and isinstance(H, sop_operator_complex):
-        return single_set_tdvp(A, H, expansion=expansion, **kwargs)
-    elif isinstance(A, ms_ttn_complex) and isinstance(H, multiset_sop_operator_complex):
-        return multiset_tdvp(A, H, expansion=expansion, **kwargs)
-    else:
-        raise RuntimeError("Invalid input types for tdvp.")
+
+    def __new__(
+        cls,
+        A: Union[ttn, ms_ttn],
+        H: Union[sop_operator, ms_sop_operator],
+        krylov_dim: int = 16,
+        subspace_krylov_dim: int = 4,
+        subspace_neigs: int = 2,
+        num_threads: int = 1,
+        nstep: int = 1
+    ) -> "subspace_expansion_tdvp":
+        """A factory method for constructing an object used for performing single set tdvp calculations
+
+        :param A: Tree Tensor Network that the tdvp algorithm will act on
+        :type A: ttn | ms_ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator | ms_sop_operator
+        :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+        :type krylov_dim: int, optional
+        :param subspace_krylov_dim: The subspace expansion based krylov subspace dimension. This is only used if expansion="subspace". (Default: 6)
+        :type subspace_krylov_dim: int, optional
+        :param subspace_neigs: The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
+        :type subspace_neigs: int, optional
+        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+        :type numthreads: int, optional
+        :param nstep: The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)
+        :type nstep: (int, optional)
+
+        :returns: The tdvp evaluation object
+        :rtype: subspace_expansion_tdvp
+        """
+        if A.backend() != H.backend():
+            raise RuntimeError(
+                "Hamiltonian and operator do not have compatible backends."
+            )
+
+        return _subspace_tdvp(
+            A,
+            H,
+            krylov_dim=krylov_dim,
+            subspace_krylov_dim=subspace_krylov_dim,
+            subspace_neigs=subspace_neigs,
+            num_threads=num_threads,
+            nstep=nstep
+        )
+
+
+    def initialise(
+        A: Union[ttn, ms_ttn],
+        H: Union[sop_operator, ms_sop_operator],
+        krylov_dim: int = 16,
+        subspace_krylov_dim: int = 4,
+        subspace_neigs: int = 2,
+        num_threads: int = 1,
+        nstep: int = 1
+    ) :
+        """Initialise adaptive one-site TDVP object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.
+
+        :param A: Tree Tensor Network that the tdvp algorithm will act on
+        :type A: ttn | ms_ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator | ms_sop_operator
+        :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+        :type krylov_dim: int, optional
+        :param subspace_krylov_dim: The subspace expansion based krylov subspace dimension. This is only used if expansion="subspace". (Default: 6)
+        :type subspace_krylov_dim: int, optional
+        :param subspace_neigs: The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
+        :type subspace_neigs: int, optional
+        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+        :type numthreads: int, optional
+        :param nstep: The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)
+        :type nstep: (int, optional)
+        """
+
+    @property
+    def subspace_eigensolver_tol(self) -> float:
+        """The absolute tolerance of the krylov subspace eigensolver used for subspace expansion"""
+        pass
+
+    @property
+    def subspace_eigensolver_reltol(self) -> float:
+        """The relative tolerance of the krylov subspace eigensolver used for subspace expansion"""
+        pass
+
+    @property
+    def spawning_threshold(self) -> float:
+        """The threshold variable used to determine whether or not to spawn a new 
+        basis vector using the two-site energy variance criteria
+        """
+        pass
+
+    @property
+    def unoccupied_threshold(self) -> float:
+        """The threshold variable used to determine whether or not to spawn a new 
+        basis vector using the spawning critea
+        """
+        pass
+
+    @property
+    def subspace_weighting_factor(self) -> float:
+        """A coefficient used to weight the importance of the second order contributions.  Taken as 1 for the tdvp algorithm"""
+        pass
+
+    @property
+    def only_apply_when_no_unoccupied(self) -> bool:
+        """A flag to set whether or not to apply the subspace expansion scheme at all times or only when there are no unoccupied vectors """
+        pass
+
+    @property 
+    def eval_but_dont_aply(self) -> bool:
+        """A flag to set whether to evaluate the metric for subspace expansion but not to apply the 
+        results. This should only be used for timing executation of the subspace expansion scheme."""
+        pass
+
+    @property
+    def minimum_unoccupied(self) -> int:
+        """The minimum number of unoccupied variables required at each subspace expansion step.  
+        If fewer are detected, additional vectors will be added to reach this limit."""
+        pass
+
+    @property
+    def maximum_bond_dimension(self) -> int:
+        """The maximum bond dimension we can expand to through a subspace expansion step."""
+        pass
+
+subspace_expansion_tdvp.register(multiset_one_site_tdvp_complex)
+if _cuda_import:
+    subspace_expansion_tdvp.register(multiset_one_site_tdvp_complex_cuda)
+
+ms_tdvp_type = subspace_expansion_tdvp
+ms_tdvp = subspace_expansion_tdvp
+subspace_expansion_tdvp_type = subspace_expansion_tdvp

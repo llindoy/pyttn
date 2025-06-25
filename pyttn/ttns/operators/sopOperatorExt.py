@@ -10,10 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from typing import TypeAlias
-
-from pyttn.ttns.sop.SOPExt import SOP_type
-from pyttn.ttns.ttn.ttnExt import ttn_type
+from abc import ABCMeta
+from typing import Union
+from pyttn.ttns.sop.SOPExt import SOP
+from pyttn.ttns.ttns.ttnExt import ttn
 from pyttn.ttnpp import system_modes
 
 
@@ -26,90 +26,209 @@ try:
     from pyttn.ttnpp import ttn_real
     from pyttn.ttnpp import SOP_real
 
-    __real_ttn_import = True
-
-    sop_operator_type: TypeAlias = sop_operator_real | sop_operator_complex
+    _real_ttn_import = True
 
 except ImportError:
-    __real_ttn_import = False
-    sop_operator_type: TypeAlias = sop_operator_complex
+    _real_ttn_import = False
 
 # and attempt to import the cuda backend
 try:
     from pyttn.ttnpp.cuda import sop_operator_complex as sop_operator_complex_cuda
     from pyttn.ttnpp.cuda import ttn_complex as ttn_complex_cuda
 
-    __cuda_import = True
+    _cuda_import = True
 
     # and if we have imported real ttns we import the cuda versions
-    if __real_ttn_import:
+    if _real_ttn_import:
         from pyttn.ttnpp.cuda import sop_operator_real as sop_operator_real_cuda
         from pyttn.ttnpp.cuda import ttn_real as ttn_real_cuda
 
-        sop_operator_type: TypeAlias = (
-            sop_operator_type | sop_operator_real_cuda | sop_operator_complex_cuda
-        )
-
-    else:
-        sop_operator_type: TypeAlias = sop_operator_type | sop_operator_complex_cuda
-
 except ImportError:
-    __cuda_import = False
+    _cuda_import = False
 
 
-def __sop_operator_blas(h, A, sysinf, *args, **kwargs):
-    if not __real_ttn_import:
+def _sop_operator_blas(h, A, sysinf, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True):
+    if not _real_ttn_import:
         if isinstance(A, ttn_complex) and isinstance(h, SOP_complex):
-            return sop_operator_complex(h, A, sysinf, *args, **kwargs)
+            return sop_operator_complex(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
-            raise RuntimeError("Invalid argument for the creation of a sop_operator.")
+            raise RuntimeError(
+                "Invalid argument for the creation of a sop_operator.")
     else:
         if isinstance(A, ttn_real) and isinstance(h, SOP_real):
-            return sop_operator_real(h, A, sysinf, *args, **kwargs)
+            return sop_operator_real(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         elif isinstance(A, ttn_complex) and isinstance(h, SOP_complex):
-            return sop_operator_complex(h, A, sysinf, *args, **kwargs)
+            return sop_operator_complex(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
-            raise RuntimeError("Invalid argument for the creation of a sop_operator.")
+            raise RuntimeError(
+                "Invalid argument for the creation of a sop_operator.")
 
 
-def __sop_operator_cuda(h, A, sysinf, *args, **kwargs):
-    if not __real_ttn_import:
+def _sop_operator_cuda(h, A, sysinf, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True):
+    if not _real_ttn_import:
         if isinstance(A, ttn_complex_cuda) and isinstance(h, SOP_complex):
-            return sop_operator_complex_cuda(h, A, sysinf, *args, **kwargs)
+            return sop_operator_complex_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
-            raise RuntimeError("Invalid argument for the creation of a sop_operator.")
+            raise RuntimeError(
+                "Invalid argument for the creation of a sop_operator.")
     else:
         if isinstance(A, ttn_real_cuda) and isinstance(h, SOP_real):
-            return sop_operator_real_cuda(h, A, sysinf, *args, **kwargs)
+            return sop_operator_real_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         elif isinstance(A, ttn_complex_cuda) and isinstance(h, SOP_complex):
-            return sop_operator_complex_cuda(h, A, sysinf, *args, **kwargs)
+            return sop_operator_complex_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
-            raise RuntimeError("Invalid argument for the creation of a sop_operator.")
-
-
-def sop_operator(
-    h: SOP_type, A: ttn_type, sysinf: system_modes, *args, **kwargs
-) -> sop_operator_type:
-    """Function for constructing the hierarchical sum of product operator of a string operator
-
-    :param h: The sum of product operator representation of the Hamiltonian
-    :type h: SOP_type
-    :param A: A TTN object with defining the topology of output hierarchical SOP object
-    :type A: ttn_type
-    :param sysinf: The composition of the system defining the default dictionary to be considered for each node
-    :type sysinf: system_modes
-    :type *args: Variable length list of arguments. See sop_operator_complex/sop_operator_real for options
-    :type **kwargs: Additional keyword arguments. See sop_operator_complex/sop_operator_real for options
-    """
-
-    if len(args) > 0:
-        if args[0].backend() != A.backend():
             raise RuntimeError(
-                "Attempted to construct sop_operator with opdict but opdict backend is not compatible with ttn backend."
+                "Invalid argument for the creation of a sop_operator.")
+
+
+class sop_operator(metaclass=ABCMeta):
+    """A class for handling the sum-of-product operators."""
+
+    def __new__( 
+        cls, h: SOP, A: ttn, sysinf: system_modes, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,
+    ) -> "sop_operator":
+        """Function for constructing the hierarchical sum of product operator of a string operator
+
+        :param h: The sum of product operator representation of the Hamiltonian
+        :type h: SOP
+        :param A: A TTN object with defining the topology of output hierarchical SOP object
+        :type A: ttn
+        :param sysinf: The composition of the system defining the default dictionary to be considered for each node
+        :type sysinf: system_modes
+        :type *args: Variable length list of arguments. Valid options are:
+
+            - Empty: Build the sum-of-product operator using the default operator dictionaries
+            - opdict (:class:`operator_dictionary`): Build the sum-of-product operator using a user defined operator dictionary
+
+        :param compress: Whether or not to use the compressed hierarchical SOP representation.  If False this uses the standard sum-of-product representation., defaults to True
+        :type compress: bool, optional
+        :param identity_opt: Whether or not to perform optimisations arising from the presence of identity operators, defaults to True
+        :type identity_opt: bool, optional
+        :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
+        :type use_sparse: bool, optional
+        :return: The sop_operator representation of the input SOP
+        :rtype: sop_operator
+        """
+
+        if len(args) > 0:
+            if args[0].backend() != A.backend():
+                raise RuntimeError(
+                    "Attempted to construct sop_operator with opdict but opdict backend is not compatible with ttn backend."
+                )
+        if A.backend() == "blas":
+            return _sop_operator_blas(
+                h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,
             )
-    if A.backend() == "blas":
-        return __sop_operator_blas(h, A, sysinf, *args, **kwargs)
-    elif __cuda_import and A.backend() == "cuda":
-        return __sop_operator_cuda(h, A, sysinf, *args, **kwargs)
-    else:
-        raise RuntimeError("Invalid backend type for sop_operator")
+        elif _cuda_import and A.backend() == "cuda":
+            return _sop_operator_cuda(
+                h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,
+            )
+        else:
+            raise RuntimeError("Invalid backend type for sop_operator")
+
+    def initialise( 
+        self, op: SOP, A: ttn, sysinf: system_modes, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,
+    ):
+        """Initialise the sop_operator object given a sOP and system_modes information
+
+        :param h: The sum of product operator representation of the Hamiltonian
+        :type h: SOP
+        :param A: A TTN object with defining the topology of output hierarchical SOP object
+        :type A: ttn
+        :param sysinf: The composition of the system defining the default dictionary to be considered for each node
+        :type sysinf: system_modes
+        :type *args: Variable length list of arguments. Valid options are
+
+            - Empty: Build the sum-of-product operator using the default operator dictionaries
+            - opdict (:class:`operator_dictionary`): Build the sum-of-product operator using a user defined operator dictionar
+
+        :param compress: Whether or not to use the compressed hierarchical SOP representation.  If False this uses the standard sum-of-product representation., defaults to True
+        :type compress: bool, optional
+        :param identity_opt: Whether or not to perform optimisations arising from the presence of identity operators, defaults to True
+        :type identity_opt: bool, optional
+        :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
+        :type use_sparse: bool, optional
+        :return: The sop_operator representation of the input SOP
+        :rtype: sop_operator
+        """
+        pass
+
+    def assign(self, o: "sop_operator"):
+        """Assign the value of the sum-of-product operator from another
+
+        :param o: The sum-of-product operator to copy into this one
+        :type o: sop_operator
+        """
+        pass
+
+    def __copy__(self):
+        """Function implementing shallow copy of the sum-of-product operator object"""
+        pass
+
+    def __deepcopy__(self, memo):
+        """Function implementing deep copy of the sum-of-product operator object"""
+        pass
+
+    @property
+    def Eshift(self) -> Union[float, complex]:
+        """A constant energy shift acting on the sum-of-product operator"""
+        pass
+
+    def clear(self):
+        """Clear and deallocate all internal buffers of the sop_operator"""
+        pass
+
+    def update(self, mode: int, t: float, dt: float):
+        """Update the operators associated with mode mode so that they store their value at time t.
+        Additionally, this takes the time-step allowing for the use of average timestep expressions
+
+        :param mode: The mode to update
+        :type mode: int
+        :param t: The new time point
+        :type t: float
+        :param dt: The integration timestep
+        :type dt: float
+        """
+        pass
+
+    def nterms(self) -> int:
+        """
+        :returns: The number terms in the sum-of-product operator
+        :rtype: int
+        """
+        pass
+
+    def nmodes(self) -> int:
+        """
+        :returns: The number of modes the sum-of-product operator acts on
+        :rtype: int
+        """
+        pass
+
+    def complex_dtype(self) -> bool:
+        """Returns whether or not the sop_operator is storing a complex valued dtype
+
+        :return: whether or not the sop_operator is storing a complex valued dtype
+        :rtype: bool
+        """
+        pass
+
+    def backend(self) -> str:
+        """Returns the backend type of the sop_operator
+
+        :return: The backend type of the object
+        :rtype: str
+        """
+        pass
+
+
+sop_operator.register(sop_operator_complex)
+if _real_ttn_import:
+    sop_operator.register(sop_operator_real)
+
+if _cuda_import:
+    sop_operator.register(sop_operator_complex_cuda)
+    if _real_ttn_import:
+        sop_operator.register(sop_operator_real_cuda)
+
+sop_operator_type = sop_operator

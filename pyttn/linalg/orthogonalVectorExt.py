@@ -10,7 +10,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
 from pyttn.linalg.tensorExt import Matrix, Vector
 from pyttn.linalg.randomEngineExt import RandomEngine
 

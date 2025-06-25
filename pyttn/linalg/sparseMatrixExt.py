@@ -10,7 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from typing import Union, TypeAlias, Optional
+from typing import Union, Optional
+from abc import ABCMeta
+import numpy as np
+from scipy.sparse import csr_matrix as spcsr
+
+from .tensorExt import Vector, Matrix
 
 # import the blas backend
 import pyttn.ttnpp.linalg as la
@@ -19,33 +24,15 @@ import pyttn.ttnpp.linalg as la
 try:
     import pyttn.ttnpp.cuda.linalg as cula
 
-    CSR_Matrix: TypeAlias = (
-        la.csr_matrix_real
-        | la.csr_matrix_complex
-        | cula.csr_matrix_real
-        | cula.csr_matrix_complex
-    )
-    Diagonal_Matrix: TypeAlias = (
-        la.diagonal_matrix_real
-        | la.diagonal_matrix_complex
-        | cula.diagonal_matrix_real
-        | cula.diagonal_matrix_complex
-    )
-
-    __cuda_import = True
+    _cuda_import = True
 except ImportError:
-    type CSR_Matrix = la.csr_matrix_real | la.csr_matrix_complex
-    type Diagonal_Matrix = la.diagonal_matrix_real | la.diagonal_matrix_complex
-
-    __cuda_import = False
-
-import numpy as np
-from scipy.sparse import csr_matrix as spcsr
+    cula = None
+    _cuda_import = False
 
 
 def __is_csr_la(Op):
     is_bla_csr = isinstance(Op, (la.csr_matrix_real, la.csr_matrix_complex))
-    if __cuda_import:
+    if _cuda_import:
         is_csr = is_bla_csr or isinstance(
             Op, (cula.csr_matrix_real, cula.csr_matrix_complex)
         )
@@ -54,7 +41,7 @@ def __is_csr_la(Op):
     return is_csr
 
 
-def __csr_matrix(mod, *args, dtype=None, **kwargs):
+def _csr_matrix(mod, *args, dtype=None, **kwargs):
     if args:
         if len(args) == 1:
             # if we are working with a csr matrix - then copy construct it
@@ -166,12 +153,127 @@ def __csr_matrix(mod, *args, dtype=None, **kwargs):
         raise RuntimeError("Default constructor not supported for csr_matrix")
 
 
+class CSR_Matrix(metaclass=ABCMeta):
+    def __new__(
+        cls,
+        *args,
+        dtype: Optional[
+            Union[float, complex, np.float64, np.complex128]
+        ] = np.complex128,
+        backend: str = "blas",
+        **kwargs,
+    ) -> 'CSR_Matrix':
+        """
+        Construct a C++ linalg::csr_matrix<T> type that can be used by the C++ layer of pyTTN.
+
+        :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
+
+            - csr matrix (CSR_Matrix) - Copy construct csr matrix object
+            - csr_matrix (scipy.sparse.csr_matrix) - construct csr matrix from scipy csr matrix
+            - values (list[dtype]), indices (list[int]), rowptr (list[int]), ncols (int, optional) - Construct TTN object from slice of multiset ttn
+            - coo array list[tuple(int, int, dtype)], nrows (int, optional), ncols (int, optional)
+
+        :param dtype: The dtype to use for the site operator.  If this is None this function attempts to infer the dtype from v (Default: None)
+        :type dtype: {None, np.float64, np.complex128}, optional
+        :param backend: The backend to use for calculation. Either blas or cuda. (Default: "blas")
+        :type backend: {"blas", "cuda"}, optional
+
+        :returns: A pybind11 wrapped linalg::csr_matrix<T> object
+        :rtype: CSR_Matrix
+        """
+
+        if backend == "blas":
+            return _csr_matrix(la, *args, dtype=dtype, **kwargs)
+        elif _cuda_import and backend == "cuda":
+            return _csr_matrix(cula, *args, dtype=dtype, **kwargs)
+        else:
+            raise RuntimeError("Invalid backend type for linalg.csr_matrix")
+
+    
+    def complex_dtype(self) -> bool:
+        """Returns whether or not the CSR_Matrix is storing a complex valued dtype
+
+        :return: whether or not the CSR_Matrix is storing a complex valued dtype
+        :rtype: bool
+        """
+        pass
+
+    
+    def __matmul__(self, b: Union[Matrix, Vector]) -> Union[Matrix, Vector]:
+        """CSR matrix - dense matrix multiplications
+
+        :param b: The dense matrix that the CSR_Matrix acts on
+        :type b: Matrix
+        :return: The result of the CSR_Matrix-Matrix multiplication
+        :rtype: Matrix
+        """
+        pass
+
+    def __str__(self) -> str:
+        """Return the string representation of the CSR_Matrix object
+
+        :return: The string representation of the CSR_Matrix
+        :rtype: str
+        """
+        pass
+
+    def backend(self) -> str:
+        """Returns the backend type of the CSR_Matrix
+
+        :return: The backend type of the object
+        :rtype: str
+        """
+        pass
+
+
+class Diagonal_Matrix(metaclass=ABCMeta):
+    def __new__(
+        cls,
+        buffer: np.ndarray,
+        dtype: Optional[
+            Union[float, complex, np.float64, np.complex128]
+        ] = np.complex128,
+        backend: str = "blas",
+        **kwargs,
+    ):
+        """
+        Construct a C++ linalg::csr_matrix<T> type that can be used by the C++ layer of pyTTN.
+
+        :param buffer: The numpy array defining the diagonals of the matrix
+        :type buffer: np.ndarray
+        :param dtype: The dtype to use for the site operator.  If this is None this function attempts to infer the dtype from v (Default: None)
+        :type dtype: {None, np.float64, np.complex128}, optional
+        :param backend: The backend to use for calculation. Either blas or cuda. (Default: "blas")
+        :type backend: {"blas", "cuda"}, optional
+
+        :returns: A pybind11 wrapped linalg::diagonal_matrix<T> object
+        :rtype: Diagonal_Matrix
+        """
+        raise RuntimeError("Diagonal Matrix interface not yet implemented.")
+
+
+CSR_Matrix.register(la.csr_matrix_real)
+CSR_Matrix.register(la.csr_matrix_complex)
+
+Diagonal_Matrix.register(la.diagonal_matrix_real)
+Diagonal_Matrix.register(la.diagonal_matrix_complex)
+
+
+if _cuda_import:
+    CSR_Matrix.register(cula.csr_matrix_real)
+    CSR_Matrix.register(cula.csr_matrix_complex)
+
+    Diagonal_Matrix.register(cula.diagonal_matrix_real)
+    Diagonal_Matrix.register(cula.diagonal_matrix_complex)
+
+Sparse_Matrix = CSR_Matrix
+
 def csr_matrix(
     *args,
     dtype: Optional[Union[float, complex, np.float64, np.complex128]] = np.complex128,
     backend: str = "blas",
     **kwargs,
-):
+) -> CSR_Matrix:
     """
     A function for converting from a numpy array to a C++ linalg::csr_matrix<T> type
      used by the C++ layer of pyTTN.
@@ -189,12 +291,6 @@ def csr_matrix(
      :type backend: {"blas", "cuda"}, optional
 
      :returns: A pybind11 wrapped linalg::csr_matrix<T> object
-     :rtype: csr_matrix_real, csr_matrix_complex
+     :rtype: CSR_Matrix
     """
-
-    if backend == "blas":
-        return __csr_matrix(la, *args, dtype=dtype, **kwargs)
-    elif __cuda_import and backend == "cuda":
-        return __csr_matrix(cula, *args, dtype=dtype, **kwargs)
-    else:
-        raise RuntimeError("Invalid backend type for linalg.csr_matrix")
+    return CSR_Matrix(*args, dtype=dtype, backend=backend, **kwargs)

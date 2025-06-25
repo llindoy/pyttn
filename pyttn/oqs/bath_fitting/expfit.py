@@ -10,25 +10,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from typing import Callable, Optional
+import abc
 import numpy as np
-from .ESPRIT import ESPRIT
+from typing import Callable, Optional, Union
+from .ESPRIT import ESPRIT, ESPRIT_frequencies
 from .softmspace import softmspace
-
 from .aaa import AAA_algorithm
+from ..spectral_density.rational_function_spectral_density import RationalFunctionSpectralDensity
 
 try:
     from scipy.interpolate import AAA
 
     def AAA_algorithm_scipy(
-        func: Callable[[np.ndarray | float], np.ndarray | np.complex128 | float],
+        func: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, complex, np.complex128]],
         Z: np.ndarray,
         tol: float = 1e-13,
         K: int = 100,
         *args,
         **kwargs,
     ) -> tuple[
-        Callable[[np.ndarray | float], np.ndarray | np.complex128 | float],
+        Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, complex, np.complex128]],
         np.ndarray,
         np.ndarray,
         np.ndarray,
@@ -65,19 +66,65 @@ except ImportError:
     use_scipy_AAA = False
 
 
-class ExpFitDecomposition:
+class ExpFitDecomposition(metaclass=abc.ABCMeta):
     r"""Base class for exponential fit decompositions"""
 
     def __init__(self):
         pass
 
 
+class SwExpFitDecomposition(ExpFitDecomposition):
+    """Abstract base class for exponential fitting decomposition schemes that take the bath spectral function as input"""
+
+    def __init__(self):
+        pass
+
+    @abc.abstractmethod
+    def __call__(
+        self, S
+    ) -> tuple[
+        np.ndarray,
+        np.ndarray,
+        Callable[[Union[np.ndarray, float]], Union[np.ndarray, np.complex128, complex]],
+    ]:
+        pass
+
+
+class PoleDecomposition(ExpFitDecomposition):
+    def __init__(self):
+        pass
+
+    @abc.abstractmethod
+    def bosonic(self, J: RationalFunctionSpectralDensity, beta: float):
+        pass
+
+    @abc.abstractmethod
+    def fermionic(self, J: RationalFunctionSpectralDensity, beta: float):
+        pass
+
+class CtExpFitDecomposition(ExpFitDecomposition):
+    """Abstract base class for exponential fitting decomposition schemes that take the bath correlation function as input"""
+
+    def __init__(self):
+        pass
+
+    @abc.abstractmethod
+    def __call__(
+        self, S
+    ) -> tuple[
+        np.ndarray,
+        np.ndarray,
+        Callable[[Union[np.ndarray, float]], Union[np.ndarray, np.complex128, complex]],
+    ]:
+        pass
+
+
 def ESPRIT_support_points(
-    t: str | list | np.ndarray = "linear",
+    t: Union[str, list, np.ndarray] = "linear",
     tmax: Optional[float] = None,
     Nt: Optional[int] = 1000,
 ):
-    r"""A function for automatically generating support points to be used within the ESPRIT algorithm.
+    """A function for automatically generating support points to be used within the ESPRIT algorithm.
 
     :param t: Either the support points or a key word used to generate the support points. (Default: "linear") This parameter can be either a
 
@@ -103,7 +150,7 @@ def ESPRIT_support_points(
         return np.linspace(0, np.abs(tmax), Nt)
 
 
-class ESPRITDecomposition(ExpFitDecomposition):
+class ESPRITDecomposition(CtExpFitDecomposition):
     r"""A class providing an easy to use interface for applying the ESPRIT decomposition to
     construct a sum-of-exponential approximation for a bath correlation function
 
@@ -126,22 +173,59 @@ class ESPRITDecomposition(ExpFitDecomposition):
 
     """
 
-    def __init__(self, K: int, t: str | list | np.ndarray = "linear", **kwargs):
+    def __init__(self, K: int, t: Union[str, list, np.ndarray] = "linear", **kwargs):
         self.t = ESPRIT_support_points(t=t, **kwargs)
         self.K = K
 
     def __call__(
-        self, Ct: Callable[[np.ndarray | float], np.ndarray | np.complex128]
+        self, Ct: Callable[[np.ndarray], np.ndarray]
     ) -> tuple[
         np.ndarray,
         np.ndarray,
-        Callable[[np.ndarray | float], np.ndarray | np.complex128],
+        np.ndarray,
     ]:
         dt = self.t[1] - self.t[0]
         C = Ct(self.t)
         dk, zk, Ctres = ESPRIT(C, self.K)
         zk = zk / dt
         return dk, zk, Ctres
+
+    def fit_correlated(
+        self,
+        Ct: Callable[[np.ndarray], np.ndarray],
+        scalar_func: Callable[[np.ndarray], np.ndarray],
+        N: int,
+    ) -> tuple[np.ndarray, np.ndarray, None]:
+        """Function for fitting a correlated spectral density object using the density discretisation approach
+
+        :param S:  The spectral function to be decomposed.
+        :type S: Callable[[Union[np.ndarray, float]], np.ndarray]
+        :param scalar_func: The scalar function used to fit density, defaults to None
+        :type scalar_func: Callable[ [ Union[np.ndarray, float]], Union[np.ndarray, float]]
+        :param N: The number of correlated degrees of freedom
+        :type N: int
+        :return: The coupling constants and frequencies of the discrete bath modes
+        :rtype: tuple[np.ndarray, np.ndarray, None]
+        """
+        dt = self.t[1] - self.t[0]
+        Ct1 = scalar_func(self.t)
+
+        # extract the frequencies in the signal using ESPRIT
+        expnu = ESPRIT_frequencies(Ct1, self.K)
+
+        # construct the time dependence of each of the frequency signals
+        ENU, Kn = np.meshgrid(expnu, np.arange(Ct1.shape[0]))
+        A = np.power(ENU, Kn)
+        zk = -np.log(expnu) / dt
+
+        dk = np.zeros((self.K, N, N), dtype=np.complex128)
+        Ctv = Ct(self.t)
+
+        for i in range(N):
+            for j in range(N):
+                dk[:, i, j] = np.linalg.lstsq(A, Ctv[i, j, :], rcond=None)[0]
+
+        return dk, zk, None
 
 
 def __generate_grid_points(N, wc, wmin=1e-9):
@@ -152,11 +236,11 @@ def __generate_grid_points(N, wc, wmin=1e-9):
 
 
 def AAA_support_points(
-    w: list | np.ndarray | str = "linear",
+    w: Union[list, np.ndarray, str] = "linear",
     wmin: Optional[float] = None,
     wmax: Optional[float] = None,
     Naaa: Optional[int] = 1000,
-):
+) -> np.ndarray:
     r"""A function for automatically generating support points to be used within the AAA algorithm.
 
     :param w: Either the support points orr a key word used to generate the support points. (Default: "linear") This parameter can be either a
@@ -174,6 +258,9 @@ def AAA_support_points(
     :type wmax: float or None, optional
     :param Naaa: The number of support points used by the AAA algorithm. (Default: 1000)
     :type Naaa: int or None, optional
+
+    :returns: The AAA support points
+    :rtype: np.ndarray
     """
     if isinstance(w, (list, np.ndarray)):
         if isinstance(w, list):
@@ -202,7 +289,7 @@ def AAA_support_points(
         raise RuntimeError("Invalid AAA support points.")
 
 
-class AAADecomposition:
+class AAADecomposition(SwExpFitDecomposition):
     r"""A class providing an easy to use interface for applying the AAA based rational function
     decomposition to approximate a bath spectral density.  This class includes tools used for
     automatic generation of support points, as well as manually specified support points to
@@ -224,30 +311,21 @@ class AAADecomposition:
     :type wmax: float or None, optional
     :param Naaa: The number of support points used by the AAA algorithm. (Default: 1000)
     :type Naaa: int or None, optional
-    :param use_scipy:
-
-    Callable arguments:
-
-    :param S: The spectral density function to be decomposed.
-    :type S: callable
-    :returns:
-        - dk (np.ndarray) - The coefficients in the sum-of-exponential decomposition of the bath correlation function
-        - zk (np.ndarray) - The exponents in the sum-of-exponential decomposition of the bath correlation function
-        - func (callable) - The AAA rational function fit of the spectral density
-
+    :param use_scipy: Whether or not to use the scipy version of the AAA algorithm, default to use_scipy_AAA
+    :type use_scipy: bool
     """
 
     def __init__(
         self,
         tol: Optional[float] = 1e-4,
         K: Optional[int] = None,
-        w: list | np.ndarray | str = "linear",
+        w: Union[list, np.ndarray, str] = "linear",
         coeff: Optional[float] = 1.0,
         wmin: Optional[float] = None,
         wmax: Optional[float] = None,
         Naaa: Optional[int] = 1000,
         use_scipy: bool = use_scipy_AAA,
-    ):
+    ) -> None:
         self.Z1 = None
         self.w = w
         self.wmin = wmin
@@ -260,7 +338,7 @@ class AAADecomposition:
         self.use_scipy = use_scipy
 
     def __AAA_to_HEOM(p, r, coeff=1.0):
-        r"""Convert the poles and residues from the AAA algorithm into the coefficients and frequencies needed
+        """Convert the poles and residues from the AAA algorithm into the coefficients and frequencies needed
         for the HEOM algorithms
 
         :param p: The poles extracted from the AAA algorithm
@@ -278,9 +356,13 @@ class AAADecomposition:
         return rr, pp
 
     def __call__(
-        self, S: Callable[[np.ndarray | float], np.ndarray | np.complex128 | float]
-    ):
-        r"""Perform the AAA decomposition on the function S.
+        self, S: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, complex, np.complex128]]
+    ) -> tuple[
+        np.ndarray,
+        np.ndarray,
+        Callable[[Union[np.ndarray, float]], Union[np.ndarray, np.complex128, complex]],
+    ]:
+        """Perform the AAA decomposition on the function S.
 
         :param S: The spectral density function to be decomposed.
         :type S: callable
@@ -313,3 +395,22 @@ class AAADecomposition:
 
         # return the function for optional plotting as well as the coefficients
         return dk, zk, func1
+
+    def fit_correlated(
+        self,
+        Sw: Callable[[np.ndarray], np.ndarray],
+        scalar_func: Callable[[np.ndarray], np.ndarray],
+        N: int,
+    ) -> tuple[np.ndarray, np.ndarray, None]:
+        """Function for fitting a correlated spectral density object using the density discretisation approach
+
+        :param S:  The spectral function to be decomposed.
+        :type S: Callable[[Union[np.ndarray, float]], np.ndarray]
+        :param scalar_func: The scalar function used to fit density, defaults to None
+        :type scalar_func: Callable[ [ Union[np.ndarray, float]], Union[np.ndarray, float]]
+        :param N: The number of correlated degrees of freedom
+        :type N: int
+        :return: The coupling constants and frequencies of the discrete bath modes
+        :rtype: tuple[np.ndarray, np.ndarray, None]
+        """
+        raise RuntimeError("Matrix Valued AAA is currently not supported.")

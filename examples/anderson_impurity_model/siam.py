@@ -53,7 +53,9 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
     #setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
     def V(w):
-        return np.where(np.abs(w) <= W, Gamma*np.sqrt(1-(w*w)/(W*W)), 0.0)
+        gamma = 1
+        W = 10*gamma
+        return np.pi*np.where(np.abs(w/W) < 1, gamma*np.sqrt(1-(w/W)**2)/(np.pi*W), 0)*10
 
     #set up the open quantum system bath object
     bath = oqs.FermionicBath(V, beta=beta)

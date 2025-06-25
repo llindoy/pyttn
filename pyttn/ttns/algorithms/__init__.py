@@ -10,19 +10,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .dmrgExt import single_set_dmrg, multiset_dmrg, dmrg, dmrg_type, ms_dmrg_type
-from .tdvpExt import single_set_tdvp, multiset_tdvp, tdvp, tdvp_type, ms_tdvp_type
+from .dmrgExt import one_site_dmrg, subspace_expansion_dmrg, dmrg
+from .tdvpExt import one_site_tdvp, subspace_expansion_tdvp, tdvp
 
 
 __all__: list[str] = [
-    "single_set_dmrg",
-    "multiset_dmrg",
+    "one_site_dmrg",
+    "subspace_expansion_dmrg",
     "dmrg",
-    "dmrg_type",
-    "ms_dmrg_type",
-    "single_set_tdvp",
-    "multiset_tdvp",
+    "one_site_tdvp",
+    "subspace_expansion_tdvp",
     "tdvp",
-    "tdvp_type",
-    "ms_tdvp_type"
 ]

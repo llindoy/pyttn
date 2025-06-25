@@ -147,6 +147,14 @@ namespace ttns
             return res;
         }
 
+        inline void prune_zeros(double tol = 1e-15)
+        {
+            for (auto &it : m_terms)
+            {
+                it.second.prune_zeros(tol);
+            }
+        }
+
         multiset_SOP &jordan_wigner(const system_modes &sys_info, double tol = 1e-15)
         {
             for (auto &it : m_terms)

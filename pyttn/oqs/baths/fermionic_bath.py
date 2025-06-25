@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,14 +12,30 @@
 
 import numpy as np
 import scipy as sp
+from .bath import Bath
+from typing import Callable, Optional, Union
+from ..bath_fitting import (
+    ExpFitDecomposition,
+    CtExpFitDecomposition,
+    SwExpFitDecomposition,
+    BathDiscretisation,
+)
 
-class FermionicBath:
+from pyttn.ttns import OP_type
+
+
+class FermionicBath(Bath):
     r"""A class for managing a continuous fermionic gaussian bath.  This provides
     functions for computing non-interacting bath correlation functions, as well as
     decomposing the correlation function into a linear combination of
     complex valued exponentials (expfit) or oscillator terms (discretise)
 
     :param Jw: The bath spectral function defining the non-interacting correlation function
+    :type Jw: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]] 
+    :param Sp: The system raising operators
+    :type Sp: Optional[OP_type]
+    :param Sm: The system raising operators
+    :type Sm: Optional[OP_type]    
     :param beta: The inverse temperature of the bath, defaults to None
     :type beta: float, optional
     :param wmax: the maximum frequency bound, default to np.inf
@@ -31,7 +47,14 @@ class FermionicBath:
     """
 
     def __init__(
-        self, Jw, Sp=None, Sm=None, beta=None, wmax=np.inf, wmin=None, wtol=None
+        self,
+        Jw: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]],
+        Sp: Optional[OP_type] = None,
+        Sm: Optional[OP_type] = None,
+        beta: Optional[float] = None,
+        wmax: float = np.inf,
+        wmin: Optional[float] = None,
+        wtol: Optional[float] = None,
     ):
         self.Jw = Jw
         self.Sp = Sp
@@ -41,7 +64,15 @@ class FermionicBath:
         self.wmax = wmax
         self.wtol = wtol
 
-    def Ct(self, t, Ef=0, sigma="+", epsabs=1.49e-12, epsrel=1.49e-12, limit=2000):
+    def Ct(
+        self,
+        t: np.ndarray,
+        Ef: float = 0,
+        sigma: str = "+",
+        epsabs: float = 1.49e-12,
+        epsrel: float = 1.49e-12,
+        limit: int = 2000,
+    ) -> np.ndarray:
         r"""Returns the value of the non-interacting bath correlation function evaluated
         at the time points t:
 
@@ -107,7 +138,9 @@ class FermionicBath:
                 Ct[ti] = ctr + coeff * 1.0j * cti
         return Ct / np.pi
 
-    def Ctexp(t, dk, zk, sigma="+"):
+    def Ctexp(
+        t: np.ndarray, dk: np.ndarray, zk: np.ndarray, sigma: str = "+"
+    ) -> np.ndarray:
         r"""Returns the value of the non-interacting bath correlation function evaluated
         at the time points t using the results of discretisation or expfit:
 
@@ -131,8 +164,8 @@ class FermionicBath:
             ret += dk[i] * np.exp(coeff * 1.0j * zk[i] * t)
         return ret
 
-    def fermi_distrib(self, w, Ef):
-        r"""Returns the value fermi function at w and fermi energy Ef:
+    def fermi_distrib(self, w: np.ndarray, Ef: float) -> np.ndarray:
+        """Returns the value fermi function at w and fermi energy Ef:
 
         :param w: frequency
         :type w: np.ndarray
@@ -160,7 +193,7 @@ class FermionicBath:
 
             return res
 
-    def Sw(self, w, Ef=0, sigma="+"):
+    def Sw(self, w: np.ndarray, Ef: float = 0, sigma: str = "+") -> np.ndarray:
         r"""Returns the non-interacting bath spectral function at w and fermi energy Ef
 
         .. math::
@@ -181,7 +214,9 @@ class FermionicBath:
         else:
             return self.Jw(w) * (1 - self.fermi_distrib(w, Ef))
 
-    def estimate_bounds(self, wmax=None, Ef=0, sigma="+"):
+    def estimate_bounds(
+        self, wmax: Optional[float] = None, Ef: float = 0, sigma: str = "+"
+    ) -> tuple[float, float]:
         r"""Returns estimates for the upper and lower bounds of the spectral density to be used for the
         discretisation function
 
@@ -217,7 +252,9 @@ class FermionicBath:
 
         return wmin, wmax
 
-    def discretise(self, discretisation_engine, Ef=0, sigma="+"):
+    def discretise(
+        self, discretisation_engine: BathDiscretisation, Ef: float = 0, sigma: str = "+"
+    ) -> tuple[np.ndarray, np.ndarray]:
         r"""Returns the coupling constants and frequencies associated with a discretised representation of the bath
 
         :param discretisation_engine: An object defining how to discretise a continuous bath
@@ -237,7 +274,9 @@ class FermionicBath:
             discretisation_engine.wmin = wmax
         return discretisation_engine(lambda x: self.Sw(x, Ef=Ef, sigma=sigma))
 
-    def expfit(self, fitting_engine, Ef=0, sigma="+"):
+    def expfit(
+        self, fitting_engine: ExpFitDecomposition, Ef: float = 0, sigma: str = "+"
+    ) -> tuple[np.ndarray, np.ndarray]:
         r"""Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
 
         :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition
@@ -249,11 +288,9 @@ class FermionicBath:
         :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`
         :rtype: np.ndarray, np.ndarray
         """
-        from .bath_fitting import AAADecomposition, ESPRITDecomposition
-
         dk = None
         zk = None
-        if isinstance(fitting_engine, AAADecomposition):
+        if isinstance(fitting_engine, SwExpFitDecomposition):
             wmin, wmax = self.estimate_bounds(Ef=Ef, sigma=sigma)
             wav = (wmax - wmin) / 2
             if fitting_engine.wmin is None:
@@ -262,6 +299,10 @@ class FermionicBath:
                 fitting_engine.wmin = wav + 2 * (wmax - wav)
             dk, zk, _ = fitting_engine(lambda x: self.Sw(x, Ef=Ef, sigma=sigma))
 
-        elif isinstance(fitting_engine, ESPRITDecomposition):
+        elif isinstance(fitting_engine, CtExpFitDecomposition):
             dk, zk, _ = fitting_engine(lambda x: self.Ct(x, Ef=Ef, sigma=sigma))
+        else:
+            raise RuntimeError(
+                "Failed to fit fermionic bath. Invalid fitting engine object."
+            )
         return dk, zk

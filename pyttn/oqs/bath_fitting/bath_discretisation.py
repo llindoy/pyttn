@@ -10,12 +10,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from typing import Callable, Optional
+import abc
+from typing import Callable, Optional, Union
 from pyttn.ttnpp.utils import orthopol_discretisation, density_discretisation
 import numpy as np
 
 
-class BathDiscretisation:
+class BathDiscretisation(metaclass=abc.ABCMeta):
     r"""Base class for bath discretisations
 
     :param Nb: The number of discrete points to find
@@ -31,6 +32,31 @@ class BathDiscretisation:
         self.wmin = wmin
         self.wmax = wmax
 
+    @abc.abstractmethod
+    def __call__(
+        self, S: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, np.complex128]]
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """base class for fitting the function call
+
+        :param S:  The spectral density function to be decomposed.
+        :type S: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, np.complex128]8]
+        :return: The coupling constants and frequencies of the discrete bath modes
+        :rtype: tuple[np.ndarray, np.ndarray]
+        """
+        pass
+
+    @abc.abstractmethod
+    def fit_correlated(
+        self, S: Callable[[Union[np.ndarray, float]], np.ndarray]
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """base class for fitting the function call
+
+        :param S:  The spectral function to be decomposed.
+        :type S: Callable[[Union[np.ndarray, float]], np.ndarray]
+        :return: The coupling constants and frequencies of the discrete bath modes
+        :rtype: tuple[np.ndarray, np.ndarray]
+        """
+        pass
 
 class DensityDiscretisation(BathDiscretisation):
     r"""A class wrapping the density based discretisation approach.  Selects frequencies from a density of frequencies :math:`\rho(\omega)`
@@ -68,14 +94,8 @@ class DensityDiscretisation(BathDiscretisation):
     :type niters: int, optional
     :param wcut: A lower bound on the frequency to cutoff the 1/w.  (Default: 1e-8)
     :type wcut: float, optional
-
-    Callable arguments:
-
-    :param S: The spectral density function to be decomposed.
-    :type S: callable
-    :returns:
-        - g (np.ndarray) - The coupling constants of the discrete bath modes
-        - w (np.ndarray) - The frequencies of the discrete bath modes
+    :param average_coupling: Whether or not to average the coupling constant over a small region, defaults to True
+    :type averag_coupling: bool
     """
 
     def __init__(
@@ -84,7 +104,7 @@ class DensityDiscretisation(BathDiscretisation):
         wmin: float,
         wmax: float,
         rho: Optional[
-            Callable[[np.ndarray | float], np.ndarray | float | np.complex128]
+            Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, np.complex128]]
         ] = None,
         atol: float = 0,
         rtol: float = 1e-10,
@@ -93,6 +113,7 @@ class DensityDiscretisation(BathDiscretisation):
         ftol: float = 1e-10,
         niters: float = 100,
         wcut: float = 1e-8,
+        average_coupling: bool = True
     ):
         BathDiscretisation.__init__(self, Nb, wmin, wmax)
         self.rho = rho
@@ -103,51 +124,82 @@ class DensityDiscretisation(BathDiscretisation):
         self.wtol = wtol
         self.ftol = ftol
         self.niters = niters
+        self.average_coupling = average_coupling
 
     # discretise a bosonic bath using the density algorithm.  Here we allow for specification of the density of frequencies (rho), if this isn't specified we use a density of frequencies
     # that is given by S(w)/w for np.abs(w) > 1e-12 and S(w)/1e-12 for np.abs(w) < 1e-12.
     # this currently doesn't seem to work
     def __call__(
-        self, S: Callable[[np.ndarray | float], np.ndarray | float | np.complex128]
+        self, S: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, np.complex128]]
     ) -> tuple[np.ndarray, np.ndarray]:
+        """Fit the bath spectral function using the density discretisation approach
+
+        :param S:  The spectral density function to be decomposed.
+        :type S: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, np.complex128]8]
+        :return: The coupling constants and frequencies of the discrete bath modes
+        :rtype: tuple[np.ndarray, np.ndarray]
+        """
         g = None
         w = None
 
         if self.rho is None:
-            # @jit(nopython=True)
             def rhofunc(w):
-                return S(w) / np.where(np.abs(w) < self.wcut, self.wcut, np.abs(w))
+                return S(w) 
 
-            g, w = density_discretisation.discretise(
-                S,
-                rhofunc,
-                self.wmin,
-                self.wmax,
-                self.Nb,
-                atol=self.atol,
-                rtol=self.rtol,
-                nquad=self.nquad,
-                wtol=self.wtol,
-                ftol=self.ftol,
-                niters=self.niters,
-            )
+            g, w = density_discretisation.discretise(S, rhofunc, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, nquad=self.nquad, wtol=self.wtol, ftol=self.ftol, niters=self.niters)
 
         else:
-            g, w = density_discretisation.discretise(
-                S,
-                self.rho,
-                self.wmin,
-                self.wmax,
-                self.Nb,
-                atol=self.atol,
-                rtol=self.rtol,
-                nquad=self.nquad,
-                wtol=self.wtol,
-                ftol=self.ftol,
-                niters=self.niters,
-            )
+            g, w = density_discretisation.discretise(S, self.rho, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, nquad=self.nquad, wtol=self.wtol, ftol=self.ftol, niters=self.niters)
 
         return np.array(g), np.array(w)
+
+    def fit_correlated(
+        self,
+        S: Callable[[Union[np.ndarray, float]], np.ndarray],
+        scalar_func: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]],
+        N: int 
+        
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Function for fitting a correlated spectral density object using the density discretisation approach
+
+        :param S:  The spectral function to be decomposed.
+        :type S: Callable[[Union[np.ndarray, float]], np.ndarray]
+        :param scalar_func: The scalar function used to fit density, defaults to None
+        :type scalar_func: Callable[ [ Union[np.ndarray, float]], Union[np.ndarray, float]]
+        :param N: The number of correlated degrees of freedom
+        :type N: int 
+        :return: The coupling constants and frequencies of the discrete bath modes
+        :rtype: tuple[np.ndarray, np.ndarray]
+        """
+        g = None
+        w = None
+
+        #perform the density discretisation on the scalar function argument
+        if self.rho is None:
+            def rhofunc(w):
+                return scalar_func(w) / np.where(np.abs(w) < self.wcut, self.wcut, np.abs(w))
+
+            g, w = density_discretisation.discretise(scalar_func, rhofunc, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, nquad=self.nquad, wtol=self.wtol, ftol=self.ftol, niters=self.niters)
+
+        else:
+            g, w = density_discretisation.discretise(scalar_func, self.rho, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, nquad=self.nquad, wtol=self.wtol, ftol=self.ftol, niters=self.niters)
+
+        #now compute spectral function matrix for each frequencys
+        w = np.array(w)
+        Sw = S(w)
+
+        gp = np.zeros((Sw.shape[2], Sw.shape[0], Sw.shape[1]), dtype=np.complex128)
+
+        for i in range(len(w)):
+            M = Sw[:, :, i]
+            if not np.allclose(M, M.conj().T):
+                raise RuntimeError("Failed to fit correlated bath.  The spectral density matrix is not hermitian.")
+            u, v = np.linalg.eigh(M)
+            sqrtM = v @ np.diag(np.sqrt(u)) @ v.conj().T
+
+            gp[i, :, :] = sqrtM * g[i] / np.sqrt(scalar_func(w[i]))
+
+        return gp, np.array(w)
 
 
 class OrthopolDiscretisation:
@@ -182,14 +234,6 @@ class OrthopolDiscretisation:
     :type moment_scaling_steps: int, optional
     :param nquad: The degree of the gauss-Legendre polynomial based quadrature scheme used in the evaluation of integrals.  (Default: 100)
     :type nquad: int, optional
-
-    Callable arguments:
-
-    :param S: The spectral density function to be decomposed.
-    :type S: callable
-    :returns:
-        - g (np.ndarray) - The coupling constants of the discrete bath modes
-        - w (np.ndarray) - The frequencies of the discrete bath m
     """
 
     def __init__(
@@ -215,7 +259,7 @@ class OrthopolDiscretisation:
         self.nquad = nquad
 
     def find_moment_scaling_factor(
-        S: Callable[[np.ndarray | float], np.ndarray | float | np.complex128],
+        S: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, np.complex128]],
         wmin: float,
         wmax: float,
         Nb: int,
@@ -226,7 +270,7 @@ class OrthopolDiscretisation:
         Nsteps: int = 5,
         nquad: int = 100,
     ) -> float:
-        r"""Finds a constant to scale the frequency axis by in order to ensure well defined scaling of the modified moments as we go to very high moments.
+        """Finds a constant to scale the frequency axis by in order to ensure well defined scaling of the modified moments as we go to very high moments.
         here this is done by computing the modified moments up to varying orders (with early termination if the values leave some min and max bounds)
         and fitting the resultant decay or growth to an exponential function.  Based on this fitting we extract a constant that aims to minimise the
         decay or growth, and repeats this process with growing orders (up to the maximum order we need for the discretisation) until it reaches a
@@ -260,18 +304,7 @@ class OrthopolDiscretisation:
         for Nbi in Nbs:
             Nbi = max(2, Nbi)
             moments = np.array(
-                orthopol_discretisation.moments(
-                    S,
-                    wmin,
-                    wmax,
-                    Nbi,
-                    moment_scaling=ms,
-                    atol=atol,
-                    rtol=rtol,
-                    minbound=minbound,
-                    maxbound=maxbound,
-                    nquad=nquad,
-                )
+                orthopol_discretisation.moments(S, wmin, wmax, Nbi, moment_scaling=ms, atol=atol, rtol=rtol, minbound=minbound, maxbound=maxbound, nquad=nquad)
             )
             nm = np.polyfit(np.arange(moments.shape[0]), np.log(np.abs(moments)), 1)[0]
             ms = ms * np.exp(-nm)
@@ -281,34 +314,64 @@ class OrthopolDiscretisation:
         return ms
 
     def __call__(
-        self, S: Callable[[np.ndarray | float], np.ndarray | float | np.complex128]
+        self, S: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, np.complex128]]
     ) -> tuple[np.ndarray, np.ndarray]:
+        """Fit the bath spectral function using the orthopol discretisation approach
+
+        :param S:  The spectral density function to be decomposed.
+        :type S: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, np.complex128]8]
+        :return: The coupling constants and frequencies of the discrete bath modes
+        :rtype: tuple[np.ndarray, np.ndarray]
+        """
         g = None
         w = None
 
         # if the moment scaling parameter is not zero set its value
         if self.moment_scaling is None:
-            self.moment_scaling = OrthopolDiscretisation.find_moment_scaling_factor(
-                S,
-                self.wmin,
-                self.wmax,
-                self.Nb,
-                atol=self.atol,
-                rtol=self.rtol,
-                minbound=self.minbound,
-                maxbound=self.maxbound,
-                Nsteps=self.moment_scaling_steps,
-                nquad=self.nquad,
-            )
+            self.moment_scaling = OrthopolDiscretisation.find_moment_scaling_factor(S, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, minbound=self.minbound, maxbound=self.maxbound, Nsteps=self.moment_scaling_steps, nquad=self.nquad)
 
-        g, w = orthopol_discretisation.discretise(
-            S,
-            self.wmin,
-            self.wmax,
-            self.Nb,
-            moment_scaling=self.moment_scaling,
-            atol=self.atol,
-            rtol=self.rtol,
-            nquad=self.nquad,
-        )
+        g, w = orthopol_discretisation.discretise(S, self.wmin, self.wmax, self.Nb, moment_scaling=self.moment_scaling, atol=self.atol, rtol=self.rtol, nquad=self.nquad)
         return np.array(g), np.array(w)
+
+    def fit_correlated(
+        self,
+        S: Callable[[Union[np.ndarray, float]], np.ndarray],
+        scalar_func: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]],
+        N: int,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Function for fitting a correlated spectral density object using the orthopol discretisation approach
+
+        :param S:  The spectral function to be decomposed.
+        :type S: Callable[[Union[np.ndarray, float]], np.ndarray]
+        :param scalar_func: The scalar function used to fit density, defaults to None
+        :type scalar_func: Callable[ [ Union[np.ndarray, float]], Union[np.ndarray, float]]
+            :param N: The number of correlated degrees of freedom
+        :type N: int 
+        :return: The coupling constants and frequencies of the discrete bath modes
+        :rtype: tuple[np.ndarray, np.ndarray]
+        """
+        g = None
+        w = None
+
+        # if the moment scaling parameter is not zero set its value
+        if self.moment_scaling is None:
+            self.moment_scaling = OrthopolDiscretisation.find_moment_scaling_factor(scalar_func, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, minbound=self.minbound, maxbound=self.maxbound, Nsteps=self.moment_scaling_steps, nquad=self.nquad)
+
+        g, w = orthopol_discretisation.discretise(scalar_func, self.wmin, self.wmax, self.Nb, moment_scaling=self.moment_scaling, atol=self.atol, rtol=self.rtol, nquad=self.nquad)
+
+        #now compute spectral function matrix for each frequencys
+        w = np.array(w)
+        Sw = S(w)
+
+        gp = np.zeros((Sw.shape[2], Sw.shape[0], Sw.shape[1]), dtype=np.complex128)
+
+        for i in range(len(w)):
+            M = Sw[:, :, i]
+            if not np.allclose(M, M.conj().T):
+                raise RuntimeError("Failed to fit correlated bath.  The spectral density matrix is not hermitian.")
+            
+            u, v = np.linalg.eigh(M)
+            sqrtM = v @ np.diag(np.sqrt(u)) @ v.conj().T
+            gp[i, :, :] = sqrtM * g[i] / np.sqrt(scalar_func(w[i]))
+
+        return gp, np.array(w)

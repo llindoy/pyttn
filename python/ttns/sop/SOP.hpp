@@ -232,6 +232,8 @@ void init_SOP(py::module &m, const std::string &label)
          .def("set", static_cast<void (_msSOP::*)(size_t, size_t, const SOP<T> &)>(&_msSOP::set))
 
          .def("set_is_fermion_mode", &_msSOP::set_is_fermionic_mode)
+         .def("prune_zeros", &_msSOP::prune_zeros, py::arg("tol") = 1e-15)
+
          .def("jordan_wigner", static_cast<_msSOP &(_msSOP::*)(const system_modes &, double)>(&_msSOP::jordan_wigner), py::arg(), py::arg("tol") = 1e-15)
 
          .def("__getitem__", [](_msSOP &i, std::pair<size_t, size_t> ind) -> _SOP &

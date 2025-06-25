@@ -12,7 +12,7 @@
 
 import copy
 import numpy as np
-from typing import Optional, List
+from typing import Optional, Union
 
 from pyttn.ttnpp import system_modes
 
@@ -49,10 +49,10 @@ class ModeCombination:
 
     def mode_combination_array(
         self,
-        mode_dims: List[int] | np.ndarray,
-        mode_inds: Optional[List[int] | np.ndarray] = None,
+        mode_dims: Union[list[int], np.ndarray],
+        mode_inds: Optional[Union[list[int], np.ndarray]] = None,
         _blocksize: Optional[int] = None,
-    ) -> List[List[int]]:
+    ) -> list[list[int]]:
         """Perform the mode combination process on a array of mode dimensions.
 
         :param mode_dims: the mode dimensions
@@ -126,7 +126,7 @@ class ModeCombination:
 
     def mode_combination_system(
         self, system: system_modes, _blocksize: Optional[int] = None
-    ) -> List[List[int]]:
+    ) -> list[list[int]]:
         """Perform the mode combination process on a system_modes object.
 
         :param system: the system_modes object defining all mode data
@@ -152,7 +152,7 @@ class ModeCombination:
 
     def __call__(
         self, system: system_modes, _blocksize: Optional[int] = None
-    ) -> List[List[int]]:
+    ) -> list[list[int]]:
         """Perform the mode combination process on a system_modes object.
 
         :param system: the system_modes object defining all mode data

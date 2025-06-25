@@ -29,30 +29,34 @@ dependencies = [
     "h5py",
     "numba",
     "networkx",
-    "pydot",
-    "graphviz",
+    
 ]
 
-[pyproject.optional-dependencies]
-
+[project.optional-dependencies]
+visualisation = [
+    "pydot", 
+    "graphviz",
+    "matplotlib",
+]
+dev = [
+    "tox >= 4.12.1"
+]
 test = [
     "pytest >= 8.0.0",
     "pytest-cov >= 4.1.0",
     "pytest-randomly >= 3.15.0",
 ]
-
 docs = [     
     "jupyter-sphinx >= 0.5.3",
     "nbsphinx >= 0.9.3",
     "reno >= 4.0.0",
     "sphinx-autodoc-typehints >= 2.0.0",
     "nbsphinx_link >= 1.2",
-    "sphinx_rtd_theme"
+    "ypdata-sphinx-theme"
 ]
 notebook = [
     "notebook >= 7.1.0",
     "jupyterlab >=4.1.1",
 ]
-#[tool.cibuildwheel]
 
 
