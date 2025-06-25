@@ -345,7 +345,7 @@ class CorrelatedBosonicBath(Bath):
         ] = None,
         **kwargs
     ) -> tuple[np.ndarray, np.ndarray]:
-        """Returns the coupling constants and frequencies associated with a discretised representation of the bath
+        r"""Returns the coupling constants and frequencies associated with a discretised representation of the bath
 
         :param discretisation_engine: An object defining how to discretise a continuous bath
         :type discretisation_engine: np.ndarray
@@ -376,7 +376,7 @@ class CorrelatedBosonicBath(Bath):
         ] = None,
         **kwargs
     ) -> tuple[np.ndarray, np.ndarray]:        
-        """Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
+        r"""Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
 
         :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition
         :type fitting_engine: np.ndarray

@@ -97,7 +97,7 @@ def __prz(r, z, f, w, tol):
 
 
 def __evaluate_function(z, Z, f, w):
-    """Evaluate the baryocentric form of the rational function approximation
+    r"""Evaluate the baryocentric form of the rational function approximation
 
     .. math:
         r(z) = \frac{\sum_{j=1}^N \frac{w_j f_j}{z-Z_j}}{\sum_{j=1}^N \frac{w_j}{z-Z_j}}

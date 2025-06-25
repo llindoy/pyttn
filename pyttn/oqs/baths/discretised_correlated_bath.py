@@ -186,13 +186,13 @@ class DiscreteCorrelatedBosonicBath(DiscreteCorrelatedOQSBath):
         binds: Optional[list[int]] = None,
         bskip: Optional[int] = 1,
     ) -> Union[sSOP, SOP]:
-        """Attach the bath and system bath coupling Hamiltonians associated with this bath object to an existing SOP Hamiltonian
+        r"""Attach the bath and system bath coupling Hamiltonians associated with this bath object to an existing SOP Hamiltonian
 
         :param H: The total Hamiltonian
         :type H: sSOP | SOP
         :param Sp: An operator that couples to the bath annihilation operator terms
         :type Sp: list[OP_type]
-        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
+        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(:math:`a^\dagger` + a) (Default: None)
         :type Sm: Optional[list[OP_type]]
         :param geom: The geometry of the bath to use
         :type geom: {"star", "chain", "ipchain"}
@@ -217,13 +217,13 @@ class DiscreteCorrelatedBosonicBath(DiscreteCorrelatedOQSBath):
         binds: Optional[list[int]] = None,
         bskip: Optional[int] = 1,
     ) -> sSOP:
-        """Construct a sSOP containing the system bath Hamiltonian of the object.
+        r"""Construct a sSOP containing the system bath Hamiltonian of the object.
 
         :param H: The total Hamiltonian
         :type H: sSOP | SOP
         :param Sp: An operator that couples to the bath annihilation operator terms
         :type Sp: OP_type
-        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
+        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(:math:`a^\dagger` + a) (Default: None)
         :type Sm: Optional[OP_type]
         :param geom: The geometry of the bath to use
         :type geom: {"star", "chain", "ipchain"}

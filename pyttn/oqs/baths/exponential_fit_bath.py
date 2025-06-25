@@ -347,13 +347,13 @@ class ExpFitBosonicBath(ExpFitOQSBath):
         binds: Optional[list[int]] = None,
         bskip: Optional[int] = 2,
     ) -> Union[sSOP, SOP]:
-        """Attach the bath and system bath coupling Generators associated with this bath object to an existing SOP Generator
+        r"""Attach the bath and system bath coupling Generators associated with this bath object to an existing SOP Generator
 
         :param H: The total Generator
         :type H: sSOP | SOP
         :param Sp: A list containing the left and right acting operators that couples to the bath annihilation operator terms
         :type Sp: OP_type
-        :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
+        :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(:math:`a^\dagger` + a) (Default: None)
         :type Sm: OP_type, optional
         :param method: The method used to represent the bath.
         :type method: {"heom", "pseudomode"}
