@@ -250,7 +250,7 @@ class multiset_ttn(metaclass=ABCMeta):
 
     
     def set_state(self, *args, random_unoccupied_initialisation=False):
-        """Set the coefficients in the multiset TTN so that it represents a user specified product state
+        r"""Set the coefficients in the multiset TTN so that it represents a user specified product state
 
         :param *args: A variable length list of arguments. Valid options are
 
