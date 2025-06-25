@@ -138,3 +138,66 @@ def add_bosonic_bath_hamiltonian(
             )
     else:
         raise RuntimeError("Cannot add bath Hamiltonian geometry not recognised.")
+
+
+# setup the star Hamiltonian for the spin boson model
+def add_correlated_star_bath_hamiltonian(H, Sp, g, w, Sm=None, binds=None, bskip=1):
+    if w.shape[0] != g.shape[0] or g.shape[1] != g.shape[2] or g.shape[1] != len(Sp):
+        raise RuntimeError("Failed to add star bath Hamiltonian invalid array sizes.")
+    
+    use_Sm = False
+    if isinstance(Sm, list):
+        use_Sm = True
+        if(g.shape[1] != len(Sm)):
+            raise RuntimeError("Failed to add star bath Hamiltonian invalid array sizes.")
+    Ns = g.shape[1]
+    Nb = g.shape[0]
+    binds = __generate_binds(binds, bskip, Nb*Ns)
+
+
+    if not use_Sm:
+        for i in range(Nb):
+            for k in range(Ns):
+                for m in range(Ns):
+                    H += np.sqrt(2.0) * g[i, k, m] * Sp[m] * sOP("q", binds[i*Ns+k])
+    else:
+        for i in range(Nb):        
+            for k in range(Ns):
+                for m in range(Ns):
+                    H += g[i, k, m] * Sp[m] * sOP("a", binds[i*Ns+k])
+                    H += g[i, k, m] * Sm[m] * sOP("adag", binds[i*Ns+k])
+
+    for i in range(Nb):
+        for k in range(Ns):     
+            H += w[i] * sOP("n", binds[i*Ns+k])
+
+    return H
+
+def add_correlated_bosonic_bath_hamiltonian(
+    H, Sp, g, w, Sm=None, binds=None, bskip=1, geom="star", return_frequencies=False
+):
+    if geom == "star":
+        if not return_frequencies:
+            return add_correlated_star_bath_hamiltonian(
+                H, Sp, g, w, Sm=Sm, binds=binds, bskip=bskip
+            )
+        else:
+            return (
+                add_correlated_star_bath_hamiltonian(H, Sp, g, w, Sm=Sm, binds=binds, bskip=bskip),
+                w,
+            )
+    #elif geom == "chain":
+    #    t, e = chain_map(g, w)
+    #    if not return_frequencies:
+    #        return add_chain_bath_hamiltonian(
+    #            H, Sp, t, e, Sm=Sm, binds=binds, bskip=bskip
+    #        )
+    #    else:
+    #        return (
+    #            add_chain_bath_hamiltonian(
+    #                H, Sp, t, e, Sm=Sm, binds=binds, bskip=bskip
+    #            ),
+    #            e,
+    #        )
+    else:
+        raise RuntimeError("Cannot add bath Hamiltonian geometry not recognised.")

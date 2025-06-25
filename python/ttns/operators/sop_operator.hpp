@@ -66,6 +66,8 @@ void init_sop_operator(py::module &m, const std::string &label)
         .def("update", &_sop::template update<real_type>)
         .def("nterms", &_sop::nterms)
         .def("nmodes", &_sop::nmodes)
+        .def("complex_dtype", [](const _sop &)
+             { return !std::is_same<T, real_type>::value; })
         .def("backend", [](const _sop &)
              { return backend::label(); });
 
@@ -90,6 +92,8 @@ void init_sop_operator(py::module &m, const std::string &label)
         .def("clear", &_mssop::clear)
         .def("update", &_mssop::template update<real_type>)
         .def("nset", &_mssop::nset)
+        .def("complex_dtype", [](const _mssop &)
+             { return !std::is_same<T, real_type>::value; })
         .def("nmodes", &_mssop::nmodes)
         .def("backend", [](const _mssop &)
              { return backend::label(); });

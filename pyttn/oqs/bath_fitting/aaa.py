@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from typing import Callable
+from typing import Callable, Union
 import numpy as np
 from scipy import sparse
 from scipy import linalg as splinalg
@@ -121,14 +121,14 @@ def __evaluate_function(z, Z, f, w):
 
 
 def AAA_algorithm(
-    F: Callable[..., np.ndarray | list],
+    F: Callable[..., Union[np.ndarray, list]],
     Z: np.ndarray,
     tol: float = 1e-13,
     K: int = 100,
     *args,
     **kwargs,
 ) -> tuple[
-    Callable[[np.ndarray | float], np.ndarray | np.complex128 | float],
+    Callable[[Union[np.ndarray, float]], Union[np.ndarray, complex, np.complex128, float]],
     np.ndarray,
     np.ndarray,
     np.ndarray,

@@ -87,6 +87,7 @@ namespace ttns
         site_operator &operator=(const site_operator &o) = default;
         site_operator &operator=(site_operator &&o) = default;
 
+        void clear(){m_mode = 0; m_op=nullptr;}
     protected:
         void setup_operator(const system_modes &sys, size_t mode, size_t lmode, std::shared_ptr<ops::primitive<T, backend>> op, bool is_composite_mode)
         {

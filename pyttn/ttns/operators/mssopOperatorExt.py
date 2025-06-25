@@ -10,10 +10,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from typing import TypeAlias
+from abc import ABCMeta
+from typing import Union
 
-from pyttn.ttns.sop.SOPExt import ms_SOP_type
-from pyttn.ttns.ttn.ttnExt import ms_ttn_type
+from pyttn.ttns.sop.SOPExt import multiset_SOP
+from pyttn.ttns.ttns.msttnExt import multiset_ttn
 from pyttn.ttnpp import system_modes
 
 from pyttn.ttnpp import multiset_sop_operator_complex
@@ -25,13 +26,10 @@ try:
     from pyttn.ttnpp import ms_ttn_real
     from pyttn.ttnpp import multiset_SOP_real
 
-    __real_ttn_import = True
-    ms_sop_operator_type: TypeAlias = (
-        multiset_sop_operator_real | multiset_sop_operator_complex
-    )
+    _real_ttn_import = True
+
 except ImportError:
-    __real_ttn_import = False
-    ms_sop_operator_type: TypeAlias = multiset_sop_operator_complex
+    _real_ttn_import = False
 
 
 # and attempt to import the cuda backend
@@ -41,35 +39,24 @@ try:
     )
     from pyttn.ttnpp.cuda import ms_ttn_complex as ms_ttn_complex_cuda
 
-    __cuda_import = True
+    _cuda_import = True
 
     # and if we have imported real ttns we import the cuda versions
-    if __real_ttn_import:
+    if _real_ttn_import:
         from pyttn.ttnpp.cuda import (
             multiset_sop_operator_real as multiset_sop_operator_real_cuda,
         )
         from pyttn.ttnpp.cuda import ms_ttn_real as ms_ttn_real_cuda
 
-        ms_sop_operator_type: TypeAlias = (
-            ms_sop_operator_type
-            | multiset_sop_operator_real
-            | multiset_sop_operator_complex
-        )
-
-    else:
-        ms_sop_operator_type: TypeAlias = (
-            ms_sop_operator_type | multiset_sop_operator_complex
-        )
-
 
 except ImportError:
-    __cuda_import = False
+    _cuda_import = False
 
 
-def __multiset_sop_operator_blas(h, A, sysinf, *args, **kwargs):
-    if not __real_ttn_import:
+def _multiset_sop_operator_blas(h, A, sysinf, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,):
+    if not _real_ttn_import:
         if isinstance(A, ms_ttn_complex) and isinstance(h, multiset_SOP_complex):
-            return multiset_sop_operator_complex(h, A, sysinf, *args, **kwargs)
+            return multiset_sop_operator_complex(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
                 "Invalid argument for the creation of a multiset_sop_operator."
@@ -80,19 +67,19 @@ def __multiset_sop_operator_blas(h, A, sysinf, *args, **kwargs):
             and isinstance(h, multiset_SOP_real)
             and multiset_SOP_real is not None
         ):
-            return multiset_sop_operator_real(h, A, sysinf, *args, **kwargs)
+            return multiset_sop_operator_real(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         elif isinstance(A, ms_ttn_complex) and isinstance(h, multiset_SOP_complex):
-            return multiset_sop_operator_complex(h, A, sysinf, *args, **kwargs)
+            return multiset_sop_operator_complex(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
                 "Invalid argument for the creation of a multiset_sop_operator."
             )
 
 
-def __multiset_sop_operator_cuda(h, A, sysinf, *args, **kwargs):
-    if not __real_ttn_import:
+def _multiset_sop_operator_cuda(h, A, sysinf, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,):
+    if not _real_ttn_import:
         if isinstance(A, ms_ttn_complex_cuda) and isinstance(h, multiset_SOP_complex):
-            return multiset_sop_operator_complex_cuda(h, A, sysinf, *args, **kwargs)
+            return multiset_sop_operator_complex_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
                 "Invalid argument for the creation of a multiset_sop_operator."
@@ -103,55 +90,166 @@ def __multiset_sop_operator_cuda(h, A, sysinf, *args, **kwargs):
             and isinstance(h, multiset_SOP_real)
             and multiset_SOP_real is not None
         ):
-            return multiset_sop_operator_real_cuda(h, A, sysinf, *args, **kwargs)
+            return multiset_sop_operator_real_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         elif isinstance(A, ms_ttn_complex_cuda) and isinstance(h, multiset_SOP_complex):
-            return multiset_sop_operator_complex_cuda(h, A, sysinf, *args, **kwargs)
+            return multiset_sop_operator_complex_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
                 "Invalid argument for the creation of a multiset_sop_operator."
             )
 
 
-def multiset_sop_operator(
-    h: ms_SOP_type, A: ms_ttn_type, sysinf: system_modes, *args, **kwargs
-) -> ms_sop_operator_type:
-    r"""Function for constructing the multiset hierarchical sum of product operator of a string operator
+class multiset_sop_operator(metaclass=ABCMeta):
+    def __new__(cls, 
+        h: multiset_SOP, A: multiset_ttn, sysinf: system_modes, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,
+    ) -> "multiset_sop_operator":
+        """Function for constructing the multiset hierarchical sum of product operator of a string operator
 
-    :param h: The sum of product operator representation of the Hamiltonian
-    :type h: ms_SOP_type
-    :param A: A TTN object with defining the topology of output hierarchical SOP object
-    :type A: ms_ttn_type
-    :param sysinf: The composition of the system defining the default dictionary to be considered for each node
-    :type sysinf: system_modes
-    :type *args: Variable length list of arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options
-    :type **kwargs: Additional keyword arguments. See /multiset_sop_operator_complex/multiset_sop_operator_real for options
-    """
-    if len(args) > 0:
-        if args[0].backend() != A.backend():
-            raise RuntimeError(
-                "Attempted to construct multiset_sop_operator with opdict but opdict backend is not compatible with ms_ttn backend."
-            )
+        :param h: The multiset sum of product operator representation of the Hamiltonian
+        :type h: multiset_SOP
+        :param A: A TTN object with defining the topology of output hierarchical SOP object
+        :type A: multiset_ttn
+        :param sysinf: The composition of the system defining the default dictionary to be considered for each node
+        :type sysinf: system_modes
+        :type *args: Variable length list of arguments. Valid options are
 
-    if A.backend() == "blas":
-        return __multiset_sop_operator_blas(h, A, sysinf, *args, **kwargs)
-    elif __cuda_import and A.backend() == "cuda":
-        return __multiset_sop_operator_cuda(h, A, sysinf, *args, **kwargs)
-    else:
-        raise RuntimeError("Invalid backend type for multiset_sop_operator")
+            - Empty: Build the multiset sum-of-product operator using the default operator dictionaries
+            - opdict (:class:`operator_dictionary`): Build the multiset sum-of-product operator using a user defined operator dictionary
+
+        :param compress: Whether or not to use the compressed hierarchical SOP representation.  If False this uses the standard multiset sum-of-product representation., defaults to True
+        :type compress: bool, optional
+        :param identity_opt: Whether or not to perform optimisations arising from the presence of identity operators, defaults to True
+        :type identity_opt: bool, optional
+        :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
+        :type use_sparse: bool, optional
+        :returns: The multiset sop operator
+        :rtype: multiset_sop_operator
+        """
+        if len(args) > 0:
+            if args[0].backend() != A.backend():
+                raise RuntimeError(
+                    "Attempted to construct multiset_sop_operator with opdict but opdict backend is not compatible with ms_ttn backend."
+                )
+
+        if A.backend() == "blas":
+            return _multiset_sop_operator_blas(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
+        elif _cuda_import and A.backend() == "cuda":
+            return _multiset_sop_operator_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
+        else:
+            raise RuntimeError("Invalid backend type for multiset_sop_operator")
+
+    def initialise( 
+        self, op: multiset_SOP, sysinf: system_modes, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,
+    ) -> None:
+        """Initialise the multiset_sop_operator object given a sOP and system_modes information
+
+        :param h: The multiset  sum of product operator representation of the Hamiltonian
+        :type h: multiset_SOP
+        :param A: A TTN object with defining the topology of output hierarchical SOP object
+        :type A: multiset_ttn
+        :param sysinf: The composition of the system defining the default dictionary to be considered for each node
+        :type sysinf: system_modes
+        :type *args: Variable length list of arguments. Valid options are
+
+            - Empty: Build the multiset sum-of-product operator using the default operator dictionaries
+            - opdict (:class:`operator_dictionary`): Build the multiset sum-of-product operator using a user defined operator dictionary
+
+        :param compress: Whether or not to use the compressed hierarchical SOP representation.  If False this uses the standard multiset sum-of-product representation., defaults to True
+        :type compress: bool, optional
+        :param identity_opt: Whether or not to perform optimisations arising from the presence of identity operators, defaults to True
+        :type identity_opt: bool, optional
+        :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
+        :type use_sparse: bool, optional
+        :return: The multiset_sop_operator representation of the input SOP
+        :rtype: sop_operator
+        """
+        pass
 
 
-def ms_sop_operator(
-    h: ms_SOP_type, A: ms_ttn_type, sysinf: system_modes, *args, **kwargs
-) -> ms_sop_operator_type:
-    r"""Function for constructing the multiset hierarchical sum of product operator of a string operator
+    def assign(self, o: "multiset_sop_operator"):
+        """Assign the value of the multiset sum-of product product operator from another
 
-    :param h: The sum of product operator representation of the Hamiltonian
-    :type h: ms_SOP_type
-    :param A: A TTN object with defining the topology of output hierarchical SOP object
-    :type A: ms_ttn_type
-    :param sysinf: The composition of the system defining the default dictionary to be considered for each node
-    :type sysinf: system_modes
-    :type *args: Variable length list of arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options
-    :type **kwargs: Additional keyword arguments. See multiset_sop_operator_complex/multiset_sop_operator_real for options
-    """
-    return multiset_sop_operator(h, A, sysinf, *args, **kwargs)
+        :param o: The multiset sum-of-product operator to copy into this one
+        :type o: multiset_sop_operator
+        """
+        pass
+
+    def __copy__(self):
+        """Function implementing shallow copy of the multiset sum-of-product operator object"""
+        pass
+
+    def __deepcopy__(self, memo):
+        """Function implementing deep copy of the multiset sum-of-product operator object"""
+        pass
+
+    def Eshift(self, i: int, j: int) -> Union[float, complex]:
+        """Return the value of the energy shift associated with the [i, j]th term of the multiset_sop_operator
+
+        :param i: Index i
+        :type i: int
+        :param j: Index j
+        :type j: int
+        :return: The constant energy shift associated with this term
+        :rtype: Union[float, complex]
+        """
+        pass
+
+    def clear(self):
+        """Clear and deallocate all internal buffers of the multiset_sop_operator"""
+        pass
+
+    def update(self, mode: int, t: float, dt: float):
+        """Update the operators associated with mode mode so that they store their value at time t.
+        Additionally, this takes the time-step allowing for the use of average timestep expressions
+
+        :param mode: The mode to update
+        :type mode: int
+        :param t: The new time point
+        :type t: float
+        :param dt: The integration timestep
+        :type dt: float
+        """
+        pass
+
+    def nset(self) -> int:
+        """
+        :returns: The number of set multiset sum-of-product operator
+        :rtype: int
+        """
+        pass
+
+    def nmodes(self) -> int:
+        """
+        :returns: The number of modes the multiset sum-of-product operator acts on
+        :rtype: int
+        """
+        pass
+
+    def complex_dtype(self) -> bool:
+        """Returns whether or not the multiset_sop_operator is storing a complex valued dtype
+
+        :return: whether or not the multiset_sop_operator is storing a complex valued dtype
+        :rtype: bool
+        """
+        pass
+
+    def backend(self) -> str:
+        """Returns the backend type of the multiset_sop_operator
+
+        :return: The backend type of the object
+        :rtype: str
+        """
+        pass
+
+multiset_sop_operator.register(multiset_sop_operator_complex)
+if _real_ttn_import:
+    multiset_sop_operator.register(multiset_sop_operator_real)
+
+if _cuda_import:
+    multiset_sop_operator.register(multiset_sop_operator_complex_cuda)
+    if _real_ttn_import:
+        multiset_sop_operator.register(multiset_sop_operator_real_cuda)
+
+ms_sop_operator = multiset_sop_operator
+ms_sop_operator_type = multiset_sop_operator
+multiset_sop_operator_type = multiset_sop_operator

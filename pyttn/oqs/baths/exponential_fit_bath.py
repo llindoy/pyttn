@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,12 +11,122 @@
 # limitations under the License
 
 import numpy as np
+import abc
+from pyttn.utils.truncate import TruncationBase, DepthTruncation  #
+from pyttn.utils.mode_combination import ModeCombination
+from pyttn import (
+    system_modes,
+    boson_mode,
+    fermion_mode,
+    ntreeBuilder,
+    ntreeNode,
+    OP_type,
+    SOP,
+    sSOP,
+)
+from typing import Callable, Optional, Union
+from ..heom import add_bosonic_bath_generator, add_fermionic_bath_generator
 
-from pyttn.utils.truncate import DepthTruncation
-from pyttn import system_modes, boson_mode, fermion_mode, ntreeBuilder, sSOP
 
+class ExpFitBath(metaclass=abc.ABCMeta):
+    """The base class for handling a generic bath representing an exponential fit to a bath correlation function."""
 
-class ExpFitOQSBath:
+    def __init__(self):
+        pass
+
+    def add_bath_tree(
+        self,
+        node: ntreeNode,
+        degree: int,
+        chi: Union[int , list[int] , Callable[[int], int]],
+        lhd: Optional[Union[int , list[int] , Callable[[int], int]]] = None,
+    ) -> list[list[int]]:
+        r"""Append a tree as a child of node that represents the modes represented by this expfit bath object.
+
+        :param node: The node where the subtree should be added
+        :type node: ntreeNode
+        :param degree: The degree of the tree.  If degree = 1 this appends an MPS subtree otherwise it adds a balanced degree-ary tree.
+        :type degree: int
+        :param chi: The bond dimension to insert throughout the tree.  This can accept all types supported by the ntreeBuilder objects
+        :type chi: int | list[int] | Callable[int, int])
+        :param lhd: The dimension of local Hilbert space transformation nodes.  This can accept all types supported by the ntreeBuilder objects. (Default: None)
+        :type lhd: int, list[int], (callable(int)), optional
+
+        :return: The indices of leaf nodes added to the tree
+        :rtype: list[list[int]]
+        """
+
+        nelem = node.size()
+
+        lmode_dims = self._sysinf.mode_dimensions()
+
+        if len(lmode_dims) == 0:
+            return []
+
+        nindex = node.index()
+
+        if degree == 1:
+            if isinstance(lhd, list) or lhd is not None:
+                ntreeBuilder.mps_subtree(node, lmode_dims, chi, lhd)
+            else:
+                ntreeBuilder.mps_subtree(node, lmode_dims, chi)
+        elif degree > 1:
+            if isinstance(lhd, list) or lhd is not None:
+                ntreeBuilder.mlmctdh_subtree(node, lmode_dims, degree, chi, lhd)
+            else:
+                ntreeBuilder.mlmctdh_subtree(node, lmode_dims, degree, chi)
+        else:
+            raise RuntimeError("Cannot add tree with Degree < 1.")
+
+        linds = node[nelem].leaf_indices()
+        indices = [nindex + li for li in linds]
+        return indices
+    
+    def identity_product_state(self, method: str = "heom") -> list[np.ndarray]:
+        """Set up arrays necessary to construct the identity state used for trace evaluation with na
+        expfit bath object.
+        For method = "heom", this corresponds to the vacuum state of the  bath
+        For method = "pseudomode", this corresponds to a flattened identity operator
+
+        :param method: The method used to represent the bath.
+        :type method: {"heom", "pseudomode"}
+
+        :return: A list of numpy arrays that are used to set the identity operator for the bath modes.
+        :rtype: list[np.ndarray]
+        """
+        lmode_dims = self._sysinf.mode_dimensions()
+
+        res = []
+        if method == "heom":
+            for dim in lmode_dims:
+                state_vec = np.zeros(dim, dtype=np.complex128)
+                state_vec[0] = 1
+                res.append(state_vec)
+        elif method == "pseudomode":
+            for dim in lmode_dims:
+                sqdim = int(np.sqrt(dim))
+                if not (sqdim * sqdim == dim):
+                    raise RuntimeError(
+                        "Failed to set up bath identity product state.  Invalid mode dimensions (must be a square number)."
+                    )
+                state_vec = np.identity(sqdim, dtype=np.complex128).flatten()
+                res.append(state_vec)
+        else:
+            raise RuntimeError(
+                "Failed to set up bath identity product state.  Unknown method argument."
+            )
+        return res
+
+    def vacuum_state(self) -> list[int]:
+        """Return the a list representing the vacuum state associated with the exponential fit bath object
+        
+        :return: A list containing the basis indices for each mode that correspond to the vacuum state
+        :rtype: list[int]
+        """
+        lmode_dims = self._sysinf.mode_dimensions()
+        return [0 for i in range(lmode_dims)]
+
+class ExpFitOQSBath(ExpFitBath):
     r"""The base class for handling a bath representing an exponential fit to a bath correlation function
     of the form
 
@@ -35,7 +145,14 @@ class ExpFitOQSBath:
     :type tol: float, optional
     """
 
-    def __init__(self, dk, zk, fermionic=False, combine_real=False, tol=1e-12):
+    def __init__(
+        self,
+        dk: np.ndarray,
+        zk: np.ndarray,
+        fermionic: bool = False,
+        combine_real: bool = False,
+        tol: float = 1e-12,
+    ) -> None:
         if len(dk) != len(zk):
             raise RuntimeError("Invalid bath decomposition")
 
@@ -82,13 +199,13 @@ class ExpFitOQSBath:
         self._mode_dims = []
         self._sysinf = None
 
-    def is_fermionic(self):
+    def is_fermionic(self) -> bool:
         r"""Returns whether or not the bath is fermionic
         :rtype: bool
         """
         return self._fermion
 
-    def Ct(self, t):
+    def Ct(self, t: Union[float, np.ndarray]) -> np.ndarray:
         r"""Returns the value of the non-interacting bath correlation function evaluated at the time points t,
         defined by:
 
@@ -101,89 +218,23 @@ class ExpFitOQSBath:
         :rtype: np.ndarray
 
         """
+        return_scalar = False
+        if isinstance(t, (float, int)):
+            t = np.array([t])
+            return_scalar = True
+
         ret = np.zeros(t.shape, dtype=np.complex128)
         for k in range(len(self._ck)):
             ret += self._ck[k] * np.exp(-self._wk[k] * t)
-        return ret
 
-    def add_bath_tree(self, node, degree, chi, lhd=None):
-        r"""Append a tree as a child of node that represents the modes represented by this expfit bath object.
-
-        :param node: The node where the subtree should be added
-        :type node: ntreeNode
-        :param degree: The degree of the tree.  If degree = 1 this appends an MPS subtree otherwise it adds a balanced degree-ary tree.
-        :type degree: int
-        :param chi: The bond dimension to insert throughout the tree.  This can accept all types supported by the ntreeBuilder objects
-        :type chi: int, list[int], (callable(int))
-        :param lhd: The dimension of local Hilbert space transformation nodes.  This can accept all types supported by the ntreeBuilder objects. (Default: None)
-        :type lhd: int, list[int], (callable(int)), optional
-
-        :return: The indices of leaf nodes added to the tree
-        :rtype: list[list[int]]
-        """
-
-        nelem = node.size()
-
-        lmode_dims = self._sysinf.mode_dimensions()
-
-        if len(lmode_dims) == 0:
-            return []
-
-        nindex = node.index()
-
-        if degree == 1:
-            if isinstance(lhd, list) or lhd is not None:
-                ntreeBuilder.mps_subtree(node, lmode_dims, chi, lhd)
-            else:
-                ntreeBuilder.mps_subtree(node, lmode_dims, chi)
-        elif degree > 1:
-            if isinstance(lhd, list) or lhd is not None:
-                ntreeBuilder.mlmctdh_subtree(node, lmode_dims, degree, chi, lhd)
-            else:
-                ntreeBuilder.mlmctdh_subtree(node, lmode_dims, degree, chi)
+        if return_scalar:
+            return ret[0]
         else:
-            raise RuntimeError("Cannot add tree with Degree < 1.")
+            return ret
 
-        linds = node[nelem].leaf_indices()
-        indices = [nindex + li for li in linds]
-        return indices
-
-    def identity_product_state(self, method="heom"):
-        r"""Set up arrays necessary to construct the identity state used for trace evaluation with na
-        expfit bath object.
-        For method = "heom", this corresponds to the vacuum state of the  bath
-        For method = "pseudomode", this corresponds to a flattened identity operator
-
-        :param method: The method used to represent the bath.
-        :type method: {"heom", "pseudomode"}
-
-        :return: A list of numpy arrays that are used to set the identity operator for the bath modes.
-        :rtype: list[np.ndarray]
-        """
-        lmode_dims = self._sysinf.mode_dimensions()
-
-        res = []
-        if method == "heom":
-            for dim in lmode_dims:
-                state_vec = np.zeros(dim, dtype=np.complex128)
-                state_vec[0] = 1
-                res.append(state_vec)
-        elif method == "pseudomode":
-            for dim in lmode_dims:
-                sqdim = int(np.sqrt(dim))
-                if not (sqdim * sqdim == dim):
-                    raise RuntimeError(
-                        "Failed to set up bath identity product state.  Invalid mode dimensions (must be a square number)."
-                    )
-                state_vec = np.identity(sqdim, dtype=np.complex128).flatten()
-                res.append(state_vec)
-        else:
-            raise RuntimeError(
-                "Failed to set up bath identity product state.  Unknown method argument."
-            )
-        return res
-
-    def _get_composite_params(self):
+    def _get_composite_params(
+        self,
+    ) -> tuple[list[list[np.complex128]], list[list[np.complex128]]]:
         zks = []
         dks = []
         for ind, cmode in enumerate(self._composite_modes):
@@ -192,17 +243,17 @@ class ExpFitOQSBath:
         return dks, zks
 
     @property
-    def mode_dims(self):
+    def mode_dims(self) -> list[int]:
         r"""An array containing the dimensionality of each of the modes"""
         return self._mode_dims
 
     @property
-    def dk(self):
+    def dk(self) -> np.ndarray:
         r"""An array containing the bath decomposition coefficients"""
         return self._dk
 
     @property
-    def zk(self):
+    def zk(self) -> np.ndarray:
         r"""An array containing the bath decomposition decay rates"""
         return self._zk
 
@@ -224,13 +275,19 @@ class ExpFitBosonicBath(ExpFitOQSBath):
     :type tol: float, optional
     """
 
-    def __init__(self, dk, zk, combine_real=False, tol=1e-12):
+    def __init__(
+        self,
+        dk: np.ndarray,
+        zk: np.ndarray,
+        combine_real: bool = False,
+        tol: float = 1e-12,
+    ) -> None:
         ExpFitOQSBath.__init__(
             self, dk, zk, fermionic=False, combine_real=combine_real, tol=tol
         )
         self.truncate_modes()
 
-    def truncate_modes(self, truncation=DepthTruncation(8)):
+    def truncate_modes(self, truncation: TruncationBase = DepthTruncation(8)) -> None:
         r"""Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
@@ -240,7 +297,9 @@ class ExpFitBosonicBath(ExpFitOQSBath):
         """
         self._mode_dims = truncation(self._dk, self._zk, False)
 
-    def system_information(self, mode_comb=None, force_evaluate=False):
+    def system_information(
+        self, mode_comb: Optional[ModeCombination] = None, force_evaluate: bool = False
+    ) -> system_modes:
         r"""Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.
 
         :param mode_comb: A mode combination object to apply to the system information class.  (Default: None)
@@ -266,7 +325,7 @@ class ExpFitBosonicBath(ExpFitOQSBath):
                 self._sysinf = mode_comb(self._sysinf)
         return self._sysinf
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             "bosonic bath: \n "
             + "\n \alpha "
@@ -280,45 +339,55 @@ class ExpFitBosonicBath(ExpFitOQSBath):
         )
 
     def add_system_bath_generator(
-        self, H, Sp, Sm=None, method="heom", binds=None, bskip=2
-    ):
-        r"""Attach the bath and system bath coupling Generators associated with this bath object to an existing SOP Generator
+        self,
+        H: Union[sSOP, SOP],
+        Sp: OP_type,
+        Sm: Optional[OP_type] = None,
+        method: str = "heom",
+        binds: Optional[list[int]] = None,
+        bskip: Optional[int] = 2,
+    ) -> Union[sSOP, SOP]:
+        """Attach the bath and system bath coupling Generators associated with this bath object to an existing SOP Generator
 
         :param H: The total Generator
-        :type H: SOP
+        :type H: sSOP | SOP
         :param Sp: A list containing the left and right acting operators that couples to the bath annihilation operator terms
-        :type Sp: list[sOP or sPOP or sNBO or sSOP]
+        :type Sp: OP_type
         :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-        :type Sm: list[sOP or sPOP or sNBO or sSOP, optional]
+        :type Sm: OP_type, optional
         :param method: The method used to represent the bath.
         :type method: {"heom", "pseudomode"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
-        :type binds: list, optional
+        :type binds: list[int], optional
         :param bskip: The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)
         :type bskip: int, optional
 
         :return: The total Generator now including the system bath terms
-        :rtype: type(H)
+        :rtype: sSOP | SOP
         """
 
         dks, zks = super()._get_composite_params()
-
-        from .heom import add_bosonic_bath_generator
 
         H = add_bosonic_bath_generator(
             H, Sp, dks, zks, Sm=Sm, binds=binds, bskip=bskip, method=method
         )
         return H
 
-    def system_bath_generator(self, Sp, Sm=None, method="heom", binds=None, bskip=2):
+    def system_bath_generator(
+        self,
+        Sp: OP_type,
+        Sm: Optional[OP_type] = None,
+        method: str = "heom",
+        binds: Optional[list[int]] = None,
+        bskip: Optional[int] = 2,
+        dtype: Union[np.float64, np.complex128, float, complex] = np.complex128,
+    ) -> sSOP:
         r"""Construct a sSOP containing the system bath Generator of the object.
 
-        :param H: The total Generator
-        :type H: SOP
         :param Sp: A list containing the left and right acting operators that couples to the bath annihilation operator terms
-        :type Sp: list[sOP or sPOP or sNBO or sSOP]
+        :type Sp: OP_type
         :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-        :type Sm: list[sOP or sPOP or sNBO or sSOP, optional]
+        :type Sm: OP_type, optional
         :param method: The method used to represent the bath.
         :type method: {"heom", "pseudomode"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
@@ -332,8 +401,7 @@ class ExpFitBosonicBath(ExpFitOQSBath):
 
         dks, zks = super()._get_composite_params()
 
-        H = sSOP()
-        from .heom import add_bosonic_bath_generator
+        H = sSOP(dtype=dtype)
 
         H = add_bosonic_bath_generator(
             H, Sp, dks, zks, Sm=Sm, binds=binds, bskip=bskip, method=method
@@ -366,7 +434,7 @@ class ExpFitFermionicBath(ExpFitOQSBath):
         )
         self.truncate_modes()
 
-    def truncate_modes(self, truncation=DepthTruncation(2)):
+    def truncate_modes(self, truncation: TruncationBase = DepthTruncation(2)):
         r"""Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
@@ -389,7 +457,9 @@ class ExpFitFermionicBath(ExpFitOQSBath):
             + str(self._composite_modes)
         )
 
-    def system_information(self, mode_comb=None, force_evaluate=False):
+    def system_information(
+        self, mode_comb: Optional[ModeCombination] = None, force_evaluate: bool = False
+    ) -> system_modes:
         r"""Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.
 
         :param mode_comb: A mode combination object to apply to the system information class.  (Default: None)
@@ -410,19 +480,27 @@ class ExpFitFermionicBath(ExpFitOQSBath):
                 self._sysinf = mode_comb(self._sysinf)
         return self._sysinf
 
-    def add_system_bath_generator(self, H, Sp, Sm, method="heom", binds=None, bskip=2):
+    def add_system_bath_generator(
+        self,
+        H: Union[SOP, sSOP],
+        Sp: OP_type,
+        Sm: OP_type,
+        method: str = "heom",
+        binds: Optional[list[int]] = None,
+        bskip: Optional[int] = 2,
+    ) -> Union[SOP, sSOP]:
         r"""Attach the bath and system bath coupling Generators associated with this bath object to an existing SOP Generator
 
         :param H: The total Generator
-        :type H: SOP
+        :type H: sSOP | SOP
         :param Sp: A list containing the left and right acting operators that couples to the bath annihilation operator terms
-        :type Sp: list[sOP or sPOP or sNBO or sSOP]
+        :type Sp: OP_type
         :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-        :type Sm: list[sOP or sPOP or sNBO or sSOP, optional]
+        :type Sm: OP_type, optional
         :param method: The method used to represent the bath.
         :type method: {"heom", "pseudomode"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
-        :type binds: list, optional
+        :type binds: list[int], optional
         :param bskip: The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)
         :type bskip: int, optional
 
@@ -431,8 +509,6 @@ class ExpFitFermionicBath(ExpFitOQSBath):
         """
 
         dks, zks = super()._get_composite_params()
-
-        from .heom import add_fermionic_bath_generator
 
         H = add_fermionic_bath_generator(
             H, Sp, dks, zks, Sm=Sm, binds=binds, bskip=bskip, method=method
@@ -459,9 +535,17 @@ class ExpFitFermionicBath(ExpFitOQSBath):
         :rtype: sSOP
         """
         H = sSOP()
-        from .heom import add_fermionic_bath_generator
 
         H = add_fermionic_bath_generator(
             H, Sp, self._gk, self._wk, Sm=Sm, binds=binds, bskip=bskip, method=method
         )
         return H
+
+    def filled_state(self) -> list[int]:
+        """Return the a list representing the filled state associated with the exponential fit bath object
+        
+        :return: A list containing the basis indices for each mode that correspond to the vacuum state
+        :rtype: list[int]
+        """
+        lmode_dims = self._sysinf.mode_dimensions()
+        return [ldim-1 for ldim in lmode_dims]

@@ -14,16 +14,18 @@ __version__ = "0.0.1"
 # The name must be the _single_ output extension from the CMake build.
 # If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
-    def __init__(self, name: str, sourcedir: str = "") -> None:
+    def __init__(self, name: str, sourcedir: str = "", rebuild: bool = False, parallel: int = None) -> None:
         super().__init__(name, sources=[])
         self.sourcedir = os.fspath(Path(sourcedir).resolve())
-
+        self.rebuild = rebuild
+        self.parallel=parallel
 
 class CMakeBuild(build_ext):
     def build_extension(self, ext: CMakeExtension) -> None:
         # Must be in this form due to bug in .resolve() only fixed in Python 3.10+
         ext_fullpath = Path.cwd() / self.get_ext_fullpath(ext.name)
         extdir = ext_fullpath.parent.resolve()
+        self.parallel = ext.parallel
 
         # Using this requires trailing slash for auto-detection & inclusion of
         # auxiliary "native" libs
@@ -83,8 +85,8 @@ class CMakeBuild(build_ext):
             # Specify the arch if using MSVC generator, but only if it doesn't
             # contain a backward-compatibility arch spec already in the
             # generator name.
-            if not single_config and not contains_arch:
-                cmake_args += ["-A", PLAT_TO_CMAKE[self.plat_name]]
+            #if not single_config and not contains_arch:
+            #    cmake_args += ["-A", PLAT_TO_CMAKE[self.plat_name]]
 
             # Multi-config generators have a different way to specify configs
             if not single_config:
@@ -99,28 +101,25 @@ class CMakeBuild(build_ext):
             if archs:
                 cmake_args += ["-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
 
-        # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level
-        # across all generators.
-        if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
-            # self.parallel is a Python 3 only way to set parallel jobs by hand
-            # using -j in the build_ext call, not supported by pip or PyPA-build.
-            if hasattr(self, "parallel") and self.parallel:
-                # CMake 3.12+ only.
-                build_args += [f"-j{self.parallel}"]
+        if self.parallel is not None:
+            # CMake 3.12+ only.
+            build_args += ["-j %d"%(self.parallel)]
 
         build_temp = Path(self.build_temp) / ext.name
-        if not build_temp.exists():
-            build_temp.mkdir(parents=True)
 
-        subprocess.run(
-            ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
-        )
-        subprocess.run(
-            ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
-        )
-        subprocess.run(
-            ["cmake", "--build", ".", "--target", "install"], cwd=build_temp, check=True
-        )
+        if not build_temp.exists() or ext.rebuild:
+            if not build_temp.exists():
+                build_temp.mkdir(parents=True)   
+                
+            subprocess.run(
+                ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True
+            )
+            subprocess.run(
+                ["cmake", "--build", ".", *build_args], cwd=build_temp, check=True
+            )
+            subprocess.run(
+                ["cmake", "--build", ".", "--target", "install"], cwd=build_temp, check=True
+            )
 
 
 # The information here can also be placed in setup.cfg - better separation of
@@ -132,10 +131,11 @@ setup(
     author_email="lachlan.lindoy@npl.co.uk",
     description="python bindings of ttnpp using pybind11",
     long_description="",
-    ext_modules=[CMakeExtension("pyttn.ttnpp")],
+    ext_modules=[CMakeExtension("pyttn.ttnpp", rebuild=True, parallel=16)],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={},
     python_requires=">=3.7",
+    include_package_data=True,
     packages=find_packages(),
 )

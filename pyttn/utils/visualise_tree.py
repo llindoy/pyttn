@@ -10,10 +10,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from typing import Optional
+from typing import Optional, Union
 
 from pyttn.ttnpp import ntree
-from pyttn.ttns.ttn.ttnExt import ttn_type, ms_ttn_type
+from pyttn.ttns.ttns.ttnExt import ttn
+from pyttn.ttns.ttns.msttnExt import ms_ttn
 
 
 def visualise_ntree(
@@ -66,7 +67,7 @@ def visualise_ntree(
 
 
 def visualise_ttn(
-    tree: ttn_type,
+    tree: ttn,
     prog: str = "dot",
     ax=None,
     node_size: int = 300,
@@ -78,7 +79,7 @@ def visualise_ttn(
     """A function for plotting an ttn object
 
     :param tree: The tree to be visualised
-    :type tree: ttn_type
+    :type tree: ttn
     :param prog: The visualisation function used with graphviz_layout (default: "dot")
     :type prog: str, optional
     :param ax: Draw the tree in specified Matplotlib axes
@@ -168,7 +169,7 @@ def visualise_ttn(
 
 
 def visualise_tree(
-    tree: ntree | ttn_type | ms_ttn_type,
+    tree: Union[ntree, ttn, ms_ttn],
     prog: str = "dot",
     ax=None,
     node_size: int = 300,
@@ -181,7 +182,7 @@ def visualise_tree(
     """A function for plotting a tree structured object
 
     :param tree: The tree to be visualised
-    :type tree: ntree | ttn_type | ms_ttn_type
+    :type tree: Union[ntree, ttn, ms_ttn]
     :param prog: The visualisation function used with graphviz_layout (default: "dot")
     :type prog: str, optional
     :param ax: Draw the tree in specified Matplotlib axes
@@ -198,9 +199,7 @@ def visualise_tree(
     :param label_all_bonds: An optional boolean specifying whether or not to label all bonds in the TTN.  If False only the bonds with the maximum and minimum value of the property will be labelled. (Default: False)
     :type label_all_bonds: bool, optional
     """
-
-    from pyttn import is_ttn
-
+    
     if isinstance(tree, ntree):
         visualise_ntree(
             tree,
@@ -210,7 +209,7 @@ def visualise_tree(
             linewidth=linewidth,
             add_labels=add_labels,
         )
-    elif isinstance(tree, ttn_type):
+    elif isinstance(tree, ttn):
         visualise_ttn(
             tree,
             prog=prog,

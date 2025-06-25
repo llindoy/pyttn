@@ -38,5 +38,9 @@ python_apigen_modules = {"pyttn.ttnpp": "api"}
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'pydata_sphinx_theme'
 html_static_path = ['_static']
+html_context = {
+   # ...
+   "default_mode": "light"
+}

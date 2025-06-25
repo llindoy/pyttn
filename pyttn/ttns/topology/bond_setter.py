@@ -21,7 +21,7 @@ class BondDimensionSetter(metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def __call__(self, node: ntreeNode):
+    def __call__(self, node: ntreeNode) -> None:
         """The default call function
 
         :param node: The node which will have its bond dimension set
@@ -35,7 +35,7 @@ class NodeSumSetter(BondDimensionSetter):
     value based on the values of the nodes below the current node
     """
 
-    def __call__(self, node: ntreeNode):
+    def __call__(self, node: ntreeNode) -> None:
         """Set the value of the bond dimension variable in the current node to the sum
         of the bond dimensions associated with the child nodes
 
@@ -64,7 +64,7 @@ class NodeIncrementSetter(BondDimensionSetter):
             raise RuntimeError("Invalid combination rule for NodeIncrementSetter")
         self.__child_combination = combination
 
-    def __call__(self, node: ntreeNode):
+    def __call__(self, node: ntreeNode) -> None:
         """Set the value of the bond dimension variable in the current node to be
         bond_dim = func(child_bond_dims) + inc
 

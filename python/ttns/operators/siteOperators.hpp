@@ -79,6 +79,8 @@ void init_site_operators(py::module &m, const std::string &label)
         .def("todense", [](const siteop& op){return op.todense();})
         .def("todense", [](const siteop& op, const std::vector<size_type>& mode_dims){return op.todense(mode_dims);})
 
+        .def("clear", &siteop::clear)
+
         .def("assign", [](siteop &op, const siteop &o)
              { return op = o; })
         .def("assign", [](siteop &op, const ident &o)

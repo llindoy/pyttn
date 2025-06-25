@@ -11,9 +11,10 @@
 # limitations under the License
 
 import numpy as np
-from typing import TypeAlias, Optional, Union
+from typing import Optional, Union
 
-from pyttn.ttns.sop.sSOPExt import sOP, sPOP, sNBO_type
+from abc import ABCMeta
+from pyttn.ttns.sop.sSOPExt import sOP, sPOP, sNBO
 from pyttn.ttnpp import system_modes
 
 from pyttn.ttnpp import product_operator_complex
@@ -21,13 +22,10 @@ from pyttn.ttnpp import product_operator_complex
 try:
     from pyttn.ttnpp import product_operator_real
 
-    __real_ttn_import = True
-    product_operator_type: TypeAlias = product_operator_complex | product_operator_real
+    _real_ttn_import = True
 
 except ImportError:
-    __real_ttn_import = False
-    product_operator_type: TypeAlias = product_operator_complex
-
+    _real_ttn_import = False
 
 # and attempt to import the cuda backend
 try:
@@ -35,55 +33,133 @@ try:
         product_operator_complex as product_operator_complex_cuda,
     )
 
-    __cuda_import = True
-
+    _cuda_import = True
     # and if we have imported real ttns we import the cuda versions
-    if __real_ttn_import:
+    if _real_ttn_import:
         from pyttn.ttnpp.cuda import product_operator_real as product_operator_real_cuda
 
-        product_operator_type: TypeAlias = (
-            product_operator_type
-            | product_operator_complex_cuda
-            | product_operator_real_cuda
-        )
-
-    else:
-        product_operator_type: TypeAlias = (
-            product_operator_type | product_operator_complex_cuda
-        )
-
 except ImportError:
-    __cuda_import = False
+    _cuda_import = False
 
 
-def product_operator(
-    h: sOP | sPOP | sNBO_type,
-    sysinf: system_modes,
-    *args,
-    dtype: Optional[Union[float, complex, np.float64, np.complex128]] = np.complex128,
-    backend: str = "blas",
-    **kwargs,
-) -> product_operator_type:
-    """Function for constructing a product_operator
+class product_operator(metaclass=ABCMeta):
+    """A class for handling product operators."""
 
-    :param h: The product operator representation of the Hamiltonian
-    :type h: sOP or sPOP or sNBO_type
-    :param sysinf: The composition of the system defining the default dictionary to be considered for each node
-    :type sysinf: system_modes
-    :type *args: Variable length list of arguments. See product_operator_real/product_operator_complex for options
-    :param dtype: The internal variable type for the product operator.(Default: np.complex128)
-    :type dtype: {np.float64, np.complex128}, optional
-    :param backend: The computational backend to use for the product operator  (Default: "blas")
-    :type backend: {"blas", "cuda"}, optional
-    :type **kwargs: Additional keyword arguments. See product_operator_real/product_operator_complex for options
-    """
-    if backend == "blas":
-        if dtype == np.complex128 or not __real_ttn_import:
-            return product_operator_complex(h, sysinf, *args, **kwargs)
-        else:
-            return product_operator_real(h, sysinf, *args, **kwargs)
-    elif __cuda_import and backend == "cuda":
-        if dtype == np.complex128 or not __real_ttn_import:
-            return product_operator_complex(h, sysinf, *args, **kwargs)
-        else:
-            return product_operator_real(h, sysinf, *args, **kwargs)
+    def __new__(
+        cls,
+        h: Union[sOP, sPOP, sNBO],
+        sysinf: system_modes,
+        *args,
+        dtype: Optional[
+            Union[float, complex, np.float64, np.complex128]
+        ] = np.complex128,
+        backend: str = "blas",
+        use_sparse: bool = True,
+    ) -> "product_operator":
+        """Function for constructing a product_operator
+
+        :param h: The product operator representation of the Hamiltonian
+        :type h: Union[sOP, sPOP, sNBO]
+        :param sysinf: The composition of the system defining the default dictionary to be considered for each node
+        :type sysinf: system_modes
+        :type *args: Variable length list of arguments. Valid options are:
+
+            - Empty: Build the product operator using the default operator dictionaries
+            - opdict (:class:`operator_dictionary`): Build the product operator using a user defined operator dictionary
+
+        :param dtype: The internal variable type for the product operator.(Default: np.complex128)
+        :type dtype: {np.float64, np.complex128}, optional
+        :param backend: The computational backend to use for the product operator  (Default: "blas")
+        :type backend: {"blas", "cuda"}, optional
+        :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
+        :type use_sparse: bool, optional  
+        """
+        if backend == "blas":
+            if dtype == np.complex128 or not _real_ttn_import:
+                return product_operator_complex(h, sysinf, *args, use_sparse=use_sparse)
+            else:
+                return product_operator_real(h, sysinf, *args, use_sparse=use_sparse)
+        elif _cuda_import and backend == "cuda":
+            if dtype == np.complex128 or not _real_ttn_import:
+                return product_operator_complex(h, sysinf, *args, use_sparse=use_sparse)
+            else:
+                return product_operator_real(h, sysinf, *args, use_sparse=use_sparse)
+
+    def initialise(self, op: Union[sOP, sPOP, sNBO], sysinf: system_modes, *args, use_sparse: bool = True):
+        """Initialise the product_operator object given a sOP and system_modes information
+
+        :param op: The product operator representation of the Hamiltonian
+        :type op: Union[sOP, sPOP, sNBO]
+        :param sysinf: The information about the system degrees of freedom
+        :type sysinf: system_modes
+        :type *args: Variable length list of arguments. Valid options are:
+
+            - Empty: Build the product operator using the default operator dictionaries
+            - opdict (:class:`operator_dictionary`): Build the product operator using a user defined operator dictionary
+
+        :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
+        :type use_sparse: bool, optional
+        """
+        pass
+
+    def assign(self, o: "product_operator"):
+        """Assign the value of the product operator from another 
+
+        :param o: The product operator to copy into this one
+        :type o: product_operator
+        """
+        pass
+
+    def complex_dtype(self) -> bool:
+        """Returns whether or not the product_operator is storing a complex valued dtype
+
+        :return: whether or not the product_operator is storing a complex valued dtype
+        :rtype: bool
+        """
+        pass
+
+    def __copy__(self):
+        """Function implementing shallow copy of the product_operator object"""
+        pass
+
+    def __deepcopy__(self, memo):
+        """Function implementing deep copy of the product_operator object"""
+        pass
+
+    def __str__(self) -> str:
+        """Return the string representation of the product_operator object
+
+        :return: The string representation of the product_operator
+        :rtype: str
+        """
+        pass
+
+    def backend(self) -> str:
+        """Returns the backend type of the product_operator
+
+        :return: The backend type of the object
+        :rtype: str
+        """
+        pass
+
+    def clear(self):
+        """Clear and deallocate all internal buffers of the ttn"""
+        pass
+
+    def nmodes(self) -> int:
+        """
+        :returns: The number of modes the product operator acts on
+        :rtype: int
+        """
+        pass
+
+product_operator.register(product_operator_complex)
+if _real_ttn_import:
+    product_operator.register(product_operator_real)
+
+if _cuda_import:
+    product_operator.register(product_operator_complex_cuda)
+    if _real_ttn_import:
+        product_operator.register(product_operator_real_cuda)
+
+product_operator_type = product_operator

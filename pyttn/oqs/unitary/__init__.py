@@ -10,5 +10,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .bosonic_bath_hamiltonian import *
-from .fermionic_bath_hamiltonian import *
+from .bosonic_bath_hamiltonian import (
+    add_star_bath_hamiltonian,
+    add_chain_bath_hamiltonian,
+    add_ipchain_bath_hamiltonian,
+    add_bosonic_bath_hamiltonian,
+    add_correlated_bosonic_bath_hamiltonian,
+    add_correlated_star_bath_hamiltonian
+)
+from .fermionic_bath_hamiltonian import (
+    add_fermionic_bath_hamiltonian,
+    add_fermionic_chain_bath_hamiltonian,
+    add_fermionic_star_bath_hamiltonian,
+)
+
+__all__ = [
+    "add_star_bath_hamiltonian",
+    "add_chain_bath_hamiltonian",
+    "add_ipchain_bath_hamiltonian",
+    "add_bosonic_bath_hamiltonian",
+    "add_correlated_star_bath_hamiltonian",
+    "add_correlated_bosonic_bath_hamiltonian",
+    "add_fermionic_bath_hamiltonian",
+    "add_fermionic_chain_bath_hamiltonian",
+    "add_fermionic_star_bath_hamiltonian",
+]

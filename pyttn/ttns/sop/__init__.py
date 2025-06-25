@@ -10,8 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .SOPExt import SOP, multiset_SOP, ms_SOP, sum_of_product, ms_SOP_type, SOP_type
+from .SOPExt import SOP, multiset_SOP, ms_SOP, ms_SOP_type, SOP_type
 from .sSOPExt import (
+    sOP, 
+    sPOP,
     coeff,
     sNBO,
     sSOP,
@@ -20,13 +22,14 @@ from .sSOPExt import (
     sNBO_type,
     sSOP_type,
     coeff_type,
+    OP_type
 )
 from .opdictExt import operator_dictionary, operator_dictionary_type
 from .liouvilleSpaceExt import liouville_space_superoperator
 from .stateExt import stateStr, sepState, ket, isSepState, isKet
 
 from pyttn.ttnpp import convert_to_dense
-from pyttn.ttnpp import sOP, sPOP, fOP, fermion_operator
+from pyttn.ttnpp import fOP, fermion_operator
 from pyttn.ttnpp import (
     mode_type,
     primitive_mode_data,
@@ -42,12 +45,10 @@ from pyttn.ttnpp import (
     combine_systems,
 )
 
-
 __all__: list[str] = [
     "SOP",
     "multiset_SOP",
     "ms_SOP",
-    "sum_of_product",
     "SOP_type",
     "ms_SOP_type",
     "coeff",
@@ -57,6 +58,7 @@ __all__: list[str] = [
     "sPOP_type",
     "sNBO_type",
     "sSOP_type",
+    "OP_type",
     "coeff_type",
     "stateStr",
     "sepState",

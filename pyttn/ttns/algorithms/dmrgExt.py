@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,101 +10,430 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-
-from typing import TypeAlias
+from typing import Union
+from abc import ABCMeta
 
 from pyttn.ttnpp import (
     one_site_dmrg_complex,
     adaptive_one_site_dmrg_complex,
-    ttn_complex,
-    sop_operator_complex,
 )
 from pyttn.ttnpp import (
     multiset_one_site_dmrg_complex,
-    ms_ttn_complex,
-    multiset_sop_operator_complex,
 )
 
-from pyttn.ttns.ttn.ttnExt import ttn_type, ms_ttn_type
-from pyttn.ttns.operators.sopOperatorExt import sop_operator_type
-from pyttn.ttns.operators.mssopOperatorExt import ms_sop_operator_type
+from pyttn.ttns.ttns.ttnExt import ttn
+from pyttn.ttns.ttns.msttnExt import ms_ttn
+
+from pyttn.ttns.operators.sopOperatorExt import sop_operator
+from pyttn.ttns.operators.mssopOperatorExt import ms_sop_operator
 
 
-dmrg_type: TypeAlias = one_site_dmrg_complex | adaptive_one_site_dmrg_complex
-ms_dmrg_type: TypeAlias = multiset_one_site_dmrg_complex
+# and attempt to import the cuda backend
+try:
+    from pyttn.ttnpp.cuda import one_site_dmrg_complex as one_site_dmrg_complex_cuda
+    from pyttn.ttnpp.cuda import (
+        mulitset_one_site_dmrg_complex as multiset_one_site_dmrg_complex_cuda,
+    )
+
+    _cuda_import = True
+
+except ImportError:
+    _cuda_import = False
 
 
-#TODO: Need to add on cuda backend functionality here
-
-def single_set_dmrg(A : ttn_type, H : sop_operator_type, expansion: str="onesite", **kwargs) -> dmrg_type:
-    """A factory method for constructing an object used for performing single set dmrg calculations
-
-    :param A: Tree Tensor Network that the DMRG algorithm will act on
-    :type A: ttn_type
-    :param H: The Hamiltonian sop operator object
-    :type H: sop_operator_type
-    :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
-    :type expansion: {'onesite', 'subspace'}, optional
-    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_dmrg_complex
-
-    :returns: The DMRG evaluation object
-    :rtype: dmrg_type
-    """
-
-    if isinstance(A, ttn_complex) and isinstance(H, sop_operator_complex):
-        if expansion == "onesite":
-            return one_site_dmrg_complex(A, H, **kwargs)
-        elif expansion == "subspace":
-            return adaptive_one_site_dmrg_complex(A, H, **kwargs)
+def _one_site_dmrg_blas(A, H, **kwargs):
+    if isinstance(A, ttn) and isinstance(H, sop_operator):
+        return one_site_dmrg_complex(A, H, **kwargs)
+    elif isinstance(A, ms_ttn) and isinstance(H, ms_sop_operator):
+        return multiset_one_site_dmrg_complex(A, H, **kwargs)
     else:
-        raise RuntimeError("Invalid input types for dmrg.")
+        raise RuntimeError("Invalid inputs for one site dmrg")
 
 
-def multiset_dmrg(A : ms_ttn_type, H : ms_sop_operator_type, expansion:str="onesite", **kwargs) -> ms_dmrg_type:
-    """A factory method for constructing an object used for performing multiset dmrg calculations
+def _one_site_dmrg_cuda(A, H, **kwargs):
+    if isinstance(A, ttn) and isinstance(H, sop_operator):
+        return one_site_dmrg_complex_cuda(A, H, **kwargs)
+    elif isinstance(A, ms_ttn) and isinstance(H, ms_sop_operator):
+        return multiset_one_site_dmrg_complex_cuda(A, H, **kwargs)
+    else:
+        raise RuntimeError("Invalid inputs for one site dmrg")
 
-    :param A: Tree Tensor Network that the DMRG algorithm will act on
-    :type A: ms_ttn_type
-    :param H: The Hamiltonian sop operator object
-    :type H: ms_sop_operator_type
-    :param expansion: A string determining the type of bond dimension expansion to be used.  (Default: 'onesite')
-    :type expansion: {'onesite'}, optional
-    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see multiset_one_site_dmrg_complex
 
-    :returns: The DMRG evaluation object
-    :rtype: ms_dmrg_type
-    """
-    if isinstance(A, ms_ttn_complex) and isinstance(H, multiset_sop_operator_complex):
-        if expansion == "onesite":
-            return multiset_one_site_dmrg_complex(A, H, **kwargs)
-        elif expansion == "subspace":
-            raise ValueError(
-                "subspace expansion algorithm has not yet been implemented."
+def _one_site_dmrg(A, H, **kwargs):
+    if A.backend() == "blas" and H.backend() == "blas":
+        return _one_site_dmrg_blas(A, H, **kwargs)
+    elif A.backend() == "cuda" and H.backend() == "cuda":
+        return _one_site_dmrg_cuda(A, H, **kwargs)
+    else:
+        raise RuntimeError("Invalid backend arguments.")
+
+
+def _subspace_dmrg_blas(A, H, **kwargs):
+    if isinstance(A, ttn) and isinstance(H, sop_operator):
+        return adaptive_one_site_dmrg_complex(A, H, **kwargs)
+    elif isinstance(A, ms_ttn) and isinstance(H, ms_sop_operator):
+        raise RuntimeError(
+            "Subspace expansion based integrator has not yet been implemented for Multiset TTNs"
+        )
+    else:
+        raise RuntimeError("Invalid inputs for one site dmrg")
+
+
+def _subspace_dmrg_cuda(A, H, **kwargs):
+    if isinstance(A, ttn) and isinstance(H, sop_operator):
+        raise RuntimeError(
+            "Subspace expansion based integrator has not yet been implemented for CUDA"
+        )
+    elif isinstance(A, ms_ttn) and isinstance(H, ms_sop_operator):
+        raise RuntimeError(
+            "Subspace expansion based integrator has not yet been implemented for Multiset TTNs"
+        )
+    else:
+        raise RuntimeError("Invalid inputs for one site dmrg")
+
+
+def _subspace_dmrg(A, H, **kwargs):
+    if A.backend() == "blas":
+        return _subspace_dmrg_blas(A, H, **kwargs)
+    elif A.backend() == "cuda":
+        return _subspace_dmrg_cuda(A, H, **kwargs)
+    else:
+        raise RuntimeError("Backend not recognised.")
+
+
+class dmrg(metaclass=ABCMeta):
+    """The base class for all Density Matrix Renormalisation Group implementations."""
+
+    def __new__(
+        cls,
+        A: Union[ttn, ms_ttn],
+        H: Union[sop_operator, ms_sop_operator],
+        expansion: str = "onesite",
+        **kwargs,
+    ) -> "dmrg":
+        """A factory method for constructing an object used for performing either single or multi set dmrg calculations.
+        Which type to construct is determined by the types of the input A and h matrices.
+
+        :param A: Tree Tensor Network that the DMRG algorithm will act on
+        :type A: ttn | ms_ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator | ms_sop_operator
+        :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
+        :type expansion: {'onesite', 'subspace'}, optional
+        :param **kwargs: Keyword arguments to pass to the tdvp engine constructor. The allowed values depend on the choice of expansion:
+    
+            - **krylov_dim** (int, optional): The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            - **numthreads** (int, optional): The number of openmp threads to be used by the solver. (Default: 1)
+            - **subspace_krylov_dim** (int, optional): Only when expansion="subspace". The subspace expansion based krylov subspace dimension. This is only used if expansion="subspace". (Default: 6)
+            - **subspace_neigs** (int, optional): Only when expansion="subspace".The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
+
+        :returns: The dmrg evaluation object
+        :rtype: dmrg
+        """
+        if A.backend() != H.backend():
+            raise RuntimeError(
+                "Hamiltonian and operator do not have compatible backends."
             )
-    else:
-        raise RuntimeError("Invalid input types for dmrg.")
+
+        if expansion == "onesite":
+            return _one_site_dmrg(A, H, **kwargs)
+        elif expansion == "subspace":
+            return _subspace_dmrg(A, H, **kwargs)
+        else:
+            raise RuntimeError("Invalid input types for dmrg.")
+
+    def assign(self, o: "dmrg"):
+        """Assign the value of the dmrg engine from another
+
+        :param o: The dmrg object to copy into this one
+        :type o: dmrg
+        """
+        pass
+
+    def __copy__(self):
+        """Function implementing shallow copy of the dmrg object"""
+        pass
+
+    def __deepcopy__(self, memo):
+        """Function implementing deep copy of the dmrg object"""
+        pass
+
+    def E(self) -> Union[float, complex]:
+        """Return the energy computed in the last sweep of the algorithm
+
+        :return: Energy
+        :rtype: Union[float, complex]
+        """
+        pass
+
+    @property
+    def restarts(self) -> int:
+        """The number of restarts to use in the krylov subspace eigensolver."""
+        pass
+
+    @property
+    def eigensolver_tol(self) -> float:
+        """The absolute tolerance of the krylov subspace eigensolver"""
+
+    @property
+    def eigensolver_reltol(self) -> float:
+        """The relative tolerance of the krylov subspace eigensolver"""
+
+    def clear(self):
+        """Clear and deallocate all internal buffers of the dmrg object"""
+        pass
+
+    def step(self, A: ttn, H: sop_operator, update_env: bool = False):
+        """Performs a single step of the single site DMRG algorithm
+
+        :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+        :type A: ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator
+        :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+        :type update_env: bool, optional
+        """
+        pass
+
+    def __call__(self, A: ttn, H: sop_operator, update_env: bool = False):
+        """Performs a single step of the single site DMRG algorithm
+
+        :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+        :type A: ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator
+        :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+        :type update_env: bool, optional
+        """
+        pass
+
+    def prepare_environment(
+        self, A: ttn, H: sop_operator, attempt_expansion: bool = False
+    ):
+        """Update all Single Particle Function environment tensors to prepare the system for performing a DMRG sweep.
+
+        :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+        :type A: ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator
+        :param attempt_expansion: Whether or not attempt to expand bond dimensions throughout this step.  (Default: False)
+        :type attempt_expansion: bool, optional
+        """
+        pass
+
+    def backend(self) -> str:
+        """Returns the backend type of the dmrg
+
+        :return: The backend type of the object
+        :rtype: str
+        """
+        pass
 
 
-def dmrg(A : ttn_type | ms_ttn_type, H : sop_operator_type | ms_sop_operator_type, expansion:str="onesite", **kwargs) -> dmrg_type | ms_dmrg_type:
-    """A factory method for constructing an object used for performing either single or multi set dmrg calculations.
-    Which type to construct is determined by the types of the input A and h matrices.  For details on the use of these
-    DMRG objects please see the documentation associated with the possible return types.
+class one_site_dmrg(dmrg):
+    """The base class for all one-site DMRG algorithm implementations."""
 
-    :param A: Tree Tensor Network that the DMRG algorithm will act on
-    :type A: ttn_type | ms_ttn_type
-    :param H: The Hamiltonian sop operator object
-    :type H: sop_operator_type | ms_sop_operator_type
-    :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
-    :type expansion: {'onesite', 'subspace'}, optional
-    :param **kwargs: Keyword arguments to pass to the DMRG engine constructor.  For details see one_site_dmrg_complex or adaptive_one_site_dmrg_complex
+    def __new__(
+        cls,
+        A: Union[ttn, ms_ttn],
+        H: Union[sop_operator, ms_sop_operator],
+        krylov_dim: int = 16,
+        num_threads: int = 1,
+    ) -> "one_site_dmrg":
+        """A factory method for constructing an object used for performing single set dmrg calculations
 
-    :returns: The DMRG evaluation object
-    :rtype: dmrg_type | ms_dmrg_type
+        :param A: Tree Tensor Network that the DMRG algorithm will act on
+        :type A: Union[ttn, ms_ttn]
+        :param H: The Hamiltonian sop operator object
+        :type H: Union[sop_operator, ms_sop_operator]
+        :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+        :type krylov_dim: int, optional
+        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+        :type numthreads: int, optional
+
+        :returns: The dmrg evaluation object
+        :rtype: one_site_dmrg
+        """
+        if A.backend() != H.backend():
+            raise RuntimeError(
+                "Hamiltonian and operator do not have compatible backends."
+            )
+
+        return _one_site_dmrg(A, H, krylov_dim=krylov_dim, num_threads=num_threads)
+
+    def initialise(
+        A: Union[ttn, ms_ttn],
+        H: Union[sop_operator, ms_sop_operator],
+        krylov_dim: int = 16,
+        num_threads: int = 1,
+    ) -> "one_site_dmrg":
+        """Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Network A, with Hamiltonian H.
+
+        :param A: Tree Tensor Network that the DMRG algorithm will act on
+        :type A: Union[ttn, ms_ttn]
+        :param H: The Hamiltonian sop operator object
+        :type H: Union[sop_operator, ms_sop_operator]
+        :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+        :type krylov_dim: int, optional
+        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+        :type numthreads: int, optional
+
+        :returns: The dmrg evaluation object
+        :rtype: one_site_dmrg
+        """
+        if A.backend() != H.backend():
+            raise RuntimeError(
+                "Hamiltonian and operator do not have compatible backends."
+            )
+
+        return _one_site_dmrg(A, H, krylov_dim=krylov_dim, num_threads=num_threads)
+
+
+one_site_dmrg.register(one_site_dmrg_complex)
+one_site_dmrg.register(multiset_one_site_dmrg_complex)
+dmrg_type = one_site_dmrg
+if _cuda_import:
+    one_site_dmrg.register(one_site_dmrg_complex_cuda)
+    one_site_dmrg.register(multiset_one_site_dmrg_complex_cuda)
+
+
+class subspace_expansion_dmrg(dmrg):
+    """The base class for all subspace expansion based DMRG implementations.  This set of implementations
+    allows for adaptive growth of the bond dimensions used throughout the tensor network throughout the
+    optimisation process.  In order to do this, the code uses two metrics:
+
+    :Two-site Energy Variance:
+        This criteria expands the basis based on the use of the variance of the two-site energy.  In particular,
+        this finds the dominant contribution to the two-site energy variance that does not lay in the current
+        one-site manifold and expands the one-site tensors in these directions, if the weighting of these through
+        an update step is larger than some user defined tolerance.
+
+    :One-site Natural Population:
+        This criteria expands the basis based on the occupancy of the one-site energy density matrix.  This spawns
+        new random basis functions if there are not sufficiently many (a parameter controllued by the user)
+        unoccupied basis functions, with the threshold for unoccupied being set by the user.
     """
 
-    if isinstance(A, ttn_complex) and isinstance(H, sop_operator_complex):
-        return single_set_dmrg(A, H, expansion=expansion, **kwargs)
-    elif isinstance(A, ms_ttn_complex) and isinstance(H, multiset_sop_operator_complex):
-        return multiset_dmrg(A, H, expansion=expansion, **kwargs)
-    else:
-        raise RuntimeError("Invalid input types for dmrg.")
+    def __new__(
+        cls,
+        A: Union[ttn, ms_ttn],
+        H: Union[sop_operator, ms_sop_operator],
+        krylov_dim: int = 16,
+        subspace_krylov_dim: int = 4,
+        subspace_neigs: int = 2,
+        num_threads: int = 1,
+    ) -> "subspace_expansion_dmrg":
+        """A factory method for constructing an object used for performing single set dmrg calculations
+
+        :param A: Tree Tensor Network that the DMRG algorithm will act on
+        :type A: ttn | ms_ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator | ms_sop_operator
+        :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+        :type krylov_dim: int, optional
+        :param subspace_krylov_dim: The subspace expansion based krylov subspace dimension. This is only used if expansion="subspace". (Default: 6)
+        :type subspace_krylov_dim: int, optional
+        :param subspace_neigs: The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
+        :type subspace_neigs: int, optional
+        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+        :type numthreads: int, optional
+
+        :returns: The dmrg evaluation object
+        :rtype: subspace_expansion_dmrg
+        """
+        if A.backend() != H.backend():
+            raise RuntimeError(
+                "Hamiltonian and operator do not have compatible backends."
+            )
+
+        return _subspace_dmrg(
+            A,
+            H,
+            krylov_dim=krylov_dim,
+            subspace_krylov_dim=subspace_krylov_dim,
+            subspace_neigs=subspace_neigs,
+            num_threads=num_threads,
+        )
+
+    def initialise(
+        A: Union[ttn, ms_ttn],
+        H: Union[sop_operator, ms_sop_operator],
+        krylov_dim: int = 16,
+        subspace_krylov_dim: int = 4,
+        subspace_neigs: int = 2,
+        num_threads: int = 1,
+    ) -> "subspace_expansion_dmrg":
+        """ Initialise adaptive one-site DMRG object initialising all buffers needed to perform DMRG on a Tree Tensor Network A, with Hamiltonian H.
+
+        :param A: Tree Tensor Network that the DMRG algorithm will act on
+        :type A: ttn | ms_ttn
+        :param H: The Hamiltonian sop operator object
+        :type H: sop_operator | ms_sop_operator
+        :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+        :type krylov_dim: int, optional
+        :param subspace_krylov_dim: The subspace expansion based krylov subspace dimension. This is only used if expansion="subspace". (Default: 6)
+        :type subspace_krylov_dim: int, optional
+        :param subspace_neigs: The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
+        :type subspace_neigs: int, optional
+        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+        :type numthreads: int, optional
+        """
+
+    @property
+    def subspace_eigensolver_tol(self) -> float:
+        """The absolute tolerance of the krylov subspace eigensolver used for subspace expansion"""
+        pass
+
+    @property
+    def subspace_eigensolver_reltol(self) -> float:
+        """The relative tolerance of the krylov subspace eigensolver used for subspace expansion"""
+        pass
+
+    @property
+    def spawning_threshold(self) -> float:
+        """The threshold variable used to determine whether or not to spawn a new 
+        basis vector using the two-site energy variance criteria
+        """
+        pass
+
+    @property
+    def unoccupied_threshold(self) -> float:
+        """The threshold variable used to determine whether or not to spawn a new 
+        basis vector using the spawning critea
+        """
+        pass
+
+    @property
+    def subspace_weighting_factor(self) -> float:
+        """A coefficient used to weight the importance of the second order contributions.  Taken as 1 for the DMRG algorithm"""
+        pass
+
+    @property
+    def only_apply_when_no_unoccupied(self) -> bool:
+        """A flag to set whether or not to apply the subspace expansion scheme at all times or only when there are no unoccupied vectors """
+        pass
+
+    @property 
+    def eval_but_dont_aply(self) -> bool:
+        """A flag to set whether to evaluate the metric for subspace expansion but not to apply the 
+        results. This should only be used for timing executation of the subspace expansion scheme."""
+        pass
+
+    @property
+    def minimum_unoccupied(self) -> int:
+        """The minimum number of unoccupied variables required at each subspace expansion step.  
+        If fewer are detected, additional vectors will be added to reach this limit."""
+        pass
+
+    @property
+    def maximum_bond_dimension(self) -> int:
+        """The maximum bond dimension we can expand to through a subspace expansion step."""
+        pass
+
+subspace_expansion_dmrg.register(multiset_one_site_dmrg_complex)
+if _cuda_import:
+    subspace_expansion_dmrg.register(multiset_one_site_dmrg_complex_cuda)
+
+ms_dmrg_type = subspace_expansion_dmrg
+ms_dmrg = subspace_expansion_dmrg
+subspace_expansion_dmrg_type = subspace_expansion_dmrg

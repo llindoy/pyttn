@@ -768,6 +768,16 @@ namespace ttns
         }
 
         template <typename U>
+        sSOP<T> &operator/=(const U &a)
+        {
+            for (auto &op : m_terms)
+            {
+                op /= a;
+            }
+            return *this;
+        }
+
+        template <typename U>
         sSOP<T> &operator*=(const sSOP<U> &a)
         {
             container_type terms;

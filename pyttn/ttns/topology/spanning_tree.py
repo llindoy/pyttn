@@ -13,7 +13,7 @@
 import networkx as nx
 import numpy as np
 from math import ceil
-from typing import Generator, Any, List, Optional
+from typing import Generator, Any, Optional
 
 
 def distance_matrix_to_graph(M: np.ndarray) -> nx.Graph:
@@ -68,7 +68,7 @@ def __insert_physical_nodes(spanning_tree, N, root_ind):
     return spanning_tree, mapping[root_ind]
 
 
-def chunks(nodes: List[int], n: int) -> Generator[Any, Any, None]:
+def chunks(nodes: list[int], n: int) -> Generator[Any, Any, None]:
     N = ceil(len(nodes) / n)
     for i in range(0, len(nodes), N):
         yield nodes[i : i + N]

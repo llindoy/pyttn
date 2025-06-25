@@ -15,7 +15,7 @@ import networkx as nx
 from pyttn.ttnpp import ntree, ntreeNode
 
 
-def convert_nx_to_subtree(tree: nx.Graph, root: ntreeNode, root_ind: int = 0) -> list:
+def convert_nx_to_subtree(tree: nx.Graph, root: ntreeNode, root_ind: int = 0) -> list[int]:
     """A function for converting a networkx graph storing a tree structure into a subtree
     of an ntree object with root at node root.
 
@@ -27,7 +27,7 @@ def convert_nx_to_subtree(tree: nx.Graph, root: ntreeNode, root_ind: int = 0) ->
     :type root_ind: int, optional
 
     :return: An array containing the index of the physical modes found at each leaf index
-    :rtype: list
+    :rtype: list[int]
     """
 
     if not nx.is_tree(tree):
@@ -61,7 +61,7 @@ def convert_nx_to_subtree(tree: nx.Graph, root: ntreeNode, root_ind: int = 0) ->
     ]
 
 
-def convert_nx_to_tree(tree: nx.Graph, root_ind: int = 0) -> tuple[ntree, list]:
+def convert_nx_to_tree(tree: nx.Graph, root_ind: int = 0) -> tuple[ntree, list[int]]:
     """A function for constructing an ntree object from a networkx object.
 
     :param tree: The networkx graph object representing the topology tree.  This
@@ -69,7 +69,7 @@ def convert_nx_to_tree(tree: nx.Graph, root_ind: int = 0) -> tuple[ntree, list]:
     :param root_ind: The index in the tree object that should be connected to root, defaults to 0
     :type root_ind: int, optional
     :return: An array containing the index of the physical modes found at each leaf index
-    :rtype: list
+    :rtype: list[int]
     """
 
     if not nx.is_tree(tree):

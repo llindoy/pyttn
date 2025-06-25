@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,68 +10,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+
+from typing import Callable, Optional, Union
 import numpy as np
+import abc
 
-from pyttn.utils.truncate import DepthTruncation
-from pyttn import system_modes, boson_mode, fermion_mode, sSOP, ntreeBuilder
+from pyttn.utils.truncate import DepthTruncation, TruncationBase
+from pyttn.utils.mode_combination import ModeCombination
+from pyttn import (
+    system_modes,
+    boson_mode,
+    fermion_mode,
+    ntreeBuilder,
+    ntreeNode,
+    OP_type,
+    sSOP,
+    SOP,
+)
 
+from ..unitary import add_fermionic_bath_hamiltonian, add_bosonic_bath_hamiltonian
 
-class DiscreteOQSBath:
-    r"""The base class for handling a bath representing a Discrete bath correlation function
-    of the form
+class DiscreteBath(metaclass=abc.ABCMeta):
+    """The base class for handling a generic bath representing a discrete fit to a bath correlation function."""
 
-    .. math::
-        C(t) = \sum_k g_{k}^2 \exp(-1.0j w_k t)
+    def __init__(self):
+        pass
 
-    :param gk: The coefficient in the exponential decomposition
-    :type gk: np.ndarray
-    :param wk: The decay rates in the exponential decomposition
-    :type wk: np.ndarray
-    :param fermionic: Whether or not the bath is a fermionic bath (default False)
-    :type fermionic: bool, optional
-    :param combine_real: Whether or not to combine real frequency modes (default False)
-    :type combine_real: bool, optional
-    :param tol: The tolerance used to determine if a mode is a real frequency mode (default 1e-12)
-    :type tol: float, optional
-    """
-
-    def __init__(self, gk, wk, fermionic=False, tol=1e-12):
-        if len(gk) != len(wk):
-            raise RuntimeError("Invalid bath decomposition")
-
-        self._gk = np.array(gk)
-        self._wk = np.array(wk)
-        self._composite_modes = []
-
-        self._fermion = fermionic
-        self._mode_dims = []
-        self._sysinf = None
-
-    def is_fermionic(self):
-        r"""Returns whether or not the bath is fermionic
-        :rtype: bool
-        """
-        return self._fermion
-
-    def Ct(self, t):
-        r"""Returns the value of the non-interacting bath correlation function evaluated at the time points t,
-        defined by:
-
-        .. math::
-            C(t) = \sum_k g_{k}^2 \exp(-1.0j*w_k t)
-
-        :param t: time
-        :type t: np.ndarray
-        :return: The bath correlation function
-        :rtype: np.ndarray
-        """
-        ret = np.zeros(t.shape, dtype=np.complex128)
-        for k in range(len(self._gk)):
-            ret += np.abs(self._gk[k]) ** 2 * np.exp(-1.0j * self._wk[k] * t)
-        return ret
-
-    def add_bath_tree(self, node, degree, chi, lhd=None):
-        r"""Append a tree as a child of node that represents the modes represented by this discrete bath object.
+    def add_bath_tree(
+        self,
+        node: ntreeNode,
+        degree: int,
+        chi: Union[int, list[int], Callable[[int], int]],
+        lhd: Optional[Union[int, list[int], Callable[[int], int]]] = None,
+    ) -> list[list[int]]:
+        """Append a tree as a child of node that represents the modes represented by this discrete bath object.
 
         :param node: The node where the subtree should be added
         :type node: ntreeNode
@@ -112,19 +84,87 @@ class DiscreteOQSBath:
         indices = [nindex + li for li in linds]
         return indices
 
+
+class DiscreteOQSBath(DiscreteBath):
+    r"""The base class for handling a bath representing a Discrete bath correlation function
+    of the form
+
+    .. math::
+        C(t) = \sum_k g_{k}^2 \exp(-1.0j w_k t)
+
+    :param gk: The coefficient in the exponential decomposition
+    :type gk: np.ndarray
+    :param wk: The decay rates in the exponential decomposition
+    :type wk: np.ndarray
+    :param fermionic: Whether or not the bath is a fermionic bath (default False)
+    :type fermionic: bool, optional
+    :param tol: The tolerance used to determine if a mode is a real frequency mode (default 1e-12)
+    :type tol: float, optional
+    """
+
+    def __init__(
+        self,
+        gk: np.ndarray,
+        wk: np.ndarray,
+        fermionic: bool = False,
+        tol: float = 1e-12,
+    ) -> None:
+        if len(gk) != len(wk):
+            raise RuntimeError("Invalid bath decomposition")
+
+        self._gk = np.array(gk)
+        self._wk = np.array(wk)
+        self._composite_modes = []
+
+        self._fermion = fermionic
+        self._mode_dims = []
+        self._sysinf = None
+
+    def is_fermionic(self) -> bool:
+        r"""Returns whether or not the bath is fermionic
+        :rtype: bool
+        """
+        return self._fermion
+
+    def Ct(self, t: Union[float, np.ndarray]) -> Union[complex, np.complex128, np.ndarray]:
+        r"""Returns the value of the non-interacting bath correlation function evaluated at the time points t,
+        defined by:
+
+        .. math::
+            C(t) = \sum_k g_{k}^2 \exp(-1.0j*w_k t)
+
+        :param t: time
+        :type t: float | np.ndarray
+        :return: The bath correlation function
+        :rtype: np.complex128 | np.ndarray
+        """
+
+        return_scalar = False
+        if isinstance(t, (float, int)):
+            t = np.array([t])
+            return_scalar = True
+        ret = np.zeros(t.shape, dtype=np.complex128)
+        for k in range(len(self._gk)):
+            ret += np.abs(self._gk[k]) ** 2 * np.exp(-1.0j * self._wk[k] * t)
+
+        if return_scalar:
+            return ret[0]
+        else:
+            return ret
+
     @property
     def primitive_mode_dims(self):
-        r"""An array containing the dimensionality of each of the modes"""
+        """An array containing the dimensionality of each of the modes"""
         return self._mode_dims
 
     @property
     def gk(self):
-        r"""An array containing the bath decomposition coefficients"""
+        """An array containing the bath decomposition coefficients"""
         return self._gk
 
     @property
     def wk(self):
-        r"""An array containing the bath decomposition decay rates"""
+        """An array containing the bath decomposition decay rates"""
         return self._wk
 
 
@@ -139,33 +179,33 @@ class DiscreteBosonicBath(DiscreteOQSBath):
     :type gk: np.ndarray
     :param wk: The decay rates in the exponential decomposition
     :type wk: np.ndarray
-    :param combine_real: Whether or not to combine real frequency modes (default False)
-    :type combine_real: bool, optional
     :param tol: The tolerance used to determine if a mode is a real frequency mode (default 1e-12)
     :type tol: float, optional
     """
 
-    def __init__(self, gk, wk, tol=1e-12):
+    def __init__(self, gk: np.ndarray, wk: np.ndarray, tol: float = 1e-12):
         DiscreteOQSBath.__init__(self, gk, wk, fermionic=False, tol=tol)
         self._gk_trunc = gk
         self._wk_trunc = wk
         self.truncate_modes()
 
-    def truncate_modes(self, truncation=DepthTruncation(8)):
-        r"""Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
+    def truncate_modes(self, truncation: TruncationBase = DepthTruncation(8)):
+        """Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
         :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(8))
-        :type truncation: TruncationBase, optional
+        :type truncation: TruncationBase
 
         """
         self._mode_dims = truncation(self._gk_trunc, self._wk_trunc, False)
 
-    def system_information(self, mode_comb=None, force_evaluate=False):
-        r"""Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.
+    def system_information(
+        self, mode_comb: Optional[ModeCombination] = None, force_evaluate: bool = False
+    ) -> system_modes:
+        """Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.
 
         :param mode_comb: A mode combination object to apply to the system information class.  (Default: None)
-        :type mode_comb: ModeCombination, optional
+        :type mode_comb: Optional[ModeCombination]
         :param force_evaluate: Forces evaluation of the system_modes object regardless of whether or not one has already been formed. (Default: False)
         :type force_evaluation: bool, optional
 
@@ -201,75 +241,66 @@ class DiscreteBosonicBath(DiscreteOQSBath):
         )
 
     def add_system_bath_hamiltonian(
-        self, H, Sp, Sm=None, geom="star", binds=None, bskip=1
-    ):
-        r"""Attach the bath and system bath coupling Hamiltonians associated with this bath object to an existing SOP Hamiltonian
+        self,
+        H: Union[sSOP, SOP],
+        Sp: OP_type,
+        Sm: Optional[OP_type] = None,
+        geom: str = "star",
+        binds: Optional[list[int]] = None,
+        bskip: Optional[int] = 1,
+    ) ->  Union[sSOP, SOP]:
+        """Attach the bath and system bath coupling Hamiltonians associated with this bath object to an existing SOP Hamiltonian
 
         :param H: The total Hamiltonian
-        :type H: SOP
+        :type H: sSOP | SOP
         :param Sp: An operator that couples to the bath annihilation operator terms
-        :type Sp: sOP or sPOP or sNBO or sSOP
+        :type Sp: OP_type
         :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-        :type Sm: sOP or sPOP or sNBO or sSOP, optional
+        :type Sm: Optional[OP_type]
         :param geom: The geometry of the bath to use
         :type geom: {"star", "chain", "ipchain"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
-        :type binds: list, optional
+        :type binds: Optional[list[int]]
         :param bskip: The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)
-        :type bskip: int, optional
+        :type bskip: Optional[int]
 
         :return: The total Hamiltonian now including the system bath terms
-        :rtype: type(H)
+        :rtype: sSOP | SOP
         """
-        from .unitary import add_bosonic_bath_hamiltonian
 
-        H, freq = add_bosonic_bath_hamiltonian(
-            H,
-            Sp,
-            self._gk,
-            self._wk,
-            Sm=Sm,
-            binds=binds,
-            geom=geom,
-            bskip=bskip,
-            return_frequencies=True,
-        )
+        H, freq = add_bosonic_bath_hamiltonian(H, Sp, self._gk, self._wk, Sm=Sm, binds=binds, geom=geom, bskip=bskip, return_frequencies=True,)
         self._wk_trunc = freq
         return H
 
-    def system_bath_hamiltonian(self, Sp, Sm=None, geom="star", binds=None, bskip=1):
-        r"""Construct a sSOP containing the system bath Hamiltonian of the object.
+    def system_bath_hamiltonian(
+        self,
+        Sp: OP_type,
+        Sm: Optional[OP_type] = None,
+        geom: str = "star",
+        binds: Optional[list[int]] = None,
+        bskip: Optional[int] = 1,
+    ) -> sSOP:
+        """Construct a sSOP containing the system bath Hamiltonian of the object.
 
         :param H: The total Hamiltonian
-        :type H: SOP
+        :type H: sSOP | SOP
         :param Sp: An operator that couples to the bath annihilation operator terms
-        :type Sp: sOP or sPOP or sNBO or sSOP
+        :type Sp: OP_type
         :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-        :type Sm: sOP or sPOP or sNBO or sSOP, optional
+        :type Sm: Optional[OP_type]
         :param geom: The geometry of the bath to use
         :type geom: {"star", "chain", "ipchain"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
-        :type binds: list, optional
+        :type binds:  Optional[list[int]]
         :param bskip: The index to start the contiguous block of bath indices.  This object is ignored if the binds parameter is specified. (Default: 1)
-        :type bskip: int, optional
+        :type bskip: Optional[int]
 
         :return: The total Hamiltonian now including the system bath terms
         :rtype: sSOP
         """
         H = sSOP()
-        from .unitary import add_bosonic_bath_hamiltonian
 
-        H, freq = add_bosonic_bath_hamiltonian(
-            H,
-            Sp,
-            self._gk,
-            self._wk,
-            Sm=Sm,
-            binds=binds,
-            geom=geom,
-            bskip=bskip,
-            return_frequencies=True,
-        )
+        H, freq = add_bosonic_bath_hamiltonian(H, Sp, self._gk, self._wk, Sm=Sm, binds=binds, geom=geom, bskip=bskip, return_frequencies=True)
         self._wk_trunc = freq
         return H
 
@@ -285,21 +316,19 @@ class DiscreteFermionicBath(DiscreteOQSBath):
     :type gk: np.ndarray
     :param wk: The decay rates in the exponential decomposition
     :type wk: np.ndarray
-    :param combine_real: Whether or not to combine real frequency modes (default False)
-    :type combine_real: bool, optional
     :param tol: The tolerance used to determine if a mode is a real frequency mode (default 1e-12)
     :type tol: float, optional
 
     """
 
-    def __init__(self, dk, zk, combine_real=False, tol=1e-12):
+    def __init__(self, dk, zk, tol=1e-12):
         DiscreteOQSBath.__init__(
-            self, dk, zk, fermionic=True, combine_real=combine_real, tol=tol
+            self, dk, zk, fermionic=True, tol=tol
         )
         self.truncate_modes()
 
     def truncate_modes(self, truncation=DepthTruncation(2)):
-        r"""Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
+        """Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
         :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(2))
@@ -322,7 +351,7 @@ class DiscreteFermionicBath(DiscreteOQSBath):
         )
 
     def system_information(self, mode_comb=None, force_evaluate=False):
-        r"""Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.
+        """Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.
 
         :param mode_comb: A mode combination object to apply to the system information class.  (Default: None)
         :type mode_comb: ModeCombination, optional
@@ -343,7 +372,7 @@ class DiscreteFermionicBath(DiscreteOQSBath):
         return self._sysinf
 
     def add_system_bath_hamiltonian(self, H, Sp, Sm, geom="star", binds=None, bskip=1):
-        r"""Attach the bath and system bath coupling Hamiltonians associated with this bath object to an existing SOP Hamiltonian
+        """Attach the bath and system bath coupling Hamiltonians associated with this bath object to an existing SOP Hamiltonian
 
         :param H: The total Hamiltonian
         :type H: SOP
@@ -361,7 +390,6 @@ class DiscreteFermionicBath(DiscreteOQSBath):
         :return: The total Hamiltonian now including the system bath terms
         :rtype: type(H)
         """
-        from .unitary import add_fermionic_bath_hamiltonian
 
         H = add_fermionic_bath_hamiltonian(
             H, Sp, Sm, self._gk, self._wk, binds=binds, geom=geom, bskip=bskip
@@ -369,7 +397,7 @@ class DiscreteFermionicBath(DiscreteOQSBath):
         return H
 
     def system_bath_hamiltonian(self, Sp, Sm, geom="star", binds=None, bskip=1):
-        r"""Construct a sSOP containing the system bath Hamiltonian of the object.
+        """Construct a sSOP containing the system bath Hamiltonian of the object.
 
         :param H: The total Hamiltonian
         :type H: SOP
@@ -388,7 +416,6 @@ class DiscreteFermionicBath(DiscreteOQSBath):
         :rtype: sSOP
         """
         H = sSOP()
-        from .unitary import add_fermionic_bath_hamiltonian
 
         H = add_fermionic_bath_hamiltonian(
             H, Sp, self._gk, self._wk, Sm=Sm, binds=binds, geom=geom, bskip=bskip

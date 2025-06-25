@@ -81,7 +81,7 @@ Additional python dependencies introduced by the core functionality of the pyTTN
  - [pydot](https://github.com/pydot/pydot)
  - [graphviz](https://graphviz.org/)
 
-With the final two dependencies only required for use of improved tree plotting functionality, e.g. when using `prog = "dot"`.
+With the final two dependencies only required for use of improved tree plotting functionality, e.g. when using `prog = "dot"`.  In order to use this improved tree plotting functionality it is necessary to install the system graphviz in addition to the graphviz python package.
 
 All python packages are installed automatically when installing using pip, however, it is necessary to manually install graphviz to enable this functionality.
 <!--
