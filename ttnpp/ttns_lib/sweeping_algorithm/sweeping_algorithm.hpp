@@ -72,22 +72,22 @@ namespace ttns
 
     public:
         sweeping_algorithm() {}
-        sweeping_algorithm(const ttn_type &A, const env_type &ham, size_type num_threads = 1)
+        sweeping_algorithm(const ttn_type &A, const env_type &ham, size_type set_var_nthreads = 1)
         {
             m_validate_inputs = true;
-            CALL_AND_HANDLE(initialise_default(A, ham, num_threads), "Failed to construct sweeping_algorithm using minimum parameters.");
+            CALL_AND_HANDLE(initialise_default(A, ham, set_var_nthreads), "Failed to construct sweeping_algorithm using minimum parameters.");
         }
 
-        sweeping_algorithm(const ttn_type &A, const env_type &ham, const update_params &upd, const environment_params &env, const subspace_params &sub, size_type num_threads = 1)
+        sweeping_algorithm(const ttn_type &A, const env_type &ham, const update_params &upd, const environment_params &env, const subspace_params &sub, size_type set_var_nthreads = 1)
         {
             m_validate_inputs = true;
-            CALL_AND_HANDLE(initialise(A, ham, upd, env, sub, num_threads), "Failed to construct sweeping_algorithm.");
+            CALL_AND_HANDLE(initialise(A, ham, upd, env, sub, set_var_nthreads), "Failed to construct sweeping_algorithm.");
         }
 
-        sweeping_algorithm(const ttn_type &A, const env_type &ham, update_params &&upd, environment_params &&env, subspace_params &&sub, size_type num_threads = 1)
+        sweeping_algorithm(const ttn_type &A, const env_type &ham, update_params &&upd, environment_params &&env, subspace_params &&sub, size_type set_var_nthreads = 1)
         {
             m_validate_inputs = true;
-            CALL_AND_HANDLE(initialise(A, ham, std::forward<update_params>(upd), std::forward<environment_params>(env), std::forward<subspace_params>(sub), num_threads), "Failed to construct sweeping_algorithm.");
+            CALL_AND_HANDLE(initialise(A, ham, std::forward<update_params>(upd), std::forward<environment_params>(env), std::forward<subspace_params>(sub), set_var_nthreads), "Failed to construct sweeping_algorithm.");
         }
 
         sweeping_algorithm(const sweeping_algorithm &o) = default;
@@ -96,12 +96,12 @@ namespace ttns
         sweeping_algorithm &operator=(const sweeping_algorithm &o) = default;
         sweeping_algorithm &operator=(sweeping_algorithm &&o) = default;
 
-        void initialise_default(const ttn_type &A, const env_type &ham, size_type num_threads = 1)
+        void initialise_default(const ttn_type &A, const env_type &ham, size_type set_var_nthreads = 1)
         {
             try
             {
-                m_env.num_buffers() = num_threads;
-                CALL_AND_HANDLE(m_env.initialise(A, ham, m_ham), "Failed to initialise environment object.");
+                set_var_nthreads = set_var_nthreads < 1 ? 1 : set_var_nthreads;
+                CALL_AND_HANDLE(m_env.initialise(A, ham, m_ham, set_var_nthreads), "Failed to initialise environment object.");
                 CALL_AND_HANDLE(subspace_type::initialise(A, ham), "Failed to initialise subspace expansion object.");
                 CALL_AND_HANDLE(update_type::initialise(A), "Failed to initialise the update object.");
             }
@@ -112,12 +112,12 @@ namespace ttns
             }
         }
 
-        void initialise(const ttn_type &A, const env_type &ham, const update_params &upd, const environment_params &env, const subspace_params &sub, size_type num_threads = 1)
+        void initialise(const ttn_type &A, const env_type &ham, const update_params &upd, const environment_params &env, const subspace_params &sub, size_type set_var_nthreads = 1)
         {
             try
             {
-                m_env.num_buffers() = num_threads;
-                CALL_AND_HANDLE(m_env.initialise(A, ham, m_ham, env), "Failed to initialise environment object.");
+                set_var_nthreads = set_var_nthreads < 1 ? 1 : set_var_nthreads;                
+                CALL_AND_HANDLE(m_env.initialise(A, ham, m_ham, env, set_var_nthreads), "Failed to initialise environment object.");
                 CALL_AND_HANDLE(subspace_type::initialise(A, ham, sub), "Failed to initialise subspace expansion object.");
                 CALL_AND_HANDLE(update_type::initialise(A, upd), "Failed to initialise the update object.");
             }
@@ -128,12 +128,12 @@ namespace ttns
             }
         }
 
-        void initialise(const ttn_type &A, const env_type &ham, update_params &&upd, environment_params &&env, subspace_params &&sub, size_type num_threads = 1)
+        void initialise(const ttn_type &A, const env_type &ham, update_params &&upd, environment_params &&env, subspace_params &&sub, size_type set_var_nthreads = 1)
         {
             try
             {
-                m_env.num_buffers() = num_threads;
-                CALL_AND_HANDLE(m_env.initialise(A, ham, m_ham, std::forward<environment_params>(env)), "Failed to initialise environment object.");
+                set_var_nthreads = set_var_nthreads < 1 ? 1 : set_var_nthreads;                    
+                CALL_AND_HANDLE(m_env.initialise(A, ham, m_ham, std::forward<environment_params>(env), set_var_nthreads), "Failed to initialise environment object.");
                 CALL_AND_HANDLE(subspace_type::initialise(A, ham, sub), "Failed to initialise subspace expansion object.");
                 CALL_AND_HANDLE(update_type::initialise(A, upd), "Failed to initialise the update object.");
             }
@@ -472,10 +472,12 @@ namespace ttns
     protected:
         environment_type m_env;
         size_type m_nh_evals = 0;
+
         bool m_env_set = false;
 
-        // an object storing the traversal order required for evaluating the root to leaf decomposition
-        size_type m_num_threads = 1;
+        size_type m_operator_sum_nthreads = 1;
+        size_type m_set_var_nthreads = 1;   
+ 
         bool m_validate_inputs = true;
 
         env_container_type m_ham;

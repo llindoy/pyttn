@@ -59,6 +59,14 @@ namespace ttns
 
         struct parameter_list
         {
+            parameter_list() : opsum_nthreads(1) {}
+            parameter_list(size_t nop) : opsum_nthreads(nop) {}
+            parameter_list(const parameter_list &o) = default;
+            parameter_list(parameter_list &&o) = default;
+            parameter_list &operator=(const parameter_list &o) = default;
+            parameter_list &operator=(parameter_list &&o) = default;
+
+            size_type opsum_nthreads;
         };
 
         using buffer_type = matrix_element_buffer<T, backend>;
@@ -71,7 +79,13 @@ namespace ttns
         sop_environment &operator=(const sop_environment &o) = default;
         sop_environment &operator=(sop_environment &&o) = default;
 
-        void initialise(const ttn_type &A, const environment_type &sop, container_type &ham)
+        inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, size_type set_var_nthreads = 1) 
+        {
+            parameter_list params; 
+            CALL_AND_RETHROW(initialise(A, h, ham, params, set_var_nthreads)); 
+        }
+
+        void initialise(const ttn_type &A, const environment_type &sop, container_type &ham, const parameter_list & params, size_type set_var_nthreads = 1)
         {
             using common::rzip;
             using common::zip;
@@ -86,18 +100,28 @@ namespace ttns
                 {
                     maxcapacity = maxmfo;
                 }
+                size_type os_nt = params.opsum_nthreads < 1 ? 1 : params.opsum_nthreads;
+                size_type sv_nt = set_var_nthreads < 1 ? 1 : set_var_nthreads;
+
+                m_operator_sum_nthreads = os_nt;
+                m_set_var_nthreads = sv_nt;
 
                 // resize the working arrays.  We will resize these to the maximum possible array sizes
                 try
                 {
-                    m_buf.reallocate(maxcapacity, m_num_buffers);
+
+                    m_buf.reallocate(maxcapacity, os_nt*sv_nt);
                     m_buf.resize(1, maxsize);
+                    fha = bond_action(os_nt, sv_nt);
+                    cel = site_action_leaf(os_nt, sv_nt);
+                    ceb = site_action_branch(os_nt, sv_nt);
                 }
                 catch (const std::exception &ex)
                 {
                     std::cerr << ex.what() << std::endl;
                     RAISE_EXCEPTION("Failed to reallocate internal buffers required for the sop environment");
                 }
+
 
                 CALL_AND_HANDLE(ham.construct_topology(A), "Failed to construct the topology of the matrix element buffer tree.");
 
@@ -117,11 +141,12 @@ namespace ttns
             }
         }
 
-        inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, const parameter_list &) { CALL_AND_RETHROW(initialise(A, h, ham)); }
-        inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, parameter_list &&) { CALL_AND_RETHROW(initialise(A, h, ham)); }
+        inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, parameter_list && _params, size_type set_var_nthreads = 1) 
+        {
+            parameter_list params(_params);
+            CALL_AND_RETHROW(initialise(A, h, ham, params, set_var_nthreads)); 
+        }
 
-        const size_type &num_buffers() const { return m_num_buffers; }
-        size_type &num_buffers() { return m_num_buffers; }
 
         void clear()
         {
@@ -130,12 +155,12 @@ namespace ttns
 
         inline void update_env_down(const environment_type &op, const hnode &_a1, node_type &_h)
         {
-            CALL_AND_HANDLE(mfo_core::evaluate(op.contraction_info()[_h.id()], _a1, m_buf.HA, m_buf.temp, _h), "Failed to evaluate the mean field operator.");
+            CALL_AND_HANDLE(mfo_core::evaluate(op.contraction_info()[_h.id()], _a1, m_buf, _h, m_operator_sum_nthreads, m_set_var_nthreads), "Failed to evaluate the mean field operator.");
         }
 
         inline void update_env_up(const environment_type &op, const hnode &_a1, node_type &_h, bool force_update = true)
         {
-            CALL_AND_HANDLE(spo_core::evaluate(op, op.contraction_info()[_h.id()], _a1, _h, m_buf.HA, m_buf.temp, false, force_update), "Failed to evaluate the single particle operator.");
+            CALL_AND_HANDLE(spo_core::evaluate(op, op.contraction_info()[_h.id()], _a1, _h, m_buf, false, force_update, m_operator_sum_nthreads, m_set_var_nthreads), "Failed to evaluate the single particle operator.");
         }
 
         const buffer_type &buffer() const { return m_buf; }
@@ -165,11 +190,12 @@ namespace ttns
 #endif
 
     public:
-        size_type m_num_buffers = 1;
         buffer_type m_buf;
         bond_action fha;
         site_action_leaf cel;
         site_action_branch ceb;
+        size_type m_operator_sum_nthreads = 1;
+        size_type m_set_var_nthreads = 1;
     };
 
 }

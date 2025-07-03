@@ -130,14 +130,14 @@ namespace ttns
             {
                 env.ceb.set_pointer(&(A()));
                 CALL_AND_HANDLE(
-                    ret = m_eigensolver(A().as_matrix(), m_curr_E, env.ceb, h, op, env.buffer().HA, env.buffer().temp, env.buffer().temp2),
+                    ret = m_eigensolver(A().as_matrix(), m_curr_E, env.ceb, h, op, env.buffer()),
                     "Failed to evolve the branch coefficient matrix.");
                 env.ceb.unset_pointer();
             }
             else
             {
                 CALL_AND_HANDLE(
-                    ret = m_eigensolver(A().as_matrix(), m_curr_E, env.cel, h, op, env.buffer().HA, env.buffer().temp),
+                    ret = m_eigensolver(A().as_matrix(), m_curr_E, env.cel, h, op, env.buffer()),
                     "Failed to evolve the leaf coefficient matrix.");
             }
             return ret;
@@ -265,7 +265,7 @@ namespace ttns
             {
                 env.ceb.set_pointer(&(A()));
                 CALL_AND_HANDLE(
-                    ret = m_eigensolver(mbuf.A(), m_curr_E, env.ceb, h, op, env.buffer().HA, env.buffer().temp, env.buffer().temp2, mbuf.res()),
+                    ret = m_eigensolver(mbuf.A(), m_curr_E, env.ceb, h, op, env.buffer(), mbuf.res()),
                     "Failed to evolve the branch coefficient matrix.");
                 env.ceb.unset_pointer();
             }
@@ -273,7 +273,7 @@ namespace ttns
             {
                 env.cel.set_pointer(&(A()));
                 CALL_AND_HANDLE(
-                    ret = m_eigensolver(mbuf.A(), m_curr_E, env.cel, h, op, env.buffer().HA, env.buffer().temp, mbuf.res()),
+                    ret = m_eigensolver(mbuf.A(), m_curr_E, env.cel, h, op, env.buffer(), mbuf.res()),
                     "Failed to evolve the leaf coefficient matrix.");
                 env.cel.unset_pointer();
             }

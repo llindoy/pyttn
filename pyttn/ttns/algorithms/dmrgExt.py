@@ -123,9 +123,10 @@ class dmrg(metaclass=ABCMeta):
         :param **kwargs: Keyword arguments to pass to the tdvp engine constructor. The allowed values depend on the choice of expansion:
     
             - **krylov_dim** (int, optional): The krylov subspace dimension used for the eigensolver steps. (Default: 16)
-            - **numthreads** (int, optional): The number of openmp threads to be used by the solver. (Default: 1)
+            - **num_threads** (int, optional): The number of openmp threads to be used by the solver for parallelising over sum of terms. (Default: 1)
             - **subspace_krylov_dim** (int, optional): Only when expansion="subspace". The subspace expansion based krylov subspace dimension. This is only used if expansion="subspace". (Default: 6)
             - **subspace_neigs** (int, optional): Only when expansion="subspace".The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
+            - **set_var_num_threads** (int, optional): The number of openmp threads to be used by the solver for parallelising over the set variable. (Default: 1)
 
         :returns: The dmrg evaluation object
         :rtype: dmrg
@@ -239,6 +240,7 @@ class one_site_dmrg(dmrg):
         H: Union[sop_operator, ms_sop_operator],
         krylov_dim: int = 16,
         num_threads: int = 1,
+        set_var_num_threads: int = 1,
     ) -> "one_site_dmrg":
         """A factory method for constructing an object used for performing single set dmrg calculations
 
@@ -248,9 +250,10 @@ class one_site_dmrg(dmrg):
         :type H: Union[sop_operator, ms_sop_operator]
         :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
         :type krylov_dim: int, optional
-        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
-        :type numthreads: int, optional
-
+        :param num_threads: The number of openmp threads to be used by the solver for parallelising over the Hamiltonian sum. (Default: 1)
+        :type num_threads: int, optional
+        :param set_var_num_threads: The number of openmp threads to be used by the solver for parallelising over the set variable. (Default: 1)
+        :type set_var_num_threads: int, optional
         :returns: The dmrg evaluation object
         :rtype: one_site_dmrg
         """
@@ -259,7 +262,7 @@ class one_site_dmrg(dmrg):
                 "Hamiltonian and operator do not have compatible backends."
             )
 
-        return _one_site_dmrg(A, H, krylov_dim=krylov_dim, num_threads=num_threads)
+        return _one_site_dmrg(A, H, krylov_dim=krylov_dim, num_threads=num_threads, set_var_num_threads=set_var_num_threads)
 
     def initialise(
         A: Union[ttn, ms_ttn],
@@ -275,8 +278,8 @@ class one_site_dmrg(dmrg):
         :type H: Union[sop_operator, ms_sop_operator]
         :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
         :type krylov_dim: int, optional
-        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
-        :type numthreads: int, optional
+        :param num_threads: The number of openmp threads to be used by the solver. (Default: 1)
+        :type num_threads: int, optional
 
         :returns: The dmrg evaluation object
         :rtype: one_site_dmrg
@@ -335,8 +338,8 @@ class subspace_expansion_dmrg(dmrg):
         :type subspace_krylov_dim: int, optional
         :param subspace_neigs: The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
         :type subspace_neigs: int, optional
-        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
-        :type numthreads: int, optional
+        :param num_threads: The number of openmp threads to be used by the solver. (Default: 1)
+        :type num_threads: int, optional
 
         :returns: The dmrg evaluation object
         :rtype: subspace_expansion_dmrg
@@ -375,8 +378,8 @@ class subspace_expansion_dmrg(dmrg):
         :type subspace_krylov_dim: int, optional
         :param subspace_neigs: The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
         :type subspace_neigs: int, optional
-        :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
-        :type numthreads: int, optional
+        :param num_threads: The number of openmp threads to be used by the solver. (Default: 1)
+        :type num_threads: int, optional
         """
 
     @property

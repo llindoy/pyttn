@@ -339,6 +339,23 @@ namespace ttns
             ASSERT(j < m_indices[i].size(), "Index out of bounds.");
             return m_Eshift[i][j];
         }
+
+        void set_Eshift(size_t i, size_t j, const T& v)
+        { 
+            ASSERT(i < m_nset, "Index out of bounds.");
+            ASSERT(j < m_indices[i].size(), "Index out of bounds.");
+            _m_Eshift[i][j] = literal::coeff<T>(v);
+            m_Eshift[i][j] = _m_Eshift[i][j](0.0); 
+        }
+
+        void set_Eshift(size_t i, size_t j, const literal::coeff<T>& v)
+        { 
+            ASSERT(i < m_nset, "Index out of bounds.");
+            ASSERT(j < m_indices[i].size(), "Index out of bounds.");
+            _m_Eshift[i][j] = v;
+            m_Eshift[i][j] = _m_Eshift[i][j](0.0); 
+        }
+
         size_t nrow(size_t i) const
         {
             ASSERT(i < m_nset, "Index out of bounds.");

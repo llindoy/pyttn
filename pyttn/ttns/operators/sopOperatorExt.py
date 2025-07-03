@@ -174,6 +174,14 @@ class sop_operator(metaclass=ABCMeta):
         """A constant energy shift acting on the sum-of-product operator"""
         pass
 
+    def set_Eshift(self, v : Union[float, complex]):
+        """A constant energy shift acting on the sum-of-product operator
+        
+        :param v: The new value of the Eshift object
+        :type v: Union[float, complex]
+        """
+        pass
+
     def clear(self):
         """Clear and deallocate all internal buffers of the sop_operator"""
         pass

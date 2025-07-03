@@ -43,6 +43,7 @@ class CMakeBuild(build_ext):
         cmake_args = [
             f"-DBUILD_SRC=OFF",
             f"-DBUILD_TESTS=OFF",
+            f"-DUSE_OPENMP=ON",
             f"-DBUILD_PYTHON_BINDINGS=ON",
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",

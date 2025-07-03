@@ -69,7 +69,7 @@ namespace ttns
             if (!A.is_leaf())
             {
                 CALL_AND_HANDLE(
-                    env.ceb(A(), h, op, env.buffer().HA, env.buffer().temp, env.buffer().temp2, m_res),
+                    env.ceb(A(), h, op, env.buffer(), m_res),
                     "Failed to evolve the branch coefficient matrix.");
                 auto t1 = m_res.reinterpret_shape(A().as_matrix().size());
                 auto a1 = A().as_matrix().reinterpret_shape(A().as_matrix().size());
@@ -78,7 +78,7 @@ namespace ttns
             else
             {
                 CALL_AND_HANDLE(
-                    env.cel(A().as_matrix(), h, op, env.buffer().HA, env.buffer().temp, m_res),
+                    env.cel(A().as_matrix(), h, op, env.buffer(), m_res),
                     "Failed to evolve the leaf coefficient matrix.");
                 auto t1 = m_res.reinterpret_shape(A().as_matrix().size());
                 auto a1 = A().as_matrix().reinterpret_shape(A().as_matrix().size());
@@ -89,7 +89,7 @@ namespace ttns
         void update_bond_tensor(bond_matrix_type &r, const environment_type &env, env_node_type &h, env_type &op)
         {
             m_res = r;
-            CALL_AND_HANDLE(env.fha(r, h, op, env.buffer().HA, m_res), "Failed to compute action of hamiltonian on node");
+            CALL_AND_HANDLE(env.fha(r, h, op, env.buffer(), m_res), "Failed to compute action of hamiltonian on node");
             auto t1 = m_res.reinterpret_shape(r.size());
             auto a1 = r.reinterpret_shape(r.size());
             std::cerr << "bond dim: " << linalg::dot_product(t1, linalg::conj(a1)) << std::endl;
@@ -155,7 +155,7 @@ namespace ttns
             {
                 env.ceb.set_pointer(&(A()));
                 CALL_AND_HANDLE(
-                    env.ceb(mbuf.A(), h, op, env.buffer().HA, env.buffer().temp, env.buffer().temp2, mbuf.res(), mbuf.resbuf()),
+                    env.ceb(mbuf.A(), h, op, env.buffer(), mbuf.res(), mbuf.resbuf()),
                     "Failed to evolve the branch coefficient matrix.");
                 env.ceb.unset_pointer();
             }
@@ -163,7 +163,7 @@ namespace ttns
             {
                 env.cel.set_pointer(&(A()));
                 CALL_AND_HANDLE(
-                    env.cel(mbuf.A(), h, op, env.buffer().HA, env.buffer().temp, mbuf.res(), mbuf.resbuf()),
+                    env.cel(mbuf.A(), h, op, env.buffer(), mbuf.res(), mbuf.resbuf()),
                     "Failed to evolve the leaf coefficient matrix.");
                 env.cel.unset_pointer();
             }
@@ -185,7 +185,7 @@ namespace ttns
             mbuf.setup(r);
 
             env.fha.set_pointer(&(r));
-            CALL_AND_HANDLE(env.fha(mbuf.A(), h, op, env.buffer().HA, mbuf.res(), mbuf.resbuf()), "Failed to compute action of hamiltonian on node");
+            CALL_AND_HANDLE(env.fha(mbuf.A(), h, op, env.buffer(), mbuf.res(), mbuf.resbuf()), "Failed to compute action of hamiltonian on node");
             env.fha.unset_pointer();
 
             mbuf.unpack_results();

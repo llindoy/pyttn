@@ -706,6 +706,19 @@ namespace ttns
             ASSERT(i == 0 && j == 0, "Index out of bounds.");
             return m_Eshift;
         }
+
+        void set_Eshift(const T& v)
+        { 
+            _m_Eshift = literal::coeff<T>(v);
+            m_Eshift = _m_Eshift(0.0); 
+        }
+
+        void set_Eshift(const literal::coeff<T> & v)
+        { 
+            _m_Eshift = v;
+            m_Eshift = _m_Eshift(0.0); 
+        }
+
         const T &Eshift() const { return m_Eshift; }
         literal::coeff<T> &Eshift() { return _m_Eshift; }
 

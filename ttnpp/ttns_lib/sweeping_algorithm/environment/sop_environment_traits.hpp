@@ -35,23 +35,36 @@ namespace ttns
     // TODO need to make the action of res on Eshift work correctly.
     class bond_action_helper
     {
+
     protected:
-        template <typename T, typename vtype, typename soptype, typename cinftype, typename mat_type, typename rtype>
-        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, mat_type &_t1, mat_type & /* _t2 */, rtype &res)
+        template <typename T, typename vtype, typename soptype, typename cinftype, typename buffer_type, typename rtype>
+#ifdef USE_OPENMP
+        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads)
+#else
+        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t /*opsum_nthreads*/)
+#endif
         {
             bool add_Eshift = Eshift != T(0.0);
             size_t nadd = add_Eshift ? 1 : 0;
+
+            buffer.reset_result_buffer(v.shape(0), v.shape(1));
+
+            //parallel addition of all of the terms into the result buffer objects
+#ifdef USE_OPENMP
+            #pragma omp parallel for num_threads(opsum_nthreads) default(shared) schedule(dynamic, 1)
+#endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
                 size_t ti = omp_get_thread_num();
-                auto &t1 = _t1[ti];
-                size_t n1 = t1.shape(0);
-                size_t n2 = t1.shape(1);
+                auto &t1 = buffer.temp[ti];
+                auto &t2 = buffer.temp2[ti];
+                auto &rb = buffer.res[ti];
                 t1.resize(v.shape(0), v.shape(1));
+                t2.resize(v.shape(0), v.shape(1));
 
                 if (add_Eshift && indx == 0)
                 {
-                    res += Eshift * v;
+                    t2 += Eshift * v;
                 }
                 else
                 {
@@ -60,11 +73,11 @@ namespace ttns
                     {
                         if (cinf[ind].is_identity_mf())
                         {
-                            CALL_AND_HANDLE(res += cinf[ind].coeff() * v, "Failed to apply identity contribution.");
+                            CALL_AND_HANDLE(rb += cinf[ind].coeff() * v, "Failed to apply identity contribution.");
                         }
                         else
                         {
-                            CALL_AND_HANDLE(res += cinf[ind].coeff() * v * trans(h.mf(ind)), "Failed to apply the mean field contribution matrix.");
+                            CALL_AND_HANDLE(rb += cinf[ind].coeff() * v * trans(h.mf(ind)), "Failed to apply the mean field contribution matrix.");
                         }
                     }
                     else
@@ -72,35 +85,51 @@ namespace ttns
 
                         if (cinf[ind].is_identity_mf())
                         {
-                            CALL_AND_HANDLE(res += cinf[ind].coeff() * h.spf(ind) * v, "Failed to apply the single particle contribution.");
+                            CALL_AND_HANDLE(rb += cinf[ind].coeff() * h.spf(ind) * v, "Failed to apply the single particle contribution.");
                         }
                         else
                         {
                             CALL_AND_HANDLE(t1 = h.spf(ind) * v, "Failed to apply the single particle contribution.");
-                            CALL_AND_HANDLE(res += cinf[ind].coeff() * t1 * trans(h.mf(ind)), "Failed to apply the mean field contribution.");
+                            CALL_AND_HANDLE(rb += cinf[ind].coeff() * t1 * trans(h.mf(ind)), "Failed to apply the mean field contribution.");
                         }
                     }
                 }
-                CALL_AND_RETHROW(t1.resize(n1, n2));
+            }
+
+            //now sum over the result buffers
+            for(size_t i = 0; i < buffer.buf; ++i)
+            {
+                res += buffer.res[i];
             }
         }
-        template <typename T, typename vtype, typename soptype, typename cinftype, typename mat_type, typename rtype>
-        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, mat_type &_t1, mat_type & /* t2 */, rtype &res)
+        template <typename T, typename vtype, typename soptype, typename cinftype, typename buffer_type, typename rtype>
+#ifdef USE_OPENMP
+        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads)
+#else
+        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t /*opsum_nthreads*/)
+#endif
         {
             bool add_Eshift = Eshift != T(0.0);
             size_t nadd = add_Eshift ? 1 : 0;
+
+            buffer.reset_result_buffer(v.shape(0), v.shape(1));
+
+#ifdef USE_OPENMP
+            #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
+#endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
                 size_t ti = omp_get_thread_num();
-                auto &t1 = _t1[ti];
-                size_t n1 = t1.shape(0);
-                size_t n2 = t1.shape(1);
+                auto &t1 = buffer.temp[ti];
+                auto &t2 = buffer.temp2[ti];
+                auto &rb = buffer.res[ti];
                 t1.resize(v.shape(0), v.shape(1));
+                t2.resize(v.shape(0), v.shape(1));
 
                 if (add_Eshift && indx == 0)
                 {
                     CALL_AND_HANDLE(t1 = h.spf_id() * v, "Failed to apply the single particle contribution.");
-                    CALL_AND_HANDLE(res += Eshift * t1 * trans(h.mf_id()), "Failed to apply the mean field contribution.");
+                    CALL_AND_HANDLE(rb += Eshift * t1 * trans(h.mf_id()), "Failed to apply the mean field contribution.");
                 }
                 else
                 {
@@ -115,28 +144,33 @@ namespace ttns
                     }
                     if (cinf[ind].is_identity_mf())
                     {
-                        CALL_AND_HANDLE(res += cinf[ind].coeff() * t1 * trans(h.mf_id()), "Failed to apply the mean field contribution.");
+                        CALL_AND_HANDLE(rb += cinf[ind].coeff() * t1 * trans(h.mf_id()), "Failed to apply the mean field contribution.");
                     }
                     else
                     {
-                        CALL_AND_HANDLE(res += cinf[ind].coeff() * t1 * trans(h.mf(ind)), "Failed to apply the mean field contribution.");
+                        CALL_AND_HANDLE(rb += cinf[ind].coeff() * t1 * trans(h.mf(ind)), "Failed to apply the mean field contribution.");
                     }
                 }
-                CALL_AND_RETHROW(t1.resize(n1, n2));
+            }
+
+            //now sum over the result buffers
+            for(size_t i = 0; i < buffer.buf; ++i)
+            {
+                res += buffer.res[i];
             }
         }
 
     public:
-        template <typename T, typename vtype, typename soptype, typename cinftype, typename mat_type, typename rtype>
-        static inline void evaluate(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, mat_type &t1, mat_type &t2, rtype &res, bool use_identity = true)
+        template <typename T, typename vtype, typename soptype, typename cinftype, typename buffer_type, typename rtype>
+        static inline void evaluate(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type &buffer, rtype &res, bool use_identity = true, size_t opsum_nthreads = 1)
         {
             if (use_identity)
             {
-                CALL_AND_RETHROW(evaluate_id(v, h, cinf, Eshift, t1, t2, res));
+                CALL_AND_RETHROW(evaluate_id(v, h, cinf, Eshift, buffer, res, opsum_nthreads));
             }
             else
             {
-                CALL_AND_RETHROW(evaluate_olap(v, h, cinf, Eshift, t1, t2, res));
+                CALL_AND_RETHROW(evaluate_olap(v, h, cinf, Eshift, buffer, res, opsum_nthreads));
             }
         }
     };
@@ -144,26 +178,36 @@ namespace ttns
     class site_action_leaf_helper
     {
     protected:
-        template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename mat_type, typename rtype>
-        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, mat_type &_t1, mat_type &_t2, rtype &res)
+        template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename buffer_type, typename rtype>
+#ifdef USE_OPENMP
+        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type &buffer, rtype &res, size_t opsum_nthreads = 1)
+#else
+        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type &buffer, rtype &res, size_t /*opsum_nthreads*/ = 1)
+#endif
         {
             try
             {
                 bool add_Eshift = Eshift != T(0.0);
                 size_t nadd = add_Eshift ? 1 : 0;
+
+                buffer.reset_result_buffer(v.shape(0), v.shape(1));
+
+#ifdef USE_OPENMP
+                #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
+#endif
                 for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
                 {
                     size_t ti = omp_get_thread_num();
-                    auto &t1 = _t1[ti];
-                    auto &t2 = _t2[ti];
-                    size_t n1 = t1.shape(0);
-                    size_t n2 = t1.shape(1);
+                    auto &t1 = buffer.temp[ti];
+                    auto &t2 = buffer.temp2[ti];
+                    auto &rb = buffer.res[ti];
+
                     t1.resize(v.shape(0), v.shape(1));
                     t2.resize(v.shape(0), v.shape(1));
 
                     if (add_Eshift && indx == 0)
                     {
-                        res += Eshift * v;
+                        rb += Eshift * v;
                     }
                     else
                     {
@@ -179,11 +223,11 @@ namespace ttns
                             coeff *= cinf[ind].coeff();
                             if (cinf[ind].is_identity_mf())
                             {
-                                CALL_AND_HANDLE(res += coeff * v, "Failed to apply identity contribution.");
+                                CALL_AND_HANDLE(rb += coeff * v, "Failed to apply identity contribution.");
                             }
                             else
                             {
-                                CALL_AND_HANDLE(res += coeff * v * trans(h.mf(ind)), "Failed to apply the mean field contribution matrix.");
+                                CALL_AND_HANDLE(rb += coeff * v * trans(h.mf(ind)), "Failed to apply the mean field contribution matrix.");
                             }
                         }
                         else
@@ -195,7 +239,7 @@ namespace ttns
                                     T coeff = cinf[ind].spf_coeff(i) * cinf[ind].coeff();
                                     auto &indices = cinf[ind].spf_indexing()[i][0];
                                     CALL_AND_HANDLE(hprim[indices[0]][indices[1]].apply(v, t2), "Failed to apply leaf operator.");
-                                    res += coeff * t2;
+                                    rb += coeff * t2;
                                 }
                             }
                             else
@@ -214,12 +258,15 @@ namespace ttns
                                     t2 += coeff * t1;
                                 }
 
-                                CALL_AND_HANDLE(res += t2 * trans(h.mf(ind)), "Failed to apply the mean field contribution.");
+                                CALL_AND_HANDLE(rb += t2 * trans(h.mf(ind)), "Failed to apply the mean field contribution.");
                             }
                         }
                     }
-                    CALL_AND_RETHROW(t1.resize(n1, n2));
-                    CALL_AND_RETHROW(t2.resize(n1, n2));
+                }
+                //now sum over the result buffers
+                for(size_t i = 0; i < buffer.buf; ++i)
+                {
+                    res += buffer.res[i];
                 }
             }
             catch (const std::exception &ex)
@@ -228,26 +275,34 @@ namespace ttns
                 RAISE_EXCEPTION("Failed to apply the leaf coefficient evolution operator at a node.");
             }
         }
-        template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename mat_type, typename rtype>
-        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, mat_type &_t1, mat_type &_t2, rtype &res)
+        template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename buffer_type, typename rtype>
+#ifdef USE_OPENMP        
+        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1)
+#else
+        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type& buffer, rtype &res, size_t /*opsum_nthreads*/ = 1)
+#endif
         {
             try
             {
                 bool add_Eshift = Eshift != T(0.0);
                 size_t nadd = add_Eshift ? 1 : 0;
+
+                buffer.reset_result_buffer(v.shape(0), v.shape(1));
+#ifdef USE_OPENMP
+                #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
+#endif
                 for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
                 {
                     size_t ti = omp_get_thread_num();
-                    auto &t1 = _t1[ti];
-                    auto &t2 = _t2[ti];
-                    size_t n1 = t1.shape(0);
-                    size_t n2 = t1.shape(1);
+                    auto &t1 = buffer.temp[ti];
+                    auto &t2 = buffer.temp2[ti];
+                    auto &rb = buffer.res[ti];
                     t1.resize(v.shape(0), v.shape(1));
                     t2.resize(v.shape(0), v.shape(1));
 
                     if (add_Eshift && indx == 0)
                     {
-                        CALL_AND_HANDLE(res += Eshift * v * trans(h.mf_id()), "Failed to apply the mean field contribution.");
+                        CALL_AND_HANDLE(rb += Eshift * v * trans(h.mf_id()), "Failed to apply the mean field contribution.");
                     }
                     else
                     {
@@ -263,11 +318,11 @@ namespace ttns
                             coeff *= cinf[ind].coeff();
                             if (cinf[ind].is_identity_mf())
                             {
-                                CALL_AND_HANDLE(res += coeff * v * trans(h.mf_id()), "Failed to apply identity contribution.");
+                                CALL_AND_HANDLE(rb += coeff * v * trans(h.mf_id()), "Failed to apply identity contribution.");
                             }
                             else
                             {
-                                CALL_AND_HANDLE(res += coeff * v * trans(h.mf(ind)), "Failed to apply the mean field contribution matrix.");
+                                CALL_AND_HANDLE(rb += coeff * v * trans(h.mf(ind)), "Failed to apply the mean field contribution matrix.");
                             }
                         }
                         else
@@ -287,16 +342,19 @@ namespace ttns
                             }
                             if (cinf[ind].is_identity_mf())
                             {
-                                CALL_AND_HANDLE(res += t2 * trans(h.mf_id()), "Failed to apply the mean field contribution.");
+                                CALL_AND_HANDLE(rb += t2 * trans(h.mf_id()), "Failed to apply the mean field contribution.");
                             }
                             else
                             {
-                                CALL_AND_HANDLE(res += t2 * trans(h.mf(ind)), "Failed to apply the mean field contribution.");
+                                CALL_AND_HANDLE(rb += t2 * trans(h.mf(ind)), "Failed to apply the mean field contribution.");
                             }
                         }
                     }
-                    CALL_AND_RETHROW(t1.resize(n1, n2));
-                    CALL_AND_RETHROW(t2.resize(n1, n2));
+                }
+                //now sum over the result buffers
+                for(size_t i = 0; i < buffer.buf; ++i)
+                {
+                    res += buffer.res[i];
                 }
             }
             catch (const std::exception &ex)
@@ -307,16 +365,16 @@ namespace ttns
         }
 
     public:
-        template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename mat_type, typename rtype>
-        static inline void evaluate(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, mat_type &t1, mat_type &t2, rtype &res, bool use_identity = true)
+        template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename buffer_type, typename rtype>
+        static inline void evaluate(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type& buffer, rtype &res, bool use_identity = true, size_t opsum_nthreads = 1)
         {
             if (use_identity)
             {
-                CALL_AND_RETHROW(evaluate_id(v, h, cinf, hprim, Eshift, t1, t2, res));
+                CALL_AND_RETHROW(evaluate_id(v, h, cinf, hprim, Eshift, buffer, res, opsum_nthreads));
             }
             else
             {
-                CALL_AND_RETHROW(evaluate_olap(v, h, cinf, hprim, Eshift, t1, t2, res));
+                CALL_AND_RETHROW(evaluate_olap(v, h, cinf, hprim, Eshift, buffer, res, opsum_nthreads));
             }
         }
     };
@@ -324,28 +382,37 @@ namespace ttns
     class site_action_branch_helper
     {
     public:
-        template <typename T, typename backend, typename soptype, typename cinftype, typename mat_type, typename rtype>
-        static inline void evaluate(const ttn_node_data<T, backend> &v, const soptype &h, const cinftype &cinf, const T &Eshift, mat_type &_t1, mat_type &_t2, mat_type &_t3, rtype &res)
+        template <typename T, typename backend, typename soptype, typename cinftype, typename buffer_type, typename rtype>
+#ifdef USE_OPENMP
+        static inline void evaluate(const ttn_node_data<T, backend> &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1)
+#else
+        static inline void evaluate(const ttn_node_data<T, backend> &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t /*opsum_nthreads*/ = 1)
+#endif
         {
             using spo_core = single_particle_operator_engine<T, backend>;
 
             bool add_Eshift = Eshift != T(0.0);
             size_t nadd = add_Eshift ? 1 : 0;
+
+            buffer.reset_result_buffer(v.shape(0), v.shape(1));
+#ifdef USE_OPENMP
+            #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
+#endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
                 size_t ti = omp_get_thread_num();
-                auto &t1 = _t1[ti];
-                auto &t2 = _t2[ti];
-                auto &t3 = _t3[ti];
-                size_t n1 = t1.shape(0);
-                size_t n2 = t1.shape(1);
+                auto &t1 = buffer.HA[ti];
+                auto &t2 = buffer.temp[ti];
+                auto &t3 = buffer.temp2[ti];
+                auto &rb = buffer.res[ti];
+
                 t1.resize(v.shape(0), v.shape(1));
                 t2.resize(v.shape(0), v.shape(1));
                 t3.resize(v.shape(0), v.shape(1));
 
                 if (add_Eshift && indx == 0)
                 {
-                    res += Eshift * v;
+                    rb += Eshift * v;
                 }
                 else
                 {
@@ -361,11 +428,11 @@ namespace ttns
 
                         if (cinf[ind].is_identity_mf())
                         {
-                            CALL_AND_HANDLE(res += coeff * v.as_matrix(), "Failed to apply identity contribution.");
+                            CALL_AND_HANDLE(rb += coeff * v.as_matrix(), "Failed to apply identity contribution.");
                         }
                         else
                         {
-                            CALL_AND_HANDLE(res += coeff * v.as_matrix() * trans(h().mf(ind)), "Failed to apply the mean field contribution matrix.");
+                            CALL_AND_HANDLE(rb += coeff * v.as_matrix() * trans(h().mf(ind)), "Failed to apply the mean field contribution matrix.");
                         }
                     }
                     else
@@ -376,7 +443,7 @@ namespace ttns
                             {
                                 T coeff = cinf[ind].spf_coeff(i) * cinf[ind].coeff();
                                 CALL_AND_HANDLE(spo_core::kron_prod(h, cinf, ind, i, v, t1, t2), "Failed to apply kronecker product operator.");
-                                res += coeff * t2;
+                                rb += coeff * t2;
                             }
                         }
                         else
@@ -391,33 +458,45 @@ namespace ttns
                                 t3 += coeff * t2;
                             }
 
-                            CALL_AND_HANDLE(res += t3 * trans(h().mf(ind)), "Failed to apply the mean field contribution.");
+                            CALL_AND_HANDLE(rb += t3 * trans(h().mf(ind)), "Failed to apply the mean field contribution.");
                         }
                     }
                 }
-                CALL_AND_RETHROW(t1.resize(n1, n2));
-                CALL_AND_RETHROW(t2.resize(n1, n2));
-                CALL_AND_RETHROW(t3.resize(n1, n2));
+            }
+            //now sum over the result buffers
+            for(size_t i = 0; i < buffer.buf; ++i)
+            {
+                res += buffer.res[i];
             }
         }
 
     public:
-        template <typename T, typename backend, typename soptype, typename cinftype, typename mat_type, typename rtype>
-        static inline void evaluate(const ttn_node_data<T, backend> &v, const ttn_node_data<T, backend> &vb, const soptype &h, const cinftype &cinf, const T &Eshift, mat_type &_t1, mat_type &_t2, mat_type &_t3, rtype &res)
+        template <typename T, typename backend, typename soptype, typename cinftype, typename buffer_type, typename rtype>
+#ifdef USE_OPENMP
+        static inline void evaluate(const ttn_node_data<T, backend> &v, const ttn_node_data<T, backend> &vb, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1)
+#else
+        static inline void evaluate(const ttn_node_data<T, backend> &v, const ttn_node_data<T, backend> &vb, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t /*opsum_nthreads*/ = 1)
+#endif
         {
             using kpo = kronecker_product_operator_mel<T, backend>;
             using spo_core = single_particle_operator_engine<T, backend>;
 
             bool add_Eshift = Eshift != T(0.0);
             size_t nadd = add_Eshift ? 1 : 0;
+
+            buffer.reset_result_buffer(v.shape(0), v.shape(1));
+
+#ifdef USE_OPENMP
+            #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
+#endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
                 size_t ti = omp_get_thread_num();
-                auto &t1 = _t1[ti];
-                auto &t2 = _t2[ti];
-                auto &t3 = _t3[ti];
-                size_t n1 = t1.shape(0);
-                size_t n2 = t1.shape(1);
+                auto &t1 = buffer.HA[ti];
+                auto &t2 = buffer.temp[ti];
+                auto &t3 = buffer.temp2[ti];
+                auto &rb = buffer.res[ti];
+
                 t1.resize(v.shape(0), v.shape(1));
                 t2.resize(v.shape(0), v.shape(1));
                 t3.resize(v.shape(0), v.shape(1));
@@ -425,7 +504,7 @@ namespace ttns
                 if (add_Eshift && indx == 0)
                 {
                     CALL_AND_HANDLE(kpo::kpo_id(h, v, t1, t2), "Failed to apply kronecker product operator.");
-                    CALL_AND_HANDLE(res += Eshift * t2 * trans(h().mf_id()), "Failed to apply the mean field contribution.");
+                    CALL_AND_HANDLE(rb += Eshift * t2 * trans(h().mf_id()), "Failed to apply the mean field contribution.");
                 }
                 else
                 {
@@ -450,16 +529,18 @@ namespace ttns
                     }
                     if (cinf[ind].is_identity_mf())
                     {
-                        CALL_AND_HANDLE(res += t3 * trans(h().mf_id()), "Failed to apply the mean field contribution.");
+                        CALL_AND_HANDLE(rb += t3 * trans(h().mf_id()), "Failed to apply the mean field contribution.");
                     }
                     else
                     {
-                        CALL_AND_HANDLE(res += t3 * trans(h().mf(ind)), "Failed to apply the mean field contribution.");
+                        CALL_AND_HANDLE(rb += t3 * trans(h().mf(ind)), "Failed to apply the mean field contribution.");
                     }
                 }
-                CALL_AND_RETHROW(t1.resize(n1, n2));
-                CALL_AND_RETHROW(t2.resize(n1, n2));
-                CALL_AND_RETHROW(t3.resize(n1, n2));
+            }
+            //now sum over the result buffers
+            for(size_t i = 0; i < buffer.buf; ++i)
+            {
+                res += buffer.res[i];
             }
         }
     };
@@ -485,15 +566,21 @@ namespace ttns
             void set_pointer(bond_matrix_type *) const {}
             void unset_pointer() const {}
 
+            bond_action(){}
+            bond_action(size_type opsum_nthreads) : m_opsum_nthreads(opsum_nthreads){}
+            bond_action(size_type opsum_nthreads, size_type /*set_nthreads*/) : m_opsum_nthreads(opsum_nthreads){}
+            bond_action(const bond_action&)=default;
+            bond_action& operator=(const bond_action&)=default;
+
         public:
-            template <typename vtype, typename mat_type, typename rtype>
-            inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, mat_type &t1, mat_type &t2, rtype &res) const
+            template <typename vtype, typename buffer_type, typename rtype>
+            inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
                 try
                 {
                     res.fill_zeros();
                     const auto &cinf = hprim.contraction_info()[h.id()]();
-                    CALL_AND_RETHROW(bond_action_helper::evaluate(v, h(), cinf, hprim.Eshift(), t1, t2, res));
+                    CALL_AND_RETHROW(bond_action_helper::evaluate(v, h(), cinf, hprim.Eshift(), buffer, res, m_opsum_nthreads));
                 }
                 catch (const std::exception &ex)
                 {
@@ -501,6 +588,9 @@ namespace ttns
                     RAISE_EXCEPTION("Failed to apply the action of the full Hamiltonian at a node.");
                 }
             }
+
+        protected: 
+            size_type m_opsum_nthreads = 1;
         }; // class bond_action
 
         class site_action_leaf
@@ -508,16 +598,21 @@ namespace ttns
         public:
             void set_pointer(hdata *) const {}
             void unset_pointer() const {}
+            site_action_leaf(){}
+            site_action_leaf(size_type opsum_nthreads) : m_opsum_nthreads(opsum_nthreads){}
+            site_action_leaf(size_type opsum_nthreads, size_type /*set_nthreads*/) : m_opsum_nthreads(opsum_nthreads){}
 
+            site_action_leaf(const site_action_leaf&) = default;
+            site_action_leaf& operator=(const site_action_leaf&) = default;
         public:
-            template <typename vtype, typename mat_type, typename rtype>
-            inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, mat_type &t1, mat_type &t2, rtype &res) const
+            template <typename vtype, typename buffer_type, typename rtype>
+            inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
                 try
                 {
                     res.fill_zeros();
                     const auto &cinf = hprim.contraction_info()[h.id()]();
-                    CALL_AND_RETHROW(site_action_leaf_helper::evaluate(v, h(), cinf, hprim.mode_operators(), hprim.Eshift(), t1, t2, res));
+                    CALL_AND_RETHROW(site_action_leaf_helper::evaluate(v, h(), cinf, hprim.mode_operators(), hprim.Eshift(), buffer, res, m_opsum_nthreads));
                 }
                 catch (const std::exception &ex)
                 {
@@ -525,6 +620,9 @@ namespace ttns
                     RAISE_EXCEPTION("Failed to apply the leaf coefficient evolution operator at a node.");
                 }
             }
+
+        protected: 
+            size_type m_opsum_nthreads = 1;
         }; // class site_action_leaf
 
         class site_action_branch
@@ -537,17 +635,20 @@ namespace ttns
             void unset_pointer() const { node_inf = nullptr; }
 
             site_action_branch() : node_inf(nullptr) {}
+            site_action_branch(size_type opsum_nthreads) : node_inf(nullptr), m_opsum_nthreads(opsum_nthreads){}
+            site_action_branch(size_type opsum_nthreads, size_type /*set_nthreads*/) : node_inf(nullptr), m_opsum_nthreads(opsum_nthreads){}
             ~site_action_branch() { node_inf = nullptr; }
-
+            site_action_branch(const site_action_branch&) = default;
+            site_action_branch& operator=(const site_action_branch&) = default;
         public:
-            template <typename vtype, typename mat_type, typename rtype>
-            inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, mat_type &t1, mat_type &t2, mat_type &t3, rtype &res) const
+            template <typename vtype, typename buffer_type, typename rtype>
+            inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
                 try
                 {
                     ASSERT(node_inf != nullptr, "Cannot apply site action branch without first binding a node_type object to this.");
                     (*node_inf).as_matrix() = v;
-                    CALL_AND_RETHROW(this->operator()(*node_inf, h, hprim, t1, t2, t3, res));
+                    CALL_AND_RETHROW(this->operator()(*node_inf, h, hprim, buffer, res));
                 }
                 catch (const std::exception &ex)
                 {
@@ -556,14 +657,14 @@ namespace ttns
                 }
             }
 
-            template <typename mat_type, typename rtype>
-            inline void operator()(const hdata &v, const node_type &h, const environment_type &hprim, mat_type &t1, mat_type &t2, mat_type &t3, rtype &res) const
+            template <typename buffer_type, typename rtype>
+            inline void operator()(const hdata &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
                 try
                 {
                     res.fill_zeros();
                     const auto &cinf = hprim.contraction_info()[h.id()]();
-                    CALL_AND_RETHROW(site_action_branch_helper::evaluate(v, h, cinf, hprim.Eshift(), t1, t2, t3, res));
+                    CALL_AND_RETHROW(site_action_branch_helper::evaluate(v, h, cinf, hprim.Eshift(), buffer, res, m_opsum_nthreads));
                 }
                 catch (const std::exception &ex)
                 {
@@ -571,6 +672,9 @@ namespace ttns
                     RAISE_EXCEPTION("Failed to apply the branch coefficient evolution operator at a node.");
                 }
             }
+
+        protected: 
+            size_type m_opsum_nthreads = 1;
         }; // class site_action_branch
     };
 
@@ -605,29 +709,31 @@ namespace ttns
             void unset_pointer() const { node_inf = nullptr; }
 
             bond_action() : node_inf(nullptr) {}
+            bond_action(size_type opsum_nthreads) : node_inf(nullptr), m_opsum_nthreads(opsum_nthreads){}
+            bond_action(size_type opsum_nthreads, size_type set_nthreads) : node_inf(nullptr), m_opsum_nthreads(opsum_nthreads), m_set_nthreads(set_nthreads){}
             ~bond_action() { node_inf = nullptr; }
+            bond_action(const bond_action&)=default;
+            bond_action& operator=(const bond_action&)=default;
 
         public:
-            template <typename vtype, typename mat_type, typename rtype, typename mrestype>
-            inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, mat_type &t1, mat_type &t2, std::vector<mrestype> &m_res, rtype &res) const
+            template <typename vtype, typename buffer_type, typename rtype, typename mrestype>
+            inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, std::vector<mrestype> &m_res, rtype &res) const
             {
                 ASSERT(node_inf != nullptr, "Cannot apply branch action without first binding a node_type object to this.");
                 CALL_AND_HANDLE(ttn_type::unpack(v, (*node_inf)), "Failed to copy bufffer to bond matrix type.");
 
-                CALL_AND_RETHROW(this->operator()((*node_inf), h, hprim, t1, t2, m_res));
+                CALL_AND_RETHROW(this->operator()((*node_inf), h, hprim, buffer, m_res));
                 CALL_AND_HANDLE(ttn_type::flatten(m_res, res), "Failed to copy bufffer to bond matrix type.");
             }
 
-            template <typename mat_type, typename rtype>
-            inline void operator()(const bond_matrix_type &v, const node_type &h, const environment_type &hprim, mat_type &t1, mat_type &t2, std::vector<rtype> &res) const
+            template <typename buffer_type, typename rtype>
+            inline void operator()(const bond_matrix_type &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, std::vector<rtype> &res) const
             {
                 try
                 {
                     const auto &cinf = hprim.contraction_info()[h.id()]();
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
-#pragma omp parallel for default(shared) if (t1.size() > 1 && v.size() > 1) num_threads(t1.size())
-#endif
+                    #pragma omp parallel for num_threads(m_set_nthreads) default(shared) if (buffer.buf > 1 && v.size() > 1) 
 #endif
                     for (size_t row = 0; row < v.size(); ++row)
                     {
@@ -635,7 +741,7 @@ namespace ttns
                         for (size_t ci = 0; ci < cinf[row].size(); ++ci)
                         {
                             size_t col = cinf[row][ci].col();
-                            CALL_AND_RETHROW(bond_action_helper::evaluate(v[col], h()[row][ci], cinf[row][ci], hprim.Eshift(row, ci), t1, t2, res[row], row == col));
+                            CALL_AND_RETHROW(bond_action_helper::evaluate(v[col], h()[row][ci], cinf[row][ci], hprim.Eshift(row, ci), buffer, res[row], row == col, m_opsum_nthreads));
                         }
                     }
                 }
@@ -646,6 +752,9 @@ namespace ttns
                 }
             }
 
+        protected: 
+            size_type m_opsum_nthreads = 1;
+            size_type m_set_nthreads=1;
         }; // class bond_action
 
         class site_action_leaf
@@ -658,29 +767,30 @@ namespace ttns
             void unset_pointer() const { node_inf = nullptr; }
 
             site_action_leaf() : node_inf(nullptr) {}
+            site_action_leaf(size_type opsum_nthreads) : node_inf(nullptr), m_opsum_nthreads(opsum_nthreads){}
+            site_action_leaf(size_type opsum_nthreads, size_type set_nthreads) : node_inf(nullptr), m_opsum_nthreads(opsum_nthreads), m_set_nthreads(set_nthreads){}
             ~site_action_leaf() { node_inf = nullptr; }
-
+            site_action_leaf(const site_action_leaf&) = default;
+            site_action_leaf& operator=(const site_action_leaf&) = default;
         public:
-            template <typename vtype, typename mat_type, typename rtype, typename mrestype>
-            inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, mat_type &t1, mat_type &t2, std::vector<mrestype> &m_res, rtype &res) const
+            template <typename vtype, typename buffer_type, typename rtype, typename mrestype>
+            inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, std::vector<mrestype> &m_res, rtype &res) const
             {
                 ASSERT(node_inf != nullptr, "Cannot apply site action leaf without first binding a node_type object to this.");
                 CALL_AND_HANDLE(ttn_type::unpack(v, (*node_inf)), "Failed to copy bufffer to bond matrix type.");
 
-                CALL_AND_RETHROW(this->operator()((*node_inf), h, hprim, t1, t2, m_res));
+                CALL_AND_RETHROW(this->operator()((*node_inf), h, hprim, buffer, m_res));
                 CALL_AND_HANDLE(ttn_type::flatten(m_res, res), "Failed to copy bufffer to bond matrix type.");
             }
 
-            template <typename mat_type, typename rtype>
-            inline void operator()(const ms_hdata &v, const node_type &h, const environment_type &hprim, mat_type &t1, mat_type &t2, rtype &res) const
+            template <typename buffer_type, typename rtype>
+            inline void operator()(const ms_hdata &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
                 try
                 {
                     const auto &cinf = hprim.contraction_info()[h.id()]();
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
-#pragma omp parallel for default(shared) if (t1.size() > 1 && v.size() > 1) num_threads(t1.size())
-#endif
+                    #pragma omp parallel for num_threads(m_set_nthreads) default(shared) if (buffer.buf > 1 && v.size() > 1) 
 #endif
                     for (size_t row = 0; row < v.size(); ++row)
                     {
@@ -688,7 +798,7 @@ namespace ttns
                         for (size_t ci = 0; ci < cinf[row].size(); ++ci)
                         {
                             size_t col = cinf[row][ci].col();
-                            CALL_AND_RETHROW(site_action_leaf_helper::evaluate(v[col], h()[row][ci], cinf[row][ci], hprim.mode_operators(row, ci), hprim.Eshift(row, ci), t1, t2, res[row], row == col));
+                            CALL_AND_RETHROW(site_action_leaf_helper::evaluate(v[col], h()[row][ci], cinf[row][ci], hprim.mode_operators(row, ci), hprim.Eshift(row, ci), buffer, res[row], row == col, m_opsum_nthreads));
                         }
                     }
                 }
@@ -698,6 +808,9 @@ namespace ttns
                     RAISE_EXCEPTION("Failed to apply the action of the full Hamiltonian at a node.");
                 }
             }
+        protected: 
+            size_type m_opsum_nthreads = 1;
+            size_type m_set_nthreads=1;
         }; // class site_action_leaf
 
         class site_action_branch
@@ -711,29 +824,31 @@ namespace ttns
             void unset_pointer() const { node_inf = nullptr; }
 
             site_action_branch() : node_inf(nullptr) {}
+            site_action_branch(size_type opsum_nthreads) : node_inf(nullptr), m_opsum_nthreads(opsum_nthreads){}
+            site_action_branch(size_type opsum_nthreads, size_type set_nthreads) : node_inf(nullptr), m_opsum_nthreads(opsum_nthreads), m_set_nthreads(set_nthreads){}
             ~site_action_branch() { node_inf = nullptr; }
+            site_action_branch(const site_action_branch&) = default;
+            site_action_branch& operator=(const site_action_branch&) = default;
 
         public:
-            template <typename vtype, typename mat_type, typename rtype, typename mrestype>
-            inline void operator()(const vtype &v, node_type &h, const environment_type &hprim, mat_type &t1, mat_type &t2, mat_type &t3, std::vector<mrestype> &m_res, rtype &res) const
+            template <typename vtype, typename buffer_type, typename rtype, typename mrestype>
+            inline void operator()(const vtype &v, node_type &h, const environment_type &hprim, buffer_type& buffer, std::vector<mrestype> &m_res, rtype &res) const
             {
                 ASSERT(node_inf != nullptr, "Cannot apply site action branch action without first binding a node_type object to this.");
                 CALL_AND_HANDLE(ttn_type::unpack(v, (*node_inf)), "Failed to copy bufffer to bond matrix type.");
 
-                CALL_AND_RETHROW(this->operator()((*node_inf), h, hprim, t1, t2, t3, m_res));
+                CALL_AND_RETHROW(this->operator()((*node_inf), h, hprim, buffer, m_res));
                 CALL_AND_HANDLE(ttn_type::flatten(m_res, res), "Failed to copy bufffer to bond matrix type.");
             }
 
-            template <typename mat_type, typename rtype>
-            inline void operator()(const ms_hdata &v, node_type &h, const environment_type &hprim, mat_type &t1, mat_type &t2, mat_type &t3, rtype &res) const
+            template <typename buffer_type, typename rtype>
+            inline void operator()(const ms_hdata &v, node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
                 try
                 {
                     const auto &cinf = hprim.contraction_info()[h.id()]();
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
-#pragma omp parallel for default(shared) if (t1.size() > 1 && v.size() > 1) num_threads(t1.size())
-#endif
+                    #pragma omp parallel for num_threads(m_set_nthreads) default(shared) if (buffer.buf > 1 && v.size() > 1) 
 #endif
                     for (size_t row = 0; row < v.size(); ++row)
                     {
@@ -746,11 +861,11 @@ namespace ttns
 
                             if (row == col)
                             {
-                                CALL_AND_RETHROW(site_action_branch_helper::evaluate(v[col], hslice, cinf[row][ci], hprim.Eshift(row, ci), t1, t2, t3, res[row]));
+                                CALL_AND_RETHROW(site_action_branch_helper::evaluate(v[col], hslice, cinf[row][ci], hprim.Eshift(row, ci), buffer, res[row], m_opsum_nthreads));
                             }
                             else
                             {
-                                CALL_AND_RETHROW(site_action_branch_helper::evaluate(v[col], v[row], hslice, cinf[row][ci], hprim.Eshift(row, ci), t1, t2, t3, res[row]));
+                                CALL_AND_RETHROW(site_action_branch_helper::evaluate(v[col], v[row], hslice, cinf[row][ci], hprim.Eshift(row, ci), buffer, res[row], m_opsum_nthreads));
                             }
                         }
                     }
@@ -761,7 +876,9 @@ namespace ttns
                     RAISE_EXCEPTION("Failed to apply the action of the full Hamiltonian at a node.");
                 }
             }
-
+        protected: 
+            size_type m_opsum_nthreads = 1;
+            size_type m_set_nthreads=1;
         }; // class site_action_branch
     };
 
