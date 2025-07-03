@@ -153,11 +153,7 @@ namespace ttns
 
     protected:
         template <typename spftype>
-#ifdef USE_OPENMP
-        static inline void evaluate_leaf(const op_container &h, const cinftype &cinf, const hdata &B, const hdata &A, buffer_type &buffer, spftype &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
-#else
-        static inline void evaluate_leaf(const op_container &h, const cinftype &cinf, const hdata &B, const hdata &A, buffer_type &buffer, spftype &hspf, bool compute_identity = false, bool update_all = true, size_t /*operator_sum_nthreads*/ = 1)
-#endif
+        static inline void evaluate_leaf(const op_container &h, const cinftype &cinf, const hdata &B, const hdata &A, buffer_type &buffer, spftype &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
             try
             {
@@ -176,7 +172,11 @@ namespace ttns
 #endif
                 for (size_type ind = 0; ind < cinf.nterms(); ++ind)
                 {
-                    size_type ti = omp_get_thread_num();
+#ifdef USE_OPENMP
+                    size_type ti = omp_get_thread_num() + tid*operator_sum_nthreads;
+#else
+                    size_type ti = tid*operator_sum_nthreads;
+#endif                                     
                     CALL_AND_HANDLE(buffer.HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
                     // update all terms if we aren't worrying about time dependence otherwise only deal with time dependence
                     if (update_all || cinf[ind].is_time_dependent())
@@ -207,35 +207,35 @@ namespace ttns
         }
 
         template <typename spfnode>
-        static inline void evaluate_leaf_single_set(const soptype &h, const cinfnode &cinf, const hnode &B, const hnode &A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
+        static inline void evaluate_leaf_single_set(const soptype &h, const cinfnode &cinf, const hnode &B, const hnode &A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
-            CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), buffer, hspf(), compute_identity, update_all, operator_sum_nthreads));
+            CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), buffer, hspf(), compute_identity, update_all, operator_sum_nthreads, tid));
         }
 
         template <typename spfnode>
-        static inline void evaluate_leaf_single_set(const soptype &h, const cinfnode &cinf, ms_slice_node &&B, ms_slice_node &&A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
+        static inline void evaluate_leaf_single_set(const soptype &h, const cinfnode &cinf, ms_slice_node &&B, ms_slice_node &&A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
-            CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), buffer, hspf(), compute_identity, update_all, operator_sum_nthreads));
+            CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), buffer, hspf(), compute_identity, update_all, operator_sum_nthreads, tid));
         }
 
         template <typename spfnode>
-        static inline void evaluate_leaf_single_set(const soptype &h, const cinfnode &cinf, ms_slice_node &&B, const hnode &A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
+        static inline void evaluate_leaf_single_set(const soptype &h, const cinfnode &cinf, ms_slice_node &&B, const hnode &A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
-            CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), buffer, hspf(), compute_identity, update_all, operator_sum_nthreads));
+            CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), buffer, hspf(), compute_identity, update_all, operator_sum_nthreads, tid));
         }
 
         template <typename spfnode>
-        static inline void evaluate_leaf_single_set(const soptype &h, const cinfnode &cinf, const hnode &B, ms_slice_node &&A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
+        static inline void evaluate_leaf_single_set(const soptype &h, const cinfnode &cinf, const hnode &B, ms_slice_node &&A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
-            CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), buffer, hspf(), compute_identity, update_all, operator_sum_nthreads));
+            CALL_AND_RETHROW(evaluate_leaf(h.mode_operators(), cinf(), B(), A(), buffer, hspf(), compute_identity, update_all, operator_sum_nthreads, tid));
         }
 
         template <typename spfnode>
-        static inline void evaluate_leaf(const ms_soptype &h, const ms_cinfnode &cinf, const ms_hnode &B, const ms_hnode &A, size_t i, size_t c, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
+        static inline void evaluate_leaf(const ms_soptype &h, const ms_cinfnode &cinf, const ms_hnode &B, const ms_hnode &A, size_t i, size_t c, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
             // now we need to iterate over each of the set indices and perform the correct contractions storing them in the correct locations
             size_t j = cinf()[i][c].col();
-            CALL_AND_RETHROW(evaluate_leaf(h.mode_operators()[i][c], cinf()[i][c], B(i), A(j), buffer, hspf(), compute_identity, update_all, operator_sum_nthreads));
+            CALL_AND_RETHROW(evaluate_leaf(h.mode_operators()[i][c], cinf()[i][c], B(i), A(j), buffer, hspf(), compute_identity, update_all, operator_sum_nthreads, tid));
         }
 
         template <typename spfnode>
@@ -250,21 +250,22 @@ namespace ttns
 #endif
             for (size_t row = 0; row < cinf().size(); ++row)
             {
+#ifdef USE_OPENMP
+                size_t tid = omp_get_thread_num();
+#else
+                size_t tid = 0;
+#endif
                 for (size_t ci = 0; ci < cinf()[row].size(); ++ci)
                 {
                     size_t col = cinf()[row][ci].col();
-                    CALL_AND_RETHROW(evaluate_leaf(h.mode_operators()[row][ci], cinf()[row][ci], B(row), A(col), buffer, hspf()[row][ci], compute_identity, update_all, operator_sum_nthreads));
+                    CALL_AND_RETHROW(evaluate_leaf(h.mode_operators()[row][ci], cinf()[row][ci], B(row), A(col), buffer, hspf()[row][ci], compute_identity, update_all, operator_sum_nthreads, tid));
                 }
             }
         }
 
     protected:
         template <typename spfnode>
-#ifdef USE_OPENMP
-        static inline void _evaluate_branch(const cinftype &cinf, const hdata &A, buffer_type &buffer, spfnode &hspf, bool update_all = true, size_t operator_sum_nthreads = 1)
-#else     
-        static inline void _evaluate_branch(const cinftype &cinf, const hdata &A, buffer_type &buffer, spfnode &hspf, bool update_all = true, size_t /*operator_sum_nthreads*/ = 1)
-#endif
+        static inline void _evaluate_branch(const cinftype &cinf, const hdata &A, buffer_type &buffer, spfnode &hspf, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
             try
             {
@@ -274,8 +275,12 @@ namespace ttns
                 #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(dynamic, 1)
 #endif
                 for (size_type ind = 0; ind < cinf.nterms(); ++ind)
-                {
-                    size_type ti = omp_get_thread_num();
+                {    
+#ifdef USE_OPENMP
+                    size_type ti = omp_get_thread_num() + tid*operator_sum_nthreads;
+#else
+                    size_type ti = tid*operator_sum_nthreads;
+#endif                    
                     CALL_AND_HANDLE(buffer.HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
                     CALL_AND_HANDLE(buffer.temp[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
                     if (update_all || cinf[ind].is_time_dependent())
@@ -305,24 +310,19 @@ namespace ttns
         }
 
         template <typename spfnode>
-#ifdef USE_OPENMP
-        static inline void _evaluate_branch(const cinftype &cinf, const hdata &B, const hdata &A, buffer_type &buffer, spfnode &hspf, bool update_all = true, size_t operator_sum_nthreads = 1)
-#else
-        static inline void _evaluate_branch(const cinftype &cinf, const hdata &B, const hdata &A, buffer_type &buffer, spfnode &hspf, bool update_all = true, size_t /*operator_sum_nthreads*/ = 1)
-#endif
+        static inline void _evaluate_branch(const cinftype &cinf, const hdata &B, const hdata &A, buffer_type &buffer, spfnode &hspf, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
             try
             {
-                size_type ti = omp_get_thread_num();
-                CALL_AND_HANDLE(buffer.HA[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
-                CALL_AND_HANDLE(buffer.temp[ti].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
+                CALL_AND_HANDLE(buffer.HA[tid].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
+                CALL_AND_HANDLE(buffer.temp[tid].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
                 CALL_AND_HANDLE(hspf().resize_matrices(B.size(1), A.size(1)), "Failed to resize the single-particle Hamiltonian operator matrices.");
 
                 const auto &b = B.as_matrix();
                 if (update_all)
                 {
-                    CALL_AND_HANDLE(kpo::kpo_id(hspf, A, buffer.temp[ti], buffer.HA[ti]), "Failed to apply kronecker product operator.");
-                    CALL_AND_HANDLE(hspf().spf_id() = adjoint(b) * buffer.HA[ti], "Failed to compute the id matrix term.");
+                    CALL_AND_HANDLE(kpo::kpo_id(hspf, A, buffer.temp[tid], buffer.HA[tid]), "Failed to apply kronecker product operator.");
+                    CALL_AND_HANDLE(hspf().spf_id() = adjoint(b) * buffer.HA[tid], "Failed to compute the id matrix term.");
                 }
 
 #ifdef USE_OPENMP
@@ -332,7 +332,11 @@ namespace ttns
                 {
                     if (update_all || cinf[ind].is_time_dependent())
                     {
-                        size_type ti2 = omp_get_thread_num();
+#ifdef USE_OPENMP
+                        size_type ti2 = omp_get_thread_num() + tid*operator_sum_nthreads;
+#else
+                        size_type ti2 = tid*operator_sum_nthreads;
+#endif
                         CALL_AND_HANDLE(buffer.HA[ti2].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
                         CALL_AND_HANDLE(buffer.temp[ti2].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
                         if (!cinf[ind].is_identity_spf())
@@ -360,48 +364,48 @@ namespace ttns
         }
 
         template <typename spfnode>
-        static inline void evaluate_branch(const cinftype &cinf, const hdata &B, const hdata &A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
+        static inline void evaluate_branch(const cinftype &cinf, const hdata &B, const hdata &A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
             if (&A == &B && !compute_identity)
             {
-                CALL_AND_RETHROW(_evaluate_branch(cinf, A, buffer, hspf, update_all, operator_sum_nthreads));
+                CALL_AND_RETHROW(_evaluate_branch(cinf, A, buffer, hspf, update_all, operator_sum_nthreads, tid));
             }
             else
             {
-                CALL_AND_RETHROW(_evaluate_branch(cinf, B, A, buffer, hspf, update_all, operator_sum_nthreads));
+                CALL_AND_RETHROW(_evaluate_branch(cinf, B, A, buffer, hspf, update_all, operator_sum_nthreads, tid));
             }
         }
 
     protected:
         template <typename spfnode>
-        static inline void evaluate_branch_single_set(const cinfnode &cinf, const hnode &B, const hnode &A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
+        static inline void evaluate_branch_single_set(const cinfnode &cinf, const hnode &B, const hnode &A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
-            CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), buffer, hspf, compute_identity, update_all, operator_sum_nthreads));
+            CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), buffer, hspf, compute_identity, update_all, operator_sum_nthreads, tid));
         }
 
         template <typename spfnode>
-        static inline void evaluate_branch_single_set(const cinfnode &cinf, ms_slice_node &&B, ms_slice_node &&A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
+        static inline void evaluate_branch_single_set(const cinfnode &cinf, ms_slice_node &&B, ms_slice_node &&A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
-            CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), buffer, hspf, compute_identity, update_all, operator_sum_nthreads));
+            CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), buffer, hspf, compute_identity, update_all, operator_sum_nthreads, tid));
         }
 
         template <typename spfnode>
-        static inline void evaluate_branch_single_set(const cinfnode &cinf, ms_slice_node &&B, const hnode &A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
+        static inline void evaluate_branch_single_set(const cinfnode &cinf, ms_slice_node &&B, const hnode &A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
-            CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), buffer, hspf, compute_identity, update_all, operator_sum_nthreads));
+            CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), buffer, hspf, compute_identity, update_all, operator_sum_nthreads, tid));
         }
 
         template <typename spfnode>
-        static inline void evaluate_branch_single_set(const cinfnode &cinf, const hnode &B, ms_slice_node &&A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
+        static inline void evaluate_branch_single_set(const cinfnode &cinf, const hnode &B, ms_slice_node &&A, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
-            CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), buffer, hspf, compute_identity, update_all, operator_sum_nthreads));
+            CALL_AND_RETHROW(evaluate_branch(cinf(), B(), A(), buffer, hspf, compute_identity, update_all, operator_sum_nthreads, tid));
         }
 
         template <typename spfnode>
-        static inline void evaluate_branch(const ms_cinfnode &cinf, const ms_hnode &B, const ms_hnode &A, size_t i, size_t c, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
+        static inline void evaluate_branch(const ms_cinfnode &cinf, const ms_hnode &B, const ms_hnode &A, size_t i, size_t c, buffer_type &buffer, spfnode &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
             size_t j = cinf()[i][c].col();
-            CALL_AND_RETHROW(evaluate_branch(cinf()[i][c], B(i), A(j), buffer, hspf, compute_identity, update_all, operator_sum_nthreads));
+            CALL_AND_RETHROW(evaluate_branch(cinf()[i][c], B(i), A(j), buffer, hspf, compute_identity, update_all, operator_sum_nthreads, tid));
         }
 
         template <typename spfnode>
@@ -416,11 +420,16 @@ namespace ttns
 #endif
             for (size_t row = 0; row < cinf().size(); ++row)
             {
+#ifdef USE_OPENMP
+                size_t tid = omp_get_thread_num();
+#else
+                size_t tid = 0;
+#endif
                 for (size_t ci = 0; ci < cinf()[row].size(); ++ci)
                 {
                     size_t col = cinf()[row][ci].col();
                     ms_sop_env_slice<T, backend> hslice(hspf, row, ci);
-                    CALL_AND_RETHROW(evaluate_branch(cinf()[row][ci], B(row), A(col), buffer, hslice, compute_identity, update_all, operator_sum_nthreads));
+                    CALL_AND_RETHROW(evaluate_branch(cinf()[row][ci], B(row), A(col), buffer, hslice, compute_identity, update_all, operator_sum_nthreads, tid));
                 }
             }
         }

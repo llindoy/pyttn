@@ -109,11 +109,12 @@ namespace ttns
             }
         }
 
-        void reset_result_buffer(size_t s1, size_t s2) const
+        void reset_result_buffer(size_t tid, size_t nthread, size_t s1, size_t s2) const
         {
-            for (size_t i = 0; i < res.size(); ++i)
+            ASSERT( (tid+1)*nthread <= res.size(), "Requested out of index reset buffer.");
+            for (size_t i = 0; i < nthread; ++i)
             {
-                CALL_AND_HANDLE(res[i].resize(s1, s2), "Failed to reszie temporary matrix.");
+                CALL_AND_HANDLE(res[i+tid*nthread].resize(s1, s2), "Failed to reszie temporary matrix.");
                 res[i].fill_zeros();
             }
         }

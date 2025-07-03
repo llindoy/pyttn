@@ -95,11 +95,7 @@ namespace ttns
         }
 
         template <typename opnode>
-#ifdef USE_OPENMP
         static inline void evaluate(const ms_cinfnode &hinf, const ms_hnode &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads=1, size_t set_var_nthreads=1)
-#else
-        static inline void evaluate(const ms_cinfnode &hinf, const ms_hnode &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads=1, size_t /*set_var_nthreads*/=1)
-#endif
         {
             if (!h.is_root())
             {
@@ -113,16 +109,21 @@ namespace ttns
                 {
                     for (size_t ci = 0; ci < hinf()[row].size(); ++ci)
                     {
+#ifdef USE_OPENMP
+                        size_t tid = omp_get_thread_num();
+#else
+                        size_t tid = 0;
+#endif
                         size_t col = hinf()[row][ci].col();
                         ms_sop_env_slice<T, backend> hslice(h, row, ci);
 
                         if (row == col)
                         {
-                            _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, A(row), buffer, hslice, operator_sum_nthreads);
+                            _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, A(row), buffer, hslice, operator_sum_nthreads, tid);
                         }
                         else
                         {
-                            _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, A(row), A(col), buffer, hslice, operator_sum_nthreads);
+                            _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, A(row), A(col), buffer, hslice, operator_sum_nthreads, tid);
                         }
                     }
                 }
@@ -131,12 +132,7 @@ namespace ttns
 
     protected:
         template <typename opnode>
-#ifdef USE_OPENMP
-        static inline void _evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads=1)
-#else
-        static inline void _evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &A, buffer_type& buffer, opnode &h, size_t /*operator_sum_nthreads*/=1)
-
-#endif
+        static inline void _evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
             try
             {
@@ -147,7 +143,11 @@ namespace ttns
 #endif
                 for (size_type ind = 0; ind < hinf.nterms(); ++ind)
                 {
-                    size_type ti = omp_get_thread_num();
+#ifdef USE_OPENMP
+                    size_type ti = omp_get_thread_num() + tid*operator_sum_nthreads;
+#else
+                    size_type ti = tid*operator_sum_nthreads;
+#endif                                    
                     CALL_AND_HANDLE(buffer.HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
                     CALL_AND_HANDLE(buffer.temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
 
@@ -196,18 +196,18 @@ namespace ttns
         }
 
         template <typename opnode>
-        static inline void _evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &B, const hdata &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads=1)
+        static inline void _evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &B, const hdata &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
             if (&A == &B)
             {
-                CALL_AND_RETHROW(return _evaluate_term(hinf, hinf_p, mode, A, buffer, h, operator_sum_nthreads));
+                CALL_AND_RETHROW(return _evaluate_term(hinf, hinf_p, mode, A, buffer, h, operator_sum_nthreads, tid));
             }
             try
             {
 
                 const auto &h_p = h.parent();
                 {
-                    size_type ti = omp_get_thread_num();
+                    size_type ti = tid*operator_sum_nthreads;
                     CALL_AND_HANDLE(buffer.HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
                     CALL_AND_HANDLE(buffer.temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
 
@@ -239,8 +239,11 @@ namespace ttns
                     // if the mean field operator is the identity then we don't need to do anything.
                     if (!hinf[ind].is_identity_mf())
                     {
-                        size_type ti = omp_get_thread_num();
-
+#ifdef USE_OPENMP
+                        size_type ti = omp_get_thread_num() + tid*operator_sum_nthreads;
+#else
+                        size_type ti = tid*operator_sum_nthreads;
+#endif                
                         CALL_AND_HANDLE(buffer.HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
                         CALL_AND_HANDLE(buffer.temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
 
@@ -295,7 +298,7 @@ namespace ttns
         }
 
         template <typename opnode>
-        static inline void evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &B, const hdata &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads=1)
+        static inline void evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &B, const hdata &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads = 1)
         {
             if (&A == &B)
             {

@@ -101,6 +101,7 @@ namespace ttns
             try
             {
                 set_var_nthreads = set_var_nthreads < 1 ? 1 : set_var_nthreads;
+                ASSERT(set_var_nthreads == 1, "Parallelising over set variables is currently not working.");                 
                 CALL_AND_HANDLE(m_env.initialise(A, ham, m_ham, set_var_nthreads), "Failed to initialise environment object.");
                 CALL_AND_HANDLE(subspace_type::initialise(A, ham), "Failed to initialise subspace expansion object.");
                 CALL_AND_HANDLE(update_type::initialise(A), "Failed to initialise the update object.");
@@ -116,7 +117,8 @@ namespace ttns
         {
             try
             {
-                set_var_nthreads = set_var_nthreads < 1 ? 1 : set_var_nthreads;                
+                set_var_nthreads = set_var_nthreads < 1 ? 1 : set_var_nthreads;  
+                ASSERT(set_var_nthreads == 1, "Parallelising over set variables is currently not working.");                 
                 CALL_AND_HANDLE(m_env.initialise(A, ham, m_ham, env, set_var_nthreads), "Failed to initialise environment object.");
                 CALL_AND_HANDLE(subspace_type::initialise(A, ham, sub), "Failed to initialise subspace expansion object.");
                 CALL_AND_HANDLE(update_type::initialise(A, upd), "Failed to initialise the update object.");
@@ -132,7 +134,8 @@ namespace ttns
         {
             try
             {
-                set_var_nthreads = set_var_nthreads < 1 ? 1 : set_var_nthreads;                    
+                set_var_nthreads = set_var_nthreads < 1 ? 1 : set_var_nthreads;   
+                ASSERT(set_var_nthreads == 1, "Parallelising over set variables is currently not working.");                 
                 CALL_AND_HANDLE(m_env.initialise(A, ham, m_ham, std::forward<environment_params>(env), set_var_nthreads), "Failed to initialise environment object.");
                 CALL_AND_HANDLE(subspace_type::initialise(A, ham, sub), "Failed to initialise subspace expansion object.");
                 CALL_AND_HANDLE(update_type::initialise(A, upd), "Failed to initialise the update object.");

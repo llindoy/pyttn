@@ -305,3 +305,4 @@ def test_dmrg_mps_tfim_fork(N, expected_result, adaptive):
     res = np.real(mel(h, A)) / N
 
     assert pytest.approx(res, 1e-6) == (expected_result - 3)
+

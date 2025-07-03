@@ -578,6 +578,9 @@ namespace ttns
             CALL_AND_HANDLE(this->set_orthogonality_centre(i1), "Failed to apply one body operator.  Failed to shift orthogonality centre.");
         }
         */
+    size_type nthreads() const { return 1; }
+    void set_nthreads(size_t ) const{}
+
     public:
         ttn &apply_product_operator(product_operator<T, backend> &op, bool shift_orthogonality = true)
         {

@@ -38,24 +38,23 @@ namespace ttns
 
     protected:
         template <typename T, typename vtype, typename soptype, typename cinftype, typename buffer_type, typename rtype>
-#ifdef USE_OPENMP
-        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads)
-#else
-        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t /*opsum_nthreads*/)
-#endif
+        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads, size_t tid = 0)
         {
             bool add_Eshift = Eshift != T(0.0);
             size_t nadd = add_Eshift ? 1 : 0;
 
-            buffer.reset_result_buffer(v.shape(0), v.shape(1));
+            buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 
-            //parallel addition of all of the terms into the result buffer objects
 #ifdef USE_OPENMP
             #pragma omp parallel for num_threads(opsum_nthreads) default(shared) schedule(dynamic, 1)
 #endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
-                size_t ti = omp_get_thread_num();
+#ifdef USE_OPENMP
+                size_t ti = omp_get_thread_num()+ tid*opsum_nthreads;
+#else
+                size_t ti = tid*opsum_nthreads;
+#endif                
                 auto &t1 = buffer.temp[ti];
                 auto &t2 = buffer.temp2[ti];
                 auto &rb = buffer.res[ti];
@@ -64,7 +63,7 @@ namespace ttns
 
                 if (add_Eshift && indx == 0)
                 {
-                    t2 += Eshift * v;
+                    rb += Eshift * v;
                 }
                 else
                 {
@@ -97,32 +96,34 @@ namespace ttns
             }
 
             //now sum over the result buffers
-            for(size_t i = 0; i < buffer.buf; ++i)
+            for(size_t i = 0; i < opsum_nthreads; ++i)
             {
-                res += buffer.res[i];
+                res += buffer.res[i+ tid*opsum_nthreads];
             }
         }
         template <typename T, typename vtype, typename soptype, typename cinftype, typename buffer_type, typename rtype>
-#ifdef USE_OPENMP
-        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads)
-#else
-        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t /*opsum_nthreads*/)
-#endif
+        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads, size_t tid = 0)
         {
             bool add_Eshift = Eshift != T(0.0);
             size_t nadd = add_Eshift ? 1 : 0;
 
-            buffer.reset_result_buffer(v.shape(0), v.shape(1));
+            buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 
 #ifdef USE_OPENMP
             #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
 #endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
-                size_t ti = omp_get_thread_num();
+#ifdef USE_OPENMP
+                size_t ti = omp_get_thread_num()+ tid*opsum_nthreads;
+#else
+                size_t ti = tid*opsum_nthreads;
+#endif
+
                 auto &t1 = buffer.temp[ti];
                 auto &t2 = buffer.temp2[ti];
                 auto &rb = buffer.res[ti];
+
                 t1.resize(v.shape(0), v.shape(1));
                 t2.resize(v.shape(0), v.shape(1));
 
@@ -154,23 +155,23 @@ namespace ttns
             }
 
             //now sum over the result buffers
-            for(size_t i = 0; i < buffer.buf; ++i)
+            for(size_t i = 0; i < opsum_nthreads; ++i)
             {
-                res += buffer.res[i];
+                res += buffer.res[i+ tid*opsum_nthreads];
             }
         }
 
     public:
         template <typename T, typename vtype, typename soptype, typename cinftype, typename buffer_type, typename rtype>
-        static inline void evaluate(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type &buffer, rtype &res, bool use_identity = true, size_t opsum_nthreads = 1)
+        static inline void evaluate(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type &buffer, rtype &res, bool use_identity = true, size_t opsum_nthreads = 1, size_t tid = 0)
         {
             if (use_identity)
             {
-                CALL_AND_RETHROW(evaluate_id(v, h, cinf, Eshift, buffer, res, opsum_nthreads));
+                CALL_AND_RETHROW(evaluate_id(v, h, cinf, Eshift, buffer, res, opsum_nthreads, tid));
             }
             else
             {
-                CALL_AND_RETHROW(evaluate_olap(v, h, cinf, Eshift, buffer, res, opsum_nthreads));
+                CALL_AND_RETHROW(evaluate_olap(v, h, cinf, Eshift, buffer, res, opsum_nthreads, tid));
             }
         }
     };
@@ -179,25 +180,25 @@ namespace ttns
     {
     protected:
         template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename buffer_type, typename rtype>
-#ifdef USE_OPENMP
-        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type &buffer, rtype &res, size_t opsum_nthreads = 1)
-#else
-        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type &buffer, rtype &res, size_t /*opsum_nthreads*/ = 1)
-#endif
+        static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type &buffer, rtype &res, size_t opsum_nthreads = 1, size_t tid=0)
         {
             try
             {
                 bool add_Eshift = Eshift != T(0.0);
                 size_t nadd = add_Eshift ? 1 : 0;
 
-                buffer.reset_result_buffer(v.shape(0), v.shape(1));
+                buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 
 #ifdef USE_OPENMP
                 #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
 #endif
                 for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
                 {
-                    size_t ti = omp_get_thread_num();
+#ifdef USE_OPENMP
+                    size_t ti = omp_get_thread_num()+ tid*opsum_nthreads;
+#else
+                    size_t ti = tid*opsum_nthreads;
+#endif
                     auto &t1 = buffer.temp[ti];
                     auto &t2 = buffer.temp2[ti];
                     auto &rb = buffer.res[ti];
@@ -264,9 +265,9 @@ namespace ttns
                     }
                 }
                 //now sum over the result buffers
-                for(size_t i = 0; i < buffer.buf; ++i)
+                for(size_t i = 0; i < opsum_nthreads; ++i)
                 {
-                    res += buffer.res[i];
+                    res += buffer.res[i+ tid*opsum_nthreads];
                 }
             }
             catch (const std::exception &ex)
@@ -276,24 +277,24 @@ namespace ttns
             }
         }
         template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename buffer_type, typename rtype>
-#ifdef USE_OPENMP        
-        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1)
-#else
-        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type& buffer, rtype &res, size_t /*opsum_nthreads*/ = 1)
-#endif
+        static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1, size_t tid=0)
         {
             try
             {
                 bool add_Eshift = Eshift != T(0.0);
                 size_t nadd = add_Eshift ? 1 : 0;
 
-                buffer.reset_result_buffer(v.shape(0), v.shape(1));
+                buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 #ifdef USE_OPENMP
                 #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
 #endif
                 for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
                 {
-                    size_t ti = omp_get_thread_num();
+#ifdef USE_OPENMP
+                    size_t ti = omp_get_thread_num()+ tid*opsum_nthreads;
+#else
+                    size_t ti = tid*opsum_nthreads;
+#endif              
                     auto &t1 = buffer.temp[ti];
                     auto &t2 = buffer.temp2[ti];
                     auto &rb = buffer.res[ti];
@@ -352,9 +353,9 @@ namespace ttns
                     }
                 }
                 //now sum over the result buffers
-                for(size_t i = 0; i < buffer.buf; ++i)
+                for(size_t i = 0; i < opsum_nthreads; ++i)
                 {
-                    res += buffer.res[i];
+                    res += buffer.res[i+ tid*opsum_nthreads];
                 }
             }
             catch (const std::exception &ex)
@@ -366,15 +367,15 @@ namespace ttns
 
     public:
         template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename buffer_type, typename rtype>
-        static inline void evaluate(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type& buffer, rtype &res, bool use_identity = true, size_t opsum_nthreads = 1)
+        static inline void evaluate(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type& buffer, rtype &res, bool use_identity = true, size_t opsum_nthreads = 1, size_t tid = 0)
         {
             if (use_identity)
             {
-                CALL_AND_RETHROW(evaluate_id(v, h, cinf, hprim, Eshift, buffer, res, opsum_nthreads));
+                CALL_AND_RETHROW(evaluate_id(v, h, cinf, hprim, Eshift, buffer, res, opsum_nthreads, tid));
             }
             else
             {
-                CALL_AND_RETHROW(evaluate_olap(v, h, cinf, hprim, Eshift, buffer, res, opsum_nthreads));
+                CALL_AND_RETHROW(evaluate_olap(v, h, cinf, hprim, Eshift, buffer, res, opsum_nthreads, tid));
             }
         }
     };
@@ -383,24 +384,24 @@ namespace ttns
     {
     public:
         template <typename T, typename backend, typename soptype, typename cinftype, typename buffer_type, typename rtype>
-#ifdef USE_OPENMP
-        static inline void evaluate(const ttn_node_data<T, backend> &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1)
-#else
-        static inline void evaluate(const ttn_node_data<T, backend> &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t /*opsum_nthreads*/ = 1)
-#endif
+        static inline void evaluate(const ttn_node_data<T, backend> &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1, size_t tid=0)
         {
             using spo_core = single_particle_operator_engine<T, backend>;
 
             bool add_Eshift = Eshift != T(0.0);
             size_t nadd = add_Eshift ? 1 : 0;
 
-            buffer.reset_result_buffer(v.shape(0), v.shape(1));
+            buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 #ifdef USE_OPENMP
             #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
 #endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
-                size_t ti = omp_get_thread_num();
+#ifdef USE_OPENMP
+                size_t ti = omp_get_thread_num()+ tid*opsum_nthreads;
+#else
+                size_t ti = tid*opsum_nthreads;
+#endif                
                 auto &t1 = buffer.HA[ti];
                 auto &t2 = buffer.temp[ti];
                 auto &t3 = buffer.temp2[ti];
@@ -464,19 +465,15 @@ namespace ttns
                 }
             }
             //now sum over the result buffers
-            for(size_t i = 0; i < buffer.buf; ++i)
+            for(size_t i = 0; i < opsum_nthreads; ++i)
             {
-                res += buffer.res[i];
+                res += buffer.res[i+ tid*opsum_nthreads];
             }
         }
 
     public:
         template <typename T, typename backend, typename soptype, typename cinftype, typename buffer_type, typename rtype>
-#ifdef USE_OPENMP
-        static inline void evaluate(const ttn_node_data<T, backend> &v, const ttn_node_data<T, backend> &vb, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1)
-#else
-        static inline void evaluate(const ttn_node_data<T, backend> &v, const ttn_node_data<T, backend> &vb, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t /*opsum_nthreads*/ = 1)
-#endif
+        static inline void evaluate(const ttn_node_data<T, backend> &v, const ttn_node_data<T, backend> &vb, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1, size_t tid=0)
         {
             using kpo = kronecker_product_operator_mel<T, backend>;
             using spo_core = single_particle_operator_engine<T, backend>;
@@ -484,14 +481,19 @@ namespace ttns
             bool add_Eshift = Eshift != T(0.0);
             size_t nadd = add_Eshift ? 1 : 0;
 
-            buffer.reset_result_buffer(v.shape(0), v.shape(1));
+            buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 
 #ifdef USE_OPENMP
             #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
 #endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
-                size_t ti = omp_get_thread_num();
+#ifdef USE_OPENMP
+                size_t ti = omp_get_thread_num()+ tid*opsum_nthreads;
+#else
+                size_t ti = tid*opsum_nthreads;
+#endif
+
                 auto &t1 = buffer.HA[ti];
                 auto &t2 = buffer.temp[ti];
                 auto &t3 = buffer.temp2[ti];
@@ -538,9 +540,9 @@ namespace ttns
                 }
             }
             //now sum over the result buffers
-            for(size_t i = 0; i < buffer.buf; ++i)
+            for(size_t i = 0; i < opsum_nthreads; ++i)
             {
-                res += buffer.res[i];
+                res += buffer.res[i+ tid*opsum_nthreads];
             }
         }
     };
@@ -580,7 +582,7 @@ namespace ttns
                 {
                     res.fill_zeros();
                     const auto &cinf = hprim.contraction_info()[h.id()]();
-                    CALL_AND_RETHROW(bond_action_helper::evaluate(v, h(), cinf, hprim.Eshift(), buffer, res, m_opsum_nthreads));
+                    CALL_AND_RETHROW(bond_action_helper::evaluate(v, h(), cinf, hprim.Eshift(), buffer, res, true, m_opsum_nthreads));
                 }
                 catch (const std::exception &ex)
                 {
@@ -612,7 +614,7 @@ namespace ttns
                 {
                     res.fill_zeros();
                     const auto &cinf = hprim.contraction_info()[h.id()]();
-                    CALL_AND_RETHROW(site_action_leaf_helper::evaluate(v, h(), cinf, hprim.mode_operators(), hprim.Eshift(), buffer, res, m_opsum_nthreads));
+                    CALL_AND_RETHROW(site_action_leaf_helper::evaluate(v, h(), cinf, hprim.mode_operators(), hprim.Eshift(), buffer, res, true, m_opsum_nthreads));
                 }
                 catch (const std::exception &ex)
                 {
@@ -738,10 +740,16 @@ namespace ttns
                     for (size_t row = 0; row < v.size(); ++row)
                     {
                         res[row] *= 0.0;
+#ifdef USE_OPENMP
+                        size_t tid = omp_get_thread_num();
+#else
+                        size_t tid = 0;
+#endif
+
                         for (size_t ci = 0; ci < cinf[row].size(); ++ci)
                         {
                             size_t col = cinf[row][ci].col();
-                            CALL_AND_RETHROW(bond_action_helper::evaluate(v[col], h()[row][ci], cinf[row][ci], hprim.Eshift(row, ci), buffer, res[row], row == col, m_opsum_nthreads));
+                            CALL_AND_RETHROW(bond_action_helper::evaluate(v[col], h()[row][ci], cinf[row][ci], hprim.Eshift(row, ci), buffer, res[row], row == col, m_opsum_nthreads, tid));
                         }
                     }
                 }
@@ -794,11 +802,17 @@ namespace ttns
 #endif
                     for (size_t row = 0; row < v.size(); ++row)
                     {
+#ifdef USE_OPENMP
+                        size_t tid = omp_get_thread_num();
+#else
+                        size_t tid = 0;
+#endif
+
                         res[row] *= 0.0;
                         for (size_t ci = 0; ci < cinf[row].size(); ++ci)
                         {
                             size_t col = cinf[row][ci].col();
-                            CALL_AND_RETHROW(site_action_leaf_helper::evaluate(v[col], h()[row][ci], cinf[row][ci], hprim.mode_operators(row, ci), hprim.Eshift(row, ci), buffer, res[row], row == col, m_opsum_nthreads));
+                            CALL_AND_RETHROW(site_action_leaf_helper::evaluate(v[col], h()[row][ci], cinf[row][ci], hprim.mode_operators(row, ci), hprim.Eshift(row, ci), buffer, res[row], row == col, m_opsum_nthreads, tid));
                         }
                     }
                 }
@@ -852,6 +866,12 @@ namespace ttns
 #endif
                     for (size_t row = 0; row < v.size(); ++row)
                     {
+#ifdef USE_OPENMP
+                        size_t tid = omp_get_thread_num();
+#else
+                        size_t tid = 0;
+#endif
+
                         res[row] *= 0.0;
                         for (size_t ci = 0; ci < cinf[row].size(); ++ci)
                         {
@@ -861,11 +881,11 @@ namespace ttns
 
                             if (row == col)
                             {
-                                CALL_AND_RETHROW(site_action_branch_helper::evaluate(v[col], hslice, cinf[row][ci], hprim.Eshift(row, ci), buffer, res[row], m_opsum_nthreads));
+                                CALL_AND_RETHROW(site_action_branch_helper::evaluate(v[col], hslice, cinf[row][ci], hprim.Eshift(row, ci), buffer, res[row], m_opsum_nthreads, tid));
                             }
                             else
                             {
-                                CALL_AND_RETHROW(site_action_branch_helper::evaluate(v[col], v[row], hslice, cinf[row][ci], hprim.Eshift(row, ci), buffer, res[row], m_opsum_nthreads));
+                                CALL_AND_RETHROW(site_action_branch_helper::evaluate(v[col], v[row], hslice, cinf[row][ci], hprim.Eshift(row, ci), buffer, res[row], m_opsum_nthreads, tid));
                             }
                         }
                     }
