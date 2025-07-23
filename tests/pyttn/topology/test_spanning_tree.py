@@ -73,7 +73,7 @@ def test_spanning_tree_msb_star_1():
     #now convert this to an ntree object and construct the leaf_ordering
     tree, leaf_ordering = convert_nx_to_tree(spanning_tree, root_ind=spanning_root_ind)
 
-    assert leaf_ordering == [1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 10, 5, 0]
+    assert leaf_ordering == [14, 0, 1, 2, 3, 13, 4, 5, 6, 7, 12, 8, 9, 10, 11]
     assert tree.root().value == 15
     assert tree.at([0]).value == 1
     assert tree.at([1]).value == 2
@@ -117,7 +117,7 @@ def test_spanning_tree_msb_star_2():
     #now convert this to an ntree object and construct the leaf_ordering
     tree, leaf_ordering = convert_nx_to_tree(spanning_tree, root_ind=spanning_root_ind)
 
-    assert leaf_ordering == [1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 10, 5, 0]
+    assert leaf_ordering == [14, 0, 1, 2, 3, 13, 4, 5, 6, 7, 12, 8, 9, 10, 11]
     assert tree.root().value == 24
     assert tree.at([0]).value == 15
     assert tree.at([0, 0]).value == 1
@@ -170,7 +170,7 @@ def test_spanning_tree_msb_star_3():
     #now convert this to an ntree object and construct the leaf_ordering
     tree, leaf_ordering = convert_nx_to_tree(spanning_tree, root_ind=spanning_root_ind)
 
-    assert leaf_ordering == [1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 10, 5, 0]
+    assert leaf_ordering == [14, 0, 1, 2, 3, 13, 4, 5, 6, 7, 12, 8, 9, 10, 11]
     assert tree.root().value == 24
     assert tree.at([0]).value == 15
     assert tree.at([0, 0]).value == 16
@@ -227,7 +227,7 @@ def test_spanning_tree_msb_star_4():
     #now convert this to an ntree object and construct the leaf_ordering
     tree, leaf_ordering = convert_nx_to_tree(spanning_tree, root_ind=spanning_root_ind)
 
-    assert leaf_ordering == [1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 10, 5, 0]
+    assert leaf_ordering == [14, 0, 1, 2, 3, 13, 4, 5, 6, 7, 12, 8, 9, 10, 11]
     assert tree.root().value == 23
 
     assert tree.at([0]).value == 15
@@ -278,7 +278,7 @@ def test_spanning_tree_msb_star_5():
     #now convert this to an ntree object and construct the leaf_ordering
     tree, leaf_ordering = convert_nx_to_tree(spanning_tree, root_ind=spanning_root_ind)    
 
-    assert leaf_ordering == [1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 10, 5, 0]
+    assert leaf_ordering == [14, 0, 1, 2, 3, 13, 4, 5, 6, 7, 12, 8, 9, 10, 11]
     assert tree.root().value == 24
     assert tree.at([0]).value == 15
     assert tree.at([0, 0]).value == 16

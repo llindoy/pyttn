@@ -58,5 +58,27 @@ notebook = [
     "notebook >= 7.1.0",
     "jupyterlab >=4.1.1",
 ]
+lint = [
+    "ruff>=0.1.0",
+]
 
 
+[tool.ruff]
+line-length = 88
+exclude = ["tutorials", "tests", "*.ipynb", ".vscode", "build", "cmake", "docs", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "C"]
+ignore = ["E501", "B023", "I001"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint.mccabe]
+max-complexity=24
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

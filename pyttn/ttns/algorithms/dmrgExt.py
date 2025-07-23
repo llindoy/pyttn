@@ -10,30 +10,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from abc import ABCMeta, abstractmethod
 from typing import Union
-from abc import ABCMeta
 
 from pyttn.ttnpp import (
-    one_site_dmrg_complex,
     adaptive_one_site_dmrg_complex,
-)
-from pyttn.ttnpp import (
     multiset_one_site_dmrg_complex,
+    one_site_dmrg_complex,
 )
-
-from pyttn.ttns.ttns.ttnExt import ttn
-from pyttn.ttns.ttns.msttnExt import ms_ttn
-
-from pyttn.ttns.operators.sopOperatorExt import sop_operator
 from pyttn.ttns.operators.mssopOperatorExt import ms_sop_operator
-
+from pyttn.ttns.operators.sopOperatorExt import sop_operator
+from pyttn.ttns.ttns.msttnExt import ms_ttn
+from pyttn.ttns.ttns.ttnExt import ttn
 
 # and attempt to import the cuda backend
 try:
-    from pyttn.ttnpp.cuda import one_site_dmrg_complex as one_site_dmrg_complex_cuda
     from pyttn.ttnpp.cuda import (
         mulitset_one_site_dmrg_complex as multiset_one_site_dmrg_complex_cuda,
     )
+    from pyttn.ttnpp.cuda import one_site_dmrg_complex as one_site_dmrg_complex_cuda
 
     _cuda_import = True
 
@@ -143,6 +138,7 @@ class dmrg(metaclass=ABCMeta):
         else:
             raise RuntimeError("Invalid input types for dmrg.")
 
+    @abstractmethod
     def assign(self, o: "dmrg"):
         """Assign the value of the dmrg engine from another
 
@@ -151,14 +147,17 @@ class dmrg(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the dmrg object"""
         pass
 
+    @abstractmethod
     def __deepcopy__(self, memo):
         """Function implementing deep copy of the dmrg object"""
         pass
 
+    @abstractmethod
     def E(self) -> Union[float, complex]:
         """Return the energy computed in the last sweep of the algorithm
 
@@ -168,22 +167,27 @@ class dmrg(metaclass=ABCMeta):
         pass
 
     @property
+    @abstractmethod
     def restarts(self) -> int:
         """The number of restarts to use in the krylov subspace eigensolver."""
         pass
 
     @property
+    @abstractmethod
     def eigensolver_tol(self) -> float:
         """The absolute tolerance of the krylov subspace eigensolver"""
 
     @property
+    @abstractmethod
     def eigensolver_reltol(self) -> float:
         """The relative tolerance of the krylov subspace eigensolver"""
 
+    @abstractmethod
     def clear(self):
         """Clear and deallocate all internal buffers of the dmrg object"""
         pass
 
+    @abstractmethod
     def step(self, A: ttn, H: sop_operator, update_env: bool = False):
         """Performs a single step of the single site DMRG algorithm
 
@@ -196,6 +200,7 @@ class dmrg(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __call__(self, A: ttn, H: sop_operator, update_env: bool = False):
         """Performs a single step of the single site DMRG algorithm
 
@@ -208,6 +213,7 @@ class dmrg(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def prepare_environment(
         self, A: ttn, H: sop_operator, attempt_expansion: bool = False
     ):
@@ -222,6 +228,7 @@ class dmrg(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def backend(self) -> str:
         """Returns the backend type of the dmrg
 

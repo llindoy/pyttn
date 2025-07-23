@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
-from typing import Union, Optional
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
+from typing import Optional, Union
 
-from pyttn.ttnpp import convert_to_dense
+import numpy as np
 
 # import the blas backend
 import pyttn.ttnpp.linalg as la
+from pyttn.ttnpp import convert_to_dense
 
 # and attempt to import the cuda backend
 try:
@@ -102,7 +102,6 @@ def _build_matrix(mod, dtype, *args):
     elif dtype is None:
         return mod.matrix_complex(*args)
     else:
-        print
         raise RuntimeError("Invalid dtype for tensor build obj"+str(dtype))
 
 
@@ -151,6 +150,7 @@ def _get_dtype_la(v, dtype=None):
 
 
 class Tensor(metaclass=ABCMeta):
+    @abstractmethod
     def complex_dtype(self) -> bool:
         """Returns whether or not the Tensor is storing a complex valued dtype
         
@@ -159,6 +159,7 @@ class Tensor(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __str__(self) -> str:
         """Return the string representation of the Tensor object 
 
@@ -167,6 +168,7 @@ class Tensor(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def backend(self) -> str:
         """Returns the backend type of the Tensor
 
@@ -175,6 +177,7 @@ class Tensor(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def ndim(self) -> int:
         """Returns the dimensionality of the tensor
 
@@ -183,6 +186,7 @@ class Tensor(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def shape(self, i) -> int:
         """Returns the shape along dimension i
 
@@ -193,6 +197,7 @@ class Tensor(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def transpose(self, inds: list[int]) -> 'Tensor':
         """Return the transposed tensor with new ordered inds[0], inds[1], ..., inds[ndim]
 

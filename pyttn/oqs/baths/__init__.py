@@ -11,14 +11,14 @@
 # limitations under the License
 
 
+from .bath import Bath
 from .bath_factory import (
     bosonic_bath,
-    fermionic_bath,
     discrete_bath,
     discrete_bosonic_bath,
     discrete_fermionic_bath,
+    fermionic_bath,
 )
-from .bath import Bath
 from .bosonic_bath import BosonicBath
 from .correlated_bosonic_bath import CorrelatedBosonicBath
 from .discretised_bath import (
@@ -37,8 +37,10 @@ from .exponential_fit_bath import (
     ExpFitFermionicBath,
     ExpFitOQSBath,
 )
-from .exponential_fit_correlated_bath import ExpFitCorrelatedBosonicBath, ExpFitCorrelatedOQSBath
-
+from .exponential_fit_correlated_bath import (
+    ExpFitCorrelatedBosonicBath,
+    ExpFitCorrelatedOQSBath,
+)
 from .fermionic_bath import FermionicBath
 
 __all__ = [

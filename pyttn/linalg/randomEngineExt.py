@@ -10,16 +10,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
 # import the blas backend
 import pyttn.ttnpp.linalg as la
 
 try:
     import pyttn.ttnpp.cuda.linalg as cula
+
     _cuda_import = True
 except ImportError:
     _cuda_import = False
+
 
 class RandomEngine(metaclass=ABCMeta):
     def __new__(cls, backend: str = "blas"):
@@ -37,7 +39,7 @@ class RandomEngine(metaclass=ABCMeta):
         else:
             raise RuntimeError("Backend not recognised.")
 
-    
+    @abstractmethod
     def backend() -> str:
         """Returns the backend type of the C++ random number generator.
 
@@ -46,12 +48,14 @@ class RandomEngine(metaclass=ABCMeta):
         """
         pass
 
+
 RandomEngine.register(la.random_engine)
 # and attempt to import the cuda backend
 
 if _cuda_import:
     RandomEngine.register(cula.random_engine)
-    
+
+
 def random_engine(backend: str = "blas") -> RandomEngine:
     """Create a new random engine object associated with a given linear algebra backend
 

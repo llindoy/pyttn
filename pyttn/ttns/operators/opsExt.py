@@ -11,10 +11,10 @@
 # limitations under the License
 
 
-from abc import ABCMeta
-import pyttn.ttnpp.ops as ops
+from abc import ABCMeta, abstractmethod
 
-from pyttn.linalg import Matrix, Sparse_Matrix, Diagonal_Matrix
+import pyttn.ttnpp.ops as ops
+from pyttn.linalg import Diagonal_Matrix, Matrix, Sparse_Matrix
 
 if hasattr(ops, "identity_real"):
     _real_ops=True
@@ -200,6 +200,7 @@ class siteOp(metaclass=ABCMeta):
         elif type == "diagonal_matrix" or type == "diagonal matrix":
             return _diagonal_matrix(*args, dtype=dtype, backend=backend)
 
+    @abstractmethod
     def size(self) -> int:
         """Return the dimension of the space the siteOp acts on
 
@@ -208,6 +209,7 @@ class siteOp(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def is_identity(self) -> bool:
         """Returns whether or not the present operator is an identity operator
 
@@ -216,6 +218,7 @@ class siteOp(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def is_resizable(self) -> bool:
         """Returns whether or not the operator can be resized.
 
@@ -224,6 +227,7 @@ class siteOp(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def resize(self, n: int):
         """Resize the operator changing its local Hilbert space dimension
 
@@ -232,6 +236,7 @@ class siteOp(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def clone(self) -> "siteOp":
         """Returns a copy of the present operator
 
@@ -240,6 +245,7 @@ class siteOp(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def transpose(self) -> "siteOp":
         """Returns the transpose present operator
 
@@ -248,6 +254,7 @@ class siteOp(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def complex_dtype(self) -> bool:
         """Returns whether or not the siteOp is storing a complex valued dtype
 
@@ -256,6 +263,7 @@ class siteOp(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __str__(self) -> str:
         """Return the string representation of the siteOp object
 
@@ -264,6 +272,7 @@ class siteOp(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def backend(self) -> str:
         """Returns the backend type of the siteOp
 

@@ -10,10 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
+from typing import Optional, TypeVar, Union
 
-from typing import Union, Optional, TypeVar
+import numpy as np
 
 from pyttn.linalg import Matrix
 from pyttn.ttnpp import ttn_complex
@@ -151,7 +151,7 @@ class ttn(metaclass=ABCMeta):
         else:
             raise RuntimeError("Invalid backend type for ttn")
 
-    
+    @abstractmethod
     def complex_dtype(self) -> bool:
         """Returns whether or not the object stores a complex valued dtype
 
@@ -160,7 +160,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def assign(self, o : 'ttn'):
         """Assign the value of this ttn from another ttn
 
@@ -169,7 +169,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def bond(self) -> list[tuple[int, int]]:
         """Return a list of all bonds in the network
 
@@ -178,7 +178,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def bond_dimensions(self) -> dict[tuple[int, int], int]:
         """Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network
 
@@ -187,7 +187,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def bond_capacities(self) -> dict[tuple[int, int], int]:
         """Return a dictionary containing the bond (the two sites forming the bond) and maximum bond dimension of all bonds in the network
 
@@ -196,12 +196,12 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def reset_orthogonality_centre(self):
         """Resets the orthogonality centre of the ttn to the root node of the tree."""
         pass
 
-    
+    @abstractmethod
     def resize(self, *args, purification: bool =False):
         """Resize the ttn object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction
 
@@ -216,7 +216,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def set_seed(self, seed: int):
         """Set the value of the random number generate seed used for internal operations requiring random sampling
 
@@ -225,7 +225,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def set_state(self, state: list[int], random_unoccupied_initialisation: bool=False):
         """Set the coefficients in the ttn so that it represents a user specified product state
 
@@ -236,7 +236,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def set_product(self, state : list[list[T]]):
         """Set the coefficients in the ttn so that it represents a product of a set of one body states
 
@@ -245,12 +245,12 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def set_identity_purification(self):
         """Sets the state of the ttn to a purification state representing the identity"""
         pass
 
-    
+    @abstractmethod
     def sample_product(self, dist: list[list[T]]):
         """Sample a direct product of occupation states from a set of probabilities of observing each mode in a given state
 
@@ -259,7 +259,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __imul__(self, b: T):
         """Inplace multiplication of the ttn object by a scalar
 
@@ -268,7 +268,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __idiv__(self, b: T):
         """Inplace division of the ttn object by a scalar
 
@@ -277,27 +277,27 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def conj(self):
         "Take the complex conjugate of the ttn.  Here this is evaluated lazily"
         pass
 
-    
+    @abstractmethod
     def random(self):
         "Sample the coefficients in the ttn randomly from a normal distribution"
         pass
 
-    
+    @abstractmethod
     def zero(self):
         "Set all coefficients in the ttn to zero"
         pass
 
-    
+    @abstractmethod
     def clear(self):
         "Clear and deallocate all internal buffers of the ttn"
         pass
 
-    
+    @abstractmethod
     def __iter__(self):
         """
         :returns: Iterator object over nodes in ttn
@@ -305,7 +305,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def mode_dimensions(self) -> list[int]:
         """
         :returns: list of local Hilbert space dimensions
@@ -313,7 +313,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def dim(self, i: int) -> int:
         """Returns the local Hilbert space dimension of mode i
 
@@ -325,7 +325,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def nmodes(self) -> int:
         """
         :returns: The number of modes in the ttn
@@ -333,7 +333,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def is_purification(self) -> bool:
         """
         :returns: Whether or not the state represents a purification
@@ -341,7 +341,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def ntensors(self) -> int:
         """
         :returns: The total number of tensors in the tensor network
@@ -349,7 +349,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def nsites(self) -> int:
         """
         :returns: The total number of tensors in the tensor network
@@ -357,7 +357,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def nset(self) -> int:
         """
         :returns: The number of set variables for the ttn.  Here it is one
@@ -365,7 +365,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def nelems(self) -> int:
         """
         :returns: The total number of elements in all tensors of the network.
@@ -373,7 +373,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __len__(self) -> int:
         """
         :returns: The number of modes in the ttn
@@ -381,7 +381,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def compute_maximum_bond_entropy(self) -> float:
         """Computes the maximum SvN across any bond in the tensor network and returns the results
 
@@ -391,7 +391,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def maximum_bond_entropy(self) -> float:
         """Returns the previously computed maximum SvN across any bond in the tensor network
 
@@ -401,7 +401,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def bond_entropy(self, i: int) -> float:
         """Returns the SvN across the ith bond of the current orthogonality centre.
         Where for all nodes but the root 0 corresponds to the parent of the current orthogonality centre and its children are then 1-nchild,
@@ -413,7 +413,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def maximum_bond_dimension(self) -> int:
         """
         :returns: The maximum bond dimension
@@ -422,7 +422,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def minimum_bond_dimension(self) -> int:
         """
         :returns: The minimum bond dimension
@@ -431,16 +431,16 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def has_orthogonality_centre(self) -> bool:
-        r"""
+        """
         :returns: Whether or not the ttn has an active orthogonality centre
         :rtype: bool
 
         """
         pass
 
-    
+    @abstractmethod
     def orthogonality_centre(self) -> int:
         """
         :returns: The index of the current orthogonality centre
@@ -449,7 +449,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def is_orthogonalised(self) -> bool:
         """
         :returns: Whether or not the ttn has an orthogonality centre at the root
@@ -458,7 +458,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def force_set_orthogonality_centre(self, i: int):
         """Sets the orthogonality centre of the tensor network to index i but does not modify the tensor to ensure that this is a
         valid orthogonality centre
@@ -469,7 +469,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def shift_orthogonality_centre(self, i: int, tol: float=0, nchi: int=0):
         """Shift the orthogonality centre down the ith bond of the current orthogonality centre with possible truncation.
         Where for all nodes but the root 0 corresponds to the parent of the current orthogonality centre and its children are then 1-nchild
@@ -485,7 +485,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def set_orthogonality_centre(self, i: int, tol: float=0, nchi: int=0):
         """Sets the orthogonality centre of the tensor network to index i either introducing an orthogonality centre if there is none
         or simply shifting the orthogonality centre from its current location to the required location
@@ -500,7 +500,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def orthogonalise(self, force: bool=False):
         """Shifts the orthogonality centre to the root node of the ttn
 
@@ -509,7 +509,7 @@ class ttn(metaclass=ABCMeta):
 
         """
 
-    
+    @abstractmethod
     def truncate(self, tol: float=0, nchi: int=0):
         """Ensures the tensor network is in an orthogonalised form.  Then performs an euler tour truncating each bond according to the user
         specified tol and nchi parameters
@@ -522,7 +522,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def normalise(self) -> float:
         """Ensures the ttn is a normalised to one and returns the previous value of the norm of the tensor
 
@@ -531,7 +531,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def norm(self) -> float:
         """
         :returns: The 2-norm of the ttn
@@ -539,7 +539,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __setitem__(self, i : int, v):
         """Sets the value of a site tensor in the tensor network
 
@@ -551,7 +551,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __getitem__(self, i : int , v):
         """Access tensor data at node i
 
@@ -564,7 +564,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def set_site_tensor(self, i : int, v):
         """Sets the value of a site tensor in the tensor network
 
@@ -576,7 +576,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def site_tensor(self, i : int, v):
         """Access tensor data at node i
 
@@ -589,7 +589,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def measure_without_collapse(self, i : int) -> list[float]:
         """Evaluate the probablity of observing each state following a projective measurement applied to mode i without performing the collapse
 
@@ -601,7 +601,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def collapse_basis(self, U: Union[list[np.ndarray], list[Matrix]] , truncate: bool=True, tol: float=0, nchi: int=0) -> float:
         """Perform a projective measurement across all modes in the ttn applying a basis transformation U_i to each mode i before doing so
 
@@ -619,7 +619,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def collapse(self, truncate: bool=True, tol: float=0, nchi: int=0) -> float:
         """Perform a projective measurement across all modes in the ttn
 
@@ -635,7 +635,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def apply_one_body_operator(self, *args, shift_orthogonality: bool=True):
         """Apply a one-body operator to the ttn updating its value
 
@@ -649,7 +649,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def apply_product_operator(self, op, shift_orthogonality: bool=True):
         """Apply a product of one-body operator to the ttn updating its value
 
@@ -660,7 +660,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def apply_operator(self, op, shift_orthogonality: bool=True):
         """Apply a product of one-body operator to the ttn updating its value
 
@@ -671,7 +671,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __imatmul__(self, op):
         """Apply an operator to the ttn updating its value.  Shifting the orthogonality centre to the leaf nodes that will be updated by this operator
 
@@ -681,7 +681,7 @@ class ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __rmatmul__(A: 'ttn', op) -> 'ttn':
         """Apply an operator to the ttn updating its value, returning the result as a new ttn
 

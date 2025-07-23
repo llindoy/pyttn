@@ -11,17 +11,17 @@
 # limitations under the License
 
 
+import argparse
 import os
+import sys
 os.environ["OMP_NUM_THREADS"] = "1"
 
-import numpy as np
-import sys
 import h5py
-import argparse
+import numpy as np
+from numba import jit
 
 import pyttn
 from pyttn import oqs, utils
-from numba import jit
 
 
 def output_results(ofname, t, Sz, norm, maxchi):

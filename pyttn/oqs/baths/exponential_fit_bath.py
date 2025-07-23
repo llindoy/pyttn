@@ -10,27 +10,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
 import abc
-from pyttn.utils.truncate import TruncationBase, DepthTruncation  #
-from pyttn.utils.mode_combination import ModeCombination
+from typing import Callable, Optional, Union
+
+import numpy as np
+
 from pyttn import (
-    system_modes,
+    SOP,
+    OP_type,
     boson_mode,
     fermion_mode,
     ntreeBuilder,
     ntreeNode,
-    OP_type,
-    SOP,
     sSOP,
+    system_modes,
 )
-from typing import Callable, Optional, Union
+from pyttn.utils.mode_combination import ModeCombination
+from pyttn.utils.truncate import DepthTruncation, TruncationBase  #
+
 from ..heom import add_bosonic_bath_generator, add_fermionic_bath_generator
 
 
 class ExpFitBath(metaclass=abc.ABCMeta):
     """The base class for handling a generic bath representing an exponential fit to a bath correlation function."""
 
+    @abc.abstractmethod
     def __init__(self):
         pass
 
@@ -235,11 +239,8 @@ class ExpFitOQSBath(ExpFitBath):
     def _get_composite_params(
         self,
     ) -> tuple[list[list[np.complex128]], list[list[np.complex128]]]:
-        zks = []
-        dks = []
-        for ind, cmode in enumerate(self._composite_modes):
-            zks.append([self._zk[x] for x in cmode])
-            dks.append([self._dk[x] for x in cmode])
+        zks = [[[self._zk[x] for x in cmode]] for cmode in self._composite_modes]
+        dks = [[[self._dk[x] for x in cmode]] for cmode in self._composite_modes]
         return dks, zks
 
     @property
@@ -287,7 +288,7 @@ class ExpFitBosonicBath(ExpFitOQSBath):
         )
         self.truncate_modes()
 
-    def truncate_modes(self, truncation: TruncationBase = DepthTruncation(8)) -> None:
+    def truncate_modes(self, truncation: Optional[TruncationBase] = None) -> None:
         r"""Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
@@ -295,6 +296,8 @@ class ExpFitBosonicBath(ExpFitOQSBath):
         :type truncation: TruncationBase, optional
 
         """
+        if truncation is None:
+            truncation = DepthTruncation(8)
         self._mode_dims = truncation(self._dk, self._zk, False)
 
     def system_information(
@@ -434,7 +437,7 @@ class ExpFitFermionicBath(ExpFitOQSBath):
         )
         self.truncate_modes()
 
-    def truncate_modes(self, truncation: TruncationBase = DepthTruncation(2)):
+    def truncate_modes(self, truncation: Optional[TruncationBase] = None):
         r"""Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
@@ -442,6 +445,8 @@ class ExpFitFermionicBath(ExpFitOQSBath):
         :type truncation: TruncationBase, optional
 
         """
+        if truncation is None:
+            truncation = DepthTruncation(2)
         self._mode_dims = truncation(self._dk, self._zk, True)
 
     def __str__(self):

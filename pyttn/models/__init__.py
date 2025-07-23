@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .modelsExt import AIM, electronic_structure, TFIM, spin_boson
+from .modelsExt import AIM, TFIM, electronic_structure, spin_boson
 
 __all__ = [
         "AIM",

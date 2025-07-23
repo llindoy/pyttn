@@ -10,18 +10,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Callable, Optional, Union
+
 import numpy as np
 import scipy as sp
-from .bath import Bath
-from typing import Callable, Optional, Union
-from ..bath_fitting import (
-    ExpFitDecomposition,
-    CtExpFitDecomposition,
-    SwExpFitDecomposition,
-    BathDiscretisation,
-)
 
 from pyttn.ttns import OP_type
+
+from ..bath_fitting import (
+    BathDiscretisation,
+    CtExpFitDecomposition,
+    ExpFitDecomposition,
+    SwExpFitDecomposition,
+)
+from .bath import Bath
 
 
 class FermionicBath(Bath):

@@ -13,8 +13,8 @@
 from typing import Optional, Union
 
 from pyttn.ttnpp import ntree
-from pyttn.ttns.ttns.ttnExt import ttn
 from pyttn.ttns.ttns.msttnExt import ms_ttn
+from pyttn.ttns.ttns.ttnExt import ttn
 
 
 def visualise_ntree(
@@ -61,9 +61,8 @@ def visualise_ntree(
 
         pos = graphviz_layout(G, prog=prog, root=tree())
         nx.draw(G, pos, labels=labeldict, node_size=node_size, width=linewidth, ax=ax)
-    except Exception as e:
-        print(e)
-        raise RuntimeError("Failed to visualise tree structure.")
+    except Exception:
+        raise RuntimeError("Failed to visualise tree structure.") from None
 
 
 def visualise_ttn(
@@ -102,7 +101,7 @@ def visualise_ttn(
         G = nx.Graph()
 
         # add all of the nodes to the tree
-        for i, n in enumerate(tree):
+        for i, _ in enumerate(tree):
             G.add_node(i)
 
         bonds = tree.bonds()
@@ -163,9 +162,8 @@ def visualise_ttn(
                 nx.draw(G, pos, node_size=node_size, width=linewidth, ax=ax)
                 nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-    except Exception as e:
-        print(e)
-        raise RuntimeError("Failed to visualise tree structure.")
+    except Exception:
+        raise RuntimeError("Failed to visualise tree structure.") from None
 
 
 def visualise_tree(

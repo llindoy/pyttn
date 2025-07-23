@@ -1,16 +1,27 @@
-import os
-
-os.environ["OMP_NUM_THREADS"] = "1"
+# This files is part of the pyTTN package.
+#(C) Copyright 2025 NPL Management Limited
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License
 
 import argparse
-import numpy as np
-import time
-import h5py
 import copy
+import os
+import time
+os.environ["OMP_NUM_THREADS"] = "1"
+
+import h5py
+import numpy as np
+from numba import jit
 
 import pyttn
 from pyttn import oqs, utils
-from numba import jit
 
 
 def build_topology(Ns, ds, chi, chiS, chiB, nbose, discbath, degree):
@@ -109,7 +120,7 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_m
     site_info = copy.deepcopy(sysinf)
     sysinfo = copy.deepcopy(sysinf)
     # and add on the system information objects for the remaining spins
-    for i in range(Ns - 1):
+    for _ in range(Ns - 1):
         sysinfo = pyttn.combine_systems(sysinfo, sysinf)
 
     sysinf = sysinfo

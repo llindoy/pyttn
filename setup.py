@@ -7,6 +7,12 @@ from pathlib import Path
 from setuptools import Extension, setup, find_packages
 from setuptools.command.build_ext import build_ext
 
+try:
+    import ninja
+    _ninja_import = True
+except ImportError:
+    _ninja_import = False
+
 __version__ = "0.0.1"
 
 
@@ -41,10 +47,10 @@ class CMakeBuild(build_ext):
         # EXAMPLE_VERSION_INFO shows you how to pass a value into the C++ code
         # from Python.
         cmake_args = [
-            f"-DBUILD_SRC=OFF",
-            f"-DBUILD_TESTS=OFF",
-            f"-DUSE_OPENMP=ON",
-            f"-DBUILD_PYTHON_BINDINGS=ON",
+            "-DBUILD_SRC=OFF",
+            "-DBUILD_TESTS=OFF",
+            "-DUSE_OPENMP=ON",
+            "-DBUILD_PYTHON_BINDINGS=ON",
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
@@ -65,23 +71,19 @@ class CMakeBuild(build_ext):
             # Users can override the generator with CMAKE_GENERATOR in CMake
             # 3.15+.
             if not cmake_generator or cmake_generator == "Ninja":
-                try:
-                    import ninja
+                if _ninja_import:
 
                     ninja_executable_path = Path(ninja.BIN_DIR) / "ninja"
                     cmake_args += [
                         "-GNinja",
                         f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
                     ]
-                except ImportError:
-                    pass
-
         else:
             # Single config generators are handled "normally"
             single_config = any(x in cmake_generator for x in {"NMake", "Ninja"})
 
             # CMake allows an arch-in-generator style for backward compatibility
-            contains_arch = any(x in cmake_generator for x in {"ARM", "Win64"})
+            #contains_arch = any(x in cmake_generator for x in {"ARM", "Win64"})
 
             # Specify the arch if using MSVC generator, but only if it doesn't
             # contain a backward-compatibility arch spec already in the
@@ -132,7 +134,7 @@ setup(
     author_email="lachlan.lindoy@npl.co.uk",
     description="python bindings of ttnpp using pybind11",
     long_description="",
-    ext_modules=[CMakeExtension("pyttn.ttnpp", rebuild=True, parallel=16)],
+    ext_modules=[CMakeExtension("pyttn.ttnpp", rebuild=False, parallel=16)],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={},

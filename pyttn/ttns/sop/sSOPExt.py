@@ -10,32 +10,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from abc import ABCMeta, abstractmethod
 from typing import Union
 
-from abc import ABCMeta
+import numpy as np
+
+from pyttn.ttnpp import (
+    coeff_complex,
+    coeff_real,
+    sNBO_complex,
+    sNBO_real,
+    sSOP_complex,
+    sSOP_real,
+)
 from pyttn.ttnpp import sOP as _sOP
 from pyttn.ttnpp import sPOP as _sPOP
-from pyttn.ttnpp import (
-    sNBO_real,
-    sNBO_complex,
-    sSOP_real,
-    sSOP_complex,
-    coeff_real,
-    coeff_complex,
-)
-import numpy as np
 
 
 class OP_type(metaclass=ABCMeta):
-    """Base class for all symbolic string operator types:
-    
-        - :class:`sOP`
-        - :class:`sPOP` 
-        - :class:`sNBO`
-        - :class:`sSOP`
-    """
-
-    pass
+    @abstractmethod
+    def __init__(self):
+        """Base class for all symbolic string operator types:
+        
+            - :class:`sOP`
+            - :class:`sPOP` 
+            - :class:`sNBO`
+            - :class:`sSOP`
+        """
+        pass
 
 
 class sOP(OP_type):
@@ -117,7 +119,6 @@ class sOP(OP_type):
         pass
 
     @property
-    
     def mode(self) -> int:
         """Returns the mode the sOP object acts on
 
@@ -126,7 +127,6 @@ class sOP(OP_type):
         """
 
     @property
-    
     def op(self) -> str:
         """Returns the label of the sOP object
 
@@ -418,7 +418,7 @@ class coeff(metaclass=ABCMeta):
         else:
             raise RuntimeError("Invalid dtype for sNBO")
 
-    
+    @abstractmethod
     def assign(self, o: "coeff"):
         """Assign the value of the coeff from another
 
@@ -427,22 +427,22 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the coeff object"""
         pass
 
-    
+    @abstractmethod
     def __deepcopy__(self, memo):
         """Function implementing deep copy of the coeff object"""
         pass
 
-    
+    @abstractmethod
     def clear(self):
         """Clear all internal storage used by the coeff object"""
         pass
 
-    
+    @abstractmethod
     def is_zero(self) -> bool:
         """Whether or not the coefficient stores the zero value
 
@@ -450,23 +450,23 @@ class coeff(metaclass=ABCMeta):
         :rtype: bool
         """
 
-    
+    @abstractmethod
     def is_positive(self) -> bool:
         """Whether or not the coefficient is positive
 
         :returns: Whether of not the coefficient is positive
         :rtype: bool
         """
-
     
+    @abstractmethod
     def is_time_dependent(self) -> bool:
         """Whether or not the coefficient is time dependent
 
         :returns: Whether of not the coefficient is time dependent
         :rtype: bool
         """
-
     
+    @abstractmethod
     def __str__(self) -> str:
         """Return the string representation of the coeff object
 
@@ -475,7 +475,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __call__(self, t: Union[float, np.float64]) -> Union[float, complex]:
         """Return the value of the coefficient at a given time point
 
@@ -486,7 +486,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __add__(
         self, op: Union[float, complex, np.float64, np.complex128, "coeff"]
     ) -> "coeff":
@@ -499,7 +499,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __radd__(self, op: Union[float, complex, np.float64, np.complex128]) -> "coeff":
         """Add a scalar to a coeff object
 
@@ -510,7 +510,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __iadd__(
         self, op: Union[float, complex, np.float64, np.complex128, "coeff"]
     ) -> "coeff":
@@ -523,7 +523,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __sub__(
         self, op: Union[float, complex, np.float64, np.complex128, "coeff"]
     ) -> "coeff":
@@ -536,7 +536,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __rsub__(self, op: Union[float, complex, np.float64, np.complex128]) -> "coeff":
         """Subtract a coeff from a scalar
 
@@ -547,7 +547,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __isub__(
         self, op: Union[float, complex, np.float64, np.complex128, "coeff"]
     ) -> "coeff":
@@ -560,7 +560,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __div__(self, v: Union[float, complex, np.float64, np.complex128]) -> "coeff":
         """Functions for dividing a coeff by a scalar.
 
@@ -571,7 +571,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __idiv__(self, v: Union[float, complex, np.float64, np.complex128]) -> "coeff":
         """Functions for inplace division of a coeff by a scalar
 
@@ -582,7 +582,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __mul__(
         self,
         v: Union[float, complex, np.float64, np.complex128, "coeff", OP_type],
@@ -601,7 +601,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __rmul__(
         self,
         v: Union[float, complex, np.float64, np.complex128],
@@ -615,7 +615,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __imul__(
         self,
         v: Union[float, complex, np.float64, np.complex128],

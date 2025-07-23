@@ -33,6 +33,7 @@ from ..unitary import add_fermionic_bath_hamiltonian, add_bosonic_bath_hamiltoni
 class DiscreteBath(metaclass=abc.ABCMeta):
     """The base class for handling a generic bath representing a discrete fit to a bath correlation function."""
 
+    @abc.abstractmethod
     def __init__(self):
         pass
 
@@ -121,7 +122,7 @@ class DiscreteOQSBath(DiscreteBath):
         self._sysinf = None
 
     def is_fermionic(self) -> bool:
-        r"""Returns whether or not the bath is fermionic
+        """Returns whether or not the bath is fermionic
         :rtype: bool
         """
         return self._fermion
@@ -189,7 +190,7 @@ class DiscreteBosonicBath(DiscreteOQSBath):
         self._wk_trunc = wk
         self.truncate_modes()
 
-    def truncate_modes(self, truncation: TruncationBase = DepthTruncation(8)):
+    def truncate_modes(self, truncation: Optional[TruncationBase] = None):
         """Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
@@ -197,6 +198,8 @@ class DiscreteBosonicBath(DiscreteOQSBath):
         :type truncation: TruncationBase
 
         """
+        if truncation is None:
+            truncation = DepthTruncation(8)
         self._mode_dims = truncation(self._gk_trunc, self._wk_trunc, False)
 
     def system_information(
@@ -327,7 +330,7 @@ class DiscreteFermionicBath(DiscreteOQSBath):
         )
         self.truncate_modes()
 
-    def truncate_modes(self, truncation=DepthTruncation(2)):
+    def truncate_modes(self, truncation: Optional[TruncationBase] = None):
         """Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
@@ -335,6 +338,8 @@ class DiscreteFermionicBath(DiscreteOQSBath):
         :type truncation: TruncationBase, optional
 
         """
+        if truncation is None:
+            truncation = DepthTruncation(2)
         self._mode_dims = truncation(self._gk, self._wk, True)
 
     def __str__(self):

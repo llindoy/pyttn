@@ -10,8 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
 import copy
+
+import numpy as np
 
 
 def remove_zeros(M, tol=1e-14):

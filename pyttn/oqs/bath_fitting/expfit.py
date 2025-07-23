@@ -11,12 +11,16 @@
 # limitations under the License
 
 import abc
-import numpy as np
 from typing import Callable, Optional, Union
+
+import numpy as np
+
+from ..spectral_density.rational_function_spectral_density import (
+    RationalFunctionSpectralDensity,
+)
+from .aaa import AAA_algorithm
 from .ESPRIT import ESPRIT, ESPRIT_frequencies
 from .softmspace import softmspace
-from .aaa import AAA_algorithm
-from ..spectral_density.rational_function_spectral_density import RationalFunctionSpectralDensity
 
 try:
     from scipy.interpolate import AAA
@@ -67,8 +71,9 @@ except ImportError:
 
 
 class ExpFitDecomposition(metaclass=abc.ABCMeta):
-    r"""Base class for exponential fit decompositions"""
+    """Base class for exponential fit decompositions"""
 
+    @abc.abstractmethod
     def __init__(self):
         pass
 
@@ -151,7 +156,7 @@ def ESPRIT_support_points(
 
 
 class ESPRITDecomposition(CtExpFitDecomposition):
-    r"""A class providing an easy to use interface for applying the ESPRIT decomposition to
+    """A class providing an easy to use interface for applying the ESPRIT decomposition to
     construct a sum-of-exponential approximation for a bath correlation function
 
     Constructor arguments:
@@ -241,7 +246,7 @@ def AAA_support_points(
     wmax: Optional[float] = None,
     Naaa: Optional[int] = 1000,
 ) -> np.ndarray:
-    r"""A function for automatically generating support points to be used within the AAA algorithm.
+    """A function for automatically generating support points to be used within the AAA algorithm.
 
     :param w: Either the support points orr a key word used to generate the support points. (Default: "linear") This parameter can be either a
 
@@ -290,7 +295,7 @@ def AAA_support_points(
 
 
 class AAADecomposition(SwExpFitDecomposition):
-    r"""A class providing an easy to use interface for applying the AAA based rational function
+    """A class providing an easy to use interface for applying the AAA based rational function
     decomposition to approximate a bath spectral density.  This class includes tools used for
     automatic generation of support points, as well as manually specified support points to
     allow for both easy general use and flexibility when handling more complex spectral densities.

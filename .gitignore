@@ -119,7 +119,12 @@
 
 #now we include the tutorials
 !tutorials
-!tutorials/*.ipynb
+!tutorials/getting_started/
+!tutorials/getting_started/*.ipynb
+!tutorials/DMRG/
+!tutorials/DMRG/*.ipynb
+!tutorials/TDVP/
+!tutorials/TDVP/*.ipynb
 !tutorials/multiset_ansatz/
 !tutorials/multiset_ansatz/*.ipynb
 !tutorials/open_quantum_systems/

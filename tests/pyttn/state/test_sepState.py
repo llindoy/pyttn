@@ -101,7 +101,7 @@ def test_init4(state, coeff, size, nnz):
         ([], 3.0j, 0, 0),
     ],
 )
-def test_init4(state, coeff, size, nnz):
+def test_init5(state, coeff, size, nnz):
     _state = stateStr(state)
     _State = sepState(coeff, _state)
 

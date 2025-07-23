@@ -10,16 +10,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from abc import ABCMeta, abstractmethod
 from typing import Optional, Union
-from abc import ABCMeta
 
-from pyttn.linalg import Vector, Matrix
-from ..sop.sSOPExt import sOP
-from pyttn.ttnpp import system_modes
-from .opsExt import siteOp
 import numpy as np
 
+from pyttn.linalg import Matrix, Vector
+from pyttn.ttnpp import system_modes
 from pyttn.ttnpp.ops import site_operator_complex
+
+from ..sop.sSOPExt import sOP
+from .opsExt import siteOp
 
 try:
     from pyttn.ttnpp.ops import site_operator_real
@@ -69,9 +70,8 @@ def _site_operator_blas(*args, mode=None, optype=None, dtype=np.complex128, **kw
             else:
                 ret = site_operator_real(M)
         except RuntimeError:
-            raise RuntimeError(
-                "Failed to construct site_operator object.  optype not recognized."
-            )
+            message = "Failed to construct site_operator object.  optype not recognized."
+            raise RuntimeError(message) from None
     if mode is not None:
         ret.mode = mode
     return ret
@@ -102,9 +102,8 @@ def _site_operator_cuda(*args, mode=None, optype=None, dtype=np.complex128, **kw
             else:
                 ret = site_operator_real_cuda(M)
         except RuntimeError:
-            raise RuntimeError(
-                "Failed to construct site_operator object.  optype not recognized."
-            )
+            message = "Failed to construct site_operator object.  optype not recognized."
+            raise RuntimeError(message) from None
     if mode is not None:
         ret.mode = mode
     return ret
@@ -159,6 +158,7 @@ class site_operator(metaclass=ABCMeta):
         else:
             raise RuntimeError("Invalid backend type for site_operator")
 
+    @abstractmethod
     def initialise(self, op: sOP, sysinf: system_modes, *args, use_sparse: bool = True):
         """Initialise the site_operator object given a sOP and system_modes information
 
@@ -176,6 +176,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def complex_dtype(self) -> bool:
         """Returns whether or not the site_operator is storing a complex valued dtype
 
@@ -184,10 +185,12 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def clear(self):
         """Clear and deallocate all internal buffers of the site_operator"""
         pass
 
+    @abstractmethod
     def transpose(self) -> "site_operator":
         """Returns the transpose of the operator
 
@@ -196,6 +199,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def todense(self, *args) -> Matrix:
         """ Return the dens Matrix representation of this site operator
 
@@ -205,6 +209,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def assign(self, o: Union["site_operator", siteOp]):
         """Assign the value of the site operator from another or a siteOp
 
@@ -213,6 +218,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def bind(self, v : siteOp):
         """Assign the value stored in the site operator to a siteOp
 
@@ -221,14 +227,17 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the site_operator object"""
         pass
 
+    @abstractmethod
     def __deepcopy__(self, memo):
         """Function implementing deep copy of the site_operator object"""
         pass
 
+    @abstractmethod
     def size(self) -> int:
         """Return the local Hilbert space dimension associated with this site operator
 
@@ -237,6 +246,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def is_identity(self) -> bool:
         """Returns whether or not the present operator is an identity operator
 
@@ -245,6 +255,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def is_resizable(self) -> bool:
         """Returns whether or not the operator can be resized.
 
@@ -255,10 +266,12 @@ class site_operator(metaclass=ABCMeta):
 
 
     @property
+    @abstractmethod
     def mode(self) -> int:
         """The mode the system acts on"""
         pass
 
+    @abstractmethod
     def resize(self, size: int):
         """Resize the site_operator object so that it can describe a system with size modes
 
@@ -267,6 +280,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def apply(self, a: Union[Vector, Matrix], b: Union[Vector, Matrix]):
         """Compute the action of the operator on the object a and store the result in b
             op*a = b
@@ -276,6 +290,7 @@ class site_operator(metaclass=ABCMeta):
         :type b: Union[Vector, Matrix]
         """
 
+    @abstractmethod
     def __str__(self) -> str:
         """Return the string representation of the site_operator object
 
@@ -284,6 +299,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def backend(self) -> str:
         """Returns the backend type of the site_operator
 

@@ -12,12 +12,14 @@
 
 import abc
 from typing import Callable, Optional, Union
-from pyttn.ttnpp.utils import orthopol_discretisation, density_discretisation
+
 import numpy as np
+
+from pyttn.ttnpp.utils import density_discretisation, orthopol_discretisation
 
 
 class BathDiscretisation(metaclass=abc.ABCMeta):
-    r"""Base class for bath discretisations
+    """Base class for bath discretisations
 
     :param Nb: The number of discrete points to find
     :type Nb: int

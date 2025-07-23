@@ -10,21 +10,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import Union
+
+from pyttn.ttnpp import SOP_complex, sop_operator_complex, system_modes, ttn_complex
 from pyttn.ttns.sop.SOPExt import SOP
 from pyttn.ttns.ttns.ttnExt import ttn
-from pyttn.ttnpp import system_modes
-
-
-from pyttn.ttnpp import sop_operator_complex
-from pyttn.ttnpp import ttn_complex
-from pyttn.ttnpp import SOP_complex
 
 try:
-    from pyttn.ttnpp import sop_operator_real
-    from pyttn.ttnpp import ttn_real
-    from pyttn.ttnpp import SOP_real
+    from pyttn.ttnpp import SOP_real, sop_operator_real, ttn_real
 
     _real_ttn_import = True
 
@@ -125,7 +119,8 @@ class sop_operator(metaclass=ABCMeta):
             )
         else:
             raise RuntimeError("Invalid backend type for sop_operator")
-
+        
+    @abstractmethod
     def initialise( 
         self, op: SOP, A: ttn, sysinf: system_modes, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,
     ):
@@ -153,6 +148,7 @@ class sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def assign(self, o: "sop_operator"):
         """Assign the value of the sum-of-product operator from another
 
@@ -161,19 +157,23 @@ class sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the sum-of-product operator object"""
         pass
 
+    @abstractmethod
     def __deepcopy__(self, memo):
         """Function implementing deep copy of the sum-of-product operator object"""
         pass
-
+    
     @property
+    @abstractmethod
     def Eshift(self) -> Union[float, complex]:
         """A constant energy shift acting on the sum-of-product operator"""
         pass
 
+    @abstractmethod
     def set_Eshift(self, v : Union[float, complex]):
         """A constant energy shift acting on the sum-of-product operator
         
@@ -182,10 +182,12 @@ class sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def clear(self):
         """Clear and deallocate all internal buffers of the sop_operator"""
         pass
 
+    @abstractmethod
     def update(self, mode: int, t: float, dt: float):
         """Update the operators associated with mode mode so that they store their value at time t.
         Additionally, this takes the time-step allowing for the use of average timestep expressions
@@ -199,6 +201,7 @@ class sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def nterms(self) -> int:
         """
         :returns: The number terms in the sum-of-product operator
@@ -206,6 +209,7 @@ class sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def nmodes(self) -> int:
         """
         :returns: The number of modes the sum-of-product operator acts on
@@ -213,6 +217,7 @@ class sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def complex_dtype(self) -> bool:
         """Returns whether or not the sop_operator is storing a complex valued dtype
 
@@ -221,6 +226,7 @@ class sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def backend(self) -> str:
         """Returns the backend type of the sop_operator
 

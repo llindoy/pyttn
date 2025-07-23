@@ -10,22 +10,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Callable, Optional, Union
+
 import numpy as np
-from typing import Optional, Callable, Union
+
+from pyttn.ttns import OP_type
 
 from ..spectral_density import CorrelatedSpectralDensity
 from .bosonic_bath import BosonicBath
 from .correlated_bosonic_bath import CorrelatedBosonicBath
-from .fermionic_bath import FermionicBath
-
 from .discretised_bath import (
     DiscreteBosonicBath,
     DiscreteFermionicBath,
     DiscreteOQSBath,
 )
 from .discretised_correlated_bath import DiscreteCorrelatedBosonicBath
-
-from pyttn.ttns import OP_type
+from .fermionic_bath import FermionicBath
 
 
 def bosonic_bath(

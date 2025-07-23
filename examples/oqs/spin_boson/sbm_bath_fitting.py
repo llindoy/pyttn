@@ -12,14 +12,13 @@
 
 
 import os
-
 os.environ["OMP_NUM_THREADS"] = "1"
 
+import matplotlib.pyplot as plt
 import numpy as np
+from numba import jit
 
 from pyttn import oqs
-from numba import jit
-import matplotlib.pyplot as plt
 
 
 def fit_bath(Nb, alpha, wc, s, dt, beta=None, nstep=1, method="orthopol", tol=1e-13, Nw=10):

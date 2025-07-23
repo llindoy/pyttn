@@ -12,6 +12,7 @@
 
 import numpy as np
 
+
 def generate_binds(binds, bskip, Nb):
     if not isinstance(binds, np.ndarray):
         if binds is None:

@@ -13,8 +13,10 @@
 from typing import Optional, Union
 
 from pyttn.ttnpp import liouville_space, system_modes
-from .SOPExt import SOP
+
 from .opdictExt import operator_dictionary
+from .SOPExt import SOP
+
 
 def liouville_space_superoperator(
     Op : SOP, sys : system_modes, optype: str, opdict: Optional[operator_dictionary]=None, Lopdict: Optional[operator_dictionary]=None, coeff : Union[float, complex]=1.0

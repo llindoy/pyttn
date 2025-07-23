@@ -57,7 +57,7 @@ def ESPRIT(Ct: np.ndarray, K: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.nd
 
 
 def ESPRIT_frequencies(Ct: np.ndarray, K: np.ndarray) -> np.ndarray:
-    r"""Extract the frequencies to be used in the ESPRIT algorithm
+    """Extract the frequencies to be used in the ESPRIT algorithm
 
     :param Ct: An array containing the values to be fit
     :type Ct: np.ndarray

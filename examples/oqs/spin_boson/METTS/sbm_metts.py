@@ -10,17 +10,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
-import time
-import h5py
-import copy
 import argparse
+import copy
+import os
+import time
+os.environ["OMP_NUM_THREADS"] = "1"
+
+import h5py
+import numpy as np
+from numba import jit
 
 import pyttn
 from pyttn import oqs
 from pyttn.oqs.bath_fitting import softmspace
-
-from numba import jit
 
 
 def evolve_imaginary_time(A, h, mel, sweep, betasteps):
@@ -184,7 +186,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = 5, nbeta =
         sweep_therm.t=0
 
         sweep_therm.coefficient = -1.0
-        for iter in range(2):
+        for _ in range(2):
             sweep.t=0
             print(A.collapse_basis(Uproj, nchi=2), mode_dims)
             A.normalise()

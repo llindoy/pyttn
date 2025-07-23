@@ -12,6 +12,7 @@
 
 import numpy as np
 
+
 class TruncationBase:
     """Base class for local Hilbert space mode decomposition"""
 

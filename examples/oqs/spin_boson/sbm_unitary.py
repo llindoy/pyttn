@@ -12,15 +12,15 @@
 
 
 import os
-
 os.environ["OMP_NUM_THREADS"] = "1"
 
-import numpy as np
 import h5py
+import numpy as np
+from numba import jit
 
 import pyttn
 from pyttn import oqs, utils
-from numba import jit
+
 
 def output_results(ofname, t, Sz, maxchi):
     h5 = h5py.File(ofname, "w")

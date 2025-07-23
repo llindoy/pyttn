@@ -10,9 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
-from pyttn import sOP, sSOP, SOP, OP_type
 from typing import Optional, Union
+
+import numpy as np
+
+from pyttn import SOP, OP_type, sOP, sSOP
+
 from .utils import generate_binds
 
 

@@ -11,9 +11,10 @@
 # limitations under the License
 
 from typing import Callable, Union
+
 import numpy as np
-from scipy import sparse
 from scipy import linalg as splinalg
+from scipy import sparse
 from scipy.integrate import quad_vec
 
 

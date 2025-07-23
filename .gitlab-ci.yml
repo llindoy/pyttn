@@ -12,7 +12,9 @@ build_and_test:
   - python -m pip install pytest
   - python -m pip install numpy
   - python -m pip install h5py
+  - python -m pip install ruff
   - export CMAKE_BUILD_PARALLEL_LEVEL=4
   - python -m pip -v install ./
   - python -m pytest
+  - ruff check
 

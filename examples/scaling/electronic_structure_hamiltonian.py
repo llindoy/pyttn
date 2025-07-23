@@ -10,15 +10,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+import argparse
+import copy
 import os
+import time
 os.environ['OPENBLAS_NUM_THREADS']='1'
 
 import numpy as np
-import time
-import copy
-import argparse
-#import memory_profiler as mp
 
+#import memory_profiler as mp
 import pyttn
 from pyttn import models
 
@@ -38,7 +38,7 @@ def do_step(A, h, sweep, nstep):
     return np.mean(timings), stdev
 
 def electronic_structure_hamiltonian_test(t, U, chi, dt, nstep = 1, degree = 2, compress = True, nthreads = 1):
-    r""" Function for setting up and running tdvp for an electronic structure Hamiltonian computing the time required per step and memory required
+    """ Function for setting up and running tdvp for an electronic structure Hamiltonian computing the time required per step and memory required
 
     :param t: A matrix containing the 1-electron integrals of the system
     :type t: np.ndarray
@@ -86,7 +86,7 @@ def electronic_structure_hamiltonian_test(t, U, chi, dt, nstep = 1, degree = 2, 
 
 
 def sop_timing(N, compress, nstep=10, nthreads=1):
-    r""" Function for setting up and running a random molecular Hamiltonian problem and computing 
+    """ Function for setting up and running a random molecular Hamiltonian problem and computing 
 
     :param N: The number of spin-orbitals to include in the problem
     :type N: int

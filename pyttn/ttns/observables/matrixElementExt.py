@@ -10,14 +10,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import Optional, Union
+
 import numpy as np
 
-from pyttn.ttnpp import matrix_element_complex, ttn_complex, ms_ttn_complex
+from pyttn.ttnpp import matrix_element_complex, ms_ttn_complex, ttn_complex
 
 try:
-    from pyttn.ttnpp import matrix_element_real, ttn_real, ms_ttn_real
+    from pyttn.ttnpp import matrix_element_real, ms_ttn_real, ttn_real
 
     _use_real_matel = True
 
@@ -84,21 +85,24 @@ class matrix_element(metaclass=ABCMeta):
                     return matrix_element_complex(**kwargs)
                 else:
                     raise RuntimeError("Invalid dtype for matrix_element")
-
+                
+    @abstractmethod
     def assign(self, o):
-        r"""Assign the value of this matrix element from another matrix element
+        """Assign the value of this matrix element from another matrix element
 
         :param o: The other matrix_element object
         :type o: matrix_element
         """
         pass
 
+    @abstractmethod
     def clear(self):
-        r"Clear and deallocate all internal buffers of the matrix element"
+        "Clear and deallocate all internal buffers of the matrix element"
         pass
 
+    @abstractmethod
     def resize(self, *args, **kwargs):
-        r"""Resize the matrix element to fit the required wavefunctions
+        """Resize the matrix element to fit the required wavefunctions
 
         :param *args: A variable length list of arguments. Valid options are
 
@@ -114,6 +118,7 @@ class matrix_element(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def _call_(self, *args, use_sparsity=True):
         r"""Function for evaluating the inner product of tensor network states with matrix elements
 

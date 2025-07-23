@@ -10,10 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .ttnExt import ttn, ttn_type, is_ttn, available_backends
-from .msttnExt import ms_ttn, multiset_ttn, ms_ttn_type, multiset_ttn_type, is_ms_ttn
-
 from pyttn.ttnpp import ntree, ntreeBuilder, ntreeNode
+
+from .msttnExt import is_ms_ttn, ms_ttn, ms_ttn_type, multiset_ttn, multiset_ttn_type
+from .ttnExt import available_backends, is_ttn, ttn, ttn_type
 
 __all__: list[str] = [
         "ttn",

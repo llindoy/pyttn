@@ -50,7 +50,10 @@ namespace ttns
 
     public:
         _one_site_tdvp() : base_type() {}
-        _one_site_tdvp(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1) : base_type(A, ham, {krylov_dim, nstep}, {hamiltonian_sum_threads}, {}, set_var_threads) {}
+        _one_site_tdvp(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1) : base_type(A, ham, {krylov_dim, nstep}, {hamiltonian_sum_threads}, {}, set_var_threads) 
+        {
+            ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");     
+        }
 
         _one_site_tdvp(const _one_site_tdvp &o) = default;
         _one_site_tdvp(_one_site_tdvp &&o) = default;
@@ -60,6 +63,7 @@ namespace ttns
 
         void initialise(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1)
         {
+            ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");
             CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, nstep}, {hamiltonian_sum_threads}, {}, set_var_threads));
         }
     };
@@ -95,7 +99,10 @@ namespace ttns
 
     public:
         _adaptive_one_site_tdvp() : base_type() {}
-        _adaptive_one_site_tdvp(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1) : base_type(A, ham, {krylov_dim, nstep}, {hamiltonian_sum_threads}, {eigensolver_krylov_dim, neigenvalues}, set_var_threads) {}
+        _adaptive_one_site_tdvp(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1) : base_type(A, ham, {krylov_dim, nstep}, {hamiltonian_sum_threads}, {eigensolver_krylov_dim, neigenvalues}, set_var_threads) 
+        {
+            ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");
+        }
 
         _adaptive_one_site_tdvp(const _adaptive_one_site_tdvp &o) = default;
         _adaptive_one_site_tdvp(_adaptive_one_site_tdvp &&o) = default;
@@ -105,6 +112,7 @@ namespace ttns
 
         void initialise(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1)
         {
+            ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");
             CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, nstep}, {hamiltonian_sum_threads}, {eigensolver_krylov_dim, neigenvalues}, set_var_threads));
         }
 
@@ -148,7 +156,10 @@ namespace ttns
 
     public:
         _subspace_two_site_cost_tdvp() : base_type() {}
-        _subspace_two_site_cost_tdvp(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1) : base_type(A, ham, {krylov_dim, nstep}, {hamiltonian_sum_threads}, {}, set_var_threads) {}
+        _subspace_two_site_cost_tdvp(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1) : base_type(A, ham, {krylov_dim, nstep}, {hamiltonian_sum_threads}, {}, set_var_threads)
+        {
+            ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");
+        }
 
         _subspace_two_site_cost_tdvp(const _subspace_two_site_cost_tdvp &o) = default;
         _subspace_two_site_cost_tdvp(_subspace_two_site_cost_tdvp &&o) = default;
@@ -158,6 +169,7 @@ namespace ttns
 
         void initialise(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type nstep = 1, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1)
         {
+            ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");
             CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, nstep}, {hamiltonian_sum_threads}, {}, set_var_threads));
         }
 

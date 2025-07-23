@@ -12,6 +12,7 @@
 
 from pyttn import ntree, ntreeBuilder
 
+
 def build_topology_mode_combination(N1, N2, N3, N4, N5, m):
 
     """ Construct the pyrazine ML-MCTDH tree structure used in O. Vendrell and H.-D. Meyer, J. Chem. Phys. 134, 044135 (2011).

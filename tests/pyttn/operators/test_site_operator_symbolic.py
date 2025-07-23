@@ -405,7 +405,7 @@ def test_nlevel(N) -> None:
 
     random.seed(0)
 
-    for test_ind in range(10):
+    for _ in range(10):
         i = random.randint(0, N-1)
         j = random.randint(0, N-1)
         label = "|"+str(i)+"><"+str(j)+"|"

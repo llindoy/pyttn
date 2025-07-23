@@ -12,14 +12,16 @@
 
 
 import abc
-import numpy as np
 import copy
-
 from typing import Union
+
+import numpy as np
+
 
 class RationalFunctionSpectralDensity(metaclass=abc.ABCMeta):
     """An abstact base class for handling Rational Function spectral densities"""
 
+    @abc.abstractmethod
     def __init__(self):
         pass
 

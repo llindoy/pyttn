@@ -11,14 +11,14 @@
 # limitations under the License
 
 import os
+import time
 os.environ['OMP_NUM_THREADS']='1'
 
 import numpy as np
-import time
+from numba import jit
 
 import pyttn
 from pyttn import oqs, utils
-from numba import jit
 
 
 def sbm_dynamics_timing(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta = None, nstep = 1, Nw = 10.0, degree = 2, 

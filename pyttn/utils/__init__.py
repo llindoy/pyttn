@@ -11,28 +11,23 @@
 # limitations under the License
 
 from pyttn.ttnpp.utils import (
-    orthopol,
-    jacobi_polynomial,
-    gegenbauer_polynomial,
+    associated_laguerre_polynomial,
+    chebyshev_fourth_kind_polynomial,
     chebyshev_polynomial,
-)
-from pyttn.ttnpp.utils import (
     chebyshev_second_kind_polynomial,
     chebyshev_third_kind_polynomial,
-    chebyshev_fourth_kind_polynomial,
-)
-from pyttn.ttnpp.utils import (
-    legendre_polynomial,
-    associated_laguerre_polynomial,
-    laguerre_polynomial,
+    gegenbauer_polynomial,
     hermite_polynomial,
+    jacobi_polynomial,
+    laguerre_polynomial,
+    legendre_polynomial,
     nonclassical_polynomial,
+    orthopol,
 )
 
-from .truncate import TruncationBase, DepthTruncation, EnergyTruncation
 from .mode_combination import ModeCombination
+from .truncate import DepthTruncation, EnergyTruncation, TruncationBase
 from .visualise_tree import visualise_tree
-
 
 __all__ = [
     "orthopol",

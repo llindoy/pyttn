@@ -10,14 +10,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
+from abc import ABCMeta, abstractmethod
 from typing import Optional, Union
 
-from abc import ABCMeta
-from pyttn.ttns.sop.sSOPExt import sOP, sPOP, sNBO
-from pyttn.ttnpp import system_modes
+import numpy as np
 
-from pyttn.ttnpp import product_operator_complex
+from pyttn.ttnpp import product_operator_complex, system_modes
+from pyttn.ttns.sop.sSOPExt import sNBO, sOP, sPOP
 
 try:
     from pyttn.ttnpp import product_operator_real
@@ -85,6 +84,7 @@ class product_operator(metaclass=ABCMeta):
             else:
                 return product_operator_real(h, sysinf, *args, use_sparse=use_sparse)
 
+    @abstractmethod
     def initialise(self, op: Union[sOP, sPOP, sNBO], sysinf: system_modes, *args, use_sparse: bool = True):
         """Initialise the product_operator object given a sOP and system_modes information
 
@@ -102,6 +102,7 @@ class product_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def assign(self, o: "product_operator"):
         """Assign the value of the product operator from another 
 
@@ -110,6 +111,7 @@ class product_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def complex_dtype(self) -> bool:
         """Returns whether or not the product_operator is storing a complex valued dtype
 
@@ -118,14 +120,17 @@ class product_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the product_operator object"""
         pass
 
+    @abstractmethod
     def __deepcopy__(self, memo):
         """Function implementing deep copy of the product_operator object"""
         pass
 
+    @abstractmethod
     def __str__(self) -> str:
         """Return the string representation of the product_operator object
 
@@ -134,6 +139,7 @@ class product_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def backend(self) -> str:
         """Returns the backend type of the product_operator
 
@@ -142,10 +148,12 @@ class product_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def clear(self):
         """Clear and deallocate all internal buffers of the ttn"""
         pass
 
+    @abstractmethod
     def nmodes(self) -> int:
         """
         :returns: The number of modes the product operator acts on

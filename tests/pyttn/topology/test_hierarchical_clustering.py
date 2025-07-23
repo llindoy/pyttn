@@ -45,11 +45,12 @@ def test_hierarchical_clustering_tree():
     tree, leaf_ordering = convert_nx_to_tree(nxtree, root_ind=root_ind)
 
     # check that the leaf ordering is correct
-    assert leaf_ordering == [1, 5, 6, 3, 2, 7, 0, 4]
+    assert leaf_ordering == [6, 0, 4, 3, 7, 1 , 2, 5]
 
+    leaf_indices = [1, 5, 6, 3, 2, 7, 0, 4]
     # check that the nxtree also has this ordering
     for i, linds in enumerate(tree.leaf_indices()):
-        assert tree.at(linds).value == leaf_ordering[i]
+        assert tree.at(linds).value == leaf_indices[i]
 
     assert tree.root().value == 14
     assert tree.at([0]).value == 11
@@ -110,7 +111,7 @@ def test_hierarchical_clustering_subtree():
     leaf_ordering = convert_nx_to_subtree(nxtree, tree(), root_ind=root_ind)
 
     # check that the leaf ordering is correct
-    assert leaf_ordering == [1, 5, 6, 3, 2, 7, 0, 4]
+    assert leaf_ordering == [6, 0, 4, 3, 7, 1, 2, 5]
 
     tree_leaves = [121, 1, 5, 6, 3, 2, 7, 0, 4]
     # check that the nxtree also has this ordering

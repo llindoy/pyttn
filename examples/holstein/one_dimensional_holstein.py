@@ -11,20 +11,27 @@
 # limitations under the License
 
 
+import argparse
 import os
-
+import time
 os.environ["OMP_NUM_THREADS"] = "1"
 
-import numpy as np
-import time
 import h5py
-import argparse
+import numpy as np
 
-from pyttn import ntreeBuilder
-from pyttn import system_modes, boson_mode
-from pyttn import matrix_element, tdvp, sOP
+from pyttn import (
+    boson_mode,
+    matrix_element,
+    ms_sop_operator,
+    ms_ttn,
+    multiset_SOP,
+    ntreeBuilder,
+    sOP,
+    system_modes,
+    tdvp,
+)
 from pyttn.utils import ModeCombination
-from pyttn import ms_ttn, ms_sop_operator, multiset_SOP
+
 
 def run_initial_step(A, h, sweep, dt, nstep=10):
     tp = 0

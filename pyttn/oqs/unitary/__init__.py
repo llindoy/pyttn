@@ -11,12 +11,12 @@
 # limitations under the License
 
 from .bosonic_bath_hamiltonian import (
-    add_star_bath_hamiltonian,
-    add_chain_bath_hamiltonian,
-    add_ipchain_bath_hamiltonian,
     add_bosonic_bath_hamiltonian,
+    add_chain_bath_hamiltonian,
     add_correlated_bosonic_bath_hamiltonian,
-    add_correlated_star_bath_hamiltonian
+    add_correlated_star_bath_hamiltonian,
+    add_ipchain_bath_hamiltonian,
+    add_star_bath_hamiltonian,
 )
 from .fermionic_bath_hamiltonian import (
     add_fermionic_bath_hamiltonian,

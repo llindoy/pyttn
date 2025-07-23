@@ -16,7 +16,7 @@ import numpy as np
 def softmspace(
     start: float, stop: float, N: int, beta: float = 1, endpoint: bool = True
 ) -> np.ndarray:
-    r"""A function for generating a set of points with separations defined by a softmspace function.
+    """A function for generating a set of points with separations defined by a softmspace function.
     This ensures that at small values we points near a logspace and at large values we get something closer to linspace, allowing for
     logspace resolution at low frequencies but retaining moderate resolution at high frequencies
 

@@ -10,18 +10,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .bath_discretisation import OrthopolDiscretisation, DensityDiscretisation, BathDiscretisation
+from .bath_discretisation import (
+    BathDiscretisation,
+    DensityDiscretisation,
+    OrthopolDiscretisation,
+)
 from .expfit import (
     AAADecomposition,
-    ESPRITDecomposition,
     CtExpFitDecomposition,
-    SwExpFitDecomposition,
+    ESPRITDecomposition,
     ExpFitDecomposition,
-    PoleDecomposition
+    PoleDecomposition,
+    SwExpFitDecomposition,
 )
 from .pole_decomposition import MatsubaraDecomposition
 from .softmspace import softmspace
-
 
 __all__ = [
     "OrthopolDiscretisation",

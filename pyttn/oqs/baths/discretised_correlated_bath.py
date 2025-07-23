@@ -10,20 +10,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
 from typing import Optional, Union
 
-from pyttn.utils.truncate import DepthTruncation, TruncationBase
-from pyttn.utils.mode_combination import ModeCombination
+import numpy as np
+
 from pyttn import (
-    system_modes,
+    SOP,
+    OP_type,
     boson_mode,
     sSOP,
-    OP_type,
-    SOP,
+    system_modes,
 )
-from .discretised_bath import DiscreteBath
+from pyttn.utils.mode_combination import ModeCombination
+from pyttn.utils.truncate import DepthTruncation, TruncationBase
+
 from ..unitary import add_correlated_bosonic_bath_hamiltonian
+from .discretised_bath import DiscreteBath
 
 
 class DiscreteCorrelatedOQSBath(DiscreteBath):
@@ -127,7 +129,7 @@ class DiscreteCorrelatedBosonicBath(DiscreteCorrelatedOQSBath):
         self._wk_trunc = wk
         self.truncate_modes()
 
-    def truncate_modes(self, truncation:TruncationBase=DepthTruncation(8)):
+    def truncate_modes(self, truncation:Optional[TruncationBase]=None):
         r"""Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
@@ -135,6 +137,8 @@ class DiscreteCorrelatedBosonicBath(DiscreteCorrelatedOQSBath):
         :type truncation: TruncationBase, optional
 
         """
+        if truncation is None:
+            truncation = DepthTruncation(8)
         self._mode_dims = truncation(self._gk_trunc, self._wk_trunc, False)
 
     def system_information(self, mode_comb : ModeCombination=None, force_evaluate=False):

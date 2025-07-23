@@ -10,18 +10,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
 from typing import Callable, Optional, Union
-from .bath import Bath
-from ..bath_fitting import (
-    ExpFitDecomposition,
-    CtExpFitDecomposition,
-    SwExpFitDecomposition,
-    BathDiscretisation,
-)
+
+import numpy as np
 
 from pyttn.ttns import OP_type
+
+from ..bath_fitting import (
+    BathDiscretisation,
+    CtExpFitDecomposition,
+    ExpFitDecomposition,
+    SwExpFitDecomposition,
+)
 from ..spectral_density import CorrelatedSpectralDensity
+from .bath import Bath
 from .bosonic_bath import (
     evaluate_bosonic_bath_correlation_function,
     evaluate_bosonic_spectral_function,
@@ -29,7 +31,7 @@ from .bosonic_bath import (
 
 
 class CorrelatedBosonicBath(Bath):
-    r"""A class for managing a continuous correlated bosonic gaussian bath.  This provides
+    """A class for managing a continuous correlated bosonic gaussian bath.  This provides
     functions for computing non-interacting bath correlation functions, as well as
     decomposing the correlation function into a linear combination of
     complex valued exponentials (expfit) or oscillator terms (discretise)
@@ -148,7 +150,7 @@ class CorrelatedBosonicBath(Bath):
 
         for i in self.Jw.nonzero_elements():
             Ctv[i[0], i[1]] = evaluate_bosonic_bath_correlation_function(
-                lambda x: self.Sw_elem(x, *i),
+                lambda x: self.Sw_elem(x, *i),  
                 wmin,
                 wmax,
                 t,

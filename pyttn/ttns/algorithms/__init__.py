@@ -10,9 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .dmrgExt import one_site_dmrg, subspace_expansion_dmrg, dmrg
+from .dmrgExt import dmrg, one_site_dmrg, subspace_expansion_dmrg
 from .tdvpExt import one_site_tdvp, subspace_expansion_tdvp, tdvp
-
 
 __all__: list[str] = [
     "one_site_dmrg",

@@ -10,8 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
 from typing import Callable, Union
+
+import numpy as np
 
 
 class CorrelatedSpectralDensity:
@@ -73,7 +74,7 @@ class CorrelatedSpectralDensity:
             return self._zero_func
 
     def nonzero_elements(self) -> list[tuple[int, int]]:
-        return [k for k in self._spec_dense.keys()]
+        return list(self._spec_dense.keys())
 
     def __call__(self, w: Union[np.ndarray, float]) -> np.ndarray:
         """Evaluate the value of the spectral density matrix.
@@ -133,11 +134,11 @@ class CorrelatedSpectralDensity:
         res = None
         if isinstance(w, (float, int)):
             res = 0
-            for k, v in self._spec_dense.items():
+            for _, v in self._spec_dense.items():
                 res += v(w)
         elif isinstance(w, np.ndarray):
             res = np.zeros(w.shape)
-            for k, v in self._spec_dense.items():
+            for _, v in self._spec_dense.items():
                 res = res + v(w)
         else:
             raise TypeError("Invalid type for correlated_spectral_density eval.")

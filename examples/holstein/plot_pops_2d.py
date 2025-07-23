@@ -11,16 +11,15 @@
 # limitations under the License
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-import h5py
 import argparse
 
+import h5py
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def plot(fname):
-    pars = []
     t = None
     N = 0
     try:
@@ -35,7 +34,7 @@ def plot(fname):
                 res[i * N + j, :] = np.array(h5.get(label))
 
         h5.close()
-    except:
+    except Exception:
         print("Failed to read input file")
         exit()
 
@@ -53,7 +52,7 @@ def plot(fname):
         im.set_array(logdata[:, i].reshape((N, N)).T)
         return [im]
 
-    anim = animation.FuncAnimation(fig, animate, frames=ind, interval=100, blit=True)
+    animation.FuncAnimation(fig, animate, frames=ind, interval=100, blit=True)
     plt.show()
 
 

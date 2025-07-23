@@ -10,10 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
+from typing import Optional, Union
 
-from typing import Union, Optional
+import numpy as np
 
 from pyttn.ttnpp import ms_ttn_complex
 
@@ -39,7 +39,7 @@ except ImportError:
 
 
 def is_ms_ttn(A) -> bool:
-    r"""A function for determining whether a given object is a multiset ttn
+    """A function for determining whether a given object is a multiset ttn
     :param A: The object to test
     :returns: Whether or not the object is a ms_ttn
     :rtype: bool
@@ -58,7 +58,7 @@ def is_ms_ttn(A) -> bool:
 
 
 def is_multiset_ttn(A) -> bool:
-    r"""A function for determining whether a given object is a multiset ttn
+    """A function for determining whether a given object is a multiset ttn
     :param A: The object to test
     :returns: Whether or not the object is a ms_ttn
     :rtype: bool
@@ -152,7 +152,7 @@ class multiset_ttn(metaclass=ABCMeta):
             raise RuntimeError("Invalid backend type for multiset_ttn")
 
 
-    
+    @abstractmethod
     def complex_dtype(self):
         """Return the data type stored in the multiset ttn
 
@@ -161,7 +161,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def nthreads(self):
         """Stores the number of threads that can be used to attempt to parallelise updates over the set variables
 
@@ -170,7 +170,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-        
+    @abstractmethod    
     def assign(self, o):
         """Assign the value of this multiset ttn from another multiset ttn
 
@@ -179,7 +179,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def slice(self, i):
         """Returns a slice object that allows for easy accessing of the multiset ttn correspond to a single set variable i
 
@@ -191,7 +191,7 @@ class multiset_ttn(metaclass=ABCMeta):
 
         """
 
-    
+    @abstractmethod
     def bond(self):
         """Return a list of all bonds in the network
 
@@ -200,7 +200,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def bond_dimensions(self):
         """Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network
 
@@ -209,7 +209,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def bond_capacities(self):
         """Return a dictionary containing the bond (the two sites forming the bond) and maximum bond dimension of all bonds in the network
 
@@ -218,12 +218,12 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def reset_orthogonality_centre(self):
         """Resets the orthogonality centre of the multiset TTN to the root node of the tree."""
         pass
 
-    
+    @abstractmethod
     def resize(self, *args, nset, purification=False):
         """Resize the multiset TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction
 
@@ -239,7 +239,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def set_seed(self, seed):
         """Set the value of the random number generate seed used for internal operations requiring random sampling
 
@@ -248,7 +248,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def set_state(self, *args, random_unoccupied_initialisation=False):
         r"""Set the coefficients in the multiset TTN so that it represents a user specified product state
 
@@ -286,7 +286,7 @@ class multiset_ttn(metaclass=ABCMeta):
     #    """
     #    pass
 
-    
+    @abstractmethod
     def __imul__(self, b):
         """Inplace multiplication of the multiset TTN object by a scalar
 
@@ -295,7 +295,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __idiv__(self, b):
         """Inplace division of the multiset TTN object by a scalar
 
@@ -304,27 +304,27 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def conj(self):
         "Take the complex conjugate of the multiset TTN.  Here this is evaluated lazily"
         pass
 
-    
+    @abstractmethod
     def random(self):
         "Sample the coefficients in the multiset TTN randomly from a normal distribution"
         pass
 
-    
+    @abstractmethod
     def zero(self):
         "Set all coefficients in the multiset TTN to zero"
         pass
 
-        
+    @abstractmethod    
     def clear(self):
         "Clear and deallocate all internal buffers of the multiset TTN"
         pass
 
-    
+    @abstractmethod
     def __iter__(self):
         """
         :returns: Iterator object over nodes in multiset TTN
@@ -332,7 +332,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def mode_dimensions(self):
         """
         :returns: list of local Hilbert space dimensions
@@ -340,7 +340,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def dim(self, i):
         """Returns the local Hilbert space dimension of mode i
 
@@ -352,7 +352,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def nmodes(self):
         """
         :returns: The number of modes in the multiset TTN
@@ -360,7 +360,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def is_purification(self):
         """
         :returns: Whether or not the state represents a purification
@@ -368,7 +368,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def ntensors(self):
         """
         :returns: The total number of tensors in the tensor network
@@ -376,7 +376,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def nsites(self):
         """
         :returns: The total number of tensors in the tensor network
@@ -384,7 +384,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def nset(self):
         """
         :returns: The number of set variables for the multiset TTN.  Here it is one
@@ -392,7 +392,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def nelems(self):
         """
         :returns: The total number of elements in all tensors of the network.
@@ -400,7 +400,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __len__(self):
         """
         :returns: The number of modes in the multiset TTN
@@ -453,7 +453,7 @@ class multiset_ttn(metaclass=ABCMeta):
     #    """
     #    pass
 
-    
+    @abstractmethod
     def has_orthogonality_centre(self):
         """            
         :returns: Whether or not the multiset TTN has an active orthogonality centre
@@ -462,7 +462,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def orthogonality_centre(self):
         """            
         :returns: The index of the current orthogonality centre
@@ -471,7 +471,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def is_orthogonalised(self):
         """            
         :returns: Whether or not the multiset TTN has an orthogonality centre at the root
@@ -480,7 +480,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-     
+    @abstractmethod 
     def force_set_orthogonality_centre(self, i):
         """Sets the orthogonality centre of the tensor network to index i but does not modify the tensor to ensure that this is a
         valid orthogonality centre
@@ -491,7 +491,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-       
+    @abstractmethod   
     def shift_orthogonality_centre(self, i, tol=0, nchi=0):
         """Shift the orthogonality centre down the ith bond of the current orthogonality centre with possible truncation. 
         Where for all nodes but the root 0 corresponds to the parent of the current orthogonality centre and its children are then 1-nchild
@@ -507,7 +507,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def set_orthogonality_centre(self, i, tol=0, nchi=0):
         """Sets the orthogonality centre of the tensor network to index i either introducing an orthogonality centre if there is none
         or simply shifting the orthogonality centre from its current location to the required location
@@ -522,7 +522,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def orthogonalise(self, force=False):
         """Shifts the orthogonality centre to the root node of the multiset TTN
 
@@ -532,7 +532,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-        
+    @abstractmethod    
     def truncate(self, tol=0, nchi=0):
         """Ensures the tensor network is in an orthogonalised form.  Then performs an euler tour truncating each bond according to the user
         specified tol and nchi parameters
@@ -545,7 +545,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def normalise(self):
         """Ensures the multiset TTN is a normalised to one and returns the previous value of the norm of the tensor
 
@@ -554,7 +554,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def norm(self):
         """
         :returns: The 2-norm of the multiset TTN
@@ -562,7 +562,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __setitem__(self, i, v):
         r"""Sets the value of a site tensor in the tensor network
 
@@ -574,7 +574,7 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __getitem__(self, i, v):
         """Access tensor data at node i
 
@@ -598,7 +598,7 @@ class multiset_ttn(metaclass=ABCMeta):
     #    """
     #    pass
 
-    
+    @abstractmethod
     def site_tensor(self, i, v):
         r"""Access tensor data at node i
 

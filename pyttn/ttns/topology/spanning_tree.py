@@ -10,10 +10,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from math import ceil
+from typing import Any, Generator, Optional
+
 import networkx as nx
 import numpy as np
-from math import ceil
-from typing import Generator, Any, Optional
 
 
 def distance_matrix_to_graph(M: np.ndarray) -> nx.Graph:
@@ -34,13 +35,13 @@ def __insert_physical_nodes(spanning_tree, N, root_ind):
 
     # get a list of all nodes in the tree
     edges = sorted(
-        [edge for edge in nx.dfs_edges(spanning_tree, source=root_ind)],
+        nx.dfs_edges(spanning_tree, source=root_ind),
         key=lambda x: np.abs(x[0] - root_ind),
     )
 
     # determine the number of children each node has
     nchildren = [0 for x in range(N)]
-    for i, e in enumerate(edges):
+    for e in edges:
         if e[0] < N:
             nchildren[e[0]] += 1
 
@@ -64,7 +65,6 @@ def __insert_physical_nodes(spanning_tree, N, root_ind):
     for i in range(N):
         if nchildren[i] > 0:
             spanning_tree.add_edge(mapping[i], i)
-    print(mapping)
     return spanning_tree, mapping[root_ind]
 
 
@@ -167,7 +167,7 @@ def __split_high_degree_nodes(
         # of nodes with more than max_nchild children we insert sufficiently many logical nodes so that we have the
         # correct degree of connectivity
         edges = sorted(
-            [edge for edge in nx.dfs_edges(spanning_tree, source=root_index)],
+            nx.dfs_edges(spanning_tree, source=root_index),
             key=lambda x: np.abs(x[0] - root_index),
         )
 
@@ -195,7 +195,7 @@ def __split_high_degree_nodes(
                 if curr_node not in nodes_to_split.keys():
                     nodes_to_split[curr_node] = sind
 
-        for i, e in enumerate(edges):
+        for _, e in enumerate(edges):
             if curr_node != e[1]:
                 curr_node = e[1]
 
@@ -215,7 +215,6 @@ def __split_high_degree_nodes(
             for node, ind in nodes_to_split.items():
                 nchild = nchildren[node]
 
-                print([nchildren[edges[ind + i][1]] for i in range(nchild)])
                 # get a list containing all of its children
                 leaf_children = [
                     edges[ind + i][1]
@@ -228,7 +227,6 @@ def __split_high_degree_nodes(
                     for i in range(nchild)
                     if nchildren[edges[ind + i][1]] > 0
                 ]
-                print(edges[ind], leaf_children, internal_children)
 
                 if max_nleaves is None:
                     T, counter = __split_node(

@@ -1,18 +1,29 @@
-import os
+# This files is part of the pyTTN package.
+#(C) Copyright 2025 NPL Management Limited
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License
 
+import argparse
+import copy
+import os
+import time
 os.environ["OMP_NUM_THREADS"] = "1"
 
-import numpy as np
-import time
 import h5py
-import copy
-import argparse
-
+import numpy as np
+from cayley_helper import build_topology, get_mode_reordering, get_spin_connectivity
+from numba import jit
 
 import pyttn
 from pyttn import oqs, utils
-from numba import jit
-from cayley_helper import get_spin_connectivity, build_topology, get_mode_reordering
+
 
 def output_results(ofname, t, res, maxchi, timing):
     h5 = h5py.File(ofname, "w")
@@ -102,7 +113,7 @@ def xytree_dynamics(Nl, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt,
     site_info = copy.deepcopy(sysinf)
     sysinfo = copy.deepcopy(sysinf)
     # and add on the system information objects for the remaining spins
-    for i in range(Ns - 1):
+    for _ in range(Ns - 1):
         sysinfo = pyttn.combine_systems(sysinfo, sysinf)
 
     sysinfo.mode_indices = get_mode_reordering(Nl, bsys.nmodes(), site_size=1)

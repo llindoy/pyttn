@@ -10,19 +10,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Callable, Optional, Union
+
 import numpy as np
 import scipy as sp
-from typing import Callable, Optional, Union
-from .bath import Bath
-from ..bath_fitting import (
-    ExpFitDecomposition,
-    CtExpFitDecomposition,
-    SwExpFitDecomposition,
-    BathDiscretisation,
-    PoleDecomposition
-)
 
 from pyttn.ttns import OP_type
+
+from ..bath_fitting import (
+    BathDiscretisation,
+    CtExpFitDecomposition,
+    ExpFitDecomposition,
+    PoleDecomposition,
+    SwExpFitDecomposition,
+)
+from .bath import Bath
 
 
 def evaluate_bosonic_bath_correlation_function(

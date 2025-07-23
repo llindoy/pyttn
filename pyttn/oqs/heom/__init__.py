@@ -5,7 +5,6 @@ from .bosonic_bath_operator import (
 )
 from .fermionic_bath_operator import add_fermionic_bath_generator
 
-
 __all__ = [
     "add_bosonic_bath_generator",
     "add_bosonic_heom_bath_generator",

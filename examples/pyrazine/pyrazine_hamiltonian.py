@@ -11,7 +11,8 @@
 # limitations under the License
 
 import numpy as np
-from pyttn import operator_dictionary, SOP, sOP, site_operator
+
+from pyttn import SOP, operator_dictionary, site_operator, sOP
 
 # convert from eV to hartree
 eV = 0.0367493049512081

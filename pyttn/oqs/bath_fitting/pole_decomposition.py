@@ -26,8 +26,11 @@ except ImportError:
             a = -maxterms
         return np.sum(F(np.arange(a, b)))
 
+from ..spectral_density.rational_function_spectral_density import (
+    RationalFunctionSpectralDensity,
+)
 from .expfit import PoleDecomposition
-from ..spectral_density.rational_function_spectral_density import RationalFunctionSpectralDensity
+
 
 class MatsubaraDecomposition(PoleDecomposition):
     def __init__(self, K):
