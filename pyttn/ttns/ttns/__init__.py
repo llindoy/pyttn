@@ -14,6 +14,7 @@
 from .ntreeExt import ntree, ntreeNode, ntreeBuilder
 from .msttnExt import is_ms_ttn, ms_ttn, ms_ttn_type, multiset_ttn, multiset_ttn_type
 from .ttnExt import available_backends, is_ttn, ttn, ttn_type
+from .msttnSliceExt import is_ms_ttn_slice, ms_ttn_slice, ms_ttn_slice_type, multiset_ttn_slice, multiset_ttn_slice_type
 
 __all__: list[str] = [
         "ttn",
@@ -22,11 +23,16 @@ __all__: list[str] = [
         "ms_ttn_type",
         "multiset_ttn_type",
         "multiset_ttn",
+        "ms_ttn_slice",
+        "ms_ttn_slice_type",
+        "multiset_ttn_slice_type",
+        "multiset_ttn_slice",
         "ntree",
         "ntreeBuilder",
         "ntreeNode",
         "is_ttn",
         "is_ms_ttn", 
+        "is_ms_ttn_slice", 
         "available_backends"
         ]
 

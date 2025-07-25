@@ -52,7 +52,8 @@ docs = [
     "reno >= 4.0.0",
     "sphinx-autodoc-typehints >= 2.0.0",
     "nbsphinx_link >= 1.2",
-    "ypdata-sphinx-theme"
+    "ypdata-sphinx-theme", 
+    "sphinx-autodoc-typehints"
 ]
 notebook = [
     "notebook >= 7.1.0",

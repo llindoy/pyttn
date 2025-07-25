@@ -134,7 +134,7 @@ setup(
     author_email="lachlan.lindoy@npl.co.uk",
     description="python bindings of ttnpp using pybind11",
     long_description="",
-    ext_modules=[CMakeExtension("pyttn.ttnpp", rebuild=False, parallel=16)],
+    ext_modules=[CMakeExtension("pyttn.ttnpp", rebuild=True, parallel=16)],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={},

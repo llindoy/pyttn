@@ -77,13 +77,13 @@ The core python wrapper version supports Python versions >=3.9.
 Additional python dependencies introduced by the core functionality of the pyTTN wrapper are:
  - [scipy](https://scipy.org/)
  - [numpy](https://numpy.org/)
+ - [networkx](https://networkx.org/)
 
  Additionally, some of the examples depend upon the python packages:
  - [h5py](https://www.h5py.org/) 
  - [numba](https://numba.pydata.org/)
 
   Finally, full tree visualisation functionality provided by the `visualise_tree` function depends upon the packages
- - [networkx](https://networkx.org/)
  - [matplotlib](https://matplotlib.org/)
  - [pydot](https://github.com/pydot/pydot)
  - [graphviz](https://graphviz.org/)
@@ -104,8 +104,8 @@ By default pyTTN does not build the CUDA backend.  For details on how to do so s
 ## Installation
 You can install pyTTN using pip like this:
 ```
-$ cd ${pyTTN_ROOT_DIR}
-$ python3 -m pip install .
+cd ${pyTTN_ROOT_DIR}
+python3 -m pip install .
 ```
 
 ### Multithreaded Build

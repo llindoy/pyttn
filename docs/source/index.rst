@@ -38,7 +38,7 @@ If you publish working using pyTTN, please cite the paper
    Dynamics Simulations Using Tree Tensor Networks*,
    `arXiv:2503.15460 <https://arxiv.org/abs/2503.15460>`__.
 
-::
+.. code-block::
    @misc{Lindoy2025,
      title = {pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Network},
      author = {Lindoy, Lachlan P. and Rodrigo-Albert, Daniel. and Rath, Yannic and Rungger, Ivan},
@@ -75,8 +75,8 @@ pyTTN API:
 .. toctree::
    :maxdepth: 1
 
-   API Outline </pyttn/API Outline> 
-   API Documents </pyttn/index>
+   API </pyttn/index>
+   API Overview </pyttn/API overview> 
 
 
 Indices and Tables

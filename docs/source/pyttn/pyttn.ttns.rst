@@ -2,7 +2,7 @@ pyttn
 =====
 
 .. toctree::
-   :maxdepth: 6
+   :maxdepth: 2
 
    pyttn.ttns.algorithms
    pyttn.ttns.observables

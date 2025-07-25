@@ -162,6 +162,15 @@ class multiset_ttn(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def backend(self) -> str:
+        """Returns a string labelling the backend of the multiset ttn object
+
+        :returns: backend label
+        :rtype: str
+        """
+        pass
+
+    @abstractmethod
     def nthreads(self):
         """Stores the number of threads that can be used to attempt to parallelise updates over the set variables
 
@@ -250,7 +259,7 @@ class multiset_ttn(metaclass=ABCMeta):
 
     @abstractmethod
     def set_state(self, *args, random_unoccupied_initialisation=False):
-        """Set the coefficients in the multiset TTN so that it represents a user specified product state
+        r"""Set the coefficients in the multiset TTN so that it represents a user specified product state
 
         :param *args: A variable length list of arguments. Valid options are
 
@@ -387,7 +396,7 @@ class multiset_ttn(metaclass=ABCMeta):
     @abstractmethod
     def nset(self):
         """
-        :returns: The number of set variables for the multiset TTN.  Here it is one
+        :returns: The number of set variables for the multiset TTN.
         :rtype: int
         """
         pass

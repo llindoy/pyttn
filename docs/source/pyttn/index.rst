@@ -4,21 +4,38 @@ The pyTTN API
 
 The pyTTN package: An Open Source Toolbox for Quantum Dynamics Simulations Using Tree Tensor Networks.
 
+Tree Tensor Network States
+--------------------------
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    pyttn.ttns
 
-Subpackages
------------
+Open Quantum System Dynamics
+----------------------------
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 3
 
-   pyttn.linalg
-   pyttn.models
    pyttn.oqs
+
+Utilities
+---------
+
+.. toctree::
+   :maxdepth: 2
+
    pyttn.utils
+   pyttn.linalg 
+
+Models
+------
+
+.. toctree::
+   :maxdepth: 2
+
+   pyttn.models
 
 Indices and Tables
 ==================
@@ -27,25 +44,12 @@ Indices and Tables
 * :ref:`modindex`
 * :ref:`search`
 
-Module contents
----------------
-
-.. automodule:: pyttn.ttns
-   :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
-   :undoc-members:
-   :show-inheritance:
-   :no-index:
-
-pyttn.ttnpp module
+ttnpp module
 ------------------
 
-.. automodule:: pyttn.ttnpp
-   :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
-   :undoc-members:
-   :show-inheritance:
-   :no-index:
+.. toctree::
+   :maxdepth: 2
+
+   pyttn.ttnpp
+
 

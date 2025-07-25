@@ -11,7 +11,7 @@
 # limitations under the License
 
 from abc import ABCMeta, abstractmethod
-from typing import Optional, TypeVar, Union
+from typing import Optional, Union
 
 import numpy as np
 
@@ -155,6 +155,15 @@ class ttn(metaclass=ABCMeta):
 
         :returns: dtype
         :rtype: bool
+        """
+        pass
+
+    @abstractmethod
+    def backend(self) -> str:
+        """Returns a string labelling the backend of the ttn object
+
+        :returns: backend label
+        :rtype: str
         """
         pass
 

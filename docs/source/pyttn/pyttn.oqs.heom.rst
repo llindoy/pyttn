@@ -1,36 +1,11 @@
-heom subpackage
-===============
+heom
+====
 
-bosonic\_bath\_operator
------------------------
-
-.. automodule:: pyttn.oqs.heom.bosonic_bath_operator
+.. automodule:: pyttn.oqs.heom
    :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
+   :special-members: __init__,__call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
+   :exclude-members: __module__,__annotations__
    :undoc-members:
    :show-inheritance:
-   :no-index:
 
-fermionic\_bath\_operator
--------------------------
-
-.. automodule:: pyttn.oqs.heom.fermionic_bath_operator
-   :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
-   :undoc-members:
-   :show-inheritance:
-   :no-index:
-
-heom\_operators
----------------
-
-.. automodule:: pyttn.oqs.heom.heom_operators
-   :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
-   :undoc-members:
-   :show-inheritance:
-   :no-index:
 

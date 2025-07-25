@@ -74,6 +74,8 @@ void init_msttn(py::module &m, const std::string &label)
         .def("assign", static_cast<_msttn_slice &(_msttn_slice::*)(const ttn<T, backend> &)>(&_msttn_slice::template operator= <T, backend>))
         //.def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice_real&)>(&_msttn_slice::template operator=<real_type, backend>))
         //.def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice&)>(&_msttn_slice::template operator=<T, backend>))
+        .def("complex_dtype", [](const _msttn_slice &)
+             { return !std::is_same<T, real_type>::value; })
         .def("nset", &_msttn_slice::nset)
         .def("backend", [](const _msttn_slice &)
              { return backend::label(); });
