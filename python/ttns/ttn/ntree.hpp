@@ -83,17 +83,12 @@ template <typename T> void init_ntree_node(py::module &m) {
             :rtype: bool
 
             )mydelim")
-      .def("leaf_indices", &node_type::leaf_indices, py::arg(),
-           py::arg("resize") = true)
-      .def(
-          "leaf_indices",
-          [](const node_type &n, bool resize = true) {
-            std::vector<std::vector<size_t>> linds;
-            n.leaf_indices(linds, resize);
-            return linds;
-          },
-          py::arg("resize") = true)
-      .def("index", &node_type::index)
+      .def("leaf_indices", 
+            [](const node_type &n) {
+                std::vector<std::vector<size_t>> linds;
+                n.leaf_indices(linds, true);
+                return linds;
+            })
       .def("index",
            [](const node_type &n) {
              std::vector<size_t> linds;
@@ -129,6 +124,9 @@ template <typename T> void init_ntree_node(py::module &m) {
       .def("__getitem__",
            static_cast<node_type &(node_type::*)(size_t)>(
                &node_type::operator[]),
+           py::return_value_policy::reference)
+      .def("__getitem__",
+           static_cast<node_type &(node_type::*)(const std::vector<size_t> &)>(&node_type::at),
            py::return_value_policy::reference)
       .def("back",
            static_cast<const node_type &(node_type::*)() const>(

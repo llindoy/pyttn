@@ -119,8 +119,7 @@
 
 #now we include the tutorials
 !tutorials
-!tutorials/getting_started/
-!tutorials/getting_started/*.ipynb
+!tutorials/*.ipynb
 !tutorials/DMRG/
 !tutorials/DMRG/*.ipynb
 !tutorials/TDVP/

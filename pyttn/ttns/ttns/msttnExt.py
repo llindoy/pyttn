@@ -127,7 +127,7 @@ class multiset_ttn(metaclass=ABCMeta):
         backend: str = "blas",
         **kwargs,
     ) -> 'multiset_ttn':
-        """Factory function for constructing a multiset tree tensor network state operator
+        r"""Factory function for constructing a multiset tree tensor network state operator
 
         :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
 
@@ -250,7 +250,7 @@ class multiset_ttn(metaclass=ABCMeta):
 
     @abstractmethod
     def set_state(self, *args, random_unoccupied_initialisation=False):
-        r"""Set the coefficients in the multiset TTN so that it represents a user specified product state
+        """Set the coefficients in the multiset TTN so that it represents a user specified product state
 
         :param *args: A variable length list of arguments. Valid options are
 

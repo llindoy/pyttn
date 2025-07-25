@@ -278,7 +278,9 @@ class BosonicBath(Bath):
     def Sw(self, w: Union[np.ndarray, float]) -> Union[np.ndarray, float]:
         r"""Returns the non-interacting bath spectral function at w
         .. math::
-            S(\omega) = J(\omega) \frac{(\coth(\beta\omega/2)+1)}{2}
+
+           S(\omega) = J(\omega) \frac{(\coth(\beta\omega/2)+1)}{2}
+
         :param w: frequency
         :type w: Union[np.ndarray, float]
 

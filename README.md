@@ -7,6 +7,7 @@
 
 [![ArXiv](https://img.shields.io/badge/arXiv-2503.15460-red)](https://arxiv.org/abs/2503.15460)<!-- [![DOI](https://www.zenodo.org/badge/xxxxxx.svg)](https://www.zenodo.org/badge/latestdoi/xxxxx) -->
 [![Testsstatus](https://gitlab.npl.co.uk/qsm/pyttn/badges/main/pipeline.svg)](https://gitlab.npl.co.uk/qsm/pyttn/-/commits/main) 
+![Python](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12%20|%203.13-blue.svg)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -59,6 +60,9 @@ This open source project aims to provide an easy to use python interface for wor
 ### Dependencies
 The core C++ library (ttnpp) and the python wrapper (pyTTN) have the following key dependencies. 
 
+#### C++ Dependencies
+The core C++ library requires C++11 features.
+
 External Libraries:
 - [Pybind11](https://github.com/pybind/pybind11) Python bindings
 - [BLAS](https://netlib.org/blas/) linear algebra
@@ -66,6 +70,9 @@ External Libraries:
 - [Catch2](https://github.com/catchorg/Catch2) C++ Unit Tests (Only required when running C++ test)
 
 The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${pyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from their respective Github repositories.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
+
+#### Python Dependencies Dependencies
+The core python wrapper version supports Python versions >=3.9.
 
 Additional python dependencies introduced by the core functionality of the pyTTN wrapper are:
  - [scipy](https://scipy.org/)

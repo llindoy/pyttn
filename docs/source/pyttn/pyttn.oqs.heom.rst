@@ -1,21 +1,8 @@
-pyttn.oqs.heom package
-======================
+heom subpackage
+===============
 
-Submodules
-----------
-
-pyttn.oqs.heom.bath\_properties module
---------------------------------------
-
-.. automodule:: pyttn.oqs.heom.bath_properties
-   :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
-   :undoc-members:
-   :show-inheritance:
-
-pyttn.oqs.heom.bosonic\_bath\_operator module
----------------------------------------------
+bosonic\_bath\_operator
+-----------------------
 
 .. automodule:: pyttn.oqs.heom.bosonic_bath_operator
    :members:
@@ -23,19 +10,21 @@ pyttn.oqs.heom.bosonic\_bath\_operator module
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
-pyttn.oqs.heom.fermion\_bath\_operator module
----------------------------------------------
+fermionic\_bath\_operator
+-------------------------
 
-.. automodule:: pyttn.oqs.heom.fermion_bath_operator
+.. automodule:: pyttn.oqs.heom.fermionic_bath_operator
    :members:
    :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
-pyttn.oqs.heom.heom\_operators module
--------------------------------------
+heom\_operators
+---------------
 
 .. automodule:: pyttn.oqs.heom.heom_operators
    :members:
@@ -43,13 +32,5 @@ pyttn.oqs.heom.heom\_operators module
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
-Module contents
----------------
-
-.. automodule:: pyttn.oqs.heom
-   :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
-   :undoc-members:
-   :show-inheritance:

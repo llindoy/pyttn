@@ -21,4 +21,4 @@ Module contents
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
-
+   :no-index:

@@ -1,11 +1,8 @@
-pyttn.ttns.operators package
-============================
+operators
+=========
 
-Submodules
-----------
-
-pyttn.ttns.operators.mssopOperatorExt module
---------------------------------------------
+mssopOperatorExt
+----------------
 
 .. automodule:: pyttn.ttns.operators.mssopOperatorExt
    :members:
@@ -13,9 +10,10 @@ pyttn.ttns.operators.mssopOperatorExt module
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
-pyttn.ttns.operators.opsExt module
-----------------------------------
+opsExt
+------
 
 .. automodule:: pyttn.ttns.operators.opsExt
    :members:
@@ -23,9 +21,10 @@ pyttn.ttns.operators.opsExt module
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
-pyttn.ttns.operators.productOperatorExt module
-----------------------------------------------
+productOperatorExt
+------------------
 
 .. automodule:: pyttn.ttns.operators.productOperatorExt
    :members:
@@ -33,9 +32,10 @@ pyttn.ttns.operators.productOperatorExt module
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
-pyttn.ttns.operators.siteOperatorsExt module
---------------------------------------------
+siteOperatorsExt
+----------------
 
 .. automodule:: pyttn.ttns.operators.siteOperatorsExt
    :members:
@@ -43,9 +43,10 @@ pyttn.ttns.operators.siteOperatorsExt module
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
-pyttn.ttns.operators.sopOperatorExt module
-------------------------------------------
+sopOperatorExt
+--------------
 
 .. automodule:: pyttn.ttns.operators.sopOperatorExt
    :members:
@@ -53,13 +54,5 @@ pyttn.ttns.operators.sopOperatorExt module
    :exclude-members: __init__,__module__,__annotations__
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
-Module contents
----------------
-
-.. automodule:: pyttn.ttns.operators
-   :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
-   :undoc-members:
-   :show-inheritance:

@@ -38,8 +38,6 @@ try:
 except ImportError:
     _cuda_import = False
 
-T = TypeVar('T')
-
 def available_backends() -> list[str]:
     if _cuda_import:
         return ["blas", "cuda"]
@@ -237,11 +235,11 @@ class ttn(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def set_product(self, state : list[list[T]]):
+    def set_product(self, state : list[list[Union[float, complex, np.float64, np.complex128]]]):
         """Set the coefficients in the ttn so that it represents a product of a set of one body states
 
         :param state: A list containing a set of vectors corresponding to the individual product states
-        :type state: list[list[T]]
+        :type state: list[list[Union[float, complex, np.float64, np.complex128]]]
         """
         pass
 
@@ -251,16 +249,16 @@ class ttn(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def sample_product(self, dist: list[list[T]]):
+    def sample_product(self, dist: list[list[Union[float, complex, np.float64, np.complex128]]]):
         """Sample a direct product of occupation states from a set of probabilities of observing each mode in a given state
 
         :param state: A list containing a set of vectors corresponding to the probabilities of observing each occupation state
-        :type state: list[list[T]]
+        :type state: list[list[Union[float, complex, np.float64, np.complex128]]]
         """
         pass
 
     @abstractmethod
-    def __imul__(self, b: T):
+    def __imul__(self, b: Union[float, complex, np.float64, np.complex128]):
         """Inplace multiplication of the ttn object by a scalar
 
         :param b: Scalar value to multiply ttn by
@@ -269,7 +267,7 @@ class ttn(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def __idiv__(self, b: T):
+    def __idiv__(self, b: Union[float, complex, np.float64, np.complex128]):
         """Inplace division of the ttn object by a scalar
 
         :param b: Scalar value to divide ttn by

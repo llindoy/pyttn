@@ -10,8 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from pyttn.ttnpp import ntree, ntreeBuilder, ntreeNode
 
+from .ntreeExt import ntree, ntreeNode, ntreeBuilder
 from .msttnExt import is_ms_ttn, ms_ttn, ms_ttn_type, multiset_ttn, multiset_ttn_type
 from .ttnExt import available_backends, is_ttn, ttn, ttn_type
 

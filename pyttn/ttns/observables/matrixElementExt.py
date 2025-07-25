@@ -109,12 +109,10 @@ class matrix_element(metaclass=ABCMeta):
             - **A** (:class:`ttn` or :class:`ms_ttn`) - A TTN to define the topology and size of buffers needed to evaluate the tensor network.
             - **A** (:class:`ttn` or :class:`ms_ttn`), **B** (:class:`ttn` or :class:`ms_ttn`) - Two TTNs with the same topology defining the size of the bra and ket respectively.
 
-        :type *args: [Arguments (variable number and type)]
         :param **kwargs: A dictionary containing optional input arguments.
 
             - **nbuffers** (int, optional) - The number of buffers to allocate.
             - **use_capacity** (bool, optional) - Whether or not to use the capacity of the TTNs to determine the size of the buffers.
-        :type **kwargs: dict(Arguments (variable number and type))
         """
         pass
 
@@ -123,11 +121,10 @@ class matrix_element(metaclass=ABCMeta):
         r"""Function for evaluating the inner product of tensor network states with matrix elements
 
         :param *args: A variable length list of arguments. See below for a list of valid arguments.
-        :type *args: [Arguments (variable number and type)]
         :param use_sparsity: Whether or not to exploit sparsity in the evaluation of the matrix elements. (Default: True)
         :type use_sparsity: bool, optional
 
-        :*args options:
+        *args options
         Valid options for the argument list depend on the type of quantity we are evaluating.
 
         :math:`\langle A | A \rangle`:

@@ -81,7 +81,7 @@ def __weight_to_distance(M, distance_metric, **kwargs):
 def generate_hierarchical_clustering_tree(
     M: np.ndarray, distance_metric: str = "gauss", **kwargs
 ) -> tuple[nx.Graph, int]:
-    """Construct a networkx graph object from the maximum weight spanning tree of some matrix M.  This function
+    r"""Construct a networkx graph object from the maximum weight spanning tree of some matrix M.  This function
     can optionally insert logical nodes to prevent any node having a more children than max_nchild, and can be chosen
     so that any node is the root index of the tree.
 
