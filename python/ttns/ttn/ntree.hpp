@@ -97,7 +97,7 @@ template <typename T> void init_ntree_node(py::module &m) {
            })
       .def("depth", &node_type::depth)
 
-      .def("parent", &node_type::parent)
+      .def("parent", &node_type::parent, py::return_value_policy::reference)
       .def("clear", &node_type::clear)
       .def_property(
           "value",
