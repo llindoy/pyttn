@@ -37,38 +37,8 @@ static std::string& remove_whitespace_and_to_lower(std::string& str)
     str.erase(std::remove_if(str.begin(), str.end(), [](unsigned char c){return (c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '\v' || c == '\f');}), str.end());
     return str;
 }
-}
-}
 
 
-
-#ifdef USE_RAPIDJSON
-
-#include <rapidjson/document.h>
-#include <rapidjson/writer.h>
-#include <rapidjson/stringbuffer.h>
-#include <rapidjson/istreamwrapper.h>
-#include <rapidjson/ostreamwrapper.h>
-
-namespace utils
-{
-namespace io
-{
-
-
-template <typename INTERFACE_TYPE>
-class factory;
-
-template <typename Impl>
-class input_wrapper;
-
-
-struct rapidjson_tag{};
-
-namespace rapidjson_loader
-{
-template <typename type, typename enabled = void>
-class loader;
 
 template <typename T> 
 class complex_from_string
@@ -109,6 +79,60 @@ public:
         return complex_type(x, y);
     }
 };  //complex_from_string
+
+
+template <typename T> 
+class float_from_string
+{
+public:
+    static bool is_valid(const std::string& str)
+    {
+        std::regex x_regex("^(-)?([0-9]+([.][0-9]*)?|[.][0-9]+)$");   //for matching a purely real number
+        std::smatch match;
+        return  std::regex_match(str, match, x_regex) ;
+    }
+    static T get(const std::string& str)
+    {
+        T x = 0;
+        std::regex x_regex("^(-)?([0-9]+([.][0-9]*)?|[.][0-9]+)$");   //for matching a purely real number
+        std::smatch match;
+        if(std::regex_match(str, match, x_regex)){x = std::stod(match[0].str());}
+        else{RAISE_EXCEPTION("Unable to obtaind complex value from string.  Invalid string pattern.");}
+        
+        return x;
+    }
+};  //float_from_string
+}
+}
+#ifdef USE_RAPIDJSON
+
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/ostreamwrapper.h>
+
+namespace utils
+{
+namespace io
+{
+
+
+template <typename INTERFACE_TYPE>
+class factory;
+
+template <typename Impl>
+class input_wrapper;
+
+
+struct rapidjson_tag{};
+
+namespace rapidjson_loader
+{
+template <typename type, typename enabled = void>
+class loader;
+
+
 
 
 template <typename T>

@@ -1202,7 +1202,7 @@ namespace ttns
             // now finally iterate through the tree and set up the coefficient arrays
             START_TIMER;
             set_coeffs(coeff, bp);
-            STOP_TIMER("coefficients set");
+            STOP_TIMER("coefficients set");            
         }
 
         template <typename ttn_type>
@@ -1227,10 +1227,12 @@ namespace ttns
 
             START_TIMER;
             setup_spf_literal(csop, bp);
+
             STOP_TIMER("literal spf");
 
             START_TIMER;
             setup_mf_literal(bp, nterms);
+
             STOP_TIMER("literal mf");
         }
 

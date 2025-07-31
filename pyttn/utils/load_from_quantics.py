@@ -1,11 +1,12 @@
-import numpy as np
 import re
-from pyttn.ttnpp import ntree, system_modes, boson_mode, nlevel_mode
+import numpy as np
 from io import TextIOWrapper
+import functools as ft
+
+from pyttn.ttnpp import ntree, system_modes, boson_mode, nlevel_mode
 from pyttn.ttns.sop.sSOPExt import sOP
 from pyttn.ttns.sop.SOPExt import SOP
-
-from operator import add, sub, mul, pow
+from pyttn.ttns.operators.siteOperatorsExt import site_operator
 
 _energy_unit_dict = {
     'au' : 1,
@@ -25,14 +26,20 @@ class quantics_inputs:
 
         #extract the information about the tree from the quantics input file
         for line in fp:
-            if re.match(section_label, line.lower()):
+            if re.match(section_label, "".join(line.split("-")).lower()):
                 match=True
-            elif re.match('end-'+section_label, line.lower()):
+            elif re.match('end'+section_label, "".join(line.split("-")).lower()):
                 match=False
             elif match:
                 line_val = line.strip().split('#')[0]
-                if len(line_val.strip()) > 0:
-                    section.append(' '.join(line_val.split()))
+                line_val = line_val.strip()
+                if len(line_val) > 0:
+                    #handle continuation lines
+                    if(line_val.startswith("&&&")):
+                        line = "".join(line_val.split("&&&")[1:])
+                        section[-1] += line
+                    else:
+                        section.append(' '.join(line_val.split()))
         return section
     
     def _convert_primitive_modes(mode_info: str) -> tuple[str, str, int]:
@@ -130,51 +137,7 @@ class quantics_inputs:
 
         return topo 
     
-    def load_topology(fname: str) -> tuple[ntree, system_modes, list[str]]:
-        """_summary_
 
-        :param fname: Path to input quantics file
-        :type fname: str
-        :return: _description_
-        :rtype: tuple[ntree, dict]
-        """
-        with open(fname, 'r') as fp:
-            tree_info = quantics_inputs._extract_section(fp, 'ml-basis-section')
-        with open(fname, 'r') as fp:
-            mode_info = quantics_inputs._extract_section(fp, 'primitive-basis-section')
-
-        #extract the mode information from the mode_info strings
-        mode_dict = {}
-        for mode_str in mode_info:
-            label, t, d = quantics_inputs._convert_primitive_modes(mode_str)
-            mode_dict[label] = {'type': t, 'lhd': d}
-
-        #get the mode combination and mode ordering information
-        mode_combination, modes = quantics_inputs._get_mode_ordering(tree_info)
-
-        #extract the base tree structure
-        topo = quantics_inputs._convert_tree_info(tree_info)
-        #now iterate over the tree nodes and add the primitive nodes to the leaves of the tree
-        leaves = topo.leaf_indices()
-        for counter, leaf in enumerate(leaves):
-            dim = 1
-            for imode in mode_combination[counter]:
-                dim = dim * mode_dict[imode]['lhd']
-            topo.at(leaf).insert(dim)
-
-        #finally set up the system modes information
-        sysinf = system_modes(len(mode_combination))
-        for i, mc in enumerate(mode_combination):
-            combined_mode = []
-            for ml in mc:
-                if mode_dict[ml]['type'] == 'boson':
-                    combined_mode.append(boson_mode(mode_dict[ml]['lhd']))
-                elif mode_dict[ml]['type'] == 'nlevel':
-                    combined_mode.append(nlevel_mode(mode_dict[ml]['lhd']))
-                else:
-                    raise RuntimeError("Invalid mode type.")
-            sysinf[i] = combined_mode
-        return topo, sysinf, modes
     
     def _extract_parameter_dict(parameter_info : list[str]) -> dict:
         params = {}
@@ -184,7 +147,7 @@ class quantics_inputs:
             if "," in expression:
                 numeric = expression.split(",")[0].strip()
                 unit = expression.split(",")[1].strip()
-                val = float(numeric)*_energy_unit_dict[unit]
+                val = float(numeric)/_energy_unit_dict[unit]
             else:
                 val = float(expression.strip())
             params[label]=val
@@ -200,7 +163,10 @@ class quantics_inputs:
                         hamiltonian_modes.append(v)
         hamiltonian_to_tree_mapping = []
         for label in hamiltonian_modes:
-            hamiltonian_to_tree_mapping.append(modes.index(label))
+            if label in modes:
+                hamiltonian_to_tree_mapping.append(modes.index(label))
+            else:
+                hamiltonian_to_tree_mapping.append(-1)
         return hamiltonian_to_tree_mapping
     
     def _extract_coeff(coeff: str, params: dict) -> float:
@@ -247,44 +213,247 @@ class quantics_inputs:
 
         return mode_info, h_info
     
-    def _extract_mode_operator(term : str) -> tuple[str, int]:
+    def _extract_mode_operator(term : str) -> tuple[list[str], int]:
         #to do - add conversion from quantics format operator labels to pyttn format operator labels
         label = term.split(' ')[1].strip()
         hmode = int(term.split(' ')[0].strip())
-        return label, hmode
+
+        x = re.split('Z(\\d+)&(\\d+)', label)
+        if len(x) == 4:
+            label = '|%d><%d|'%(int(x[1])-1, int(x[2])-1)
+            return [label.lower()], hmode
+        x = re.split('S(\\d+)&(\\d+)', label)
+        if len(x) == 4:
+            if int(x[1]) != int(x[2]):
+                label1 = '|%d><%d|'%(int(x[1])-1, int(x[2])-1)
+                label2 = '|%d><%d|'%(int(x[2])-1, int(x[1])-1)
+
+                return [label1.lower(), label2.lower()], hmode
+            else:
+                label = '|%d><%d|'%(int(x[1])-1, int(x[2])-1)
+                return [label.lower()], hmode
+
+        return [label.lower()], hmode
 
     def _extract_operator_definition(hamiltonian_info: list[str], params: dict, mode_order: list[int]) -> SOP:
-        H = SOP(len(mode_order))
+        active_modes = []
+        for x in mode_order:
+            if x >= 0:
+                active_modes.append(x)
+        H = SOP(len(active_modes))
         for line in hamiltonian_info:
             split_line = line.split('|')
             if len(split_line) == 0:
                 continue
-            coeff = split_line[0].strip()        
+            coeff = split_line[0].strip() 
+                   
+            add_term = True
+
             terms = [x.strip() for x in split_line[1:]]
             val = quantics_inputs._extract_coeff(coeff, params)
-            
-            label, mode = quantics_inputs._extract_mode_operator(terms[0])
-            op = sOP(label, mode_order[mode-1])
-            if len(terms) > 1:
-                for term in terms[1:]:
-                    label, mode = quantics_inputs._extract_mode_operator(term)
-                    op *= sOP(label, mode_order[mode-1])
-            print(op)
-            H += op
+            contains_q3 = False
+            if np.abs(val) < 1e-14:
+                add_term = False
+
+
+            labels, mode = quantics_inputs._extract_mode_operator(terms[0])
+            op = None
+            if mode_order[mode-1] >= 0:
+                if len(labels) == 1:
+                    op = val*sOP(labels[0], mode_order[mode-1])
+                else:
+                    op = sOP(labels[0], mode_order[mode-1])
+                    for i in range(1, len(labels)):
+                        op += sOP(labels[i], mode_order[mode-1])
+                    op *= val
+
+                if len(terms) > 1:
+                    for term in terms[1:]:
+                        labels, mode = quantics_inputs._extract_mode_operator(term)
+                        if mode_order[mode-1] >= 0:
+                            mop = None
+                            if len(labels) == 1:
+                                mop = sOP(labels[0], mode_order[mode-1])
+                            else:
+                                mop = sOP(labels[0], mode_order[mode-1])
+                                for i in range(1, len(labels)):
+                                    mop += sOP(labels[i],mode_order[mode-1])
+                            op = op*mop
+                        else:
+                            add_term = False
+            else:
+                add_term = False
+
+            if contains_q3:
+                print(op)
+            if add_term:
+                H += op
+        return H
+    
+    def _extract_wfn_modes(wfn_info: list[str]) -> dict:
+        wfn_data = {}
+        for line in wfn_info:
+            if "build" in line:
+                continue
+            line = line.strip()
+            if line.startswith("init_state"):
+                wfn_data["el"] = ('nlevel', int(line.split("=")[1].strip()))
+            else:
+                data = line.split(" ")
+                if data[1] != "HO":
+                    raise RuntimeError("Currently the quantics converter only supports the harmonic oscillator basis set.")
+                wfn_data[data[0]] = ("boson", ) + tuple(float(data[x]) for x in range(2, len(data)))
+        return wfn_data
+
+    def _convert_wfn(wfn_data: dict, sysinf: system_modes, modes: list[str]) -> list[list[float]]:
+        #and compute the normalised representation of each mode in the basis we are using
+        #that is form the vector |n><n|\psi_0>
+
+        #for each primitive mode in each composite mode construct an array capable of storing the initial wavefunction
+        res = [ [np.zeros((sysinf[i][j].lhd)) for j in range(sysinf[i].nmodes()) ] for i in range(sysinf.nmodes())]
+
+        #now iterate over each term
+        for k, v in wfn_data.items():
+
+            #get which mode it corresponds to if the mode hasn't been bound in the mode list then
+            #we skip adding the term into the Hamiltonian.
+            if k in modes:
+                primitive_ind = modes.index(k)
+
+                #and extract the composite mode and primitive submode in the system info array\
+                i1, i2 = sysinf.primitive_mode_index(primitive_ind)
+
+                #and finally set the value of the term
+                if v[0] == "nlevel":
+                    res[i1][i2][v[1]-1] = 1.0
+                elif v[0] == "boson":
+                    centre = float(v[1])
+                    momentum = float(v[2])
+                    frequency = float(v[3])
+                    mass = 1
+                    if len(v) > 4:
+                        mass = float(v[4])
+
+                    if np.abs(frequency-1) > 1e-12 or np.abs(mass-1) > 1e-12:
+                        raise RuntimeError("Currently the quantics converter does not support perturbed harmonic oscillator states.")
+                    
+                    if np.abs(centre) < 1e-12 and np.abs(momentum) < 1e-12:
+                        res[i1][i2][0] = 1.0
+                    else:
+                        alpha = centre + 1.0j*momentum
+                        res[i1][i2][0] = 1.0
+
+                        op = sOP("disp"+str(alpha), 0)
+                        si = system_modes(1)
+                        si[0] = boson_mode(len(res[i1][i2]))
+                        sop = site_operator(op, si)
+                        opmat = np.array(sop.todense())
+
+                        res[i1][i2] = opmat@res[i1][i2]
+                        norm = np.dot(np.conj(res[i1][i2]), res[i1][i2])
+                        res[i1][i2] /= np.sqrt(norm)
+
+        #now for each composite mode construct the effective wavefunction by taking the kronecker product of each primitive modes wavefunction
+        return [ft.reduce(np.kron, x) if len(x) > 1 else x[0] for x in res]
+
+    def load_topology(fname: str) -> tuple[ntree, system_modes, list[str]]:
+        """Load the tree topology, system information, and order of physical modes in the tree structure from a quantics input file
+
+        :param fname: Path to input quantics file
+        :type fname: str
+        :return: The tree topology, system information and order of physical modes
+        :rtype: tuple[ntree, system_modes, list[str]]
+        """
+        with open(fname, 'r') as fp:
+            tree_info = quantics_inputs._extract_section(fp, 'mlbasissection')
+        with open(fname, 'r') as fp:
+            mode_info = quantics_inputs._extract_section(fp, 'primitivebasissection')
+
+        #extract the mode information from the mode_info strings
+        mode_dict = {}
+        for mode_str in mode_info:
+            label, t, d = quantics_inputs._convert_primitive_modes(mode_str)
+            mode_dict[label] = {'type': t, 'lhd': d}
+
+        #get the mode combination and mode ordering information
+        mode_combination, modes = quantics_inputs._get_mode_ordering(tree_info)
+        #extract the base tree structure
+        topo = quantics_inputs._convert_tree_info(tree_info)
+        #now iterate over the tree nodes and add the primitive nodes to the leaves of the tree
+        leaves = topo.leaf_indices()
+        for counter, leaf in enumerate(leaves):
+            dim = 1
+            for imode in mode_combination[counter]:
+                dim = dim * mode_dict[imode]['lhd']
+            topo.at(leaf).insert(dim)
+
+        #finally set up the system modes information
+        sysinf = system_modes(len(mode_combination))
+        for i, mc in enumerate(mode_combination):
+            combined_mode = []
+            for ml in mc:
+                if mode_dict[ml]['type'] == 'boson':
+                    combined_mode.append(boson_mode(mode_dict[ml]['lhd']))
+                elif mode_dict[ml]['type'] == 'nlevel':
+                    combined_mode.append(nlevel_mode(mode_dict[ml]['lhd']))
+                else:
+                    raise RuntimeError("Invalid mode type.")
+            sysinf[i] = combined_mode
+        return topo, sysinf, modes
+
 
     def load_operator(fname: str, modes: list[str]) -> SOP:
+        """Load the Hamiltonian object defined in a quantics input file.
+
+        :param fname: The quantics input file path
+        :type fname: str
+        :param modes: A list of the string labels for the modes in the order expected for the tree
+        :type modes: list[str]
+        :return: The Hamiltonian object defined in the quantics input file
+        :rtype: SOP
+        """
         with open(fname, 'r') as fp:
-            parameter_info = quantics_inputs._extract_section(fp, 'parameter-section')
+            parameter_info = quantics_inputs._extract_section(fp, 'parametersection')
         with open(fname, 'r') as fp:
-            hamiltonian_info = quantics_inputs._extract_section(fp, 'hamiltonian-section')
+            hamiltonian_info = quantics_inputs._extract_section(fp, 'hamiltoniansection')
 
         mode_info, hamiltonian_info = quantics_inputs._split_hamiltonian_info(hamiltonian_info)
         params = quantics_inputs._extract_parameter_dict(parameter_info)
         mode_order = quantics_inputs._extract_mode_order(mode_info, modes)
 
-        quantics_inputs._extract_operator_definition(hamiltonian_info, params, mode_order)
+        return quantics_inputs._extract_operator_definition(hamiltonian_info, params, mode_order)
 
+    def load_wfn(fname: str, sysinf: system_modes, modes: list[str]) -> list[np.ndarray]:
+        """Load the direct product initial wavefunction from the quantics file
 
-if __name__ == "__main__":
-    topo, sysinf, modes = quantics_inputs.load_topology("QuanticsTest/th21d_s1.inp")
-    quantics_inputs.load_operator("QuanticsTest/thio_opt5.op", modes)
+        :param fname: The quantics input file path
+        :type fname: str
+        :param sysinf: The system information of the model being considered
+        :type sysinf: system_modes
+        :param modes: A list of the string labels for the modes in the order expected for the tree
+        :type modes: list[str]
+        :return: A list of numpy arrays defining the direct product wavefunction
+        :rtype: list[np.ndarray]
+        """
+        with open(fname, 'r') as fp:
+            wfn_info = quantics_inputs._extract_section(fp, 'init_wf')
+
+        #extract the wavefunction information for each mode
+        wfn_data = quantics_inputs._extract_wfn_modes(wfn_info)
+        return quantics_inputs._convert_wfn(wfn_data, sysinf, modes)
+
+    def load_all(fname : str) -> tuple[ntree, system_modes, SOP, list[list[np.ndarray]]]:
+        """Function for loading tree topology, system information, hamiltonian and initial product wavefunction 
+        from a quantics input file
+
+        :param fname: The quantics input file path
+        :type fname: str
+        :return: tree topology, system information, hamiltonian and initial product wavefunction
+        :rtype: tuple[ntree, system_modes, SOP, list[list[np.ndarray]]]
+        """
+        topo, sysinf, modes = quantics_inputs.load_topology(fname)
+        H = quantics_inputs.load_operator(fname, modes)
+        wfn = quantics_inputs.load_wfn(fname, sysinf, modes)
+
+        return topo, sysinf, H, wfn
+

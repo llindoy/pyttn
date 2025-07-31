@@ -158,6 +158,29 @@ inline void init_system_info(py::module &m)
 
             :Parameters:    - **data** (:class:`primitive_mode_data`) - The primitive mode information to append to this object
         )mydelim")
+        .def("__len__", &mode_data::nmodes, R"mydelim(
+            :returns: The number of primitive modes in the composite mode
+            :rtype: int
+        )mydelim")
+        .def("nmodes", &mode_data::nmodes, R"mydelim(
+            :returns: The number of primitive modes in the composite mode
+            :rtype: int
+        )mydelim")
+        .def("__getitem__", static_cast<primitive_mode_data &(mode_data::*)(size_t)>(&mode_data::operator[]), py::return_value_policy::reference,
+             R"mydelim(
+                :Parameters:    - **i** (int) - The index of the mode to access
+
+                :Returns:       The primitive_mode_data object in location i
+                :Return Type:   :class:`primitive_mode_data`
+        )mydelim")
+        .def("__setitem__", [](mode_data &o, size_t i, const primitive_mode_data &mode)
+             { o[i] = mode; },
+             R"mydelim(
+                Set the value of the primitive_mode_data object at position i in the mode_data object
+                :Parameters:    - **i** (int) - The index of the mode to access
+                                - **mode** (:class:`primitive_mode_data`) - The primitive_mode_data object used to construct the new mode
+
+        )mydelim")
 
         .def("append", static_cast<void (mode_data::*)(const mode_data &)>(&mode_data::append), R"mydelim(
             Append all primitive modes contained in another mode data object to the current mode
@@ -462,6 +485,8 @@ inline void init_system_info(py::module &m)
         )mydelim")
         .def("mode_index", [](const system_modes &o, size_t i)
              { return o.mode_index(i); })
+        .def("primitive_mode_index", [](const system_modes &o, size_t i)
+             { return o.primitive_mode_index(i); })
         .def_property("mode_indices", &system_modes::mode_indices, &system_modes::set_mode_indices, "The user defined mode ordering for each of the modes in the system")
         .doc() = R"mydelim(
           A class for handling the specification of all modes in the system.  This stores a list of each composite mode and an

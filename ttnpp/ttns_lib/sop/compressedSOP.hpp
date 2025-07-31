@@ -354,14 +354,15 @@ namespace ttns
 
                         // extract the op_dict mode and term index from this composite site operator
                         size_t nu = std::get<0>(ind);
+
                         size_t tindex = std::get<1>(ind);
 
                         // now if the label associated with this mode is the identity we have found the identity
                         // term store the current mode and the index associated with this term and set identity_found
                         // to terminate the iteration
-                        if (m_op_dict[idnu].size() != 0)
+                        if (m_op_dict[nu].size() != 0)
                         {
-                            if (m_op_dict[idnu][tindex] == op)
+                            if (m_op_dict[nu][tindex] == op)
                             {
                                 idnu = nu;
                                 idind = index;
@@ -394,6 +395,7 @@ namespace ttns
                             }
                             ++count;
                         }
+
                         if (!rinds_set)
                         {
                             element_container_type::complement(tval, m_mode_operators[mode][id]);
@@ -440,6 +442,7 @@ namespace ttns
                         {
                             element_container_type::complement(rinds, m_mode_operators[mode][id]);
                         }
+
                         auto id_iter = m_mode_operators[mode].find(id);
                         ASSERT(id_iter != m_mode_operators[mode].end(), "Id operator has not been added.");
                         m_identity_index[mode] = std::distance(m_mode_operators[mode].begin(), id_iter);

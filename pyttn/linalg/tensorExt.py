@@ -242,7 +242,9 @@ class Vector(Tensor):
         elif(len(args) == 1):
             v = args[0]
             if backend == "blas":
-                if isinstance(v, np.ndarray):
+                if isinstance(v, (list, np.ndarray)):
+                    if isinstance(v, list):
+                        v = np.ndarray(v)
                     v = _setup_numpy(v)
                     dtype = _get_dtype_numpy(v, dtype)
                     return _build_vector(la, dtype, v)
@@ -252,7 +254,9 @@ class Vector(Tensor):
                 else:
                     raise RuntimeError("Invalid type for vector")
             elif _cuda_import and backend == "cuda":
-                if isinstance(v, np.ndarray):
+                if isinstance(v, (list, np.ndarray)):
+                    if isinstance(v, list):
+                        v = np.ndarray(v)
                     v = _setup_numpy(v)
                     dtype = _get_dtype_numpy(v, dtype)
                     return _build_vector(cula, dtype, v)

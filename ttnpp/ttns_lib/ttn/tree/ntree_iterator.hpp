@@ -60,6 +60,7 @@ namespace ttns
                 m_node = other.m_node;
                 m_child_iter = other.m_child_iter;
                 m_visited = other.m_visited;
+                return *this;
             }
 
             ~stack_elem() { m_node = nullptr; }
@@ -88,7 +89,7 @@ namespace ttns
         }
         ~ntree_dfs_preorder_iterator() {}
 
-        self_type &operator=(const self_type &other) { m_stack = other.m_stack; }
+        self_type &operator=(const self_type &other) { m_stack = other.m_stack; return *this;}
         bool operator==(const self_type &other) const { return m_stack == other.m_stack; }
         bool operator!=(const self_type &other) const { return m_stack != other.m_stack; }
 
@@ -172,6 +173,7 @@ namespace ttns
                 m_node = other.m_node;
                 m_child_iter = other.m_child_iter;
                 m_visited = other.m_visited;
+                return *this;
             }
 
             ~stack_elem() { m_node = nullptr; }
@@ -213,7 +215,7 @@ namespace ttns
         }
         ~ntree_dfs_postorder_iterator() {}
 
-        self_type &operator=(const self_type &other) { m_stack = other.m_stack; }
+        self_type &operator=(const self_type &other) { m_stack = other.m_stack; return *this;}
         bool operator==(const self_type &other) const { return m_stack == other.m_stack; }
         bool operator!=(const self_type &other) const { return m_stack != other.m_stack; }
 
@@ -314,6 +316,7 @@ namespace ttns
                 m_child_iter = other.m_child_iter;
                 m_times_visited = other.m_times_visited;
                 m_children_visited = other.m_children_visited;
+                return *this;
             }
 
             ~stack_elem() {}
@@ -345,7 +348,7 @@ namespace ttns
 
         ~ntree_dfs_pre_post_iterator() {}
 
-        self_type &operator=(const self_type &other) { m_stack = other.m_stack; }
+        self_type &operator=(const self_type &other) { m_stack = other.m_stack; return *this;}
 
         bool operator==(const self_type &other) const { return m_stack == other.m_stack; }
         bool operator!=(const self_type &other) const { return m_stack != other.m_stack; }
@@ -519,7 +522,7 @@ namespace ttns
         }
         ~ntree_leaf_iterator() {}
 
-        self_type &operator=(const self_type &other) { m_pre = other.m_pre; }
+        self_type &operator=(const self_type &other) { m_pre = other.m_pre; return *this;}
         bool operator==(const self_type &other) const { return m_pre == other.m_pre; }
         bool operator!=(const self_type &other) const { return m_pre != other.m_pre; }
 

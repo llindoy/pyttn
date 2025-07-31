@@ -229,6 +229,7 @@ namespace ttns
             setup_indexing_tree(sop, A, sys, compress, exploit_identity, site_ops);
 
             CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, site_ops, use_sparse));
+
             setup_time_dependence();
             _m_Eshift = sop.Eshift();
             update_coefficients(real_type(0.0), true);
@@ -249,6 +250,7 @@ namespace ttns
             setup_indexing_tree(sop, A, sys, compress, exploit_identity, site_ops);
 
             CALL_AND_RETHROW(set_primitive_operators(m_mode_operators, sys, opdict, site_ops, use_sparse));
+
             setup_time_dependence();
             _m_Eshift = sop.Eshift();
             update_coefficients(real_type(0.0), true);
@@ -450,7 +452,6 @@ namespace ttns
             tree<auto_sop::node_op_info<T>> bp;
 
             CALL_AND_HANDLE(m_contraction_info.construct_topology(A), "Failed to construct topology of sop_operator.");
-
             bool autosop_run = false;
             CALL_AND_HANDLE(autosop_run = autoSOP<T>::construct(sop, A, sysinf, bp, site_ops, compress), "Failed to construct spo_operator.  Failed to convert SOP to indexing tree.");
 

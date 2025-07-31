@@ -22,5 +22,6 @@
 #include "tensor/sparse/csr_matrix.hpp"
 #include "tensor/sparse/diagonal_matrix.hpp"
 #include "tensor/sparse/symmetric_tridiagonal_matrix.hpp"
+#include "utils/tosparse.hpp"
 
 #endif // PYTTN_LINALG_SPARSE_HPP_
