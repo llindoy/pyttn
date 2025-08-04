@@ -1,4 +1,4 @@
-operators
+Operators
 =========
 
 .. automodule:: pyttn.ttns.operators

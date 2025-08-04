@@ -25,7 +25,7 @@ from pyttn.ttnpp.utils import (
     orthopol,
 )
 
-from .load_from_quantics import quantics_inputs
+from .load_from_quantics import QuanticsInputs
 from .mode_combination import ModeCombination
 from .truncate import DepthTruncation, EnergyTruncation, TruncationBase
 from .visualise_tree import visualise_tree
@@ -48,5 +48,5 @@ __all__ = [
     "EnergyTruncation",
     "ModeCombination",
     "visualise_tree",
-    "quantics_inputs",
+    "QuanticsInputs",
 ]

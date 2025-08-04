@@ -162,7 +162,7 @@ def _csr_matrix(mod, *args, dtype=None, **kwargs):
         raise RuntimeError("Default constructor not supported for csr_matrix")
 
 
-class CSR_Matrix(metaclass=ABCMeta):
+class CSRMatrix(metaclass=ABCMeta):
     def __new__(
         cls,
         *args,
@@ -171,13 +171,13 @@ class CSR_Matrix(metaclass=ABCMeta):
         ] = np.complex128,
         backend: str = "blas",
         **kwargs,
-    ) -> 'CSR_Matrix':
+    ) -> 'CSRMatrix':
         """
         Construct a C++ linalg::csr_matrix<T> type that can be used by the C++ layer of pyTTN.
 
-        :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
+        :param `*args`: Variable length list of arguments. This function can handle two possible lists of arguments
 
-            - csr matrix (CSR_Matrix) - Copy construct csr matrix object
+            - csr matrix (CSRMatrix) - Copy construct csr matrix object
             - csr_matrix (scipy.sparse.csr_matrix) - construct csr matrix from scipy csr matrix
             - values (list[dtype]), indices (list[int]), rowptr (list[int]), ncols (int, optional) - Construct TTN object from slice of multiset ttn
             - coo array list[tuple(int, int, dtype)], nrows (int, optional), ncols (int, optional)
@@ -188,7 +188,7 @@ class CSR_Matrix(metaclass=ABCMeta):
         :type backend: {"blas", "cuda"}, optional
 
         :returns: A pybind11 wrapped linalg::csr_matrix<T> object
-        :rtype: CSR_Matrix
+        :rtype: CSRMatrix
         """
 
         if backend == "blas":
@@ -200,9 +200,9 @@ class CSR_Matrix(metaclass=ABCMeta):
 
     @abstractmethod
     def complex_dtype(self) -> bool:
-        """Returns whether or not the CSR_Matrix is storing a complex valued dtype
+        """Returns whether or not the CSRMatrix is storing a complex valued dtype
 
-        :return: whether or not the CSR_Matrix is storing a complex valued dtype
+        :return: whether or not the CSRMatrix is storing a complex valued dtype
         :rtype: bool
         """
         pass
@@ -211,25 +211,25 @@ class CSR_Matrix(metaclass=ABCMeta):
     def __matmul__(self, b: Union[Matrix, Vector]) -> Union[Matrix, Vector]:
         """CSR matrix - dense matrix multiplications.
 
-        :param b: The dense matrix that the CSR_Matrix acts on
+        :param b: The dense matrix that the CSRMatrix acts on
         :type b: Matrix
-        :return: The result of the CSR_Matrix-Matrix multiplication
+        :return: The result of the CSRMatrix-Matrix multiplication
         :rtype: Matrix
         """
         pass
 
     @abstractmethod
     def __str__(self) -> str:
-        """Return the string representation of the CSR_Matrix object.
+        """Return the string representation of the CSRMatrix object.
 
-        :return: The string representation of the CSR_Matrix
+        :return: The string representation of the CSRMatrix
         :rtype: str
         """
         pass
 
     @abstractmethod
     def backend(self) -> str:
-        """Returns the backend type of the CSR_Matrix
+        """Returns the backend type of the CSRMatrix
 
         :return: The backend type of the object
         :rtype: str
@@ -237,7 +237,7 @@ class CSR_Matrix(metaclass=ABCMeta):
         pass
 
 
-class Diagonal_Matrix(metaclass=ABCMeta):
+class DiagonalMatrix(metaclass=ABCMeta):
     def __new__(
         cls,
         buffer: np.ndarray,
@@ -258,58 +258,33 @@ class Diagonal_Matrix(metaclass=ABCMeta):
         :type backend: {"blas", "cuda"}, optional
 
         :returns: A pybind11 wrapped linalg::diagonal_matrix<T> object
-        :rtype: Diagonal_Matrix
+        :rtype: DiagonalMatrix
         """
         raise RuntimeError("Diagonal Matrix interface not yet implemented.")
     
     @abstractmethod
     def backend(self) -> str:
-        """Returns the backend type of the Diagonal_Matrix
+        """Returns the backend type of the DiagonalMatrix
 
         :return: The backend type of the object
         :rtype: str
         """
         pass
 
-CSR_Matrix.register(la.csr_matrix_real)
-CSR_Matrix.register(la.csr_matrix_complex)
+CSRMatrix.register(la.csr_matrix_real)
+CSRMatrix.register(la.csr_matrix_complex)
 
-Diagonal_Matrix.register(la.diagonal_matrix_real)
-Diagonal_Matrix.register(la.diagonal_matrix_complex)
+DiagonalMatrix.register(la.diagonal_matrix_real)
+DiagonalMatrix.register(la.diagonal_matrix_complex)
 
 
 if _cuda_import:
-    CSR_Matrix.register(cula.csr_matrix_real)
-    CSR_Matrix.register(cula.csr_matrix_complex)
+    CSRMatrix.register(cula.csr_matrix_real)
+    CSRMatrix.register(cula.csr_matrix_complex)
 
-    Diagonal_Matrix.register(cula.diagonal_matrix_real)
-    Diagonal_Matrix.register(cula.diagonal_matrix_complex)
+    DiagonalMatrix.register(cula.diagonal_matrix_real)
+    DiagonalMatrix.register(cula.diagonal_matrix_complex)
 
-Sparse_Matrix = CSR_Matrix
-
-def csr_matrix(
-    *args,
-    dtype: Optional[Union[float, complex, np.float64, np.complex128]] = np.complex128,
-    backend: str = "blas",
-    **kwargs,
-) -> CSR_Matrix:
-    """
-    A function for converting from a numpy array to a C++ linalg::csr_matrix<T> type
-     used by the C++ layer of pyTTN.
-
-     :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
-
-         - csr matrix (csr_dtype) - Copy construct csr matrix object
-         - csr_matrix (scipy.sparse.csr_matrix) - construct csr matrix from scipy csr matrix
-         - values (list[dtype]), indices (list[int]), rowptr (list[int]), ncols (int, optional) - Construct TTN object from slice of multiset ttn
-         - coo array list[tuple(int, int, dtype)], nrows (int, optional), ncols (int, optional)
-
-     :param dtype: The dtype to use for the site operator.  If this is None this function attempts to infer the dtype from v (Default: None)
-     :type dtype: {None, np.float64, np.complex128}, optional
-     :param backend: The backend to use for calculation. Either blas or cuda. (Default: "blas")
-     :type backend: {"blas", "cuda"}, optional
-
-     :returns: A pybind11 wrapped linalg::csr_matrix<T> object
-     :rtype: CSR_Matrix
-    """
-    return CSR_Matrix(*args, dtype=dtype, backend=backend, **kwargs)
+SparseMatrix = CSRMatrix
+csr_matrix = CSRMatrix
+diagonal_matrix = DiagonalMatrix

@@ -19,7 +19,7 @@ _energy_unit_dict = {
     'kelvin': 3.15777e5
 }
 
-class quantics_inputs:
+class QuanticsInputs:
     def _extract_section(fp: TextIOWrapper, section_label: str) -> list[str]:
         section = []
         match=False
@@ -250,17 +250,19 @@ class quantics_inputs:
             add_term = True
 
             terms = [x.strip() for x in split_line[1:]]
-            val = quantics_inputs._extract_coeff(coeff, params)
+            val = QuanticsInputs._extract_coeff(coeff, params)
             contains_q3 = False
             if np.abs(val) < 1e-14:
                 add_term = False
 
 
-            labels, mode = quantics_inputs._extract_mode_operator(terms[0])
+            labels, mode = QuanticsInputs._extract_mode_operator(terms[0])
             op = None
             if mode_order[mode-1] >= 0:
                 if len(labels) == 1:
                     op = val*sOP(labels[0], mode_order[mode-1])
+                    if(labels[0] == "q^2"):
+                        H -= 0.5*val    #subtract off the zero point energy term if we have a quadratic coupling term
                 else:
                     op = sOP(labels[0], mode_order[mode-1])
                     for i in range(1, len(labels)):
@@ -269,7 +271,7 @@ class quantics_inputs:
 
                 if len(terms) > 1:
                     for term in terms[1:]:
-                        labels, mode = quantics_inputs._extract_mode_operator(term)
+                        labels, mode = QuanticsInputs._extract_mode_operator(term)
                         if mode_order[mode-1] >= 0:
                             mop = None
                             if len(labels) == 1:
@@ -365,20 +367,20 @@ class quantics_inputs:
         :rtype: tuple[ntree, system_modes, list[str]]
         """
         with open(fname, 'r') as fp:
-            tree_info = quantics_inputs._extract_section(fp, 'mlbasissection')
+            tree_info = QuanticsInputs._extract_section(fp, 'mlbasissection')
         with open(fname, 'r') as fp:
-            mode_info = quantics_inputs._extract_section(fp, 'primitivebasissection')
+            mode_info = QuanticsInputs._extract_section(fp, 'primitivebasissection')
 
         #extract the mode information from the mode_info strings
         mode_dict = {}
         for mode_str in mode_info:
-            label, t, d = quantics_inputs._convert_primitive_modes(mode_str)
+            label, t, d = QuanticsInputs._convert_primitive_modes(mode_str)
             mode_dict[label] = {'type': t, 'lhd': d}
 
         #get the mode combination and mode ordering information
-        mode_combination, modes = quantics_inputs._get_mode_ordering(tree_info)
+        mode_combination, modes = QuanticsInputs._get_mode_ordering(tree_info)
         #extract the base tree structure
-        topo = quantics_inputs._convert_tree_info(tree_info)
+        topo = QuanticsInputs._convert_tree_info(tree_info)
         #now iterate over the tree nodes and add the primitive nodes to the leaves of the tree
         leaves = topo.leaf_indices()
         for counter, leaf in enumerate(leaves):
@@ -413,15 +415,15 @@ class quantics_inputs:
         :rtype: SOP
         """
         with open(fname, 'r') as fp:
-            parameter_info = quantics_inputs._extract_section(fp, 'parametersection')
+            parameter_info = QuanticsInputs._extract_section(fp, 'parametersection')
         with open(fname, 'r') as fp:
-            hamiltonian_info = quantics_inputs._extract_section(fp, 'hamiltoniansection')
+            hamiltonian_info = QuanticsInputs._extract_section(fp, 'hamiltoniansection')
 
-        mode_info, hamiltonian_info = quantics_inputs._split_hamiltonian_info(hamiltonian_info)
-        params = quantics_inputs._extract_parameter_dict(parameter_info)
-        mode_order = quantics_inputs._extract_mode_order(mode_info, modes)
+        mode_info, hamiltonian_info = QuanticsInputs._split_hamiltonian_info(hamiltonian_info)
+        params = QuanticsInputs._extract_parameter_dict(parameter_info)
+        mode_order = QuanticsInputs._extract_mode_order(mode_info, modes)
 
-        return quantics_inputs._extract_operator_definition(hamiltonian_info, params, mode_order)
+        return QuanticsInputs._extract_operator_definition(hamiltonian_info, params, mode_order)
 
     def load_wfn(fname: str, sysinf: system_modes, modes: list[str]) -> list[np.ndarray]:
         """Load the direct product initial wavefunction from the quantics file
@@ -436,11 +438,11 @@ class quantics_inputs:
         :rtype: list[np.ndarray]
         """
         with open(fname, 'r') as fp:
-            wfn_info = quantics_inputs._extract_section(fp, 'init_wf')
+            wfn_info = QuanticsInputs._extract_section(fp, 'init_wf')
 
         #extract the wavefunction information for each mode
-        wfn_data = quantics_inputs._extract_wfn_modes(wfn_info)
-        return quantics_inputs._convert_wfn(wfn_data, sysinf, modes)
+        wfn_data = QuanticsInputs._extract_wfn_modes(wfn_info)
+        return QuanticsInputs._convert_wfn(wfn_data, sysinf, modes)
 
     def load_all(fname : str) -> tuple[ntree, system_modes, SOP, list[list[np.ndarray]]]:
         """Function for loading tree topology, system information, hamiltonian and initial product wavefunction 
@@ -451,9 +453,9 @@ class quantics_inputs:
         :return: tree topology, system information, hamiltonian and initial product wavefunction
         :rtype: tuple[ntree, system_modes, SOP, list[list[np.ndarray]]]
         """
-        topo, sysinf, modes = quantics_inputs.load_topology(fname)
-        H = quantics_inputs.load_operator(fname, modes)
-        wfn = quantics_inputs.load_wfn(fname, sysinf, modes)
+        topo, sysinf, modes = QuanticsInputs.load_topology(fname)
+        H = QuanticsInputs.load_operator(fname, modes)
+        wfn = QuanticsInputs.load_wfn(fname, sysinf, modes)
 
         return topo, sysinf, H, wfn
 

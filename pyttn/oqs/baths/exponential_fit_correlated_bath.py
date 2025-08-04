@@ -25,11 +25,11 @@ from .exponential_fit_bath import ExpFitBath
 
 
 class ExpFitCorrelatedOQSBath(ExpFitBath):
-    r"""The base class for handling a bath representing an exponential fit to a matrix valued bath 
+    """The base class for handling a bath representing an exponential fit to a matrix valued bath 
     correlation function of the form
 
     .. math::
-        C(t) = \sum_k d_{k} \exp(-z_k t)
+        C(t) = \\sum_k d_{k} \\exp(-z_k t)
 
     :param dk: The coefficient in the exponential decomposition
     :type dk: np.ndarray
@@ -114,11 +114,11 @@ class ExpFitCorrelatedOQSBath(ExpFitBath):
         return self._fermion
 
     def Ct(self, t: Union[float, np.ndarray]) -> np.ndarray:
-        r"""Returns the matrix valued non-interacting bath correlation function evaluated at the time points t,
+        """Returns the matrix valued non-interacting bath correlation function evaluated at the time points t,
         defined by:
 
         .. math::
-            C(t) = \sum_k d_{k} \exp(-z_k t)
+            C(t) = \\sum_k d_{k} \\exp(-z_k t)
 
         :param t: time
         :type t: np.ndarray
@@ -149,26 +149,26 @@ class ExpFitCorrelatedOQSBath(ExpFitBath):
 
     @property
     def mode_dims(self) -> list[int]:
-        r"""An array containing the dimensionality of each of the modes"""
+        """An array containing the dimensionality of each of the modes"""
         return self._mode_dims
 
     @property
     def dk(self) -> np.ndarray:
-        r"""An array containing the bath decomposition coefficients"""
+        """An array containing the bath decomposition coefficients"""
         return self._dk
 
     @property
     def zk(self) -> np.ndarray:
-        r"""An array containing the bath decomposition decay rates"""
+        """An array containing the bath decomposition decay rates"""
         return self._zk
 
 
 class ExpFitCorrelatedBosonicBath(ExpFitCorrelatedOQSBath):
-    r"""A class for handling a bosonic bath representing an exponential fit to a bath correlation function
+    """A class for handling a bosonic bath representing an exponential fit to a bath correlation function
     of the form
 
     .. math::
-        C(t) = \sum_k d_{k} \exp(-z_k t)
+        C(t) = \\sum_k d_{k} \\exp(-z_k t)
 
     :param dk: The coefficient in the exponential decomposition
     :type dk: np.ndarray
@@ -249,20 +249,20 @@ class ExpFitCorrelatedBosonicBath(ExpFitCorrelatedOQSBath):
     #def add_system_bath_generator(
     #    self,
     #    H: sSOP | SOP,
-    #    Sp: OP_type,
-    #    Sm: Optional[OP_type] = None,
+    #    Sp: OPBase,
+    #    Sm: Optional[OPBase] = None,
     #    method: str = "heom",
     #    binds: Optional[list[int]] = None,
     #    bskip: Optional[int] = 2,
     #) -> sSOP | SOP:
-    #    r"""Attach the bath and system bath coupling Generators associated with this bath object to an existing SOP Generator
+    #    """Attach the bath and system bath coupling Generators associated with this bath object to an existing SOP Generator
 
     #    :param H: The total Generator
     #    :type H: sSOP | SOP
     #    :param Sp: A list containing the left and right acting operators that couples to the bath annihilation operator terms
-    #    :type Sp: OP_type
-    #    :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-    #    :type Sm: OP_type, optional
+    #    :type Sp: OPBase
+    #    :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\\dagger + a) (Default: None)
+    #    :type Sm: OPBase, optional
     #    :param method: The method used to represent the bath.
     #    :type method: {"heom", "pseudomode"}
     #    :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
@@ -283,19 +283,19 @@ class ExpFitCorrelatedBosonicBath(ExpFitCorrelatedOQSBath):
 
     #def system_bath_generator(
     #    self,
-    #    Sp: OP_type,
-    #    Sm: Optional[OP_type] = None,
+    #    Sp: OPBase,
+    #    Sm: Optional[OPBase] = None,
     #    method: str = "heom",
     #    binds: Optional[list[int]] = None,
     #    bskip: Optional[int] = 2,
     #    dtype: Union[np.float64, np.complex128, float, complex] = np.complex128,
     #) -> sSOP:
-    #    r"""Construct a sSOP containing the system bath Generator of the object.
+    #    """Construct a sSOP containing the system bath Generator of the object.
 
     #    :param Sp: A list containing the left and right acting operators that couples to the bath annihilation operator terms
-    #    :type Sp: OP_type
-    #    :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-    #    :type Sm: OP_type, optional
+    #    :type Sp: OPBase
+    #    :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\\dagger + a) (Default: None)
+    #    :type Sm: OPBase, optional
     #    :param method: The method used to represent the bath.
     #    :type method: {"heom", "pseudomode"}
     #    :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)

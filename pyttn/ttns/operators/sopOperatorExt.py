@@ -89,7 +89,7 @@ class sop_operator(metaclass=ABCMeta):
         :type A: ttn
         :param sysinf: The composition of the system defining the default dictionary to be considered for each node
         :type sysinf: system_modes
-        :type *args: Variable length list of arguments. Valid options are:
+        :type `*args`: Variable length list of arguments. Valid options are:
 
             - Empty: Build the sum-of-product operator using the default operator dictionaries
             - opdict (:class:`operator_dictionary`): Build the sum-of-product operator using a user defined operator dictionary
@@ -132,7 +132,7 @@ class sop_operator(metaclass=ABCMeta):
         :type A: ttn
         :param sysinf: The composition of the system defining the default dictionary to be considered for each node
         :type sysinf: system_modes
-        :type *args: Variable length list of arguments. Valid options are
+        :type `*args`: Variable length list of arguments. Valid options are
 
             - Empty: Build the sum-of-product operator using the default operator dictionaries
             - opdict (:class:`operator_dictionary`): Build the sum-of-product operator using a user defined operator dictionar
@@ -244,5 +244,3 @@ if _cuda_import:
     sop_operator.register(sop_operator_complex_cuda)
     if _real_ttn_import:
         sop_operator.register(sop_operator_real_cuda)
-
-sop_operator_type = sop_operator

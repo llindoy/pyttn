@@ -1,5 +1,5 @@
-ttns
-====
+Tree Tensor Network States
+==========================
 
 .. automodule:: pyttn.ttns.ttns
    :members:

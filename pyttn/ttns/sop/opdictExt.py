@@ -26,15 +26,15 @@ except ImportError:
     _real_opdict = False
 
 
-class operator_dictionary(metaclass=ABCMeta):
+class OperatorDictionary(metaclass=ABCMeta):
     def __new__(
         cls,
         *args,
         dtype: Union[float, complex, np.float64, np.complex128] = np.complex128,
-    ) -> "operator_dictionary":
+    ) -> "OperatorDictionary":
         """Factory function for constructing a user defined operator dictionary.
 
-        :param *args: Variable length list of arguments.
+        :param `*args`: Variable length list of arguments.
         :param dtype: The dtype to use for the site operator.  (Default: np.complex128)
         :type dtype: {np.float64, np.complex128}, optional
 
@@ -48,20 +48,20 @@ class operator_dictionary(metaclass=ABCMeta):
             elif dtype == np.float64 or dtype is float:
                 return operator_dictionary_real(*args)
             else:
-                raise RuntimeError("Invalid dtype for operator_dictionary")
+                raise RuntimeError("Invalid dtype for OperatorDictionary")
 
         else:
             if dtype == np.complex128 or dtype is complex:
                 return operator_dictionary_complex(*args)
             else:
-                raise RuntimeError("Invalid dtype for operator_dictionary")
+                raise RuntimeError("Invalid dtype for OperatorDictionary")
 
     @abstractmethod
-    def assign(self, o: "operator_dictionary"):
+    def assign(self, o: "OperatorDictionary"):
         """Assign the value of the operator dictionary from another
 
         :param o: The operator dictionary to copy into this one
-        :type o: operator_dictionary
+        :type o: OperatorDictionary
         """
         pass
 
@@ -184,9 +184,9 @@ class operator_dictionary(metaclass=ABCMeta):
         pass
 
 
-operator_dictionary.register(operator_dictionary_complex)
+OperatorDictionary.register(operator_dictionary_complex)
 if _real_opdict:
-    operator_dictionary.register(operator_dictionary_real)
+    OperatorDictionary.register(operator_dictionary_real)
 
 
-operator_dictionary_type = operator_dictionary
+operator_dictionary = OperatorDictionary

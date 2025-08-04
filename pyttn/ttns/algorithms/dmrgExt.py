@@ -96,7 +96,7 @@ def _subspace_dmrg(A, H, **kwargs):
         raise RuntimeError("Backend not recognised.")
 
 
-class dmrg(metaclass=ABCMeta):
+class DMRG(metaclass=ABCMeta):
     """The base class for all Density Matrix Renormalisation Group implementations."""
 
     def __new__(
@@ -105,8 +105,8 @@ class dmrg(metaclass=ABCMeta):
         H: Union[sop_operator, ms_sop_operator],
         expansion: str = "onesite",
         **kwargs,
-    ) -> "dmrg":
-        """A factory method for constructing an object used for performing either single or multi set dmrg calculations.
+    ) -> "DMRG":
+        """A factory method for constructing an object used for performing either single or multi set DMRG calculations.
         Which type to construct is determined by the types of the input A and h matrices.
 
         :param A: Tree Tensor Network that the DMRG algorithm will act on
@@ -115,7 +115,7 @@ class dmrg(metaclass=ABCMeta):
         :type H: sop_operator | ms_sop_operator
         :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
         :type expansion: {'onesite', 'subspace'}, optional
-        :param **kwargs: Keyword arguments to pass to the tdvp engine constructor. The allowed values depend on the choice of expansion:
+        :param `**kwargs`: Keyword arguments to pass to the tdvp engine constructor. The allowed values depend on the choice of expansion:
     
             - **krylov_dim** (int, optional): The krylov subspace dimension used for the eigensolver steps. (Default: 16)
             - **num_threads** (int, optional): The number of openmp threads to be used by the solver for parallelising over sum of terms. (Default: 1)
@@ -123,8 +123,8 @@ class dmrg(metaclass=ABCMeta):
             - **subspace_neigs** (int, optional): Only when expansion="subspace".The number of eigenvalues to evaluate when performing the subspace steps. This is only used if expansion="subspace". (Default: 2)
             - **set_var_num_threads** (int, optional): The number of openmp threads to be used by the solver for parallelising over the set variable. (Default: 1)
 
-        :returns: The dmrg evaluation object
-        :rtype: dmrg
+        :returns: The DMRG evaluation object
+        :rtype: DMRG
         """
         if A.backend() != H.backend():
             raise RuntimeError(
@@ -136,25 +136,25 @@ class dmrg(metaclass=ABCMeta):
         elif expansion == "subspace":
             return _subspace_dmrg(A, H, **kwargs)
         else:
-            raise RuntimeError("Invalid input types for dmrg.")
+            raise RuntimeError("Invalid input types for DMRG.")
 
     @abstractmethod
-    def assign(self, o: "dmrg"):
-        """Assign the value of the dmrg engine from another
+    def assign(self, o: "DMRG"):
+        """Assign the value of the DMRG engine from another
 
-        :param o: The dmrg object to copy into this one
-        :type o: dmrg
+        :param o: The DMRG object to copy into this one
+        :type o: DMRG
         """
         pass
 
     @abstractmethod
     def __copy__(self):
-        """Function implementing shallow copy of the dmrg object"""
+        """Function implementing shallow copy of the DMRG object"""
         pass
 
     @abstractmethod
     def __deepcopy__(self, memo):
-        """Function implementing deep copy of the dmrg object"""
+        """Function implementing deep copy of the DMRG object"""
         pass
 
     @abstractmethod
@@ -184,7 +184,7 @@ class dmrg(metaclass=ABCMeta):
 
     @abstractmethod
     def clear(self):
-        """Clear and deallocate all internal buffers of the dmrg object"""
+        """Clear and deallocate all internal buffers of the DMRG object"""
         pass
 
     @abstractmethod
@@ -230,7 +230,7 @@ class dmrg(metaclass=ABCMeta):
 
     @abstractmethod
     def backend(self) -> str:
-        """Returns the backend type of the dmrg
+        """Returns the backend type of the DMRG
 
         :return: The backend type of the object
         :rtype: str
@@ -238,7 +238,7 @@ class dmrg(metaclass=ABCMeta):
         pass
 
 
-class one_site_dmrg(dmrg):
+class OneSiteDMRG(DMRG):
     """The base class for all one-site DMRG algorithm implementations."""
 
     def __new__(
@@ -248,8 +248,8 @@ class one_site_dmrg(dmrg):
         krylov_dim: int = 16,
         num_threads: int = 1,
         set_var_num_threads: int = 1,
-    ) -> "one_site_dmrg":
-        """A factory method for constructing an object used for performing single set dmrg calculations
+    ) -> "OneSiteDMRG":
+        """A factory method for constructing an object used for performing single set DMRG calculations
 
         :param A: Tree Tensor Network that the DMRG algorithm will act on
         :type A: Union[ttn, ms_ttn]
@@ -261,8 +261,8 @@ class one_site_dmrg(dmrg):
         :type num_threads: int, optional
         :param set_var_num_threads: The number of openmp threads to be used by the solver for parallelising over the set variable. (Default: 1)
         :type set_var_num_threads: int, optional
-        :returns: The dmrg evaluation object
-        :rtype: one_site_dmrg
+        :returns: The DMRG evaluation object
+        :rtype: OneSiteDMRG
         """
         if A.backend() != H.backend():
             raise RuntimeError(
@@ -276,7 +276,7 @@ class one_site_dmrg(dmrg):
         H: Union[sop_operator, ms_sop_operator],
         krylov_dim: int = 16,
         num_threads: int = 1,
-    ) -> "one_site_dmrg":
+    ) -> "OneSiteDMRG":
         """Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Network A, with Hamiltonian H.
 
         :param A: Tree Tensor Network that the DMRG algorithm will act on
@@ -288,8 +288,8 @@ class one_site_dmrg(dmrg):
         :param num_threads: The number of openmp threads to be used by the solver. (Default: 1)
         :type num_threads: int, optional
 
-        :returns: The dmrg evaluation object
-        :rtype: one_site_dmrg
+        :returns: The DMRG evaluation object
+        :rtype: OneSiteDMRG
         """
         if A.backend() != H.backend():
             raise RuntimeError(
@@ -299,15 +299,14 @@ class one_site_dmrg(dmrg):
         return _one_site_dmrg(A, H, krylov_dim=krylov_dim, num_threads=num_threads)
 
 
-one_site_dmrg.register(one_site_dmrg_complex)
-one_site_dmrg.register(multiset_one_site_dmrg_complex)
-dmrg_type = one_site_dmrg
+OneSiteDMRG.register(one_site_dmrg_complex)
+OneSiteDMRG.register(multiset_one_site_dmrg_complex)
 if _cuda_import:
-    one_site_dmrg.register(one_site_dmrg_complex_cuda)
-    one_site_dmrg.register(multiset_one_site_dmrg_complex_cuda)
+    OneSiteDMRG.register(one_site_dmrg_complex_cuda)
+    OneSiteDMRG.register(multiset_one_site_dmrg_complex_cuda)
 
 
-class subspace_expansion_dmrg(dmrg):
+class SubspaceExpansionDMRG(DMRG):
     """The base class for all subspace expansion based DMRG implementations.  This set of implementations
     allows for adaptive growth of the bond dimensions used throughout the tensor network throughout the
     optimisation process.  In order to do this, the code uses two metrics:
@@ -332,8 +331,8 @@ class subspace_expansion_dmrg(dmrg):
         subspace_krylov_dim: int = 4,
         subspace_neigs: int = 2,
         num_threads: int = 1,
-    ) -> "subspace_expansion_dmrg":
-        """A factory method for constructing an object used for performing single set dmrg calculations
+    ) -> "SubspaceExpansionDMRG":
+        """A factory method for constructing an object used for performing single set DMRG calculations
 
         :param A: Tree Tensor Network that the DMRG algorithm will act on
         :type A: ttn | ms_ttn
@@ -348,8 +347,8 @@ class subspace_expansion_dmrg(dmrg):
         :param num_threads: The number of openmp threads to be used by the solver. (Default: 1)
         :type num_threads: int, optional
 
-        :returns: The dmrg evaluation object
-        :rtype: subspace_expansion_dmrg
+        :returns: The DMRG evaluation object
+        :rtype: SubspaceExpansionDMRG
         """
         if A.backend() != H.backend():
             raise RuntimeError(
@@ -372,7 +371,7 @@ class subspace_expansion_dmrg(dmrg):
         subspace_krylov_dim: int = 4,
         subspace_neigs: int = 2,
         num_threads: int = 1,
-    ) -> "subspace_expansion_dmrg":
+    ) -> "SubspaceExpansionDMRG":
         """ Initialise adaptive one-site DMRG object initialising all buffers needed to perform DMRG on a Tree Tensor Network A, with Hamiltonian H.
 
         :param A: Tree Tensor Network that the DMRG algorithm will act on
@@ -440,10 +439,8 @@ class subspace_expansion_dmrg(dmrg):
         """The maximum bond dimension we can expand to through a subspace expansion step."""
         pass
 
-subspace_expansion_dmrg.register(multiset_one_site_dmrg_complex)
+SubspaceExpansionDMRG.register(multiset_one_site_dmrg_complex)
 if _cuda_import:
-    subspace_expansion_dmrg.register(multiset_one_site_dmrg_complex_cuda)
+    SubspaceExpansionDMRG.register(multiset_one_site_dmrg_complex_cuda)
 
-ms_dmrg_type = subspace_expansion_dmrg
-ms_dmrg = subspace_expansion_dmrg
-subspace_expansion_dmrg_type = subspace_expansion_dmrg
+dmrg = DMRG

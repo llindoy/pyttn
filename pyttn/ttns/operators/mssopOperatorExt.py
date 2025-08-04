@@ -110,7 +110,7 @@ class multiset_sop_operator(metaclass=ABCMeta):
         :type A: multiset_ttn
         :param sysinf: The composition of the system defining the default dictionary to be considered for each node
         :type sysinf: system_modes
-        :type *args: Variable length list of arguments. Valid options are
+        :type `*args`: Variable length list of arguments. Valid options are
 
             - Empty: Build the multiset sum-of-product operator using the default operator dictionaries
             - opdict (:class:`operator_dictionary`): Build the multiset sum-of-product operator using a user defined operator dictionary
@@ -149,7 +149,7 @@ class multiset_sop_operator(metaclass=ABCMeta):
         :type A: multiset_ttn
         :param sysinf: The composition of the system defining the default dictionary to be considered for each node
         :type sysinf: system_modes
-        :type *args: Variable length list of arguments. Valid options are
+        :type `*args`: Variable length list of arguments. Valid options are
 
             - Empty: Build the multiset sum-of-product operator using the default operator dictionaries
             - opdict (:class:`operator_dictionary`): Build the multiset sum-of-product operator using a user defined operator dictionary
@@ -260,5 +260,3 @@ if _cuda_import:
         multiset_sop_operator.register(multiset_sop_operator_real_cuda)
 
 ms_sop_operator = multiset_sop_operator
-ms_sop_operator_type = multiset_sop_operator
-multiset_sop_operator_type = multiset_sop_operator

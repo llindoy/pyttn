@@ -23,7 +23,7 @@ from pyttn import (
     fermion_mode,
     ntreeBuilder,
     ntreeNode,
-    OP_type,
+    OPBase,
     sSOP,
     SOP,
 )
@@ -87,11 +87,11 @@ class DiscreteBath(metaclass=abc.ABCMeta):
 
 
 class DiscreteOQSBath(DiscreteBath):
-    r"""The base class for handling a bath representing a Discrete bath correlation function
+    """The base class for handling a bath representing a Discrete bath correlation function
     of the form
 
     .. math::
-        C(t) = \sum_k g_{k}^2 \exp(-1.0j w_k t)
+        C(t) = \\sum_k g_{k}^2 \\exp(-1.0j w_k t)
 
     :param gk: The coefficient in the exponential decomposition
     :type gk: np.ndarray
@@ -128,11 +128,11 @@ class DiscreteOQSBath(DiscreteBath):
         return self._fermion
 
     def Ct(self, t: Union[float, np.ndarray]) -> Union[complex, np.complex128, np.ndarray]:
-        r"""Returns the value of the non-interacting bath correlation function evaluated at the time points t,
+        """Returns the value of the non-interacting bath correlation function evaluated at the time points t,
         defined by:
 
         .. math::
-            C(t) = \sum_k g_{k}^2 \exp(-1.0j*w_k t)
+            C(t) = \\sum_k g_{k}^2 \\exp(-1.0j*w_k t)
 
         :param t: time
         :type t: float | np.ndarray
@@ -170,11 +170,11 @@ class DiscreteOQSBath(DiscreteBath):
 
 
 class DiscreteBosonicBath(DiscreteOQSBath):
-    r"""A class for handling a bosonic bath representing a Discrete bath correlation function
+    """A class for handling a bosonic bath representing a Discrete bath correlation function
     of the form
 
     .. math::
-        C(t) = \sum_k g_{k}^2 \exp(-1.0j w_k t)
+        C(t) = \\sum_k g_{k}^2 \\exp(-1.0j w_k t)
 
     :param gk: The coefficient in the exponential decomposition
     :type gk: np.ndarray
@@ -246,20 +246,20 @@ class DiscreteBosonicBath(DiscreteOQSBath):
     def add_system_bath_hamiltonian(
         self,
         H: Union[sSOP, SOP],
-        Sp: OP_type,
-        Sm: Optional[OP_type] = None,
+        Sp: OPBase,
+        Sm: Optional[OPBase] = None,
         geom: str = "star",
         binds: Optional[list[int]] = None,
         bskip: Optional[int] = 1,
     ) ->  Union[sSOP, SOP]:
-        r"""Attach the bath and system bath coupling Hamiltonians associated with this bath object to an existing SOP Hamiltonian
+        """Attach the bath and system bath coupling Hamiltonians associated with this bath object to an existing SOP Hamiltonian
 
         :param H: The total Hamiltonian
         :type H: sSOP | SOP
         :param Sp: An operator that couples to the bath annihilation operator terms
-        :type Sp: OP_type
-        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(:math:`a^\dagger` + a) (Default: None)
-        :type Sm: Optional[OP_type]
+        :type Sp: OPBase
+        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(:math:`a^\\dagger` + a) (Default: None)
+        :type Sm: Optional[OPBase]
         :param geom: The geometry of the bath to use
         :type geom: {"star", "chain", "ipchain"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
@@ -277,20 +277,20 @@ class DiscreteBosonicBath(DiscreteOQSBath):
 
     def system_bath_hamiltonian(
         self,
-        Sp: OP_type,
-        Sm: Optional[OP_type] = None,
+        Sp: OPBase,
+        Sm: Optional[OPBase] = None,
         geom: str = "star",
         binds: Optional[list[int]] = None,
         bskip: Optional[int] = 1,
     ) -> sSOP:
-        r"""Construct a sSOP containing the system bath Hamiltonian of the object.
+        """Construct a sSOP containing the system bath Hamiltonian of the object.
 
         :param H: The total Hamiltonian
         :type H: sSOP | SOP
         :param Sp: An operator that couples to the bath annihilation operator terms
-        :type Sp: OP_type
-        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(:math:`a^\dagger + a`) (Default: None)
-        :type Sm: Optional[OP_type]
+        :type Sp: OPBase
+        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(:math:`a^\\dagger + a`) (Default: None)
+        :type Sm: Optional[OPBase]
         :param geom: The geometry of the bath to use
         :type geom: {"star", "chain", "ipchain"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
@@ -309,11 +309,11 @@ class DiscreteBosonicBath(DiscreteOQSBath):
 
 
 class DiscreteFermionicBath(DiscreteOQSBath):
-    r"""A class for handling a fermionic bath representing an exponential fit to a bath correlation function
+    """A class for handling a fermionic bath representing an exponential fit to a bath correlation function
     of the form
 
     .. math::
-        C(t) = \sum_k g_{k}^2 \exp(-1.0j w_k t)
+        C(t) = \\sum_k g_{k}^2 \\exp(-1.0j w_k t)
 
     :param gk: The coefficient in the exponential decomposition
     :type gk: np.ndarray

@@ -14,7 +14,7 @@
 from abc import ABCMeta, abstractmethod
 
 import pyttn.ttnpp.ops as ops
-from pyttn.linalg import Diagonal_Matrix, Matrix, Sparse_Matrix
+from pyttn.linalg import DiagonalMatrix, Matrix, SparseMatrix
 
 if hasattr(ops, "identity_real"):
     _real_ops=True
@@ -288,7 +288,7 @@ class identity(siteOp):
     def __new__(cls, *args, dtype=np.complex128, backend="blas"):
         """Factory function for constructing an identity matrix site operator
 
-        :type *args: Variable length list of arguments. Allowed options are
+        :type `*args`: Variable length list of arguments. Allowed options are
             - empty - Default construct identity operator
             - size (int) - Construct an identity operator of a specified size
         :param dtype: The dtype to use for the site operator.  (Default: np.complex128)
@@ -319,7 +319,7 @@ class matrix(siteOp):
     def __new__(cls, *args, dtype=np.complex128, backend="blas"):
         """Factory function for constructing a matrix site operator
 
-        :type *args: Variable length list of arguments. For details see the dense matrix constructors.
+        :type `*args`: Variable length list of arguments. For details see the dense matrix constructors.
         :param dtype: The dtype to use for the site operator.  (Default: np.complex128)
         :type dtype: {np.float64, np.complex128}, optional
         :param backend: The computational backend to use for the matrix operator  (Default: "blas")
@@ -356,7 +356,7 @@ class sparse_matrix(siteOp):
     def __new__(cls, *args, dtype=np.complex128, backend="blas"):
         """Factory function for constructing a sparse matrix site operator
 
-        :type *args: Variable length list of arguments. For details see the sparse matrix constructors
+        :type `*args`: Variable length list of arguments. For details see the sparse matrix constructors
         :param dtype: The dtype to use for the site operator.  (Default: np.complex128)
         :type dtype: {np.float64, np.complex128}, optional
         :param backend: The computational backend to use for the sparse_matrix operator  (Default: "blas")
@@ -367,11 +367,11 @@ class sparse_matrix(siteOp):
         """
         return _sparse_matrix(*args, dtype=dtype, backend=backend)
 
-    def matrix(self) -> Sparse_Matrix:
-        """Return the Sparse_Matrix object defining this operator
+    def matrix(self) -> SparseMatrix:
+        """Return the SparseMatrix object defining this operator
 
         :return: The matrix representation of this operator
-        :rtype: Sparse_Matrix
+        :rtype: SparseMatrix
         """
         pass
 
@@ -394,7 +394,7 @@ class diagonal_matrix(siteOp):
     def __new__(cls, *args, dtype=np.complex128, backend="blas"):
         """Factory function for constructing an diagonal matrix site operator
 
-        :type *args: Variable length list of arguments. For details see the diagonal matrix constructors
+        :type `*args`: Variable length list of arguments. For details see the diagonal matrix constructors
         :param dtype: The dtype to use for the site operator.  (Default: np.complex128)
         :type dtype: {np.float64, np.complex128}, optional
         :param backend: The computational backend to use for the diagonal_matrix operator  (Default: "blas")
@@ -405,11 +405,11 @@ class diagonal_matrix(siteOp):
         """
         return _diagonal_matrix(*args, dtype=dtype, backend=backend)
 
-    def matrix(self) -> Diagonal_Matrix:
-        """Return the Diagonal_Matrix object defining this operator
+    def matrix(self) -> DiagonalMatrix:
+        """Return the DiagonalMatrix object defining this operator
 
         :return: The matrix representation of this operator
-        :rtype: Diagonal_Matrix
+        :rtype: DiagonalMatrix
         """
         pass
 

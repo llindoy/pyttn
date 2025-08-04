@@ -187,31 +187,31 @@ void init_sSOP(py::module &m)
             the type of mode considered.  These are
 
             :Fermion Modes:
-              - Annihilation operator :math:`\hat{c}` :  {"c", "a", "f"}
-              - Creation operator :math:`\hat{c}^\dagger` :  {"cdag", "adag", "fdag", "cd", "ad", "fd"}
-              - Number operator :math:`\hat{c}^\dagger\hat{c}` :  {"n", "cdagc", "adaga", "fdagf", "cdc", "ada", "fdf"}
-              - Vacancy operator :math:`1-\hat{c}^\dagger\hat{c}` :  "v"
+              - Annihilation operator :math:`\\hat{c}` :  {"c", "a", "f"}
+              - Creation operator :math:`\\hat{c}^\\dagger` :  {"cdag", "adag", "fdag", "cd", "ad", "fd"}
+              - Number operator :math:`\\hat{c}^\\dagger\\hat{c}` :  {"n", "cdagc", "adaga", "fdagf", "cdc", "ada", "fdf"}
+              - Vacancy operator :math:`1-\\hat{c}^\\dagger\\hat{c}` :  "v"
 
             :Bosonic Modes:
-              - Annihilation operator :math:`\hat{c}` :  {"c", "a", "b"}
-              - Creation operator :math:`\hat{c}^\dagger` :  {"cdag", "adag", "bdag", "cd", "ad", "bd"}
-              - Number operator :math:`\hat{c}^\dagger\hat{c}` :  {"n", "cdagc", "adaga", "bdagb", "cdc", "ada", "bdb"}
-              - Position operator :math:`hat{q}` : {"q", "x"}
-              - Momentum opeartor :math:`hat{p}` : "p"
+              - Annihilation operator :math:`\\hat{c}` :  {"c", "a", "b"}
+              - Creation operator :math:`\\hat{c}^\\dagger` :  {"cdag", "adag", "bdag", "cd", "ad", "bd"}
+              - Number operator :math:`\\hat{c}^\\dagger\\hat{c}` :  {"n", "cdagc", "adaga", "bdagb", "cdc", "ada", "bdb"}
+              - Position operator :math:`\\hat{q}` : {"q", "x"}
+              - Momentum opeartor :math:`\\hat{p}` : "p"
 
             :Spin Modes for arbitrary spin S:
-              - :math:`\hat{S}_x` : {"sx", "x"}
-              - :math:`\hat{S}_y` : {"sy", "y"}
-              - :math:`\hat{S}_z` : {"sz", "z"}
-              - :math:`\hat{S}_+` : {"s+", "sp"}
-              - :math:`\hat{S}_-` : {"s-", "sm"}
+              - :math:`\\hat{S}_x` : {"sx", "x"}
+              - :math:`\\hat{S}_y` : {"sy", "y"}
+              - :math:`\\hat{S}_z` : {"sz", "z"}
+              - :math:`\\hat{S}_+` : {"s+", "sp"}
+              - :math:`\\hat{S}_-` : {"s-", "sm"}
 
             :Two Level System Modes:
-              - :math:`\hat{\sigma}_x` : {"sx", "x", "sigmax"}
-              - :math:`\hat{\sigma}_y` : {"sy", "y", "sigmay"}
-              - :math:`\hat{\sigma}_z` : {"sz", "z", "sigmaz"}
-              - :math:`\hat{\sigma}_+` : {"s+", "sp", "sigma+", "sigmap"}
-              - :math:`\hat{\sigma}_-` : {"s-", "sm", "sigma-", "sigmam"}
+              - :math:`\\hat{\\sigma}_x` : {"sx", "x", "sigmax"}
+              - :math:`\\hat{\\sigma}_y` : {"sy", "y", "sigmay"}
+              - :math:`\\hat{\\sigma}_z` : {"sz", "z", "sigmaz"}
+              - :math:`\\hat{\\sigma}_+` : {"s+", "sp", "sigma+", "sigmap"}
+              - :math:`\\hat{\\sigma}_-` : {"s-", "sm", "sigma-", "sigmam"}
         )mydelim";
 
     m.def("fermion_operator", &fermion_operator, R"mydelim(
@@ -223,10 +223,10 @@ void init_sSOP(py::module &m)
       :type arg1: int
 
       For fermionic systems the following operator are supported:
-        - Annihilation operator :math:`\hat{c}` :  {"c", "a", "f"}
-        - Creation operator :math:`\hat{c}^\dagger` :  {"cdag", "adag", "fdag", "cd", "ad", "fd"}
-        - Number operator :math:`\hat{c}^\dagger\hat{c}` :  {"n", "cdagc", "adaga", "fdagf", "cdc", "ada", "fdf"}
-        - Vacancy operator :math:`1-\hat{c}^\dagger\hat{c}` :  {"v"}
+        - Annihilation operator :math:`\\hat{c}` :  {"c", "a", "f"}
+        - Creation operator :math:`\\hat{c}^\\dagger` :  {"cdag", "adag", "fdag", "cd", "ad", "fd"}
+        - Number operator :math:`\\hat{c}^\\dagger\\hat{c}` :  {"n", "cdagc", "adaga", "fdagf", "cdc", "ada", "fdf"}
+        - Vacancy operator :math:`1-\\hat{c}^\\dagger\\hat{c}` :  {"v"}
 
       :returns: fermionic mode data object
       :rtype: mode_data
@@ -241,10 +241,10 @@ void init_sSOP(py::module &m)
       :type arg1: int
 
       For fermionic systems the following operator are supported:
-        - Annihilation operator :math:`\hat{c}` :  {"c", "a", "f"}
-        - Creation operator :math:`\hat{c}^\dagger` :  {"cdag", "adag", "fdag", "cd", "ad", "fd"}
-        - Number operator :math:`\hat{c}^\dagger\hat{c}` :  {"n", "cdagc", "adaga", "fdagf", "cdc", "ada", "fdf"}
-        - Vacancy operator :math:`1-\hat{c}^\dagger\hat{c}` :  {"v"}
+        - Annihilation operator :math:`\\hat{c}` :  {"c", "a", "f"}
+        - Creation operator :math:`\\hat{c}^\\dagger` :  {"cdag", "adag", "fdag", "cd", "ad", "fd"}
+        - Number operator :math:`\\hat{c}^\\dagger\\hat{c}` :  {"n", "cdagc", "adaga", "fdagf", "cdc", "ada", "fdf"}
+        - Vacancy operator :math:`1-\\hat{c}^\\dagger\\hat{c}` :  {"v"}
 
       :returns: fermionic mode data object
       :rtype: mode_data

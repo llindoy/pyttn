@@ -14,7 +14,7 @@ from typing import Callable, Optional, Union
 
 import numpy as np
 
-from pyttn.ttns import OP_type
+from pyttn.ttns import OPBase
 
 from ..bath_fitting import (
     BathDiscretisation,
@@ -39,7 +39,7 @@ class CorrelatedBosonicBath(Bath):
     :param Jw: The matrix valued bath spectral function defining the non-interacting correlation function
     :type Jw: CorrelatedSpectralDensity,
     :param S: The system operator
-    :type S: list[OP_type], optional
+    :type S: list[OPBase], optional
     :param beta: The inverse temperature of the bath, defaults to None
     :type beta: float, optional
     :param wmax: the maximum frequency bound, defaults to np.inf
@@ -53,7 +53,7 @@ class CorrelatedBosonicBath(Bath):
     def __init__(
         self,
         Jw: CorrelatedSpectralDensity,
-        S: Optional[list[OP_type]] = None,
+        S: Optional[list[OPBase]] = None,
         beta: Optional[float] = None,
         wmax: float = np.inf,
         wmin: Optional[float] = None,
@@ -116,11 +116,11 @@ class CorrelatedBosonicBath(Bath):
         limit: int = 2000,
         epsomega: float = 1e-6,
     ) -> np.ndarray:
-        r"""Returns the value of the non-interacting bath correlation function evaluated at the time points t,
+        """Returns the value of the non-interacting bath correlation function evaluated at the time points t,
         defined by:
 
         .. math::
-            \boldsymbol{C}(t) = \frac{1}{\pi}\int_{\omega_{\mathrm{min}}}^{\omega_{\mathrm{max}}} \boldsymbol{J}(\omega) f_B(\beta\omega) \exp(- i \omega t)
+            \\boldsymbol{C}(t) = \\frac{1}{\\pi}\\int_{\\omega_{\\mathrm{min}}}^{\\omega_{\\mathrm{max}}} \\boldsymbol{J}(\\omega) f_B(\\beta\\omega) \\exp(- i \\omega t)
 
         :param t: time
         :type t: np.ndarray
@@ -176,11 +176,11 @@ class CorrelatedBosonicBath(Bath):
         limit: int = 2000,
         epsomega: float = 1e-6,
     ) -> Union[np.ndarray, complex]:
-        r"""Returns the bath correlation fucntion evaluated for some scalar argument
+        """Returns the bath correlation fucntion evaluated for some scalar argument
         defined by:
 
         .. math::
-            \boldsymbol{C}(t) = \frac{1}{\pi}\int_{\omega_{\mathrm{min}}}^{\omega_{\mathrm{max}}} \boldsymbol{J}(\omega) f_B(\beta\omega) \exp(- i \omega t)
+            \\boldsymbol{C}(t) = \\frac{1}{\\pi}\\int_{\\omega_{\\mathrm{min}}}^{\\omega_{\\mathrm{max}}} \\boldsymbol{J}(\\omega) f_B(\\beta\\omega) \\exp(- i \\omega t)
 
         :param t: time
         :type t: np.ndarray
@@ -347,15 +347,15 @@ class CorrelatedBosonicBath(Bath):
         ] = None,
         **kwargs
     ) -> tuple[np.ndarray, np.ndarray]:
-        r"""Returns the coupling constants and frequencies associated with a discretised representation of the bath
+        """Returns the coupling constants and frequencies associated with a discretised representation of the bath
 
         :param discretisation_engine: An object defining how to discretise a continuous bath
         :type discretisation_engine: np.ndarray
         :param scalar_func: An optional scalar valued function used for determining the density of frequencies for discretisation, defaults to None
         :type scalar_func: Optional[str | Callable[ [Union[np.ndarray, float]], Union[np.ndarray, float] ]]
-        :param **kwargs: Additional dictionary arguments that are currently not used by this function
+        :param `**kwargs`: Additional dictionary arguments that are currently not used by this function
         
-        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`
+        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\\omega_k`
         :rtype: np.ndarray, np.ndarray
         """
 
@@ -378,15 +378,15 @@ class CorrelatedBosonicBath(Bath):
         ] = None,
         **kwargs
     ) -> tuple[np.ndarray, np.ndarray]:        
-        r"""Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
+        """Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
 
         :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition
         :type fitting_engine: np.ndarray
         :param scalar_func: An optional scalar valued function used for determining the density of frequencies, defaults to None
         :type scalar_func: Optional[str | Callable[ [Union[np.ndarray, float]], float |Union[np.ndarray, complex]]]
-        :param **kwargs: Additional dictionary arguments used in the evaluation of the bath correlation if using a CtExpFitDecomposition
+        :param `**kwargs`: Additional dictionary arguments used in the evaluation of the bath correlation if using a CtExpFitDecomposition
 
-        :return: Discrete system bath coupling constants :math:`g_k` and bath frequencies :math:`\omega_k`
+        :return: Discrete system bath coupling constants :math:`g_k` and bath frequencies :math:`\\omega_k`
         :rtype: np.ndarray, np.ndarray
         """
         

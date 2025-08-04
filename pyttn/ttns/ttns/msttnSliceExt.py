@@ -118,27 +118,27 @@ def _msttn_slice_1(slice):
     else:
         raise RuntimeError("Invalid arguments for msttn_slice_1")
 
-class multiset_ttn_slice(metaclass=ABCMeta):
+class msttnSlice(metaclass=ABCMeta):
     """Class for handling multiset tree tensor network state operator
     """   
-    def __new__(cls, *args) -> 'multiset_ttn_slice':
-        r"""Factory function for constructing a multiset tree tensor network state operator
+    def __new__(cls, *args) -> 'msttnSlice':
+        """Factory function for constructing a multiset tree tensor network state operator
 
-        :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
+        :param `*args`: Variable length list of arguments. This function can handle two possible lists of arguments
 
             - Default construct a multiset TTN object
-            - slice (:class:`multiset_ttn_slice`), index (int) - Copy construct a multiset TTN slice object
+            - slice (:class:`msttnSlice`), index (int) - Copy construct a multiset TTN slice object
             - msttn (:class:`multiset_ttn`), index (int) - Construct a multiset TTN slice as a slice of a given multiset ttn
 
         :returns: The Multiset Tree Tensor Network State Slice object
-        :rtype: multiset_ttn_slice
+        :rtype: msttnSlice
         """   
         if len(args) == 1:
             return _msttn_slice_1(args[0])
         elif len(args) == 2:
             return _msttn_slice_2(args[0], args[1])
         else:
-            raise RuntimeError("Invalid arguments for multiset_ttn_slice constructor.")
+            raise RuntimeError("Invalid arguments for msttnSlice constructor.")
 
     @abstractmethod
     def assign(self, tree : ttn):
@@ -175,14 +175,13 @@ class multiset_ttn_slice(metaclass=ABCMeta):
         """
         pass
 
-multiset_ttn_slice.register(ms_ttn_slice_complex)
+msttnSlice.register(ms_ttn_slice_complex)
 if _real_ttn_import:
-    multiset_ttn_slice.register(ms_ttn_slice_real)
+    msttnSlice.register(ms_ttn_slice_real)
 if _cuda_import:
-    multiset_ttn_slice.register(ms_ttn_slice_complex_cuda)
+    msttnSlice.register(ms_ttn_slice_complex_cuda)
     if _real_ttn_import:
-       multiset_ttn_slice.register(ms_ttn_slice_real_cuda)
+       msttnSlice.register(ms_ttn_slice_real_cuda)
 
-ms_ttn_slice = multiset_ttn_slice
-ms_ttn_slice_type = multiset_ttn_slice
-multiset_ttn_slice_type = multiset_ttn_slice
+ms_ttn_slice = msttnSlice
+multiset_ttn_slice = msttnSlice

@@ -18,11 +18,11 @@ import scipy
 
 
 def ESPRIT(Ct: np.ndarray, K: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    r"""Implementation of the Estimation of Signal Parameters via Rotational Invariant Techniques (ESPRIT)
+    """Implementation of the Estimation of Signal Parameters via Rotational Invariant Techniques (ESPRIT)
     method for decomposing a signal into the form
 
     .. math:
-        C(t) \approx \sum_{k=1}^K w_k \exp(-\nu t)
+        C(t) \\approx \\sum_{k=1}^K w_k \\exp(-\\nu t)
 
     A. Paulraj, R. Roy, and T. Kailath, Proceedings of the IEEE 74, 1044 (1986).
 

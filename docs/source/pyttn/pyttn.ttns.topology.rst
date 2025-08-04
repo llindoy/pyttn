@@ -1,4 +1,4 @@
-topology
+Topology
 ========
 
 .. automodule:: pyttn.ttns.topology

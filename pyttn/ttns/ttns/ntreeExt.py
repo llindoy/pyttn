@@ -23,6 +23,7 @@ class ntreeNode(metaclass=ABCMeta):
 
     def __new__(cls) -> "ntreeNode":
         """Constructs a new ntreeNode object
+
         :return: The ntreeNode object
         :rtype: ntreeNode
         """
@@ -252,7 +253,7 @@ class ntree(metaclass=ABCMeta):
     def __new__(cls, *args) -> "ntree":
         """Constructs a new ntree object
 
-        :param *args: Variable length list of arguments. This function can handle the following lists of arguments
+        :param `*args`: Variable length list of arguments. This function can handle the following lists of arguments
 
             - Default construct ttn object
             - ntree (:class:`ntree`) - Copy construct the ntree object
@@ -262,6 +263,8 @@ class ntree(metaclass=ABCMeta):
         (1(2(3)(4))(5(6)(7))
 
         corresponds to the tree
+
+        .. code-block:: text
 
                   1
                  x_x
@@ -330,13 +333,16 @@ class ntree(metaclass=ABCMeta):
 
         corresponds to the tree
 
-              1
-             x_x
-            x___x
-           2_____5
-          x_x___x_x
-         x___x_x___x
-        3____4_6____7
+        .. code-block:: text
+
+                  1
+                 x_x
+                x___x
+               2_____5
+              x_x___x_x
+             x___x_x___x
+            3____4_6____7
+        
 
         :param tree: A string representation of a tree
         :type tree: str

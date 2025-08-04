@@ -61,16 +61,16 @@ class BathDiscretisation(metaclass=abc.ABCMeta):
         pass
 
 class DensityDiscretisation(BathDiscretisation):
-    r"""A class wrapping the density based discretisation approach.  Selects frequencies from a density of frequencies :math:`\rho(\omega)`
+    """A class wrapping the density based discretisation approach.  Selects frequencies from a density of frequencies :math:`\\rho(\\omega)`
     according to the expression
 
     .. math::
-        \int_{\omega_{\mathrm{min}}}^{\omega_k} \rho(\omega)\mathrm{d} \omega = k,
+        \\int_{\\omega_{\\mathrm{min}}}^{\\omega_k} \\rho(\\omega)\\mathrm{d} \\omega = k,
 
     with coupling constants then determined by
 
     .. math::
-        g_k^2 = \frac{1}{\pi} \frac{S(\omega_k)}{\rho(\omega_k)}.
+        g_k^2 = \\frac{1}{\\pi} \\frac{S(\\omega_k)}{\\rho(\\omega_k)}.
 
     Constructor arguments
 
@@ -205,11 +205,11 @@ class DensityDiscretisation(BathDiscretisation):
 
 
 class OrthopolDiscretisation:
-    r"""A class wrapping the orthonormal polynomial based discretisation scheme.  This scheme constructs a set of orthonormal polynomials
+    """A class wrapping the orthonormal polynomial based discretisation scheme.  This scheme constructs a set of orthonormal polynomials
     satisfying the orthogonality constraint
 
     .. math::
-        \int_{\omega_{\mathrm{min}}}^{\omega_\mathrm{max}} S(\omega) \pi_i(\omega) \pi_j(\omega) \mathrm{d}\omega = \delta_{ij}.
+        \\int_{\\omega_{\\mathrm{min}}}^{\\omega_\\mathrm{max}} S(\\omega) \\pi_i(\\omega) \\pi_j(\\omega) \\mathrm{d}\\omega = \\delta_{ij}.
 
     The coupling constants and frequencies are then obtained from the weights and nodes, respectively, of the Gaussian quadrature rule associated
     with these orthonormal polynomials.

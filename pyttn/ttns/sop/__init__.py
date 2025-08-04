@@ -29,20 +29,15 @@ from pyttn.ttnpp import (
 )
 
 from .liouvilleSpaceExt import liouville_space_superoperator
-from .opdictExt import operator_dictionary, operator_dictionary_type
-from .SOPExt import SOP, SOP_type, ms_SOP, ms_SOP_type, multiset_SOP
+from .opdictExt import OperatorDictionary, operator_dictionary
+from .SOPExt import SOP, ms_SOP, multiset_SOP
 from .sSOPExt import (
-    OP_type,
+    OPBase,
     coeff,
-    coeff_type,
     sNBO,
-    sNBO_type,
     sOP,
-    sOP_type,
     sPOP,
-    sPOP_type,
     sSOP,
-    sSOP_type,
 )
 from .stateExt import isKet, isSepState, ket, sepState, stateStr
 
@@ -50,24 +45,18 @@ __all__: list[str] = [
     "SOP",
     "multiset_SOP",
     "ms_SOP",
-    "SOP_type",
-    "ms_SOP_type",
     "coeff",
     "sNBO",
     "sSOP",
-    "sOP_type",
-    "sPOP_type",
-    "sNBO_type",
-    "sSOP_type",
-    "OP_type",
-    "coeff_type",
+    "sSOP",
+    "OPBase",
     "stateStr",
     "sepState",
     "ket",
     "isSepState",
     "isKet",
+    "OperatorDictionary",
     "operator_dictionary",
-    "operator_dictionary_type",
     "liouville_space_superoperator",
     "sOP",
     "sPOP",

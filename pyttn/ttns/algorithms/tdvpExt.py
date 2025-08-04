@@ -96,7 +96,7 @@ def _subspace_tdvp(A, H, **kwargs):
         raise RuntimeError("Backend not recognised.")
 
 
-class tdvp(metaclass=ABCMeta):
+class TDVP(metaclass=ABCMeta):
     """The base class for all Time Dependent Variational Principle implementations."""
 
     def __new__(
@@ -105,7 +105,7 @@ class tdvp(metaclass=ABCMeta):
         H: Union[sop_operator, ms_sop_operator],
         expansion: str = "onesite",
         **kwargs,
-    ) -> "tdvp":
+    ) -> "TDVP":
         """A factory method for constructing an object used for performing either single or multi set tdvp calculations.
         Which type to construct is determined by the types of the input A and h matrices.
 
@@ -115,7 +115,7 @@ class tdvp(metaclass=ABCMeta):
         :type H: sop_operator | ms_sop_operator
         :param expansion: A string determining the type of bond dimension expansion to be used.  Either no subspace expansion ('onesite') or energy variance based ('subspace').  (Default: 'onesite')
         :type expansion: {'onesite', 'subspace'}, optional
-        :param **kwargs: Keyword arguments to pass to the tdvp engine constructor. The allowed values depend on the choice of expansion:
+        :param `**kwargs`: Keyword arguments to pass to the tdvp engine constructor. The allowed values depend on the choice of expansion:
     
             - **krylov_dim** (int, optional): The krylov subspace dimension used for the eigensolver steps. (Default: 16)
             - **num_threads** (int, optional): The number of openmp threads to be used by the solver. (Default: 1)
@@ -125,7 +125,7 @@ class tdvp(metaclass=ABCMeta):
             - **set_var_num_threads** (int, optional): The number of openmp threads to be used by the solver for parallelising over the set variable. (Default: 1)
 
         :returns: The tdvp evaluation object
-        :rtype: tdvp
+        :rtype: TDVP
         """
         if A.backend() != H.backend():
             raise RuntimeError(
@@ -137,25 +137,25 @@ class tdvp(metaclass=ABCMeta):
         elif expansion == "subspace":
             return _subspace_tdvp(A, H, **kwargs)
         else:
-            raise RuntimeError("Invalid input types for tdvp.")
+            raise RuntimeError("Invalid input types for TDVP.")
 
     @abstractmethod
-    def assign(self, o: "tdvp"):
+    def assign(self, o: "TDVP"):
         """Assign the value of the tdvp engine from another
 
-        :param o: The tdvp object to copy into this one
-        :type o: tdvp
+        :param o: The TDVP object to copy into this one
+        :type o: TDVP
         """
         pass
 
     @abstractmethod
     def __copy__(self):
-        """Function implementing shallow copy of the tdvp object"""
+        """Function implementing shallow copy of the TDVP object"""
         pass
 
     @abstractmethod
     def __deepcopy__(self, memo):
-        """Function implementing deep copy of the tdvp object"""
+        """Function implementing deep copy of the TDVP object"""
         pass
 
     @property
@@ -196,14 +196,14 @@ class tdvp(metaclass=ABCMeta):
 
     @abstractmethod
     def clear(self):
-        """Clear and deallocate all internal buffers of the tdvp object"""
+        """Clear and deallocate all internal buffers of the TDVP object"""
         pass
 
     @abstractmethod
     def step(self, A: ttn, H: sop_operator, update_env: bool = False):
-        """Performs a single step of the single site tdvp algorithm
+        """Performs a single step of the single site TDVP algorithm
 
-        :param A: The Tree Tensor Network Object that will be optimised using the tdvp algorithm
+        :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
         :type A: ttn
         :param H: The Hamiltonian sop operator object
         :type H: sop_operator
@@ -214,9 +214,9 @@ class tdvp(metaclass=ABCMeta):
 
     @abstractmethod
     def __call__(self, A: ttn, H: sop_operator, update_env: bool = False):
-        """Performs a single step of the single site tdvp algorithm
+        """Performs a single step of the single site TDVP algorithm
 
-        :param A: The Tree Tensor Network Object that will be optimised using the tdvp algorithm
+        :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
         :type A: ttn
         :param H: The Hamiltonian sop operator object
         :type H: sop_operator
@@ -229,9 +229,9 @@ class tdvp(metaclass=ABCMeta):
     def prepare_environment(
         self, A: ttn, H: sop_operator, attempt_expansion: bool = False
     ):
-        """Update all Single Particle Function environment tensors to prepare the system for performing a tdvp sweep.
+        """Update all Single Particle Function environment tensors to prepare the system for performing a TDVP sweep.
 
-        :param A: The Tree Tensor Network Object that will be optimised using the tdvp algorithm
+        :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
         :type A: ttn
         :param H: The Hamiltonian sop operator object
         :type H: sop_operator
@@ -242,7 +242,7 @@ class tdvp(metaclass=ABCMeta):
 
     @abstractmethod
     def backend(self) -> str:
-        """Returns the backend type of the tdvp
+        """Returns the backend type of the TDVP
 
         :return: The backend type of the object
         :rtype: str
@@ -250,7 +250,7 @@ class tdvp(metaclass=ABCMeta):
         pass
 
 
-class one_site_tdvp(tdvp):
+class OneSiteTDVP(TDVP):
     """The base class for all one-site tdvp algorithm implementations."""
 
     def __new__(
@@ -261,7 +261,7 @@ class one_site_tdvp(tdvp):
         num_threads: int = 1,
         set_var_num_threads: int = 1,
         nstep: int = 1
-    ) -> "one_site_tdvp":
+    ) -> "OneSiteTDVP":
         """A factory method for constructing an object used for performing single set tdvp calculations
 
         :param A: Tree Tensor Network that the tdvp algorithm will act on
@@ -278,7 +278,7 @@ class one_site_tdvp(tdvp):
         :type nstep: (int, optional)
 
         :returns: The tdvp evaluation object
-        :rtype: one_site_tdvp
+        :rtype: OneSiteTDVP
         """
         if A.backend() != H.backend():
             raise RuntimeError(
@@ -294,7 +294,7 @@ class one_site_tdvp(tdvp):
         num_threads: int = 1,
         set_var_num_threads: int = 1,
         nstep: int = 1,
-    ) -> "one_site_tdvp":
+    ) -> "OneSiteTDVP":
         """Initialise the internal buffers of the tdvp object needed to perform tdvp on a Tree Tensor Network A, with Hamiltonian H.
 
         :param A: Tree Tensor Network that the tdvp algorithm will act on
@@ -309,19 +309,18 @@ class one_site_tdvp(tdvp):
         :type nstep: (int, optional)
 
         :returns: The tdvp evaluation object
-        :rtype: one_site_tdvp
+        :rtype: OneSiteTDVP
         """
 
 
-one_site_tdvp.register(one_site_tdvp_complex)
-one_site_tdvp.register(multiset_one_site_tdvp_complex)
-tdvp_type = one_site_tdvp
+OneSiteTDVP.register(one_site_tdvp_complex)
+OneSiteTDVP.register(multiset_one_site_tdvp_complex)
 if _cuda_import:
-    one_site_tdvp.register(one_site_tdvp_complex_cuda)
-    one_site_tdvp.register(multiset_one_site_tdvp_complex_cuda)
+    OneSiteTDVP.register(one_site_tdvp_complex_cuda)
+    OneSiteTDVP.register(multiset_one_site_tdvp_complex_cuda)
 
 
-class subspace_expansion_tdvp(tdvp):
+class SubspaceExpansionTDVP(TDVP):
     """The base class for all subspace expansion based tdvp implementations.  This set of implementations
     allows for adaptive growth of the bond dimensions used throughout the tensor network throughout the
     optimisation process.  In order to do this, the code uses two metrics:
@@ -347,7 +346,7 @@ class subspace_expansion_tdvp(tdvp):
         subspace_neigs: int = 2,
         num_threads: int = 1,
         nstep: int = 1
-    ) -> "subspace_expansion_tdvp":
+    ) -> "SubspaceExpansionTDVP":
         """A factory method for constructing an object used for performing single set tdvp calculations
 
         :param A: Tree Tensor Network that the tdvp algorithm will act on
@@ -366,7 +365,7 @@ class subspace_expansion_tdvp(tdvp):
         :type nstep: (int, optional)
 
         :returns: The tdvp evaluation object
-        :rtype: subspace_expansion_tdvp
+        :rtype: SubspaceExpansionTDVP
         """
         if A.backend() != H.backend():
             raise RuntimeError(
@@ -462,10 +461,8 @@ class subspace_expansion_tdvp(tdvp):
         """The maximum bond dimension we can expand to through a subspace expansion step."""
         pass
 
-subspace_expansion_tdvp.register(multiset_one_site_tdvp_complex)
+SubspaceExpansionTDVP.register(multiset_one_site_tdvp_complex)
 if _cuda_import:
-    subspace_expansion_tdvp.register(multiset_one_site_tdvp_complex_cuda)
+    SubspaceExpansionTDVP.register(multiset_one_site_tdvp_complex_cuda)
 
-ms_tdvp_type = subspace_expansion_tdvp
-ms_tdvp = subspace_expansion_tdvp
-subspace_expansion_tdvp_type = subspace_expansion_tdvp
+tdvp = TDVP

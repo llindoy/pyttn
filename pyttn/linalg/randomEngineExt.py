@@ -55,13 +55,4 @@ RandomEngine.register(la.random_engine)
 if _cuda_import:
     RandomEngine.register(cula.random_engine)
 
-
-def random_engine(backend: str = "blas") -> RandomEngine:
-    """Create a new random engine object associated with a given linear algebra backend
-
-    :param backend: The backend to use for the created random engine object, defaults to "blas"
-    :type backend: str, optional
-    :return: The random engine object
-    :rtype: RandomEngine
-    """
-    return RandomEngine(backend=backend)
+random_engine = RandomEngine

@@ -10,9 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .orthogonalVectorExt import orthogonal_vector
+from .orthogonalVectorExt import OrthogonalVector, orthogonal_vector
 from .randomEngineExt import RandomEngine, random_engine
-from .sparseMatrixExt import CSR_Matrix, Diagonal_Matrix, Sparse_Matrix, csr_matrix
+from .sparseMatrixExt import CSRMatrix, DiagonalMatrix, SparseMatrix, csr_matrix, diagonal_matrix
 from .tensorExt import (
         Matrix,
         Tensor,
@@ -34,16 +34,18 @@ __all__ = [
         "tensor_4",
         "tensor",
         "csr_matrix",
+        "diagonal_matrix",
         "available_backends",
         "Vector",
         "Matrix",
         "Tensor3",
         "Tensor4",
         "Tensor",
-        "CSR_Matrix",
-        "Sparse_Matrix",
-        "Diagonal_Matrix",
-        "orthogonal_vector",
+        "CSRMatrix",
+        "SparseMatrix",
+        "DiagonalMatrix",
+        "OrthogonalVector",
+        "orthogonal_vector"
         "random_engine",
-        "RandomEngine"
+        "RandomEngine",
         ]

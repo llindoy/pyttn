@@ -170,4 +170,4 @@ if _cuda_import:
     if _real_ttn_import:
         product_operator.register(product_operator_real_cuda)
 
-product_operator_type = product_operator
+product_operator = product_operator

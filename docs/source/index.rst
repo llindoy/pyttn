@@ -39,15 +39,17 @@ If you publish working using pyTTN, please cite the paper
    `arXiv:2503.15460 <https://arxiv.org/abs/2503.15460>`__.
 
 .. code-block::
-   @misc{Lindoy2025,
-     title = {pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Network},
-     author = {Lindoy, Lachlan P. and Rodrigo-Albert, Daniel. and Rath, Yannic and Rungger, Ivan},
-     year = {2025},
-     eprint = {2503.15460}, 
-     primaryClass={quant-ph},
-     archivePrefix={arXiv}, 
-     url={https://arxiv.org/abs/2503.15460}
-   }
+    
+    @misc{Lindoy2025,
+        title = {pyTTN: An Open Source Toolbox for Open and Closed System Quantum Dynamics Simulations Using Tree Tensor Network},
+        author = {Lindoy, Lachlan P. and Rodrigo-Albert, Daniel. and Rath, Yannic and Rungger, Ivan},
+        year = {2025},
+        eprint = {2503.15460}, 
+        primaryClass={quant-ph},
+        archivePrefix={arXiv}, 
+        url={https://arxiv.org/abs/2503.15460}
+    }
+
 
 Installation:
 -------------

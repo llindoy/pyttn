@@ -12,21 +12,24 @@
 
 
 from .ntreeExt import ntree, ntreeNode, ntreeBuilder
-from .msttnExt import is_ms_ttn, ms_ttn, ms_ttn_type, multiset_ttn, multiset_ttn_type
-from .ttnExt import available_backends, is_ttn, ttn, ttn_type
-from .msttnSliceExt import is_ms_ttn_slice, ms_ttn_slice, ms_ttn_slice_type, multiset_ttn_slice, multiset_ttn_slice_type
+from .msttnExt import is_ms_ttn, msttn, ms_ttn, multiset_ttn, msttnNode, ms_ttn_node
+from .ttnExt import available_backends, is_ttn, ttn, ttnNode, ttnNodeData, ttn_node_data, ttn_node
+from .msttnSliceExt import is_ms_ttn_slice, ms_ttn_slice, multiset_ttn_slice, msttnSlice
 
 __all__: list[str] = [
         "ttn",
-        "ttn_type",
+        "ttnNode",
+        "ttnNodeData",
+        "ttn_node_data",
+        "ttn_node", 
         "ms_ttn",
-        "ms_ttn_type",
-        "multiset_ttn_type",
+        "msttn",
         "multiset_ttn",
         "ms_ttn_slice",
-        "ms_ttn_slice_type",
-        "multiset_ttn_slice_type",
         "multiset_ttn_slice",
+        "msttnSlice",
+        "msttnNode",
+        "ms_ttn_node",
         "ntree",
         "ntreeBuilder",
         "ntreeNode",

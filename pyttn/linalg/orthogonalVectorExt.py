@@ -26,7 +26,7 @@ except ImportError:
     __cuda_import = False
 
 
-class orthogonal_vector:
+class OrthogonalVector:
     @staticmethod
     def pad_random(a: Matrix, i: int, rng: RandomEngine) -> None:
         """Pad the columns of the matrix starting at row index i with random vectors that are set to be orthogonal to all
@@ -102,4 +102,6 @@ class orthogonal_vector:
         :type rng: RandomEngine
         """
 
-        return orthogonal_vector.pad_random(a, 0, rng)
+        return OrthogonalVector.pad_random(a, 0, rng)
+
+orthogonal_vector = OrthogonalVector

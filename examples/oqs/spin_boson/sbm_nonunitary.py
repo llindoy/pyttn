@@ -45,15 +45,15 @@ def run_first_step(sweep, A, h, dt, nstep=5, nscale=1e-5):
 def sbm_dynamics(alpha, wc, s, eps, delta, chi, L, K, dt, Lmin=None, beta=None, nstep=1, 
                  ofname="sbm_nonunitary.h5", degree=2, adaptive=True, spawning_threshold=2e-4, 
                  unoccupied_threshold=1e-4, nunoccupied=0, nbmax=2, nhilbmax=1024, method = "heom"):
-    r"""A function for setting up and running dynamics of the spin boson model using the non-unitary methods (HEOM or Pseudomode)
+    """A function for setting up and running dynamics of the spin boson model using the non-unitary methods (HEOM or Pseudomode)
     Here we consider a Hamiltonian of the form
 
     .. math::
-        \hat{H} = \frac{\epsilon}{2} \hat{\sigma}_z + \frac{\Delta}{2}\hat{\sigma}_x  + \sum_{k=1}^{N_b} \hat{\sigma}_z \left(\hat{a}_k^\dagger + \hat{a}_k \right) + \sum_{k=1}^{N_b} \omega_k \hat{a}_k^\dagger \hat{a}_k
+        \\hat{H} = \\frac{\\epsilon}{2} \\hat{\\sigma}_z + \\frac{\\Delta}{2}\\hat{\\sigma}_x  + \\sum_{k=1}^{N_b} \\hat{\\sigma}_z \\left(\\hat{a}_k^\\dagger + \\hat{a}_k \\right) + \\sum_{k=1}^{N_b} \\omega_k \\hat{a}_k^\\dagger \\hat{a}_k
 
     where the coupling constants and frequencies are obtained by discretising the continuous spectral density
     .. math::
-        J(\omega) = \frac{\pi}{2} \frac{\alpha}{\omega_c^{s-1}} \exp\left(-\frac{\omega}{\omega_c}\right)
+        J(\\omega) = \\frac{\\pi}{2} \\frac{\\alpha}{\\omega_c^{s-1}} \\exp\\left(-\\frac{\\omega}{\\omega_c}\\right)
 
 
     :param alpha: The Kondo parameter associated with the bath

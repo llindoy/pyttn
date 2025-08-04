@@ -50,8 +50,8 @@ try:
         :type K: int or None, optional
         :param nmax: The maximum number of poles to use in the AAA fit. (default: 100)
         :type nmax: int, optional
-        :param *args: Variable length argument list to be passed to the F function
-        :param **kwargs: Arbitrary keyword arguments to be passed to the F function
+        :param `*args`: Variable length argument list to be passed to the F function
+        :param `**kwargs`: Arbitrary keyword arguments to be passed to the F function
 
         :returns:
             - func - A function defining the rational function approximation
@@ -133,7 +133,7 @@ def ESPRIT_support_points(
 
     :param t: Either the support points or a key word used to generate the support points. (Default: "linear") This parameter can be either a
 
-        - list/np.ndarray: In this case the function simply returns these points as the support points ignoring all other inputs
+        - Union[list, np.ndarray]: In this case the function simply returns these points as the support points ignoring all other inputs
         - str: In this case the function generates points according to a rule using the user specified tmax, and Nt. Possible options for this argument are
 
             - linear: Use a linear set of grid points between wmin and wmax
@@ -165,7 +165,7 @@ class ESPRITDecomposition(CtExpFitDecomposition):
     :type K: int
     :param t: Either the support points orr a key word used to generate the support points.  For details see the ESPRIT_support_points function.  (Default: "linear")
     :type t: str or np.ndarray or list, optional
-    :param **kwargs: Keyword arguments to pass to ESPRIT_support_points
+    :param `**kwargs`: Keyword arguments to pass to ESPRIT_support_points
 
     Callable arguments:
 

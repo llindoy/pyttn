@@ -25,7 +25,7 @@ from pyttn.ttnpp import stateStr as __stateStr
 def stateStr(*args):
     """A function for constructing a separable state for state vector preparation
 
-    :param *args: A variable list for specifying the coefficient.  Valid options are
+    :param `*args`: A variable list for specifying the coefficient.  Valid options are
 
         - Default construct the stateStr
         - state (list[int]) - Construct separable state from a set of excitation indices
@@ -38,7 +38,7 @@ def stateStr(*args):
 def sepState(*args, dtype=np.complex128):
     """A function for constructing a separable state for state vector preparation
 
-    :param *args: A variable list for specifying the coefficient.  Valid options are
+    :param `*args`:`: A variable list for specifying the coefficient.  Valid options are
 
         - Default construct the sepState
         - state (list[int]) - Construct separable state from a set of excitation indices
@@ -62,7 +62,7 @@ def isSepState(state):
 def ket(*args, dtype=np.complex128):
     """A function for constructing a separable state for state vector preparation
 
-    :param *args: A variable list for specifying the coefficient.  Valid options are
+    :param `*args`: A variable list for specifying the coefficient.  Valid options are
 
         -  Default construct the ket
         - state (ket) - Construct ket from another ket

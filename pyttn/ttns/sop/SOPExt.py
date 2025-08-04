@@ -18,7 +18,7 @@ import numpy as np
 from pyttn.ttnpp import SOP_complex, multiset_SOP_complex, system_modes
 
 from .opdictExt import operator_dictionary
-from .sSOPExt import OP_type, sSOP
+from .sSOPExt import OPBase, sSOP
 
 try:
     from pyttn.ttnpp import SOP_real, multiset_SOP_real
@@ -38,7 +38,7 @@ class SOP(metaclass=ABCMeta):
     ) -> "SOP":
         """Factory function for constructing a sum-of-product compact string operator.
 
-        :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
+        :param `*args`: Variable length list of arguments. This function can handle two possible lists of arguments
 
             - N (int) - The number of modes of the SOP
             - N (int), label (str) - The number of modes of the SOP and a label for the SOP
@@ -150,7 +150,7 @@ class SOP(metaclass=ABCMeta):
     def insert(self, *args):
         """Insert a new n-body operator into the sum-of-product representation
 
-        :param *args: An input defining the n-boddy operator. Valid  options are:
+        :param `*args`: An input defining the n-boddy operator. Valid  options are:
 
             - coeff (Union[float, complex, np.float64, np.complex128]), pop (sPOP): Add a new sNBO defined by coeff*pop
             - term (sNBO): Add the specified n-body operator
@@ -215,12 +215,12 @@ class SOP(metaclass=ABCMeta):
 
     @abstractmethod
     def __add__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Add a symbolic operator type to the current SOP to obtain a SOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
@@ -228,12 +228,12 @@ class SOP(metaclass=ABCMeta):
 
     @abstractmethod
     def __radd__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Add the SOP object from an operator or number
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
@@ -241,12 +241,12 @@ class SOP(metaclass=ABCMeta):
 
     @abstractmethod
     def __iadd__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Add inplace a symbolic operator type to the current SOP to obtain a SOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
@@ -254,12 +254,12 @@ class SOP(metaclass=ABCMeta):
 
     @abstractmethod
     def __sub__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Subtract a symbolic operator type to the current SOP to obtain a SOP
 
         :param op: The operator to be subtracted to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
@@ -267,12 +267,12 @@ class SOP(metaclass=ABCMeta):
 
     @abstractmethod
     def __rsub__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Subtract the SOP object from an operator or number
 
         :param op: The operator to be subtracted to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
@@ -280,12 +280,12 @@ class SOP(metaclass=ABCMeta):
 
     @abstractmethod
     def __isub__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Subtract inplace a symbolic operator type to the current SOP to obtain a SOP
 
         :param op: The operator to be subtracted to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
@@ -310,7 +310,7 @@ class SOP(metaclass=ABCMeta):
         """Functions for inplace multiplyication of a SOP by a scalar or operator type.
 
         :param v: The object to multiply the SOP by
-        :type v: float | complex | np.float64 | np.complex128 | coeff | OP_type
+        :type v: float | complex | np.float64 | np.complex128 | coeff | OPBase
         :return: A sum-of-product operator type storing the result
         :rtype: SOP
         """
@@ -320,9 +320,6 @@ class SOP(metaclass=ABCMeta):
 SOP.register(SOP_complex)
 if _support_real_SOP:
     SOP.register(SOP_real)
-
-SOP_type = SOP
-
 
 class multiset_SOP(metaclass=ABCMeta):
     """A class for storing a compact multiset sum-of-product operator object."""
@@ -334,7 +331,7 @@ class multiset_SOP(metaclass=ABCMeta):
     ) -> "multiset_SOP":
         """Factory function for constructing a multiset sum-of-product compact string operator.
 
-        :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
+        :param `*args`: Variable length list of arguments. This function can handle two possible lists of arguments
 
             - nset( int), N (int) - The number of set variables, The number of modes of the SOP
             - nset( int), N (int), label (str) - The number of set varibles. The number of modes of the SOP and a label for the SOP
@@ -505,5 +502,4 @@ if _support_real_SOP:
     SOP.register(multiset_SOP_real)
 
 ms_SOP = multiset_SOP
-multiset_SOP_type = multiset_SOP
-ms_SOP_type = multiset_SOP
+ms_SOPBase = multiset_SOP

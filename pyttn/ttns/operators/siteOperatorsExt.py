@@ -124,14 +124,14 @@ class site_operator(metaclass=ABCMeta):
     ) -> "site_operator":
         """Factory function for constructing a one site operator.
 
-        :param *args: Variable length list of arguments. There are several valid options for the *args parameters.  If the optype variable is None the allowed options are
+        :param `*args`: Variable length list of arguments. There are several valid options for the `*args` parameters.  If the optype variable is None the allowed options are
 
             - Default construct the site operator object
             - site_op (:class:`ops.siteOp`) - Construct a new site_operator object from a siteOp object
             - site_op (:class:`site_operator`) - Construct a new site_operator object from the existing object
             - site_op (:class:`site_operator`) - Construct a new site_operator object from the existing object
             - op (:class:`sOP`), sysinf (:class:`system_modes`) - Construct a new site_operator from the string operator and system information
-            - op (:class:`sOP`), sysinf (:class:`system_modes`), opdict (operator_dictionary_real or operator_dictionary_complex) -  Construct a new site_operator from the string operator, system information and used defined operator dictionary.
+            - op (:class:`sOP`), sysinf (:class:`system_modes`), opdict (:class:`operator_dictionary`) -  Construct a new site_operator from the string operator, system information and used defined operator dictionary.
 
             Otherwise, if the optype variable has been set then the valid arguments are determined by the specified optype see opsExt.py for details.
 
@@ -143,7 +143,7 @@ class site_operator(metaclass=ABCMeta):
         :type dtype: {np.float64, np.complex128}, optional
         :param backend: The computational backend to use for the product operator  (Default: "blas")
         :type backend: {"blas", "cuda"}, optional
-        :param **kwargs: Additional keyword arguments. To construct the site_operator object.  Valid options:
+        :param `**kwargs`: Additional keyword arguments. To construct the site_operator object.  Valid options:
             
             - use_sparse (bool)
         """
@@ -166,9 +166,9 @@ class site_operator(metaclass=ABCMeta):
         :type op: sOP
         :param sysinf: The information about the system degrees of freedom
         :type sysinf: system_modes
-        :param *args: A variable length array of arguments: Valid options are:
+        :param `*args`: A variable length array of arguments: Valid options are:
 
-            - If no *args are provided construct using standard dictionaries
+            - If no `*args` are provided construct using standard dictionaries
             - opdict (:class:`operator_dictionary`): Construct site_operator using a user created operator dictionary.
        
         :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
@@ -203,7 +203,7 @@ class site_operator(metaclass=ABCMeta):
     def todense(self, *args) -> Matrix:
         """ Return the dens Matrix representation of this site operator
 
-        :param *args: A variable length list of arguments. 
+        :param `*args`: A variable length list of arguments. 
             - Either empty
             - Or containing a list[int] defining the dimension of each mode the operator acts on.
         """
@@ -283,7 +283,7 @@ class site_operator(metaclass=ABCMeta):
     @abstractmethod
     def apply(self, a: Union[Vector, Matrix], b: Union[Vector, Matrix]):
         """Compute the action of the operator on the object a and store the result in b
-            op*a = b
+          
         :param a: The object the operator should be applied on
         :type a: Union[Vector, Matrix]
         :param b: The result of the action of the operator on a (op@a)
@@ -317,4 +317,3 @@ if _cuda_import:
     if _real_ttn_import:
         site_operator.register(site_operator_real_cuda)
 
-site_operator_type = site_operator
