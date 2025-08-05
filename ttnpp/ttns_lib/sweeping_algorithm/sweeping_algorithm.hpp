@@ -369,7 +369,7 @@ namespace ttns
                     // time evolve the coefficient tensor and apply it to its parent
                     if (!A.is_root())
                     {
-                        // modify the l2r_core::evaluate routine to include subspace expansion of the child node
+                        // modify the apply routine to include subspace expansion of the child node
                         CALL_AND_HANDLE(A.decompose_up(orthog), "Failed to shift orthogonality down.");
                         CALL_AND_HANDLE(A.apply_to_node(orthog), "Failed to enforce orthogonality condition at node.");
                     }

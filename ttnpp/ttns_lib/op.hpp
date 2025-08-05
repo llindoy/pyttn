@@ -34,15 +34,23 @@ namespace ttns
         template <typename I1, typename I2>
         Op(const linalg::matrix<T, backend> &m, const std::vector<I1> &indices, const std::vector<I2> &dims)
         {
+            ASSERT(indices.size() > 0, "Failed to construct operator.  Must specify at least one index.");
             ASSERT(indices.size() == dims.size(), "Failed to construct operator the dimensions and indices arrays are not the same size.");
 
             std::set<I1> s(indices.begin(), indices.end());
             ASSERT(s.size() == indices.size(), "Failed to construct operator.  Repeated index.")
 
+            size_t index = indices[0];
+            for(size_t i = 1; i < indices.size(); ++i)
+            {
+                ASSERT(index < indices[i], "The op object requires indices to be specified in ascending order.");
+                index = indices[i];
+            }
+
             size_type prod = 1;
             for (size_type i = 0; i < dims.size(); ++i)
             {
-                ASSERT(dims[i] >= 0 && indices[i] >= 0, "Failed to constsruct object indicees or dims invalid.");
+                ASSERT(dims[i] > 0 && indices[i] >= 0, "Failed to construct object indicees or dims invalid.");
                 prod *= dims[i];
             }
             ASSERT(prod == m.shape(0) && prod == m.shape(1), "Dimensions array is not compatible with specified matrix.");
@@ -114,9 +122,35 @@ namespace ttns
 
         size_type ndim() const { return m_dims.size(); }
 
+        bool valid_parameters() const
+        {
+            if(m_indices.size() != m_dims.size()){return false;}
+
+            std::set<size_t> s(m_indices.begin(), m_indices.end());
+            if(s.size() != m_indices.size()){return false;}
+            ASSERT(s.size() == m_indices.size(), "Failed to construct operator.  Repeated index.");
+
+            size_t index = m_indices[0];
+            for(size_t i = 1; i < m_indices.size(); ++i)
+            {
+                if(index >= m_indices[i]){return false;}
+                index = m_indices[i];
+            }
+
+            size_type prod = 1;
+            for (size_type i = 0; i < m_dims.size(); ++i)
+            {
+                if(m_dims[i] < 1 ){return false;}
+                prod *= m_dims[i];
+            }
+            if(prod != m_op.shape(0) || prod != m_op.shape(1)){return false;}
+            return true;
+        }
+
         // function for converting the operator into a list of vector which when contracted together give this vector
         std::vector<linalg::tensor<T, 4, backend>> as_mpo(int nbmax = -1, real_type tol = -1) const
         {
+            ASSERT(this->valid_parameters(), "Failed to form mpo representation of op object. The op object is not correctly formed.")
             // setup the vector of rank 4 tensors that will store the result
             std::vector<linalg::tensor<T, 4, backend>> ret(m_dims.size());
 

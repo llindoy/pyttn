@@ -434,6 +434,31 @@ namespace ttns
         }
 
     public:
+        //resize a bond of the tensor zeroing the tensor
+        void resize_bond(size_type mode, size_type size)
+        {
+            try
+            {
+                auto atens = this->as_rank_3(mode);
+                if (mode == this->nmodes())
+                {
+                    this->resize(size, this->dims());
+                }
+                else
+                {
+                    auto dims = this->dims();
+                    dims[mode] = size;
+                    this->resize(this->hrank(), dims);
+                }
+                this->as_matrix().fill_zeros();
+            }
+            catch (const std::exception &ex)
+            {
+                std::cerr << ex.what() << std::endl;
+                RAISE_EXCEPTION("Failed to expand tensor.");
+            }
+        }
+
         std::array<size_t, 3> expand_bond(size_type mode, size_type iadd, matrix_type &temp)
         {
             try
@@ -1064,6 +1089,41 @@ namespace ttns
 
             bool is_initialised() const { return m_initialised; }
 
+        public:
+            //some functions added for handling decompositions of a general matrix
+            void resize(const matrix_type& mat)
+            {
+                try
+                {
+                    size_type maxcapacity = mat.capacity();
+                    if(m_workspace.capacity() < maxcapacity)
+                    {
+                        m_workspace.reallocate(maxcapacity);
+                        m_U.reallocate(maxcapacity);
+                    }
+                    if(m_R.capacity() < maxcapacity)
+                    {
+                        m_R.reallocate(maxcapacity);
+                    }
+                    if(m_S.capacity() < maxcapacity)
+                    {
+                        m_S.reallocate(maxcapacity);
+                    }
+                    m_ortho_engine.resize(mat);
+                }
+                catch (const std::exception &ex)
+                {
+                    std::cerr << ex.what() << std::endl;
+                    RAISE_EXCEPTION("Failed to resize the decomposition engine object to handle matrix.");
+                }
+            }
+
+            size_type decompose(matrix_type& mat, real_type tol = real_type(-1), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation)
+            {
+                CALL_AND_RETHROW(this->resize(mat));
+                CALL_AND_HANDLE(return m_ortho_engine(mat, m_U, m_R, m_S, tol, nchi, rel_truncate, trunc_mode, false), "Failed to compute decomposition of tensor.");
+            }
+        public:
             template <typename tree>
             void init(tree &nodes)
             {

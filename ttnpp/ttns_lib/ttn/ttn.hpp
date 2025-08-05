@@ -477,50 +477,123 @@ namespace ttns
         }
 
     protected:
-        /*
-        void shift_dangling_bond_up(linalg::tensor<T, 3, backend>& Top, linalg::tensor<T, 4, backend>& temp, linalg::tensor<T, 4, backend>& temp2, size_type curr, size_type prev, real_type tol = real_type(0), size_type nchi=0)
+        void shift_dangling_bond_up(linalg::tensor<T, 3, backend>& Top, linalg::tensor<T, 4, backend>& temp, linalg::tensor<T, 5, backend>& temp2, size_type curr, size_type prev, real_type tol = real_type(0), size_type nchi=0)
         {
-            //get the parent tensor as a rank 3 tensor with the bond connecting the curr and prev sites separated off
-            auto ap = m_nodes[curr]().as_rank_3(m_nodes[prev].child_id());
+            //here we are in the position
+            //                dangling bond (1)
+            //                       |
+            // primitive mode (0) - Top - upwards bond (2) - node[curr]
+            //
+            // and we want to shift the dangling bond from Top node[curr].  To do this we contract Top into node[curr] (a two-site step)
+            // then after some reordering perform an svd to break the system back down to the form
+            //                                                    dangling bond (1)
+            //                                                          |
+            // primitive mode (0) - node[prev] - upwards bond (1) - node[curr] - upwards bond(2)
+            //
 
-            //contract T up into the ap tensor along the bond
-            temp = linalg::tensordot(ap, Top, {1}, {0});
+            //get the parent tensor as a rank 3 tensor with the bond connecting the curr and prev sites separated off as index 1
+            //all downward pointing nodes to the left of it are absorbed into index 0, and all to the right of this index are 
+            //absorbed into index 2
+            auto ac = m_nodes[curr]().as_rank_3(m_nodes[prev].child_id());
+            size_t hrank = m_nodes[curr]().hrank();
 
-            //now we swap the last two indices of the temp array into temp2
-            temp2 = linalg::transpose(temp, {0, 1, 3, 2});
+            //contract T up into the ap tensor along the bond.  This gives the resultant tensor of the form
+            //                  dangling bond (1)
+            //                         |
+            //   primitive mode (0) - temp - left indices (2)
+            //                         |
+            //                      right and up indices(3)
+            CALL_AND_HANDLE(temp = linalg::tensordot(Top, ap, {2}, {1}), "Failed to contract the node with a dangling bond into its parent node");
 
-            auto d = temp2.shape();
+            auto d = temp.shape();
 
-            //now get a matrix representation of this tensor
-            auto mtemp = temp2.reinterpret_shape(d[0]*d[1]*d[2], d[3]);
+            //now reshaping this as a matrix compressing bonds 1,2,3 into a single one we can svd
+            auto temp_mat = temp.reinterpret_shape(d[0], d[1]*d[2]*d[3]);
+            
+            //and performing the svd on this matrix to split it into the left tensor and the remainder
+            size_t bond_dimension = 0;
+            CALL_AND_HANDLE(bond_dimension = m_orthog.decompose(temp_mat, tol, nchi), "Failed to decompose mode");
 
-            //U*S becomes the new parent tensor which we store in Top and V^\dagger becomes the child tensor which we put
-            //into the tensor network
+            //now we can resize the previous tensor and current tensor
+            m_nodes[prev]().resize_bond(m_nodes[prev].nmodes(), bond_dimension);
+            m_nodes[curr]().resize_bond(m_nodes[prev].child_id(), bond_dimension);
+
+            //and set the previous tensor
+            m_nodes[prev]().as_matrix() = m_orthog.U();
+
+            //now we resize the R matrix
+            //                  dangling bond (1)
+            //                      |
+            //   lower bond (0) -   R - left indices (2)
+            //                   /    \
+            //      right indices(3)   up indices (4)      
+            // and reshape it so that it is in the form of the Top object that is move the downward pointing indices to the left of the dangling bond.
+            auto r2 = m_orthog.R().reinterpret_shape(bond_dimension, d[1], d[2], d[3]/hrank, hrank);
+            CALL_AND_HANDLE(temp2 = linalg::transpose(r2, {2, 0, 3, 1, 4}), "Failed to transpose the resultant tensor");
+            Top = temp2.reinterpret_shaped(d[2]*bond_dimension*d[3]/hrank, d[1], hrank);
         }
 
-        void shift_dangling_bond_down(linalg::tensor<T, 3, backend>& Top, linalg::tensor<T, 4, backend>& temp, linalg::tensor<T, 4, backend>& temp2, size_type curr, size_type prev, real_type tol = real_type(0), size_type nchi=0)
+        void shift_dangling_bond_down(linalg::tensor<T, 3, backend>& Top, linalg::tensor<T, 4, backend>& temp, linalg::tensor<T, 5, backend>& temp2, size_type curr, size_type prev, real_type tol = real_type(0), size_type nchi=0)
         {
-            //get the parent tensor as a rank 3 tensor with the bond connecting the curr and prev sites separaetd off
-            auto ap = m_nodes[prev]().as_rank_3(m_nodes[curr].child_id());
-            auto d = ap.shape();
+            //here we are in the position that Top contains the matrix
+            //                dangling bond (1)
+            //                       |
+            // primitive mode (0) - Top - upwards bond (2) 
+            //
+            //with one of the primitive mode indices connecting to the current active mode.  We need to start by resizing the Top object 
+            //so that it is a suitable shape to apply to the current node 
 
-            //now use this object to appropriately resize the Top matrix noting that the first 2 indices of T
-            //have the same shape as ap and the final index of T is the one we aim to transfer
-            auto Tt = Top.reinterpret_shape(d[0], d[1], d[2], Top.shape(2));
+            auto ptensor = m_nodes[prev]().as_rank_3(m_nodes[curr].child_id());
+            auto d = ptensor.shape();
+            auto& ap = m_nodes[curr]().as_matrix();
+            size_t hrank = ap.shape(1);
 
-            //now contract the second index of Tt into the child node of this and reshape this so that we
-            temp = linalg::tensordot(Tt, m_nodes[curr], {1}, {0});
+            //split the tensor so that it is left downwards pointing bonds. Active bond.  right downward pointing bond.  dangling bond, upward bond.
+            auto rTop = Top.reinterpret_shape(d[0], d[1], d[2]/hrank, Top.shape(1), hrank);
+            CALL_AND_HANDLE(temp2 = linalg::tensordot(ap, rTop, {1}, {1}), "Failed to contract the node with a dangling bond into its parent node");
 
-            //now we swap the last two indices of the temp array into temp2
-            temp2 = linalg::transpose(temp, {0, 1, 3, 2});
+            //temp2 now contains the rank 5 tensor obtained by contracting the active node into the node with the dangling bond.
+            //                    prev node left (1)
+            //                          |
+            //   curr_node_down (0) - temp2 - prev node right (2)
+            //                       /    \
+            //         dangling node (3)   prev node up (4)     
+            //combine the prev node left and right bonds
+            auto rtemp2 = temp2.reinterpret_shape(ap.shape(0), d[0]*d[2]/hrank, Top.shape(1), hrank)
+            
+            //now transpose the object so that we swap the dangling mode and prev node indices.  Additionally we transpose all
+            //arrays to make sure the decomposition in the next step puts the unitary matrix on the correct node
+            CALL_AND_HANDLE(temp = linalg::transpose(rtemp2, {3, 1, 2, 0}), "Failed to transpose intermediate array");
+            auto d2 = temp.shape();
+            //now we get a matrix representation of the 
+            auto temp_mat = temp.reinterpret_shape(d2[0]*d2[1], d2[2]*d2[3]);
 
-            auto d2 = temp2.shape();
+            //and performing the svd on this matrix to split it into the left tensor and the remainder
+            size_t bond_dimension = 0;
+            CALL_AND_HANDLE(bond_dimension = m_orthog.decompose(temp_mat, tol, nchi), "Failed to decompose mode");      
 
-            //now get the correct matrix representation of this tensor
-            auto mtemp = temp2.reinterpret_shape(d2[0]*d2[1], d2[2]*d2[3]);
+            //now we resize the U matrix to get the following rank 4 tensor
+            //         prev node left (1)
+            //               |
+            //   chi (3) - temp2  - prev node up (0)
+            //               |    
+            //       prev node right (2)           
+            // and reshape it so that it is in the form of the Top object that is move the downward pointing indices to the left of the dangling bond.
+            m_nodes[prev]().resize_bond(m_nodes[curr].child_id(), bond_dimension);
+            m_nodes[curr]().resize_bond(m_nodes[curr].nmodes(), bond_dimension);
+            auto rtemp = m_orthog.U().reinterpret_shape(hrank, d[0], d[2]/hrank, bond_dimension);
 
-            //U becomes the new parent tensor which we store in the parent tensor and SV^\dagger becomes
-            //the child tensor which we put into T
+            //now we want this to be prev node left, chi, prev node right, prev node up
+            CALL_AND_HANDLE(temp = linalg::transpose(rtemp, {1, 3, 2, 0}), "Failed to resize the parent matrix into the correct shape")
+            auto d3 = temp.shape();
+            CALL_AND_HANDLE(m_nodes[prev]().as_matrix() = temp.reinterpret_shape(d3[0]*d3[1]*d3[2], d3[3]), "Failed to set parent matrix.");
+
+            //now we resize and set the R matrix into Top.  By first reshaping it to a rank 3 tensor of the form
+            //        curr_node_down (1)
+            //             |
+            //   chi (0) - R  - dangling bond (2)
+            auto Top2 = m_orthog.R().reintepret_shape(bond_dimension, d2[2], d2[3]);
+            CALL_AND_HANDLE(Top = linalg::transpose(Top2, {1, 2, 0}), "Failed to transpose result array.");
         }
 
         //a function used for evaluating the action of a MPO like tensor network on the ttn.
@@ -537,7 +610,7 @@ namespace ttns
             //before performing a reshape and svd to shift the dangling bond along this pathway.
             size_type prev = 0;
             linalg::tensor<T, 4, backend> temp;
-            linalg::tensor<T, 4, backend> temp2;
+            linalg::tensor<T, 5, backend> temp2;
 
             for(size_type i : path)
             {
@@ -573,13 +646,40 @@ namespace ttns
 
         //a function for applying a two-body operator to a tensor network.  The implementation provided here
         //performs this contraction using a two site approach
-        void _apply_two_body_operator(const linalg::tensor<T, 3, backend>& A, const linalg::tensor<T, 3, backend>& B, size_type i1, size_type i2, real_type tol = real_type(0), size_type nchi=0)
+        void _apply_two_body_operator(const linalg::tensor<T, 4, backend>& _A, const linalg::tensor<T, 4, backend>& _B, size_type i1, size_type i2, real_type tol = real_type(0), size_type nchi=0)
         {
-            CALL_AND_HANDLE(this->set_orthogonality_centre(i1), "Failed to apply one body operator.  Failed to shift orthogonality centre.");
+            if(_A.shape(0) != 1 || _B.shape(3) != 1)
+            {
+                RAISE_EXCEPTION("Failed to apply two body operator.  Internal buffers are not the correct shape")
+            }
+            auto A = _A.reinterpret_shape(_A.shape(1), _A.shape(2), _A.shape(3));
+            auto B = _B.reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
+
+            size_t li1 = this->get_leaf_index(i1);
+            size_t li2 = this->get_leaf_index(i2);
+
+            CALL_AND_HANDLE(this->set_orthogonality_centre(li1), "Failed to apply two body operator.  Failed to shift orthogonality centre.");
+
+            //now apply the A operator to node li1.  This leaves us with an indexing of the form
+            //                                      dangling bond (1)
+            //                                           |
+            //    primitive_degree of freedom (0) - active_tensor - upward pointing bond (2)
+            linalg::tensor<T, 3, backend> active_tensor;
+            CALL_AND_HANDLE(active_tensor = linalg::tensordot(A, m_nodes[li1]().as_matrix(), {1}, {0}), "Failed to apply two body operator.  Failed to apply operator mpo to tensor.")
+
+            //and shift the dangling bond along the path connecting it to li2
+            CALL_AND_HANDLE(this->shift_dangling_bond(active_tensor, li1, li2, tol, nchi), "Failed to shift dangling bond position through TN");
+
+            //now finally contract the li2 tensor with the B tensor to store its new result
+            //We currently have a tensor at node Li2 of the form.  That needs to be contracted with Li2.  This requires a contraction over both the primitive and dangling nodes
+            //                dangling bond (1)
+            //                       |
+            // primitive mode (0) - Top - upwards bond (2) 
+            CALL_AND_HANDLE(m_nodes[li2]().as_matrix() = linalg::tensor_dot(B, active_tensor, {0, 2}, {1, 0}), "Failed to compute final contraction");
         }
-        */
-    size_type nthreads() const { return 1; }
-    void set_nthreads(size_t ) const{}
+        
+        size_type nthreads() const { return 1; }
+        void set_nthreads(size_t ) const{}
 
     public:
         ttn &apply_product_operator(product_operator<T, backend> &op, bool shift_orthogonality = true)
@@ -680,6 +780,8 @@ namespace ttns
             }
             else if (op.ndim() == 2)
             {
+                auto opmpo = op.as_mpo();
+                CALL_AND_RETHROW(_apply_two_body_operator(op_mpo[0], op_mpo[1], m_leaf_indices[op.indices()[0]], m_leaf_indices[op.indices()[1]], tol, nchi));
             }
             else
             {
