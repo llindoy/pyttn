@@ -10,21 +10,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 from typing import Union
 
+from pyttn.ttnpp import (
+    ms_ttn_complex,
+    multiset_SOP_complex,
+    multiset_sop_operator_complex,
+    system_modes,
+)
 from pyttn.ttns.sop.SOPExt import multiset_SOP
 from pyttn.ttns.ttns.msttnExt import multiset_ttn
-from pyttn.ttnpp import system_modes
-
-from pyttn.ttnpp import multiset_sop_operator_complex
-from pyttn.ttnpp import ms_ttn_complex
-from pyttn.ttnpp import multiset_SOP_complex
 
 try:
-    from pyttn.ttnpp import multiset_sop_operator_real
-    from pyttn.ttnpp import ms_ttn_real
-    from pyttn.ttnpp import multiset_SOP_real
+    from pyttn.ttnpp import ms_ttn_real, multiset_sop_operator_real, multiset_SOP_real
 
     _real_ttn_import = True
 
@@ -34,19 +33,19 @@ except ImportError:
 
 # and attempt to import the cuda backend
 try:
+    from pyttn.ttnpp.cuda import ms_ttn_complex as ms_ttn_complex_cuda
     from pyttn.ttnpp.cuda import (
         multiset_sop_operator_complex as multiset_sop_operator_complex_cuda,
     )
-    from pyttn.ttnpp.cuda import ms_ttn_complex as ms_ttn_complex_cuda
 
     _cuda_import = True
 
     # and if we have imported real ttns we import the cuda versions
     if _real_ttn_import:
+        from pyttn.ttnpp.cuda import ms_ttn_real as ms_ttn_real_cuda
         from pyttn.ttnpp.cuda import (
             multiset_sop_operator_real as multiset_sop_operator_real_cuda,
         )
-        from pyttn.ttnpp.cuda import ms_ttn_real as ms_ttn_real_cuda
 
 
 except ImportError:
@@ -111,7 +110,7 @@ class multiset_sop_operator(metaclass=ABCMeta):
         :type A: multiset_ttn
         :param sysinf: The composition of the system defining the default dictionary to be considered for each node
         :type sysinf: system_modes
-        :type *args: Variable length list of arguments. Valid options are
+        :type `*args`: Variable length list of arguments. Valid options are
 
             - Empty: Build the multiset sum-of-product operator using the default operator dictionaries
             - opdict (:class:`operator_dictionary`): Build the multiset sum-of-product operator using a user defined operator dictionary
@@ -137,7 +136,8 @@ class multiset_sop_operator(metaclass=ABCMeta):
             return _multiset_sop_operator_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError("Invalid backend type for multiset_sop_operator")
-
+        
+    @abstractmethod
     def initialise( 
         self, op: multiset_SOP, sysinf: system_modes, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,
     ) -> None:
@@ -149,7 +149,7 @@ class multiset_sop_operator(metaclass=ABCMeta):
         :type A: multiset_ttn
         :param sysinf: The composition of the system defining the default dictionary to be considered for each node
         :type sysinf: system_modes
-        :type *args: Variable length list of arguments. Valid options are
+        :type `*args`: Variable length list of arguments. Valid options are
 
             - Empty: Build the multiset sum-of-product operator using the default operator dictionaries
             - opdict (:class:`operator_dictionary`): Build the multiset sum-of-product operator using a user defined operator dictionary
@@ -165,7 +165,7 @@ class multiset_sop_operator(metaclass=ABCMeta):
         """
         pass
 
-
+    @abstractmethod
     def assign(self, o: "multiset_sop_operator"):
         """Assign the value of the multiset sum-of product product operator from another
 
@@ -174,14 +174,17 @@ class multiset_sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the multiset sum-of-product operator object"""
         pass
 
+    @abstractmethod
     def __deepcopy__(self, memo):
         """Function implementing deep copy of the multiset sum-of-product operator object"""
         pass
 
+    @abstractmethod
     def Eshift(self, i: int, j: int) -> Union[float, complex]:
         """Return the value of the energy shift associated with the [i, j]th term of the multiset_sop_operator
 
@@ -194,10 +197,12 @@ class multiset_sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def clear(self):
         """Clear and deallocate all internal buffers of the multiset_sop_operator"""
         pass
 
+    @abstractmethod
     def update(self, mode: int, t: float, dt: float):
         """Update the operators associated with mode mode so that they store their value at time t.
         Additionally, this takes the time-step allowing for the use of average timestep expressions
@@ -211,6 +216,7 @@ class multiset_sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def nset(self) -> int:
         """
         :returns: The number of set multiset sum-of-product operator
@@ -218,6 +224,7 @@ class multiset_sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def nmodes(self) -> int:
         """
         :returns: The number of modes the multiset sum-of-product operator acts on
@@ -225,6 +232,7 @@ class multiset_sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def complex_dtype(self) -> bool:
         """Returns whether or not the multiset_sop_operator is storing a complex valued dtype
 
@@ -233,6 +241,7 @@ class multiset_sop_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def backend(self) -> str:
         """Returns the backend type of the multiset_sop_operator
 
@@ -251,5 +260,3 @@ if _cuda_import:
         multiset_sop_operator.register(multiset_sop_operator_real_cuda)
 
 ms_sop_operator = multiset_sop_operator
-ms_sop_operator_type = multiset_sop_operator
-multiset_sop_operator_type = multiset_sop_operator

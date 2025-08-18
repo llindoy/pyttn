@@ -10,19 +10,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Callable, Optional, Union
+
 import numpy as np
 import scipy as sp
-from typing import Callable, Optional, Union
-from .bath import Bath
-from ..bath_fitting import (
-    ExpFitDecomposition,
-    CtExpFitDecomposition,
-    SwExpFitDecomposition,
-    BathDiscretisation,
-    PoleDecomposition
-)
 
-from pyttn.ttns import OP_type
+from pyttn.ttns import OPBase
+
+from ..bath_fitting import (
+    BathDiscretisation,
+    CtExpFitDecomposition,
+    ExpFitDecomposition,
+    PoleDecomposition,
+    SwExpFitDecomposition,
+)
+from .bath import Bath
 
 
 def evaluate_bosonic_bath_correlation_function(
@@ -126,7 +128,7 @@ class BosonicBath(Bath):
     :param Jw: The bath spectral function defining the non-interacting correlation function
     :type Jw: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]]
     :param S: The system operator
-    :type S: OP_type, optional
+    :type S: OPBase, optional
     :param beta: The inverse temperature of the bath, defaults to None
     :type beta: float, optional
     :param wmax: the maximum frequency bound, defaults to np.inf
@@ -138,7 +140,7 @@ class BosonicBath(Bath):
     def __init__(
         self,
         Jw: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]],
-        S: Optional[OP_type] = None,
+        S: Optional[OPBase] = None,
         beta: Optional[float] = None,
         wmax: float = np.inf,
         wmin: Optional[float] = None,
@@ -197,11 +199,11 @@ class BosonicBath(Bath):
         limit: int = 2000,
         epsomega: float = 1e-6,
     ) -> Union[np.ndarray, complex]:
-        r"""Returns the value of the non-interacting bath correlation function evaluated at the time points t,
+        """Returns the value of the non-interacting bath correlation function evaluated at the time points t,
         defined by:
 
         .. math::
-            C(t) = \frac{1}{2\pi}\int_{\omega_{\mathrm{min}}}^{\omega_{\mathrm{max}}} J(\omega) (\coth(\beta\omega/2)+1) \exp(- i \omega t)
+            C(t) = \\frac{1}{2\\pi}\\int_{\\omega_{\\mathrm{min}}}^{\\omega_{\\mathrm{max}}} J(\\omega) (\\coth(\\beta\\omega/2)+1) \\exp(- i \\omega t)
 
         For array valued t the function returns an array containing the bath correlation function at all points. 
         For scalar valued t the function returns the complex valued correlation function at that point.
@@ -274,9 +276,11 @@ class BosonicBath(Bath):
 
 
     def Sw(self, w: Union[np.ndarray, float]) -> Union[np.ndarray, float]:
-        r"""Returns the non-interacting bath spectral function at w
+        """Returns the non-interacting bath spectral function at w
         .. math::
-            S(\omega) = J(\omega) \frac{(\coth(\beta\omega/2)+1)}{2}
+
+           S(\\omega) = J(\\omega) \\frac{(\\coth(\\beta\\omega/2)+1)}{2}
+
         :param w: frequency
         :type w: Union[np.ndarray, float]
 
@@ -292,7 +296,7 @@ class BosonicBath(Bath):
 
         :param discretisation_engine: An object defining how to discretise a continuous bath
         :type discretisation_engine: np.ndarray
-        :param **kwargs: Additional dictionary arguments that are currently not used by this function
+        :param `**kwargs`: Additional dictionary arguments that are currently not used by this function
 
         :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\\omega_k`
         :rtype: np.ndarray, np.ndarray
@@ -315,7 +319,7 @@ class BosonicBath(Bath):
 
         :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition
         :type fitting_engine: np.ndarray
-        :param **kwargs: Additional dictionary arguments used in the evaluation of the bath correlation if using a CtExpFitDecomposition
+        :param `**kwargs`: Additional dictionary arguments used in the evaluation of the bath correlation if using a CtExpFitDecomposition
 
         :return: Discrete system bath coupling constants :math:`g_k` and bath frequencies :math:`\\omega_k` and matsubara truncation term
         :rtype: np.ndarray, np.ndarray, Optional[complex]

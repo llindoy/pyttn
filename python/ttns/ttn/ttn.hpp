@@ -43,6 +43,7 @@ void init_ttn(py::module &m, const std::string &label)
      using siteop = site_operator<T, backend>;
      using prodop = product_operator<T, backend>;
      using sop = sop_operator<T, backend>;
+     using Optype = Op<T,backend>;
 
      using numpy_type = typename linalg::numpy_converter<T>::type;
 
@@ -65,15 +66,21 @@ void init_ttn(py::module &m, const std::string &label)
 
          .def("conj", &_ttn_node_data::conj)
          .def("nmodes", &_ttn_node_data::nmodes)
+         .def("__len__", &_ttn_node_data::nmodes)
+
          .def("hrank", &_ttn_node_data::hrank)
-         .def("dimen", &_ttn_node_data::dimen)
+         .def("nspf", &_ttn_node_data::hrank)
+
+         .def("dimen", &_ttn_node_data::dimen, py::arg("use_max_dim")=false)
          .def("dim", &_ttn_node_data::dim)
          .def("dims", &_ttn_node_data::dims)
          .def("set_dim", &_ttn_node_data::set_dim)
 
          .def("nelems", &_ttn_node_data::nelems)
          .def("nset", &_ttn_node_data::nset)
+
          .def("max_hrank", &_ttn_node_data::max_hrank)
+         .def("max_nspf", &_ttn_node_data::max_hrank)
          .def("max_dimen", &_ttn_node_data::max_dimen)
          .def("max_dim", &_ttn_node_data::max_dim)
          .def("max_dims", &_ttn_node_data::max_dims)
@@ -105,18 +112,22 @@ void init_ttn(py::module &m, const std::string &label)
          .def(py::init())
          .def("data", static_cast<_ttn_node_data &(_ttn_node::*)()>(&_ttn_node::operator()))
          .def("data", static_cast<const _ttn_node_data &(_ttn_node::*)() const>(&_ttn_node::operator()))
+         .def("__call__", static_cast<_ttn_node_data &(_ttn_node::*)()>(&_ttn_node::operator()))
+         .def("__call__", static_cast<const _ttn_node_data &(_ttn_node::*)() const>(&_ttn_node::operator()))         
          .def("is_root", &_ttn_node::is_root)
          .def("is_leaf", &_ttn_node::is_leaf)
          .def("complex_dtype", [](const _ttn_node &)
               { return !std::is_same<T, real_type>::value; })
          .def("conj", &_ttn_node::conj)
+         .def("nmodes", &_ttn_node::size)
          .def("__len__", &_ttn_node::size)
          .def("__str__", [](const _ttn_node &o)
               {std::ostringstream oss; oss << o; return oss.str(); })
 
          .def("child", [](_ttn_node &i, size_t ind)
               { return i.at(ind); }, py::return_value_policy::reference)
-
+         .def("__getitem__", [](_ttn_node &i, size_t ind)
+              { return i.at(ind); }, py::return_value_policy::reference)
          .def("__iter__", [](_ttn_node &s)
               { return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
          .def("backend", [](const _ttn_node &)
@@ -126,11 +137,22 @@ void init_ttn(py::module &m, const std::string &label)
      py::class_<_ttn>(m, (std::string("ttn_") + label).c_str())
          .def(py::init())
          .def(py::init<const _ttn &>())
+#ifdef BUILD_REAL_TTN
          .def(py::init<const ttn<real_type, backend> &>())
+#endif
 
+#ifdef PYTTN_BUILD_CUDA
+         .def(py::init<const ttn<T, otherbackend> &>())
+#ifdef BUILD_REAL_TTN
+         .def(py::init<const ttn<real_type, otherbackend> &>())
+#endif
+#endif
+
+#ifdef BUILD_REAL_TTN
          .def(py::init<const multiset_ttn_slice<real_type, backend, true> &>())
-         .def(py::init<const multiset_ttn_slice<T, backend, true> &>())
          .def(py::init<const multiset_ttn_slice<real_type, backend, false> &>())
+#endif
+         .def(py::init<const multiset_ttn_slice<T, backend, true> &>())
          .def(py::init<const multiset_ttn_slice<T, backend, false> &>())
 
          .def(py::init<const ntree<size_t> &, bool, bool>(), py::arg(), py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
@@ -143,12 +165,16 @@ void init_ttn(py::module &m, const std::string &label)
 
          .def("assign", &_ttn::template operator= <T, backend, true>)
          .def("assign", &_ttn::template operator= <T, backend, false>)
+
+#ifdef BUILD_REAL_TTN
          .def("assign", &_ttn::template operator= <real_type, backend, true>)
          .def("assign", &_ttn::template operator= <real_type, backend, false>, "For details see :meth:`pyttn.ttn_dtype.assign`")
          .def("assign", [](_ttn &o, const _ttn &i)
               { o = i; })
          .def("assign", [](_ttn &o, const ttn<real_type, backend> &i)
               { o = i; })
+#endif
+
          .def("__copy__", [](const _ttn &o)
               { return _ttn(o); })
          .def("__deepcopy__", [](const _ttn &o, py::dict)
@@ -276,7 +302,8 @@ void init_ttn(py::module &m, const std::string &label)
               { return i.at(ind)(); }, py::return_value_policy::reference, "For details see :meth:`pyttn.ttn_dtype.resize`")
          .def("node", [](_ttn &i, size_t ind) -> _ttn_node &
               { return i[ind]; }, py::return_value_policy::reference)
-         .def("site_tensor", static_cast<const _ttn_node_data &(_ttn::*)(size_t) const>(&_ttn::site_tensor), py::return_value_policy::reference, "For details see :meth:`pyttn.ttn_dtype.site_tensor`")
+         .def("site_tensor", [](_ttn &self, size_t i)
+              { CALL_AND_HANDLE(return self.site_tensor(i).as_matrix(), "Failed to return site tensor.");}, py::return_value_policy::reference, "For details see :meth:`pyttn.ttn_dtype.site_tensor`")
 #ifdef PYTTN_BUILD_CUDA
          .def("set_site_tensor", [](_ttn &self, size_t i, const linalg::matrix<T, otherbackend> &mat)
               { CALL_AND_HANDLE(self.site_tensor(i).as_matrix() = mat, "Failed to set site tensor."); })
@@ -347,6 +374,8 @@ void init_ttn(py::module &m, const std::string &label)
               { CALL_AND_RETHROW(return o.apply_one_body_operator(op, index, shift_orthogonality)); }, py::arg(), py::arg(), py::arg("shift_orthogonality") = true, "For details see :meth:`pyttn.ttn_dtype.rapply_one_body_operator`")
          .def("apply_product_operator", [](_ttn &o, prodop &op, bool shift_orthogonality)
               { CALL_AND_RETHROW(return o.apply_product_operator(op, shift_orthogonality)); }, py::arg(), py::arg("shift_orthogonality") = true, "For details see :meth:`pyttn.ttn_dtype.apply_product_operator`")
+         .def("apply_operator", [](_ttn &o, Optype &op, real_type tol, size_t nchi)
+              {CALL_AND_RETHROW(return o.apply_operator(op, tol, nchi));}, py::arg(), py::arg("tol")=-1.0, py::arg("nchi")=0)
          .def("apply_operator", [](_ttn &o, siteop &op, bool shift_orthogonality)
               { CALL_AND_RETHROW(return o.apply_operator(op, shift_orthogonality)); }, py::arg(), py::arg("shift_orthogonality") = true)
          .def("apply_operator", [](_ttn &o, prodop &op, bool shift_orthogonality)
@@ -354,6 +383,8 @@ void init_ttn(py::module &m, const std::string &label)
 
          .def("__imatmul__", [](_ttn &o, siteop &op)
               { CALL_AND_RETHROW(return o.apply_one_body_operator(op)); })
+         .def("__imatmul__", [](_ttn &o, Optype &op)
+              { CALL_AND_RETHROW(return o.apply_operator(op)); })
          .def("__imatmul__", [](_ttn &o, prodop &op)
               { CALL_AND_RETHROW(return o.apply_operator(op)); })
          .def("__imatmul__", [](_ttn &o, sop &op)
@@ -367,6 +398,10 @@ void init_ttn(py::module &m, const std::string &label)
               {
                     _ttn i(o);
                     CALL_AND_RETHROW(return i.apply_one_body_operator(op)); })
+         .def("__rmatmul__", [](const _ttn &o, Optype &op)
+              {
+                    _ttn i(o);
+                    CALL_AND_RETHROW(return i.apply_operator(op)); })
          .def("__rmatmul__", [](const _ttn &o, prodop &op)
               {
                     _ttn i(o);

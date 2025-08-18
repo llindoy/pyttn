@@ -10,16 +10,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+import argparse
 import os
 os.environ['OMP_NUM_THREADS']='1'
 
-import numpy as np
-import argparse
 import h5py
+import numpy as np
 from numba import jit
 
 import pyttn
 from pyttn import oqs
+
+
 
 def output_results(ofname, t, n_u, n_d, n_ud, maxchi):
     h5 = h5py.File(ofname, "w")
@@ -151,10 +153,7 @@ def siam_dynamics(Nb, Gamma, W, epsd, deps, U, chi, dt, chiU = None, beta = None
         sweep.use_time_dependent_hamiltonian = True
 
     maxchi = np.zeros(nstep+1)
-    results = []
-    for i in range(len(ops)):
-        results.append(np.zeros(nstep+1))
-
+    results = [np.zeros(nstep+1) for _ in range(len(ops))]
 
     t = np.arange(nstep+1)*dt
 

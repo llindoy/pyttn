@@ -10,27 +10,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Callable, Optional, Union
+
 import numpy as np
-from typing import Optional, Callable, Union
+
+from pyttn.ttns import OPBase
 
 from ..spectral_density import CorrelatedSpectralDensity
 from .bosonic_bath import BosonicBath
 from .correlated_bosonic_bath import CorrelatedBosonicBath
-from .fermionic_bath import FermionicBath
-
 from .discretised_bath import (
     DiscreteBosonicBath,
     DiscreteFermionicBath,
     DiscreteOQSBath,
 )
 from .discretised_correlated_bath import DiscreteCorrelatedBosonicBath
-
-from pyttn.ttns import OP_type
+from .fermionic_bath import FermionicBath
 
 
 def bosonic_bath(
     Jw: Union[Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]], CorrelatedSpectralDensity],
-    S: Optional[Union[OP_type, list[OP_type]]] = None,
+    S: Optional[Union[OPBase, list[OPBase]]] = None,
     beta: Optional[float] = None,
     wmax: float = np.inf,
     wmin: Optional[float] = None,
@@ -40,7 +40,7 @@ def bosonic_bath(
     :param Jw: The bath spectral function defining the non-interacting correlation function
     :type Jw: Union[Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]], CorrelatedSpectralDensity]
     :param S: The system operator
-    :type S: OP_type, optional
+    :type S: OPBase, optional
     :param beta: The inverse temperature of the bath, defaults to None
     :type beta: float, optional
     :param wmax: the maximum frequency bound, defaults to np.inf
@@ -64,8 +64,8 @@ def bosonic_bath(
 
 def fermionic_bath(
     Jw: Union[Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]], CorrelatedSpectralDensity],
-    Sp: Optional[Union[OP_type, list[OP_type]]] = None,
-    Sm: Optional[Union[OP_type, list[OP_type]]] = None,
+    Sp: Optional[Union[OPBase, list[OPBase]]] = None,
+    Sm: Optional[Union[OPBase, list[OPBase]]] = None,
     beta: Optional[float] = None,
     wmax: float = np.inf,
     wmin: Optional[float] = None,
@@ -76,9 +76,9 @@ def fermionic_bath(
     :param Jw: The bath spectral function defining the non-interacting correlation function
     :type Jw: Union[Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]], CorrelatedSpectralDensity]
     :param Sp: The system raising operators
-    :type Sp: Optional[OP_type]
+    :type Sp: Optional[OPBase]
     :param Sm: The system raising operators
-    :type Sm: Optional[OP_type]
+    :type Sm: Optional[OPBase]
     :param beta: The inverse temperature of the bath, defaults to None
     :type beta: float, optional
     :param wmax: the maximum frequency bound, default to np.inf

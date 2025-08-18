@@ -10,11 +10,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from abc import ABCMeta, abstractmethod
 from typing import Union
-from abc import ABCMeta
+
 import numpy as np
 
 from pyttn.ttnpp import operator_dictionary_complex
+from pyttn.ttns.operators.siteOperatorsExt import site_operator
 
 try:
     from pyttn.ttnpp import operator_dictionary_real
@@ -24,15 +26,15 @@ except ImportError:
     _real_opdict = False
 
 
-class operator_dictionary(metaclass=ABCMeta):
+class OperatorDictionary(metaclass=ABCMeta):
     def __new__(
         cls,
         *args,
         dtype: Union[float, complex, np.float64, np.complex128] = np.complex128,
-    ) -> "operator_dictionary":
+    ) -> "OperatorDictionary":
         """Factory function for constructing a user defined operator dictionary.
 
-        :param *args: Variable length list of arguments.
+        :param `*args`: Variable length list of arguments.
         :param dtype: The dtype to use for the site operator.  (Default: np.complex128)
         :type dtype: {np.float64, np.complex128}, optional
 
@@ -46,34 +48,39 @@ class operator_dictionary(metaclass=ABCMeta):
             elif dtype == np.float64 or dtype is float:
                 return operator_dictionary_real(*args)
             else:
-                raise RuntimeError("Invalid dtype for operator_dictionary")
+                raise RuntimeError("Invalid dtype for OperatorDictionary")
 
         else:
             if dtype == np.complex128 or dtype is complex:
                 return operator_dictionary_complex(*args)
             else:
-                raise RuntimeError("Invalid dtype for operator_dictionary")
+                raise RuntimeError("Invalid dtype for OperatorDictionary")
 
-    def assign(self, o: "operator_dictionary"):
+    @abstractmethod
+    def assign(self, o: "OperatorDictionary"):
         """Assign the value of the operator dictionary from another
 
         :param o: The operator dictionary to copy into this one
-        :type o: operator_dictionary
+        :type o: OperatorDictionary
         """
         pass
 
+    @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the operator dictionary object"""
         pass
 
+    @abstractmethod
     def __deepcopy__(self, memo):
         """Function implementing deep copy of the operator dictionary object"""
         pass
 
+    @abstractmethod
     def clear(self):
         """Clear all internal storage used by the operator dictionary object"""
         pass
 
+    @abstractmethod
     def resize(self, size: int):
         """Resize the operator dictionary object so that it can describe a system with size modes
 
@@ -81,7 +88,8 @@ class operator_dictionary(metaclass=ABCMeta):
         :type size: int
         """
 
-    def __setitem__(self, mode: int, el: dict[str, "site_operator"]):
+    @abstractmethod
+    def __setitem__(self, mode: int, el: dict[str, 'site_operator']):
         """Set the operator dictionary for mode mode
 
         :param mode: The mode to be set
@@ -91,7 +99,8 @@ class operator_dictionary(metaclass=ABCMeta):
         """
         pass
 
-    def __getitem__(self, mode: int) -> dict[str, "site_operator"]:
+    @abstractmethod
+    def __getitem__(self, mode: int) -> dict[str, 'site_operator']:
         """Get the operator dictionary for mode mode
 
         :param mode: The mode to be set
@@ -101,7 +110,8 @@ class operator_dictionary(metaclass=ABCMeta):
         """
         pass
 
-    def site_dictionary(self, mode: int) -> dict[str, "site_operator"]:
+    @abstractmethod
+    def site_dictionary(self, mode: int) -> dict[str, 'site_operator']:
         """Get the operator dictionary for mode mode
 
         :param mode: The mode to be set
@@ -111,7 +121,8 @@ class operator_dictionary(metaclass=ABCMeta):
         """
         pass
 
-    def insert(self, mode: int, label: str, op: "site_operator"):
+    @abstractmethod
+    def insert(self, mode: int, label: str, op: 'site_operator'):
         """Insert the operator op with label label into the site operator dictionary associated with mode mode
 
         :param mode: The mode to consider
@@ -123,7 +134,8 @@ class operator_dictionary(metaclass=ABCMeta):
         """
         pass
 
-    def __call__(self, mode: int, label: str) -> "site_operator":
+    @abstractmethod
+    def __call__(self, mode: int, label: str) -> 'site_operator':
         """Return the operator with label label in the dictionary of mode mode
 
         :param mode: The mode to consider
@@ -135,6 +147,7 @@ class operator_dictionary(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __len__(self) -> int:
         """Returns the number of modes in the operator dictionary
 
@@ -143,6 +156,7 @@ class operator_dictionary(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def nmodes(self) -> int:
         """Returns the number of modes in the operator dictionary
 
@@ -151,6 +165,7 @@ class operator_dictionary(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __str__(self) -> str:
         """Return the string representation of the operator dictionary object
 
@@ -159,6 +174,7 @@ class operator_dictionary(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def backend(self) -> str:
         """Returns the backend type of the operator dictionary
 
@@ -168,9 +184,9 @@ class operator_dictionary(metaclass=ABCMeta):
         pass
 
 
-operator_dictionary.register(operator_dictionary_complex)
+OperatorDictionary.register(operator_dictionary_complex)
 if _real_opdict:
-    operator_dictionary.register(operator_dictionary_real)
+    OperatorDictionary.register(operator_dictionary_real)
 
 
-operator_dictionary_type = operator_dictionary
+operator_dictionary = OperatorDictionary

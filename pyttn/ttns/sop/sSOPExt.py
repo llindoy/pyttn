@@ -10,74 +10,79 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from abc import ABCMeta, abstractmethod
 from typing import Union
 
-from abc import ABCMeta
-from pyttn.ttnpp import sOP as _sOP
-from pyttn.ttnpp import sPOP as _sPOP
-from pyttn.ttnpp import (
-    sNBO_real,
-    sNBO_complex,
-    sSOP_real,
-    sSOP_complex,
-    coeff_real,
-    coeff_complex,
-)
 import numpy as np
 
+from pyttn.ttnpp import (
+    coeff_complex,
+    coeff_real,
+    sNBO_complex,
+    sNBO_real,
+    sSOP_complex,
+    sSOP_real,
+)
+from pyttn.ttnpp import sOP as _sOP
+from pyttn.ttnpp import sPOP as _sPOP
 
-class OP_type(metaclass=ABCMeta):
-    """Base class for all symbolic string operator types:
-    
-        - :class:`sOP`
-        - :class:`sPOP` 
-        - :class:`sNBO`
-        - :class:`sSOP`
-    """
 
-    pass
+class OPBase(metaclass=ABCMeta):
+    @abstractmethod
+    def __init__(self):
+        """Base class for all symbolic string operator types:
+        
+            - :class:`sOP`
+            - :class:`sPOP` 
+            - :class:`sNBO`
+            - :class:`sSOP`
+        """
+        pass
 
 
-class sOP(OP_type):
-    r"""The single site operator used for the string operator handling functionality of pyTTN.  This class allows for definition of
+class sOP(OPBase):
+    """The single site operator used for the string operator handling functionality of pyTTN.  This class allows for definition of
     a string label for an operator and the mode that the operator acts upon. In addition to allowing for arbitrary string labels
     with the combination of user defined operator dictionaries.  This code supports several automatic dictionaries depending on
     the type of mode considered.  These are
 
     Fermion Modes
 
-      - Annihilation operator :math:`\hat{c}` :  {"c", "a", "f"}
-      - Creation operator :math:`\hat{c}^\dagger` :  {"cdag", "adag", "fdag", "cd", "ad", "fd"}
-      - Number operator :math:`\hat{c}^\dagger\hat{c}` :  {"n", "cdagc", "adaga", "fdagf", "cdc", "ada", "fdf"}
-      - Vacancy operator :math:`1-\hat{c}^\dagger\hat{c}` :  "v"
+      - Annihilation operator :math:`\\hat{c}` :  {"c", "a", "f"}
+      - Creation operator :math:`\\hat{c}^\\dagger` :  {"cdag", "adag", "fdag", "cd", "ad", "fd"}
+      - Number operator :math:`\\hat{c}^\\dagger\\hat{c}` :  {"n", "cdagc", "adaga", "fdagf", "cdc", "ada", "fdf"}
+      - Vacancy operator :math:`1-\\hat{c}^\\dagger\\hat{c}` :  "v"
 
     Bosonic Modes
 
-      - Annihilation operator :math:`\hat{c}` :  {"c", "a", "b"}
-      - Creation operator :math:`\hat{c}^\dagger` :  {"cdag", "adag", "bdag", "cd", "ad", "bd"}
-      - Number operator :math:`\hat{c}^\dagger\hat{c}` :  {"n", "cdagc", "adaga", "bdagb", "cdc", "ada", "bdb"}
-      - Position operator :math:`hat{q}` : {"q", "x"}
-      - Momentum opeartor :math:`hat{p}` : "p"
+      - Annihilation operator :math:`\\hat{c}` :  {"c", "a", "b"}
+      - Creation operator :math:`\\hat{c}^\\dagger` :  {"cdag", "adag", "bdag", "cd", "ad", "bd"}
+      - Number operator :math:`\\hat{c}^\\dagger\\hat{c}` :  {"n", "cdagc", "adaga", "bdagb", "cdc", "ada", "bdb"}
+      - Position operator :math:`\\hat{q}` : {"q", "x"}
+      - Momentum operator :math:`\\hat{p}` : "p"
+      - Kinetic Energy Operator :math:`\\frac{1}{2} \\hat{p}^2 : "ke"
+      - Powers of any of the above operators (x) :math:`\\hat{x}^n` Y "x^n"
 
     Spin Modes for arbitrary spin S
 
-      - :math:`\hat{S}_x` : {"sx", "x"}
-      - :math:`\hat{S}_y` : {"sy", "y"}
-      - :math:`\hat{S}_z` : {"sz", "z"}
-      - :math:`\hat{S}_+` : {"s+", "sp"}
-      - :math:`\hat{S}_-` : {"s-", "sm"}
+      - :math:`\\hat{S}_x` : {"sx", "x"}
+      - :math:`\\hat{S}_y` : {"sy", "y"}
+      - :math:`\\hat{S}_z` : {"sz", "z"}
+      - :math:`\\hat{S}_+` : {"s+", "sp"}
+      - :math:`\\hat{S}_-` : {"s-", "sm"}
 
     Two Level System Modes
 
-      - :math:`\hat{\sigma}_x` : {"sx", "x", "sigmax"}
-      - :math:`\hat{\sigma}_y` : {"sy", "y", "sigmay"}
-      - :math:`\hat{\sigma}_z` : {"sz", "z", "sigmaz"}
-      - :math:`\hat{\sigma}_+` : {"s+", "sp", "sigma+", "sigmap"}
-      - :math:`\hat{\sigma}_-` : {"s-", "sm", "sigma-", "sigmam"}
+      - :math:`\\hat{\\sigma}_x` : {"sx", "x", "sigmax"}
+      - :math:`\\hat{\\sigma}_y` : {"sy", "y", "sigmay"}
+      - :math:`\\hat{\\sigma}_z` : {"sz", "z", "sigmaz"}
+      - :math:`\\hat{\\sigma}_+` : {"s+", "sp", "sigma+", "sigmap"}
+      - :math:`\\hat{\\sigma}_-` : {"s-", "sm", "sigma-", "sigmam"}
 
     N Level System Modes
 
-      - :math:`\left|m\right\rangle\left\langle n \right|` : {"|m><n|"}
+      - :math:`\\left\|m\\right\\rangle\\left\\langle n \\right\|` : {"\|m><n\|"}
+
     """
 
     def __new__(cls, label: str, mode: int, is_fermionic: bool = False):
@@ -117,7 +122,6 @@ class sOP(OP_type):
         pass
 
     @property
-    
     def mode(self) -> int:
         """Returns the mode the sOP object acts on
 
@@ -126,7 +130,6 @@ class sOP(OP_type):
         """
 
     @property
-    
     def op(self) -> str:
         """Returns the label of the sOP object
 
@@ -135,22 +138,22 @@ class sOP(OP_type):
         """
 
     
-    def __add__(self, op: OP_type) -> "sSOP":
+    def __add__(self, op: OPBase) -> "sSOP":
         """Add a symbolic operator type to the current sOP to obtain a sSOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: sSOP
         """
         pass
 
     
-    def __sub__(self, op: OP_type) -> "sSOP":
+    def __sub__(self, op: OPBase) -> "sSOP":
         """Subtract a symbolic operator type to the current sOP to obtain a sSOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: sSOP
         """
@@ -170,7 +173,7 @@ class sOP(OP_type):
     
     def __mul__(
         self,
-        v: Union[float, complex, np.float64, np.complex128, "coeff", OP_type],
+        v: Union[float, complex, np.float64, np.complex128, "coeff", OPBase],
     ) -> Union["sPOP", "sNBO", "sSOP"]:
         """Functions for multiplying a sOP by a scalar or operator type.
         The return type depends on the the type of the other object and is either:
@@ -180,7 +183,7 @@ class sOP(OP_type):
             * :class:`sSOP` : If v is :class:`sSOP`
 
         :param v: The object to multiply the sOP by
-        :type v: float | complex | np.float64 | np.complex128 | coeff | OP_type
+        :type v: float | complex | np.float64 | np.complex128 | coeff | OPBase
         :return: An n-body operator type storing the result
         :rtype: sPOP | sNBO | sSOP
         """
@@ -189,7 +192,7 @@ class sOP(OP_type):
     
     def __rmul__(
         self,
-        v: Union[float, complex, np.float64, np.complex128, "coeff", OP_type],
+        v: Union[float, complex, np.float64, np.complex128, "coeff", OPBase],
     ) -> Union["sPOP", "sNBO", "sSOP"]:
         """Functions for right multiplying a sOP by a scalar or operator type.
         The return type depends on the the type of the other object and is either:
@@ -199,7 +202,7 @@ class sOP(OP_type):
             * :class:`sSOP` : If v is :class:`sSOP`
 
         :param v: The object to multiply the sOP by
-        :type v: float | complex | np.float64 | np.complex128 | coeff | OP_type
+        :type v: float | complex | np.float64 | np.complex128 | coeff | OPBase
         :return: An n-body operator type storing the result
         :rtype: sPOP | sNBO | sSOP
         """
@@ -216,16 +219,16 @@ class sOP(OP_type):
 
 
 sOP.register(_sOP)
-sOP_type = sOP
+sOPBase = sOP
 
 
-class sPOP(OP_type):
+class sPOP(OPBase):
     """The string Product Operator used for storing a product of sOP objects"""
 
     def __new__(cls, *args):
         """A function for creating a new sPOP object
 
-        :param *args: A variable list for specifying the coefficient.  Valid options are
+        :param `*args`: A variable list for specifying the coefficient.  Valid options are
 
             -  Default construct the sPOP
             - op (:class:`sOP`) - Construct sPOP from single site operator
@@ -302,22 +305,22 @@ class sPOP(OP_type):
         """
 
     
-    def __add__(self, op: OP_type) -> "sSOP":
+    def __add__(self, op: OPBase) -> "sSOP":
         """Add a symbolic operator type to the current sPOP to obtain a sSOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: sSOP
         """
         pass
 
     
-    def __sub__(self, op: OP_type) -> "sSOP":
+    def __sub__(self, op: OPBase) -> "sSOP":
         """Subtract a symbolic operator type to the current sPOP to obtain a sSOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: sSOP
         """
@@ -337,7 +340,7 @@ class sPOP(OP_type):
     
     def __mul__(
         self,
-        v: Union[float, complex, np.float64, np.complex128, "coeff", OP_type],
+        v: Union[float, complex, np.float64, np.complex128, "coeff", OPBase],
     ) -> Union["sPOP", "sNBO", "sSOP"]:
         """Functions for multiplying a sPOP by a scalar or operator type.
         The return type depends on the the type of the other object and is either:
@@ -347,7 +350,7 @@ class sPOP(OP_type):
             * :class:`sSOP` : If v is :class:`sSOP`
 
         :param v: The object to multiply the sPOP by
-        :type v: float | complex | np.float64 | np.complex128 | coeff | OP_type
+        :type v: float | complex | np.float64 | np.complex128 | coeff | OPBase
         :return: An n-body operator type storing the result
         :rtype: sPOP | sNBO | sSOP
         """
@@ -356,7 +359,7 @@ class sPOP(OP_type):
     
     def __rmul__(
         self,
-        v: Union[float, complex, np.float64, np.complex128, "coeff", OP_type],
+        v: Union[float, complex, np.float64, np.complex128, "coeff", OPBase],
     ) -> Union["sPOP", "sNBO", "sSOP"]:
         """Functions for right multiplying a sPOP by a scalar or operator type.
         The return type depends on the the type of the other object and is either:
@@ -366,7 +369,7 @@ class sPOP(OP_type):
             * :class:`sSOP` : If v is :class:`sSOP`
 
         :param v: The object to multiply the sPOP by
-        :type v: float | complex | np.float64 | np.complex128 | coeff | OP_type
+        :type v: float | complex | np.float64 | np.complex128 | coeff | OPBase
         :return: An n-body operator type storing the result
         :rtype: sPOP | sNBO | sSOP
         """
@@ -387,7 +390,7 @@ class sPOP(OP_type):
 
 
 sPOP.register(_sPOP)
-sPOP_type = sPOP
+sPOPBase = sPOP
 
 
 class coeff(metaclass=ABCMeta):
@@ -400,7 +403,7 @@ class coeff(metaclass=ABCMeta):
     ) -> "coeff":
         """A function for constructing the coeff type for Hamiltonian specification
 
-        :param *args: A variable list for specifying the coefficient.  Valid options are
+        :param `*args`: A variable list for specifying the coefficient.  Valid options are
 
             - Default construct the coefficient
             - value (dtype) - Set the coefficient to a constant value
@@ -418,7 +421,7 @@ class coeff(metaclass=ABCMeta):
         else:
             raise RuntimeError("Invalid dtype for sNBO")
 
-    
+    @abstractmethod
     def assign(self, o: "coeff"):
         """Assign the value of the coeff from another
 
@@ -427,22 +430,22 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the coeff object"""
         pass
 
-    
+    @abstractmethod
     def __deepcopy__(self, memo):
         """Function implementing deep copy of the coeff object"""
         pass
 
-    
+    @abstractmethod
     def clear(self):
         """Clear all internal storage used by the coeff object"""
         pass
 
-    
+    @abstractmethod
     def is_zero(self) -> bool:
         """Whether or not the coefficient stores the zero value
 
@@ -450,23 +453,23 @@ class coeff(metaclass=ABCMeta):
         :rtype: bool
         """
 
-    
+    @abstractmethod
     def is_positive(self) -> bool:
         """Whether or not the coefficient is positive
 
         :returns: Whether of not the coefficient is positive
         :rtype: bool
         """
-
     
+    @abstractmethod
     def is_time_dependent(self) -> bool:
         """Whether or not the coefficient is time dependent
 
         :returns: Whether of not the coefficient is time dependent
         :rtype: bool
         """
-
     
+    @abstractmethod
     def __str__(self) -> str:
         """Return the string representation of the coeff object
 
@@ -475,7 +478,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __call__(self, t: Union[float, np.float64]) -> Union[float, complex]:
         """Return the value of the coefficient at a given time point
 
@@ -486,7 +489,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __add__(
         self, op: Union[float, complex, np.float64, np.complex128, "coeff"]
     ) -> "coeff":
@@ -499,7 +502,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __radd__(self, op: Union[float, complex, np.float64, np.complex128]) -> "coeff":
         """Add a scalar to a coeff object
 
@@ -510,7 +513,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __iadd__(
         self, op: Union[float, complex, np.float64, np.complex128, "coeff"]
     ) -> "coeff":
@@ -523,7 +526,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __sub__(
         self, op: Union[float, complex, np.float64, np.complex128, "coeff"]
     ) -> "coeff":
@@ -536,7 +539,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __rsub__(self, op: Union[float, complex, np.float64, np.complex128]) -> "coeff":
         """Subtract a coeff from a scalar
 
@@ -547,7 +550,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __isub__(
         self, op: Union[float, complex, np.float64, np.complex128, "coeff"]
     ) -> "coeff":
@@ -560,7 +563,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __div__(self, v: Union[float, complex, np.float64, np.complex128]) -> "coeff":
         """Functions for dividing a coeff by a scalar.
 
@@ -571,7 +574,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __idiv__(self, v: Union[float, complex, np.float64, np.complex128]) -> "coeff":
         """Functions for inplace division of a coeff by a scalar
 
@@ -582,10 +585,10 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __mul__(
         self,
-        v: Union[float, complex, np.float64, np.complex128, "coeff", OP_type],
+        v: Union[float, complex, np.float64, np.complex128, "coeff", OPBase],
     ) -> Union["coeff", "sNBO", "sSOP"]:
         """Functions for multiplying a coeff by a scalar or operator type.
         The return type depends on the the type of the other object and is either:
@@ -595,13 +598,13 @@ class coeff(metaclass=ABCMeta):
             * :class:`sSOP` : If v is :class:`sSOP`
 
         :param v: The object to multiply the sPOP by
-        :type v: float | complex | np.float64 | np.complex128 | coeff | OP_type
+        :type v: float | complex | np.float64 | np.complex128 | coeff | OPBase
         :return: A coeff type storing the result
         :rtype: coeff | sNBO | sSOP
         """
         pass
 
-    
+    @abstractmethod
     def __rmul__(
         self,
         v: Union[float, complex, np.float64, np.complex128],
@@ -615,7 +618,7 @@ class coeff(metaclass=ABCMeta):
         """
         pass
 
-    
+    @abstractmethod
     def __imul__(
         self,
         v: Union[float, complex, np.float64, np.complex128],
@@ -633,16 +636,14 @@ class coeff(metaclass=ABCMeta):
 coeff.register(coeff_complex)
 coeff.register(coeff_real)
 
-coeff_type = coeff
 
-
-class sNBO(OP_type):
+class sNBO(OPBase):
     """A class for handling an n-body operator string"""
 
     def __new__(cls, *args, dtype=np.complex128):
         """Construct a new n-body operator object
 
-        :param *args: A variable list for specifying the coefficient.  Valid options are
+        :param `*args`: A variable list for specifying the coefficient.  Valid options are
 
             -  Default construct the sNBO
             - op (:class:`sOP`) - Construct NBO from single site operator
@@ -732,22 +733,22 @@ class sNBO(OP_type):
         :rtype: sPOP
         """
     
-    def __add__(self, op: OP_type) -> "sSOP":
+    def __add__(self, op: OPBase) -> "sSOP":
         """Add a symbolic operator type to the current sNBO to obtain a sSOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: sSOP
         """
         pass
 
     
-    def __sub__(self, op: OP_type) -> "sSOP":
+    def __sub__(self, op: OPBase) -> "sSOP":
         """Subtract a symbolic operator type to the current sNBO to obtain a sSOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: sSOP
         """
@@ -767,7 +768,7 @@ class sNBO(OP_type):
     
     def __mul__(
         self,
-        v: Union[float, complex, np.float64, np.complex128, coeff, OP_type],
+        v: Union[float, complex, np.float64, np.complex128, coeff, OPBase],
     ) -> Union["sNBO", "sSOP"]:
         """Functions for multiplying a sNBO by a scalar or operator type.
         The return type depends on the the type of the other object and is either:
@@ -776,7 +777,7 @@ class sNBO(OP_type):
             * :class:`sSOP` : If v is :class:`sSOP`
 
         :param v: The object to multiply the sNBO by
-        :type v: float | complex | np.float64 | np.complex128 | coeff | OP_type
+        :type v: float | complex | np.float64 | np.complex128 | coeff | OPBase
         :return: An operator type storing the result
         :rtype: sNBO | sSOP
         """
@@ -785,7 +786,7 @@ class sNBO(OP_type):
     
     def __rmul__(
         self,
-        v: Union[float, complex, np.float64, np.complex128, coeff, OP_type],
+        v: Union[float, complex, np.float64, np.complex128, coeff, OPBase],
     ) -> Union["sNBO", "sSOP"]:
         """Functions for right multiplying a sNBO by a scalar or operator type.
         The return type depends on the the type of the other object and is either:
@@ -794,7 +795,7 @@ class sNBO(OP_type):
             * :class:`sSOP` : If v is :class:`sSOP`
 
         :param v: The object to multiply the sNBO by
-        :type v: float | complex | np.float64 | np.complex128 | coeff | OP_type
+        :type v: float | complex | np.float64 | np.complex128 | coeff | OPBase
         :return: An operator type storing the result
         :rtype: sNBO | sSOP
         """
@@ -824,10 +825,8 @@ class sNBO(OP_type):
 sNBO.register(sNBO_complex)
 sNBO.register(sNBO_real)
 
-sNBO_type = sNBO
 
-
-class sSOP(OP_type):
+class sSOP(OPBase):
     """Class for handling sum-of-product operator string definitions"""
 
     def __new__(
@@ -837,7 +836,7 @@ class sSOP(OP_type):
     ) -> "sSOP":
         """A function for constructing a sum-of-product string operator
 
-        :param *args: A variable list for specifying the coefficient.  Valid options are
+        :param `*args`: A variable list for specifying the coefficient.  Valid options are
 
             -  Default construct the sSOP
             - op (str) - Construct the sSOP from a string defining a sOP
@@ -969,44 +968,44 @@ class sSOP(OP_type):
         pass
 
     
-    def __add__(self, op: OP_type) -> "sSOP":
+    def __add__(self, op: OPBase) -> "sSOP":
         """Add a symbolic operator type to the current sSOP to obtain a sSOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: sSOP
         """
         pass
 
     
-    def __iadd__(self, op: OP_type) -> "sSOP":
+    def __iadd__(self, op: OPBase) -> "sSOP":
         """Add inplace a symbolic operator type to the current sSOP to obtain a sSOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: sSOP
         """
         pass
 
     
-    def __sub__(self, op: OP_type) -> "sSOP":
+    def __sub__(self, op: OPBase) -> "sSOP":
         """Subtract a symbolic operator type to the current sSOP to obtain a sSOP
 
         :param op: The operator to be subtracted to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: sSOP
         """
         pass
 
     
-    def __isub__(self, op: OP_type) -> "sSOP":
+    def __isub__(self, op: OPBase) -> "sSOP":
         """Subtract inplace a symbolic operator type to the current sSOP to obtain a sSOP
 
         :param op: The operator to be subtracted to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: sSOP
         """
@@ -1037,12 +1036,12 @@ class sSOP(OP_type):
     
     def __mul__(
         self,
-        v: Union[float, complex, np.float64, np.complex128, coeff, OP_type],
+        v: Union[float, complex, np.float64, np.complex128, coeff, OPBase],
     ) -> "sSOP":
         """Functions for multiplying a sSOP by a scalar or operator type.
 
         :param v: The object to multiply the sSOP by
-        :type v: float | complex | np.float64 | np.complex128 | coeff | OP_type
+        :type v: float | complex | np.float64 | np.complex128 | coeff | OPBase
         :return: A sum-of-product operator type storing the result
         :rtype: sSOP
         """
@@ -1051,12 +1050,12 @@ class sSOP(OP_type):
     
     def __imul__(
         self,
-        v: Union[float, complex, np.float64, np.complex128, coeff, OP_type],
+        v: Union[float, complex, np.float64, np.complex128, coeff, OPBase],
     ) -> "sSOP":
         """Functions for inplace multiplyication of a sSOP by a scalar or operator type.
 
         :param v: The object to multiply the sSOP by
-        :type v: float | complex | np.float64 | np.complex128 | coeff | OP_type
+        :type v: float | complex | np.float64 | np.complex128 | coeff | OPBase
         :return: A sum-of-product operator type storing the result
         :rtype: sSOP
         """
@@ -1079,5 +1078,3 @@ class sSOP(OP_type):
 
 sSOP.register(sSOP_complex)
 sSOP.register(sSOP_real)
-
-sSOP_type = sSOP

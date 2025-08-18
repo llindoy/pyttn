@@ -10,22 +10,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from typing import Callable, Optional, Union
+
 import numpy as np
 import scipy as sp
-from .bath import Bath
-from typing import Callable, Optional, Union
-from ..bath_fitting import (
-    ExpFitDecomposition,
-    CtExpFitDecomposition,
-    SwExpFitDecomposition,
-    BathDiscretisation,
-)
 
-from pyttn.ttns import OP_type
+from pyttn.ttns import OPBase
+
+from ..bath_fitting import (
+    BathDiscretisation,
+    CtExpFitDecomposition,
+    ExpFitDecomposition,
+    SwExpFitDecomposition,
+)
+from .bath import Bath
 
 
 class FermionicBath(Bath):
-    r"""A class for managing a continuous fermionic gaussian bath.  This provides
+    """A class for managing a continuous fermionic gaussian bath.  This provides
     functions for computing non-interacting bath correlation functions, as well as
     decomposing the correlation function into a linear combination of
     complex valued exponentials (expfit) or oscillator terms (discretise)
@@ -33,9 +35,9 @@ class FermionicBath(Bath):
     :param Jw: The bath spectral function defining the non-interacting correlation function
     :type Jw: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]] 
     :param Sp: The system raising operators
-    :type Sp: Optional[OP_type]
+    :type Sp: Optional[OPBase]
     :param Sm: The system raising operators
-    :type Sm: Optional[OP_type]    
+    :type Sm: Optional[OPBase]    
     :param beta: The inverse temperature of the bath, defaults to None
     :type beta: float, optional
     :param wmax: the maximum frequency bound, default to np.inf
@@ -49,8 +51,8 @@ class FermionicBath(Bath):
     def __init__(
         self,
         Jw: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]],
-        Sp: Optional[OP_type] = None,
-        Sm: Optional[OP_type] = None,
+        Sp: Optional[OPBase] = None,
+        Sm: Optional[OPBase] = None,
         beta: Optional[float] = None,
         wmax: float = np.inf,
         wmin: Optional[float] = None,
@@ -73,11 +75,11 @@ class FermionicBath(Bath):
         epsrel: float = 1.49e-12,
         limit: int = 2000,
     ) -> np.ndarray:
-        r"""Returns the value of the non-interacting bath correlation function evaluated
+        """Returns the value of the non-interacting bath correlation function evaluated
         at the time points t:
 
         .. math::
-            C^{\sigma}(t) = \frac{1}{pi}\int_{wmin}^{wmax} J(\omega) f_F(\sigma\beta(\omega - Ef)) exp(\sigma i \omega t)
+            C^{\\sigma}(t) = \\frac{1}{pi}\\int_{wmin}^{wmax} J(\\omega) f_F(\\sigma\\beta(\\omega - Ef)) exp(\\sigma i \\omega t)
 
         :param t: time
         :type t: np.ndarray
@@ -141,7 +143,7 @@ class FermionicBath(Bath):
     def Ctexp(
         t: np.ndarray, dk: np.ndarray, zk: np.ndarray, sigma: str = "+"
     ) -> np.ndarray:
-        r"""Returns the value of the non-interacting bath correlation function evaluated
+        """Returns the value of the non-interacting bath correlation function evaluated
         at the time points t using the results of discretisation or expfit:
 
         :param t: time
@@ -194,10 +196,10 @@ class FermionicBath(Bath):
             return res
 
     def Sw(self, w: np.ndarray, Ef: float = 0, sigma: str = "+") -> np.ndarray:
-        r"""Returns the non-interacting bath spectral function at w and fermi energy Ef
+        """Returns the non-interacting bath spectral function at w and fermi energy Ef
 
         .. math::
-            S^{\sigma}(\omega) = J(\omega) f_{f}(\sigma \omega; \beta)
+            S^{\\sigma}(\\omega) = J(\\omega) f_{f}(\\sigma \\omega; \\beta)
 
 
         :param w: frequency
@@ -217,7 +219,7 @@ class FermionicBath(Bath):
     def estimate_bounds(
         self, wmax: Optional[float] = None, Ef: float = 0, sigma: str = "+"
     ) -> tuple[float, float]:
-        r"""Returns estimates for the upper and lower bounds of the spectral density to be used for the
+        """Returns estimates for the upper and lower bounds of the spectral density to be used for the
         discretisation function
 
         :param wmax: the maximum frequency bound, defaults to self.wmax
@@ -255,7 +257,7 @@ class FermionicBath(Bath):
     def discretise(
         self, discretisation_engine: BathDiscretisation, Ef: float = 0, sigma: str = "+"
     ) -> tuple[np.ndarray, np.ndarray]:
-        r"""Returns the coupling constants and frequencies associated with a discretised representation of the bath
+        """Returns the coupling constants and frequencies associated with a discretised representation of the bath
 
         :param discretisation_engine: An object defining how to discretise a continuous bath
         :type discretisation_engine: np.ndarray
@@ -263,7 +265,7 @@ class FermionicBath(Bath):
         :type Ef: float
         :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green's Function, default to +
         :type sigma: str, optional
-        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`
+        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\\omega_k`
         :rtype: np.ndarray, np.ndarray
         """
 
@@ -277,7 +279,7 @@ class FermionicBath(Bath):
     def expfit(
         self, fitting_engine: ExpFitDecomposition, Ef: float = 0, sigma: str = "+"
     ) -> tuple[np.ndarray, np.ndarray]:
-        r"""Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
+        """Returns the coefficients and decay rates associated with a sum-of-exponential decomposition of the bath correlation function
 
         :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition
         :type fitting_engine: np.ndarray
@@ -285,7 +287,7 @@ class FermionicBath(Bath):
         :type Ef: float
         :param sigma: Whether to compute the spectral function associated with the greater (+) or lesser (-) Green's Function, default to +
         :type sigma: str, optional
-        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\omega_k`
+        :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\\omega_k`
         :rtype: np.ndarray, np.ndarray
         """
         dk = None

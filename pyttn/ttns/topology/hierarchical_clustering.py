@@ -90,7 +90,7 @@ def generate_hierarchical_clustering_tree(
     :param distance_metric: An arguments specifying how to transform the weight matrix to a distance matrix (default: 'gauss')
     :type distance_metric: {'sub', 'exp', 'gauss', 'lorentz'}, optional
 
-    :param **kwargs:  Additional keyword arguments that depend on the choice of distance metric.
+    :param `**kwargs`:  Additional keyword arguments that depend on the choice of distance metric.
 
         - For distance_metric = 'sub': This argument is ignored
         - For distance_metric={'exp', 'gauss', 'lorentz'}: an optional eps argument can be specified defining the width of the function.

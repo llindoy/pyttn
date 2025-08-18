@@ -74,6 +74,8 @@ namespace ttns
         mutable triad_type HA;
         mutable triad_type temp;
         mutable triad_type temp2;
+        mutable triad_type res;
+
         mutable size_t cap = 0;
         mutable size_t buf = 0;
 
@@ -84,11 +86,15 @@ namespace ttns
             CALL_AND_HANDLE(HA.resize(nbuffers), "Failed to resize the opA array.");
             CALL_AND_HANDLE(temp.resize(nbuffers), "Failed to resize the temporary matrix.");
             CALL_AND_HANDLE(temp2.resize(nbuffers), "Failed to resize the temporary matrix.");
+            CALL_AND_HANDLE(res.resize(nbuffers), "Failed to resize the temporary matrix.");
+
             for (size_t i = 0; i < HA.size(); ++i)
             {
                 CALL_AND_HANDLE(HA[i].reallocate(maxcapacity), "Failed to resize the opA array.");
                 CALL_AND_HANDLE(temp[i].reallocate(maxcapacity), "Failed to resize the temporary matrix.");
                 CALL_AND_HANDLE(temp2[i].reallocate(maxcapacity), "Failed to reszie temporary matrix.");
+                CALL_AND_HANDLE(res[i].reallocate(maxcapacity), "Failed to reszie temporary matrix.");
+
             }
         }
 
@@ -99,9 +105,19 @@ namespace ttns
                 CALL_AND_HANDLE(HA[i].resize(s1, s2), "Failed to resize the opA array.");
                 CALL_AND_HANDLE(temp[i].resize(s1, s2), "Failed to resize the temporary matrix.");
                 CALL_AND_HANDLE(temp2[i].resize(s1, s2), "Failed to reszie temporary matrix.");
+                CALL_AND_HANDLE(res[i].resize(s1, s2), "Failed to reszie temporary matrix.");
             }
         }
 
+        void reset_result_buffer(size_t tid, size_t nthread, size_t s1, size_t s2) const
+        {
+            ASSERT( (tid+1)*nthread <= res.size(), "Requested out of index reset buffer.");
+            for (size_t i = 0; i < nthread; ++i)
+            {
+                CALL_AND_HANDLE(res[i+tid*nthread].resize(s1, s2), "Failed to reszie temporary matrix.");
+                res[i].fill_zeros();
+            }
+        }
         void clear()
         {
             for (size_t i = 0; i < HA.size(); ++i)
@@ -109,11 +125,15 @@ namespace ttns
                 CALL_AND_HANDLE(HA[i].clear(), "Failed to clear a temporary working array tree.");
                 CALL_AND_HANDLE(temp[i].clear(), "Failed to clear a temporary working array tree.");
                 CALL_AND_HANDLE(temp2[i].clear(), "Failed to clear a temporary working array tree.");
+                CALL_AND_HANDLE(res[i].clear(), "Failed to clear a temporary working array tree.");
             }
 
             CALL_AND_HANDLE(temp2.clear(), "Failed to clear a temporary working array tree.");
             CALL_AND_HANDLE(HA.clear(), "Failed to clear a temporary working array tree.");
             CALL_AND_HANDLE(temp.clear(), "Failed to clear a temporary working array tree.");
+            CALL_AND_HANDLE(res.clear(), "Failed to clear a temporary working array tree.");
+            cap = 0;
+            buf = 0;
         }
 
         template <typename state_type>

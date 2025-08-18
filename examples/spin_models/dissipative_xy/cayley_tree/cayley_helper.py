@@ -1,7 +1,19 @@
+# This files is part of the pyTTN package.
+#(C) Copyright 2025 NPL Management Limited
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License
+
 import os
 os.environ["OMP_NUM_THREADS"] = "1"
 
-from pyttn import ntree, ntreeBuilder
+from pyttn import ntree
 
 
 def get_nskip(Nl, d=3):
@@ -42,7 +54,7 @@ def get_spin_connectivity(Nl, d=3):
             inds.append([x, y])
             topo().insert(1)
 
-        for layer in range(1, Nl):
+        for _ in range(1, Nl):
             # get all leaves
             leaf_indices = topo.leaf_indices()
 
@@ -62,19 +74,18 @@ def build_system_topology(Nl, chi, d=3):
     #now build each of the Layers around the tree
     if Nl > 0:
         #add the first layer
-        for i in range(d):
+        for _ in range(d):
             topo().insert(chi)
 
         #now attempt to add all other layers to the tree
-        for layer in range(1, Nl):
+        for _ in range(1, Nl):
             #get all of the leaves of the the tree with the current number of layers
             leaf_indices = topo.leaf_indices()
 
             #now iterate over each leaf and add its children
             for li in leaf_indices:
-                for i in range(d-1):
+                for _ in range(d-1):
                     topo.at(li).insert(chi)
-                    topo.at
 
     return topo
 

@@ -11,9 +11,10 @@
 # limitations under the License
 
 from typing import Callable, Union
+
 import numpy as np
-from scipy import sparse
 from scipy import linalg as splinalg
+from scipy import sparse
 from scipy.integrate import quad_vec
 
 
@@ -100,7 +101,7 @@ def __evaluate_function(z, Z, f, w):
     """Evaluate the baryocentric form of the rational function approximation
 
     .. math:
-        r(z) = \frac{\sum_{j=1}^N \frac{w_j f_j}{z-Z_j}}{\sum_{j=1}^N \frac{w_j}{z-Z_j}}
+        r(z) = \\frac{\\sum_{j=1}^N \\frac{w_j f_j}{z-Z_j}}{\\sum_{j=1}^N \\frac{w_j}{z-Z_j}}
 
     :params z: The point at which to evaluate the function
     :type z: np.ndarray
@@ -146,8 +147,8 @@ def AAA_algorithm(
     :type K: int or None, optional
     :param nmax: The maximum number of poles to use in the AAA fit. (default: 100)
     :type nmax: int, optional
-    :param *args: Variable length argument list to be passed to the F function
-    :param **kwargs: Arbitrary keyword arguments to be passed to the F function
+    :param `*args`: Variable length argument list to be passed to the F function
+    :param `**kwargs`: Arbitrary keyword arguments to be passed to the F function
 
     :returns:
         - func - A function defining the rational function approximation

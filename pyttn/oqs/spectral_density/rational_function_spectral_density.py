@@ -12,14 +12,16 @@
 
 
 import abc
-import numpy as np
 import copy
-
 from typing import Union
+
+import numpy as np
+
 
 class RationalFunctionSpectralDensity(metaclass=abc.ABCMeta):
     """An abstact base class for handling Rational Function spectral densities"""
 
+    @abc.abstractmethod
     def __init__(self):
         pass
 
@@ -84,9 +86,9 @@ class SumSpectralDensity(RationalFunctionSpectralDensity):
 
 
 class DebyeSpectralDensity(RationalFunctionSpectralDensity):
-    r"""A class for managing a Debye spectral density, that is
+    """A class for managing a Debye spectral density, that is
         .. math::
-            J(\omega) = \frac{\Lambda}\frac{2}\frac{\omega_c\omega}{\omega^2+\omega_c^2}
+            J(\\omega) = \\frac{\\Lambda}\\frac{2}\\frac{\\omega_c\\omega}{\\omega^2+\\omega_c^2}
 
     :param Lambda: The bath reorganisation energy
     :type Lambda: float
@@ -142,9 +144,9 @@ class DebyeSpectralDensity(RationalFunctionSpectralDensity):
 
 
 class BrownianOscillatorSpectralDensity(RationalFunctionSpectralDensity):
-    r"""A class for managing a Debye spectral density, that is
+    """A class for managing a Debye spectral density, that is
         .. math::
-            J(\omega) = \frac{\Lambda}\frac{2}\frac{\gamma\Omega^2\omega}{(\omega^2-\Omega^2)^2+\gamma^2\omega^2}
+            J(\\omega) = \\frac{\\Lambda}\\frac{2}\\frac{\\gamma\\Omega^2\\omega}{(\\omega^2-\\Omega^2)^2+\\gamma^2\\omega^2}
 
     :param Lambda: The bath reorganisation energy
     :type Lambda: float

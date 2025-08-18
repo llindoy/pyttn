@@ -131,7 +131,7 @@ namespace ttns
                 {
                     env.ceb.set_pointer(&(A()));
                     CALL_AND_HANDLE(
-                        return m_expmv(A().as_matrix(), m_dt / 2.0, m_coeff, env.ceb, h, op, env.buffer().HA, env.buffer().temp, env.buffer().temp2),
+                        return m_expmv(A().as_matrix(), m_dt / 2.0, m_coeff, env.ceb, h, op, env.buffer()),
                                "Failed to evolve the branch coefficient matrix.");
                     env.ceb.unset_pointer();
                 }
@@ -140,7 +140,7 @@ namespace ttns
                     // if we are at a leaf node we update its child operators.  This is simply done by calling the update yunction
                     CALL_AND_HANDLE(op.update(A.leaf_index(), m_t, m_dt / 2.0), "Failed to update primitive Hamiltonian object.");
                     CALL_AND_HANDLE(
-                        return m_expmv(A().as_matrix(), m_dt / 2.0, m_coeff, env.cel, h, op, env.buffer().HA, env.buffer().temp),
+                        return m_expmv(A().as_matrix(), m_dt / 2.0, m_coeff, env.cel, h, op, env.buffer()),
                                "Failed to evolve the leaf coefficient matrix.");
                 }
             }
@@ -160,7 +160,7 @@ namespace ttns
         {
             try
             {
-                CALL_AND_HANDLE(m_expmv(r, -m_dt / 2.0, m_coeff, env.fha, h, op, env.buffer().temp, env.buffer().HA), "Failed to time evolve the r matrix backwards in time.");
+                CALL_AND_HANDLE(m_expmv(r, -m_dt / 2.0, m_coeff, env.fha, h, op, env.buffer()), "Failed to time evolve the r matrix backwards in time.");
             }
             catch (const common::invalid_value &ex)
             {
@@ -315,7 +315,7 @@ namespace ttns
                 {
                     env.ceb.set_pointer(&(A()));
                     CALL_AND_HANDLE(
-                        nevals += m_expmv(mbuf.A(), m_dt / 2.0, m_coeff, env.ceb, h, op, env.buffer().HA, env.buffer().temp, env.buffer().temp2, mbuf.res()),
+                        nevals += m_expmv(mbuf.A(), m_dt / 2.0, m_coeff, env.ceb, h, op, env.buffer(), mbuf.res()),
                         "Failed to evolve the branch coefficient matrix.");
                     env.ceb.unset_pointer();
                 }
@@ -326,7 +326,7 @@ namespace ttns
 
                     env.cel.set_pointer(&(A()));
                     CALL_AND_HANDLE(
-                        nevals += m_expmv(mbuf.A(), m_dt / 2.0, m_coeff, env.cel, h, op, env.buffer().HA, env.buffer().temp, mbuf.res()),
+                        nevals += m_expmv(mbuf.A(), m_dt / 2.0, m_coeff, env.cel, h, op, env.buffer(), mbuf.res()),
                         "Failed to evolve the leaf coefficient matrix.");
                     env.cel.unset_pointer();
                 }
@@ -351,7 +351,7 @@ namespace ttns
             {
                 mbuf.setup(r);
                 env.fha.set_pointer(&(r));
-                CALL_AND_HANDLE(m_expmv(mbuf.A(), -m_dt / 2.0, m_coeff, env.fha, h, op, env.buffer().temp, env.buffer().HA, mbuf.res()), "Failed to time evolve the r matrix backwards in time.");
+                CALL_AND_HANDLE(m_expmv(mbuf.A(), -m_dt / 2.0, m_coeff, env.fha, h, op, env.buffer(), mbuf.res()), "Failed to time evolve the r matrix backwards in time.");
                 env.fha.unset_pointer();
                 ttn_type::unpack(mbuf.A(), r);
             }

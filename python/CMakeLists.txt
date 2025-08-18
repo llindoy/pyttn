@@ -10,22 +10,11 @@ set(CMAKE_BUILD_TYPE "Release")
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 #compiler flags
 option(USE_CUDA "Compile with cuda" OFF)
-option(USE_OPENMP "Compile with openmp" OFF)
-option(PARALLELISE_SET_VARIABLES "openmp parallelism over set variables" OFF)
-option(PARALLELISE_HAMILTONIAN_SUM "openmp parallelism over hamiltonian sum" OFF)
+option(USE_OPENMP "Compile with openmp" ON)
 option(BUILD_REAL_TTN "build wrapper for real valued tensor network objects." OFF)
 option(USE_GEMM3M "Compile with openmp" OFF)
 option(EVAL_BUT_DONT_APPLY "Compile with eval but don't apply option set" OFF)
 
-if(PARALLELISE_SET_VARIABLES)
-  add_definitions(-DPARALLELISE_SET_VARIABLES)
-  set(USE_OPENMP ON)
-endif()
-
-if(PARALLELISE_HAMILTONIAN_SUM)
-  add_definitions(-DPARALLELISE_HAMILTONIAN_SUM)
-  set(USE_OPENMP ON)
-endif()
 
 if(USE_OPENMP)
   add_definitions(-DUSE_OPENMP)
@@ -62,7 +51,7 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
           ttns/sop/state.cpp ttns/sop/toDense.cpp
           ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp ttns/ttn/ms_ttn.cpp
           ttns/observables/matrix_element.cpp 
-          ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp
+          ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp ttns/operators/Op.cpp
           ttns/algorithms/tdvp.cpp ttns/algorithms/dmrg.cpp
           )
     set_source_files_properties(${PYTHON_BINDINGS_SRC} PROPERTIES LANGUAGE CUDA)

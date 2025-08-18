@@ -10,15 +10,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .dmrgExt import one_site_dmrg, subspace_expansion_dmrg, dmrg
-from .tdvpExt import one_site_tdvp, subspace_expansion_tdvp, tdvp
-
+from .dmrgExt import dmrg, DMRG, OneSiteDMRG, SubspaceExpansionDMRG
+from .tdvpExt import OneSiteTDVP, SubspaceExpansionTDVP, tdvp, TDVP
 
 __all__: list[str] = [
-    "one_site_dmrg",
-    "subspace_expansion_dmrg",
+    "OneSiteDMRG",
+    "SubspaceExpansionDMRG",
     "dmrg",
-    "one_site_tdvp",
-    "subspace_expansion_tdvp",
+    "DMRG",
+    "OneSiteTDVP",
+    "SubspaceExpansionTDVP",
     "tdvp",
+    "TDVP",
 ]

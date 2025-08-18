@@ -10,10 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
 import h5py
-
+import numpy as np
 from sbm_timing_helper import sbm_dynamics_timing
+
 
 def bath_size_scaling_binary_ternary():
     chi = 20

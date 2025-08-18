@@ -11,8 +11,11 @@
 # limitations under the License
 
 from typing import Callable, Optional, Union
+
 import numpy as np
+
 from pyttn.ttnpp import ntree, ntreeNode
+
 from .bond_setter import BondDimensionSetter
 
 

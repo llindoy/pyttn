@@ -638,7 +638,7 @@ namespace linalg
                     CALL_AND_RETHROW(set_L(mat, L));
 
                     // now resize the workbuffer for constructing the unitary
-                    std::cerr << mat.shape(1) << " " << rank << " " << rank << std::endl;
+                    //std::cerr << mat.shape(1) << " " << rank << " " << rank << std::endl;
                     CALL_AND_HANDLE(blas_backend::ungqr(mat.shape(1), rank, rank,
                                                         mat.buffer(), mat.shape(1),
                                                         m_tau.buffer(), &worksize, lwork),
@@ -702,7 +702,7 @@ namespace linalg
                     CALL_AND_RETHROW(set_L(mat, L));
 
                     // now resize the workbuffer for constructing the unitary
-                    std::cerr << mat.shape(1) << " " << rank << " " << rank << std::endl;
+                    //std::cerr << mat.shape(1) << " " << rank << " " << rank << std::endl;
                     CALL_AND_HANDLE(blas_backend::ungqr(mat.shape(1), rank, rank,
                                                         mat.buffer(), mat.shape(1),
                                                         m_tau.buffer(), &worksize, lwork),

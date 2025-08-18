@@ -50,7 +50,10 @@ namespace ttns
     public:
         _one_site_dmrg() : base_type() {}
         _one_site_dmrg(const ttn_type &A, const env_type &ham) : base_type(A, ham, 1) {}
-        _one_site_dmrg(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type num_threads = 1) : base_type(A, ham, {krylov_dim, 1}, {}, {}, num_threads) {}
+        _one_site_dmrg(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1) : base_type(A, ham, {krylov_dim, 1}, {hamiltonian_sum_threads}, {}, set_var_threads) 
+        {
+            ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");
+        }
 
         _one_site_dmrg(const _one_site_dmrg &o) = default;
         _one_site_dmrg(_one_site_dmrg &&o) = default;
@@ -58,9 +61,10 @@ namespace ttns
         _one_site_dmrg &operator=(const _one_site_dmrg &o) = default;
         _one_site_dmrg &operator=(_one_site_dmrg &&o) = default;
 
-        void initialise(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type num_threads = 1)
+        void initialise(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1)
         {
-            CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, 1}, {}, {}, num_threads));
+            ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");
+            CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, 1}, {hamiltonian_sum_threads}, {}, set_var_threads));
         }
     };
 
@@ -95,7 +99,10 @@ namespace ttns
 
     public:
         _adaptive_one_site_dmrg() : base_type() {}
-        _adaptive_one_site_dmrg(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2, size_type num_threads = 1) : base_type(A, ham, {krylov_dim, 1}, {}, {eigensolver_krylov_dim, neigenvalues}, num_threads) {}
+        _adaptive_one_site_dmrg(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1) : base_type(A, ham, {krylov_dim, 1}, {hamiltonian_sum_threads}, {eigensolver_krylov_dim, neigenvalues}, set_var_threads) 
+        {
+            ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");
+        }
 
         _adaptive_one_site_dmrg(const _adaptive_one_site_dmrg &o) = default;
         _adaptive_one_site_dmrg(_adaptive_one_site_dmrg &&o) = default;
@@ -103,9 +110,10 @@ namespace ttns
         _adaptive_one_site_dmrg &operator=(const _adaptive_one_site_dmrg &o) = default;
         _adaptive_one_site_dmrg &operator=(_adaptive_one_site_dmrg &&o) = default;
 
-        void initialise(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2, size_type num_threads = 1)
+        void initialise(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1)
         {
-            CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, 1}, {}, {eigensolver_krylov_dim, neigenvalues}, num_threads));
+            ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");
+            CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, 1}, {hamiltonian_sum_threads}, {eigensolver_krylov_dim, neigenvalues}, set_var_threads));
         }
     };
 

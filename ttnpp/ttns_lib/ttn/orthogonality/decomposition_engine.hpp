@@ -51,6 +51,37 @@ namespace ttns
             decomposition_engine &operator=(const decomposition_engine &o) = default;
             decomposition_engine &operator=(decomposition_engine &&o) = default;
 
+
+            template <typename mat_type>
+            void resize(const mat_type& m)
+            {
+                try
+                {
+                    if(m_temp.capacity() < m.capacity())
+                    {
+                        m_temp.reallocate(m.capacity());
+                        m_temp2.reallocate(m.capacity());
+
+                    }
+                    m_temp.resize(m.shape(0), m.shape(1));
+                    m_temp2.resize(m.shape(0), m.shape(1));
+
+                    if(m_s.capacity() < m.shape(1))
+                    {
+                        m_s.reallocate(m.shape(1));
+                    }
+
+                    //resize the svd object
+                    CALL_AND_HANDLE(m_svd.resize(m.shape(0), m.shape(1), false), "Failed to resize svd object");
+                    CALL_AND_HANDLE(m_svd.resize_work_space(this->query_work_size(m, m_temp, m_temp2)), "Failed to resize work space for svd object.");
+                }
+                catch (const std::exception &ex)
+                {
+                    std::cerr << ex.what() << std::endl;
+                    RAISE_EXCEPTION("Failed to resize decomposition engine object.");
+                }            
+            }
+
             template <typename decomp_type, typename resize_obj, typename Utype, typename Rtype>
             void resize(const resize_obj &A, Utype &U, Rtype &r, bool use_capacity = false)
             {
@@ -83,7 +114,6 @@ namespace ttns
                 try
                 {
                     CALL_AND_HANDLE(m_s.clear(), "Failed to clear the s matrix.");
-                    CALL_AND_HANDLE(m_s2.clear(), "Failed to clear the s matrix.");
                     CALL_AND_HANDLE(m_temp.clear(), "Failed to clear a temporary working matrix.");
                     CALL_AND_HANDLE(m_temp2.clear(), "Failed to clear a temporary working matrix..");
                     CALL_AND_HANDLE(m_svd.clear(), "Failed to clear the svd engine.");
@@ -101,7 +131,6 @@ namespace ttns
                 try
                 {
                     CALL_AND_HANDLE(m_s.resize(A.shape()), "Failed to resize m_s matrix.");
-                    CALL_AND_HANDLE(m_s2.resize(A.shape()), "Failed to resize m_s matrix.");
                     size_type ws;
                     CALL_AND_HANDLE(ws = m_svd.query_work_space(A, m_s, U, V, false), "Failed when making query work space call for the underlying svd object.");
                     return ws;
@@ -246,84 +275,12 @@ namespace ttns
             }
 
         public:
-            template <typename Atype>
-            void operator()(const Atype &A)
-            {
-                try
-                {
-                    // check that the temporary arrays have the correct capacity
-                    ASSERT(A.shape(1) <= m_s.capacity(), "The matrix of singular values does not have sufficient capacity.");
-
-                    CALL_AND_HANDLE(m_s.resize(A.shape(1), A.shape(1)), "Failed to resize S matrix.");
-                    CALL_AND_HANDLE(m_svd(A, m_s), "Failed when evaluating the decomposition.")
-                    CALL_AND_HANDLE(m_shost = m_s, "Failed to copy singular values to host.");
-                }
-                catch (const common::invalid_value &ex)
-                {
-                    std::cerr << ex.what() << std::endl;
-                    RAISE_NUMERIC("applying the decomposition engine.");
-                }
-                catch (const std::exception &ex)
-                {
-                    std::cerr << ex.what() << std::endl;
-                    RAISE_EXCEPTION("Failed to apply the decomposition engine.");
-                }
-            }
-
-            template <typename Atype, typename Utype, typename Vtype>
-            size_type operator()(const Atype &A, Utype &U, Vtype &V, real_type tol = real_type(0), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation, bool save_shost = false)
-            {
-                try
-                {
-                    // check that the temporary arrays have the correct capacity
-                    ASSERT(V.size() <= m_temp.capacity(), "The temporary matrix does not have sufficient capacity.");
-                    ASSERT(A.shape(1) <= m_s.capacity(), "The matrix of singular values does not have sufficient capacity.");
-
-                    CALL_AND_HANDLE(m_s.resize(A.shape(1), A.shape(1)), "Failed to resize S matrix.");
-                    CALL_AND_HANDLE(m_s2.resize(A.shape(1), A.shape(1)), "Failed to resize S matrix.");
-                    CALL_AND_HANDLE(m_temp.resize(V.shape()), "Failed to resize temporary V matrix to ensure it has the correct shape.");
-                    CALL_AND_HANDLE(m_svd(A, m_s2, U, m_temp, A.shape(0) < A.shape(1)), "Failed when evaluating the decomposition.")
-
-                    size_type bond_dimension = get_truncated_bond_dimension(m_s2, A.shape(1), tol, nchi, rel_truncate, trunc_mode);
-
-                    if (A.shape(1) > 1 && A.shape(0) > 1)
-                    {
-                        if (bond_dimension < 2)
-                        {
-                            bond_dimension = 2;
-                        }
-                    }
-
-                    // now we need to ensure that the U matrix and R = S*V matrix are all the correct sizes.  Namely we need
-                    // U.shape() == (A.shape(0), bond_dimension) and R.shape() = (bond_dimension, bond_dimension)
-
-                    CALL_AND_HANDLE(resizeU(U, A.shape(0), bond_dimension), "Failed to resize U matrix to make it compatible with expected bond dimension.");
-                    CALL_AND_HANDLE(resizeS(m_s2, bond_dimension), "Failed to resize S matrix to make it compatible with expected bond dimension.");
-                    CALL_AND_HANDLE(resizeV(V, bond_dimension, A.shape(1)), "Failed to resize V matrix to make it compatible with expected bond dimension.");
-
-                    if (save_shost)
-                    {
-                        CALL_AND_HANDLE(m_shost = m_s2, "Failed to copy singular values to host.");
-                    }
-                    return bond_dimension;
-                }
-                catch (const common::invalid_value &ex)
-                {
-                    std::cerr << ex.what() << std::endl;
-                    RAISE_NUMERIC("applying the decomposition engine.");
-                }
-                catch (const std::exception &ex)
-                {
-                    std::cerr << ex.what() << std::endl;
-                    RAISE_EXCEPTION("Failed to apply the decomposition engine.");
-                }
-            }
-
             template <typename Atype, typename Utype, typename Vtype, typename Stype>
             size_type operator()(const Atype &A, Utype &U, Vtype &V, Stype &S, real_type tol = real_type(-1), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation, bool save_shost = false)
             {
                 try
                 {
+                    //std::cerr << A.shape(1) << " " << m_s.capacity() << std::endl;
                     // check that the temporary arrays have the correct capacity
                     ASSERT(V.size() <= m_temp.capacity(), "The temporary matrix does not have sufficient capacity.");
                     ASSERT(A.shape(1) <= m_s.capacity(), "The matrix of singular values does not have sufficient capacity.");
@@ -522,7 +479,6 @@ namespace ttns
 
             dmat_host_type m_shost;
             dmat_type m_s;
-            dmat_type m_s2;
             matrix_type m_temp;
             matrix_type m_temp2;
             svd_engine m_svd;

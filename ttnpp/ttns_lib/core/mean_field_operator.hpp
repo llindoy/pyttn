@@ -17,6 +17,7 @@
 
 #include "sop_env_node.hpp"
 #include "kronecker_product_operator_helper.hpp"
+#include "matrix_element_buffer.hpp"
 
 namespace ttns
 {
@@ -40,7 +41,7 @@ namespace ttns
         using op_container = typename soptype::container_type;
 
         using mat = linalg::matrix<T, backend>;
-        using triad = std::vector<mat>;
+        using buffer_type = matrix_element_buffer<T, backend>;
         using cinftype = sttn_node_data<T>;
 
         using size_type = typename backend::size_type;
@@ -83,44 +84,46 @@ namespace ttns
 
     public:
         template <typename opnode>
-        static inline void evaluate(const cinfnode &hinf, const hnode &A, triad &HA, triad &temp, opnode &h)
+        static inline void evaluate(const cinfnode &hinf, const hnode &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads=1, size_t /*set_var_nthreads*/=1)
         {
             if (!h.is_root())
             {
                 size_type mode = h.child_id();
                 const auto &hinf_p = hinf.parent();
-                CALL_AND_RETHROW(_evaluate_term(hinf(), hinf_p(), mode, A(), HA, temp, h));
+                CALL_AND_RETHROW(_evaluate_term(hinf(), hinf_p(), mode, A(), buffer, h, operator_sum_nthreads));
             }
         }
 
         template <typename opnode>
-        static inline void evaluate(const ms_cinfnode &hinf, const ms_hnode &A, triad &HA, triad &temp, opnode &h)
+        static inline void evaluate(const ms_cinfnode &hinf, const ms_hnode &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads=1, size_t set_var_nthreads=1)
         {
             if (!h.is_root())
             {
-                // std::cerr << "node index: " << h.id() << " " << (h.is_leaf() ? "leaf" : "not leaf") << " " << (h.parent().is_root() ? "parent root" : "not root") << std::endl;
                 size_type mode = h.child_id();
                 const auto &hinf_p = hinf.parent();
 
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
-#pragma omp parallel for default(shared) if (HA.size() > 1 && hinf().size() > 1) num_threads(HA.size())
-#endif
+#pragma omp parallel for default(shared) if (buffer.buf > 1 && hinf().size() > 1) num_threads((buffer.buf < set_var_nthreads ? buffer.buf : set_var_nthreads))
 #endif
                 for (size_t row = 0; row < hinf().size(); ++row)
                 {
                     for (size_t ci = 0; ci < hinf()[row].size(); ++ci)
                     {
+#ifdef USE_OPENMP
+                        size_t tid = omp_get_thread_num();
+#else
+                        size_t tid = 0;
+#endif
                         size_t col = hinf()[row][ci].col();
                         ms_sop_env_slice<T, backend> hslice(h, row, ci);
 
                         if (row == col)
                         {
-                            _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, A(row), HA, temp, hslice);
+                            _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, A(row), buffer, hslice, operator_sum_nthreads, tid);
                         }
                         else
                         {
-                            _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, A(row), A(col), HA, temp, hslice);
+                            _evaluate_term(hinf()[row][ci], hinf_p()[row][ci], mode, A(row), A(col), buffer, hslice, operator_sum_nthreads, tid);
                         }
                     }
                 }
@@ -129,23 +132,24 @@ namespace ttns
 
     protected:
         template <typename opnode>
-        static inline void _evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &A, triad &HA, triad &temp, opnode &h)
+        static inline void _evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
             try
             {
-
                 const auto &h_p = h.parent();
 
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_HAMILTONIAN_SUM
-                // #pragma omp parallel for default(shared) schedule(dynamic, 1)
-#endif
+                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(dynamic, 1)
 #endif
                 for (size_type ind = 0; ind < hinf.nterms(); ++ind)
                 {
-                    size_type ti = omp_get_thread_num();
-                    CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
-                    CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+#ifdef USE_OPENMP
+                    size_type ti = omp_get_thread_num() + tid*operator_sum_nthreads;
+#else
+                    size_type ti = tid*operator_sum_nthreads;
+#endif                                    
+                    CALL_AND_HANDLE(buffer.HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+                    CALL_AND_HANDLE(buffer.temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
 
                     // if the mean field operator is the identity then we don't need to do anything.
                     if (!hinf[ind].is_identity_mf())
@@ -157,21 +161,21 @@ namespace ttns
 
                             if (!hinf_p[pi].is_identity_mf())
                             {
-                                CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, A, HA[ti], temp[ti]), "Failed to evaluate action of kronecker product operator.");
-                                CALL_AND_HANDLE(HA[ti] = temp[ti] * trans(h_p().mf(pi)), "Failed to apply action of parent mean field operator.");
+                                CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, A, buffer.HA[ti], buffer.temp[ti]), "Failed to evaluate action of kronecker product operator.");
+                                CALL_AND_HANDLE(buffer.HA[ti] = buffer.temp[ti] * trans(h_p().mf(pi)), "Failed to apply action of parent mean field operator.");
                             }
                             else
                             {
-                                CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, A, temp[ti], HA[ti]), "Failed to evaluate action of kronecker product operator.");
+                                CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, A, buffer.temp[ti], buffer.HA[ti]), "Failed to evaluate action of kronecker product operator.");
                             }
 
-                            CALL_AND_HANDLE(temp[ti] = conj(A.as_matrix()), "Failed to compute conjugate of the A matrix.");
+                            CALL_AND_HANDLE(buffer.temp[ti] = conj(A.as_matrix()), "Failed to compute conjugate of the A matrix.");
 
                             try
                             {
                                 auto _A = A.as_rank_3(mode);
-                                auto _HA = HA[ti].reinterpret_shape(_A.shape(0), _A.shape(1), _A.shape(2));
-                                auto _temp = temp[ti].reinterpret_shape(_A.shape(0), _A.shape(1), _A.shape(2));
+                                auto _HA = buffer.HA[ti].reinterpret_shape(_A.shape(0), _A.shape(1), _A.shape(2));
+                                auto _temp = buffer.temp[ti].reinterpret_shape(_A.shape(0), _A.shape(1), _A.shape(2));
 
                                 CALL_AND_HANDLE(h().mf(ind) += hinf[ind].mf_coeff(it) * (contract(_temp, 0, 2, _HA, 0, 2)), "Failed when evaluating the final contraction.");
                             }
@@ -192,31 +196,31 @@ namespace ttns
         }
 
         template <typename opnode>
-        static inline void _evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &B, const hdata &A, triad &HA, triad &temp, opnode &h)
+        static inline void _evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &B, const hdata &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
             if (&A == &B)
             {
-                CALL_AND_RETHROW(return _evaluate_term(hinf, hinf_p, mode, A, HA, temp, h));
+                CALL_AND_RETHROW(return _evaluate_term(hinf, hinf_p, mode, A, buffer, h, operator_sum_nthreads, tid));
             }
             try
             {
 
                 const auto &h_p = h.parent();
                 {
-                    size_type ti = omp_get_thread_num();
-                    CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
-                    CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+                    size_type ti = tid*operator_sum_nthreads;
+                    CALL_AND_HANDLE(buffer.HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+                    CALL_AND_HANDLE(buffer.temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
 
-                    CALL_AND_HANDLE(kpo::kpo_id(h_p, A, mode, HA[ti], temp[ti]), "Failed to apply kronecker product operator.");
-                    CALL_AND_HANDLE(HA[ti] = temp[ti] * trans(h_p().mf_id()), "Failed to apply action of parent mean field operator.");
-                    CALL_AND_HANDLE(temp[ti] = conj(B.as_matrix()), "Failed to compute conjugate of the A matrix.");
+                    CALL_AND_HANDLE(kpo::kpo_id(h_p, A, mode, buffer.HA[ti], buffer.temp[ti]), "Failed to apply kronecker product operator.");
+                    CALL_AND_HANDLE(buffer.HA[ti] = buffer.temp[ti] * trans(h_p().mf_id()), "Failed to apply action of parent mean field operator.");
+                    CALL_AND_HANDLE(buffer.temp[ti] = conj(B.as_matrix()), "Failed to compute conjugate of the A matrix.");
 
                     try
                     {
                         auto _A = A.as_rank_3(mode);
                         auto _B = B.as_rank_3(mode);
-                        auto _HA = HA[ti].reinterpret_shape(_B.shape(0), _A.shape(1), _B.shape(2));
-                        auto _temp = temp[ti].reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
+                        auto _HA = buffer.HA[ti].reinterpret_shape(_B.shape(0), _A.shape(1), _B.shape(2));
+                        auto _temp = buffer.temp[ti].reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
 
                         CALL_AND_HANDLE(h().mf_id() = (contract(_temp, 0, 2, _HA, 0, 2)), "Failed when evaluating the final contraction.");
                     }
@@ -228,19 +232,20 @@ namespace ttns
                 }
 
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_HAMILTONIAN_SUM
-                // #pragma omp parallel for default(shared) schedule(dynamic, 1)
-#endif
+                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(dynamic, 1)
 #endif
                 for (size_type ind = 0; ind < hinf.nterms(); ++ind)
                 {
                     // if the mean field operator is the identity then we don't need to do anything.
                     if (!hinf[ind].is_identity_mf())
                     {
-                        size_type ti = omp_get_thread_num();
-
-                        CALL_AND_HANDLE(HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
-                        CALL_AND_HANDLE(temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+#ifdef USE_OPENMP
+                        size_type ti = omp_get_thread_num() + tid*operator_sum_nthreads;
+#else
+                        size_type ti = tid*operator_sum_nthreads;
+#endif                
+                        CALL_AND_HANDLE(buffer.HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+                        CALL_AND_HANDLE(buffer.temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
 
                         h().mf(ind).fill_zeros();
                         for (size_type it = 0; it < hinf[ind].nmf_terms(); ++it)
@@ -249,30 +254,30 @@ namespace ttns
 
                             if (hinf[ind].mf_indexing()[it].sibling_indices().size() == 0)
                             {
-                                CALL_AND_HANDLE(kpo::kpo_id(h_p, A, mode, HA[ti], temp[ti]), "Failed to apply kronecker product operator.");
+                                CALL_AND_HANDLE(kpo::kpo_id(h_p, A, mode, buffer.HA[ti], buffer.temp[ti]), "Failed to apply kronecker product operator.");
                             }
                             else
                             {
-                                CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, B, A, mode, HA[ti], temp[ti]), "Failed to evaluate action of kronecker product operator.");
+                                CALL_AND_HANDLE(kron_prod(h, hinf, ind, it, B, A, mode, buffer.HA[ti], buffer.temp[ti]), "Failed to evaluate action of kronecker product operator.");
                             }
                             if (!hinf_p[pi].is_identity_mf())
                             {
-                                CALL_AND_HANDLE(HA[ti] = temp[ti] * trans(h_p().mf(pi)), "Failed to apply action of parent mean field operator.");
+                                CALL_AND_HANDLE(buffer.HA[ti] = buffer.temp[ti] * trans(h_p().mf(pi)), "Failed to apply action of parent mean field operator.");
                             }
                             else
                             {
-                                CALL_AND_HANDLE(HA[ti] = temp[ti] * trans(h_p().mf_id()), "Failed to apply action of parent mean field operator.");
+                                CALL_AND_HANDLE(buffer.HA[ti] = buffer.temp[ti] * trans(h_p().mf_id()), "Failed to apply action of parent mean field operator.");
                             }
 
-                            CALL_AND_HANDLE(temp[ti] = conj(B.as_matrix()), "Failed to compute conjugate of the A matrix.");
+                            CALL_AND_HANDLE(buffer.temp[ti] = conj(B.as_matrix()), "Failed to compute conjugate of the A matrix.");
 
                             try
                             {
                                 auto _A = A.as_rank_3(mode);
                                 auto _B = B.as_rank_3(mode);
 
-                                auto _HA = HA[ti].reinterpret_shape(_B.shape(0), _A.shape(1), _B.shape(2));
-                                auto _temp = temp[ti].reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
+                                auto _HA = buffer.HA[ti].reinterpret_shape(_B.shape(0), _A.shape(1), _B.shape(2));
+                                auto _temp = buffer.temp[ti].reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
 
                                 CALL_AND_HANDLE(h().mf(ind) += hinf[ind].mf_coeff(it) * (contract(_temp, 0, 2, _HA, 0, 2)), "Failed when evaluating the final contraction.");
                             }
@@ -293,15 +298,15 @@ namespace ttns
         }
 
         template <typename opnode>
-        static inline void evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &B, const hdata &A, triad &HA, triad &temp, opnode &h)
+        static inline void evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &B, const hdata &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads = 1)
         {
             if (&A == &B)
             {
-                CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, A, HA, temp, h));
+                CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, A, buffer, h, operator_sum_nthreads));
             }
             else
             {
-                CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, B, A, HA, temp, h));
+                CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, B, buffer, h, operator_sum_nthreads));
             }
         }
 

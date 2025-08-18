@@ -10,20 +10,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+import copy
 import os
-
+import sys
+import time
 os.environ["OMP_NUM_THREADS"] = "1"
 
-import numpy as np
-import time
-import sys
-import copy
 import h5py
-
-from pyttn import system_modes, generic_mode, boson_mode
-from pyttn import ttn, sop_operator, matrix_element, tdvp
-from pyrazine_tree import build_topology_mode_combination
+import numpy as np
 from pyrazine_hamiltonian import hamiltonian
+from pyrazine_tree import build_topology_mode_combination
+
+from pyttn import (
+    boson_mode,
+    generic_mode,
+    matrix_element,
+    sop_operator,
+    system_modes,
+    tdvp,
+    ttn,
+)
 
 fs = 41.341374575751
 

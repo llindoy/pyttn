@@ -10,17 +10,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
-import time
-import h5py
-import copy
 import argparse
+import copy
+import os
+import time
+
+os.environ["OMP_NUM_THREADS"] = "1"
+
+import h5py
+import numpy as np
+from numba import jit
 
 import pyttn
 from pyttn import oqs
 from pyttn.oqs.bath_fitting import softmspace
 
-from numba import jit
 
 def evolve_imaginary_time_two(A, B, h, mel, sweep, sweepB, betasteps):
     beta_p = 0
@@ -29,7 +33,6 @@ def evolve_imaginary_time_two(A, B, h, mel, sweep, sweepB, betasteps):
         sweep.dt = betasteps[i] - beta_p
         beta_p = betasteps[i]
         sweep.step(A, h)
-        rho = A.normalise()
         rhoB = B.normalise()
         rho0 *= rhoB / rho0
         print("imstep:",i, A.maximum_bond_dimension(), end='                  \r', flush=True)
@@ -76,8 +79,6 @@ def Ct(t, w, g):
 
 def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta=5, nbeta=100, nsamples=256, Ncut=50, nstep=1, 
                  Nw=9, ofname="sbm.h5", degree=2, spawning_threshold=2e-4, unoccupied_threshold=1e-4, nunoccupied=0):
-
-    t = np.arange(nstep + 1) * dt
 
     #setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
@@ -206,7 +207,7 @@ def sbm_dynamics(Nb, alpha, wc, s, eps, delta, chi, nbose, dt, beta=5, nbeta=100
         sweep_therm.t = 0
 
         sweep_therm.coefficient = -1.0
-        for iter in range(1):
+        for _ in range(1):
             sweep.t = 0
             print(A.collapse_basis(Uproj, nchi=2), mode_dims)
             A.normalise()

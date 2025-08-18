@@ -11,8 +11,9 @@
 # limitations under the License
 
 import copy
-import numpy as np
 from typing import Optional, Union
+
+import numpy as np
 
 from pyttn.ttnpp import system_modes
 
@@ -66,7 +67,7 @@ class ModeCombination:
         """
         if not isinstance(mode_inds, (np.ndarray, list)):
             if mode_inds is None:
-                mode_inds = [x for x in range(len(mode_dims))]
+                mode_inds = list(range(len(mode_dims)))
 
         nbmax = self.nbmax
         nhilbmax = self.nhilb
@@ -84,7 +85,7 @@ class ModeCombination:
             # if the current cmode object is empty then we just add the current mode to the composite mode and increment
             if len(cmode) == 0:
                 # add in all modes up to the blocksize
-                for j in range(blocksize):
+                for _ in range(blocksize):
                     cmode.append(mode_inds[mode])
                     chilb = chilb * mode_dims[mode]
                     mode += 1
@@ -104,7 +105,7 @@ class ModeCombination:
                     nbmax is None or len(cmode) < nbmax
                 ) and chilb * nextdims <= nhilbmax:
                     # add all modes in the next block
-                    for j in range(blocksize):
+                    for _ in range(blocksize):
                         cmode.append(mode_inds[mode])
                         chilb = chilb * mode_dims[mode]
                         mode += 1

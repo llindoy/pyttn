@@ -64,6 +64,7 @@
 #include "ttns/operators/product_operator.hpp"
 #include "ttns/operators/siteOperators.hpp"
 #include "ttns/operators/sop_operator.hpp"
+#include "ttns/operators/Op.hpp"
 
 #include "ttns/algorithms/dmrg.hpp"
 #include "ttns/algorithms/tdvp.hpp"
@@ -149,6 +150,7 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
     initialise_liouville_space<pyttn_real_type>(m);
     initialise_convert_to_dense<pyttn_real_type>(m);
+    initialise_Op<pyttn_real_type, linalg::blas_backend>(m);
 
     //
     // Wrap the models functionality included in SOP
@@ -158,6 +160,8 @@ PYBIND11_MODULE(ttnpp, m)
 #ifdef PYTTN_BUILD_CUDA
     // the GPU implementations
     initialise_operator_dictionary<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    initialise_Op<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+
 #endif
 
     //

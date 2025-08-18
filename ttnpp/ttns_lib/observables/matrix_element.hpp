@@ -670,7 +670,7 @@ namespace ttns
                                 const auto &h = sop.contraction_info()[ind];
                                 CALL_AND_RETHROW(m_buf.resize(psi[ind](set_index).shape(0), psi[ind](set_index).shape(1)));
 
-                                CALL_AND_HANDLE(spo::evaluate(sop, h, psi[ind], psi[ind], set_index, nr, m_matel[ind], m_buf.HA, m_buf.temp, compute_identity), "Failed to compute expectation value.");
+                                CALL_AND_HANDLE(spo::evaluate(sop, h, psi[ind], psi[ind], set_index, nr, m_matel[ind], m_buf, compute_identity), "Failed to compute expectation value.");
                             }
                             const auto &hr = sop.contraction_info().root()();
                             CALL_AND_HANDLE(retval += accum_root(hr, set_index, nr, Eshift, !compute_identity), "Failed to return result.");
@@ -719,7 +719,7 @@ namespace ttns
 
                             const auto &h = sop.contraction_info()[ind];
                             CALL_AND_RETHROW(m_buf.resize(ket[ind](set_index).shape(0), ket[ind](set_index).shape(1)));
-                            CALL_AND_HANDLE(spo::evaluate(sop, h, bra[ind], ket[ind], set_index, nr, m_matel[ind], m_buf.HA, m_buf.temp, compute_identity), "Failed to compute expectation value.");
+                            CALL_AND_HANDLE(spo::evaluate(sop, h, bra[ind], ket[ind], set_index, nr, m_matel[ind], m_buf, compute_identity), "Failed to compute expectation value.");
                         }
 
                         const auto &hr = sop.contraction_info().root()();

@@ -12,7 +12,8 @@
 
 
 import numpy as np
-from pyttn import SOP, sOP
+
+from pyttn import SOP, operator_dictionary, site_operator, sOP
 
 # convert from eV to hartree
 eV = 0.0367493049512081
@@ -61,7 +62,6 @@ def ot_mode_index(Nf, n, li):
 
 
 def build_operator_dictionary(N, Nfragments):
-    from pyttn import site_operator, operator_dictionary
 
     # set up the system operator dictionary
     opdict = operator_dictionary(N)

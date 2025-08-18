@@ -10,16 +10,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from abc import ABCMeta, abstractmethod
+from typing import Iterator, Optional, Union
+
 import numpy as np
-from abc import ABCMeta
 
-from typing import Union, Optional
-
-from pyttn.ttnpp import ms_ttn_complex
+from pyttn.linalg import Matrix
+from pyttn.ttnpp import ms_ttn_complex, ms_ttn_node_complex
+from .ttnExt import ttnNodeData
 
 # and attempt to import the real ttns
 try:
-    from pyttn.ttnpp import ms_ttn_real
+    from pyttn.ttnpp import ms_ttn_real, ms_ttn_node_real
 
     _real_ttn_import = True
 except ImportError:
@@ -28,20 +30,208 @@ except ImportError:
 # and attempt to import the cuda backend
 try:
     from pyttn.ttnpp.cuda import ttn_complex as ms_ttn_complex_cuda
+    from pyttn.ttnpp.cuda import ttn_node_complex as ms_ttn_node_complex_cuda
 
     _cuda_import = True
     # and if we have imported real ttns we import the cuda versions
     if _real_ttn_import:
         from pyttn.ttnpp.cuda import ttn_real as ms_ttn_real_cuda
+        from pyttn.ttnpp.cuda import ttn_node_real as ms_ttn_node_real_cuda
 
 except ImportError:
     _cuda_import = False
 
 
-def is_ms_ttn(A) -> bool:
-    r"""A function for determining whether a given object is a multiset ttn
+
+def is_ms_ttn_node(A) -> bool:
+    """A function for determining whether a given object is a msttnNode object
     :param A: The object to test
-    :returns: Whether or not the object is a ms_ttn
+    :return: Whether or not the object is a ttnNode
+    :rtype: bool
+    """
+    ret = isinstance(A, ms_ttn_node_complex)
+    if _real_ttn_import:
+        ret = ret or isinstance(A, ms_ttn_node_real)
+
+    if _cuda_import:
+        ret = ret or isinstance(A, ms_ttn_node_complex_cuda)
+
+        if _real_ttn_import:
+            ret = ret or isinstance(A, ms_ttn_node_real_cuda)
+
+    return ret
+
+def _ms_ttn_node_blas(dtype=np.complex128):
+    if dtype == np.complex128 or dtype is complex or not _real_ttn_import:
+        return ms_ttn_node_complex()
+    elif dtype == np.float64 or dtype is float:
+        return ms_ttn_node_real()
+    else:
+        raise RuntimeError("Invalid dtype for msttnNode")
+
+
+
+def _ms_ttn_node_cuda(dtype=np.complex128):
+    if dtype == np.complex128 or dtype is complex or not _real_ttn_import:
+        return ms_ttn_node_complex_cuda()
+    elif dtype == np.float64 or dtype is float:
+        return ms_ttn_node_real_cuda()
+    else:
+        raise RuntimeError("Invalid dtype for msttnNode")
+
+
+class msttnNode(metaclass=ABCMeta):
+    """Class for handling a node in a ttn"""
+    def __new__(
+        cls, 
+        dtype: Optional[
+            Union[float, complex, np.float64, np.complex128]
+        ] = np.complex128,
+        backend: str = "blas"
+    ) -> "msttnNode":
+        """Factory function for constructing  a tree tensor network node
+
+        :param dtype: The dtype to use for the ttn node.  (Default: np.complex128)
+        :type dtype: {np.float64, np.complex128}, optional
+        :param backend: The computational backend to use for the ttn node.  (Default: "blas")
+        :type backend: {"blas", "cuda"}, optional
+        :return: The Tree Tensor Network Node object
+        :rtype: msttnNode
+        """
+        if backend == "blas":
+            return _ms_ttn_node_blas(dtype=dtype)
+        elif _cuda_import and backend == "cuda":
+            return _ms_ttn_node_cuda(dtype=dtype)
+        else:
+            raise RuntimeError("Invalid backend type for msttnNode")
+        
+    @abstractmethod
+    def data(self) -> list[ttnNodeData]:
+        """Returns the ttnNodeData object stored at the node
+
+        :return: The tensor node information stored at the node
+        :rtype: list[ttnNodeData]
+        """
+        pass
+
+    @abstractmethod
+    def __call__(self) -> list[ttnNodeData]:
+        """Returns the ttnNodeData object stored at the node
+
+        :return: The tensor node information stored at the node
+        :rtype: list[ttnNodeData]
+        """
+        pass
+
+    @abstractmethod
+    def is_root(self) -> bool:
+        """Returns whether or not the current node is the root
+
+        :return: Whether or not the current node is the root
+        :rtype: bool
+        """
+        pass
+
+    @abstractmethod
+    def is_leaf(self) -> bool:
+        """Returns whether or not the current node is a leaf
+
+        :return: Whether or not the current node is a leaf
+        :rtype: bool
+        """
+        pass
+    
+    @abstractmethod
+    def complex_dtype(self) -> bool:
+        """Returns whether or not the object stores a complex valued dtype
+
+        :return: dtype
+        :rtype: bool
+        """
+        pass
+
+    @abstractmethod
+    def conj(self) -> None:
+        "Take the complex conjugate of the msttnNode.  Here this is evaluated lazily"
+        pass    
+
+    @abstractmethod
+    def nmodes(self) -> int:
+        """
+        :return: The number of modes stored at this node.  That is the number of children of the node.
+        :rtype: int
+        """
+        pass
+
+    @abstractmethod
+    def __len__(self) -> int:
+        """
+        :return: The number of modes stored at this node.  That is the number of children of the node.
+        :rtype: int
+        """
+        pass
+
+    @abstractmethod
+    def __str__(self) -> str:
+        """
+        :return: A string represent of the msttnNode object
+        :rtype: str
+        """
+        pass
+
+    @abstractmethod
+    def backend(self) -> str:
+        """Returns a string labelling the backend of the msttnNode object
+
+        :return: backend label
+        :rtype: str
+        """
+        pass
+
+    @abstractmethod
+    def __getitem__(self, ind : int) -> "msttnNode":
+        """Returns the child of the current node at index ind
+
+        :param ind: The index of the child to access
+        :type ind: int
+        :return: The child at index ind
+        :rtype: msttnNode
+        """
+        pass
+
+    @abstractmethod
+    def child(self, ind : int) -> "msttnNode":
+        """Returns the child of the current node at index ind
+
+        :param ind: The index of the child to access
+        :type ind: int
+        :return: The child at index ind
+        :rtype: msttnNode
+        """
+        pass
+
+    @abstractmethod
+    def __iter__(self) -> Iterator:
+        """
+        :return: Iterator object over the children of the current node
+        :rtype: Iterator
+        """
+        pass
+
+msttnNode.register(ms_ttn_node_complex)
+if _real_ttn_import:
+    msttnNode.register(ms_ttn_node_real)
+if _cuda_import:
+    msttnNode.register(ms_ttn_node_complex_cuda)
+    if _real_ttn_import:
+        msttnNode.register(ms_ttn_node_real_cuda)
+
+ms_ttn_node = msttnNode
+
+def is_ms_ttn(A) -> bool:
+    """A function for determining whether a given object is a multiset ttn
+    :param A: The object to test
+    :return: Whether or not the object is a ms_ttn
     :rtype: bool
     """
     ret = isinstance(A, ms_ttn_complex)
@@ -58,9 +248,9 @@ def is_ms_ttn(A) -> bool:
 
 
 def is_multiset_ttn(A) -> bool:
-    r"""A function for determining whether a given object is a multiset ttn
+    """A function for determining whether a given object is a multiset ttn
     :param A: The object to test
-    :returns: Whether or not the object is a ms_ttn
+    :return: Whether or not the object is a ms_ttn
     :rtype: bool
     """
     return is_ms_ttn(A)
@@ -119,20 +309,20 @@ def _ms_ttn_cuda(*args, dtype=np.complex128, **kwargs):
 
 
 
-class multiset_ttn(metaclass=ABCMeta):
+class msttn(metaclass=ABCMeta):
     """Class for handling multiset tree tensor network state operator
     """   
     def __new__(cls, *args,
         dtype: Optional[Union[float, complex, np.float64, np.complex128]] = np.complex128,
         backend: str = "blas",
         **kwargs,
-    ) -> 'multiset_ttn':
+    ) -> 'msttn':
         """Factory function for constructing a multiset tree tensor network state operator
 
-        :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
+        :param `*args`: Variable length list of arguments. This function can handle two possible lists of arguments
 
             - Default construct a multiset TTN object
-            - msttn (:class:`multiset_ttn`) - Copy construct a multiset TTN object
+            - msttn (:class:`msttn`) - Copy construct a multiset TTN object
             - tree (:class:`ntree`), nset (int) - Construct a multiset TTN from an Ntree object and the number of set variables
             - string (str), nset (int) - Construct multiset TTN from an string defining an Ntree object and the number of set variables
 
@@ -140,107 +330,116 @@ class multiset_ttn(metaclass=ABCMeta):
         :type dtype: {np.float64, np.complex128}, optional
         :param backend: The computational backend to use for the ttn.  (Default: "blas")
         :type backend: {"blas", "cuda"}, optional
-        :param **kwargs: Additional keyword arguments that are based to the ttn object constructor
-        :returns: The Multiset Tree Tensor Network State object
-        :rtype: multiset_ttn 
+        :param `**kwargs`: Additional keyword arguments that are based to the ttn object constructor
+        :return: The Multiset Tree Tensor Network State object
+        :rtype: msttn 
         """   
         if backend == "blas":
             return _ms_ttn_blas(*args, dtype=dtype, **kwargs)
         elif _cuda_import and backend == "cuda":
             return _ms_ttn_cuda(*args, dtype=dtype, **kwargs)
         else:
-            raise RuntimeError("Invalid backend type for multiset_ttn")
+            raise RuntimeError("Invalid backend type for msttn")
 
 
-    
-    def complex_dtype(self):
+    @abstractmethod
+    def complex_dtype(self) -> bool:
         """Return the data type stored in the multiset ttn
 
-        :returns: dtype
-        :rtype: {np.complex128 or np.float64}
+        :return: Whether or not the object has a complex dtype
+        :rtype: bool
         """
         pass
 
-    
-    def nthreads(self):
+    @abstractmethod
+    def backend(self) -> str:
+        """Returns a string labelling the backend of the multiset ttn object
+
+        :return: backend label
+        :rtype: str
+        """
+        pass
+
+    @abstractmethod
+    def nthreads(self) -> int:
         """Stores the number of threads that can be used to attempt to parallelise updates over the set variables
 
-        :returns: dtype
+        :return: dtype
         :rtype: {np.complex128 or np.float64}
         """
         pass
 
-        
-    def assign(self, o):
+    @abstractmethod    
+    def assign(self, o) -> None:
         """Assign the value of this multiset ttn from another multiset ttn
 
         :param o: The other multiset ttn object
-        :type o: multiset_ttn
+        :type o: msttn
         """
         pass
 
-    
-    def slice(self, i):
+    @abstractmethod
+    def slice(self, i) -> "msttnSlice":  # type: ignore # noqa: F821
         """Returns a slice object that allows for easy accessing of the multiset ttn correspond to a single set variable i
 
         :param i: The set index of the slice
         :type i: int
 
         :return: A slice of the multiset ttn used for accessing the tensor network associated with a single system state
-        :rtype: multiset_ttn_slice
+        :rtype: msttnSlice
 
         """
 
-    
+    @abstractmethod
     def bond(self):
         """Return a list of all bonds in the network
 
-        :returns: All bonds in the network
+        :return: All bonds in the network
         :rtype: list[int, int]
         """
         pass
 
-    
-    def bond_dimensions(self):
+    @abstractmethod
+    def bond_dimensions(self) -> dict[tuple[int,int], list[int]]:
         """Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network
 
-        :returns: All bond dimensions in the network
-        :rtype: dict([int, int], list[int])
+        :return: All bond dimensions in the network
+        :rtype: dict[tuple[int,int], list[int]]
         """
         pass
 
-    
-    def bond_capacities(self):
+    @abstractmethod
+    def bond_capacities(self) -> dict[tuple[int,int], list[int]]:
         """Return a dictionary containing the bond (the two sites forming the bond) and maximum bond dimension of all bonds in the network
 
-        :returns: All maximum bond dimensions in the network
-        :rtype: dict([int, int], list[int])
+        :return: All maximum bond dimensions in the network
+        :rtype: dict[tuple[int,int], list[int]]
         """
         pass
 
-    
-    def reset_orthogonality_centre(self):
+    @abstractmethod
+    def reset_orthogonality_centre(self) -> None:
         """Resets the orthogonality centre of the multiset TTN to the root node of the tree."""
         pass
 
-    
-    def resize(self, *args, nset, purification=False):
+    @abstractmethod
+    def resize(self, *args, nset, purification=False) -> None:
         """Resize the multiset TTN object given a new set of topology information. This optionally takes a flag allowing for the state to automatically represent a purification of a wavefunction
 
-        :param *args: A variable length list of arguments. Valid options are
+        :param `*args`: A variable length list of arguments. Valid options are
 
             - **topology** (:class:`ntree` or str) - Construct a multiset ttn from a ntree object defining the topology and bond dimensions of the ttn
             - **topology** (:class:`ntree` or str), **capacity** (ntree or str ) - Construct a multiset ttn from an ntree object defining the topology and a capacity defining the maximum bond dimensions
-        :type *args: [Arguments (variable number and type)]
-        :param nset: The number of set variables to use for the multiset_ttn
+        :type `*args`: [Arguments (variable number and type)]
+        :param nset: The number of set variables to use for the msttn
         :type nset: int
         :param purification: Whether or not the buffers should be resized to store a purification of the requested state size.  (Default: False)
         :type purification: bool, optional
         """
         pass
 
-    
-    def set_seed(self, seed):
+    @abstractmethod
+    def set_seed(self, seed) -> None:
         """Set the value of the random number generate seed used for internal operations requiring random sampling
 
         :param seed: The new value of the seed
@@ -248,14 +447,14 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
-    def set_state(self, *args, random_unoccupied_initialisation=False):
+    @abstractmethod
+    def set_state(self, *args, random_unoccupied_initialisation=False) -> None:
         """Set the coefficients in the multiset TTN so that it represents a user specified product state
 
-        :param *args: A variable length list of arguments. Valid options are
+        :param `*args`: A variable length list of arguments. Valid options are
 
             - **set_index** (int), **state** (list[int]) - For setting the state to be a product state vector acting on a specific set index
-            - **coeff** (list[dtype]), **state** (list[list[int]]) - For setting the system to be the state :math:`\sum_i c_i \|i\rangle \bigotimes \mathrm{state}_i`
+            - **coeff** (list[dtype]), **state** (list[list[int]]) - For setting the system to be the state :math:`\\sum_i c_i \\|i\\rangle \\bigotimes \\mathrm{state}_i`
 
         :param random_unoccupied_initialisation: Whether or not to set all other elements of the multiset TTN not determining the product state to random values or not. (Default: False)
         :type random_unoccupied_initialisation: bool, optional
@@ -265,7 +464,7 @@ class multiset_ttn(metaclass=ABCMeta):
     # def set_product(self, state):
     #    """Set the coefficients in the multiset TTN so that it represents a product of a set of one body states
 
-    #    :param *args: A variable length list of arguments. Valid options are
+    #    :param `*args`:`:`: A variable length list of arguments. Valid options are
     #
     #        - **set_index** (int), **state** (list[list[dtype]]) - For setting the state to be a product state vector acting on a specific set index
     #        - **coeff** (list[dtype]), **state** (list[list[list[dtype]]]) - For setting the system to be the state :math:`\sum_i c_i \|i\rangle \bigotimes \mathrm{state}_i`
@@ -286,124 +485,128 @@ class multiset_ttn(metaclass=ABCMeta):
     #    """
     #    pass
 
-    
-    def __imul__(self, b):
+    @abstractmethod
+    def __imul__(self, b : Union[float, complex, np.float64, np.complex128]) -> "msttn":
         """Inplace multiplication of the multiset TTN object by a scalar
 
         :param b: Scalar value to multiply multiset TTN by
-        :type b: number
+        :type b: Union[float, complex, np.float64, np.complex128]
+        :return: The result of the inplace multiplication
+        :rtype: msttn
         """
         pass
 
-    
-    def __idiv__(self, b):
+    @abstractmethod
+    def __idiv__(self, b : Union[float, complex, np.float64, np.complex128]) -> "msttn":
         """Inplace division of the multiset TTN object by a scalar
 
         :param b: Scalar value to divide multiset TTN by
-        :type b: number
+        :type b: Union[float, complex, np.float64, np.complex128]
+        :return: The result of the inplace division
+        :rtype: msttn
         """
         pass
 
-    
-    def conj(self):
+    @abstractmethod
+    def conj(self) -> None:
         "Take the complex conjugate of the multiset TTN.  Here this is evaluated lazily"
         pass
 
-    
-    def random(self):
+    @abstractmethod
+    def random(self) -> None:
         "Sample the coefficients in the multiset TTN randomly from a normal distribution"
         pass
 
-    
-    def zero(self):
+    @abstractmethod
+    def zero(self) -> None:
         "Set all coefficients in the multiset TTN to zero"
         pass
 
-        
-    def clear(self):
+    @abstractmethod    
+    def clear(self) -> None:
         "Clear and deallocate all internal buffers of the multiset TTN"
         pass
 
-    
-    def __iter__(self):
+    @abstractmethod
+    def __iter__(self) -> Iterator:
         """
-        :returns: Iterator object over nodes in multiset TTN
-        :rtype: iterator
+        :return: Iterator object over nodes in multiset TTN
+        :rtype: Iterator
         """
         pass
 
-    
-    def mode_dimensions(self):
+    @abstractmethod
+    def mode_dimensions(self) -> list[int]:
         """
-        :returns: list of local Hilbert space dimensions
+        :return: list of local Hilbert space dimensions
         :rtype: list[int]
         """
         pass
 
-    
-    def dim(self, i):
+    @abstractmethod
+    def dim(self, i : int) -> int:
         """Returns the local Hilbert space dimension of mode i
 
         :param i: The index of the mode
         :type i: int
 
-        :returns: local Hilbert space dimension of mode i
+        :return: local Hilbert space dimension of mode i
         :rtype: int
         """
         pass
 
-    
-    def nmodes(self):
+    @abstractmethod
+    def nmodes(self) -> int:
         """
-        :returns: The number of modes in the multiset TTN
+        :return: The number of modes in the multiset TTN
         :rtype: int
         """
         pass
 
-    
-    def is_purification(self):
+    @abstractmethod
+    def is_purification(self) -> bool:
         """
-        :returns: Whether or not the state represents a purification
+        :return: Whether or not the state represents a purification
         :rtype: bool
         """
         pass
 
-    
-    def ntensors(self):
+    @abstractmethod
+    def ntensors(self) -> int:
         """
-        :returns: The total number of tensors in the tensor network
+        :return: The total number of tensors in the tensor network
         :rtype: int
         """
         pass
 
-    
-    def nsites(self):
+    @abstractmethod
+    def nsites(self) -> int:
         """
-        :returns: The total number of tensors in the tensor network
+        :return: The total number of tensors in the tensor network
         :rtype: int
         """
         pass
 
-    
-    def nset(self):
+    @abstractmethod
+    def nset(self) -> int:
         """
-        :returns: The number of set variables for the multiset TTN.  Here it is one
+        :return: The number of set variables for the multiset TTN.
         :rtype: int
         """
         pass
 
-    
-    def nelems(self):
+    @abstractmethod
+    def nelems(self) -> int:
         """
-        :returns: The total number of elements in all tensors of the network.
+        :return: The total number of elements in all tensors of the network.
         :rtype: int
         """
         pass
 
-    
-    def __len__(self):
+    @abstractmethod
+    def __len__(self) -> int:
         """
-        :returns: The number of modes in the multiset TTN
+        :return: The number of modes in the multiset TTN
         :rtype: int
         """
         pass
@@ -411,7 +614,7 @@ class multiset_ttn(metaclass=ABCMeta):
     # def compute_maximum_bond_entropy(self):
     #    """Computes the maximum SvN across any bond in the tensor network and returns the results
 
-    #    :returns: The maximum bond entropy in the tensor network
+    #    :return: The maximum bond entropy in the tensor network
     #    :rtype: float
 
     #    """
@@ -420,7 +623,7 @@ class multiset_ttn(metaclass=ABCMeta):
     # def maximum_bond_entropy(self):
     #    """Returns the previously computed maximum SvN across any bond in the tensor network
 
-    #    :returns: The maximum bond entropy in the tensor network
+    #    :return: The maximum bond entropy in the tensor network
     #    :rtype: float
 
     #    """
@@ -431,7 +634,7 @@ class multiset_ttn(metaclass=ABCMeta):
     #    Where for all nodes but the root 0 corresponds to the parent of the current orthogonality centre and its children are then 1-nchild,
     #    For the root i just indexes the children
 
-    #    :returns: The bond entropy
+    #    :return: The bond entropy
     #    :rtype: float
 
     #    """
@@ -439,7 +642,7 @@ class multiset_ttn(metaclass=ABCMeta):
 
     # def maximum_bond_dimension(self):
     #    """
-    #    :returns: The maximum bond dimension
+    #    :return: The maximum bond dimension
     #    :rtype: int
 
     #    """
@@ -447,58 +650,58 @@ class multiset_ttn(metaclass=ABCMeta):
 
     # def minimum_bond_dimension(self):
     #    """
-    #    :returns: The minimum bond dimension
+    #    :return: The minimum bond dimension
     #    :rtype: int
 
     #    """
     #    pass
 
-    
-    def has_orthogonality_centre(self):
+    @abstractmethod
+    def has_orthogonality_centre(self) -> bool:
         """            
-        :returns: Whether or not the multiset TTN has an active orthogonality centre
+        :return: Whether or not the multiset TTN has an active orthogonality centre
         :rtype: bool
 
         """
         pass
 
-    
-    def orthogonality_centre(self):
+    @abstractmethod
+    def orthogonality_centre(self) -> int:
         """            
-        :returns: The index of the current orthogonality centre
+        :return: The index of the current orthogonality centre
         :rtype: int
 
         """
         pass
 
-    
-    def is_orthogonalised(self):
+    @abstractmethod
+    def is_orthogonalised(self) -> bool:
         """            
-        :returns: Whether or not the multiset TTN has an orthogonality centre at the root
+        :return: Whether or not the multiset TTN has an orthogonality centre at the root
         :rtype: bool
 
         """
         pass
 
-     
-    def force_set_orthogonality_centre(self, i):
+    @abstractmethod 
+    def force_set_orthogonality_centre(self, i : Union[int, list[int]]) -> None:
         """Sets the orthogonality centre of the tensor network to index i but does not modify the tensor to ensure that this is a
         valid orthogonality centre
 
         :param i: The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre
-        :type i: int or list[int]
+        :type i:  Union[int, list[int]]
 
         """
         pass
 
-       
-    def shift_orthogonality_centre(self, i, tol=0, nchi=0):
+    @abstractmethod   
+    def shift_orthogonality_centre(self, i : int, tol : float = 0, nchi : int =0) -> None:
         """Shift the orthogonality centre down the ith bond of the current orthogonality centre with possible truncation. 
         Where for all nodes but the root 0 corresponds to the parent of the current orthogonality centre and its children are then 1-nchild
         For the root i just indexes the children
 
-        :param i: The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre
-        :type i: int or list[int]
+        :param i: The index of the bond of the current node that we will shift the orthogonality centre across
+        :type i: int
         :param tol: A truncation tolerance for the singular values to discard weight.  (Default: 0)
         :type tol: float, optional
         :param nchi: A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)
@@ -507,13 +710,13 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
-    def set_orthogonality_centre(self, i, tol=0, nchi=0):
+    @abstractmethod
+    def set_orthogonality_centre(self, i  : Union[int, list[int]] , tol : float =0, nchi : int =0) -> None:
         """Sets the orthogonality centre of the tensor network to index i either introducing an orthogonality centre if there is none
         or simply shifting the orthogonality centre from its current location to the required location
 
         :param i: The index of or a list of ints defining the traversal path to reach the node correspond to the new orthogonality centre
-        :type i: int or list[int]
+        :type i: Union[int, list[int]]
         :param tol: A truncation tolerance for the singular values to discard weight.  (Default: 0)
         :type tol: float, optional
         :param nchi: A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)
@@ -522,8 +725,8 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
-    def orthogonalise(self, force=False):
+    @abstractmethod
+    def orthogonalise(self, force : bool =False) -> None:
         """Shifts the orthogonality centre to the root node of the multiset TTN
 
         :param force: Whether or not to force a full reorthogonalisation of the multiset TTN regardless of whether or not it believes it has an orthogonality centre
@@ -532,8 +735,8 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-        
-    def truncate(self, tol=0, nchi=0):
+    @abstractmethod    
+    def truncate(self, tol : float = 0, nchi : int =0) -> None:
         """Ensures the tensor network is in an orthogonalised form.  Then performs an euler tour truncating each bond according to the user
         specified tol and nchi parameters
 
@@ -545,68 +748,68 @@ class multiset_ttn(metaclass=ABCMeta):
         """
         pass
 
-    
-    def normalise(self):
+    @abstractmethod
+    def normalise(self) -> float:
         """Ensures the multiset TTN is a normalised to one and returns the previous value of the norm of the tensor
 
-        :returns: The previous 2-norm of the multiset TTN
+        :return: The previous 2-norm of the multiset TTN
         :rtype: float
         """
         pass
 
-    
-    def norm(self):
+    @abstractmethod
+    def norm(self) -> float:
         """
-        :returns: The 2-norm of the multiset TTN
+        :return: The 2-norm of the multiset TTN
         :rtype: float
         """
         pass
 
-    
-    def __setitem__(self, i, v):
-        r"""Sets the value of a site tensor in the tensor network
+    @abstractmethod
+    def __setitem__(self, i, v : list[ttnNodeData]) -> None:
+        """Sets the value of a site tensor in the tensor network
 
         :param i: Index of the node to set
         :type i: int
         :param v: The new value of the node data object
-        :type v: multiset_ttn_data
-
+        :type v: list[ttnNodeData]
         """
         pass
 
-    
-    def __getitem__(self, i, v):
+    @abstractmethod
+    def __getitem__(self, i) -> list[ttnNodeData]:
         """Access tensor data at node i
 
         :param i: Index of the node to access data from
         :type i: int
 
-        :returns: tensor data
-        :rtype: multiset_ttn_data
+        :return: tensor data
+        :rtype: list[ttnNodeData]
 
         """
         pass
 
-    # def set_site_tensor(self, i, v):
-    #    """Sets the value of a site tensor in the tensor network
+    @abstractmethod
+    def set_site_tensor(self, i : int, v : Union[list[Matrix], list[np.ndarray]]) -> None:
+        """Sets the value of a site tensor in the tensor network
 
-    #    :param i: Index of the node to set
-    #    :type i: int
-    #    :param v: The new value of the node data object
-    #    :type v: ttn_data
+        :param i: Index of the node to set
+        :type i: int
+        :param v: The new value of the node data object
+        :type v: Union[list[Matrix], list[np.ndarray]]
 
-    #    """
-    #    pass
+        """
+        pass
 
-    
-    def site_tensor(self, i, v):
-        r"""Access tensor data at node i
+    @abstractmethod
+    def site_tensor(self, i) -> list[Matrix]:
+        """Access tensor data at node i
 
         :param i: Index of the node to access data from
         :type i: int
 
-        :returns: tensor data
-        :rtype: multiset_ttn_data
+        :return: tensor data
+        :rtype: list[Matrix]
 
         """
         pass
@@ -617,7 +820,7 @@ class multiset_ttn(metaclass=ABCMeta):
     #    :param i: The physical mode to perform the projective measurement on
     #    :type i: int
 
-    #    :returns: The probability of observing each basis state following the projective measurement
+    #    :return: The probability of observing each basis state following the projective measurement
     #    :rtype: list[float]
     #    """
     #    pass
@@ -634,7 +837,7 @@ class multiset_ttn(metaclass=ABCMeta):
     #    :param nchi: A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)
     #    :type nchi: int, optional
 
-    #    :returns: The probability of this collapse event occurint
+    #    :return: The probability of this collapse event occurint
     #    :rtype: float
     #    """
     #    pass
@@ -649,7 +852,7 @@ class multiset_ttn(metaclass=ABCMeta):
     #    :param nchi: A maximum bond dimension to truncate to.  This is ignored if nchi=0.  (Default: 0)
     #    :type nchi: int, optional
 
-    #    :returns: The probability of this collapse event occurint
+    #    :return: The probability of this collapse event occurint
     #    :rtype: float
     #    """
     #    pass
@@ -657,11 +860,11 @@ class multiset_ttn(metaclass=ABCMeta):
     # def apply_one_body_operator(self, *args, shift_orthogonality=True):
     #    """Apply a one-body operator to the multiset TTN updating its value
 
-    #    :param *args: A variable length list of arguments. Valid options are
+    #    :param `*args`: A variable length list of arguments. Valid options are
     #
     #        - **op** (linalg.matrix or np.ndarray or site_operator), **mode** (int) -  Apply the operator op to mode mode
     #        - **op** (site_operator) - Apply the operator op to the mode specified by op
-    #    :type *args: [Arguments (variable number and type)]
+    #    :type `*args`: [Arguments (variable number and type)]
     #    :param shift_orthogonality: Whether or not to shift the orthogonality centre of the multiset TTN to the leaf node that will be updated by this one-body operator.  (Default: True)
     #    :type shift_orthogonality: bool, optional
     #    """
@@ -700,25 +903,24 @@ class multiset_ttn(metaclass=ABCMeta):
     #    """Apply an operator to the multiset TTN updating its value, returning the result as a new multiset TTN
 
     #    :param A: The multiset ttn to apply the operator to
-    #    :type A: ms_ttn
+    #    :type A: msttn
     #    :param op: The product operator to apply to the system
     #    :type op: site_operator or product_operator or sop_opertor
 
-    #    :returns: The result of op@A
-    #    :rtype: ms_ttn
+    #    :return: The result of op@A
+    #    :rtype: msttn
 
     #    """
     #    pass
 
-multiset_ttn.register(ms_ttn_complex)
+msttn.register(ms_ttn_complex)
 if _real_ttn_import:
-    multiset_ttn.register(ms_ttn_real)
+    msttn.register(ms_ttn_real)
 if _cuda_import:
-    multiset_ttn.register(ms_ttn_complex_cuda)
+    msttn.register(ms_ttn_complex_cuda)
     if _real_ttn_import:
-       multiset_ttn.register(ms_ttn_real_cuda)
+       msttn.register(ms_ttn_real_cuda)
 
-ms_ttn = multiset_ttn
-ms_ttn_type = multiset_ttn
-multiset_ttn_type = multiset_ttn
+ms_ttn = msttn
+multiset_ttn = msttn
 

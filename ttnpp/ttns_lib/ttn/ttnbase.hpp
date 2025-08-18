@@ -1155,6 +1155,17 @@ namespace ttns
             ntree_builder<INTEGER>::sanitise_tree(_tree, collapse_bond_matrices);
             ntree_builder<INTEGER>::sanitise_tree(capacity, collapse_bond_matrices);
 
+            typename ntree<INTEGER, Alloc>::iterator capacity_iter = capacity.begin();
+            for (typename ntree<INTEGER, Alloc>::iterator tree_iter = _tree.begin(); tree_iter != _tree.end(); ++tree_iter, ++capacity_iter)
+            {
+                if(tree_iter->value() > capacity_iter->value())
+                {
+                    tree_iter->value() = capacity_iter->value();
+                }
+            }
+            ntree_builder<INTEGER>::sanitise_tree(_tree, collapse_bond_matrices);
+            ntree_builder<INTEGER>::sanitise_tree(capacity, collapse_bond_matrices);
+
             ASSERT(__tree.size() > 2, "Failed to build ttn from topology tree.  The input topology must contain at least 3 elements.  If it contains fewer than 3 elements then this is just a vector and we won't want to use the full TTN structure.");
             ASSERT(_tree.size() == capacity.size(), "Failed to construct ttn topology with capacity.");
 
@@ -1185,7 +1196,7 @@ namespace ttns
             size_type count = 0;
             size_type leaf_counter = 0;
             auto this_it = m_nodes.begin();
-            typename ntree<INTEGER, Alloc>::iterator capacity_iter = capacity.begin();
+           capacity_iter = capacity.begin();
             for (typename ntree<INTEGER, Alloc>::iterator tree_iter = _tree.begin(); tree_iter != _tree.end(); ++tree_iter, ++capacity_iter)
             {
                 ASSERT(capacity_iter != capacity.end(), "The capacity and tree iter objects are not the same size.");

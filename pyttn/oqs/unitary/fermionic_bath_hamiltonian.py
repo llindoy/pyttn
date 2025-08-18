@@ -11,8 +11,10 @@
 # limitations under the License
 
 import numpy as np
-from .chain_map import chain_map
+
 from pyttn import fOP
+
+from .chain_map import chain_map
 
 
 def __generate_binds(binds, bskip, Nb):

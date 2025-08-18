@@ -1,3 +1,5 @@
+"""Wrapper of the Orthogonal Vector functionality"""
+
 # This files is part of the pyTTN package.
 # (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -10,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from pyttn.linalg.tensorExt import Matrix, Vector
-from pyttn.linalg.randomEngineExt import RandomEngine
-
 # import the blas backend
 import pyttn.ttnpp.linalg as la
+from pyttn.linalg.randomEngineExt import RandomEngine
+from pyttn.linalg.tensorExt import Matrix, Vector
 
 # and attempt to import the cuda backend
 try:
@@ -25,7 +26,7 @@ except ImportError:
     __cuda_import = False
 
 
-class orthogonal_vector:
+class OrthogonalVector:
     @staticmethod
     def pad_random(a: Matrix, i: int, rng: RandomEngine) -> None:
         """Pad the columns of the matrix starting at row index i with random vectors that are set to be orthogonal to all
@@ -101,4 +102,6 @@ class orthogonal_vector:
         :type rng: RandomEngine
         """
 
-        return orthogonal_vector.pad_random(a, 0, rng)
+        return OrthogonalVector.pad_random(a, 0, rng)
+
+orthogonal_vector = OrthogonalVector

@@ -35,9 +35,14 @@ void init_msttn(py::module &m, const std::string &label)
 {
     using namespace ttns;
     using numpy_type = typename linalg::numpy_converter<T>::type;
+    using conv = linalg::pybuffer_converter<backend>;
 
     using real_type = typename linalg::get_real_type<T>::type;
     using size_type = typename backend::size_type;
+
+#ifdef PYTTN_BUILD_CUDA
+     using otherbackend = typename other_backend<backend>::type;
+#endif
 
     using _msttn = ms_ttn<T, backend>;
     using _msttn_node = typename _msttn::node_type;
@@ -49,14 +54,23 @@ void init_msttn(py::module &m, const std::string &label)
         .def(py::init())
         .def("data", static_cast<_msttn_node_data &(_msttn_node::*)()>(&_msttn_node::operator()))
         .def("data", static_cast<const _msttn_node_data &(_msttn_node::*)() const>(&_msttn_node::operator()))
+        .def("__call__", static_cast<_msttn_node_data &(_msttn_node::*)()>(&_msttn_node::operator()))
+        .def("__call__", static_cast<const _msttn_node_data &(_msttn_node::*)() const>(&_msttn_node::operator()))
         .def("is_root", &_msttn_node::is_root)
         .def("is_leaf", &_msttn_node::is_leaf)
         .def("complex_dtype", [](const _msttn_node &)
              { return !std::is_same<T, real_type>::value; })
         .def("conj", &_msttn_node::conj)
+        .def("nmodes", &_msttn_node::size)
+
         .def("__len__", &_msttn_node::size)
         .def("__str__", [](const _msttn_node &o)
              {std::ostringstream oss; oss << o; return oss.str(); })
+
+        .def("child", [](_msttn_node &i, size_t ind)
+              { return i.at(ind); }, py::return_value_policy::reference)
+        .def("__getitem__", [](_msttn_node &i, size_t ind)
+              { return i.at(ind); }, py::return_value_policy::reference)
         .def(
             "__iter__",
             [](_msttn_node &s)
@@ -74,6 +88,8 @@ void init_msttn(py::module &m, const std::string &label)
         .def("assign", static_cast<_msttn_slice &(_msttn_slice::*)(const ttn<T, backend> &)>(&_msttn_slice::template operator= <T, backend>))
         //.def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice_real&)>(&_msttn_slice::template operator=<real_type, backend>))
         //.def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice&)>(&_msttn_slice::template operator=<T, backend>))
+        .def("complex_dtype", [](const _msttn_slice &)
+             { return !std::is_same<T, real_type>::value; })
         .def("nset", &_msttn_slice::nset)
         .def("backend", [](const _msttn_slice &)
              { return backend::label(); });
@@ -81,7 +97,15 @@ void init_msttn(py::module &m, const std::string &label)
     // expose the ttn node class.  This is our core tensor network object.
     py::class_<_msttn>(m, (std::string("ms_ttn_") + label).c_str())
         .def(py::init<const _msttn &>())
+#ifdef BUILD_REAL_TTN
         .def(py::init<const ms_ttn<real_type, backend> &>())
+#endif
+#ifdef PYTTN_BUILD_CUDA
+         .def(py::init<const ms_ttn<T, otherbackend> &>())
+#ifdef BUILD_REAL_TTN
+         .def(py::init<const ms_ttn<real_type, otherbackend> &>())
+#endif
+#endif
 
         .def(py::init<size_t, const ntree<size_t> &, bool, bool>(), py::arg(), py::arg(), py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
         .def(py::init<size_t, const ntree<size_t> &, const ntree<size_t> &, bool, bool>(), py::arg(), py::arg(), py::arg(), py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
@@ -100,7 +124,9 @@ void init_msttn(py::module &m, const std::string &label)
 
         .def("slice", static_cast<_msttn_slice (_msttn::*)(size_t)>(&_msttn::slice))
 
+#ifdef BUILD_REAL_TTN
         .def("assign_slice", static_cast<void (_msttn::*)(size_type, const ttn<real_type, backend> &)>(&_msttn::template set_slice<real_type, backend>))
+#endif
         .def("assign_slice", static_cast<void (_msttn::*)(size_type, const ttn<T, backend> &)>(&_msttn::template set_slice<T, backend>))
         //.def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice_real&)>(&_msttn::template set_slice<real_type, backend>))
         //.def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice&)>(&_msttn::template set_slice<T, backend>))
@@ -226,22 +252,56 @@ void init_msttn(py::module &m, const std::string &label)
              { i[ind]() = o; })
         .def("__getitem__", [](_msttn &i, size_t ind) -> _msttn_node_data &
              { return i[ind](); }, py::return_value_policy::reference)
-        .def("site_tensor", static_cast<const _msttn_node_data &(_msttn::*)(size_t) const>(&_msttn::site_tensor), py::return_value_policy::reference)
-        /*
-        //.def(
-        //        "set_site_tensor",
-        //        [](_msttn& self, size_t i, const linalg::matrix<T>& mat)
-        //        {
-        //            CALL_AND_HANDLE(self.site_tensor(i).as_matrix() = mat, "Failed to set site tensor.");
-        //        }
-        //    )
-        //.def(
-        //        "set_site_tensor",
-        //        [](_msttn& self, size_t i, py::buffer& mat)
-        //        {
-        //            CALL_AND_HANDLE(conv::copy_to_tensor(mat, self.site_tensor(i).as_matrix()), "Failed to set site tensor.");
-        //        }
-        //    )
+
+         .def("at", [](_msttn &i, const std::vector<size_t> &ind) -> _msttn_node_data &
+              { return i.at(ind)(); }, py::return_value_policy::reference, "For details see :meth:`pyttn.ttn_dtype.resize`")
+         .def("node", [](_msttn &i, size_t ind) -> _msttn_node &
+              { return i[ind]; }, py::return_value_policy::reference)
+    
+        .def("site_tensor", 
+            [](_msttn& self, size_t i)
+            {   
+                std::vector<linalg::matrix<T, backend>> ret(self.nset());
+                 for(size_t j = 0; j < self.nset(); ++j)
+                {
+                    CALL_AND_HANDLE(ret[j] = self.site_tensor(i)[j].as_matrix(), "Failed to set site tensor.");
+                }
+                return ret;
+            })
+        .def(
+                "set_site_tensor",
+                [](_msttn& self, size_t i, const std::vector<linalg::matrix<T>>& mats)
+                {   
+                    if(mats.size() != self.nset())
+                    {
+                        RAISE_EXCEPTION("Failed to set site tensor.");
+                    }
+                    else
+                    {
+                        for(size_t j = 0; j < mats.size(); ++j)
+                        {
+                            CALL_AND_HANDLE(self.site_tensor(i)[j].as_matrix() = mats[j], "Failed to set site tensor.");
+                        }
+                    }
+                }
+            )
+        .def(
+                "set_site_tensor",
+                [](_msttn& self, size_t i, std::vector<py::buffer>& mats)
+                {
+                    if(mats.size() != self.nset())
+                    {
+                        RAISE_EXCEPTION("Failed to set site tensor.");
+                    }
+                    else
+                    {
+                        for(size_t j = 0; j < mats.size(); ++j)
+                        {
+                            CALL_AND_HANDLE(conv::copy_to_tensor(mats[j], self.site_tensor(i)[j].as_matrix()), "Failed to set site tensor.");
+                        }
+                    }
+                }
+            )
 
 
         //.def(
@@ -327,7 +387,7 @@ void init_msttn(py::module &m, const std::string &label)
 
         //ttn& apply_one_body_operator(const Op<T, backend>& op, bool shift_orthogonality = true)
         //ttn& apply_operator(const Op<T, backend>& op, real_type tol = real_type(0), size_type nchi=0)
-        */
+        
         .def("backend", [](const _msttn &)
              { return backend::label(); });
 }

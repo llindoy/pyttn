@@ -1,35 +1,20 @@
-pyttn.ttns.observables package
-==============================
+Observables
+===========
 
-Submodules
-----------
 
-pyttn.ttns.observables.matrixElementExt module
-----------------------------------------------
-
-.. automodule:: pyttn.ttns.observables.matrixElementExt
+.. autoclass:: pyttn.ttns.observables.MatrixElement
    :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
+   :special-members: __new__,__init__,__call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
+   :exclude-members: __module__,__annotations__
    :undoc-members:
    :show-inheritance:
 
-pyttn.ttns.observables.matrix\_element\_interface module
---------------------------------------------------------
+Aliases
+-------
 
-.. automodule:: pyttn.ttns.observables.matrix_element_interface
+.. autoclass:: pyttn.ttns.observables.matrix_element
    :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
+   :special-members: __new__,__init__,__call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
+   :exclude-members: __module__,__annotations__
    :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: pyttn.ttns.observables
-   :members:
-   :special-members: __call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
-   :exclude-members: __init__,__module__,__annotations__
-   :undoc-members:
-   :show-inheritance:
+   :show-inheritance:   

@@ -11,15 +11,15 @@
 # limitations under the License
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-import h5py
 import argparse
+
+import h5py
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def plot(fnames):
     for fname in fnames:
-        pars = []
         t = None
         try:
             h5 = None
@@ -32,7 +32,7 @@ def plot(fnames):
                 res[i, :] = np.array(h5.get(label))
 
             h5.close()
-        except:
+        except Exception:
             print("Failed to read input file")
             continue
 

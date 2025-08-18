@@ -477,107 +477,204 @@ namespace ttns
         }
 
     protected:
-        /*
-        void shift_dangling_bond_up(linalg::tensor<T, 3, backend>& Top, linalg::tensor<T, 4, backend>& temp, linalg::tensor<T, 4, backend>& temp2, size_type curr, size_type prev, real_type tol = real_type(0), size_type nchi=0)
+        //a function for applying a two-body operator to a tensor network.  The implementation provided here
+        //performs this contraction using a two site approach
+        void _apply_two_body_operator(const linalg::tensor<T, 4, backend>& _A, const linalg::tensor<T, 4, backend>& _B, size_type i1, size_type i2, real_type tol = real_type(0), size_type nchi=0)
         {
-            //get the parent tensor as a rank 3 tensor with the bond connecting the curr and prev sites separated off
-            auto ap = m_nodes[curr]().as_rank_3(m_nodes[prev].child_id());
-
-            //contract T up into the ap tensor along the bond
-            temp = linalg::tensordot(ap, Top, {1}, {0});
-
-            //now we swap the last two indices of the temp array into temp2
-            temp2 = linalg::transpose(temp, {0, 1, 3, 2});
-
-            auto d = temp2.shape();
-
-            //now get a matrix representation of this tensor
-            auto mtemp = temp2.reinterpret_shape(d[0]*d[1]*d[2], d[3]);
-
-            //U*S becomes the new parent tensor which we store in Top and V^\dagger becomes the child tensor which we put
-            //into the tensor network
-        }
-
-        void shift_dangling_bond_down(linalg::tensor<T, 3, backend>& Top, linalg::tensor<T, 4, backend>& temp, linalg::tensor<T, 4, backend>& temp2, size_type curr, size_type prev, real_type tol = real_type(0), size_type nchi=0)
-        {
-            //get the parent tensor as a rank 3 tensor with the bond connecting the curr and prev sites separaetd off
-            auto ap = m_nodes[prev]().as_rank_3(m_nodes[curr].child_id());
-            auto d = ap.shape();
-
-            //now use this object to appropriately resize the Top matrix noting that the first 2 indices of T
-            //have the same shape as ap and the final index of T is the one we aim to transfer
-            auto Tt = Top.reinterpret_shape(d[0], d[1], d[2], Top.shape(2));
-
-            //now contract the second index of Tt into the child node of this and reshape this so that we
-            temp = linalg::tensordot(Tt, m_nodes[curr], {1}, {0});
-
-            //now we swap the last two indices of the temp array into temp2
-            temp2 = linalg::transpose(temp, {0, 1, 3, 2});
-
-            auto d2 = temp2.shape();
-
-            //now get the correct matrix representation of this tensor
-            auto mtemp = temp2.reinterpret_shape(d2[0]*d2[1], d2[2]*d2[3]);
-
-            //U becomes the new parent tensor which we store in the parent tensor and SV^\dagger becomes
-            //the child tensor which we put into T
-        }
-
-        //a function used for evaluating the action of a MPO like tensor network on the ttn.
-        //This function handles the result of shifting the dangling bond that arises after acting
-        //the left most tensor of the MPO on the ttn through the ttn until we reach the location where
-        //it next needs to act
-        //this assumes that T is the tensor at site i1 with the dangling bond contracted into it
-        void shift_dangling_bond(linalg::tensor<T, 3, backend>& Top, size_type i1, size_type i2, real_type tol = real_type(0), size_type nchi=0)
-        {
-            //get the path through the tensor network connecting nodes i1 and i2
-            std::list<size_type> path;  this->path(i1, i2, path);
-
-            //now we iterate through the path - contracting the T tensor into the next tensor along the path
-            //before performing a reshape and svd to shift the dangling bond along this pathway.
-            size_type prev = 0;
-            linalg::tensor<T, 4, backend> temp;
-            linalg::tensor<T, 4, backend> temp2;
-
-            for(size_type i : path)
+            try
             {
-                //we don't contract in the first step, but we do update the index of the previous operator.
-                if(i != i1)
+                if(_A.shape(0) != 1 || _B.shape(3) != 1)
                 {
-                    //if the previous node is a child of the next node - that is we are still moving up
-                    //the tree structure then we perform the upwards contraction step
-                    if(m_nodes[prev].is_child_of(i))
+                    RAISE_EXCEPTION("Failed to apply two body operator.  Internal buffers are not the correct shape")
+                }
+                auto A = _A.reinterpret_shape(_A.shape(1), _A.shape(2), _A.shape(3));
+                auto B = _B.reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
+
+                CALL_AND_HANDLE(this->set_orthogonality_centre(i1), "Failed to apply two body operator.  Failed to shift orthogonality centre.");
+                
+                //get the path through the tensor network connecting nodes i1 and i2
+                std::list<size_type> path;  this->path(i1, i2, path);
+                std::list<size_type> bpath; this->path(i2, i1, bpath);
+
+                //now apply the A operator to node i1.  This leaves us with an indexing of the form
+                //                                      dangling bond (1)
+                //                                           |
+                //    primitive_degree of freedom (0) - active_tensor - upward pointing bond (2)
+                linalg::tensor<T, 3, backend> active_tensor;
+                linalg::tensor<T, 3, backend> working_tensor;
+                CALL_AND_HANDLE(active_tensor = linalg::tensordot(A, m_nodes[i1]().as_matrix(), std::array<int, 1>{{1}}, std::array<int, 1>{{0}}), "Failed to apply two body operator.  Failed to apply operator mpo to tensor.")
+
+                auto d = active_tensor.shape();
+                //now set the value of active_tensor so that it can fit the new active tensor.  Here we make it so that the dangling bond becomes the outer index
+                //of the bond
+                CALL_AND_HANDLE(m_nodes[i1]().resize_bond(m_nodes[i1]().nmodes(), d[1]*d[2]), "Failed to resize tensor node so that it can fit the required node");
+                CALL_AND_HANDLE(m_nodes[i1]().as_matrix() = active_tensor.reinterpret_shape(d[0], d[1]*d[2]), "Failed to set node of tensor given active tensor");
+
+                size_type chi = A.shape(2);
+                size_type prev = i1;
+
+                //now iterate over the path and expand the node as required
+                for(auto it = path.begin(); it != path.end(); ++it)
+                {   
+                    size_type curr = 0;
+                    size_type i = *it;
+                    bool curr_found = false;
+                    size_type m1 = 0;
+
+                    //figure out the current node index.  Additional determine which bond connects the current node to the previous node
+                    if(!m_nodes[prev].is_root())
                     {
-                        CALL_AND_HANDLE(
-                            shift_dangling_bond_up(Top, temp, temp2, i, prev, tol, nchi),
-                            "Failed to shift dangling bond up."
-                        );
+                        //if i == 0 we are moving upwards so the current node is the parent of the previous
+                        //node and it is connected by the bond corresponding to the previous nodes parent index.
+                        if(i == 0)
+                        {
+                            std::cerr  << "A" << std::endl;
+                            curr = m_nodes[prev].parent_pointer()->id();
+                            curr_found = true;
+                            m1 = m_nodes[prev].child_id();
+                        }
+                        
+                        //if we aren't moving up decrement i so it points in the children index
+                        else{--i;std::cerr  << "B" << std::endl;}
                     }
-                    //otherwise if the current node is a child of the previous node - we are heading down the tree
-                    else if(m_nodes[i].is_child_of(prev))
+
+                    //now at this stage if we haven't assigned the current node the only option is the ith
+                    //child of the previous node and it is connected by the upward pointing bond
+                    if(!curr_found)
                     {
-                        CALL_AND_HANDLE(
-                            shift_dangling_bond_down(Top, temp, temp2,i, prev, tol, nchi),
-                            "Failed to shift dangling bond down."
-                        );
+                        curr = m_nodes[prev].child_pointer(i)->id();
+                        m1 = m_nodes[curr].nmodes();
+                        std::cerr  << "C" << std::endl;
+                    }
+
+                    //if we are at the final node of the path we contract with the B tensor and reshape the result so that it can fit in the node object
+                    if(curr == i2)
+                    {
+
+                        ASSERT(std::next(it) == path.end(), "Accessed last node but not at end of traversal path");
+                        CALL_AND_HANDLE(active_tensor = linalg::tensordot(B, m_nodes[i2]().as_matrix(), std::array<int, 1>{{2}}, std::array<int, 1>{{0}}), "Failed to apply two body operator.  Failed to apply operator mpo to tensor.")
+                        d = active_tensor.shape();
+                        CALL_AND_HANDLE(m_nodes[i2]().resize_bond(m_nodes[i2]().nmodes(), d[0]*d[2]), "Failed to resize tensor node so that it can fit the required node");
+                        CALL_AND_HANDLE(working_tensor = linalg::transpose(active_tensor, {1, 0, 2}), "Failed to reorder tensor indices.");
+                        CALL_AND_HANDLE(m_nodes[i2]().as_matrix() = active_tensor.reinterpret_shape(d[1], d[0]*d[2]), "Failed to set final tensor node.");
                     }
                     else
                     {
-                        RAISE_EXCEPTION("Failed to shift dangling bond two sites in the path were not connected.");
+                        bool next_found = false;
+
+                        size_type m2 = 0;
+                        size_type ix = *(std::next(it));
+
+                        //now we want to determine which bond points towards the next node in the path.
+                        //if the current node is not the root
+                        if(!m_nodes[curr].is_root())
+                        {
+                            //we first check to see if we are still traversing upwards.  In this case m2 is
+                            //set to point up.
+                            if(ix == 0)
+                            {
+                                next_found = true;
+                                m2 = m_nodes[curr].nmodes();
+                                std::cerr  << "D" << std::endl;
+                            }
+                            //otherwise decrement the indexing so it points to the child index
+                            else{--ix; std::cerr  << "E" << std::endl;}
+                        }
+
+                        //if at the stage we haven't found the bond pointing to the next index it is the bond corresponding 
+                        //to the ith child of this node. 
+                        if(!next_found)
+                        {
+                            m2 = ix;
+                            std::cerr  << "F" << std::endl;
+                        }
+
+
+                        if(m1 > m2)
+                        {
+                            size_type mtemp = m1;
+                            m1 = m2;
+                            m2 = mtemp;
+                        }
+
+                        //get the rank 5 representation of the tensor with indices pointing along the path spanning this tree
+                        auto M = m_nodes[curr]().as_rank_5(m1, m2);
+                        std::array<size_type, 5> d2 = M.shape();
+
+                        //now resize the active tensor so that it can fit the buffer needed for the result of the outer product
+                        CALL_AND_HANDLE(active_tensor.resize(d2[0]*d2[1]*chi, d2[2]*chi, d2[3]*d2[4]), "Failed to resize the active tensor");
+                        std::array<size_type, 5> dest_dims{{d2[0], d2[1]*chi, d2[2], d2[3]*chi, d2[4]}};
+                        std::array<size_type, 5> skip{{0, 0, 0, 0, 0}};
+                        //now we go ahead and set the blocks needed in a rank 5 view of the active tensor using the set_tensor_block function provided
+                        for(size_type ind = 0; ind < chi; ++ind)   
+                        {                 
+                            skip[1] = d2[1]*ind;
+                            skip[3] = d2[3]*ind;
+                            backend::set_tensor_block(m_nodes[curr]().as_matrix().buffer(), d2, active_tensor.buffer(), dest_dims, skip);
+                        }
+
+                        //now we resize the current node object so that it can fit the active tensor and copy the results
+                        std::vector<size_type> dims = m_nodes[curr]().dims();
+
+                        //if this is the root of the subtree then we need to set the new size to adjust two downward pointing indices
+                        if(m2 != m_nodes[curr].nmodes())
+                        {
+                            dims[m1] *= chi;
+                            dims[m2] *= chi;
+                            std::cerr << "downward shape:" << active_tensor.shape(0) << " " <<  active_tensor.shape(1) << " " <<  active_tensor.shape(2)  << std::endl;
+
+                            std::cerr << "downward shape:" << m_nodes[curr]().as_matrix().shape(0) << " " <<  m_nodes[curr]().as_matrix().shape(1) << std::endl;
+                            CALL_AND_HANDLE(m_nodes[curr]().resize(m_nodes[curr]().hrank(), dims), "Failed to resize node object");
+                            std::cerr << "downward shape:" << m_nodes[curr]().as_matrix().shape(0) << " " <<  m_nodes[curr]().as_matrix().shape(1) << std::endl;
+                        }
+                        //otherwise we need to adjust the size of one downward pointing index and one upward pointing index.
+                        else
+                        {
+                            dims[m1] *= chi;
+                            std::cerr << "up shape:" << active_tensor.shape(0) << " " <<  active_tensor.shape(1) << " " <<  active_tensor.shape(2)  << std::endl;
+
+                            std::cerr << "up shape:" << m_nodes[curr]().as_matrix().shape(0) << " " <<  m_nodes[curr]().as_matrix().shape(1) << std::endl;
+                            CALL_AND_HANDLE(m_nodes[curr]().resize(m_nodes[curr]().hrank()*chi, dims), "Failed to resize node object");
+                            std::cerr << "up shape:" << m_nodes[curr]().as_matrix().shape(0) << " " <<  m_nodes[curr]().as_matrix().shape(1) << std::endl;
+                           
+                        }
+                        ASSERT(active_tensor.size() == m_nodes[curr]().as_matrix().size(), "Invalid size for active tensor object.");
+                        CALL_AND_HANDLE(m_nodes[curr]().as_matrix().set_buffer(active_tensor.buffer(), active_tensor.size()), "Failed to set current tensor buffer");
+                        std::cerr << prev << " " << curr << " " << m1 << " " << m2 << std::endl;                    
                     }
-                    //now check if mode i is a child of mode i1
+                    prev = curr;
                 }
-                prev = i;
+
+                this->m_has_orthogonality_centre = false;
+                return;
+                
+                //now we iterate backwards over the path and shift the orthogonality centre until it reaches i1.
+                this->force_set_orthogonality_centre(i2);
+                for(auto i : bpath)
+                {
+                    CALL_AND_HANDLE(this->shift_orthogonality_centre(i), "Failed when shifting orthogonality centre.");
+                }
+                return;
+
+                //and finally if the truncation parameters have been set shift the orthogonality centre back to i2 truncating along the path
+                if(tol > 0 && nchi > 0)
+                {
+                    for(auto i : path)
+                    {
+                        CALL_AND_HANDLE(this->shift_orthogonality_centre(i, tol, nchi), "Failed when shifting orthogonality centre.");
+                    }               
+                }
+            }
+            catch(const std::exception& ex)
+            {
+                std::cerr << ex.what() << std::endl;
+                RAISE_EXCEPTION("Failed to apply_two_body operator to ttn.");
             }
         }
+        
+        size_type nthreads() const { return 1; }
+        void set_nthreads(size_t ) const{}
 
-        //a function for applying a two-body operator to a tensor network.  The implementation provided here
-        //performs this contraction using a two site approach
-        void _apply_two_body_operator(const linalg::tensor<T, 3, backend>& A, const linalg::tensor<T, 3, backend>& B, size_type i1, size_type i2, real_type tol = real_type(0), size_type nchi=0)
-        {
-            CALL_AND_HANDLE(this->set_orthogonality_centre(i1), "Failed to apply one body operator.  Failed to shift orthogonality centre.");
-        }
-        */
     public:
         ttn &apply_product_operator(product_operator<T, backend> &op, bool shift_orthogonality = true)
         {
@@ -677,6 +774,8 @@ namespace ttns
             }
             else if (op.ndim() == 2)
             {
+                auto opmpo = op.as_mpo();
+                CALL_AND_RETHROW(_apply_two_body_operator(opmpo[0], opmpo[1], m_leaf_indices[op.indices()[0]], m_leaf_indices[op.indices()[1]], tol, nchi));
             }
             else
             {

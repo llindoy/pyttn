@@ -10,19 +10,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from pyttn.ttnpp import sepState_complex, ket_complex
+from pyttn.ttnpp import ket_complex, sepState_complex
+
 try:
-    from pyttn.ttnpp import sepState_real, ket_real
+    from pyttn.ttnpp import ket_real, sepState_real
     allow_real_type=True
 except ImportError:
     allow_real_type = False
-from pyttn.ttnpp import stateStr as __stateStr
 import numpy as np
 
-def stateStr(*args):
-    r"""A function for constructing a separable state for state vector preparation
+from pyttn.ttnpp import stateStr as __stateStr
 
-    :param *args: A variable list for specifying the coefficient.  Valid options are
+
+def stateStr(*args):
+    """A function for constructing a separable state for state vector preparation
+
+    :param `*args`: A variable list for specifying the coefficient.  Valid options are
 
         - Default construct the stateStr
         - state (list[int]) - Construct separable state from a set of excitation indices
@@ -33,9 +36,9 @@ def stateStr(*args):
 
 
 def sepState(*args, dtype=np.complex128):
-    r"""A function for constructing a separable state for state vector preparation
+    """A function for constructing a separable state for state vector preparation
 
-    :param *args: A variable list for specifying the coefficient.  Valid options are
+    :param `*args`:`: A variable list for specifying the coefficient.  Valid options are
 
         - Default construct the sepState
         - state (list[int]) - Construct separable state from a set of excitation indices
@@ -57,9 +60,9 @@ def isSepState(state):
         return isinstance(state, sepState_complex)
 
 def ket(*args, dtype=np.complex128):
-    r"""A function for constructing a separable state for state vector preparation
+    """A function for constructing a separable state for state vector preparation
 
-    :param *args: A variable list for specifying the coefficient.  Valid options are
+    :param `*args`: A variable list for specifying the coefficient.  Valid options are
 
         -  Default construct the ket
         - state (ket) - Construct ket from another ket

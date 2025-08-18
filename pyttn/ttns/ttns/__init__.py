@@ -10,23 +10,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .ttnExt import ttn, ttn_type, is_ttn, available_backends
-from .msttnExt import ms_ttn, multiset_ttn, ms_ttn_type, multiset_ttn_type, is_ms_ttn
 
-from pyttn.ttnpp import ntree, ntreeBuilder, ntreeNode
+from .ntreeExt import ntree, ntreeNode, ntreeBuilder
+from .msttnExt import is_ms_ttn, msttn, ms_ttn, multiset_ttn, msttnNode, ms_ttn_node
+from .ttnExt import available_backends, is_ttn, ttn, ttnNode, ttnNodeData, ttn_node_data, ttn_node
+from .msttnSliceExt import is_ms_ttn_slice, ms_ttn_slice, multiset_ttn_slice, msttnSlice
 
 __all__: list[str] = [
         "ttn",
-        "ttn_type",
+        "ttnNode",
+        "ttnNodeData",
+        "ttn_node_data",
+        "ttn_node", 
         "ms_ttn",
-        "ms_ttn_type",
-        "multiset_ttn_type",
+        "msttn",
         "multiset_ttn",
+        "ms_ttn_slice",
+        "multiset_ttn_slice",
+        "msttnSlice",
+        "msttnNode",
+        "ms_ttn_node",
         "ntree",
         "ntreeBuilder",
         "ntreeNode",
         "is_ttn",
         "is_ms_ttn", 
+        "is_ms_ttn_slice", 
         "available_backends"
         ]
 

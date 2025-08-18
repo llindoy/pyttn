@@ -12,6 +12,7 @@
 
 import numpy as np
 
+
 def commutator(L):
     return np.kron(L, np.identity(L.shape[0])) - np.kron(np.identity(L.shape[0]), L.T)
 

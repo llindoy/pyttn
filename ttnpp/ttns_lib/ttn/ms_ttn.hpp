@@ -334,6 +334,7 @@ namespace ttns
     public:
         size_type nthreads() const { return m_orthog.nthreads(); }
         size_type &nthreads() { return m_orthog.nthreads(); }
+        void set_nthreads(size_t nthreads) const{m_orthog.nthreads() = nthreads;}
 
         real_type bond_entropy(size_t bond_index)
         {

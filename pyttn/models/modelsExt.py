@@ -29,7 +29,7 @@ def AIM(*args, dtype=np.complex128):
         if dtype == np.complex128:
             return AIM_complex(*args)
         else:
-            raise RuntimeError("Invalid dtype for AIM")
+            raise RuntimeError("Invalid dtype for AIM") from None
 
 
 def electronic_structure(*args, dtype=np.complex128, **kwargs):
@@ -48,7 +48,7 @@ def electronic_structure(*args, dtype=np.complex128, **kwargs):
         if dtype == np.complex128:
             return electronic_structure_complex(*args, **kwargs)
         else:
-            raise RuntimeError("Invalid dtype for electronic_structure model")
+            raise RuntimeError("Invalid dtype for electronic_structure model") from None
 
 
 def TFIM(*args, dtype=np.complex128):
@@ -67,7 +67,7 @@ def TFIM(*args, dtype=np.complex128):
         if dtype == np.complex128:
             return TFIM_complex(*args)
         else:
-            raise RuntimeError("Invalid dtype for TFIM")
+            raise RuntimeError("Invalid dtype for TFIM") from None
 
 
 def __init_sb_type(sbt1, sbt2, *args, dtype=None):
@@ -93,17 +93,17 @@ def __init_sb_type(sbt1, sbt2, *args, dtype=None):
 
 def spin_boson(*args, geom="star", dtype=np.complex128):
     from pyttn.ttnpp.models import (
-        spin_boson_generic_complex,
-        spin_boson_star_complex,
         spin_boson_chain_complex,
         spin_boson_chain_real,
+        spin_boson_generic_complex,
+        spin_boson_star_complex,
     )
 
     try:
         from pyttn.ttnpp.models import (
+            spin_boson_chain_real,
             spin_boson_generic_real,
             spin_boson_star_real,
-            spin_boson_chain_real,
         )
     except ImportError:
         spin_boson_generic_real = None

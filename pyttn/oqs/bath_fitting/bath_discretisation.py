@@ -12,12 +12,14 @@
 
 import abc
 from typing import Callable, Optional, Union
-from pyttn.ttnpp.utils import orthopol_discretisation, density_discretisation
+
 import numpy as np
+
+from pyttn.ttnpp.utils import density_discretisation, orthopol_discretisation
 
 
 class BathDiscretisation(metaclass=abc.ABCMeta):
-    r"""Base class for bath discretisations
+    """Base class for bath discretisations
 
     :param Nb: The number of discrete points to find
     :type Nb: int
@@ -59,16 +61,16 @@ class BathDiscretisation(metaclass=abc.ABCMeta):
         pass
 
 class DensityDiscretisation(BathDiscretisation):
-    r"""A class wrapping the density based discretisation approach.  Selects frequencies from a density of frequencies :math:`\rho(\omega)`
+    """A class wrapping the density based discretisation approach.  Selects frequencies from a density of frequencies :math:`\\rho(\\omega)`
     according to the expression
 
     .. math::
-        \int_{\omega_{\mathrm{min}}}^{\omega_k} \rho(\omega)\mathrm{d} \omega = k,
+        \\int_{\\omega_{\\mathrm{min}}}^{\\omega_k} \\rho(\\omega)\\mathrm{d} \\omega = k,
 
     with coupling constants then determined by
 
     .. math::
-        g_k^2 = \frac{1}{\pi} \frac{S(\omega_k)}{\rho(\omega_k)}.
+        g_k^2 = \\frac{1}{\\pi} \\frac{S(\\omega_k)}{\\rho(\\omega_k)}.
 
     Constructor arguments
 
@@ -203,11 +205,11 @@ class DensityDiscretisation(BathDiscretisation):
 
 
 class OrthopolDiscretisation:
-    r"""A class wrapping the orthonormal polynomial based discretisation scheme.  This scheme constructs a set of orthonormal polynomials
+    """A class wrapping the orthonormal polynomial based discretisation scheme.  This scheme constructs a set of orthonormal polynomials
     satisfying the orthogonality constraint
 
     .. math::
-        \int_{\omega_{\mathrm{min}}}^{\omega_\mathrm{max}} S(\omega) \pi_i(\omega) \pi_j(\omega) \mathrm{d}\omega = \delta_{ij}.
+        \\int_{\\omega_{\\mathrm{min}}}^{\\omega_\\mathrm{max}} S(\\omega) \\pi_i(\\omega) \\pi_j(\\omega) \\mathrm{d}\\omega = \\delta_{ij}.
 
     The coupling constants and frequencies are then obtained from the weights and nodes, respectively, of the Gaussian quadrature rule associated
     with these orthonormal polynomials.
@@ -234,6 +236,10 @@ class OrthopolDiscretisation:
     :type moment_scaling_steps: int, optional
     :param nquad: The degree of the gauss-Legendre polynomial based quadrature scheme used in the evaluation of integrals.  (Default: 100)
     :type nquad: int, optional
+    :param alpha: The alpha order of the jacobi polynomial used for the left boundary.  (Default: 1)
+    :type alpha: float, optional
+    :param beta: The beta order of the jacobi polynomial used for the right boundary.  (Default: 0)
+    :type beta: float, optional
     """
 
     def __init__(
@@ -248,6 +254,8 @@ class OrthopolDiscretisation:
         maxbound: float = 1e25,
         moment_scaling_steps: float = 4,
         nquad: int = 100,
+        alpha: float = 1,
+        beta: float = 0,
     ):
         BathDiscretisation.__init__(self, Nb, wmin, wmax)
         self.moment_scaling = moment_scaling
@@ -257,6 +265,8 @@ class OrthopolDiscretisation:
         self.maxbound = maxbound
         self.moment_scaling_steps = moment_scaling_steps
         self.nquad = nquad
+        self.alpha = alpha
+        self.beta = beta
 
     def find_moment_scaling_factor(
         S: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float, np.complex128]],
@@ -269,6 +279,8 @@ class OrthopolDiscretisation:
         maxbound: float = 1e30,
         Nsteps: int = 5,
         nquad: int = 100,
+        alpha: float = 1,
+        beta: float = 0,
     ) -> float:
         """Finds a constant to scale the frequency axis by in order to ensure well defined scaling of the modified moments as we go to very high moments.
         here this is done by computing the modified moments up to varying orders (with early termination if the values leave some min and max bounds)
@@ -297,6 +309,10 @@ class OrthopolDiscretisation:
         :type Nsteps: int, optional
         :param nquad: The degree of the gauss-Legendre polynomial based quadrature scheme used in the evaluation of integrals.  (Default: 100)
         :type nquad: int, optional
+        :param alpha: The alpha order of the jacobi polynomial used for the left boundary.  (Default: 1)
+        :type alpha: float, optional
+        :param beta: The beta order of the jacobi polynomial used for the right boundary.  (Default: 0)
+        :type beta: float, optional
 
         """
         Nbs = (np.arange(Nsteps) + 1) * (Nb // (Nsteps + 1))
@@ -304,7 +320,7 @@ class OrthopolDiscretisation:
         for Nbi in Nbs:
             Nbi = max(2, Nbi)
             moments = np.array(
-                orthopol_discretisation.moments(S, wmin, wmax, Nbi, moment_scaling=ms, atol=atol, rtol=rtol, minbound=minbound, maxbound=maxbound, nquad=nquad)
+                orthopol_discretisation.moments(S, wmin, wmax, Nbi, moment_scaling=ms, atol=atol, rtol=rtol, minbound=minbound, maxbound=maxbound, nquad=nquad, alpha=alpha, beta=beta)
             )
             nm = np.polyfit(np.arange(moments.shape[0]), np.log(np.abs(moments)), 1)[0]
             ms = ms * np.exp(-nm)
@@ -328,9 +344,9 @@ class OrthopolDiscretisation:
 
         # if the moment scaling parameter is not zero set its value
         if self.moment_scaling is None:
-            self.moment_scaling = OrthopolDiscretisation.find_moment_scaling_factor(S, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, minbound=self.minbound, maxbound=self.maxbound, Nsteps=self.moment_scaling_steps, nquad=self.nquad)
+            self.moment_scaling = OrthopolDiscretisation.find_moment_scaling_factor(S, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, minbound=self.minbound, maxbound=self.maxbound, Nsteps=self.moment_scaling_steps, nquad=self.nquad, alpha=self.alpha, beta=self.beta)
 
-        g, w = orthopol_discretisation.discretise(S, self.wmin, self.wmax, self.Nb, moment_scaling=self.moment_scaling, atol=self.atol, rtol=self.rtol, nquad=self.nquad)
+        g, w = orthopol_discretisation.discretise(S, self.wmin, self.wmax, self.Nb, moment_scaling=self.moment_scaling, atol=self.atol, rtol=self.rtol, nquad=self.nquad, alpha=self.alpha, beta=self.beta)
         return np.array(g), np.array(w)
 
     def fit_correlated(
@@ -355,9 +371,9 @@ class OrthopolDiscretisation:
 
         # if the moment scaling parameter is not zero set its value
         if self.moment_scaling is None:
-            self.moment_scaling = OrthopolDiscretisation.find_moment_scaling_factor(scalar_func, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, minbound=self.minbound, maxbound=self.maxbound, Nsteps=self.moment_scaling_steps, nquad=self.nquad)
+            self.moment_scaling = OrthopolDiscretisation.find_moment_scaling_factor(scalar_func, self.wmin, self.wmax, self.Nb, atol=self.atol, rtol=self.rtol, minbound=self.minbound, maxbound=self.maxbound, Nsteps=self.moment_scaling_steps, nquad=self.nquad, alpha=self.alpha, beta=self.beta)
 
-        g, w = orthopol_discretisation.discretise(scalar_func, self.wmin, self.wmax, self.Nb, moment_scaling=self.moment_scaling, atol=self.atol, rtol=self.rtol, nquad=self.nquad)
+        g, w = orthopol_discretisation.discretise(scalar_func, self.wmin, self.wmax, self.Nb, moment_scaling=self.moment_scaling, atol=self.atol, rtol=self.rtol, nquad=self.nquad, alpha=self.alpha, beta=self.beta)
 
         #now compute spectral function matrix for each frequencys
         w = np.array(w)

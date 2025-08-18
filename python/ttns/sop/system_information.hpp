@@ -91,14 +91,14 @@ inline void init_system_info(py::module &m)
         .doc() = R"mydelim(
           A class for handling information about the primitive modes making up a system
 
-          :param \*args: A variable length list of arguments. Valid options are
+          :param `*args`: A variable length list of arguments. Valid options are
               
               - none - in this case we call the default constructor of the primitive_mode_data objcet.
               - **d** (int) - Construct a primitive_mode_data object with a generic_mode mode_type with a Local Hilbert space dimension of d
               - **d** (int),  **type** (:class:`mode_type`) -  Construct a primitive_mode_data object with a type mode_type with a Local Hilbert space dimension of d
               - **other** (:class:`primitive_mode_data`) - Copy constructs a primitive_mode_data object from another primitive_mode_data object
 
-          :type \*args: [Arguments (variable number and type)]
+          :type `*args`: [Arguments (variable number and type)]
         )mydelim";
 
     py::class_<mode_data>(m, "mode_data")
@@ -158,6 +158,29 @@ inline void init_system_info(py::module &m)
 
             :Parameters:    - **data** (:class:`primitive_mode_data`) - The primitive mode information to append to this object
         )mydelim")
+        .def("__len__", &mode_data::nmodes, R"mydelim(
+            :returns: The number of primitive modes in the composite mode
+            :rtype: int
+        )mydelim")
+        .def("nmodes", &mode_data::nmodes, R"mydelim(
+            :returns: The number of primitive modes in the composite mode
+            :rtype: int
+        )mydelim")
+        .def("__getitem__", static_cast<primitive_mode_data &(mode_data::*)(size_t)>(&mode_data::operator[]), py::return_value_policy::reference,
+             R"mydelim(
+                :Parameters:    - **i** (int) - The index of the mode to access
+
+                :Returns:       The primitive_mode_data object in location i
+                :Return Type:   :class:`primitive_mode_data`
+        )mydelim")
+        .def("__setitem__", [](mode_data &o, size_t i, const primitive_mode_data &mode)
+             { o[i] = mode; },
+             R"mydelim(
+                Set the value of the primitive_mode_data object at position i in the mode_data object
+                :Parameters:    - **i** (int) - The index of the mode to access
+                                - **mode** (:class:`primitive_mode_data`) - The primitive_mode_data object used to construct the new mode
+
+        )mydelim")
 
         .def("append", static_cast<void (mode_data::*)(const mode_data &)>(&mode_data::append), R"mydelim(
             Append all primitive modes contained in another mode data object to the current mode
@@ -194,7 +217,7 @@ inline void init_system_info(py::module &m)
           This class stores a set of primitive_mode_data defining each individual mode that forms this composite,
           and provides several helper functions for determining the properties of the underlying modes. 
 
-          :param \*args: A variable length list of arguments. Valid options are
+          :param `*args`: A variable length list of arguments. Valid options are
             - none - in this case we call the default constructor of the mode_data objcet.
             - **d** (int) - Construct a mode_data object with a generic_mode mode_type with a Local Hilbert space dimension of d
             - **d** (int),  **type** (:class:`mode_type`) -  Construct a mode_data object with a type mode_type with a Local Hilbert space dimension of d
@@ -202,7 +225,7 @@ inline void init_system_info(py::module &m)
             - **other** (:class:`primitive_mode_data`) - Constructs a mode_data object containing a single primitive_mode_data object
             - **other** (list[:class:`primitive_mode_data`]) - Constructs a mode_data object containing a list of primitive_mode_data object
 
-          :type \*args: [Arguments (variable number and type)]
+          :type `*args`: [Arguments (variable number and type)]
         )mydelim";
 
     m.def("fermion_mode", &fermion_mode, R"mydelim(
@@ -462,12 +485,14 @@ inline void init_system_info(py::module &m)
         )mydelim")
         .def("mode_index", [](const system_modes &o, size_t i)
              { return o.mode_index(i); })
+        .def("primitive_mode_index", [](const system_modes &o, size_t i)
+             { return o.primitive_mode_index(i); })
         .def_property("mode_indices", &system_modes::mode_indices, &system_modes::set_mode_indices, "The user defined mode ordering for each of the modes in the system")
         .doc() = R"mydelim(
           A class for handling the specification of all modes in the system.  This stores a list of each composite mode and an
           optional user supplied ordering of the modes
 
-          :param \*args: A variable length list of arguments. Valid options are
+          :param `*args`: A variable length list of arguments. Valid options are
               
               - none - in this case we call the default constructor of the system_modes object.
               - **N** (int) - Construct a system_modes object containing N modes
@@ -479,7 +504,7 @@ inline void init_system_info(py::module &m)
               - **other** (list[:class:`mode_data`]) - Constructs a system_modes object from a list of composite modes
               - **other** (list[:class:`mode_data`]), **ordering** (list[int]) - Constructs a system_modes object from a list of composite modes.  Additionally provide a user defined ordering of the modes
 
-          :type \*args: [Arguments (variable number and type)]
+          :type `*args`: [Arguments (variable number and type)]
         )mydelim";
 
     m.def("combine_systems", &combine_systems, R"mydelim(

@@ -10,10 +10,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
-import matplotlib.pyplot as plt
-import h5py
 import argparse
+
+import h5py
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def plot(fnames, params):
@@ -30,7 +31,7 @@ def plot(fnames, params):
                 pars.append(np.array(h5.get(par)))
 
             h5.close()
-        except:
+        except Exception:
             print("Failed to read input file")
             continue
 
@@ -39,7 +40,7 @@ def plot(fnames, params):
                 plt.semilogy(
                     t, np.real(par) , "-", label=label + "_" + fname
                 )
-            except:
+            except Exception:
                 print("Failed to plot: " + label)
         c += 1
         c = c % 3

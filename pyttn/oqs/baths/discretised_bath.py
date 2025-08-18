@@ -23,7 +23,7 @@ from pyttn import (
     fermion_mode,
     ntreeBuilder,
     ntreeNode,
-    OP_type,
+    OPBase,
     sSOP,
     SOP,
 )
@@ -33,6 +33,7 @@ from ..unitary import add_fermionic_bath_hamiltonian, add_bosonic_bath_hamiltoni
 class DiscreteBath(metaclass=abc.ABCMeta):
     """The base class for handling a generic bath representing a discrete fit to a bath correlation function."""
 
+    @abc.abstractmethod
     def __init__(self):
         pass
 
@@ -86,11 +87,11 @@ class DiscreteBath(metaclass=abc.ABCMeta):
 
 
 class DiscreteOQSBath(DiscreteBath):
-    r"""The base class for handling a bath representing a Discrete bath correlation function
+    """The base class for handling a bath representing a Discrete bath correlation function
     of the form
 
     .. math::
-        C(t) = \sum_k g_{k}^2 \exp(-1.0j w_k t)
+        C(t) = \\sum_k g_{k}^2 \\exp(-1.0j w_k t)
 
     :param gk: The coefficient in the exponential decomposition
     :type gk: np.ndarray
@@ -121,17 +122,17 @@ class DiscreteOQSBath(DiscreteBath):
         self._sysinf = None
 
     def is_fermionic(self) -> bool:
-        r"""Returns whether or not the bath is fermionic
+        """Returns whether or not the bath is fermionic
         :rtype: bool
         """
         return self._fermion
 
     def Ct(self, t: Union[float, np.ndarray]) -> Union[complex, np.complex128, np.ndarray]:
-        r"""Returns the value of the non-interacting bath correlation function evaluated at the time points t,
+        """Returns the value of the non-interacting bath correlation function evaluated at the time points t,
         defined by:
 
         .. math::
-            C(t) = \sum_k g_{k}^2 \exp(-1.0j*w_k t)
+            C(t) = \\sum_k g_{k}^2 \\exp(-1.0j*w_k t)
 
         :param t: time
         :type t: float | np.ndarray
@@ -169,11 +170,11 @@ class DiscreteOQSBath(DiscreteBath):
 
 
 class DiscreteBosonicBath(DiscreteOQSBath):
-    r"""A class for handling a bosonic bath representing a Discrete bath correlation function
+    """A class for handling a bosonic bath representing a Discrete bath correlation function
     of the form
 
     .. math::
-        C(t) = \sum_k g_{k}^2 \exp(-1.0j w_k t)
+        C(t) = \\sum_k g_{k}^2 \\exp(-1.0j w_k t)
 
     :param gk: The coefficient in the exponential decomposition
     :type gk: np.ndarray
@@ -189,7 +190,7 @@ class DiscreteBosonicBath(DiscreteOQSBath):
         self._wk_trunc = wk
         self.truncate_modes()
 
-    def truncate_modes(self, truncation: TruncationBase = DepthTruncation(8)):
+    def truncate_modes(self, truncation: Optional[TruncationBase] = None):
         """Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
@@ -197,6 +198,8 @@ class DiscreteBosonicBath(DiscreteOQSBath):
         :type truncation: TruncationBase
 
         """
+        if truncation is None:
+            truncation = DepthTruncation(8)
         self._mode_dims = truncation(self._gk_trunc, self._wk_trunc, False)
 
     def system_information(
@@ -243,8 +246,8 @@ class DiscreteBosonicBath(DiscreteOQSBath):
     def add_system_bath_hamiltonian(
         self,
         H: Union[sSOP, SOP],
-        Sp: OP_type,
-        Sm: Optional[OP_type] = None,
+        Sp: OPBase,
+        Sm: Optional[OPBase] = None,
         geom: str = "star",
         binds: Optional[list[int]] = None,
         bskip: Optional[int] = 1,
@@ -254,9 +257,9 @@ class DiscreteBosonicBath(DiscreteOQSBath):
         :param H: The total Hamiltonian
         :type H: sSOP | SOP
         :param Sp: An operator that couples to the bath annihilation operator terms
-        :type Sp: OP_type
-        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-        :type Sm: Optional[OP_type]
+        :type Sp: OPBase
+        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(:math:`a^\\dagger` + a) (Default: None)
+        :type Sm: Optional[OPBase]
         :param geom: The geometry of the bath to use
         :type geom: {"star", "chain", "ipchain"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
@@ -274,8 +277,8 @@ class DiscreteBosonicBath(DiscreteOQSBath):
 
     def system_bath_hamiltonian(
         self,
-        Sp: OP_type,
-        Sm: Optional[OP_type] = None,
+        Sp: OPBase,
+        Sm: Optional[OPBase] = None,
         geom: str = "star",
         binds: Optional[list[int]] = None,
         bskip: Optional[int] = 1,
@@ -285,9 +288,9 @@ class DiscreteBosonicBath(DiscreteOQSBath):
         :param H: The total Hamiltonian
         :type H: sSOP | SOP
         :param Sp: An operator that couples to the bath annihilation operator terms
-        :type Sp: OP_type
-        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-        :type Sm: Optional[OP_type]
+        :type Sp: OPBase
+        :param Sm: An operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(:math:`a^\\dagger + a`) (Default: None)
+        :type Sm: Optional[OPBase]
         :param geom: The geometry of the bath to use
         :type geom: {"star", "chain", "ipchain"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
@@ -306,11 +309,11 @@ class DiscreteBosonicBath(DiscreteOQSBath):
 
 
 class DiscreteFermionicBath(DiscreteOQSBath):
-    r"""A class for handling a fermionic bath representing an exponential fit to a bath correlation function
+    """A class for handling a fermionic bath representing an exponential fit to a bath correlation function
     of the form
 
     .. math::
-        C(t) = \sum_k g_{k}^2 \exp(-1.0j w_k t)
+        C(t) = \\sum_k g_{k}^2 \\exp(-1.0j w_k t)
 
     :param gk: The coefficient in the exponential decomposition
     :type gk: np.ndarray
@@ -327,7 +330,7 @@ class DiscreteFermionicBath(DiscreteOQSBath):
         )
         self.truncate_modes()
 
-    def truncate_modes(self, truncation=DepthTruncation(2)):
+    def truncate_modes(self, truncation: Optional[TruncationBase] = None):
         """Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
@@ -335,6 +338,8 @@ class DiscreteFermionicBath(DiscreteOQSBath):
         :type truncation: TruncationBase, optional
 
         """
+        if truncation is None:
+            truncation = DepthTruncation(2)
         self._mode_dims = truncation(self._gk, self._wk, True)
 
     def __str__(self):

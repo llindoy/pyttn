@@ -1,16 +1,27 @@
+# This files is part of the pyTTN package.
+#(C) Copyright 2025 NPL Management Limited
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#     http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License
+
+import argparse
+import copy
 import os
+import time
 os.environ["OMP_NUM_THREADS"] = "1"
 
-import numpy as np
-import time
 import h5py
-import copy
-import argparse
-
+import numpy as np
+from numba import jit
 
 import pyttn
 from pyttn import oqs, utils
-from numba import jit
 
 
 def build_topology(Ns, ds, chi, chiS, chiB, nbose, expbath, degree):
@@ -94,7 +105,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
     sysinfo = copy.deepcopy(sysinf)
     site_info = copy.deepcopy(sysinf)
     # and add on the system information objects for the remaining spins
-    for i in range(Ns - 1):
+    for _ in range(Ns - 1):
         sysinfo = pyttn.combine_systems(sysinfo, sysinf)
 
     # set up the total Hamiltonian
@@ -144,7 +155,7 @@ def xychain_dynamics(Ns, alpha, wc, eta, chi, chiS, chiB, L, K, dt, Lmin=None, E
 
     #now set this up 
     prod_state = []
-    for i in range(Ns):
+    for _ in range(Ns):
         prod_state += [np.identity(2).flatten()] 
         #add on the product state that projects us onto the bath trace.  This depends on the method used.
         if K != 0:

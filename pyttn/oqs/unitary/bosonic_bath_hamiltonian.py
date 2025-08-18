@@ -10,11 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
 import copy
 
+import numpy as np
+
+from pyttn import coeff, sOP
+
 from .chain_map import chain_map
-from pyttn import sOP, coeff
+
 
 # functions for setting up the bath hamiltonian in several different geometries.
 def __generate_binds(binds, bskip, Nb):

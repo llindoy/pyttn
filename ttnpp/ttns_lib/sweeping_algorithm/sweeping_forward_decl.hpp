@@ -59,15 +59,15 @@ namespace ttns
         };
 
     public:
-        void initialise(const ttn_type &A, const environment_type &, container_type &ham)
+        void initialise(const ttn_type &A, const environment_type &, container_type &ham, size_type set_var_nthreads = 1)
         {
             ham.construct_topology(A);
         }
-        static inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, const parameter_list &)
+        static inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, const parameter_list &, size_type set_var_nthreads = 1)
         {
             CALL_AND_RETHROW(initialise(A, h, ham));
         }
-        static inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, parameter_list &&)
+        static inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, parameter_list &&, size_type set_var_nthreads = 1)
         {
             CALL_AND_RETHROW(initialise(A, h, ham));
         }
@@ -78,11 +78,7 @@ namespace ttns
         inline void update_env_up(const environment_type &, const hnode &, node_type &, bool = false) {}
         inline void update_env_up(const environment_type &, const hnode &, node_type &, node_type &, bool = false) {}
 
-        const size_type &num_buffers() const { return m_num_buffers; }
-        size_type &num_buffers() { return m_num_buffers; }
-
     protected:
-        size_type m_num_buffers = 1;
         container_type m_container;
     };
 

@@ -47,15 +47,16 @@ void init_tdvp_core(py::module &m, const std::string &label)
     // wrapper for the sPOP type
     py::class_<tdvp>(m, label.c_str())
         .def(py::init<>())
-        .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type>(),
-             py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, R"mydelim(
+        .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type, size_type>(),
+             py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1, R"mydelim(
             Construct a new one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.
 
             :Parameters:    - **A** (:class:`ttn_complex`) - The Tree Tensor Network Object that will be optimised using the DMRG algorithm
                             - **H** (:class:`sop_operator_complex`) - The Hamiltonian sop operator object
                             - **krylov_dim** (int, optional) - The krylov subspace dimension used for the eigensolver steps. (Default: 16)
                             - **nstep** (int, optional): The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)
-                            - **num_threads** (int, optional) - The number of openmp threads to be used by the solver. (Default: 1)
+                            - **num_threads** (int, optional) - The number of openmp threads to be used for parallelising over the Hamiltonian sum in the solver. (Default: 1)
+                            - **set_var_num_threads** (int, optional) - The number of openmp threads to be used for parallelising over the set by the solver. (Default: 1)
           )mydelim")
         .def("assign", [](tdvp &self, const tdvp &o)
              { self = o; })
@@ -63,14 +64,15 @@ void init_tdvp_core(py::module &m, const std::string &label)
              { return tdvp(o); })
         .def("__deepcopy__", [](const tdvp &o, py::dict)
              { return tdvp(o); }, py::arg("memo"))
-        .def("initialise", &tdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, R"mydelim(
+        .def("initialise", &tdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1, R"mydelim(
             Initialise one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.
 
             :Parameters:    - **A** (:class:`ttn_complex`) - The Tree Tensor Network Object that will be optimised using the DMRG algorithm
                             - **H** (:class:`sop_operator_complex`) - The Hamiltonian sop operator object
                             - **krylov_dim** (int, optional) - The krylov subspace dimension used for the eigensolver steps. (Default: 16)
                             - **nstep** (int, optional): The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)
-                            - **num_threads** (int, optional) - The number of openmp threads to be used by the solver. (Default: 1)
+                            - **num_threads** (int, optional) - The number of openmp threads to be used for parallelising over the Hamiltonian sum in the solver. (Default: 1)
+                            - **set_var_num_threads** (int, optional) - The number of openmp threads to be used for parallelising over the set by the solver. (Default: 1)
           )mydelim")
         .def_property("coefficient", [](const tdvp &o)
                       { return _T(o.coefficient()); }, [](tdvp &o, const _T &i)
@@ -136,15 +138,15 @@ void init_tdvp_adaptive(py::module &m, const std::string &label)
 
     py::class_<atdvp>(m, label.c_str())
         .def(py::init<>())
-        .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type, size_type, size_type>(),
-             py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("subspace_krylov_dim") = 4, py::arg("subspace_neigs") = 2, py::arg("num_threads") = 1)
+        .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type, size_type, size_type, size_type>(),
+             py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("subspace_krylov_dim") = 4, py::arg("subspace_neigs") = 2, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
         .def("assign", [](atdvp &self, const atdvp &o)
              { self = o; })
         .def("__copy__", [](const atdvp &o)
              { return atdvp(o); })
         .def("__deepcopy__", [](const atdvp &o, py::dict)
              { return atdvp(o); }, py::arg("memo"))
-        .def("initialise", &atdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("subspace_krylov_dim") = 4, py::arg("subspace_neigs") = 2, py::arg("num_threads") = 1)
+        .def("initialise", &atdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("subspace_krylov_dim") = 4, py::arg("subspace_neigs") = 2, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
         .def_property("coefficient", [](const atdvp &o)
                       { return _T(o.coefficient()); }, [](atdvp &o, const _T &i)
                       { o.coefficient() = i; })
@@ -202,15 +204,15 @@ void init_tdvp_adaptive_ts_cost(py::module &m, const std::string &label)
 
     py::class_<atdvp>(m, label.c_str())
         .def(py::init<>())
-        .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type>(),
-             py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1)
+        .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type, size_type>(),
+             py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
         .def("assign", [](atdvp &self, const atdvp &o)
              { self = o; })
         .def("__copy__", [](const atdvp &o)
              { return atdvp(o); })
         .def("__deepcopy__", [](const atdvp &o, py::dict)
              { return atdvp(o); }, py::arg("memo"))
-        .def("initialise", &atdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1)
+        .def("initialise", &atdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
         .def_property("coefficient", [](const atdvp &o)
                       { return _T(o.coefficient()); }, [](atdvp &o, const _T &i)
                       { o.coefficient() = i; })

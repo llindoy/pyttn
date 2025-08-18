@@ -10,16 +10,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from abc import ABCMeta, abstractmethod
 from typing import Optional, Union
-from abc import ABCMeta
 
-from pyttn.linalg import Vector, Matrix
-from ..sop.sSOPExt import sOP
-from pyttn.ttnpp import system_modes
-from .opsExt import siteOp
 import numpy as np
 
+from pyttn.linalg import Matrix, Vector
+from pyttn.ttnpp import system_modes
 from pyttn.ttnpp.ops import site_operator_complex
+
+from ..sop.sSOPExt import sOP
+from .opsExt import siteOp
 
 try:
     from pyttn.ttnpp.ops import site_operator_real
@@ -69,9 +70,8 @@ def _site_operator_blas(*args, mode=None, optype=None, dtype=np.complex128, **kw
             else:
                 ret = site_operator_real(M)
         except RuntimeError:
-            raise RuntimeError(
-                "Failed to construct site_operator object.  optype not recognized."
-            )
+            message = "Failed to construct site_operator object.  optype not recognized."
+            raise RuntimeError(message) from None
     if mode is not None:
         ret.mode = mode
     return ret
@@ -102,9 +102,8 @@ def _site_operator_cuda(*args, mode=None, optype=None, dtype=np.complex128, **kw
             else:
                 ret = site_operator_real_cuda(M)
         except RuntimeError:
-            raise RuntimeError(
-                "Failed to construct site_operator object.  optype not recognized."
-            )
+            message = "Failed to construct site_operator object.  optype not recognized."
+            raise RuntimeError(message) from None
     if mode is not None:
         ret.mode = mode
     return ret
@@ -125,14 +124,14 @@ class site_operator(metaclass=ABCMeta):
     ) -> "site_operator":
         """Factory function for constructing a one site operator.
 
-        :param *args: Variable length list of arguments. There are several valid options for the *args parameters.  If the optype variable is None the allowed options are
+        :param `*args`: Variable length list of arguments. There are several valid options for the `*args` parameters.  If the optype variable is None the allowed options are
 
             - Default construct the site operator object
             - site_op (:class:`ops.siteOp`) - Construct a new site_operator object from a siteOp object
             - site_op (:class:`site_operator`) - Construct a new site_operator object from the existing object
             - site_op (:class:`site_operator`) - Construct a new site_operator object from the existing object
             - op (:class:`sOP`), sysinf (:class:`system_modes`) - Construct a new site_operator from the string operator and system information
-            - op (:class:`sOP`), sysinf (:class:`system_modes`), opdict (operator_dictionary_real or operator_dictionary_complex) -  Construct a new site_operator from the string operator, system information and used defined operator dictionary.
+            - op (:class:`sOP`), sysinf (:class:`system_modes`), opdict (:class:`operator_dictionary`) -  Construct a new site_operator from the string operator, system information and used defined operator dictionary.
 
             Otherwise, if the optype variable has been set then the valid arguments are determined by the specified optype see opsExt.py for details.
 
@@ -144,7 +143,7 @@ class site_operator(metaclass=ABCMeta):
         :type dtype: {np.float64, np.complex128}, optional
         :param backend: The computational backend to use for the product operator  (Default: "blas")
         :type backend: {"blas", "cuda"}, optional
-        :param **kwargs: Additional keyword arguments. To construct the site_operator object.  Valid options:
+        :param `**kwargs`: Additional keyword arguments. To construct the site_operator object.  Valid options:
             
             - use_sparse (bool)
         """
@@ -159,6 +158,7 @@ class site_operator(metaclass=ABCMeta):
         else:
             raise RuntimeError("Invalid backend type for site_operator")
 
+    @abstractmethod
     def initialise(self, op: sOP, sysinf: system_modes, *args, use_sparse: bool = True):
         """Initialise the site_operator object given a sOP and system_modes information
 
@@ -166,9 +166,9 @@ class site_operator(metaclass=ABCMeta):
         :type op: sOP
         :param sysinf: The information about the system degrees of freedom
         :type sysinf: system_modes
-        :param *args: A variable length array of arguments: Valid options are:
+        :param `*args`: A variable length array of arguments: Valid options are:
 
-            - If no *args are provided construct using standard dictionaries
+            - If no `*args` are provided construct using standard dictionaries
             - opdict (:class:`operator_dictionary`): Construct site_operator using a user created operator dictionary.
        
         :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
@@ -176,6 +176,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def complex_dtype(self) -> bool:
         """Returns whether or not the site_operator is storing a complex valued dtype
 
@@ -184,10 +185,12 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def clear(self):
         """Clear and deallocate all internal buffers of the site_operator"""
         pass
 
+    @abstractmethod
     def transpose(self) -> "site_operator":
         """Returns the transpose of the operator
 
@@ -196,15 +199,17 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def todense(self, *args) -> Matrix:
         """ Return the dens Matrix representation of this site operator
 
-        :param *args: A variable length list of arguments. 
+        :param `*args`: A variable length list of arguments. 
             - Either empty
             - Or containing a list[int] defining the dimension of each mode the operator acts on.
         """
         pass
 
+    @abstractmethod
     def assign(self, o: Union["site_operator", siteOp]):
         """Assign the value of the site operator from another or a siteOp
 
@@ -213,6 +218,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def bind(self, v : siteOp):
         """Assign the value stored in the site operator to a siteOp
 
@@ -221,14 +227,17 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the site_operator object"""
         pass
 
+    @abstractmethod
     def __deepcopy__(self, memo):
         """Function implementing deep copy of the site_operator object"""
         pass
 
+    @abstractmethod
     def size(self) -> int:
         """Return the local Hilbert space dimension associated with this site operator
 
@@ -237,6 +246,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def is_identity(self) -> bool:
         """Returns whether or not the present operator is an identity operator
 
@@ -245,6 +255,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def is_resizable(self) -> bool:
         """Returns whether or not the operator can be resized.
 
@@ -255,10 +266,12 @@ class site_operator(metaclass=ABCMeta):
 
 
     @property
+    @abstractmethod
     def mode(self) -> int:
         """The mode the system acts on"""
         pass
 
+    @abstractmethod
     def resize(self, size: int):
         """Resize the site_operator object so that it can describe a system with size modes
 
@@ -267,15 +280,17 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def apply(self, a: Union[Vector, Matrix], b: Union[Vector, Matrix]):
         """Compute the action of the operator on the object a and store the result in b
-            op*a = b
+          
         :param a: The object the operator should be applied on
         :type a: Union[Vector, Matrix]
         :param b: The result of the action of the operator on a (op@a)
         :type b: Union[Vector, Matrix]
         """
 
+    @abstractmethod
     def __str__(self) -> str:
         """Return the string representation of the site_operator object
 
@@ -284,6 +299,7 @@ class site_operator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def backend(self) -> str:
         """Returns the backend type of the site_operator
 
@@ -301,4 +317,3 @@ if _cuda_import:
     if _real_ttn_import:
         site_operator.register(site_operator_real_cuda)
 
-site_operator_type = site_operator

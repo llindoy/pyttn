@@ -20,6 +20,7 @@
 #include "spin_operator.hpp"
 #include "pauli_operator.hpp"
 #include "nlevel_operator.hpp"
+
 #include <unordered_map>
 
 #include "../system_information.hpp"
@@ -133,6 +134,8 @@ namespace ttns
                 {std::string("q"), std::make_shared<position<T>>()},
                 // bind the moment operators
                 {std::string("p"), std::make_shared<momentum<T>>()},
+                // bind the kinetic energy operators
+                {std::string("ke"), std::make_shared<kinetic_energy<T>>()},                
         };
 
     } // namespace boson
@@ -264,11 +267,35 @@ namespace ttns
             CALL_AND_RETHROW(return fermi_dict::query(label));
 
         case mode_type::BOSON_MODE:
-            CALL_AND_RETHROW(return bose_dict::query(label));
+            if(bose_dict::in_dict(label))
+            {
+                CALL_AND_RETHROW(return bose_dict::query(label));
+            }
+            else if(label.find(std::string("disp")) != std::string::npos)
+            {
+                std::regex r("disp\\((.*?)\\)");
+                std::smatch m;
+                bool match = std::regex_search(label, m, r);
+                std::string disp_string("");
+                if (match)
+                {
+                    disp_string = m[1].str();
+                }
+                else
+                {
+                    RAISE_EXCEPTION("Failed to load displacement operator.  Invalid displacement.")
+                }
 
+                CALL_AND_RETHROW(return std::make_shared<boson::displacement<T>>(disp_string));
+            }
+            else
+            {
+                CALL_AND_RETHROW(return std::make_shared<boson::operator_power<T>>(label));
+            }
+            break;
+            
         case mode_type::QUBIT_MODE:
             CALL_AND_RETHROW(return pauli_dict::query(label));
-            break;
 
         case mode_type::SPIN_MODE:
             CALL_AND_RETHROW(return spin_dict::query(label));

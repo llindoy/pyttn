@@ -5,7 +5,7 @@ os.environ["OMP_NUM_THREADS"] = "1"
 from pyttn.linalg import matrix
 from pyttn.linalg import available_backends
 from pyttn.linalg import random_engine
-from pyttn.linalg import orthogonal_vector
+from pyttn.linalg import OrthogonalVector
 import pytest
 
 @pytest.mark.parametrize("M, N", [(2, 2), (8, 8), (12, 15), (3, 5)])
@@ -16,7 +16,7 @@ def test_fill_random(M, N) -> None:
 
             m2 = matrix(np.zeros((M, N)), dtype=dtype, backend=backend)
             rng = random_engine(backend)
-            orthogonal_vector.fill_random(m2, rng)
+            OrthogonalVector.fill_random(m2, rng)
 
             m1 = np.array(m2)
             for i in range(min(M, N)):
@@ -37,9 +37,9 @@ def test_pad_random(M, N) -> None:
         def run_test(dtype) -> None:
             m2 = matrix(np.zeros((M, N)), dtype=dtype, backend=backend)
             rng = random_engine(backend)
-            orthogonal_vector.fill_random(m2, rng)
+            OrthogonalVector.fill_random(m2, rng)
 
-            orthogonal_vector.pad_random(m2, 1, rng)
+            OrthogonalVector.pad_random(m2, 1, rng)
 
             m1 = np.array(m2)
             for i in range(min(M, N)):
@@ -60,9 +60,9 @@ def test_generate(M, N) -> None:
         def run_test(dtype) -> None:
             m2 = matrix(np.zeros((M, N)), dtype=dtype, backend=backend)
             rng = random_engine(backend)
-            orthogonal_vector.fill_random(m2, rng)
+            OrthogonalVector.fill_random(m2, rng)
 
-            v = orthogonal_vector.generate(m2, rng)
+            v = OrthogonalVector.generate(m2, rng)
 
             m1 = np.array(m2)
             v1 = np.array(v)

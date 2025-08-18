@@ -11,19 +11,31 @@
 # limitations under the License
 
 
+import argparse
 import os
-
+import sys
+import time
 os.environ["OMP_NUM_THREADS"] = "1"
 
-import numpy as np
-import time
-import sys
 import h5py
-import argparse
+import numpy as np
+from p3ht_pcbm_hamiltonian import multiset_hamiltonian
 
-from pyttn import ntree, ntreeBuilder
-from pyttn import system_modes, generic_mode, boson_mode
-from pyttn import ttn, sop_operator, matrix_element, tdvp, site_operator, sOP
+from pyttn import (
+    boson_mode,
+    generic_mode,
+    matrix_element,
+    ms_sop_operator,
+    ms_ttn,
+    ntree,
+    ntreeBuilder,
+    site_operator,
+    sOP,
+    sop_operator,
+    system_modes,
+    tdvp,
+    ttn,
+)
 
 fs = 41.341374575751
 
@@ -269,8 +281,7 @@ def p3ht_pcbm_single_set(topo, capacity, mode_dims, tmax=200, dt=0.25, adaptive=
 def p3ht_pcbm_multiset(
     topo, mode_dims, tmax=200, dt=0.25, ofname="p3ht_pcbm.h5", output_skip=1
 ):
-    from pyttn import ms_ttn, ms_sop_operator
-    from p3ht_pcbm_hamiltonian import multiset_hamiltonian
+
 
     """Function for performing the dynamics of the multiset p3ht_pcbm model
     """

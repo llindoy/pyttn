@@ -69,7 +69,7 @@ void init_convert_to_dense(py::module &m)
         Create a dense matrix representation of an sNBO.
 
         :param op: The string operator object
-        :type op: sNBO_type
+        :type op: sNBO
 
         :returns: The dense matrix representation of the operator
         :rtype: Matrix
@@ -83,7 +83,7 @@ void init_convert_to_dense(py::module &m)
         Create a dense matrix representation of an sSOP.
 
         :param op: The string operator object
-        :type op: sSOP_type
+        :type op: sSOP
 
         :returns: The dense matrix representation of the operator
         :rtype: Matrix
@@ -97,7 +97,7 @@ void init_convert_to_dense(py::module &m)
         Create a dense matrix representation of an SOP.
 
         :param op: The string operator object
-        :type op: SOP_type
+        :type op: SOP
 
         :returns: The dense matrix representation of the operator
         :rtype: Matrix

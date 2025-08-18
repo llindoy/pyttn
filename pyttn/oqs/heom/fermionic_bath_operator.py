@@ -10,18 +10,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
-from pyttn import sOP, sSOP, SOP, OP_type
 from typing import Optional, Union
+
+import numpy as np
+
+from pyttn import SOP, OPBase, sOP, sSOP
+
 from .utils import generate_binds
 
 
 def add_bosonic_heom_bath_generator(
     H: Union[sSOP, SOP],
-    Sp: OP_type,
+    Sp: OPBase,
     dks: np.ndarray,
     zks: np.ndarray,
-    Sm: Optional[OP_type] = None,
+    Sm: Optional[OPBase] = None,
     binds: Optional[list[int]] = None,
     bskip: Optional[int] = 2,
 ) -> Union[sSOP, SOP]:
@@ -35,13 +38,13 @@ def add_bosonic_heom_bath_generator(
     :param H: The input sum-of-product operator that the generator is to be added to
     :type H: Union[sSOP, SOP]
     :param Sp: The system part of the system bath coupling term corresponding to the system raising operator
-    :type Sp: OP_type
+    :type Sp: OPBase
     :param dks: The coefficients in the bath correlation function expansion
     :type dks: np.ndarray
     :param zks:  The exponents in the bath correlation function expansion
     :type zks: np.ndarray
     :param Sm: The system part of the system bath coupling term corresponding to the system lowering operator, defaults to None
-    :type Sm: OP_type, optional
+    :type Sm: OPBase, optional
     :param binds: The indices of the HEOM bath modes, defaults to None
     :type binds: list, optional
     :param bskip: The number of sites to skip when define a contiguous set of bath mode indices, defaults to 2
@@ -96,8 +99,8 @@ def add_bosonic_heom_bath_generator(
 
 def add_fermionic_pseudomode_bath_generator(
     H: Union[sSOP, SOP],
-    Sp: OP_type,
-    Sm: OP_type,
+    Sp: OPBase,
+    Sm: OPBase,
     dks: np.ndarray,
     zks: np.ndarray,
     binds: Optional[list[int]] = None,
@@ -113,9 +116,9 @@ def add_fermionic_pseudomode_bath_generator(
     :param H: The input sum-of-product operator that the generator is to be added to
     :type H: Union[sSOP, SOP]
     :param Sp: The system part of the system bath coupling term corresponding to the system raising operator
-    :type Sp: OP_type
+    :type Sp: OPBase
     :param Sm: The system part of the system bath coupling term corresponding to the system lowering operator
-    :type Sm: OP_type    
+    :type Sm: OPBase    
     :param dks: The coefficients in the bath correlation function expansion
     :type dks: np.ndarray
     :param zks:  The exponents in the bath correlation function expansion
@@ -165,8 +168,8 @@ def add_fermionic_pseudomode_bath_generator(
 
 def add_fermionic_bath_generator(
     H: Union[sSOP, SOP],
-    Sp: OP_type,
-    Sm: OP_type,
+    Sp: OPBase,
+    Sm: OPBase,
     dks: np.ndarray,
     zks: np.ndarray,
     binds: Optional[list[int]] = None,
@@ -181,9 +184,9 @@ def add_fermionic_bath_generator(
     :param H: The input sum-of-product operator that the generator is to be added to
     :type H: SOP
     :param Sp: The system part of the system bath coupling term corresponding to the system raising operator
-    :type Sp: OP_type
+    :type Sp: OPBase
     :param Sm: The system part of the system bath coupling term corresponding to the system lowering operator
-    :type Sm: OP_type   
+    :type Sm: OPBase   
     :param dks: The coefficients in the bath correlation function expansion
     :type dks: np.ndarray
     :param zks:  The exponents in the bath correlation function expansion

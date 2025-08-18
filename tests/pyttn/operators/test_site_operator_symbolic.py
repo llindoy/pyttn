@@ -6,7 +6,8 @@ from pyttn import system_modes, boson_mode, fermion_mode, spin_mode, tls_mode, n
 import pytest
 import numpy as np
 import random
-
+import copy
+import sys
 
 
 def test_fermionic():
@@ -133,6 +134,11 @@ def test_bosonic(N):
     amat = a(N)
     nmat = n(N)
 
+    amat1 = a(N+1)
+    p = 1.0j/(np.sqrt(2))*(amat1.T-amat1)
+    kemat = (p@p)/2
+    kemat = kemat[:N, :N]
+
     # test whether the boson operators works when as the only mode
     labels = ["a", "b", "c"]
     for label in labels:
@@ -149,7 +155,7 @@ def test_bosonic(N):
     test_1("x", 1/(np.sqrt(2))*(amat+amat.T), N)
     test_1("q", 1/(np.sqrt(2))*(amat+amat.T), N)
     test_1("p", 1.0j/(np.sqrt(2))*(amat.T-amat), N)
-
+    test_1("ke", kemat, N)
     # test whether the boson operators works when created as a composite mode at various positions
     for mi in range(3):
         test_2("a", amat, N, mi)
@@ -157,7 +163,195 @@ def test_bosonic(N):
         test_2("n", nmat, N, mi)
         test_2("x", 1/(np.sqrt(2))*(amat+amat.T), N, mi)
         test_2("p", 1.0j/(np.sqrt(2))*(amat.T-amat), N, mi)
+        test_2("ke", kemat, N, mi)
 
+
+@pytest.mark.parametrize("power", [2, 3, 4, 5, 6])
+def test_bosonic_powers(power):
+    # test whether it works when we are dealing with a single mode
+    def test_1(label, mat, N):
+        sysinf = system_modes(1)
+        sysinf[0] = boson_mode(N)
+
+        H = sOP(label, 0)
+        siteop = site_operator(H, sysinf)
+        assert not siteop.is_identity()
+        assert siteop.size() == N
+        assert siteop.mode == 0
+
+        mat2 = siteop.todense()
+        assert np.allclose(np.array(mat2), mat)
+
+    # test whether it works when we are dealing with a single mode
+    def test_2(label, mat, N, mi):
+        mi = mi % 3
+        sysinf = system_modes(1)
+        sysinf[0] = [boson_mode(N), boson_mode(N), boson_mode(N)]
+
+        Id = np.identity(N)
+
+        if mi == 0:
+            mat = np.kron(mat, np.kron(Id, Id))
+        elif mi == 1:
+            mat = np.kron(Id, np.kron(mat, Id))
+        elif mi == 2:
+            mat = np.kron(Id, np.kron(Id, mat))
+
+        H = sOP(label, mi)
+        siteop = site_operator(H, sysinf)
+        assert not siteop.is_identity()
+        assert siteop.size() == N**3
+        assert siteop.mode == 0
+
+        mat2 = siteop.todense()
+        assert np.allclose(np.array(mat2), mat)
+
+    def a(N):
+        res = np.zeros((N, N))
+        for i in range(N-1):
+            res[i, i+1] = np.sqrt(i+1)
+        return res
+
+    def n(N):
+        return np.diag(np.arange(N))
+
+    N = 8
+
+    #build the matrices at a larger size to avoid truncation errors on the submatrix we care about when
+    #evaluating the power of the matrix
+    amat = a(N+power)
+
+
+
+    xmat = 1/np.sqrt(2)*(amat+amat.T)
+    temp = copy.deepcopy(xmat)
+    ap = copy.deepcopy(xmat)
+    for i in range(1, power):
+        ap = xmat@temp
+        temp = copy.deepcopy(ap)
+
+    xmat = ap[:N, :N]
+
+    pmat = 1.0j/(np.sqrt(2))*(amat.T-amat)
+    temp = copy.deepcopy(pmat)
+    ap = copy.deepcopy(pmat)
+    for i in range(1, power):
+        ap = pmat@temp
+        temp = copy.deepcopy(ap)
+    pmat = ap[:N, :N]
+
+    temp = copy.deepcopy(amat)
+    ap = copy.deepcopy(amat)
+    for i in range(1, power):
+        ap = amat@temp
+        temp = copy.deepcopy(ap)
+
+    amat = ap[:N, :N]
+    nmat = n(N)
+    nmat = np.power(nmat, power)
+
+    # test whether the boson operators works when as the only mode
+    labels = ["a", "b", "c"]
+    for label in labels:
+        test_1(label+"^"+str(power), amat, N)
+
+    labels = ["adag", "cdag", "bdag", "ad", "cd", "bd"]
+    for label in labels:
+        test_1(label+"^"+str(power), amat.T, N)
+
+    labels = ["n", "adaga", "cdagc", "bdagb", "ada", "cdc", "bdb"]
+    for label in labels:
+        test_1(label+"^"+str(power), nmat, N)
+
+    test_1("x"+"^"+str(power), xmat, N)
+    test_1("q"+"^"+str(power), xmat, N)
+    test_1("p"+"^"+str(power), pmat, N)
+
+    # test whether the boson operators works when created as a composite mode at various positions
+    for mi in range(3):
+        test_2("a"+"^"+str(power), amat, N, mi)
+        test_2("adag"+"^"+str(power), amat.T, N, mi)
+        test_2("n"+"^"+str(power), nmat, N, mi)
+        test_2("x"+"^"+str(power), xmat, N, mi)
+        test_2("p"+"^"+str(power), pmat, N, mi)
+
+
+@pytest.mark.parametrize("power", [2, 3, 4, 5, 6])
+def test_bosonic_powers_large_basis(power):
+    # test whether it works when we are dealing with a single mode
+    def test_1(label, mat, N):
+        sysinf = system_modes(1)
+        sysinf[0] = boson_mode(N)
+
+        H = sOP(label, 0)
+        siteop = site_operator(H, sysinf)
+        assert not siteop.is_identity()
+        assert siteop.size() == N
+        assert siteop.mode == 0
+
+        mat2 = siteop.todense()
+        assert np.allclose(np.array(mat2), mat)
+
+    def a(N):
+        res = np.zeros((N, N))
+        for i in range(N-1):
+            res[i, i+1] = np.sqrt(i+1)
+        return res
+
+    def n(N):
+        return np.diag(np.arange(N))
+
+    N = 91
+
+    #build the matrices at a larger size to avoid truncation errors on the submatrix we care about when
+    #evaluating the power of the matrix
+    amat = a(N+power)
+
+
+
+    xmat = 1/np.sqrt(2)*(amat+amat.T)
+    temp = copy.deepcopy(xmat)
+    ap = copy.deepcopy(xmat)
+    for i in range(1, power):
+        ap = xmat@temp
+        temp = copy.deepcopy(ap)
+
+    xmat = ap[:N, :N]
+
+    pmat = 1.0j/(np.sqrt(2))*(amat.T-amat)
+    temp = copy.deepcopy(pmat)
+    ap = copy.deepcopy(pmat)
+    for i in range(1, power):
+        ap = pmat@temp
+        temp = copy.deepcopy(ap)
+    pmat = ap[:N, :N]
+
+    temp = copy.deepcopy(amat)
+    ap = copy.deepcopy(amat)
+    for i in range(1, power):
+        ap = amat@temp
+        temp = copy.deepcopy(ap)
+
+    amat = ap[:N, :N]
+    nmat = n(N)
+    nmat = np.power(nmat, power)
+
+    # test whether the boson operators works when as the only mode
+    labels = ["a", "b", "c"]
+    for label in labels:
+        test_1(label+"^"+str(power), amat, N)
+
+    labels = ["adag", "cdag", "bdag", "ad", "cd", "bd"]
+    for label in labels:
+        test_1(label+"^"+str(power), amat.T, N)
+
+    labels = ["n", "adaga", "cdagc", "bdagb", "ada", "cdc", "bdb"]
+    for label in labels:
+        test_1(label+"^"+str(power), nmat, N)
+
+    test_1("x"+"^"+str(power), xmat, N)
+    test_1("q"+"^"+str(power), xmat, N)
+    test_1("p"+"^"+str(power), pmat, N)
 
 @pytest.mark.parametrize("N", [2, 3, 4, 5, 6])
 def test_spin(N):
@@ -303,7 +497,6 @@ def test_tls():
         assert siteop.mode == 0
 
         mat2 = siteop.todense()
-        print(mat2)
         assert np.allclose(np.array(mat2), mat)
 
     sxmat = np.array([[0, 1], [1, 0]])
@@ -400,12 +593,11 @@ def test_nlevel(N) -> None:
         assert siteop.mode == 0
 
         mat2 = siteop.todense()
-        print(mat2)
         assert np.allclose(np.array(mat2), mat)
 
     random.seed(0)
 
-    for test_ind in range(10):
+    for _ in range(10):
         i = random.randint(0, N-1)
         j = random.randint(0, N-1)
         label = "|"+str(i)+"><"+str(j)+"|"

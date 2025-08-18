@@ -12,7 +12,9 @@
 
 import abc
 
+
 class Bath(metaclass=abc.ABCMeta):
     """An abstract base class for representing a bath object"""
+    @abc.abstractmethod
     def __init__(self):
         pass

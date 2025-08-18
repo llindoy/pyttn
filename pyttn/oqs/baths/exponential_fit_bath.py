@@ -10,27 +10,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
 import abc
-from pyttn.utils.truncate import TruncationBase, DepthTruncation  #
-from pyttn.utils.mode_combination import ModeCombination
+from typing import Callable, Optional, Union
+
+import numpy as np
+
 from pyttn import (
-    system_modes,
+    SOP,
+    OPBase,
     boson_mode,
     fermion_mode,
     ntreeBuilder,
     ntreeNode,
-    OP_type,
-    SOP,
     sSOP,
+    system_modes,
 )
-from typing import Callable, Optional, Union
+from pyttn.utils.mode_combination import ModeCombination
+from pyttn.utils.truncate import DepthTruncation, TruncationBase  #
+
 from ..heom import add_bosonic_bath_generator, add_fermionic_bath_generator
 
 
 class ExpFitBath(metaclass=abc.ABCMeta):
     """The base class for handling a generic bath representing an exponential fit to a bath correlation function."""
 
+    @abc.abstractmethod
     def __init__(self):
         pass
 
@@ -41,7 +45,7 @@ class ExpFitBath(metaclass=abc.ABCMeta):
         chi: Union[int , list[int] , Callable[[int], int]],
         lhd: Optional[Union[int , list[int] , Callable[[int], int]]] = None,
     ) -> list[list[int]]:
-        r"""Append a tree as a child of node that represents the modes represented by this expfit bath object.
+        """Append a tree as a child of node that represents the modes represented by this expfit bath object.
 
         :param node: The node where the subtree should be added
         :type node: ntreeNode
@@ -127,11 +131,11 @@ class ExpFitBath(metaclass=abc.ABCMeta):
         return [0 for i in range(lmode_dims)]
 
 class ExpFitOQSBath(ExpFitBath):
-    r"""The base class for handling a bath representing an exponential fit to a bath correlation function
+    """The base class for handling a bath representing an exponential fit to a bath correlation function
     of the form
 
     .. math::
-        C(t) = \sum_k d_{k} \exp(-z_k t)
+        C(t) = \\sum_k d_{k} \\exp(-z_k t)
 
     :param dk: The coefficient in the exponential decomposition
     :type dk: np.ndarray
@@ -200,17 +204,17 @@ class ExpFitOQSBath(ExpFitBath):
         self._sysinf = None
 
     def is_fermionic(self) -> bool:
-        r"""Returns whether or not the bath is fermionic
+        """Returns whether or not the bath is fermionic
         :rtype: bool
         """
         return self._fermion
 
     def Ct(self, t: Union[float, np.ndarray]) -> np.ndarray:
-        r"""Returns the value of the non-interacting bath correlation function evaluated at the time points t,
+        """Returns the value of the non-interacting bath correlation function evaluated at the time points t,
         defined by:
 
         .. math::
-            C(t) = \sum_k d_{k} \exp(-z_k t)
+            C(t) = \\sum_k d_{k} \\exp(-z_k t)
 
         :param t: time
         :type t: np.ndarray
@@ -235,35 +239,32 @@ class ExpFitOQSBath(ExpFitBath):
     def _get_composite_params(
         self,
     ) -> tuple[list[list[np.complex128]], list[list[np.complex128]]]:
-        zks = []
-        dks = []
-        for ind, cmode in enumerate(self._composite_modes):
-            zks.append([self._zk[x] for x in cmode])
-            dks.append([self._dk[x] for x in cmode])
+        zks = [[[self._zk[x] for x in cmode]] for cmode in self._composite_modes]
+        dks = [[[self._dk[x] for x in cmode]] for cmode in self._composite_modes]
         return dks, zks
 
     @property
     def mode_dims(self) -> list[int]:
-        r"""An array containing the dimensionality of each of the modes"""
+        """An array containing the dimensionality of each of the modes"""
         return self._mode_dims
 
     @property
     def dk(self) -> np.ndarray:
-        r"""An array containing the bath decomposition coefficients"""
+        """An array containing the bath decomposition coefficients"""
         return self._dk
 
     @property
     def zk(self) -> np.ndarray:
-        r"""An array containing the bath decomposition decay rates"""
+        """An array containing the bath decomposition decay rates"""
         return self._zk
 
 
 class ExpFitBosonicBath(ExpFitOQSBath):
-    r"""A class for handling a bosonic bath representing an exponential fit to a bath correlation function
+    """A class for handling a bosonic bath representing an exponential fit to a bath correlation function
     of the form
 
     .. math::
-        C(t) = \sum_k d_{k} \exp(-z_k t)
+        C(t) = \\sum_k d_{k} \\exp(-z_k t)
 
     :param dk: The coefficient in the exponential decomposition
     :type dk: np.ndarray
@@ -287,20 +288,22 @@ class ExpFitBosonicBath(ExpFitOQSBath):
         )
         self.truncate_modes()
 
-    def truncate_modes(self, truncation: TruncationBase = DepthTruncation(8)) -> None:
-        r"""Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
+    def truncate_modes(self, truncation: Optional[TruncationBase] = None) -> None:
+        """Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
         :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(8))
         :type truncation: TruncationBase, optional
 
         """
+        if truncation is None:
+            truncation = DepthTruncation(8)
         self._mode_dims = truncation(self._dk, self._zk, False)
 
     def system_information(
         self, mode_comb: Optional[ModeCombination] = None, force_evaluate: bool = False
     ) -> system_modes:
-        r"""Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.
+        """Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.
 
         :param mode_comb: A mode combination object to apply to the system information class.  (Default: None)
         :type mode_comb: ModeCombination, optional
@@ -341,8 +344,8 @@ class ExpFitBosonicBath(ExpFitOQSBath):
     def add_system_bath_generator(
         self,
         H: Union[sSOP, SOP],
-        Sp: OP_type,
-        Sm: Optional[OP_type] = None,
+        Sp: OPBase,
+        Sm: Optional[OPBase] = None,
         method: str = "heom",
         binds: Optional[list[int]] = None,
         bskip: Optional[int] = 2,
@@ -352,9 +355,9 @@ class ExpFitBosonicBath(ExpFitOQSBath):
         :param H: The total Generator
         :type H: sSOP | SOP
         :param Sp: A list containing the left and right acting operators that couples to the bath annihilation operator terms
-        :type Sp: OP_type
-        :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-        :type Sm: OP_type, optional
+        :type Sp: OPBase
+        :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(:math:`a^\\dagger` + a) (Default: None)
+        :type Sm: OPBase, optional
         :param method: The method used to represent the bath.
         :type method: {"heom", "pseudomode"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
@@ -375,19 +378,19 @@ class ExpFitBosonicBath(ExpFitOQSBath):
 
     def system_bath_generator(
         self,
-        Sp: OP_type,
-        Sm: Optional[OP_type] = None,
+        Sp: OPBase,
+        Sm: Optional[OPBase] = None,
         method: str = "heom",
         binds: Optional[list[int]] = None,
         bskip: Optional[int] = 2,
         dtype: Union[np.float64, np.complex128, float, complex] = np.complex128,
     ) -> sSOP:
-        r"""Construct a sSOP containing the system bath Generator of the object.
+        """Construct a sSOP containing the system bath Generator of the object.
 
         :param Sp: A list containing the left and right acting operators that couples to the bath annihilation operator terms
-        :type Sp: OP_type
-        :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-        :type Sm: OP_type, optional
+        :type Sp: OPBase
+        :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\\dagger + a) (Default: None)
+        :type Sm: OPBase, optional
         :param method: The method used to represent the bath.
         :type method: {"heom", "pseudomode"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
@@ -411,11 +414,11 @@ class ExpFitBosonicBath(ExpFitOQSBath):
 
 # This is currently completely incorrect.  We need to set this up to split this into filled and unfilled baths
 class ExpFitFermionicBath(ExpFitOQSBath):
-    r"""A class for handling a fermionic bath representing an exponential fit to a bath correlation function
+    """A class for handling a fermionic bath representing an exponential fit to a bath correlation function
     of the form
 
     .. math::
-        C(t) = \sum_k d_{k} \exp(-z_k t)
+        C(t) = \\sum_k d_{k} \\exp(-z_k t)
 
     :param dk: The coefficient in the exponential decomposition
     :type dk: np.ndarray
@@ -434,14 +437,16 @@ class ExpFitFermionicBath(ExpFitOQSBath):
         )
         self.truncate_modes()
 
-    def truncate_modes(self, truncation: TruncationBase = DepthTruncation(2)):
-        r"""Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
+    def truncate_modes(self, truncation: Optional[TruncationBase] = None):
+        """Determines the local Hilbert space dimension (stored in mode_dims) of each of the bosonic bath modes
         using the truncation rule defined in the truncation object.
 
         :param truncation: The truncation rule used to determine the potentially frequency and coupling strength dependent local Hilbert space dimension for each mode in the bath. (Default DepthTruncation(2))
         :type truncation: TruncationBase, optional
 
         """
+        if truncation is None:
+            truncation = DepthTruncation(2)
         self._mode_dims = truncation(self._dk, self._zk, True)
 
     def __str__(self):
@@ -460,7 +465,7 @@ class ExpFitFermionicBath(ExpFitOQSBath):
     def system_information(
         self, mode_comb: Optional[ModeCombination] = None, force_evaluate: bool = False
     ) -> system_modes:
-        r"""Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.
+        """Constructs and returns a system_modes object suitable for handling the bath degrees of freedom described by this object.
 
         :param mode_comb: A mode combination object to apply to the system information class.  (Default: None)
         :type mode_comb: ModeCombination, optional
@@ -483,20 +488,20 @@ class ExpFitFermionicBath(ExpFitOQSBath):
     def add_system_bath_generator(
         self,
         H: Union[SOP, sSOP],
-        Sp: OP_type,
-        Sm: OP_type,
+        Sp: OPBase,
+        Sm: OPBase,
         method: str = "heom",
         binds: Optional[list[int]] = None,
         bskip: Optional[int] = 2,
     ) -> Union[SOP, sSOP]:
-        r"""Attach the bath and system bath coupling Generators associated with this bath object to an existing SOP Generator
+        """Attach the bath and system bath coupling Generators associated with this bath object to an existing SOP Generator
 
         :param H: The total Generator
         :type H: sSOP | SOP
         :param Sp: A list containing the left and right acting operators that couples to the bath annihilation operator terms
-        :type Sp: OP_type
-        :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
-        :type Sm: OP_type, optional
+        :type Sp: OPBase
+        :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\\dagger + a) (Default: None)
+        :type Sm: OPBase, optional
         :param method: The method used to represent the bath.
         :type method: {"heom", "pseudomode"}
         :param binds: A list containing the indices of the bath modes. If this is set to None, the bath modes will be placed in a contiguous block starting at index bskip (Default: None)
@@ -516,13 +521,13 @@ class ExpFitFermionicBath(ExpFitOQSBath):
         return H
 
     def system_bath_generator(self, Sp, Sm, method="heom", binds=None, bskip=2):
-        r"""Construct a sSOP containing the system bath Generator of the object.
+        """Construct a sSOP containing the system bath Generator of the object.
 
         :param H: The total Generator
         :type H: SOP
         :param Sp: A list containing the left and right acting operators that couples to the bath annihilation operator terms
         :type Sp: list[sOP or sPOP or sNBO or sSOP]
-        :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\dagger + a) (Default: None)
+        :param Sm: A list containing the left and right operator that couples to the bath creation operator terms.  If set to None then, we consider coupling of the form Sp(a^\\dagger + a) (Default: None)
         :type Sm: list[sOP or sPOP or sNBO or sSOP, optional]
         :param method: The method used to represent the bath.
         :type method: {"heom", "pseudomode"}

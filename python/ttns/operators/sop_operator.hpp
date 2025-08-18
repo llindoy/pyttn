@@ -38,6 +38,7 @@ void init_sop_operator(py::module &m, const std::string &label)
     using ttn_type = ttn<T, backend>;
     using opdict = operator_dictionary<T, backend>;
     using _sop = sop_operator<T, backend>;
+    using coef = literal::coeff<T>;
 
     using ms_ttn_type = ms_ttn<T, backend>;
     using _mssop = multiset_sop_operator<T, backend>;
@@ -57,7 +58,10 @@ void init_sop_operator(py::module &m, const std::string &label)
         .def("__deepcopy__", [](const _sop &o, py::dict)
              { return _sop(o); }, py::arg("memo"))
         .def_property("Eshift", static_cast<const T &(_sop::*)() const>(&_sop::Eshift), [](_sop &o, const T &i)
-                      { o.Eshift() = i; })
+                      { o.set_Eshift(i); })
+        .def("set_Eshift", [](_sop& o, const T& i){o.set_Eshift(i);})
+        .def("set_Eshift", [](_sop& o, const coef& i){o.set_Eshift(i);})
+
         .def("initialise", [](_sop &o, SOP<T> &sop, const ttn_type &A, const system_modes &sys, bool compress, bool exploit_identity, bool use_sparse)
              { o.initialise(sop, A, sys, compress, exploit_identity, use_sparse); }, py::arg(), py::arg(), py::arg(), py::arg("compress") = true, py::arg("identity_opt") = true, py::arg("use_sparse") = true)
         .def("initialise", [](_sop &o, SOP<T> &sop, const ttn_type &A, const system_modes &sys, const opdict &opd, bool compress, bool exploit_identity, bool use_sparse)
@@ -85,6 +89,8 @@ void init_sop_operator(py::module &m, const std::string &label)
         .def("__deepcopy__", [](const _mssop &o, py::dict)
              { return _mssop(o); }, py::arg("memo"))
         .def("Eshift", static_cast<const T &(_mssop::*)(size_t, size_t) const>(&_mssop::Eshift))
+        .def("set_Eshift", [](_mssop& o, size_t i, size_t j, const T& a){o.set_Eshift(i, j, a);})
+        .def("set_Eshift", [](_mssop& o, size_t i, size_t j, const coef& a){o.set_Eshift(i, j, a);})
         .def("initialise", [](_mssop &o, multiset_SOP<T> &sop, const ms_ttn_type &A, const system_modes &sys, bool compress, bool exploit_identity, bool use_sparse)
              { o.initialise(sop, A, sys, compress, exploit_identity, use_sparse); }, py::arg(), py::arg(), py::arg(), py::arg("compress") = true, py::arg("identity_opt") = true, py::arg("use_sparse") = true)
         .def("initialise", [](_mssop &o, multiset_SOP<T> &sop, const ms_ttn_type &A, const system_modes &sys, const opdict &opd, bool compress, bool exploit_identity, bool use_sparse)

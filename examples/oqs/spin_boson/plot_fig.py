@@ -10,14 +10,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-import numpy as np
-import matplotlib.pyplot as plt
-import h5py
 import argparse
+
+import h5py
+import matplotlib.pyplot as plt
+import numpy as np
 
 plt.rcParams.update({'font.size':16})
 def plot():
-    pars = []
     t = None
 
     fig, ax = plt.subplots(2, 1, sharex=True, figsize=(2.25*1.5, 2.25*2.5))
@@ -34,7 +34,7 @@ def plot():
         ax[1].semilogy(
             t, np.real(norm) , "-", label="HEOM",linewidth=3        )
         h5.close()
-    except:
+    except Exception:
         print("Failed to read input file")
 
     fname = "sbm_pseudomode.h5"
@@ -50,7 +50,7 @@ def plot():
         ax[1].semilogy(
             t, np.real(norm) , "-", label="Pseudomode",linewidth=3        )
         h5.close()
-    except:
+    except Exception:
         print("Failed to read input file")
 
     plt.subplots_adjust(hspace=0.)

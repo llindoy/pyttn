@@ -10,8 +10,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from .matrixElementExt import matrix_element
+from .matrixElementExt import matrix_element, MatrixElement
 
 __all__ = [
-    "matrix_element"
+    "matrix_element",
+    "MatrixElement"
 ]

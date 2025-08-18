@@ -10,20 +10,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from abc import ABCMeta, abstractmethod
 from typing import Union
+
 import numpy as np
 
-from abc import ABCMeta
-
+from pyttn.ttnpp import SOP_complex, multiset_SOP_complex, system_modes
 
 from .opdictExt import operator_dictionary
-from pyttn.ttnpp import SOP_complex, system_modes
-from pyttn.ttnpp import multiset_SOP_complex
-from .sSOPExt import OP_type, sSOP
+from .sSOPExt import OPBase, sSOP
 
 try:
-    from pyttn.ttnpp import SOP_real
-    from pyttn.ttnpp import multiset_SOP_real
+    from pyttn.ttnpp import SOP_real, multiset_SOP_real
 
     _support_real_SOP = True
 except ImportError:
@@ -40,7 +38,7 @@ class SOP(metaclass=ABCMeta):
     ) -> "SOP":
         """Factory function for constructing a sum-of-product compact string operator.
 
-        :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
+        :param `*args`: Variable length list of arguments. This function can handle two possible lists of arguments
 
             - N (int) - The number of modes of the SOP
             - N (int), label (str) - The number of modes of the SOP and a label for the SOP
@@ -63,6 +61,7 @@ class SOP(metaclass=ABCMeta):
             else:
                 raise RuntimeError("Invalid dtype for SOP")
 
+    @abstractmethod
     def assign(self, o: "SOP"):
         """Assign the value of the SOP from another
 
@@ -71,21 +70,26 @@ class SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the SOP object"""
         pass
 
+    @abstractmethod
     def __deepcopy__(self, memo):
         """Function implementing deep copy of the SOP object"""
         pass
 
+    @abstractmethod
     def __iter__(self):
         """Return an iterator over the terms in the SOP"""
 
+    @abstractmethod
     def clear(self):
         """Clear all internal storage used by the SOP object"""
         pass
 
+    @abstractmethod
     def resize(self, n: int):
         """Resizes the SOP object so that it can act on n modes
 
@@ -93,6 +97,7 @@ class SOP(metaclass=ABCMeta):
         :type n: int
         """
 
+    @abstractmethod
     def reserve(self, n: int):
         """Allocate the internal buffer for the SOP object so that it is capable of storing n terms
 
@@ -100,6 +105,7 @@ class SOP(metaclass=ABCMeta):
         :type n: int
         """
 
+    @abstractmethod
     def nmodes(self) -> int:
         """Returns the number of modes that the SOP acts on
 
@@ -107,6 +113,7 @@ class SOP(metaclass=ABCMeta):
         :rtype: int
         """
 
+    @abstractmethod
     def nterms(self) -> int:
         """Returns the number of terms in the SOP
 
@@ -116,10 +123,12 @@ class SOP(metaclass=ABCMeta):
         pass
 
     @property
+    @abstractmethod
     def operator_dictionary(self) -> operator_dictionary:
         """The operator dictionary object used by the SOP object"""
         pass
 
+    @abstractmethod
     def set_operator_dictionary(self, opdict: operator_dictionary):
         """Set the value of the operator dictionary object to be used by the SOP
 
@@ -128,6 +137,7 @@ class SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def get_operator_dictionary(self) -> operator_dictionary:
         """Access the operator dictionary object used by the SOP
 
@@ -136,16 +146,18 @@ class SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def insert(self, *args):
         """Insert a new n-body operator into the sum-of-product representation
 
-        :param *args: An input defining the n-boddy operator. Valid  options are:
+        :param `*args`: An input defining the n-boddy operator. Valid  options are:
 
             - coeff (Union[float, complex, np.float64, np.complex128]), pop (sPOP): Add a new sNBO defined by coeff*pop
             - term (sNBO): Add the specified n-body operator
         """
         pass
 
+    @abstractmethod
     def set_is_fermion_mode(self, is_fermion_mode: list[bool]) -> bool:
         """Set whether or not the modes in the SOP object are fermionic
 
@@ -156,6 +168,7 @@ class SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def prune_zeros(self, tol: float = 1e-15):
         """Remove any terms in the Hamiltonian definition that are zero within the user specified tolerance
 
@@ -164,6 +177,7 @@ class SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def jordan_wigner(self, sysinf: system_modes, tol: float = 1e-15) -> "SOP":
         """Perform an inplace Jordan-Wigner mapping of the SOP object
 
@@ -176,6 +190,7 @@ class SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def expand(self) -> sSOP:
         """Expand the SOP object to form an sSOP object
 
@@ -183,6 +198,7 @@ class SOP(metaclass=ABCMeta):
         :rtype: sSOP
         """
 
+    @abstractmethod
     def __str__(self) -> str:
         """Return the string representation of the SOP object
 
@@ -192,82 +208,90 @@ class SOP(metaclass=ABCMeta):
         pass
 
     @property
+    @abstractmethod
     def label(self) -> str:
         """A string labelling the operator"""
         pass
 
+    @abstractmethod
     def __add__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Add a symbolic operator type to the current SOP to obtain a SOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
         pass
 
+    @abstractmethod
     def __radd__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Add the SOP object from an operator or number
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
         pass
 
+    @abstractmethod
     def __iadd__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Add inplace a symbolic operator type to the current SOP to obtain a SOP
 
         :param op: The operator to be added to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
         pass
 
+    @abstractmethod
     def __sub__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Subtract a symbolic operator type to the current SOP to obtain a SOP
 
         :param op: The operator to be subtracted to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
         pass
 
+    @abstractmethod
     def __rsub__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Subtract the SOP object from an operator or number
 
         :param op: The operator to be subtracted to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
         pass
 
+    @abstractmethod
     def __isub__(
-        self, op: Union[float, complex, np.float64, np.complex128, OP_type]
+        self, op: Union[float, complex, np.float64, np.complex128, OPBase]
     ) -> "SOP":
         """Subtract inplace a symbolic operator type to the current SOP to obtain a SOP
 
         :param op: The operator to be subtracted to the current operator
-        :type op: OP_type
+        :type op: OPBase
         :return: The sum-of-product operator storing the result
         :rtype: SOP
         """
         pass
 
+    @abstractmethod
     def __idiv__(self, v: Union[float, complex, np.float64, np.complex128]) -> "SOP":
         """Functions in place division a SOP by a scalar .
 
@@ -278,6 +302,7 @@ class SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __imul__(
         self,
         v: Union[float, complex, np.float64, np.complex128],
@@ -285,7 +310,7 @@ class SOP(metaclass=ABCMeta):
         """Functions for inplace multiplyication of a SOP by a scalar or operator type.
 
         :param v: The object to multiply the SOP by
-        :type v: float | complex | np.float64 | np.complex128 | coeff | OP_type
+        :type v: float | complex | np.float64 | np.complex128 | coeff | OPBase
         :return: A sum-of-product operator type storing the result
         :rtype: SOP
         """
@@ -295,9 +320,6 @@ class SOP(metaclass=ABCMeta):
 SOP.register(SOP_complex)
 if _support_real_SOP:
     SOP.register(SOP_real)
-
-SOP_type = SOP
-
 
 class multiset_SOP(metaclass=ABCMeta):
     """A class for storing a compact multiset sum-of-product operator object."""
@@ -309,7 +331,7 @@ class multiset_SOP(metaclass=ABCMeta):
     ) -> "multiset_SOP":
         """Factory function for constructing a multiset sum-of-product compact string operator.
 
-        :param *args: Variable length list of arguments. This function can handle two possible lists of arguments
+        :param `*args`: Variable length list of arguments. This function can handle two possible lists of arguments
 
             - nset( int), N (int) - The number of set variables, The number of modes of the SOP
             - nset( int), N (int), label (str) - The number of set varibles. The number of modes of the SOP and a label for the SOP
@@ -332,6 +354,7 @@ class multiset_SOP(metaclass=ABCMeta):
             else:
                 raise RuntimeError("Invalid dtype for multiset_SOP")
 
+    @abstractmethod
     def assign(self, o: "multiset_SOP"):
         """Assign the value of the multiset_SOP from another
 
@@ -340,18 +363,22 @@ class multiset_SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the multiset_SOP object"""
         pass
 
+    @abstractmethod
     def __deepcopy__(self, memo):
         """Function implementing deep copy of the multiset_SOP object"""
         pass
 
+    @abstractmethod
     def clear(self):
         """Clear all internal storage used by the multiset_SOP object"""
         pass
 
+    @abstractmethod
     def resize(self, nset: int, n: int):
         """Resizes the multiset_SOP object so that it can act on n modes
 
@@ -361,6 +388,7 @@ class multiset_SOP(metaclass=ABCMeta):
         :type n: int
         """
 
+    @abstractmethod
     def nset(self) -> int:
         """Returns the number of set variables the multiset SOP acts on
 
@@ -368,6 +396,7 @@ class multiset_SOP(metaclass=ABCMeta):
         :rtype: int
         """
 
+    @abstractmethod
     def nmodes(self) -> int:
         """Returns the number of modes that the multiset_SOP acts on
 
@@ -375,6 +404,7 @@ class multiset_SOP(metaclass=ABCMeta):
         :rtype: int
         """
 
+    @abstractmethod
     def nterms(self) -> int:
         """Returns the number of set variables that are set in the multiset_SOP
 
@@ -383,6 +413,7 @@ class multiset_SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def set(self, i: int, j: int, vals: SOP):
         """Set the [i, j] element of the multiset SOP to the value vals
 
@@ -395,6 +426,7 @@ class multiset_SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def set_is_fermion_mode(self, is_fermion_mode: list[bool]) -> bool:
         """Set whether or not the modes in the multiset SOP object are fermionic
 
@@ -405,6 +437,7 @@ class multiset_SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def prune_zeros(self, tol: float = 1e-15):
         """Remove any terms in the Hamiltonian definition that are zero within the user specified tolerance
 
@@ -413,6 +446,7 @@ class multiset_SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def jordan_wigner(self, sysinf: system_modes, tol: float = 1e-15) -> "SOP":
         """Perform an inplace Jordan-Wigner mapping of the multiset SOP object
 
@@ -425,6 +459,7 @@ class multiset_SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __str__(self) -> str:
         """Return the string representation of the SOP object
 
@@ -434,10 +469,12 @@ class multiset_SOP(metaclass=ABCMeta):
         pass
 
     @property
+    @abstractmethod
     def label(self) -> str:
         """A string labelling the operator"""
         pass
 
+    @abstractmethod
     def __getitem__(self, a: tuple[int, int]) -> SOP:
         """Return the SOP associated with a specific set index in the multiset SOP object
 
@@ -448,6 +485,7 @@ class multiset_SOP(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
     def __setitem__(self, a: tuple[int, int], v: SOP):
         """Set the SOP associated with a specific set index in the multiset SOP object
 
@@ -464,5 +502,4 @@ if _support_real_SOP:
     SOP.register(multiset_SOP_real)
 
 ms_SOP = multiset_SOP
-multiset_SOP_type = multiset_SOP
-ms_SOP_type = multiset_SOP
+ms_SOPBase = multiset_SOP

@@ -11,50 +11,48 @@
 # limitations under the License
 
 from .bath_fitting import (
-    OrthopolDiscretisation,
-    DensityDiscretisation,
-    BathDiscretisation,
     AAADecomposition,
-    ESPRITDecomposition,
+    BathDiscretisation,
     CtExpFitDecomposition,
-    SwExpFitDecomposition,
+    DensityDiscretisation,
+    ESPRITDecomposition,
     ExpFitDecomposition,
-    PoleDecomposition,
     MatsubaraDecomposition,
+    OrthopolDiscretisation,
+    PoleDecomposition,
+    SwExpFitDecomposition,
     softmspace,
 )
-
 from .baths import (
-    bosonic_bath,
-    fermionic_bath,
-    discrete_bath,
-    discrete_bosonic_bath,
-    discrete_fermionic_bath,
     Bath,
     BosonicBath,
     CorrelatedBosonicBath,
     DiscreteBath,
     DiscreteBosonicBath,
-    DiscreteFermionicBath,
-    DiscreteOQSBath,
     DiscreteCorrelatedBosonicBath,
     DiscreteCorrelatedOQSBath,
+    DiscreteFermionicBath,
+    DiscreteOQSBath,
     ExpFitBath,
     ExpFitBosonicBath,
-    ExpFitFermionicBath,
-    ExpFitOQSBath,
     ExpFitCorrelatedBosonicBath,
     ExpFitCorrelatedOQSBath,
+    ExpFitFermionicBath,
+    ExpFitOQSBath,
     FermionicBath,
+    bosonic_bath,
+    discrete_bath,
+    discrete_bosonic_bath,
+    discrete_fermionic_bath,
+    fermionic_bath,
 )
 from .spectral_density import (
+    BrownianOscillatorSpectralDensity,
     CorrelatedSpectralDensity,
+    DebyeSpectralDensity,
     RationalFunctionSpectralDensity,
     SumSpectralDensity,
-    DebyeSpectralDensity,
-    BrownianOscillatorSpectralDensity,
 )
-
 
 __all__: list[str] = [
     "OrthopolDiscretisation",

@@ -97,7 +97,7 @@ def tfim_dmrg(A):
     sweep.spawning_threshold = 1e-6
     sweep.minimum_unoccupied = 0
 
-    for i in range(nsteps):
+    for _ in range(nsteps):
         sweep(A, h)
 
     return A
@@ -123,7 +123,7 @@ def tfim_dmrg_ms(A):
 
     sweep = dmrg(A, h, krylov_dim=12)
 
-    for i in range(nsteps):
+    for _ in range(nsteps):
         sweep(A, h)
         E = sweep.E()
 

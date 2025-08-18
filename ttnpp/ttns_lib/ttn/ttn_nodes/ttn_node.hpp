@@ -396,7 +396,7 @@ namespace ttns
 
         linalg::reinterpreted_tensor<T, 4, backend> as_rank_4(size_type mode)
         {
-            ASSERT(mode < nmodes(), "Failed to interpret ttn_node_data as rank 3 tensor.  The mode index is out of bounds.");
+            ASSERT(mode < nmodes(), "Failed to interpret ttn_node_data as rank 4 tensor.  The mode index is out of bounds.");
             std::array<size_type, 4> shape{{1, dim(mode), 1, hrank()}};
             for (size_type i = 0; i < mode; ++i)
             {
@@ -411,7 +411,7 @@ namespace ttns
 
         linalg::reinterpreted_tensor<const T, 4, backend> as_rank_4(size_type mode) const
         {
-            ASSERT(mode < nmodes(), "Failed to interpret ttn_node_data as rank 3 tensor.  The mode index is out of bounds.");
+            ASSERT(mode < nmodes(), "Failed to interpret ttn_node_data as rank 4 tensor.  The mode index is out of bounds.");
             std::array<size_type, 4> shape{{1, dim(mode), 1, hrank()}};
             for (size_type i = 0; i < mode; ++i)
             {
@@ -424,6 +424,110 @@ namespace ttns
             return this->reinterpret_shape(shape[0], shape[1], shape[2], shape[3]);
         }
 
+        linalg::reinterpreted_tensor<T, 5, backend> as_rank_5(size_type modei, size_type modeo)
+        {
+            try
+            {
+                ASSERT(modei <= nmodes() && modeo <= nmodes(), "Failed to interpret ttn_node_data as rank 5 tensor.  The mode index is out of bounds.");
+                ASSERT(modei != modeo, "The two mode indices must be different.")
+                if(modei > modeo)
+                {
+                    size_type c = modei;
+                    modei = modeo;
+                    modeo = c;
+                }
+                std::array<size_type, 5> shape;
+                if (modeo < nmodes())
+                {
+                    shape = std::array<size_type, 5>({{1, dim(modei), 1, dim(modeo), hrank()}});
+                    for (size_type i = 0; i < modei; ++i)
+                    {
+                        shape[0] *= dim(i);
+                    }
+                    for (size_type i = modei + 1; i < modeo; ++i)
+                    {
+                        shape[2] *= dim(i);
+                    }
+                    for (size_type i = modeo + 1; i < nmodes(); ++i)
+                    {
+                        shape[4] *= dim(i);
+                    }
+                    return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+                }
+                else
+                {
+                    shape = std::array<size_type, 5> ({{1, dim(modei), 1, hrank(), 1}});
+                    for (size_type i = 0; i < modei; ++i)
+                    {
+                        shape[0] *= dim(i);
+                    }
+                    for (size_type i = modei + 1; i < modeo; ++i)
+                    {
+                        shape[2] *= dim(i);
+                    }
+                }
+                return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+
+            }
+            catch (const std::exception &ex)
+            {
+                std::cerr << ex.what() << std::endl;
+                RAISE_EXCEPTION("Failed to reinterpret hierarchical tucker tensor node as a rank 5 tensor.");
+            }
+        }
+
+        linalg::reinterpreted_tensor<const T, 5, backend> as_rank_5(size_type modei, size_type modeo) const
+        {
+            try
+            {
+                ASSERT(modei <= nmodes() && modeo <= nmodes(), "Failed to interpret ttn_node_data as rank 5 tensor.  The mode index is out of bounds.");
+                ASSERT(modei != modeo, "The two mode indices must be different.")
+                if(modei > modeo)
+                {
+                    size_type c = modei;
+                    modei = modeo;
+                    modeo = c;
+                }
+                std::array<size_type, 5> shape;
+                if (modeo < nmodes())
+                {
+                    shape = std::array<size_type, 5> ({{1, dim(modei), 1, dim(modeo), hrank()}});
+                    for (size_type i = 0; i < modei; ++i)
+                    {
+                        shape[0] *= dim(i);
+                    }
+                    for (size_type i = modei + 1; i < modeo; ++i)
+                    {
+                        shape[2] *= dim(i);
+                    }
+                    for (size_type i = modeo + 1; i < nmodes(); ++i)
+                    {
+                        shape[4] *= dim(i);
+                    }
+                    return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+                }
+                else
+                {
+                    shape = std::array<size_type, 5>({{1, dim(modei), 1, hrank(), 1}});
+                    for (size_type i = 0; i < modei; ++i)
+                    {
+                        shape[0] *= dim(i);
+                    }
+                    for (size_type i = modei + 1; i < modeo; ++i)
+                    {
+                        shape[2] *= dim(i);
+                    }
+                }
+                return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+
+            }
+            catch (const std::exception &ex)
+            {
+                std::cerr << ex.what() << std::endl;
+                RAISE_EXCEPTION("Failed to reinterpret hierarchical tucker tensor node as a rank 5 tensor.");
+            }
+        }
+
         linalg::matrix<T, backend> &as_matrix() { return *this; }
         const linalg::matrix<T, backend> &as_matrix() const { return *this; }
 
@@ -434,6 +538,30 @@ namespace ttns
         }
 
     public:
+        //resize a bond of the tensor zeroing the tensor
+        void resize_bond(size_type mode, size_type size)
+        {
+            try
+            {
+                if (mode == this->nmodes())
+                {
+                    this->resize(size, this->dims());
+                }
+                else
+                {
+                    auto dims = this->dims();
+                    dims[mode] = size;
+                    this->resize(this->hrank(), dims);
+                }
+                this->as_matrix().fill_zeros();
+            }
+            catch (const std::exception &ex)
+            {
+                std::cerr << ex.what() << std::endl;
+                RAISE_EXCEPTION("Failed to expand tensor.");
+            }
+        }
+
         std::array<size_t, 3> expand_bond(size_type mode, size_type iadd, matrix_type &temp)
         {
             try
@@ -873,9 +1001,7 @@ namespace ttns
         {
             orth.resize_data(A);
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
 #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
-#endif
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -890,9 +1016,7 @@ namespace ttns
         {
             orth.resize_data(A);
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
 #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
-#endif
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -909,9 +1033,7 @@ namespace ttns
         static void apply_to_node(node_type &A, orthogonality_type &orth)
         {
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
 #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
-#endif
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -931,9 +1053,7 @@ namespace ttns
             ASSERT(orth.most_recent_node() == A.id(), "Cannot apply bond matrix to parent.  The most recently decomposed node is not this node.");
             // apply the action of the current bond matrix to the node.  Here this applies the matrix along the bond pointing down into the node
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
 #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
-#endif
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -948,9 +1068,7 @@ namespace ttns
         {
             ASSERT(orth.most_recent_node() == A.parent().id(), "Cannot apply bond matrix from parent.  The most recently decomposed node is not the parent of this node.");
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
 #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
-#endif
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -965,9 +1083,7 @@ namespace ttns
             ASSERT(orth.most_recent_node() == A.id(), "Cannot apply bond matrix to child.  The most recently decomposed node is not this node.");
             // apply the action of the current bond matrix to the node.  Here this applies the matrix along the bond pointing down into the node
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
 #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
-#endif
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -982,9 +1098,7 @@ namespace ttns
             ASSERT(orth.most_recent_node() == A[mode].id(), "Cannot apply bond matrix from child.  The most recently decomposed node is not the expected child of this node.");
             // apply the action of the current bond matrix to the node.  Here this applies the matrix along the bond pointing down into the node
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
 #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
-#endif
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -1000,9 +1114,7 @@ namespace ttns
         static void shift_orthogonality_down(node_type &A, orthogonality_type &orth, size_type mode, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false)
         {
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
 #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
-#endif
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -1021,9 +1133,7 @@ namespace ttns
         static void shift_orthogonality_up(node_type &A, orthogonality_type &orth, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false)
         {
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_SET_VARIABLES
 #pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
-#endif
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -1082,6 +1192,43 @@ namespace ttns
 
             bool is_initialised() const { return m_initialised; }
 
+        public:
+            //some functions added for handling decompositions of a general matrix
+            template <typename mat_type>
+            void resize(const mat_type& mat)
+            {
+                try
+                {
+                    size_type maxcapacity = mat.capacity();
+                    if(m_workspace.capacity() < maxcapacity)
+                    {
+                        m_workspace.reallocate(maxcapacity);
+                        m_U.reallocate(maxcapacity);
+                    }
+                    if(m_R.capacity() < maxcapacity)
+                    {
+                        m_R.reallocate(maxcapacity);
+                    }
+                    if(m_S.capacity() < maxcapacity)
+                    {
+                        m_S.reallocate(maxcapacity);
+                    }
+                    m_ortho_engine.resize(mat);
+                }
+                catch (const std::exception &ex)
+                {
+                    std::cerr << ex.what() << std::endl;
+                    RAISE_EXCEPTION("Failed to resize the decomposition engine object to handle matrix.");
+                }
+            }
+
+            template <typename mat_type>
+            size_type decompose(mat_type& mat, real_type tol = real_type(-1), size_type nchi = 0, bool rel_truncate = false, orthogonality::truncation_mode trunc_mode = orthogonality::truncation_mode::singular_values_truncation)
+            {
+                CALL_AND_RETHROW(this->resize(mat));
+                CALL_AND_HANDLE(return m_ortho_engine(mat, m_U, m_R, m_S, tol, nchi, rel_truncate, trunc_mode, false), "Failed to compute decomposition of tensor.");
+            }
+        public:
             template <typename tree>
             void init(tree &nodes)
             {

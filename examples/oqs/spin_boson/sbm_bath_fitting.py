@@ -12,21 +12,20 @@
 
 
 import os
-
 os.environ["OMP_NUM_THREADS"] = "1"
 
+import matplotlib.pyplot as plt
 import numpy as np
+from numba import jit
 
 from pyttn import oqs
-from numba import jit
-import matplotlib.pyplot as plt
 
 
 def fit_bath(Nb, alpha, wc, s, dt, beta=None, nstep=1, method="orthopol", tol=1e-13, Nw=10):
-    r"""A function for fitting and plotting the fit quality of a bath spectral density using the methods supported in pyTTN
+    """A function for fitting and plotting the fit quality of a bath spectral density using the methods supported in pyTTN
     Here we consider a spectral density of the form
     .. math::
-        J(\omega) = \frac{\pi}{2} \frac{\alpha}{\omega_c^{s-1}} \exp\left(-\frac{\omega}{\omega_c}\right)
+        J(\\omega) = \\frac{\\pi}{2} \\frac{\\alpha}{\\omega_c^{s-1}} \\exp\\left(-\\frac{\\omega}{\\omega_c}\\right)
 
 
     :param Nb: The number of bath modes to use in the discretisation

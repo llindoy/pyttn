@@ -11,8 +11,12 @@
 # limitations under the License
 
 from .correlated_spectral_density import CorrelatedSpectralDensity
-from .rational_function_spectral_density import RationalFunctionSpectralDensity, SumSpectralDensity, DebyeSpectralDensity, BrownianOscillatorSpectralDensity
-
+from .rational_function_spectral_density import (
+    BrownianOscillatorSpectralDensity,
+    DebyeSpectralDensity,
+    RationalFunctionSpectralDensity,
+    SumSpectralDensity,
+)
 
 __all__ = [
     "CorrelatedSpectralDensity",
