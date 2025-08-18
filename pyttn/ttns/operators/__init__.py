@@ -18,8 +18,10 @@ from .mssopOperatorExt import (
 from .productOperatorExt import product_operator
 from .siteOperatorsExt import site_operator
 from .sopOperatorExt import sop_operator
+from .opExt import Op
 
 __all__: list[str] = [
+    "Op",
     "ops",
     "site_operator",
     "product_operator",

@@ -30,6 +30,8 @@ namespace ttns
         Op() {}
         Op(const Op &o) : m_op(o.m_op), m_indices(o.m_indices), m_dims(o.m_dims) {}
         Op(Op &&o) noexcept : m_op(std::move(o.m_op)), m_indices(std::move(o.m_indices)), m_dims(std::move(o.m_dims)) {}
+        template <typename U, typename be>
+        Op(const Op<U, be> &other) : m_op(other.matrix()), m_indices(other.indices()), m_dims(other.dims()){}
 
         template <typename I1, typename I2>
         Op(const linalg::matrix<T, backend> &m, const std::vector<I1> &indices, const std::vector<I2> &dims)
@@ -54,13 +56,6 @@ namespace ttns
                 prod *= dims[i];
             }
             ASSERT(prod == m.shape(0) && prod == m.shape(1), "Dimensions array is not compatible with specified matrix.");
-
-            m_strides.resize(dims.size());
-            m_strides[dims.size() - 1] = 1;
-            for (size_type i = 1; i < dims.size(); ++i)
-            {
-                m_strides[dims.size() - (i + 1)] = m_strides[dims.size() - i] * dims[dims.size() - i];
-            }
 
             m_op = m;
             m_indices.resize(indices.size());
@@ -108,6 +103,13 @@ namespace ttns
             return *this;
         }
 
+        void clear()
+        {
+            m_op.clear();
+            m_indices.clear();
+            m_dims.clear();
+        }
+
         const linalg::matrix<T, backend> &operator()() const { return m_op; }
         linalg::matrix<T, backend> &operator()() { return m_op; }
 
@@ -120,7 +122,9 @@ namespace ttns
         const std::vector<size_type> &dims() const { return m_dims; }
         std::vector<size_type> &dims() { return m_dims; }
 
+        size_type nmodes() const { return m_dims.size(); }
         size_type ndim() const { return m_dims.size(); }
+        size_type size() const {return m_op.shape(0);}
 
         bool valid_parameters() const
         {
@@ -151,6 +155,14 @@ namespace ttns
         std::vector<linalg::tensor<T, 4, backend>> as_mpo(int nbmax = -1, real_type tol = -1) const
         {
             ASSERT(this->valid_parameters(), "Failed to form mpo representation of op object. The op object is not correctly formed.")
+
+            std::vector<size_type> strides(m_dims.size());
+            strides[m_dims.size() - 1] = 1;
+            for (size_type i = 1; i < m_dims.size(); ++i)
+            {
+                strides[m_dims.size() - (i + 1)] = strides[m_dims.size() - i] * m_dims[m_dims.size() - i];
+            }
+
             // setup the vector of rank 4 tensors that will store the result
             std::vector<linalg::tensor<T, 4, backend>> ret(m_dims.size());
 
@@ -158,27 +170,29 @@ namespace ttns
             {
                 ret[0] = linalg::tensor<T, 4, backend>(1, m_dims[0], m_dims[0], 1);
                 ret[0].set_buffer(m_op);
+
             }
             else
             {
                 size_type dims1 = 1;
                 linalg::matrix<T, backend> Umat(m_op.shape(0), m_op.shape(1));
+
                 Umat.set_buffer(m_op);
-                linalg::tensor<T, 5, backend> Umt(dims1, m_dims[0], m_dims[0], m_strides[0], m_strides[0]);
+
+                linalg::tensor<T, 5, backend> Umt(dims1, m_dims[0], m_dims[0], strides[0], strides[0]);
 
                 linalg::singular_value_decomposition<linalg::matrix<T, backend>, true> m_svd;
 
                 linalg::matrix<T, backend> _U, _Vh;
                 linalg::diagonal_matrix<real_type, backend> S;
-
                 for (size_type i = 0; i + 1 < m_dims.size(); ++i)
                 {
                     // swap the tensor indices so that it is in the correct format to SVD
-                    auto Ut = Umat.reinterpret_shape(dims1, m_dims[i], m_strides[i], m_dims[i], m_strides[i]);
+                    auto Ut = Umat.reinterpret_shape(dims1, m_dims[i], strides[i], m_dims[i], strides[i]);
                     Umt = linalg::trans(Ut, {0, 1, 3, 2, 4});
 
                     // reshape the current tensor to a matrix of the correct dimension
-                    auto Um = Umt.reinterpret_shape(dims1 * m_dims[i] * m_dims[i], m_strides[i] * m_strides[i]);
+                    auto Um = Umt.reinterpret_shape(dims1 * m_dims[i] * m_dims[i], strides[i] * strides[i]);
 
                     // now compute the singular values decomposition of the matrix representation of the tensor
                     CALL_AND_HANDLE(m_svd(Um, S, _U, _Vh, false), "Failed to compute singular values decomposition of MPO.")
@@ -206,16 +220,31 @@ namespace ttns
                 size_type d = m_dims[ind];
                 ret[ind].resize(dims1, d, d, 1);
                 ret[ind].set_buffer(Umat);
+
             }
             return ret;
         }
 
+        std::ostream &print(std::ostream &os) const
+        {
+            os << "op: [" << m_op << " ";
+            for (size_t i = 0; i < m_indices.size(); ++i)
+            {
+                os << "ind: " << m_indices[i] << ", dim: " << m_dims[i] << (i + 1 != this->ndim() ? ", " : "]");
+            }
+            return os;
+        }
     protected:
         linalg::matrix<T, backend> m_op;
         std::vector<size_type> m_indices;
         std::vector<size_type> m_dims;
-        std::vector<size_type> m_strides;
     };
+
+    template <typename T, typename backend>
+    std::ostream &operator<<(std::ostream &os, const Op<T, backend> &t)
+    {
+        return t.print(os);
+    }
 
 }
 

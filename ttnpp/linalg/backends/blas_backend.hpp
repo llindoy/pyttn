@@ -455,6 +455,60 @@ namespace linalg
             }
         }
 
+        template <typename T, size_t D>
+        static inline void set_tensor_block(const T* src, const std::array<size_type, D>& src_dims, T* dest, const std::array<size_type, D>& dest_dims, const std::array<size_type, D>& skip)
+        {
+            size_type n_to_add = 1;
+            for(size_type i = 0; i < D; ++i)
+            {
+                ASSERT(src_dims[i] + skip[i] <= dest_dims[i], "fill tensor block call failed.  The sublock cannot fit in the location specified");
+                n_to_add *= src_dims[i];
+            }
+
+            //set up an array of the indices
+            std::array<size_type, D> index;
+            std::fill(index.begin(), index.end(), 0);
+
+            std::array<size_type, D> dest_stride;
+            std::fill(dest_stride.begin(), dest_stride.end(), 1);
+            for(size_type k = 1; k < D; ++k)
+            {
+                size_type kd = D-(k+1);
+                dest_stride[kd] = dest_stride[kd+1]*dest_dims[kd+1];
+            }
+
+
+            //now iterate over the source dims array
+            for(size_type ind = 0; ind < n_to_add; ++ind)
+            {
+                size_type dest_index = 0;
+                for(size_type k = 0; k < D; ++k)
+                {
+                    size_type kd = D-(k+1);
+                    dest_index += (index[kd]+skip[kd])*dest_stride[kd];
+                }
+
+                dest[dest_index] = src[ind];
+
+                //now advance the current index in the tensor
+                bool update_index = true;
+                for(size_type k = 0; k < D && update_index; ++k)
+                {
+                    size_type kd = D-(k+1);
+                    index[kd] += 1;
+                    if (index[kd] < src_dims[kd])
+                    {
+                        update_index = false;
+                    }
+                    else
+                    {
+                        index[kd] = 0;
+                        update_index = true;
+                    }
+                }
+            }
+        }
+
         template <typename T>
         static inline void fill_matrix_upper_triangle(const T *src, size_type m1, size_type n1, T *dest, size_type m2, size_type n2)
         {

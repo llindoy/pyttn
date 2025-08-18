@@ -43,6 +43,7 @@ void init_ttn(py::module &m, const std::string &label)
      using siteop = site_operator<T, backend>;
      using prodop = product_operator<T, backend>;
      using sop = sop_operator<T, backend>;
+     using Optype = Op<T,backend>;
 
      using numpy_type = typename linalg::numpy_converter<T>::type;
 
@@ -136,11 +137,22 @@ void init_ttn(py::module &m, const std::string &label)
      py::class_<_ttn>(m, (std::string("ttn_") + label).c_str())
          .def(py::init())
          .def(py::init<const _ttn &>())
+#ifdef BUILD_REAL_TTN
          .def(py::init<const ttn<real_type, backend> &>())
+#endif
 
+#ifdef PYTTN_BUILD_CUDA
+         .def(py::init<const ttn<T, otherbackend> &>())
+#ifdef BUILD_REAL_TTN
+         .def(py::init<const ttn<real_type, otherbackend> &>())
+#endif
+#endif
+
+#ifdef BUILD_REAL_TTN
          .def(py::init<const multiset_ttn_slice<real_type, backend, true> &>())
-         .def(py::init<const multiset_ttn_slice<T, backend, true> &>())
          .def(py::init<const multiset_ttn_slice<real_type, backend, false> &>())
+#endif
+         .def(py::init<const multiset_ttn_slice<T, backend, true> &>())
          .def(py::init<const multiset_ttn_slice<T, backend, false> &>())
 
          .def(py::init<const ntree<size_t> &, bool, bool>(), py::arg(), py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
@@ -153,12 +165,16 @@ void init_ttn(py::module &m, const std::string &label)
 
          .def("assign", &_ttn::template operator= <T, backend, true>)
          .def("assign", &_ttn::template operator= <T, backend, false>)
+
+#ifdef BUILD_REAL_TTN
          .def("assign", &_ttn::template operator= <real_type, backend, true>)
          .def("assign", &_ttn::template operator= <real_type, backend, false>, "For details see :meth:`pyttn.ttn_dtype.assign`")
          .def("assign", [](_ttn &o, const _ttn &i)
               { o = i; })
          .def("assign", [](_ttn &o, const ttn<real_type, backend> &i)
               { o = i; })
+#endif
+
          .def("__copy__", [](const _ttn &o)
               { return _ttn(o); })
          .def("__deepcopy__", [](const _ttn &o, py::dict)
@@ -358,6 +374,8 @@ void init_ttn(py::module &m, const std::string &label)
               { CALL_AND_RETHROW(return o.apply_one_body_operator(op, index, shift_orthogonality)); }, py::arg(), py::arg(), py::arg("shift_orthogonality") = true, "For details see :meth:`pyttn.ttn_dtype.rapply_one_body_operator`")
          .def("apply_product_operator", [](_ttn &o, prodop &op, bool shift_orthogonality)
               { CALL_AND_RETHROW(return o.apply_product_operator(op, shift_orthogonality)); }, py::arg(), py::arg("shift_orthogonality") = true, "For details see :meth:`pyttn.ttn_dtype.apply_product_operator`")
+         .def("apply_operator", [](_ttn &o, Optype &op, real_type tol, size_t nchi)
+              {CALL_AND_RETHROW(return o.apply_operator(op, tol, nchi));}, py::arg(), py::arg("tol")=-1.0, py::arg("nchi")=0)
          .def("apply_operator", [](_ttn &o, siteop &op, bool shift_orthogonality)
               { CALL_AND_RETHROW(return o.apply_operator(op, shift_orthogonality)); }, py::arg(), py::arg("shift_orthogonality") = true)
          .def("apply_operator", [](_ttn &o, prodop &op, bool shift_orthogonality)
@@ -365,6 +383,8 @@ void init_ttn(py::module &m, const std::string &label)
 
          .def("__imatmul__", [](_ttn &o, siteop &op)
               { CALL_AND_RETHROW(return o.apply_one_body_operator(op)); })
+         .def("__imatmul__", [](_ttn &o, Optype &op)
+              { CALL_AND_RETHROW(return o.apply_operator(op)); })
          .def("__imatmul__", [](_ttn &o, prodop &op)
               { CALL_AND_RETHROW(return o.apply_operator(op)); })
          .def("__imatmul__", [](_ttn &o, sop &op)
@@ -378,6 +398,10 @@ void init_ttn(py::module &m, const std::string &label)
               {
                     _ttn i(o);
                     CALL_AND_RETHROW(return i.apply_one_body_operator(op)); })
+         .def("__rmatmul__", [](const _ttn &o, Optype &op)
+              {
+                    _ttn i(o);
+                    CALL_AND_RETHROW(return i.apply_operator(op)); })
          .def("__rmatmul__", [](const _ttn &o, prodop &op)
               {
                     _ttn i(o);

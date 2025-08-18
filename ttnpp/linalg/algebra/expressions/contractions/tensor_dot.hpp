@@ -55,8 +55,8 @@ namespace linalg
             using result_type = linalg::tensor<decltype(a_value_type() * b_value_type()), rank, backend_type>;
 
         protected:
-            a_tensor_type _trans_a;
-            b_tensor_type _trans_b;
+            linalg::tensor<typename std::remove_const<a_value_type>::type, traits<a_tensor_type>::rank, backend_type> _trans_a;
+            linalg::tensor<typename std::remove_const<b_value_type>::type, traits<b_tensor_type>::rank, backend_type> _trans_b;
 
             const a_tensor_type &_A;
             const b_tensor_type &_B;
@@ -211,8 +211,7 @@ namespace linalg
                     }
 
                     // and now tensor transpose storing into _trans_a.
-                    auto transa = tensor_transpose_expression<a_tensor_type>(_A, inds);
-                    _trans_a = transa;
+                    _trans_a = tensor_transpose_expression<a_tensor_type>(_A, inds);;
                 }
                 if (B_requires_transpose || true)
                 {
@@ -232,8 +231,7 @@ namespace linalg
                     }
 
                     // and now tensor transpose storing into _trans_a.
-                    auto transb = tensor_transpose_expression<b_tensor_type>(_B, inds);
-                    _trans_b = transb;
+                    _trans_b = tensor_transpose_expression<b_tensor_type>(_B, inds);
                 }
 
                 res.reinterpret_shape(m, n) = transpose_expression<decltype(_trans_a.reinterpret_shape(k, m)), false>(_trans_a.reinterpret_shape(k, m)) * _trans_b.reinterpret_shape(k, n);

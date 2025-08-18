@@ -51,7 +51,7 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
           ttns/sop/state.cpp ttns/sop/toDense.cpp
           ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp ttns/ttn/ms_ttn.cpp
           ttns/observables/matrix_element.cpp 
-          ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp
+          ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp ttns/operators/Op.cpp
           ttns/algorithms/tdvp.cpp ttns/algorithms/dmrg.cpp
           )
     set_source_files_properties(${PYTHON_BINDINGS_SRC} PROPERTIES LANGUAGE CUDA)

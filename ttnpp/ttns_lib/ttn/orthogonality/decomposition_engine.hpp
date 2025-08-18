@@ -66,6 +66,11 @@ namespace ttns
                     m_temp.resize(m.shape(0), m.shape(1));
                     m_temp2.resize(m.shape(0), m.shape(1));
 
+                    if(m_s.capacity() < m.shape(1))
+                    {
+                        m_s.reallocate(m.shape(1));
+                    }
+
                     //resize the svd object
                     CALL_AND_HANDLE(m_svd.resize(m.shape(0), m.shape(1), false), "Failed to resize svd object");
                     CALL_AND_HANDLE(m_svd.resize_work_space(this->query_work_size(m, m_temp, m_temp2)), "Failed to resize work space for svd object.");
@@ -275,6 +280,7 @@ namespace ttns
             {
                 try
                 {
+                    //std::cerr << A.shape(1) << " " << m_s.capacity() << std::endl;
                     // check that the temporary arrays have the correct capacity
                     ASSERT(V.size() <= m_temp.capacity(), "The temporary matrix does not have sufficient capacity.");
                     ASSERT(A.shape(1) <= m_s.capacity(), "The matrix of singular values does not have sufficient capacity.");

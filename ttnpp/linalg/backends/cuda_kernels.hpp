@@ -16,6 +16,7 @@
 #define PYTTN_LINALG_BACKENDS_CUDA_KERNELS_HPP_
 
 // a file containing the kernels used for the linear algebra routines.
+// TODO: add kernel for setting a block of a tensor
 
 #ifdef PYTTN_BUILD_CUDA
 namespace linalg

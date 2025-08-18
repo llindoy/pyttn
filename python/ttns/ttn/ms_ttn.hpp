@@ -40,6 +40,10 @@ void init_msttn(py::module &m, const std::string &label)
     using real_type = typename linalg::get_real_type<T>::type;
     using size_type = typename backend::size_type;
 
+#ifdef PYTTN_BUILD_CUDA
+     using otherbackend = typename other_backend<backend>::type;
+#endif
+
     using _msttn = ms_ttn<T, backend>;
     using _msttn_node = typename _msttn::node_type;
     using _msttn_node_data = multiset_node_data<T, backend>;
@@ -93,7 +97,15 @@ void init_msttn(py::module &m, const std::string &label)
     // expose the ttn node class.  This is our core tensor network object.
     py::class_<_msttn>(m, (std::string("ms_ttn_") + label).c_str())
         .def(py::init<const _msttn &>())
+#ifdef BUILD_REAL_TTN
         .def(py::init<const ms_ttn<real_type, backend> &>())
+#endif
+#ifdef PYTTN_BUILD_CUDA
+         .def(py::init<const ms_ttn<T, otherbackend> &>())
+#ifdef BUILD_REAL_TTN
+         .def(py::init<const ms_ttn<real_type, otherbackend> &>())
+#endif
+#endif
 
         .def(py::init<size_t, const ntree<size_t> &, bool, bool>(), py::arg(), py::arg(), py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
         .def(py::init<size_t, const ntree<size_t> &, const ntree<size_t> &, bool, bool>(), py::arg(), py::arg(), py::arg(), py::arg("collapse_bond_matrices") = true, py::arg("purification") = false)
@@ -112,7 +124,9 @@ void init_msttn(py::module &m, const std::string &label)
 
         .def("slice", static_cast<_msttn_slice (_msttn::*)(size_t)>(&_msttn::slice))
 
+#ifdef BUILD_REAL_TTN
         .def("assign_slice", static_cast<void (_msttn::*)(size_type, const ttn<real_type, backend> &)>(&_msttn::template set_slice<real_type, backend>))
+#endif
         .def("assign_slice", static_cast<void (_msttn::*)(size_type, const ttn<T, backend> &)>(&_msttn::template set_slice<T, backend>))
         //.def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice_real&)>(&_msttn::template set_slice<real_type, backend>))
         //.def("assign_slice", static_cast<void (_msttn::*)(size_type, const _msttn_slice&)>(&_msttn::template set_slice<T, backend>))

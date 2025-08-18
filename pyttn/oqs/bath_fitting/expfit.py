@@ -144,7 +144,7 @@ def ESPRIT_support_points(
     :param Nt: The number of time points to use with the ESPRIT algorithm. (Default: 1000)
     :type Nt: int or None, optional
     """
-    if isinstance(ESPRIT_support_points, (list, np.ndarray)):
+    if isinstance(t, (list, np.ndarray)):
         if isinstance(ESPRIT_support_points, list):
             return np.array(ESPRIT_support_points)
         else:

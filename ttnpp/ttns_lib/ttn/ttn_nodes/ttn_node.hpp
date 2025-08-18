@@ -396,7 +396,7 @@ namespace ttns
 
         linalg::reinterpreted_tensor<T, 4, backend> as_rank_4(size_type mode)
         {
-            ASSERT(mode < nmodes(), "Failed to interpret ttn_node_data as rank 3 tensor.  The mode index is out of bounds.");
+            ASSERT(mode < nmodes(), "Failed to interpret ttn_node_data as rank 4 tensor.  The mode index is out of bounds.");
             std::array<size_type, 4> shape{{1, dim(mode), 1, hrank()}};
             for (size_type i = 0; i < mode; ++i)
             {
@@ -411,7 +411,7 @@ namespace ttns
 
         linalg::reinterpreted_tensor<const T, 4, backend> as_rank_4(size_type mode) const
         {
-            ASSERT(mode < nmodes(), "Failed to interpret ttn_node_data as rank 3 tensor.  The mode index is out of bounds.");
+            ASSERT(mode < nmodes(), "Failed to interpret ttn_node_data as rank 4 tensor.  The mode index is out of bounds.");
             std::array<size_type, 4> shape{{1, dim(mode), 1, hrank()}};
             for (size_type i = 0; i < mode; ++i)
             {
@@ -422,6 +422,110 @@ namespace ttns
                 shape[2] *= dim(i);
             }
             return this->reinterpret_shape(shape[0], shape[1], shape[2], shape[3]);
+        }
+
+        linalg::reinterpreted_tensor<T, 5, backend> as_rank_5(size_type modei, size_type modeo)
+        {
+            try
+            {
+                ASSERT(modei <= nmodes() && modeo <= nmodes(), "Failed to interpret ttn_node_data as rank 5 tensor.  The mode index is out of bounds.");
+                ASSERT(modei != modeo, "The two mode indices must be different.")
+                if(modei > modeo)
+                {
+                    size_type c = modei;
+                    modei = modeo;
+                    modeo = c;
+                }
+                std::array<size_type, 5> shape;
+                if (modeo < nmodes())
+                {
+                    shape = std::array<size_type, 5>({{1, dim(modei), 1, dim(modeo), hrank()}});
+                    for (size_type i = 0; i < modei; ++i)
+                    {
+                        shape[0] *= dim(i);
+                    }
+                    for (size_type i = modei + 1; i < modeo; ++i)
+                    {
+                        shape[2] *= dim(i);
+                    }
+                    for (size_type i = modeo + 1; i < nmodes(); ++i)
+                    {
+                        shape[4] *= dim(i);
+                    }
+                    return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+                }
+                else
+                {
+                    shape = std::array<size_type, 5> ({{1, dim(modei), 1, hrank(), 1}});
+                    for (size_type i = 0; i < modei; ++i)
+                    {
+                        shape[0] *= dim(i);
+                    }
+                    for (size_type i = modei + 1; i < modeo; ++i)
+                    {
+                        shape[2] *= dim(i);
+                    }
+                }
+                return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+
+            }
+            catch (const std::exception &ex)
+            {
+                std::cerr << ex.what() << std::endl;
+                RAISE_EXCEPTION("Failed to reinterpret hierarchical tucker tensor node as a rank 5 tensor.");
+            }
+        }
+
+        linalg::reinterpreted_tensor<const T, 5, backend> as_rank_5(size_type modei, size_type modeo) const
+        {
+            try
+            {
+                ASSERT(modei <= nmodes() && modeo <= nmodes(), "Failed to interpret ttn_node_data as rank 5 tensor.  The mode index is out of bounds.");
+                ASSERT(modei != modeo, "The two mode indices must be different.")
+                if(modei > modeo)
+                {
+                    size_type c = modei;
+                    modei = modeo;
+                    modeo = c;
+                }
+                std::array<size_type, 5> shape;
+                if (modeo < nmodes())
+                {
+                    shape = std::array<size_type, 5> ({{1, dim(modei), 1, dim(modeo), hrank()}});
+                    for (size_type i = 0; i < modei; ++i)
+                    {
+                        shape[0] *= dim(i);
+                    }
+                    for (size_type i = modei + 1; i < modeo; ++i)
+                    {
+                        shape[2] *= dim(i);
+                    }
+                    for (size_type i = modeo + 1; i < nmodes(); ++i)
+                    {
+                        shape[4] *= dim(i);
+                    }
+                    return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+                }
+                else
+                {
+                    shape = std::array<size_type, 5>({{1, dim(modei), 1, hrank(), 1}});
+                    for (size_type i = 0; i < modei; ++i)
+                    {
+                        shape[0] *= dim(i);
+                    }
+                    for (size_type i = modei + 1; i < modeo; ++i)
+                    {
+                        shape[2] *= dim(i);
+                    }
+                }
+                return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+
+            }
+            catch (const std::exception &ex)
+            {
+                std::cerr << ex.what() << std::endl;
+                RAISE_EXCEPTION("Failed to reinterpret hierarchical tucker tensor node as a rank 5 tensor.");
+            }
         }
 
         linalg::matrix<T, backend> &as_matrix() { return *this; }
@@ -439,7 +543,6 @@ namespace ttns
         {
             try
             {
-                auto atens = this->as_rank_3(mode);
                 if (mode == this->nmodes())
                 {
                     this->resize(size, this->dims());
@@ -1091,7 +1194,8 @@ namespace ttns
 
         public:
             //some functions added for handling decompositions of a general matrix
-            void resize(const matrix_type& mat)
+            template <typename mat_type>
+            void resize(const mat_type& mat)
             {
                 try
                 {
@@ -1118,7 +1222,8 @@ namespace ttns
                 }
             }
 
-            size_type decompose(matrix_type& mat, real_type tol = real_type(-1), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation)
+            template <typename mat_type>
+            size_type decompose(mat_type& mat, real_type tol = real_type(-1), size_type nchi = 0, bool rel_truncate = false, orthogonality::truncation_mode trunc_mode = orthogonality::truncation_mode::singular_values_truncation)
             {
                 CALL_AND_RETHROW(this->resize(mat));
                 CALL_AND_HANDLE(return m_ortho_engine(mat, m_U, m_R, m_S, tol, nchi, rel_truncate, trunc_mode, false), "Failed to compute decomposition of tensor.");

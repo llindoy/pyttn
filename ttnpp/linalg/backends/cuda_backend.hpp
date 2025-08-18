@@ -958,7 +958,12 @@ namespace linalg
 
             cuda_kernels::fill_matrix_block<<<dg, db, 0, environment().current_stream()>>>(src, m, n, dest, m2, n2);
         }
-
+        // TODO: add kernel for setting a block of a tensor
+        template <typename T, size_t D>
+        static inline void set_tensor_block(const T* src, const std::array<size_type, D>& src_dims, T* dest, const std::array<size_type, D>& dest_dims, const std::array<size_type, D>& skip)
+        {
+            RAISE_EXCEPTION("set tensor block not implemented for cuda backend.");
+        }
         template <typename T>
         static inline void transfer_coo_tuple_to_csr(const std::vector<std::tuple<index_type, index_type, T>> &coo, T *vals, index_type *colinds)
         {

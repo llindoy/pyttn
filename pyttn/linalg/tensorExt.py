@@ -302,7 +302,7 @@ class Tensor(metaclass=ABCMeta):
 
         :param T: The numpy tensor
         :type T: np.ndarray
-        :param dtype: The dtype to use for the site operator.  If this is None this function attempts to infer the dtype from v (Default: None)
+        :param dtype: The dtype to use for the Tensor.  If this is None this function attempts to infer the dtype from v (Default: None)
         :type dtype: {None, np.float64, np.complex128}, optional
         :param backend: The backend to use for calculation. Either blas or cuda. (Default: "blas")
         :type backend: str, optional
@@ -409,7 +409,7 @@ class Vector(Tensor):
 
             - Default construct Vector
             - M (Union[np.ndarray,:class:`Vector`]) - Construct a vector from a numpy array or Vector
-        :param dtype: The dtype to use for the site operator.  If this is None this function attempts to infer the dtype from v (Default: None)
+        :param dtype: The dtype to use for the Vector.  If this is None this function attempts to infer the dtype from v (Default: None)
         :type dtype: {None, np.float64, np.complex128}, optional
         :param backend: The backend to use for calculation. (Default: "blas")
         :type backend: {"blas", "cuda"}, optional
@@ -437,7 +437,7 @@ class Matrix(Tensor):
             - Default construct Matrix
             - M (Union[np.ndarray,:class:`Matrix`]) - Construct a matrix from a numpy array or Matrix
             - Op (:class:`OPBase`), sysinf (:class:`system_modes`) - Construct a matrix from a string operator type and the system_modes info
-        :param dtype: The dtype to use for the site operator.  If this is None this function attempts to infer the dtype from v (Default: None)
+        :param dtype: The dtype to use for the Matrix.  If this is None this function attempts to infer the dtype from v (Default: None)
         :type dtype: {None, np.float64, np.complex128}, optional
         :param backend: The backend to use for calculation. Either blas or cuda. (Default: "blas")
         :type backend: {"blas", "cuda"}, optional
@@ -480,7 +480,7 @@ class Tensor3(Tensor):
 
             - Default construct Tensor4
             - M (Union[np.ndarray,:class:`Tensor3`]) - Construct a matrix from a numpy array or Tensor3        
-        :param dtype: The dtype to use for the site operator.  If this is None this function attempts to infer the dtype from v (Default: None)
+        :param dtype: The dtype to use for the Tensor3.  If this is None this function attempts to infer the dtype from v (Default: None)
         :type dtype: {None, np.float64, np.complex128}, optional
         :param backend: The backend to use for calculation. Either blas or cuda. (Default: "blas")
         :type backend: {"blas", "cuda"}, optional
@@ -505,7 +505,7 @@ class Tensor4(Tensor):
 
             - Default construct Tensor4
             - M (Union[np.ndarray,:class:`Tensor4`]) - Construct a matrix from a numpy array or Tensor4        
-        :param dtype: The dtype to use for the site operator.  If this is None this function attempts to infer the dtype from v (Default: None)
+        :param dtype: The dtype to use for the Tensor4.  If this is None this function attempts to infer the dtype from v (Default: None)
         :type dtype: {None, np.float64, np.complex128}, optional
         :param backend: The backend to use for calculation. Either blas or cuda. (Default: "blas")
         :type backend: {"blas", "cuda"}, optional

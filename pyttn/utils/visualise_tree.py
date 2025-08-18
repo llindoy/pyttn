@@ -192,6 +192,7 @@ def visualise_tree(
     :param add_labels: Whether or not to include the ntree node labels.  This option is only used if tree is an ntree. (default: True)
     :type add_labels: bool, optional
     :param bond_prop: A parameter specifying the bond property to plot for a ttn or ms_ttn.  See :meth:`visualise_ttn` or :meth:`visualise_ms_ttn` for more details.
+    :type bond_prop: {"bond dimension", "bond capacity"}, optional
     :param colourmap: An optional name for colour map to use when plotting bond properties. (Default: 'viridis')
     :type colourmap: str, optional
     :param label_all_bonds: An optional boolean specifying whether or not to label all bonds in the TTN.  If False only the bonds with the maximum and minimum value of the property will be labelled. (Default: False)
