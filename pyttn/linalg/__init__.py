@@ -45,7 +45,7 @@ __all__ = [
         "SparseMatrix",
         "DiagonalMatrix",
         "OrthogonalVector",
-        "orthogonal_vector"
+        "orthogonal_vector",
         "random_engine",
         "RandomEngine",
         ]
