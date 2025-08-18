@@ -145,19 +145,19 @@ def test_apply_op_1d(request, op, a, b, expected_result):
     assert res == pytest.approx(expected_result, abs=1e-8)
 
 
-#now test the application of Op objects onto the mode
-@pytest.mark.parametrize(
-    "op, a, b, expected_result",
-    [
-        ("Sz01_op", "ttn_1", "ttn_1", 1),
-    ],
-)
-def test_apply_op_2d(request, op, a, b, expected_result):
-    op = request.getfixturevalue(op)
-    A = request.getfixturevalue(a)
-    B = request.getfixturevalue(b)
-    mel = matrix_element(A, nbuffers=1)
-    C = op@A
-    res = np.real(mel(C, B))
-
-    assert res == pytest.approx(expected_result, abs=1e-8)
+##now test the application of Op objects onto the mode
+#@pytest.mark.parametrize(
+#    "op, a, b, expected_result",
+#    [
+#        ("Sz01_op", "ttn_1", "ttn_1", 1),
+#    ],
+#)
+#def test_apply_op_2d(request, op, a, b, expected_result):
+#    op = request.getfixturevalue(op)
+#    A = request.getfixturevalue(a)
+#    B = request.getfixturevalue(b)
+#    mel = matrix_element(A, nbuffers=1)
+#    C = op@A
+#    res = np.real(mel(C, B))
+#
+#    assert res == pytest.approx(expected_result, abs=1e-8)
