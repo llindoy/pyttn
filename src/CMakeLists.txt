@@ -26,7 +26,7 @@ else()
     if(MSVC)
         message(FATAL_ERROR "Request MSVC compiler.  I don't know how this works so exiting.")
     else()
-        set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -Wshadow -pedantic -Wold-style-cast")
+        set(CMAKE_CXX_FLAGS "-O3 -g -Wall -Wextra -Wshadow -pedantic -Wold-style-cast")
         option(WITH_WERROR "Compile with '-Werror' C++ compiler flag" ON)
         if(WITH_WERROR)
             #set(CMAKE_CXX_FLAGS "-Werror ${CMAKE_CXX_FLAGS}")
@@ -34,7 +34,7 @@ else()
 
         #additional compilation flags for GNU compilers
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcx-fortran-rules -march=native -mtune=native -flto=auto")
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcx-fortran-rules -flto=auto")
             if(USE_OPENMP)
                 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
             endif()
@@ -93,7 +93,7 @@ else()
     endif()
 endif()
 message(STATUS ${CMAKE_CXX_FLAGS})
-add_executable(operator_test.x operator_gen.cpp)
+add_executable(operator_test.x operator_test.cpp)
 
 
 

@@ -17,6 +17,7 @@ import numpy as np
 
 from pyttn.linalg import Matrix
 from pyttn.ttnpp import ttn_complex, ttn_node_complex, ttn_data_complex
+from pyttn.ttns.operators.opExt import Op
 # and attempt to import the real ttns
 try:
     from pyttn.ttnpp import ttn_real, ttn_node_real, ttn_data_real
@@ -1202,6 +1203,22 @@ class ttn(metaclass=ABCMeta):
         :type op: product_operator
         :param shift_orthogonality: Whether or not to shift the orthogonality centre of the ttn to the leaf node that will be updated by this one-body operator.  (Default: True)
         :type shift_orthogonality: bool, optional
+        """
+        pass
+
+    @abstractmethod
+    def apply_op(self, op : Op, tol : float = -1.0, nchi : int = 0, zipup : bool = False) -> None:
+        """
+        Apply a matrix valued operator object to the ttn updating its value
+
+        :param op: The product operator to apply to the system
+        :type op: Op
+        :param tol: The truncation tolerance, defaults to -1.0
+        :type tol: float, optional
+        :param nchi: The maximum bond dimension, defaults to 0
+        :type nchi: int, optional
+        :param zipup: Whether or not to use the zipup algorithm for computing the action of the operator on the ttn, defaults to False
+        :type zipup: bool, optional
         """
         pass
 

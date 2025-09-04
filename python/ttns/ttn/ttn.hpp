@@ -374,8 +374,10 @@ void init_ttn(py::module &m, const std::string &label)
               { CALL_AND_RETHROW(return o.apply_one_body_operator(op, index, shift_orthogonality)); }, py::arg(), py::arg(), py::arg("shift_orthogonality") = true, "For details see :meth:`pyttn.ttn_dtype.rapply_one_body_operator`")
          .def("apply_product_operator", [](_ttn &o, prodop &op, bool shift_orthogonality)
               { CALL_AND_RETHROW(return o.apply_product_operator(op, shift_orthogonality)); }, py::arg(), py::arg("shift_orthogonality") = true, "For details see :meth:`pyttn.ttn_dtype.apply_product_operator`")
-         .def("apply_operator", [](_ttn &o, Optype &op, real_type tol, size_t nchi)
-              {CALL_AND_RETHROW(return o.apply_operator(op, tol, nchi));}, py::arg(), py::arg("tol")=-1.0, py::arg("nchi")=0)
+         .def("apply_op", [](_ttn &o, Optype &op, real_type tol, size_t nchi, bool zipup)
+              {CALL_AND_RETHROW(return o.apply_operator(op, tol, nchi,zipup));}, py::arg(), py::arg("tol")=-1.0, py::arg("nchi")=0, py::arg("zipup")=false)
+         .def("apply_operator", [](_ttn &o, Optype &op, real_type tol, size_t nchi, bool zipup)
+              {CALL_AND_RETHROW(return o.apply_operator(op, tol, nchi,zipup));}, py::arg(), py::arg("tol")=-1.0, py::arg("nchi")=0, py::arg("zipup")=false)
          .def("apply_operator", [](_ttn &o, siteop &op, bool shift_orthogonality)
               { CALL_AND_RETHROW(return o.apply_operator(op, shift_orthogonality)); }, py::arg(), py::arg("shift_orthogonality") = true)
          .def("apply_operator", [](_ttn &o, prodop &op, bool shift_orthogonality)
@@ -407,6 +409,24 @@ void init_ttn(py::module &m, const std::string &label)
                     _ttn i(o);
                     CALL_AND_RETHROW(return i.apply_operator(op)); })
          .def("__rmatmul__", [](const _ttn &o, sop &op)
+              {
+                    _ttn i;
+                    using contr = sop_ttn_contraction_engine<T, backend>;
+                    CALL_AND_RETHROW(contr::sop_ttn_contraction(op, o, i));
+                    return i; }, "For details see :meth:`pyttn.ttn_dtype.__rmatmul__`")
+         .def("__matmul__", [](const _ttn &o, siteop &op)
+              {
+                    _ttn i(o);
+                    CALL_AND_RETHROW(return i.apply_one_body_operator(op)); })
+         .def("__matmul__", [](const _ttn &o, Optype &op)
+              {
+                    _ttn i(o);
+                    CALL_AND_RETHROW(return i.apply_operator(op)); })
+         .def("__matmul__", [](const _ttn &o, prodop &op)
+              {
+                    _ttn i(o);
+                    CALL_AND_RETHROW(return i.apply_operator(op)); })
+         .def("__matmul__", [](const _ttn &o, sop &op)
               {
                     _ttn i;
                     using contr = sop_ttn_contraction_engine<T, backend>;

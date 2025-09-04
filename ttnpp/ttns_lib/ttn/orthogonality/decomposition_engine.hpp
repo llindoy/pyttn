@@ -154,14 +154,15 @@ namespace ttns
                     bond_dimension = std::min(nchi, bond_dimension);
                 }
                 real_type snorm = 0.0;
+
                 if (tol > real_type(0))
                 {
                     m_shost = S;
                     size_type nb = 0;
-
+                    size_type sshape = std::min(S.shape(0), S.shape(1));
                     if (rel_truncate)
                     {
-                        for (size_type i = 0; i < bond_dimension; ++i)
+                        for (size_type i = 0; i < sshape; ++i)
                         {
                             snorm += m_shost(i, i) * m_shost(i, i);
                         }
@@ -171,10 +172,9 @@ namespace ttns
                     {
                         snorm = 1.0;
                     }
-
                     if (trunc_mode == truncation_mode::singular_values_truncation)
                     {
-                        for (size_type i = 0; i < bond_dimension; ++i)
+                        for (size_type i = 0; i < sshape; ++i)
                         {
                             if (std::abs(m_shost(i, i)) > tol * snorm)
                             {
@@ -186,9 +186,9 @@ namespace ttns
                     {
                         real_type discarded_weight = 0;
                         nb = bond_dimension;
-                        for (size_type i = 0; i < bond_dimension; ++i)
+                        for (size_type i = 0; i < sshape; ++i)
                         {
-                            size_type ind = bond_dimension - (i + 1);
+                            size_type ind = sshape - (i + 1);
                             discarded_weight += m_shost(ind, ind) * m_shost(ind, ind);
                             if (discarded_weight > tol * snorm)
                             {
@@ -197,9 +197,9 @@ namespace ttns
                             }
                         }
                     }
-
-                    nb = std::max(size_type(1), nb);
+                    //now truncate the bond dimension down, noting that we never let it be less than 2
                     bond_dimension = std::min(nb, bond_dimension);
+                    bond_dimension = std::max(size_type(2), bond_dimension);
                 }
                 return bond_dimension;
             }
@@ -280,17 +280,12 @@ namespace ttns
             {
                 try
                 {
-                    //std::cerr << A.shape(1) << " " << m_s.capacity() << std::endl;
                     // check that the temporary arrays have the correct capacity
-                    ASSERT(V.size() <= m_temp.capacity(), "The temporary matrix does not have sufficient capacity.");
-                    ASSERT(A.shape(1) <= m_s.capacity(), "The matrix of singular values does not have sufficient capacity.");
-
                     CALL_AND_HANDLE(S.resize(A.shape(1), A.shape(1)), "Failed to resize S matrix.");
                     CALL_AND_HANDLE(m_temp.resize(V.shape()), "Failed to resize temporary V matrix to ensure it has the correct shape.");
                     CALL_AND_HANDLE(m_svd(A, S, U, m_temp, A.shape(0) < A.shape(1)), "Failed when evaluating the decomposition.")
 
                     size_type bond_dimension = get_truncated_bond_dimension(S, A.shape(1), tol, nchi, rel_truncate, trunc_mode);
-
                     if (A.shape(1) > 1 && A.shape(0) > 1)
                     {
                         if (bond_dimension < 2)
@@ -299,9 +294,7 @@ namespace ttns
                         }
                     }
 
-                    // now we need to ensure that the U matrix and R = S*V matrix are all the correct sizes.  Namely we need
-                    // U.shape() == (A.shape(0), bond_dimension) and R.shape() = (bond_dimension, bond_dimension)
-
+                    // now we need to ensure that the U matrix and R = S*V matrix are all the correct sizes.
                     CALL_AND_HANDLE(resizeU(U, A.shape(0), bond_dimension), "Failed to resize U matrix to make it compatible with expected bond dimension.");
                     CALL_AND_HANDLE(resizeS(S, bond_dimension), "Failed to resize S matrix to make it compatible with expected bond dimension.");
                     CALL_AND_HANDLE(resizeV(m_temp, bond_dimension, A.shape(1)), "Failed to resize V matrix to make it compatible with expected bond dimension.");
@@ -331,7 +324,6 @@ namespace ttns
             template <typename Atype, typename Utype, typename Stype>
             void pad_buffer(const Atype &A, Utype &U, Stype &S, size_type bond_dimension)
             {
-                ASSERT(A.size() <= m_temp2.capacity(), "The second temporary matrix does not have sufficient capacity.");
                 CALL_AND_HANDLE(m_temp2.resize(A.shape(0), bond_dimension), "Failed to resize the second temporary matrix so that it has the correct shape.");
 
                 using memfill = linalg::memory::filler<real_type, backend>;
@@ -407,7 +399,6 @@ namespace ttns
                     }
                     else
                     {
-                        ASSERT(V.size() <= m_temp.capacity(), "The temporary matrix does not have sufficient capacity.");
                         CALL_AND_HANDLE(m_temp = trans(V), "Failed to evaluate transpose of V matrix into temporary buffer.");
                         CALL_AND_HANDLE(V = m_temp, "Failed to store transposed V matrix.");
                     }

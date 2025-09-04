@@ -278,7 +278,7 @@ def Sx0_op():
 
 @pytest.fixture
 def Sz01_op():
-    sz = np.array([[0,1.0],[1.0, 0]])
+    sz = np.array([[1,0.0],[0.0, -1.0]])
     return Op(np.kron(sz, sz), [0, 1], [2, 2])
 
 #######

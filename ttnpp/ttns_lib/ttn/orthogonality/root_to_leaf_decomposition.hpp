@@ -87,17 +87,6 @@ namespace ttns
                     }
                 }
 
-                // check that the result arrays have the correct capacity so that we can make sure we get the correct result
-                if (use_capacity)
-                {
-                    ASSERT(A.capacity() <= U.capacity(), "The U matrix is not the same size as the input matrix.");
-                }
-                else
-                {
-                    ASSERT(A.size() <= U.capacity(), "The U matrix is not the same size as the input matrix.");
-                }
-                ASSERT(max_dim * max_dim <= R.capacity(), "The R matrix is not large enough to store the result of the decomposition.");
-
                 CALL_AND_HANDLE(U.resize(A.dimen(use_capacity), A.hrank(use_capacity)), "Failed when resizing the U matrix so that it has the correct shape.");
                 CALL_AND_HANDLE(R.resize(A.hrank(use_capacity), A.hrank(use_capacity)), "Failed when resizing the R matrix so that it has the correct shape.");
 
@@ -165,10 +154,6 @@ namespace ttns
 
                 size_type d1 = (A.hrank() * A.dimen()) / A.dim(mode);
                 size_type d2 = A.dim(mode);
-
-                ASSERT(A.size() <= U.capacity(), "The U matrix is not the same size as the input matrix.");
-                ASSERT(A.size() <= tm.capacity(), "The U matrix is not the same size as the input matrix.");
-                ASSERT(d2 * d2 <= R.capacity(), "The R matrix is not large enough to store the result of the decomposition.");
 
                 CALL_AND_HANDLE(U.resize(A.size(0), A.size(1)), "Failed when resizing the U matrix so that it has the correct shape.");
                 CALL_AND_HANDLE(tm.resize(d1, d2), "Failed when resizing the U matrix so that it has the correct shape.");
@@ -246,10 +231,9 @@ namespace ttns
                 CALL_AND_HANDLE(a.as_matrix() = tm, "Failed to set the value of the hierarchial tucker tensor node matrix.");
 
                 a.set_dim(bond_index, pr.shape(1));
+                ASSERT(a.check_sizes(), "Invalid sizes for a array.")
                 mat &A = c.as_matrix();
 
-                ASSERT(A.size() <= tm.capacity(), "The temporary working matrix is not large enough to store the result.");
-                ASSERT(pr.shape(0) == A.shape(1), "The parent's R matrix is not the correct size.");
                 CALL_AND_HANDLE(tm.resize(A.shape(0), pr.shape(1)), "Failed to resize the temporary working matrix so that it has the correct shape.");
 
                 CALL_AND_HANDLE(tm = A * pr, "Failed to evaluate contraction with parents R matrix.");

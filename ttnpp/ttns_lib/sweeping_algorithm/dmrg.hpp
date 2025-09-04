@@ -49,7 +49,6 @@ namespace ttns
 
     public:
         _one_site_dmrg() : base_type() {}
-        _one_site_dmrg(const ttn_type &A, const env_type &ham) : base_type(A, ham, 1) {}
         _one_site_dmrg(const ttn_type &A, const env_type &ham, size_type krylov_dim = 16, size_type hamiltonian_sum_threads = 1, size_type set_var_threads = 1) : base_type(A, ham, {krylov_dim, 1}, {hamiltonian_sum_threads}, {}, set_var_threads) 
         {
             ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");

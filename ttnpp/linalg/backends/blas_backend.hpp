@@ -491,21 +491,28 @@ namespace linalg
                 dest[dest_index] = src[ind];
 
                 //now advance the current index in the tensor
-                bool update_index = true;
-                for(size_type k = 0; k < D && update_index; ++k)
+                if(ind+1 != n_to_add)
                 {
-                    size_type kd = D-(k+1);
-                    index[kd] += 1;
-                    if (index[kd] < src_dims[kd])
+                    bool update_index = true;
+                    for(size_type k = 0; k < D && update_index; ++k)
                     {
-                        update_index = false;
-                    }
-                    else
-                    {
-                        index[kd] = 0;
-                        update_index = true;
+                        size_type kd = D-(k+1);
+                        index[kd] += 1;
+                        if (index[kd] < src_dims[kd])
+                        {
+                            update_index = false;
+                        }
+                        else
+                        {
+                            index[kd] = 0;
+                            update_index = true;
+                        }
                     }
                 }
+            }
+            for(size_t i = 0; i < D; ++i)
+            {
+                ASSERT(index[i]+1 == src_dims[i], "Something when wrong when setting tensor block.");
             }
         }
 

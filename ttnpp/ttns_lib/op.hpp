@@ -32,7 +32,6 @@ namespace ttns
         Op(Op &&o) noexcept : m_op(std::move(o.m_op)), m_indices(std::move(o.m_indices)), m_dims(std::move(o.m_dims)) {}
         template <typename U, typename be>
         Op(const Op<U, be> &other) : m_op(other.matrix()), m_indices(other.indices()), m_dims(other.dims()){}
-
         template <typename I1, typename I2>
         Op(const linalg::matrix<T, backend> &m, const std::vector<I1> &indices, const std::vector<I2> &dims)
         {

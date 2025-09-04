@@ -184,6 +184,16 @@ namespace ttns
 
         size_type nmodes() const { return m_mode_dims.size(); }
 
+        bool check_sizes()
+        {
+            size_type dims = 1;
+            for(size_type i = 0; i < m_mode_dims.size(); ++i)
+            {
+                dims *= m_mode_dims[i];
+            }
+            return dims == this->shape(0);
+        }
+
         size_type hrank(bool use_max_dim = false) const
         {
             if (!use_max_dim)
@@ -221,6 +231,7 @@ namespace ttns
         {
             return m_mode_dims;
         }
+
         void set_dim(size_type n, size_type dim)
         {
             ASSERT(dim <= this->m_mode_capacity[n], "Failed to set mode dim larger than maximum size.");
@@ -452,7 +463,7 @@ namespace ttns
                     {
                         shape[4] *= dim(i);
                     }
-                    return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+                    return this->reinterpret_shape(shape[0], shape[1], shape[2], shape[3], shape[4]);
                 }
                 else
                 {
@@ -466,7 +477,7 @@ namespace ttns
                         shape[2] *= dim(i);
                     }
                 }
-                return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+                return this->reinterpret_shape(shape[0], shape[1], shape[2], shape[3], shape[4]);
 
             }
             catch (const std::exception &ex)
@@ -504,7 +515,7 @@ namespace ttns
                     {
                         shape[4] *= dim(i);
                     }
-                    return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+                    return this->reinterpret_shape(shape[0], shape[1], shape[2], shape[3], shape[4]);
                 }
                 else
                 {
@@ -518,7 +529,7 @@ namespace ttns
                         shape[2] *= dim(i);
                     }
                 }
-                return this->reinterpret_capacity(shape[0], shape[1], shape[2], shape[3], shape[4]);
+                return this->reinterpret_shape(shape[0], shape[1], shape[2], shape[3], shape[4]);
 
             }
             catch (const std::exception &ex)

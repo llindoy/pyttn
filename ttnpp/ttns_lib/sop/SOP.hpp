@@ -389,7 +389,7 @@ namespace ttns
 
     protected:
         iterator last_insert;
-        literal::coeff<T> m_Eshift = literal::coeff<T>(T(0));
+        literal::coeff<T> m_Eshift;
 
     public:
         SOP() {}

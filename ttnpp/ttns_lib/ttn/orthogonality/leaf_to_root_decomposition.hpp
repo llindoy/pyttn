@@ -46,16 +46,6 @@ namespace ttns
             {
                 try
                 {
-                    if (use_capacity)
-                    {
-                        ASSERT(A.capacity() <= U.capacity(), "The U matrix is not the same size as the input matrix.");
-                    }
-                    else
-                    {
-                        ASSERT(A.size() <= U.capacity(), "The U matrix is not the same size as the input matrix.");
-                    }
-                    ASSERT(A.hrank(use_capacity) * A.hrank(use_capacity) <= R.capacity(), "The R matrix is not large enough to store the result of the decomposition.");
-
                     CALL_AND_HANDLE(U.resize(A.dimen(use_capacity), A.hrank(use_capacity)), "Failed when resizing the U matrix so that it has the correct shape.");
                     CALL_AND_HANDLE(R.resize(A.hrank(use_capacity), A.hrank(use_capacity)), "Failed when resizing the R matrix so that it has the correct shape.");
                     CALL_AND_HANDLE(return eng.query_work_size(A.as_rank_2(use_capacity), U, R), "Failed to query work size of the decomposition engine.");
@@ -78,9 +68,6 @@ namespace ttns
             static inline size_type evaluate(engine &eng, const hdata &a, mat &U, mat &R, dmat &S, real_type tol = real_type(0), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation, bool save_svd = false)
             {
                 const auto &A = a.as_matrix();
-                ASSERT(A.size() <= U.capacity(), "The U matrix is not the same size as the input matrix.");
-                ASSERT(a.hrank() * a.hrank() <= R.capacity(), "The R matrix is not large enough to store the result of the decomposition.");
-
                 CALL_AND_HANDLE(U.resize(A.shape(0), A.shape(1)), "Failed when resizing the U matrix so that it has the correct shape.");
                 CALL_AND_HANDLE(R.resize(A.shape(1), A.shape(1)), "Failed when resizing the R matrix so that it has the correct shape.");
                 size_type bond_dimension = 0;
@@ -93,7 +80,6 @@ namespace ttns
             static inline void apply_bond_matrix(hdata &a, hdata &pa, size_type mode, const mat &R, mat &pt)
             {
                 pt.resize(pa.shape(0), pa.shape(1));
-                ASSERT(pa.as_matrix().size() <= pt.capacity(), "The temporary working matrix is not large enough to store the result.");
                 CALL_AND_HANDLE(pt.resize(pa.as_matrix().shape()), "Failed to resize the temporary working matrix so that it has the correct shape.");
 
                 ASSERT(mode < pa.nmodes(), "The hierarchical tucker tensor is ill-formed.");
@@ -109,23 +95,25 @@ namespace ttns
             // this function applies the transformation to both the present node and it's parent.
             static inline void apply_with_truncation(hdata &a, hdata &pa, size_type mode, const mat &R, mat &u)
             {
+                //first set a to the new u tensor.  This will update its hrank if u has been truncated.
                 CALL_AND_HANDLE(a.as_matrix() = u, "Failed to set the value of the hierarchial tucker tensor node matrix.");
 
+                //now we need to set the value in the parent tensor.  To do this we first re
                 u.resize(pa.shape(0), pa.shape(1));
 
-                ASSERT(pa.as_matrix().size() <= u.capacity(), "The uorary working matrix is not large enough to store the result.");
                 CALL_AND_HANDLE(u.resize(pa.as_matrix().shape()), "Failed to resize the uorary working matrix so that it has the correct shape.");
 
                 ASSERT(mode < pa.nmodes(), "The hierarchical tucker tensor is ill-formed.");
-
                 auto pa_3 = pa.as_rank_3(mode);
-                u.resize((R.shape(0) * pa.shape(0)) / R.shape(1), pa.shape(1));
 
+                u.resize((R.shape(0) * pa.shape(0)) / R.shape(1), pa.shape(1));
                 auto pt_3 = u.reinterpret_shape(pa_3.shape(0), R.shape(0), pa_3.shape(2));
                 CALL_AND_HANDLE(pt_3 = contract(R, 1, pa_3, 1), "Failed to compute the requested contraction between the R matrix and the parent A tensor.");
 
-                CALL_AND_HANDLE(pa.as_matrix() = u, "Failed to copy uorary working matrix into hierarchical tucker tensor parent node matrix.");
+                CALL_AND_HANDLE(pa.as_matrix() = u, "Failed to copy u matrix into hierarchical tucker tensor parent node matrix.");
                 pa.set_dim(mode, R.shape(0));
+                ASSERT(pa.check_sizes(), "Invalid sizes for parent array.")
+
                 u.resize(a.shape(0), a.shape(1));
             }
 
