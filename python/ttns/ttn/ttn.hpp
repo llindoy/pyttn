@@ -30,6 +30,13 @@
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+#include <fstream>
+#include <sstream>
+#endif
+
 namespace py = pybind11;
 
 template <typename T, typename backend>
@@ -434,6 +441,76 @@ void init_ttn(py::module &m, const std::string &label)
                     return i; }, "For details see :meth:`pyttn.ttn_dtype.__rmatmul__`")
          .def("backend", [](const _ttn &)
               { return backend::label(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", [](const _ttn & a, const std::string& ofname, bool as_binary)
+         {
+            if(as_binary)
+            {
+                std::ofstream os(ofname, std::ios::binary);
+                if(!os)
+                {
+                    RAISE_EXCEPTION("Failed to open output file stream");
+                }
+                cereal::BinaryOutputArchive archive(os);
+                archive(a);
+            }
+            else
+            {
+                std::ofstream os(ofname);
+                if(!os)
+                {
+                    RAISE_EXCEPTION("Failed to open output file stream");
+                }
+
+                cereal::JSONOutputArchive archive(os);
+                archive(a);
+            }
+         }, py::arg(), py::arg("as_binary")=true)
+        .def("load", [](_ttn & a, const std::string& ifname, bool as_binary)
+         {
+            if(as_binary)
+            {
+                std::ifstream is(ifname, std::ios::binary);
+                if(!is)
+                {
+                    RAISE_EXCEPTION("Failed to open input file stream");
+                }
+                cereal::BinaryInputArchive archive(is);
+                archive(a);
+            }
+            else
+            {
+                std::ifstream is(ifname);
+                if(!is)
+                {
+                    RAISE_EXCEPTION("Failed to open input file stream");
+                }
+                cereal::JSONInputArchive archive(is);
+                archive(a);
+            }
+         }, py::arg(), py::arg("as_binary")=true)
+
+         .def(py::pickle(
+            [](const _ttn& a){  // __getstate__
+                std::ostringstream oss;
+                {
+                    cereal::JSONOutputArchive archive(oss);
+                    archive(a);
+                }
+                return py::make_tuple(oss.str());
+            },
+            [](py::tuple t){    // __setstate__
+                _ttn a;
+                std::istringstream iss( t[0].cast<std::string>());
+                {
+                    cereal::JSONInputArchive archive(iss);
+                    archive(a);
+                }
+                return a;
+            }
+         ))
+#endif
+
          .doc() = R"mydelim(
           The pybind11 wrapper class for handling a general tree tensor network
           )mydelim";

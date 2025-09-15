@@ -358,6 +358,7 @@ namespace ttns
             }
             CALL_AND_HANDLE(ar(cereal::make_nvp("nodes", m_saved_nodes)), "Failed to serialise tree_base object.  Failed to serialise its nodes.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nleaves", m_nleaves)), "Failed to serialise tree_base object.  Failed to serialise its number of leaves.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("nlevels", m_level_indexing)), "Failed to serialise tree_base object.  Failed to serialise its number of leaves.");
         }
 
         template <typename archive>
@@ -367,6 +368,7 @@ namespace ttns
             std::vector<serialisation_node_load_wrapper<node_type, size_type>> m_loaded_nodes;
             CALL_AND_HANDLE(ar(cereal::make_nvp("nodes", m_loaded_nodes)), "Failed to serialise tree_base object.  Failed to serialise its nodes.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nleaves", m_nleaves)), "Failed to serialise tree_base object.  Failed to serialise its number of leaves.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("nlevels", m_level_indexing)), "Failed to serialise tree_base object.  Failed to serialise its number of leaves.");
 
             // now that we have loaded in all of the node information we need to construct
             m_nodes.resize(m_loaded_nodes.size());
@@ -677,6 +679,22 @@ namespace ttns
         reverse_iterator rend() { return reverse_iterator(tree_base<T>::m_nodes.rend()); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(tree_base<T>::m_nodes.rbegin()); }
         const_reverse_iterator rend() const { return const_reverse_iterator(tree_base<T>::m_nodes.rend()); }
+
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive &ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise tree object.  Error when serialising the base object.");
+        }
+
+        template <typename archive>
+        void load(archive &ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise tree object.  Error when serialising the base object.");
+        }
+#endif
+
     };
 
     template <typename T, typename U, typename = typename std::enable_if<is_tree<U>::value && is_tree<T>::value, void>::type>

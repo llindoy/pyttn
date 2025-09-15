@@ -20,6 +20,10 @@
 #include <algorithm>
 #include "../../linalg_forward_decl.hpp"
 
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/types/array.hpp>
+#endif
+
 namespace linalg
 {
 
@@ -285,8 +289,10 @@ namespace linalg
         template <typename archive>
         void save(archive &ar) const
         {
-            CALL_AND_HANDLE(ar(cereal::make_nvp("colind", ibuffer_writer_type{m_colind, m_max_nnz})), "Failed to serialise csr topology object.  Error when serialising the colinds buffer.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("rowptr", ibuffer_writer_type{m_rowptr, m_max_rows + 1})), "Failed to serialise csr topology object.  Error when serialising the rowptr buffer.");
+            auto cind_writer = ibuffer_writer_type{m_colind, m_max_nnz};
+            auto rptr_writer = ibuffer_writer_type{m_rowptr, m_max_rows + 1};
+            CALL_AND_HANDLE(ar(cereal::make_nvp("colind", cind_writer)), "Failed to serialise csr topology object.  Error when serialising the colinds buffer.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("rowptr", rptr_writer)), "Failed to serialise csr topology object.  Error when serialising the rowptr buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("shape", m_shape)), "Failed to serialise csr topology object.  Failed to serialise the csr topology shape.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nnz", m_nnz)), "Failed to serialise csr topology object.  Error when serialising the number of non-zero elements in the matrix.");
         }
@@ -294,8 +300,10 @@ namespace linalg
         template <typename archive>
         void load(archive &ar)
         {
-            CALL_AND_HANDLE(ar(cereal::make_nvp("colind", ibuffer_reader_type{&m_colind, &m_max_nnz})), "Failed to deserialise csr topology object.  Error when deserialising the colinds buffer.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("rowptr", ibuffer_reader_type{&m_rowptr, &m_max_rows})), "Failed to deserialise csr topology object.  Error when deserialising the rowptr buffer.");
+            auto cind_reader = ibuffer_reader_type{&m_colind, &m_max_nnz};
+            auto rptr_reader = ibuffer_reader_type{&m_rowptr, &m_max_rows};
+            CALL_AND_HANDLE(ar(cereal::make_nvp("colind", cind_reader)), "Failed to deserialise csr topology object.  Error when deserialising the colinds buffer.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("rowptr", rptr_reader)), "Failed to deserialise csr topology object.  Error when deserialising the rowptr buffer.");
             m_max_rows = m_max_rows - 1;
             CALL_AND_HANDLE(ar(cereal::make_nvp("shape", m_shape)), "Failed to deserialise csr topology object.  Failed to deserialise the csr topology shape.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nnz", m_nnz)), "Failed to deserialise csr topology object.  Error when deserialising the number of non-zero elements in the matrix.");

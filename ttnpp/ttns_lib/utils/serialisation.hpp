@@ -79,6 +79,7 @@ public:
 template <typename node_type, typename size_type>
 class serialisation_node_load_wrapper
 {
+public:
     node_type m_node;
     std::vector<size_type> m_children_ids;
     size_type m_parent_id;

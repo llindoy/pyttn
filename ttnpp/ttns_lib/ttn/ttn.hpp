@@ -403,7 +403,6 @@ namespace ttns
         {
             CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn object.  Error when serialising the base object.");
         }
-
         template <typename archive>
         void load(archive &ar)
         {

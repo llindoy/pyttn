@@ -17,6 +17,7 @@
 
 #include <vector>
 #include "../../linalg_forward_decl.hpp"
+#include "../../utils/serialisation.hpp"
 
 namespace linalg
 {
@@ -301,7 +302,8 @@ namespace linalg
         template <typename archive>
         void save(archive &ar) const
         {
-            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", buffer_writer_type{m_vals, m_capacity})), "Failed to serialise special sparse matrix object.  Error when serialising the data buffer.");
+            auto bwriter = buffer_writer_type{m_vals, m_capacity};
+            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", bwriter)), "Failed to serialise special sparse matrix object.  Error when serialising the data buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nnz", m_nnz)), "Failed to serialise special sparse matrix object.  Failed to serialise the number of nonzero elements.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("shape", m_shape)), "Failed to serialise special sparse matrix object.  Failed to serialise the matrix shape.");
         }
@@ -309,7 +311,8 @@ namespace linalg
         template <typename archive>
         void load(archive &ar)
         {
-            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", buffer_reader_type{&m_vals, &m_capacity})), "Failed to serialise special sparse matrix object.  Error when serialising the data buffer.");
+            auto breader = buffer_reader_type{&m_vals, &m_capacity};
+            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", breader)), "Failed to serialise special sparse matrix object.  Error when serialising the data buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nnz", m_nnz)), "Failed to serialise special sparse matrix object.  Failed to serialise the number of nonzero elements.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("shape", m_shape)), "Failed to serialise special sparse matrix object.  Failed to serialise the matrix shape.");
         }
