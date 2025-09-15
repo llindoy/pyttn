@@ -611,7 +611,7 @@ namespace linalg
         template <typename archive>
         void save(archive &ar) const
         {
-            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", buffer_writer_type{m_vals, m_topo.m_max_nnz})), "Failed to serialise csr matrix object.  Error when serialising the data buffer.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", buffer_writer_type{m_vals, m_topo.m_nnz, m_topo.m_max_nnz})), "Failed to serialise csr matrix object.  Error when serialising the data buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("topology", m_topo)), "Failed to serialise csr matrix object.  Error when serialising the topology object.");
         }
 
@@ -619,9 +619,12 @@ namespace linalg
         void load(archive &ar)
         {
             size_type _max_nnz;
-            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", buffer_reader_type{&m_vals, &_max_nnz})), "Failed to deserialise csr matrix object.  Error when deserialising the data buffer.");
+            size_type nnz;
+            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", buffer_reader_type{&m_vals, &nnz, &_max_nnz})), "Failed to deserialise csr matrix object.  Error when deserialising the data buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("topology", m_topo)), "Failed to deserialise csr matrix object.  Error when deserialising the topology object.");
             ASSERT(_max_nnz == m_topo.m_max_nnz, "Failed do deserialise the values buffer and buffer object do not have the same maximum number of non-zeros.");
+            ASSERT(nnz == m_topo.m_nnz, "Failed do deserialise the values buffer and buffer object do not have the same maximum number of non-zeros.");
+
         }
 #endif
 

@@ -412,7 +412,7 @@ namespace linalg
         template <typename archive>
         void save(archive &ar) const
         {
-            auto bwriter = buffer_writer_type{m_buffer, m_totcapacity};
+            auto bwriter = buffer_writer_type{m_buffer, m_totsize, m_totcapacity};
             CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", bwriter)), "Failed to serialise tensor object.  Error when serialising the data buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("shape", m_shape)), "Failed to serialise tensor object.  Failed to serialise the tensor shape.");
         }
@@ -420,7 +420,8 @@ namespace linalg
         template <typename archive>
         void load(archive &ar)
         {
-            auto breader = buffer_reader_type{&m_buffer, &m_totcapacity};
+            size_type totsize;
+            auto breader = buffer_reader_type{&m_buffer, &totsize, &m_totcapacity};
             CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", breader)), "Failed to deserialise tensor object.  Error when deserialising the data buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("shape", m_shape)), "Failed to deserialise tensor object.  Failed to deserialise the tensor shape.");
             m_totsize = 1;
@@ -429,6 +430,7 @@ namespace linalg
                 m_totsize *= m_shape[i];
             }
             ASSERT(m_totsize <= m_totcapacity, "Failed to deserialise tensor object. The total size of the tensor is incompatible with the storage buffer size.");
+            ASSERT(m_totsize == totsize, "Failed to deserialise tensor object. The total size of the tensor is incompatible with the shape.");
             init_stride();
         }
 #endif
