@@ -44,6 +44,12 @@ namespace ttns
         template <typename Y, typename V>
         friend class operator_container;
 
+    protected:
+        sSOP<T> m_spf;
+        sSOP<T> m_mf;
+
+        operator_contraction_info<T> m_oci;
+        
     public:
         sop_term() {}
         sop_term(const sop_term &o) = default;
@@ -99,12 +105,6 @@ namespace ttns
             CALL_AND_HANDLE(ar(cereal::make_nvp("contraction_info", m_oci)), "Failed to serialise operator term object.  Error when serialising the contraction info.");
         }
 #endif
-
-    protected:
-        sSOP<T> m_spf;
-        sSOP<T> m_mf;
-
-        operator_contraction_info<T> m_oci;
     };
 
     template <typename T>

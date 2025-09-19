@@ -65,6 +65,21 @@ namespace ttns
             ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");
             CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, 1}, {hamiltonian_sum_threads}, {}, set_var_threads));
         }
+
+        
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive &ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise one site dmrg object..");
+        }
+        template <typename archive>
+        void load(archive &ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise one site dmrg object..");
+        }
+#endif
     };
 
     template <typename T, typename backend>
@@ -114,6 +129,20 @@ namespace ttns
             ASSERT(hamiltonian_sum_threads == 1 || set_var_threads == 1, "Parallelism over both Hamiltonian sum and set variables is currently not supported.");
             CALL_AND_RETHROW(base_type::initialise(A, ham, {krylov_dim, 1}, {hamiltonian_sum_threads}, {eigensolver_krylov_dim, neigenvalues}, set_var_threads));
         }
+
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive &ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise one site dmrg object..");
+        }
+        template <typename archive>
+        void load(archive &ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise one site dmrg object..");
+        }
+#endif
     };
 
     template <typename T, typename backend>

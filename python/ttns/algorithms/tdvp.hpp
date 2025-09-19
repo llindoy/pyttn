@@ -118,6 +118,18 @@ void init_tdvp_core(py::module &m, const std::string &label)
             :param attempt_expansion: Whether or not to attempt subspace expansion throughout the update scheme.  (Default: False)
             :type attempt_expansion: bool, optional
           )mydelim")
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const tdvp & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](tdvp & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const tdvp& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<tdvp>(t);}
+         ))  
+#endif  
         .def("backend", [](const tdvp &)
              { return backend::label(); });
 }
@@ -185,7 +197,20 @@ void init_tdvp_adaptive(py::module &m, const std::string &label)
              { return o(A, sop, update_environment); }, py::arg(), py::arg(), py::arg("update_env") = false)
         .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion") = false)
         .def("backend", [](const atdvp &)
-             { return backend::label(); });
+             { return backend::label(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const atdvp & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](atdvp & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const atdvp& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<atdvp>(t);}
+         ))  
+#endif  
+             ;
 }
 
 template <typename T, template <typename, typename> class ttn_class, typename backend>
@@ -247,7 +272,20 @@ void init_tdvp_adaptive_ts_cost(py::module &m, const std::string &label)
              { return o(A, sop, update_environment); }, py::arg(), py::arg(), py::arg("update_env") = false)
         .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion") = false)
         .def("backend", [](const atdvp &)
-             { return backend::label(); });
+             { return backend::label(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const atdvp & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](atdvp & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const atdvp& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<atdvp>(t);}
+         ))  
+#endif  
+             ;
 }
 
 template <typename T, typename backend>

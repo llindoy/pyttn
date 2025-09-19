@@ -560,15 +560,25 @@ namespace ttns
             bp.clear();
         }
 
+
 #ifdef CEREAL_LIBRARY_FOUND
     public:
         template <typename archive>
         void serialize(archive &ar)
         {
-            CALL_AND_HANDLE(ar(cereal::make_nvp("contraction_info", m_contraction_info)), "Failed to serialise sum of product operator.  Failed to serialise array of product operators.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("operators", m_mode_operators)), "Failed to serialise sum of product operator.  Failed to serialise array of product operators.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("mode_dimension", m_mode_dimension)), "Failed to serialise sum of product operator.  Failed to serialise the number of modes.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("Eshift", _m_Eshift)), "Failed to serialise multiset_sop_operator object.  Error when serialising Eshift");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("Eshiftv", m_Eshift)), "Failed to serialise multiset_sop_operator object.  Error when serialising Eshift value");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("time_dependent_operators_set", m_time_dependent_operators_set)), "Failed to serialise multiset_sop_operator object.  Error when serialising whether time-dependent operators have been set");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("time_dependent_coefficients_set", m_time_dependent_coefficients_set)), "Failed to serialise multiset_sop_operator object.  Error when serialising whether time-dependent coefficients have been set");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("time_dependent", m_time_dependent)), "Failed to serialise multiset_sop_operator object.  Error when serialising whether the object is time-dependent");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("contraction_info", m_contraction_info)), "Failed to serialise multiset_sop_operator object.  Error when serialising the contraction info");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("mode_dimension", m_mode_dimension)), "Failed to serialise multiset_sop_operator object.  Error when serialising the mode dimension info");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("indices", m_indices)), "Failed to serialise multiset_sop_operator object.  Error when serialising the mode indices info");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("nset", m_nset)), "Failed to serialise multiset_sop_operator object.  Error when serialising the nubmer of set variables");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("time_dependent_operators", m_time_dependent_operators)), "Failed to serialise multiset_sop_operator object.  Error when serialising whether or not the object has time-dependent operators");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("time_dependent_coefficient", m_time_dependent_coefficients)), "Failed to serialise multiset_sop_operator object.  Error when serialising whether or not the object has time-dependent coefficients");
         }
+
 #endif
     }; // class multiset_sop_operator
 

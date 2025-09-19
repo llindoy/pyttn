@@ -30,12 +30,7 @@
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 
-#ifdef CEREAL_LIBRARY_FOUND
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/json.hpp>
-#include <fstream>
-#include <sstream>
-#endif
+
 
 namespace py = pybind11;
 
@@ -442,72 +437,15 @@ void init_ttn(py::module &m, const std::string &label)
          .def("backend", [](const _ttn &)
               { return backend::label(); })
 #ifdef CEREAL_LIBRARY_FOUND
-         .def("save", [](const _ttn & a, const std::string& ofname, bool as_binary)
-         {
-            if(as_binary)
-            {
-                std::ofstream os(ofname, std::ios::binary);
-                if(!os)
-                {
-                    RAISE_EXCEPTION("Failed to open output file stream");
-                }
-                cereal::BinaryOutputArchive archive(os);
-                archive(a);
-            }
-            else
-            {
-                std::ofstream os(ofname);
-                if(!os)
-                {
-                    RAISE_EXCEPTION("Failed to open output file stream");
-                }
-
-                cereal::JSONOutputArchive archive(os);
-                archive(a);
-            }
-         }, py::arg(), py::arg("as_binary")=true)
-        .def("load", [](_ttn & a, const std::string& ifname, bool as_binary)
-         {
-            if(as_binary)
-            {
-                std::ifstream is(ifname, std::ios::binary);
-                if(!is)
-                {
-                    RAISE_EXCEPTION("Failed to open input file stream");
-                }
-                cereal::BinaryInputArchive archive(is);
-                archive(a);
-            }
-            else
-            {
-                std::ifstream is(ifname);
-                if(!is)
-                {
-                    RAISE_EXCEPTION("Failed to open input file stream");
-                }
-                cereal::JSONInputArchive archive(is);
-                archive(a);
-            }
-         }, py::arg(), py::arg("as_binary")=true)
-
+         .def("save", 
+            [](const _ttn & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](_ttn & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
          .def(py::pickle(
-            [](const _ttn& a){  // __getstate__
-                std::ostringstream oss;
-                {
-                    cereal::JSONOutputArchive archive(oss);
-                    archive(a);
-                }
-                return py::make_tuple(oss.str());
-            },
-            [](py::tuple t){    // __setstate__
-                _ttn a;
-                std::istringstream iss( t[0].cast<std::string>());
-                {
-                    cereal::JSONInputArchive archive(iss);
-                    archive(a);
-                }
-                return a;
-            }
+            [](const _ttn& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<_ttn>(t);}
          ))
 #endif
 

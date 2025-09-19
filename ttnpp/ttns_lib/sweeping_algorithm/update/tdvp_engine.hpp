@@ -47,6 +47,16 @@ namespace ttns
 
         using parameter_list = simple_update_parameter_list;
 
+    protected:
+        // the krylov subspace engine
+        expmv_type m_expmv;
+
+        real_type m_dt;
+        real_type m_t;
+        T m_coeff;
+
+        bool m_use_time_dependent_hamiltonian = true;
+
     public:
         tdvp_engine() : m_dt(0), m_t(0), m_coeff(1) {}
         tdvp_engine(const ttn_type &A, size_type krylov_dim = 12, size_type ndt = 1) : m_dt(0), m_t(0), m_coeff(1)
@@ -191,16 +201,28 @@ namespace ttns
             }
         }
 
-    protected:
-        // the krylov subspace engine
-        expmv_type m_expmv;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive& ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("expmv", m_expmv)), "Failed to serialise tdvp engine.  Failed to serialise expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("t", m_t)), "Failed to serialise tdvp engine.  Failed to serialise current time.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("dt", m_dt)), "Failed to serialise tdvp engine.  Failed to serialise timestep.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", m_coeff)), "Failed to serialise tdvp engine.  Failed to serialise coeff.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("td", m_use_time_dependent_hamiltonian)), "Failed to serialise tdvp engine.  Failed to serialise use time-dependent Hamiltonian.");
+        }
 
-        real_type m_dt;
-        real_type m_t;
-        T m_coeff;
-
-        bool m_use_time_dependent_hamiltonian = true;
-
+        template <typename archive>
+        void load(archive& ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("expmv", m_expmv)), "Failed to serialise tdvp engine.  Failed to serialise expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("t", m_t)), "Failed to serialise tdvp engine.  Failed to serialise current time.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("dt", m_dt)), "Failed to serialise tdvp engine.  Failed to serialise timestep.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", m_coeff)), "Failed to serialise tdvp engine.  Failed to serialise coeff.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("td", m_use_time_dependent_hamiltonian)), "Failed to serialise tdvp engine.  Failed to serialise use time-dependent Hamiltonian.");
+        }
+#endif
     }; // class tdvp_engine
 
     // implementation of the tdvp update for a multiset ttn type
@@ -226,6 +248,18 @@ namespace ttns
         using expmv_type = utils::expmv<T, backend, false>;
 
         using parameter_list = simple_update_parameter_list;
+
+    protected:
+        // the krylov subspace engine
+        expmv_type m_expmv;
+
+        real_type m_dt;
+        real_type m_t;
+        T m_coeff;
+
+        bool m_use_time_dependent_hamiltonian = true;
+
+        multiset_update_buffer<T, backend> mbuf;
 
     public:
         tdvp_engine() : m_dt(0), m_t(0), m_coeff(1) {}
@@ -385,17 +419,31 @@ namespace ttns
             }
         }
 
-    protected:
-        // the krylov subspace engine
-        expmv_type m_expmv;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive& ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("expmv", m_expmv)), "Failed to serialise tdvp engine.  Failed to serialise expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("t", m_t)), "Failed to serialise tdvp engine.  Failed to serialise current time.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("dt", m_dt)), "Failed to serialise tdvp engine.  Failed to serialise timestep.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", m_coeff)), "Failed to serialise tdvp engine.  Failed to serialise coeff.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("td", m_use_time_dependent_hamiltonian)), "Failed to serialise tdvp engine.  Failed to serialise use time-dependent Hamiltonian.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("buf", mbuf)), "Failed to serialise tdvp engine.  Failed to serialise buffer.");
+        }
+        template <typename archive>
+        void load(archive& ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("expmv", m_expmv)), "Failed to serialise tdvp engine.  Failed to serialise expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("t", m_t)), "Failed to serialise tdvp engine.  Failed to serialise current time.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("dt", m_dt)), "Failed to serialise tdvp engine.  Failed to serialise timestep.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", m_coeff)), "Failed to serialise tdvp engine.  Failed to serialise coeff.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("td", m_use_time_dependent_hamiltonian)), "Failed to serialise tdvp engine.  Failed to serialise use time-dependent Hamiltonian.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("buf", mbuf)), "Failed to serialise tdvp engine.  Failed to serialise buffer.");
 
-        real_type m_dt;
-        real_type m_t;
-        T m_coeff;
+        }
+#endif
 
-        bool m_use_time_dependent_hamiltonian = true;
-
-        multiset_update_buffer<T, backend> mbuf;
     }; // class tdvp_engine
 
 }

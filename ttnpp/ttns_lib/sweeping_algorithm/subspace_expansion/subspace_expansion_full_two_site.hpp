@@ -46,9 +46,46 @@ namespace ttns
 
         using bond_matrix_type = typename ttn<T, backend>::bond_matrix_type;
 
+    protected:
+        two_site_variations<T, backend> m_twosite;
+
+        vec_type m_rvec;
+        mat_type m_trvec;
+        mat_type m_trvec2;
+
+        // add in a second set of indices
+        linalg::vector<size_type> m_inds;
+        linalg::vector<T> m_coeffs;
+        triad_type m_2s_1;
+        std::vector<linalg::tensor<T, 3, backend>> m_2s_2;
+
+        size_type m_max_two_site_energy_terms = 0;
+        size_type m_twosite_capacity = 0;
+        size_type m_twosite_size = 0;
+        real_type m_spawning_threshold = -1.0;
+        real_type m_unoccupied_threshold = -1.0;
+        size_type m_minimum_unoccupied = 0;
+        size_type m_neigenvalues = 2;
+        size_type m_onesite_expansions = 0;
+        size_type m_twosite_expansions = 0;
+        size_type m_maxcapacity;
+        size_type m_max_dim = 0;
+
+        orthogonality::truncation_mode m_trunc_mode = orthogonality::truncation_mode::second_order_truncation;
+
+        linalg::singular_value_decomposition<mat_type, true> m_svd;
+        mat_type m_twosite_energy;
+        mat_type m_twosite_temp;
+
+        mat_type m_U;
+        linalg::diagonal_matrix<real_type, backend> m_S;
+        mat_type m_V;
+        bool m_only_apply_when_no_unoccupied = false;
+        bool m_eval_but_dont_apply = false;
+
     public:
         subspace_expansion_full_two_site() : m_twosite() {}
-        subspace_expansion_full_two_site(const ttn<T, backend> &A, const env_type &ham, size_type seed = 0) : m_twosite(seed)
+        subspace_expansion_full_two_site(const ttn<T, backend> &A, const env_type &ham) : m_twosite()
         {
             CALL_AND_HANDLE(initialise(A, ham), "Failed to construct subspace_expansion_full_two_site.");
         }
@@ -102,14 +139,14 @@ namespace ttns
                     }
                 }
 
-                size_type max_two_site_energy_terms = 0;
+                m_max_two_site_energy_terms = 0;
 
                 for (const auto &hinf : sop.contraction_info())
                 {
                     size_type two_site_energy_terms = twosite::get_nterms(hinf());
-                    if (two_site_energy_terms > max_two_site_energy_terms)
+                    if (two_site_energy_terms > m_max_two_site_energy_terms)
                     {
-                        max_two_site_energy_terms = two_site_energy_terms;
+                        m_max_two_site_energy_terms = two_site_energy_terms;
                     }
                 }
 
@@ -118,19 +155,20 @@ namespace ttns
                 m_twosite_energy.resize(1, mtwosite_size);
                 m_twosite_temp.resize(1, mtwosite_size);
 
-                CALL_AND_HANDLE(m_2s_1.resize(max_two_site_energy_terms), "Failed to resize two site spf buffer.");
-                CALL_AND_HANDLE(m_2s_2.resize(max_two_site_energy_terms), "Failed to resize two site mf buffer.");
+                CALL_AND_HANDLE(m_2s_1.resize(m_max_two_site_energy_terms), "Failed to resize two site spf buffer.");
+                CALL_AND_HANDLE(m_2s_2.resize(m_max_two_site_energy_terms), "Failed to resize two site mf buffer.");
 
-                for (size_type i = 0; i < max_two_site_energy_terms; ++i)
+                for (size_type i = 0; i < m_max_two_site_energy_terms; ++i)
                 {
                     CALL_AND_HANDLE(m_2s_1[i].reallocate(maxcapacity), "Failed to reallocate two site spf buffer.");
                     CALL_AND_HANDLE(m_2s_2[i].reallocate(maxcapacity), "Failed to reallocate two site mf buffer.");
                 }
 
                 m_maxcapacity = maxcapacity;
+                m_twosite_capacity = mtwosite_capacity;
+                m_twosite_size = mtwosite_size;
                 m_inds.resize(maxnmodes);
                 m_coeffs.resize(maxnmodes);
-                m_dim.resize(maxnmodes);
 
                 m_rvec.reallocate(maxcapacity);
                 m_trvec.reallocate(maxcapacity);
@@ -162,6 +200,9 @@ namespace ttns
                 CALL_AND_HANDLE(m_trvec2.clear(), "Failed to clear the rvec object.");
                 CALL_AND_HANDLE(m_2s_1.clear(), "Failed to clear the rvec object.");
                 CALL_AND_HANDLE(m_2s_2.clear(), "Failed to clear the rvec object.");
+                m_twosite_capacity = 0;
+                m_maxcapacity=0;
+                m_twosite_size = 0;
                 m_onesite_expansions = 0;
                 m_twosite_expansions = 0;
                 m_twosite_energy.clear();
@@ -643,42 +684,70 @@ namespace ttns
             }
             return nunocc;
         }
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive& ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("maxmodes", m_inds.size())), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("maxtwosite", m_max_two_site_energy_terms)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("spawning_threshold", m_spawning_threshold)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("unoccupied_threshold", m_unoccupied_threshold)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("min_unoccupied", m_minimum_unoccupied)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("neigs", m_neigenvalues)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("onesite", m_onesite_expansions)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("twosite", m_twosite_expansions)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("max_capacity", m_maxcapacity)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("max_dim", m_max_dim)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("trunc_mode", m_trunc_mode)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("twosite_capacity", m_twosite_capacity)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("twosite_size", m_twosite_size)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("apply_when_no_unoccupied", m_only_apply_when_no_unoccupied)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eval_but_dont_apply", m_eval_but_dont_apply)), "Failed to serialise twosite subspace expansions engine.");
+        }
 
-    protected:
-        two_site_variations<T, backend> m_twosite;
+        template <typename archive>
+        void load(archive& ar) 
+        {
+            size_type maxnmodes;
+            CALL_AND_HANDLE(ar(cereal::make_nvp("maxmodes", maxnmodes)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("maxtwosite", m_max_two_site_energy_terms)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("spawning_threshold", m_spawning_threshold)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("unoccupied_threshold", m_unoccupied_threshold)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("min_unoccupied", m_minimum_unoccupied)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("neigs", m_neigenvalues)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("onesite", m_onesite_expansions)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("twosite", m_twosite_expansions)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("max_capacity", m_maxcapacity)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("max_dim", m_max_dim)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("trunc_mode", m_trunc_mode)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("twosite_capacity", m_twosite_capacity)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("twosite_size", m_twosite_size)), "Failed to serialise twosite subspace expansions engine.");            
+            CALL_AND_HANDLE(ar(cereal::make_nvp("apply_when_no_unoccupied", m_only_apply_when_no_unoccupied)), "Failed to serialise twosite subspace expansions engine.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eval_but_dont_apply", m_eval_but_dont_apply)), "Failed to serialise twosite subspace expansions engine.");
 
-        vec_type m_rvec;
-        mat_type m_trvec;
-        mat_type m_trvec2;
+            m_twosite = twosite();
+            m_rvec.reallocate(m_maxcapacity);
+            m_trvec.reallocate(m_maxcapacity);
+            m_trvec2.reallocate(m_maxcapacity);
 
-        std::vector<size_type> m_dim;
+            m_inds.resize(maxnmodes);
+            m_coeffs.resize(maxnmodes);
 
-        // add in a second set of indices
-        linalg::vector<size_type> m_inds;
-        linalg::vector<T> m_coeffs;
-        triad_type m_2s_1;
-        std::vector<linalg::tensor<T, 3, backend>> m_2s_2;
+            CALL_AND_HANDLE(m_2s_1.resize(m_max_two_site_energy_terms), "Failed to resize two site spf buffer.");
+            CALL_AND_HANDLE(m_2s_2.resize(m_max_two_site_energy_terms), "Failed to resize two site mf buffer.");
+            for (size_type i = 0; i < m_max_two_site_energy_terms; ++i)
+            {
+                CALL_AND_HANDLE(m_2s_1[i].reallocate(m_maxcapacity), "Failed to reallocate two site spf buffer.");
+                CALL_AND_HANDLE(m_2s_2[i].reallocate(m_maxcapacity), "Failed to reallocate two site mf buffer.");
+            }
 
-        real_type m_spawning_threshold = -1.0;
-        real_type m_unoccupied_threshold = -1.0;
-        size_type m_minimum_unoccupied = 0;
-        size_type m_neigenvalues = 2;
-        size_type m_onesite_expansions = 0;
-        size_type m_twosite_expansions = 0;
-        size_type m_maxcapacity;
-        size_type m_max_dim = 0;
-
-        orthogonality::truncation_mode m_trunc_mode = orthogonality::truncation_mode::second_order_truncation;
-
-        linalg::singular_value_decomposition<mat_type, true> m_svd;
-        mat_type m_twosite_energy;
-        mat_type m_twosite_temp;
-
-        mat_type m_U;
-        linalg::diagonal_matrix<real_type, backend> m_S;
-        mat_type m_V;
-        bool m_only_apply_when_no_unoccupied = false;
-        bool m_eval_but_dont_apply = false;
+            m_twosite_energy.reallocate(m_twosite_capacity);
+            m_twosite_temp.reallocate(m_twosite_capacity);
+            m_twosite_energy.resize(1, m_twosite_size);
+            m_twosite_temp.resize(1, m_twosite_size);
+        }
+#endif
 
     }; // class subspace_expansion_full_two_site
 } // namespace ttns

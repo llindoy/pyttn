@@ -118,7 +118,21 @@ void init_site_operators(py::module &m, const std::string &label)
         .def("apply", static_cast<void (siteop::*)(const_vector_ref, vector_ref, real_type, real_type)>(&siteop::apply))
         .def("__str__", &siteop::to_string)
         .def("backend", [](const siteop &)
-             { return backend::label(); });
+             { return backend::label(); })
+    #ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const siteop & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](siteop & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const siteop& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<siteop>(t);}
+         ))  
+#endif  
+             
+             ;
 
     // the base primitive operator type
     py::class_<prim>(m, (std::string("primitive_") + label).c_str())
@@ -141,7 +155,21 @@ void init_site_operators(py::module &m, const std::string &label)
         .def(py::init())
         .def(py::init<size_type>())
         .def("complex_dtype", [](const ident &)
-             { return !std::is_same<T, real_type>::value; });
+             { return !std::is_same<T, real_type>::value; })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const ident & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](ident & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const ident& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<ident>(t);}
+         ))  
+#endif  
+             
+             ;
 
     // a dense matrix representation of the operator
     py::class_<dmat, prim>(m, (std::string("matrix_") + label).c_str())
@@ -154,7 +182,21 @@ void init_site_operators(py::module &m, const std::string &label)
                     return dmat(mat); }))
         .def("complex_dtype", [](const dmat &)
              { return !std::is_same<T, real_type>::value; })
-        .def("matrix", &dmat::mat);
+        .def("matrix", &dmat::mat)
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const dmat & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](dmat & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const dmat& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<dmat>(t);}
+         ))  
+#endif          
+        
+        ;
 
     // a csr matrix representation of an operator
     using csr_type = linalg::csr_matrix<T, backend>;
@@ -165,7 +207,21 @@ void init_site_operators(py::module &m, const std::string &label)
         .def(py::init<const csr_type &>())
         .def("complex_dtype", [](const spmat &)
              { return !std::is_same<T, real_type>::value; })
-        .def("matrix", &spmat::mat);
+        .def("matrix", &spmat::mat)
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const spmat & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](spmat & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const spmat& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<spmat>(t);}
+         ))  
+#endif          
+        
+        ;
 
     // a diagonal matrix representation of an operator
     using diag_type = linalg::diagonal_matrix<T, backend>;
@@ -185,7 +241,21 @@ void init_site_operators(py::module &m, const std::string &label)
         .def(py::init<const linalg::tensor<T, 1> &, size_t, size_t>())
         .def("complex_dtype", [](const diagmat &)
              { return !std::is_same<T, real_type>::value; })
-        .def("matrix", &diagmat::mat);
+        .def("matrix", &diagmat::mat)
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const diagmat & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](diagmat & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const diagmat& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<diagmat>(t);}
+         ))  
+#endif  
+        
+        ;
 }
 
 template <typename real_type, typename backend>

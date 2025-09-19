@@ -454,10 +454,11 @@ namespace ttns
         void serialize(archive &ar)
         {
             CALL_AND_HANDLE(ar(cereal::make_nvp("operators", m_mode_operators)), "Failed to serialise sum of product operator.  Failed to serialise array of operators.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", m_coeff)), "Failed to serialise sum of product operator.  Failed to serialise array of operators.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("coeffv", m_coeff)), "Failed to serialise sum of product operator.  Failed to serialise array of operators.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", _m_coeff)), "Failed to serialise sum of product operator.  Failed to serialise array of operators.");
         }
 #endif
-    }; // class product_operator
+    }; 
 
     template <typename T, typename backend>
     std::ostream &operator<<(std::ostream &os, const product_operator<T, backend> &t)

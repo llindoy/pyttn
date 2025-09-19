@@ -25,6 +25,13 @@
 #include "system_information.hpp"
 #include "operator_dictionaries/default_operator_dictionaries.hpp"
 
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/types/vector.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/list.hpp>
+#include <cereal/types/utility.hpp>
+
+#endif
 namespace ttns
 {
 
@@ -34,6 +41,11 @@ namespace ttns
 
     class sOP
     {
+    protected:
+        std::string m_op_data;
+        size_t m_mode;
+        bool m_fermionic;
+
     public:
         sOP() : m_fermionic(false) {}
         sOP(const std::string &op, size_t mode) : m_op_data(op), m_mode(mode), m_fermionic(false) {}
@@ -77,10 +89,17 @@ namespace ttns
             }
         }
 
-    protected:
-        std::string m_op_data;
-        size_t m_mode;
-        bool m_fermionic;
+
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void serialize(archive &ar) 
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("opdata", m_op_data)), "Failed to serialise sOP.  Failed to serialise opdata.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("mode", m_mode)), "Failed to serialise sOP.  Failed to serialise mode.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("fermionic", m_fermionic)), "Failed to serialise sOP.  Failed to serialise fermionic.");
+        }        
+#endif
     };
 
     inline std::ostream &operator<<(std::ostream &os, const ttns::sOP &op)
@@ -136,6 +155,9 @@ namespace ttns
         using const_iterator = typename std::list<sOP>::const_iterator;
         using reverse_iterator = typename std::list<sOP>::reverse_iterator;
         using const_reverse_iterator = typename std::list<sOP>::const_reverse_iterator;
+
+    protected:
+        std::list<sOP> m_ops;
 
     public:
         sPOP() {}
@@ -249,8 +271,15 @@ namespace ttns
         const_reverse_iterator rbegin() const { return const_reverse_iterator(m_ops.rbegin()); }
         const_reverse_iterator rend() const { return const_reverse_iterator(m_ops.rend()); }
 
-    protected:
-        std::list<sOP> m_ops;
+#ifdef CEREAL_LIBRARY_FOUND 
+    public:
+        template <typename archive>
+        void serialize(archive &ar) 
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("opdata", m_ops)), "Failed to serialise sPOP.  Failed to serialise ops.");
+        }        
+#endif
+
     };
 
     inline std::ostream &operator<<(std::ostream &os, const ttns::sPOP &op)
@@ -355,6 +384,10 @@ namespace ttns
         using reverse_iterator = typename sPOP::reverse_iterator;
         using const_reverse_iterator = typename sPOP::const_reverse_iterator;
         using function_type = typename literal::coeff<T>::function_type;
+
+    protected:
+        literal::coeff<T> m_coeff;
+        sPOP m_ops;
 
     public:
         sNBO() {}
@@ -481,9 +514,16 @@ namespace ttns
         const_reverse_iterator rbegin() const { return const_reverse_iterator(m_ops.rbegin()); }
         const_reverse_iterator rend() const { return const_reverse_iterator(m_ops.rend()); }
 
-    protected:
-        literal::coeff<T> m_coeff;
-        sPOP m_ops;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void serialize(archive &ar) 
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("opdata", m_ops)), "Failed to serialise sNBO.  Failed to serialise ops.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", m_coeff)), "Failed to serialise sNBO.  Failed to serialise coeff.");
+        }        
+#endif    
+    
     };
 
     template <typename T>
@@ -841,6 +881,16 @@ namespace ttns
     protected:
         container_type m_terms;
         std::string m_label;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void serialize(archive &ar) 
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("terms", m_terms)), "Failed to serialise sSOP.  Failed to serialise terms.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("label", m_label)), "Failed to serialise sSOP.  Failed to serialise label.");
+        }        
+#endif    
+
     };
 
     template <typename T>

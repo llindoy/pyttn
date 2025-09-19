@@ -47,6 +47,10 @@ namespace ttns
             void clear() {}
         };
 
+    protected:
+        container_type m_container;
+    
+    public:
         empty_environment() {}
         empty_environment(const empty_environment &o) = default;
         empty_environment(empty_environment &&o) = default;
@@ -78,8 +82,17 @@ namespace ttns
         inline void update_env_up(const environment_type &, const hnode &, node_type &, bool = false) {}
         inline void update_env_up(const environment_type &, const hnode &, node_type &, node_type &, bool = false) {}
 
-    protected:
-        container_type m_container;
+
+#ifdef CEREAL_LIBRARY_FOUND
+    template <typename archive> void save(archive& ar) const
+    {
+        CALL_AND_HANDLE(ar(cereal::make_nvp("container", m_container)), "Failed to serialise empty environment.");
+    }
+    template <typename archive> void load(archive& ar)
+    {
+        CALL_AND_HANDLE(ar(cereal::make_nvp("container", m_container)), "Failed to serialise empty environment.");
+    }
+#endif
     };
 
     template <typename T, typename backend, template <typename, typename> class ttn_class>
@@ -141,6 +154,10 @@ namespace ttns
     public:
         const size_type &Nonesite() const { return 0; }
         const size_type &Ntwosite() const { return 0; }
+#ifdef CEREAL_LIBRARY_FOUND
+    template <typename archive> void save(archive& /* ar*/) const{}
+    template <typename archive> void load(archive& /*ar*/){}
+#endif
 
     }; // class single_site
 
@@ -194,6 +211,11 @@ namespace ttns
         void update_bond_tensor(bond_matrix_type & /* r */, const environment_type & /* env */, env_node_type & /* h */, const env_type & /* op */) {}
         void advance_hamiltonian(ttn_type &, environment_type &, env_container_type &, env_type &) {}
         void advance_half_step() {}
+
+#ifdef CEREAL_LIBRARY_FOUND
+    template <typename archive> void save(archive& /* ar*/) const{}
+    template <typename archive> void load(archive& /*ar*/){}
+#endif
     };
 
     template <typename T, typename backend, template <typename, typename> class ttn_class, template <typename, typename, template <typename, typename> class> class Environment>

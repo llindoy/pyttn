@@ -27,6 +27,11 @@
 #include <type_traits>
 #include <vector>
 #include <list>
+#include <sstream>
+
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/types/string.hpp>
+#endif
 
 namespace ttns
 {
@@ -89,7 +94,7 @@ namespace ttns
         ntree(const ntree &tree) : m_root(nullptr), m_allocator(tree.m_allocator) { *this = tree; }
         ntree(const std::string &str) : m_root(nullptr)
         {
-            load(str);
+            load_from_string(str);
         }
 
         ~ntree() { clear(); }
@@ -137,7 +142,7 @@ namespace ttns
             return m_root->subtree_size();
         }
 
-        void load(const std::string &str)
+        void load_from_string(const std::string &str)
         {
             clear();
 
@@ -440,6 +445,25 @@ namespace ttns
             }
         }
 
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive &ar) const
+        {
+            std::ostringstream oss;
+            oss << (*m_root);
+            std::string tree = oss.str();
+            CALL_AND_HANDLE(ar(cereal::make_nvp("tree", tree)), "Failed to serialise ntree.");
+        }
+
+        template <typename archive>
+        void load(archive &ar)
+        {
+            std::string str;
+            CALL_AND_HANDLE(ar(cereal::make_nvp("tree", str)), "Failed to serialise ntree.");
+            this->load_from_string(str);
+        }
+#endif
     }; // class ntree
 
     template <typename T>

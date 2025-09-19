@@ -121,7 +121,7 @@ namespace linalg
             void load(Archive &archive)
             {    
                 using allocator = memory::allocator<T, blas_backend>;
-                size_type s, _cap;
+                size_type _cap;
                 std::vector<T> val;
                 //CALL_AND_HANDLE(archive(cereal::make_size_tag(s)), "Failed to deserialize cpu buffer.  Failed to read capacity.");
                 CALL_AND_HANDLE(archive(cereal::make_nvp("capacity", _cap)), "Failed to deserialise cpu buffer.  Failed to read size.");

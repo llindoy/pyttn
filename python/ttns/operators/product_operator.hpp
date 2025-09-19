@@ -24,6 +24,7 @@
 #include <pybind11/pytypes.h>
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
+#include "../../utils.hpp"
 
 namespace py = pybind11;
 
@@ -84,6 +85,20 @@ void init_product_operator(py::module &m, const std::string &label)
              { return !std::is_same<T, real_type>::value; })
         .def("__str__", [](const pop &o)
              {std::ostringstream oss; oss << o; return oss.str(); })
+
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const pop & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](pop & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const pop& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<pop>(t);}
+         ))  
+#endif  
+
         .def("backend", [](const pop &)
              { return backend::label(); });
 }

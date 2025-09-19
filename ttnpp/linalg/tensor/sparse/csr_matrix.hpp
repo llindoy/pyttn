@@ -289,8 +289,8 @@ namespace linalg
         template <typename archive>
         void save(archive &ar) const
         {
-            auto cind_writer = ibuffer_writer_type{m_colind, m_max_nnz};
-            auto rptr_writer = ibuffer_writer_type{m_rowptr, m_max_rows + 1};
+            auto cind_writer = ibuffer_writer_type{m_colind, m_nnz, m_max_nnz};
+            auto rptr_writer = ibuffer_writer_type{m_rowptr, m_shape[0]+1, m_max_rows + 1};
             CALL_AND_HANDLE(ar(cereal::make_nvp("colind", cind_writer)), "Failed to serialise csr topology object.  Error when serialising the colinds buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("rowptr", rptr_writer)), "Failed to serialise csr topology object.  Error when serialising the rowptr buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("shape", m_shape)), "Failed to serialise csr topology object.  Failed to serialise the csr topology shape.");
@@ -299,14 +299,17 @@ namespace linalg
 
         template <typename archive>
         void load(archive &ar)
-        {
-            auto cind_reader = ibuffer_reader_type{&m_colind, &m_max_nnz};
-            auto rptr_reader = ibuffer_reader_type{&m_rowptr, &m_max_rows};
+        {    
+            size_type cind_size, rptr_size;
+            auto cind_reader = ibuffer_reader_type{&m_colind, &cind_size, &m_max_nnz};
+            auto rptr_reader = ibuffer_reader_type{&m_rowptr, &rptr_size, &m_max_rows};
             CALL_AND_HANDLE(ar(cereal::make_nvp("colind", cind_reader)), "Failed to deserialise csr topology object.  Error when deserialising the colinds buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("rowptr", rptr_reader)), "Failed to deserialise csr topology object.  Error when deserialising the rowptr buffer.");
             m_max_rows = m_max_rows - 1;
             CALL_AND_HANDLE(ar(cereal::make_nvp("shape", m_shape)), "Failed to deserialise csr topology object.  Failed to deserialise the csr topology shape.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nnz", m_nnz)), "Failed to deserialise csr topology object.  Error when deserialising the number of non-zero elements in the matrix.");
+            ASSERT(cind_size == m_nnz, "Failed to deserialise csr topology object.  Colind array does not have the correct number of elements.");
+            ASSERT(rptr_size == m_shape[0]+1, "Failed to deserialise csr topology object.  Rowptr array does not have the correct number of elements.")
         }
 #endif
 

@@ -25,6 +25,13 @@
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+#include <fstream>
+#include <sstream>
+#endif
+
 namespace py = pybind11;
 
 namespace linalg
@@ -190,6 +197,85 @@ class other_backend<linalg::cuda_backend>
 public:
     using type = linalg::blas_backend;
 };
+#endif
+
+#ifdef CEREAL_LIBRARY_FOUND
+namespace serialisation_utilities
+{
+    template <typename obj>
+    static inline void save_obj(const obj &a, const std::string &ofname, bool as_binary)
+    {
+        if (as_binary)
+        {
+            std::ofstream os(ofname, std::ios::binary);
+            if (!os)
+            {
+                RAISE_EXCEPTION("Failed to open output file stream");
+            }
+            cereal::BinaryOutputArchive archive(os);
+            archive(a);
+        }
+        else
+        {
+            std::ofstream os(ofname);
+            if (!os)
+            {
+                RAISE_EXCEPTION("Failed to open output file stream");
+            }
+            cereal::JSONOutputArchive archive(os);
+            archive(a);
+        }
+    }
+
+    template <typename obj>
+    static inline void load_obj(obj &a, const std::string &ifname, bool as_binary)
+    {
+        if (as_binary)
+        {
+            std::ifstream is(ifname, std::ios::binary);
+            if (!is)
+            {
+                RAISE_EXCEPTION("Failed to open input file stream");
+            }
+            cereal::BinaryInputArchive archive(is);
+            archive(a);
+        }
+        else
+        {
+            std::ifstream is(ifname);
+            if (!is)
+            {
+                RAISE_EXCEPTION("Failed to open input file stream");
+            }
+            cereal::JSONInputArchive archive(is);
+            archive(a);
+        }
+    }
+
+    template <typename obj>
+    static inline py::tuple __getstate__(obj& a)
+    {
+        std::ostringstream oss;
+        {
+            cereal::JSONOutputArchive archive(oss);
+            archive(a);
+        }
+        return py::make_tuple(oss.str());
+    }
+
+    template <typename obj>
+    static inline obj __setstate__(py::tuple t)
+    {
+        obj a;
+        std::istringstream iss(t[0].cast<std::string>());
+        {
+            cereal::JSONInputArchive archive(iss);
+            archive(a);
+        }
+        return a;
+    }
+
+}
 #endif
 
 #endif // PYTHON_BINDING_UTILS_HPP_

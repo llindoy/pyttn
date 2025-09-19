@@ -12,7 +12,12 @@
  * limitations under the License
  */
 
-#define TTNS_REGISTER_COMPLEX_DOUBLE_OPERATOR
+#define TTNS_REGISTER_COMPLEX_DOUBLE
+
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+#endif
 
 #include <algorithm>
 #include <cstdint>

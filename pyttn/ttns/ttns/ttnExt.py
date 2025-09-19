@@ -1245,20 +1245,41 @@ class ttn(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def __rmatmul__(A: 'ttn', op) -> 'ttn':
+    def __rmatmul__(self, op) -> 'ttn':
         """Apply an operator to the ttn updating its value, returning the result as a new ttn
 
-        :param A: The ttn to apply the operator to
-        :type A: ttn
         :param op: The product operator to apply to the system
         :type op: site_operator or product_operator or sop_opertor
 
-        :return: The result of op@A
+        :return: The result of op@self
         :rtype: ttn
 
         """
         pass
 
+    @abstractmethod
+    def save(self, fname : str, as_binary: bool = True):
+        """Serialise the TTN object to a file fname.  
+
+        :param fname: The output file name
+        :type fname: str
+        :param as_binary: Whether or not to save as a binary file, defaults to True
+        :type as_binary: bool, optional
+
+        """
+        pass
+
+    @abstractmethod
+    def load(self, fname : str, as_binary: bool = True):
+        """Load a TTN object from the file fname.  
+        
+        :param fname: The input file name
+        :type fname: str
+        :param as_binary: Whether or not to load as a binary file, defaults to True
+        :type as_binary: bool, optional
+
+        """
+        pass
 
 ttn.register(ttn_complex)
 if _real_ttn_import:

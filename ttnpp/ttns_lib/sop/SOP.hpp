@@ -12,6 +12,15 @@
  * limitations under the License
  */
 
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/types/vector.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/unordered_map.hpp>
+#include <cereal/types/tuple.hpp>
+#include <cereal/types/utility.hpp>
+
+#endif
+
 #ifndef PYTTN_TTNS_LIB_SOP_SOP_HPP_
 #define PYTTN_TTNS_LIB_SOP_SOP_HPP_
 
@@ -36,6 +45,15 @@ namespace ttns
         using const_iterator = typename container_type::const_iterator;
         using reverse_iterator = typename container_type::reverse_iterator;
         using const_reverse_iterator = typename container_type::const_reverse_iterator;
+        
+    protected:
+        container_type m_ops; // the ops object has been made mutable so that we can edit it while using it as a key in a unordered_map.
+                              // additionally we have ensured that the
+        bool m_has_hash = false;
+        std::size_t m_hash;
+
+        mutable std::vector<bool> m_prepend_jw;
+        mutable bool m_mapped = false;
 
     public:
         prodOP() {}
@@ -321,14 +339,19 @@ namespace ttns
         bool contains_jordan_wigner_string() const { return m_prepend_jw.size() != 0; }
         bool prepend_jordan_wigner_string(size_t i) const { return m_prepend_jw[i]; }
 
-    protected:
-        container_type m_ops; // the ops object has been made mutable so that we can edit it while using it as a key in a unordered_map.
-                              // additionally we have ensured that the
-        bool m_has_hash = false;
-        std::size_t m_hash;
+#ifdef CEREAL_LIBRARY_FOUND
+        template <typename archive>
+        void serialize(archive &ar) 
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("ops", m_ops)), "Failed to serialise prodOP.  Failed to serialise ops.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("hashed", m_has_hash)), "Failed to serialise prodOP.  Failed to serialise hashed.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("hash", m_hash)), "Failed to serialise prodOP.  Failed to serialise hash.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("jw", m_prepend_jw)), "Failed to serialise prodOP.  Failed to serialise jw info.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("mapped", m_mapped)), "Failed to serialise prodOP.  Failed to serialise mapped.");
+        }        
+#endif
 
-        mutable std::vector<bool> m_prepend_jw;
-        mutable bool m_mapped = false;
+
     };
 
     inline bool operator==(const prodOP &A, const prodOP &B)
@@ -388,8 +411,13 @@ namespace ttns
         using function_type = typename literal::coeff<T>::function_type;
 
     protected:
-        iterator last_insert;
         literal::coeff<T> m_Eshift;
+
+        operator_dictionary_type m_opdict;
+        container_type m_terms;
+        std::string m_label;
+        bool m_allow_insertion = true;
+        std::vector<size_t> m_jordan_wigner_indices;
 
     public:
         SOP() {}
@@ -622,12 +650,6 @@ namespace ttns
         size_t jordan_wigner_index(size_t i) const { ASSERT(i < m_jordan_wigner_indices.size(), "Failed to access jordan wigner index.")
                                                      return m_jordan_wigner_indices[i]; }
 
-    protected:
-        operator_dictionary_type m_opdict;
-        container_type m_terms;
-        std::string m_label;
-        bool m_allow_insertion = true;
-        std::vector<size_t> m_jordan_wigner_indices;
 
     public:
         inline bool set_is_fermionic_mode(std::vector<bool> &is_fermion_mode) const
@@ -739,6 +761,21 @@ namespace ttns
             }
             return ret;
         }
+
+
+#ifdef CEREAL_LIBRARY_FOUND
+        template <typename archive>
+        void serialize(archive &ar) 
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("Eshift", m_Eshift)), "Failed to serialise SOP.  Failed to serialise Eshift.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("opdict", m_opdict)), "Failed to serialise SOP.  Failed to serialise opdict.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("terms", m_terms)), "Failed to serialise SOP.  Failed to serialise terms.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("label", m_label)), "Failed to serialise SOP.  Failed to serialise label.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("allow_insert", m_allow_insertion)), "Failed to serialise SOP.  Failed to serialise allow insertion.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("jwinds", m_jordan_wigner_indices)), "Failed to serialise SOP.  Failed to serialise jw indices.");
+        }        
+#endif
+
     };
 
     template <typename T>
@@ -766,6 +803,7 @@ namespace ttns
         }
         return os;
     }
+
 }
 
 /*

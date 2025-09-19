@@ -57,6 +57,10 @@ namespace ttns
         {
         };
 
+    protected:
+        subspace_expansion_full_two_site<T, backend> m_ss_expand;
+        real_type m_subspace_weighting_factor = real_type(1.0);
+
     public:
         variance_subspace_expansion_full_two_site() : m_ss_expand() {}
         variance_subspace_expansion_full_two_site(const ttn_type &A, const env_type &ham) : m_ss_expand()
@@ -169,10 +173,24 @@ namespace ttns
         const size_type &Nonesite() const { return m_ss_expand.Nonesite(); }
         const size_type &Ntwosite() const { return m_ss_expand.Ntwosite(); }
 
-    protected:
-        subspace_expansion_full_two_site<T, backend> m_ss_expand;
 
-        real_type m_subspace_weighting_factor = real_type(1.0);
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive& ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("ssexpander", m_ss_expand)), "Failed to serialise twosite variance subspace expansions engine.  Failed to serialise subspace expander.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("weighting", m_subspace_weighting_factor)), "Failed to serialise twosite variance subspace expansion engine.  Failed to serialise weighting factor.");
+        }
+
+        template <typename archive>
+        void load(archive& ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("ssexpander", m_ss_expand)), "Failed to serialise twosite variance subspace expansions engine.  Failed to serialise subspace expander.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("weighting", m_subspace_weighting_factor)), "Failed to serialise twosite variance subspace expansion engine.  Failed to serialise weighting factor.");
+        }
+#endif
+
     }; // class variance_subspace_expansion_full_two_site
 } // namespace ttns
 

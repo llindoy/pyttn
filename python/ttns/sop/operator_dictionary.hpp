@@ -15,6 +15,7 @@
 #ifndef PYTHON_BINDING_TTNS_OPERATOR_DICTIONARY_HPP
 #define PYTHON_BINDING_TTNS_OPERATOR_DICTIONARY_HPP
 
+#include "../../utils.hpp"
 #include <ttns_lib/operators/sop_operator.hpp>
 #include <sstream>
 
@@ -82,7 +83,21 @@ void init_operator_dictionary(py::module &m, const std::string &label)
             }
             return oss.str(); })
         .def("backend", [](const opdict &)
-             { return backend::label(); });
+             { return backend::label(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const opdict & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](opdict & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const opdict& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<opdict>(t);}
+         ))
+#endif
+             
+             ;
 }
 
 template <typename real_type, typename backend>

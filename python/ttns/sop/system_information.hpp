@@ -17,6 +17,7 @@
 
 #include <ttns_lib/sop/sSOP.hpp>
 #include <ttns_lib/sop/SOP.hpp>
+#include "../../utils.hpp"
 
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
@@ -79,6 +80,20 @@ inline void init_system_info(py::module &m)
         )mydelim")
         .def("__str__", [](const primitive_mode_data &o)
              {std::stringstream oss;   oss << o; return oss.str(); })
+
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const primitive_mode_data & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](primitive_mode_data & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const primitive_mode_data& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<primitive_mode_data>(t);}
+         ))  
+#endif  
+
         .def_property("type", static_cast<const mode_type &(primitive_mode_data::*)() const>(&primitive_mode_data::type), [](primitive_mode_data &o, mode_type i)
                       { o.type() = i; }, "The type of the mode. That is whether it is fermionic, bosonic, spin, tls, generic.")
         .def_property("lhd", static_cast<const size_t &(primitive_mode_data::*)() const>(&primitive_mode_data::lhd), [](primitive_mode_data &o, size_t i)
@@ -194,6 +209,20 @@ inline void init_system_info(py::module &m)
              { return mode_data(o); }, py::arg("memo"))
         .def("__str__", [](const mode_data &o)
              {std::stringstream oss;   oss << o; return oss.str(); })
+
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const mode_data & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](mode_data & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const mode_data& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<mode_data>(t);}
+         ))  
+#endif  
+
         .def("liouville_space", &mode_data::liouville_space, R"mydelim(
             Constructs a new mode_data object that corresponds to a Liouville space representation of this object.  This is done
             by taking each mode and appending a dual space operator following this mode of the same type. 
@@ -406,6 +435,20 @@ inline void init_system_info(py::module &m)
         )mydelim")
         .def("__str__", [](const system_modes &o)
              {std::stringstream oss;   oss << o; return oss.str(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const system_modes & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](system_modes & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const system_modes& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<system_modes>(t);}
+         ))  
+#endif  
+
+
         .def("__len__", &system_modes::nmodes, R"mydelim(
             :returns: The number of composite modes in the system
             :rtype: int

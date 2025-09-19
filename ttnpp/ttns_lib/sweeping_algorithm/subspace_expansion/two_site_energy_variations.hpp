@@ -341,6 +341,11 @@ namespace ttns
         }
     };
 
+#ifdef CEREAL_LIBRARY_FOUND
+
+#endif
+
+
 } // namespace ttns
 
 #endif // PYTTN_TTNS_LIB_SWEEPING_ALGORITHM_SUBSPACE_EXPANSION_TWO_SITE_ENERGY_VARIATIONS_HPP_//

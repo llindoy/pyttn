@@ -47,6 +47,15 @@ namespace ttns
         template <typename Y, typename V>
         friend class operator_container;
 
+    protected:
+        linalg::matrix<T, B> m_spf;
+        linalg::matrix<T, B> m_mf;
+
+        std::array<size_type, 2> m_matsize;
+        bool m_exploit_identity_opt = true;
+
+        operator_contraction_info<T> m_oci;
+
     public:
         operator_term() {}
         operator_term(const operator_term &o) = default;
@@ -191,20 +200,12 @@ namespace ttns
         {
             CALL_AND_HANDLE(ar(cereal::make_nvp("spf", m_spf)), "Failed to serialise operator term object.  Error when serialising the spf matrix.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("mf", m_mf)), "Failed to serialise operator term object.  Error when serialising the mf matrix.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("matsize", m_matsize)), "Failed to serialise operator term object.  Error when serialising the matrix size.");
 
             CALL_AND_HANDLE(ar(cereal::make_nvp("contraction_info", m_oci)), "Failed to serialise operator term object.  Error when serialising the contraction info.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("use_idopt", m_exploit_identity_opt)), "Failed to serialise operator term object.  Error when serialising the contraction info.");
         }
 #endif
-
-    protected:
-        linalg::matrix<T, B> m_spf;
-        linalg::matrix<T, B> m_mf;
-
-        std::array<size_type, 2> m_matsize;
-        bool m_exploit_identity_opt = true;
-
-        operator_contraction_info<T> m_oci;
     };
 
     template <typename T, typename backend>
@@ -400,9 +401,14 @@ namespace ttns
 #ifdef CEREAL_LIBRARY_FOUND
     public:
         template <typename archive>
-        void serialize(archive &ar)
+        void save(archive &ar) const
         {
             CALL_AND_HANDLE(ar(cereal::make_nvp("terms", m_term)), "Failed to serialise operator node object.  Error when serialising the terms.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("idspf", m_idmatspf)), "Failed to serialise operator node object.  Error when serialising the identity spf.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("idmf", m_idmatmf)), "Failed to serialise operator node object.  Error when serialising the identity spf.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("hasid", m_has_idmat)), "Failed to serialise operator node object.  Error when serialising the whether the object has identity matrices.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("use_id", m_exploit_identity_opt)), "Failed to serialise operator node object.  Error when serialising the whether to use the identity optimisation.");
+
         }
 #endif
 

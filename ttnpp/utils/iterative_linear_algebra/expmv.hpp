@@ -63,15 +63,17 @@ namespace utils
         linalg::vector<value_type, linalg::blas_backend> m_temp2;
 
         size_type m_krylov_dim;
+        size_type m_dim;
         size_type m_cur_order;
         size_type m_istride;
         real_type m_eps;
         real_type m_gamma;
         real_type m_delta;
 
+
     public:
-        expmv_base() : m_arnoldi(), m_krylov_dim(16), m_cur_order(0), m_istride(1), m_eps(std::numeric_limits<real_type>::epsilon() * 1e3), m_gamma(0.8), m_delta(0.9) {}
-        expmv_base(size_type krylov_dim, size_type dim, real_type eps = std::numeric_limits<real_type>::epsilon() * 1e3) : m_arnoldi(), m_krylov_dim(krylov_dim), m_cur_order(0), m_istride(1), m_eps(eps), m_gamma(0.8), m_delta(0.9) { CALL_AND_HANDLE(resize(krylov_dim, dim), "Failed to construct krylov subspace integrator."); }
+        expmv_base() : m_arnoldi(), m_krylov_dim(16), m_dim(0), m_cur_order(0), m_istride(1), m_eps(std::numeric_limits<real_type>::epsilon() * 1e3), m_gamma(0.8), m_delta(0.9) {}
+        expmv_base(size_type krylov_dim, size_type dim, real_type eps = std::numeric_limits<real_type>::epsilon() * 1e3) : m_arnoldi(), m_krylov_dim(krylov_dim), m_dim(dim), m_cur_order(0), m_istride(1), m_eps(eps), m_gamma(0.8), m_delta(0.9) { CALL_AND_HANDLE(resize(krylov_dim, dim), "Failed to construct krylov subspace integrator."); }
         expmv_base(const expmv_base &o) = default;
         expmv_base(expmv_base &&o) = default;
 
@@ -83,6 +85,7 @@ namespace utils
             try
             {
                 m_krylov_dim = krylov_dim;
+                m_dim = dim;
                 CALL_AND_HANDLE(m_arnoldi.resize(krylov_dim, dim), "Failed to resize arnoldi iteration engine.");
                 CALL_AND_HANDLE(m_eigensolver.resize(krylov_dim, false), "Failed to resize upper_hessenberg_eigensolver.");
                 CALL_AND_HANDLE(m_e1.resize(krylov_dim), "Failed to resize the e1 vector.");
@@ -113,6 +116,7 @@ namespace utils
             try
             {
                 m_krylov_dim = 0;
+                m_dim = 0;
                 CALL_AND_HANDLE(m_arnoldi.clear(), "Failed to resize arnoldi iteration engine.");
                 CALL_AND_HANDLE(m_eigensolver.clear(), "Failed to resize upper_hessenberg_eigensolver.");
                 CALL_AND_HANDLE(m_e1.clear(), "Failed to resize the e1 vector.");
@@ -134,6 +138,7 @@ namespace utils
         real_type &error_tolerance() { return m_eps; }
 
         const size_type &krylov_dim() const { return m_krylov_dim; }
+        const size_type &dim() const { return m_dim; }
 
         // accessors for the safety parameters
         const real_type &gamma() const { return m_gamma; }
@@ -411,6 +416,35 @@ namespace utils
                 RAISE_EXCEPTION("Failed to compute local error estimate.");
             }
         }
+
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive &ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("krylov_dim", m_krylov_dim)), "Failed to serialise arnoldi expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("dim", m_dim)), "Failed to serialise arnoldi expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("istride", m_istride)), "Failed to serialise arnoldi expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eps", m_eps)), "Failed to serialise arnoldi expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("gamma", m_gamma)), "Failed to serialise arnoldi expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("delta", m_delta)), "Failed to serialise arnoldi expmv.");
+
+        }
+        template <typename archive>
+        void load(archive &ar)
+        {
+            size_type krylov_dim, dim;
+            CALL_AND_HANDLE(ar(cereal::make_nvp("krylov_dim", krylov_dim)), "Failed to serialise arnoldi expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("dim", dim)), "Failed to serialise arnoldi expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("istride", m_istride)), "Failed to serialise arnoldi expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eps", m_eps)), "Failed to serialise arnoldi expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("gamma", m_gamma)), "Failed to serialise arnoldi expmv.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("delta", m_delta)), "Failed to serialise arnoldi expmv.");      
+            m_cur_order = 0;
+            resize(krylov_dim, dim);
+        }
+#endif
+
     };
 
     template <typename T, typename backend = linalg::blas_backend, bool adaptive = false>
@@ -536,6 +570,20 @@ namespace utils
                 RAISE_EXCEPTION("Failed to perform krylov subspace integration.");
             }
         }
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive &ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn object.  Error when serialising the base object.");
+        }
+        template <typename archive>
+        void load(archive &ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn object.  Error when serialising the base object.");
+        }
+#endif
+
     };
 
     template <typename T, typename backend>
@@ -611,6 +659,20 @@ namespace utils
                 RAISE_EXCEPTION("Failed to perform krylov subspace integration.");
             }
         }
+
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive &ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn object.  Error when serialising the base object.");
+        }
+        template <typename archive>
+        void load(archive &ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn object.  Error when serialising the base object.");
+        }
+#endif
     };
 }
 
