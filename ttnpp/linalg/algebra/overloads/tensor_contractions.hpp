@@ -310,8 +310,8 @@ namespace linalg
     tensordot(const T1 &A, const T2 &B, const strict_array<int, D> &Ainds, const strict_array<int, D> &Binds)
     {
         // static_assert(D1 == D2, "Invalid array sizes for tensordot.")
-        std::array<int, D> _Ainds(A);
-        std::array<int, D> _Binds(B);
+        std::array<int, D> _Ainds(Ainds);
+        std::array<int, D> _Binds(Binds);
         return expression_templates::tensordot_expr<T1, T2, D>(A, B, _Ainds, _Binds);
     }
 
@@ -322,6 +322,59 @@ namespace linalg
         return expression_templates::tensordot_expr<T1, T2, D>(A, B, Ainds, Binds);
     }
 
+    template <typename T1, typename T2, size_t D>
+    typename std::enable_if<is_linalg_object<T1>::value && is_linalg_object<T2>::value, expression_templates::tensordot_expr<T1, T2, D>>::type
+    tensordot(const  conj_type<T1> &A, const T2 &B, const strict_array<int, D> &Ainds, const strict_array<int, D> &Binds)
+    {
+        // static_assert(D1 == D2, "Invalid array sizes for tensordot.")
+        std::array<int, D> _Ainds(Ainds);
+        std::array<int, D> _Binds(Binds);
+        return expression_templates::tensordot_expr<T1, T2, D>(A.obj(), B, _Ainds, _Binds, true);
+    }
+
+    template <typename T1, typename T2, size_t D>
+    typename std::enable_if<is_linalg_object<T1>::value && is_linalg_object<T2>::value, expression_templates::tensordot_expr<T1, T2, D>>::type
+    tensordot(const  conj_type<T1> &A, const T2 &B, const std::array<int, D> &Ainds, const std::array<int, D> &Binds)
+    {
+        // static_assert(D1 == D2, "Invalid array sizes for tensordot.")
+        return expression_templates::tensordot_expr<T1, T2, D>(A.obj(), B, Ainds, Binds, true);
+    }
+
+    template <typename T1, typename T2, size_t D>
+    typename std::enable_if<is_linalg_object<T1>::value && is_linalg_object<T2>::value, expression_templates::tensordot_expr<T1, T2, D>>::type
+    tensordot(const T1 &A, const conj_type<T2> &B, const strict_array<int, D> &Ainds, const strict_array<int, D> &Binds)
+    {
+        // static_assert(D1 == D2, "Invalid array sizes for tensordot.")
+        std::array<int, D> _Ainds(Ainds);
+        std::array<int, D> _Binds(Binds);
+        return expression_templates::tensordot_expr<T1, T2, D>(A, B.obj(), _Ainds, _Binds, false, true);
+    }
+
+    template <typename T1, typename T2, size_t D>
+    typename std::enable_if<is_linalg_object<T1>::value && is_linalg_object<T2>::value, expression_templates::tensordot_expr<T1, T2, D>>::type
+    tensordot(const T1 &A, const conj_type<T2> &B, const std::array<int, D> &Ainds, const std::array<int, D> &Binds)
+    {
+        // static_assert(D1 == D2, "Invalid array sizes for tensordot.")
+        return expression_templates::tensordot_expr<T1, T2, D>(A, B.obj(), Ainds, Binds, false, true);
+    }
+
+    template <typename T1, typename T2, size_t D>
+    typename std::enable_if<is_linalg_object<T1>::value && is_linalg_object<T2>::value, expression_templates::tensordot_expr<T1, T2, D>>::type
+    tensordot(const conj_type<T1> &A, const conj_type<T2> &B, const strict_array<int, D> &Ainds, const strict_array<int, D> &Binds)
+    {
+        // static_assert(D1 == D2, "Invalid array sizes for tensordot.")
+        std::array<int, D> _Ainds(Ainds);
+        std::array<int, D> _Binds(Binds);
+        return expression_templates::tensordot_expr<T1, T2, D>(A.obj(), B.obj(), _Ainds, _Binds, true, true);
+    }
+
+    template <typename T1, typename T2, size_t D>
+    typename std::enable_if<is_linalg_object<T1>::value && is_linalg_object<T2>::value, expression_templates::tensordot_expr<T1, T2, D>>::type
+    tensordot(const conj_type<T1> &A, const conj_type<T2> &B, const std::array<int, D> &Ainds, const std::array<int, D> &Binds)
+    {
+        // static_assert(D1 == D2, "Invalid array sizes for tensordot.")
+        return expression_templates::tensordot_expr<T1, T2, D>(A.obj(), B.obj(), Ainds, Binds, true, true);
+    }
 } // namespace linalg
 
 #endif // PYTTN_LINALG_ALGEBRA_OVERLOADS_TENSOR_CONTRACTIONS_HPP_//

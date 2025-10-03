@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <set>
 
+
 #include "../permutations/transpose_expression.hpp"
 #include "../permutations/tensor_transpose.hpp"
 
@@ -64,9 +65,12 @@ namespace linalg
             std::array<size_type, D> _Ainds;
             std::array<size_type, D> _Binds;
 
+            bool _conjA = false;
+            bool _conjB = false;
+
         public:
             template <typename i1, typename i2>
-            tensordot_expr(const a_tensor_type &A, const b_tensor_type &B, const std::array<i1, D> &cindsa, const std::array<i2, D> &cindsb) : base_type(shape_type{{}}), _A(A), _B(B)
+            tensordot_expr(const a_tensor_type &A, const b_tensor_type &B, const std::array<i1, D> &cindsa, const std::array<i2, D> &cindsb, bool conjA = false, bool conjB = false) : base_type(shape_type{{}}), _A(A), _B(B), _conjA(conjA), _conjB(conjB)
             {
                 // check that the index arrays are all valid
                 for (size_type i = 0; i < D; ++i)
@@ -234,7 +238,30 @@ namespace linalg
                     _trans_b = tensor_transpose_expression<b_tensor_type>(_B, inds);
                 }
 
-                res.reinterpret_shape(m, n) = transpose_expression<decltype(_trans_a.reinterpret_shape(k, m)), false>(_trans_a.reinterpret_shape(k, m)) * _trans_b.reinterpret_shape(k, n);
+                if(!_conjA)
+                {
+                    if(!_conjB)
+                    {
+                        res.reinterpret_shape(m, n) = transpose_expression<decltype(_trans_a.reinterpret_shape(k, m)), false>(_trans_a.reinterpret_shape(k, m)) * _trans_b.reinterpret_shape(k, n);
+                    }
+                    else
+                    {
+                        linalg::tensor<decltype(a_value_type() * b_value_type()), 2, backend_type> conj(k, n);
+                        res.reinterpret_shape(m, n) = (transpose_expression<decltype(_trans_a.reinterpret_shape(k, m)), false>(_trans_a.reinterpret_shape(k, m)) * linalg::conj(_trans_b.reinterpret_shape(k, n))).bind_conjugate_workspace(conj);
+                    }
+                }
+                else
+                {
+                    if(!_conjB)
+                    {
+                        res.reinterpret_shape(m, n) = transpose_expression<decltype(_trans_a.reinterpret_shape(k, m)), true>(_trans_a.reinterpret_shape(k, m)) * _trans_b.reinterpret_shape(k, n);
+                    }
+                    else
+                    {
+                        linalg::tensor<decltype(a_value_type() * b_value_type()), 2, backend_type> conj(k, n);
+                        res.reinterpret_shape(m, n) = (transpose_expression<decltype(_trans_a.reinterpret_shape(k, m)), true>(_trans_a.reinterpret_shape(k, m)) * linalg::conj(_trans_b.reinterpret_shape(k, n))).bind_conjugate_workspace(conj);
+                    }
+                }
                 /*
                 if(A_requires_transpose && B_requires_transpose)
                 {

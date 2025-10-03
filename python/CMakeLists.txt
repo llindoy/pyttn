@@ -50,7 +50,7 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
           ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
           ttns/sop/state.cpp ttns/sop/toDense.cpp
           ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp ttns/ttn/ms_ttn.cpp
-          ttns/observables/matrix_element.cpp 
+          ttns/observables/matrix_element.cpp ttns/observables/rdm.cpp 
           ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp ttns/operators/Op.cpp
           ttns/algorithms/tdvp.cpp ttns/algorithms/dmrg.cpp
           )
@@ -74,7 +74,7 @@ else()
     set(PYTHON_BINDINGS_SRC pyttn.cpp 
           utils/orthopol.cpp utils/discretisation.cpp
           linalg/sparseMatrix.cpp linalg/tensor.cpp linalg/backend.cpp
-          ttns/observables/matrix_element.cpp 
+          ttns/observables/matrix_element.cpp ttns/observables/rdm.cpp 
           ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp
           ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
           ttns/sop/state.cpp ttns/sop/toDense.cpp
@@ -88,7 +88,7 @@ else()
         if(MSVC)
             message(FATAL_ERROR "Request MSVC compiler.  I don't know how this works so exiting.")
         else()
-            set(CMAKE_CXX_FLAGS "-O3 -g -Wall -Wextra -Wshadow -pedantic -Wold-style-cast")
+            set(CMAKE_CXX_FLAGS "-O3 -g -Wall -Wextra -Wshadow -pedantic -Wold-style-cast -Wno-dangling-reference")
             option(WITH_WERROR "Compile with '-Werror' C++ compiler flag" ON)
             if(WITH_WERROR)
                 #set(CMAKE_CXX_FLAGS "-Werror ${CMAKE_CXX_FLAGS}")

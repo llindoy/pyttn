@@ -197,7 +197,7 @@ def test_multiset_ttn_serialise(N, use_mps):
     pickled = pickle.dumps(h)
     h2 = pickle.loads(pickled)
 
-    #res = np.real(mel(h, A)) / N
-    #resB = np.real(mel(h2, A)) / N
+    res = np.real(mel(h, A)) / N
+    resB = np.real(mel(h2, A)) / N
 
-    #assert pytest.approx(res, 1e-8) == resB
+    assert pytest.approx(res, 1e-8) == resB

@@ -21,7 +21,7 @@ from .algorithms import (
     tdvp,
     TDVP,
 )
-from .observables import matrix_element, MatrixElement
+from .observables import matrix_element, MatrixElement, rdm
 from .operators import (
     ms_sop_operator,
     multiset_sop_operator,
@@ -108,6 +108,7 @@ __all__: list[str] = [
     "tdvp",
     "TDVP",
     "matrix_element",
+    "rdm",
     "MatrixElement",
     "ops",
     "Op",

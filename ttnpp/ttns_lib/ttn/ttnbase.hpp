@@ -881,7 +881,7 @@ namespace ttns
         }
 
     public:
-        size_type get_leaf_index(size_type lid)
+        size_type get_leaf_index(size_type lid) const
         {
             ASSERT(lid < m_nleaves, "Invalid leaf index.");
             return m_leaf_indices[lid];

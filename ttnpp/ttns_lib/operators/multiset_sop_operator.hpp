@@ -560,7 +560,6 @@ namespace ttns
             bp.clear();
         }
 
-
 #ifdef CEREAL_LIBRARY_FOUND
     public:
         template <typename archive>
@@ -572,6 +571,7 @@ namespace ttns
             CALL_AND_HANDLE(ar(cereal::make_nvp("time_dependent_coefficients_set", m_time_dependent_coefficients_set)), "Failed to serialise multiset_sop_operator object.  Error when serialising whether time-dependent coefficients have been set");
             CALL_AND_HANDLE(ar(cereal::make_nvp("time_dependent", m_time_dependent)), "Failed to serialise multiset_sop_operator object.  Error when serialising whether the object is time-dependent");
             CALL_AND_HANDLE(ar(cereal::make_nvp("contraction_info", m_contraction_info)), "Failed to serialise multiset_sop_operator object.  Error when serialising the contraction info");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("mode_operators", m_mode_operators)), "Failed to serialise multiset_sop_operator object.  Error when serialising the mode operators");
             CALL_AND_HANDLE(ar(cereal::make_nvp("mode_dimension", m_mode_dimension)), "Failed to serialise multiset_sop_operator object.  Error when serialising the mode dimension info");
             CALL_AND_HANDLE(ar(cereal::make_nvp("indices", m_indices)), "Failed to serialise multiset_sop_operator object.  Error when serialising the mode indices info");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nset", m_nset)), "Failed to serialise multiset_sop_operator object.  Error when serialising the nubmer of set variables");
