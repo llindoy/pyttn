@@ -15,10 +15,10 @@ from typing import Optional, Union
 
 import numpy as np
 
-from pyttn.ttnpp import rdm_complex, ms_ttn_complex, ttn_complex
+from pyttn.ttnpp import rdm_complex, ttn_complex
 
 try:
-    from pyttn.ttnpp import rdm_real, ms_ttn_real, ttn_real
+    from pyttn.ttnpp import rdm_real, ttn_real
 
     _use_real_matel = True
 
