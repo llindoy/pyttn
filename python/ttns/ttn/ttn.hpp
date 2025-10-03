@@ -30,6 +30,8 @@
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 
+
+
 namespace py = pybind11;
 
 template <typename T, typename backend>
@@ -434,6 +436,19 @@ void init_ttn(py::module &m, const std::string &label)
                     return i; }, "For details see :meth:`pyttn.ttn_dtype.__rmatmul__`")
          .def("backend", [](const _ttn &)
               { return backend::label(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const _ttn & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](_ttn & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const _ttn& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<_ttn>(t);}
+         ))
+#endif
+
          .doc() = R"mydelim(
           The pybind11 wrapper class for handling a general tree tensor network
           )mydelim";

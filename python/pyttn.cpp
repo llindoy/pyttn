@@ -12,7 +12,12 @@
  * limitations under the License
  */
 
-#define TTNS_REGISTER_COMPLEX_DOUBLE_OPERATOR
+#define TTNS_REGISTER_COMPLEX_DOUBLE
+
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+#endif
 
 #include <algorithm>
 #include <cstdint>
@@ -60,6 +65,7 @@
 #include "ttns/ttn/ms_ttn.hpp"
 
 #include "ttns/observables/matrix_element.hpp"
+#include "ttns/observables/rdm.hpp"
 
 #include "ttns/operators/product_operator.hpp"
 #include "ttns/operators/siteOperators.hpp"
@@ -177,6 +183,7 @@ PYBIND11_MODULE(ttnpp, m)
 #endif
 
     initialise_matrix_element<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_rdm<pyttn_real_type, linalg::blas_backend>(m);
 
     initialise_site_operators<pyttn_real_type, linalg::blas_backend>(m_ops);
     initialise_product_operator<pyttn_real_type, linalg::blas_backend>(m);
@@ -184,6 +191,7 @@ PYBIND11_MODULE(ttnpp, m)
 
 #ifdef PYTTN_BUILD_CUDA
     initialise_matrix_element<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    initialise_rdm<pyttn_real_type, linalg::cuda_backend>(m_cuda);
 
     initialise_site_operators<pyttn_real_type, linalg::cuda_backend>(m_ops_gpu);
     initialise_product_operator<pyttn_real_type, linalg::cuda_backend>(m_cuda);

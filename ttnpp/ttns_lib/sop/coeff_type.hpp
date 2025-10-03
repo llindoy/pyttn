@@ -20,6 +20,10 @@
 
 #include <common/tmp_funcs.hpp>
 
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/types/vector.hpp>
+#include <cereal/types/utility.hpp>
+#endif
 namespace ttns
 {
 
@@ -38,6 +42,10 @@ namespace ttns
             using real_type = typename tmp::get_real_type<T>::type;
             using function_type = std::function<T(real_type)>;
             using real_function_type = std::function<real_type(real_type)>;
+
+        protected:
+            T m_constant;
+            std::vector<std::pair<T, function_type>> m_funcs;
 
         public:
             coeff() : m_constant(T(0.0)), m_funcs() {}
@@ -284,15 +292,21 @@ namespace ttns
 #ifdef CEREAL_LIBRARY_FOUND
         public:
             template <typename archive>
-            void serialize(archive &ar)
+            void save(archive &ar) const
             {
                 CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", m_constant)), "Failed to serialise sum of product operator.  Failed to serialise array of product operators.");
-                CALL_AND_HANDLE(ar(cereal::make_nvp("funcs", m_funcs)), "Failed to serialise sum of product operator.  Failed to serialise array of product operators.");
+                ASSERT(m_funcs.size() == 0, "Cannot serialise coefficient object with function valued arguments.  This is not supported by CEREAL.");
+                //CALL_AND_HANDLE(ar(cereal::make_nvp("funcs", m_funcs)), "Failed to serialise sum of product operator.  Failed to serialise array of product operators.");
+            }
+
+            template <typename archive>
+            void load(archive &ar) 
+            {
+                CALL_AND_HANDLE(ar(cereal::make_nvp("coeff", m_constant)), "Failed to serialise sum of product operator.  Failed to serialise array of product operators.");
+                m_funcs.clear();
+                //CALL_AND_HANDLE(ar(cereal::make_nvp("funcs", m_funcs)), "Failed to serialise sum of product operator.  Failed to serialise array of product operators.");
             }
 #endif
-        protected:
-            T m_constant;
-            std::vector<std::pair<T, function_type>> m_funcs;
         };
 
         template <typename T>

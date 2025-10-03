@@ -44,6 +44,14 @@ namespace ttns
     class compositeSiteOperator
     {
     public:
+        using container_type = std::vector<size_t>;
+        using iterator = typename container_type::iterator;
+        using const_iterator = typename container_type::const_iterator;
+
+    protected:
+        container_type m_op_indices;
+
+    public:
         compositeSiteOperator() {}
         compositeSiteOperator(const std::vector<size_t> &o) : m_op_indices(o) {}
 
@@ -102,9 +110,6 @@ namespace ttns
             return ret;
         }
 
-        using container_type = std::vector<size_t>;
-        using iterator = typename container_type::iterator;
-        using const_iterator = typename container_type::const_iterator;
 
         iterator begin() { return m_op_indices.begin(); }
         iterator end() { return m_op_indices.end(); }
@@ -112,8 +117,6 @@ namespace ttns
         const_iterator begin() const { return m_op_indices.begin(); }
         const_iterator end() const { return m_op_indices.end(); }
 
-    protected:
-        container_type m_op_indices;
     };
 
     inline bool operator==(const compositeSiteOperator &A, const compositeSiteOperator &B)
@@ -175,6 +178,16 @@ namespace ttns
         using composite_dict_container = std::vector<composite_dict_type>;
 
         using site_ops_type = std::vector<std::vector<sPOP>>;
+
+    protected:
+        container_type m_mode_operators;
+        dict_container m_op_dict;
+        composite_dict_container m_composite_op_dict;
+
+        size_t m_nterms;
+        std::vector<literal::coeff<T>> m_coeff;
+        std::string m_label;
+        std::vector<size_t> m_identity_index;
 
     public:
         compressedSOP() : m_nterms(0) {}
@@ -635,15 +648,6 @@ namespace ttns
             return sop;
         }
 
-    protected:
-        container_type m_mode_operators;
-        dict_container m_op_dict;
-        composite_dict_container m_composite_op_dict;
-
-        size_t m_nterms;
-        std::vector<literal::coeff<T>> m_coeff;
-        std::string m_label;
-        std::vector<size_t> m_identity_index;
     }; // class compressedSOP
 
     template <typename T>

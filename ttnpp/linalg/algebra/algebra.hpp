@@ -32,7 +32,6 @@
 #include "expressions/contractions/dense_matrix_vector_multiplication.hpp"
 #include "expressions/contractions/csr_matrix_vector_multiplication.hpp"
 #include "expressions/contractions/diagonal_matrix_vector_multiplication.hpp"
-#include "expressions/contractions/tensor_dot.hpp"
 
 #include "expressions/contractions/dense_dense_matrix_multiplication.hpp"
 #include "expressions/contractions/csr_matrix_dense_matrix_multiplication.hpp"
@@ -56,5 +55,6 @@
 #include "overloads/tensor_contractions.hpp"
 #include "overloads/dot_product.hpp"
 #include "overloads/trace.hpp"
+#include "expressions/contractions/tensor_dot.hpp"
 
 #endif // PYTTN_LINALG_ALGEBRA_ALGEBRA_HPP_//

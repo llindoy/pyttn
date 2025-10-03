@@ -18,6 +18,7 @@
 #include <ttns_lib/sop/system_information.hpp>
 #include <ttns_lib/operators/sop_operator.hpp>
 #include <ttns_lib/operators/multiset_sop_operator.hpp>
+#include "../../utils.hpp"
 
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
@@ -73,7 +74,20 @@ void init_sop_operator(py::module &m, const std::string &label)
         .def("complex_dtype", [](const _sop &)
              { return !std::is_same<T, real_type>::value; })
         .def("backend", [](const _sop &)
-             { return backend::label(); });
+             { return backend::label(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const _sop & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](_sop & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const _sop& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<_sop>(t);}
+         ))  
+#endif    
+             ;
 
     py::class_<_mssop>(m, (std::string("multiset_sop_operator_") + label).c_str())
         .def(py::init())
@@ -102,7 +116,21 @@ void init_sop_operator(py::module &m, const std::string &label)
              { return !std::is_same<T, real_type>::value; })
         .def("nmodes", &_mssop::nmodes)
         .def("backend", [](const _mssop &)
-             { return backend::label(); });
+             { return backend::label(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const _mssop & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](_mssop & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const _mssop& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<_mssop>(t);}
+         ))  
+#endif  
+             
+             ;
 }
 
 template <typename real_type, typename backend>

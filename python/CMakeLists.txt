@@ -50,7 +50,7 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
           ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
           ttns/sop/state.cpp ttns/sop/toDense.cpp
           ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp ttns/ttn/ms_ttn.cpp
-          ttns/observables/matrix_element.cpp 
+          ttns/observables/matrix_element.cpp ttns/observables/rdm.cpp 
           ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp ttns/operators/Op.cpp
           ttns/algorithms/tdvp.cpp ttns/algorithms/dmrg.cpp
           )
@@ -74,7 +74,7 @@ else()
     set(PYTHON_BINDINGS_SRC pyttn.cpp 
           utils/orthopol.cpp utils/discretisation.cpp
           linalg/sparseMatrix.cpp linalg/tensor.cpp linalg/backend.cpp
-          ttns/observables/matrix_element.cpp 
+          ttns/observables/matrix_element.cpp ttns/observables/rdm.cpp 
           ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp
           ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/models/models.cpp
           ttns/sop/state.cpp ttns/sop/toDense.cpp
@@ -88,7 +88,7 @@ else()
         if(MSVC)
             message(FATAL_ERROR "Request MSVC compiler.  I don't know how this works so exiting.")
         else()
-            set(CMAKE_CXX_FLAGS "-O3 -g -Wall -Wextra -Wshadow -pedantic -Wold-style-cast")
+            set(CMAKE_CXX_FLAGS "-O3 -g -Wall -Wextra -Wshadow -pedantic -Wold-style-cast -Wno-dangling-reference")
             option(WITH_WERROR "Compile with '-Werror' C++ compiler flag" ON)
             if(WITH_WERROR)
                 #set(CMAKE_CXX_FLAGS "-Werror ${CMAKE_CXX_FLAGS}")
@@ -181,11 +181,41 @@ if(NOT pybind11_POPULATED)
 endif()
 add_definitions(-DPYBIND11)
 
+
+set (BUILD_DOC OFF CACHE INTERNAL "Turn off cereal docs")
+set (BUILD_SANDBOX OFF CACHE INTERNAL "Turn off cereal sandbox")
+set (SKIP_PERFORMANCE_COMPARISON ON CACHE INTERNAL "Turn on skipping cereal/boost performance comparison")
+
+
+set(CEREAL_ROOT_DIR ${CMAKE_SOURCE_DIR}/external/cereal)
+if(NOT EXISTS ${CEREAL_ROOT_DIR})
+    FetchContent_Declare(
+        cereal
+        GIT_REPOSITORY "https://github.com/USCiLab/cereal.git"
+        SOURCE_DIR ${CEREAL_ROOT_DIR}
+    )
+
+else()
+    message(STATUS "${CEREAL_ROOT_DIR}")
+    FetchContent_Declare(
+        cereal SOURCE_DIR ${CEREAL_ROOT_DIR}
+    )
+endif()
+
+FetchContent_GetProperties(cereal)
+if(NOT cereal_POPULATED)
+    FetchContent_Populate(cereal)
+    add_subdirectory(${cereal_SOURCE_DIR} ${cereal_BINARY_DIR})
+endif()
+add_definitions(-DCEREAL_LIBRARY_FOUND)
+set(cereal_INCLUDE_DIR ${cereal_SOURCE_DIR}/include)
+message(STATUS "${cereal_INCLUDE_DIR}")
+
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 message(STATUS "${PYTHON_BINDINGS_SRC}")
 pybind11_add_module(ttnpp ${PYTHON_BINDINGS_SRC})
-target_include_directories(ttnpp PUBLIC ${TTNS_INCLUDE_DIRECTORIES})
+target_include_directories(ttnpp PUBLIC ${TTNS_INCLUDE_DIRECTORIES} ${cereal_INCLUDE_DIR})
 
 if(USE_CUDA AND CMAKE_CUDA_COMPILER)
     target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver CUDA::curand CUDA::cutensor Thrust ) 

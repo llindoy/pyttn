@@ -913,6 +913,30 @@ class msttn(metaclass=ABCMeta):
     #    """
     #    pass
 
+    @abstractmethod
+    def save(self, fname : str, as_binary: bool = True):
+        """Serialise the msTTN object to a file fname.  
+
+        :param fname: The output file name
+        :type fname: str
+        :param as_binary: Whether or not to save as a binary file, defaults to True
+        :type as_binary: bool, optional
+
+        """
+        pass
+
+    @abstractmethod
+    def load(self, fname : str, as_binary: bool = True):
+        """Load a msTTN object from the file fname.  
+        
+        :param fname: The input file name
+        :type fname: str
+        :param as_binary: Whether or not to load as a binary file, defaults to True
+        :type as_binary: bool, optional
+
+        """
+        pass
+
 msttn.register(ms_ttn_complex)
 if _real_ttn_import:
     msttn.register(ms_ttn_real)

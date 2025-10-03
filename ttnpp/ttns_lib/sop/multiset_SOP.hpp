@@ -41,6 +41,12 @@ namespace ttns
         using iterator = typename container_type::iterator;
         using const_iterator = typename container_type::const_iterator;
 
+    protected:
+        container_type m_terms;
+        size_t m_nset;
+        size_t m_nmodes;
+        std::string m_label;
+
     public:
         multiset_SOP() : m_nset(1), m_nmodes(0) {}
         multiset_SOP(size_t nset, size_t nmodes) : m_nset(nset), m_nmodes(nmodes) {}
@@ -130,11 +136,6 @@ namespace ttns
             iter->second = sop;
         }
 
-    protected:
-        container_type m_terms;
-        size_t m_nset;
-        size_t m_nmodes;
-        std::string m_label;
 
     public:
         inline bool set_is_fermionic_mode(std::vector<bool> &is_fermion_mode) const
@@ -168,6 +169,17 @@ namespace ttns
         iterator end() { return iterator(m_terms.end()); }
         const_iterator begin() const { return const_iterator(m_terms.begin()); }
         const_iterator end() const { return const_iterator(m_terms.end()); }
+
+#ifdef CEREAL_LIBRARY_FOUND
+        template <typename archive>
+        void serialize(archive &ar) 
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("terms", m_terms)), "Failed to serialise multiset SOP.  Failed to serialise terms.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("nset", m_nset)), "Failed to serialise multiset SOP.  Failed to serialise nset.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("nmodes", m_nmodes)), "Failed to serialise multiset SOP.  Failed to serialise modes.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("label", m_label)), "Failed to serialise multiset SOP.  Failed to serialise label.");
+        }        
+#endif
     };
 
     template <typename T>

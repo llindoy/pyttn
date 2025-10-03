@@ -343,14 +343,13 @@ namespace ttns
             return m_op->todense();
         }
 #ifdef CEREAL_LIBRARY_FOUND
-    public:
-        template <typename archive>
-        void serialize(archive &ar) const
-        {
-            CALL_AND_HANDLE(ar(cereal::make_nvp("op", m_op)), "Failed to primitive operator.  Failed to serialise its size.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("mode", m_mode)), "Failed to primitive operator.  Failed to serialise its size.");
-        }
-
+        public:
+            template <typename archive>
+            void serialize(archive &ar)
+            {
+                CALL_AND_HANDLE(ar(cereal::make_nvp("op", m_op)), "Failed to serialise site_operator object.  Error when serialising the operator.");
+                CALL_AND_HANDLE(ar(cereal::make_nvp("mode", m_mode)), "Failed to serialise site_operator object.  Error when serialising the mode.");
+            }
 #endif
     };
 

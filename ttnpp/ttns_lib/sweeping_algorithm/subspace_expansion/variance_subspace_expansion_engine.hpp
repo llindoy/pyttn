@@ -67,6 +67,12 @@ namespace ttns
             size_type neigenvalues;
         };
 
+    protected:
+        subspace_expansion<T, backend> m_ss_expand;
+        // the krylov subspace engine
+        eigensolver_type m_eigensolver;
+        real_type m_subspace_weighting_factor = real_type(1.0);
+        
     public:
         variance_subspace_expansion() : m_ss_expand() {}
         variance_subspace_expansion(const ttn_type &A, const env_type &ham, size_type eigensolver_krylov_dim = 4, size_type neigenvalues = 2) : m_ss_expand()
@@ -200,13 +206,26 @@ namespace ttns
         const size_type &Nonesite() const { return m_ss_expand.Nonesite(); }
         const size_type &Ntwosite() const { return m_ss_expand.Ntwosite(); }
 
-    protected:
-        subspace_expansion<T, backend> m_ss_expand;
 
-        // the krylov subspace engine
-        eigensolver_type m_eigensolver;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive& ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("ssexpander", m_ss_expand)), "Failed to serialise variance subspace expansions engine.  Failed to serialise subspace expander.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("weighting", m_subspace_weighting_factor)), "Failed to serialise variance subspace expansion engine.  Failed to serialise weighting factor.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("subspace_eigensolver", m_eigensolver)), "Failed to serialise variance subspace expansion engine.  Failed to serialise eigensolver.");
+        }
 
-        real_type m_subspace_weighting_factor = real_type(1.0);
+        template <typename archive>
+        void load(archive& ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("ssexpander", m_ss_expand)), "Failed to serialise variance subspace expansions engine.  Failed to serialise subspace expander.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("weighting", m_subspace_weighting_factor)), "Failed to serialise variance subspace expansion engine.  Failed to serialise weighting factor.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("subspace_eigensolver", m_eigensolver)), "Failed to serialise variance subspace expansion engine.  Failed to serialise eigensolver.");       
+        }
+#endif
+
     }; // class variance_subspace_expansion
 } // namespace ttns
 

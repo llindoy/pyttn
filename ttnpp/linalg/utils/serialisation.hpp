@@ -72,6 +72,7 @@ namespace linalg
         {
             using size_type = blas_backend::size_type;
             T *buf;
+            size_type size;
             size_type cap;
 
             ~buffer_writer_wrapper() { buf = nullptr; }
@@ -79,11 +80,14 @@ namespace linalg
             template <typename Archive>
             void save(Archive &archive) const
             {
-                archive(cereal::make_size_tag(cap));
-                for (size_type i = 0; i < cap; ++i)
-                {
-                    archive(buf[i]);
-                }
+                //CALL_AND_HANDLE(archive(cereal::make_size_tag(size)), "Failed to serialize cpu buffer.  Failed to save capacity.");
+                CALL_AND_HANDLE(archive(cereal::make_nvp("capacity", cap)), "Failed to serialise cpu buffer.  Failed to save size.");
+                std::vector<T> val(buf, buf+size);
+                CALL_AND_HANDLE(archive(cereal::make_nvp("data", val)), "Failed to serialise cpu buffer.  Failed to save size.");
+                //for (size_type i = 0; i < size; ++i)
+                //{
+                //    archive(buf[i]);
+                //}
             }
 
             template <typename Archive>
@@ -95,12 +99,14 @@ namespace linalg
         {
             using size_type = blas_backend::size_type;
             T **buf;
+            size_type *size;
             size_type *cap;
 
             ~buffer_reader_wrapper()
             {
                 buf = nullptr;
                 cap = nullptr;
+                size = nullptr;
             }
 
             template <typename U>
@@ -113,27 +119,36 @@ namespace linalg
 
             template <typename Archive>
             void load(Archive &archive)
-            {
+            {    
                 using allocator = memory::allocator<T, blas_backend>;
-                size_type s;
-                archive(cereal::make_size_tag(s));
-                if (*buf == nullptr)
+                size_type _cap;
+                std::vector<T> val;
+                //CALL_AND_HANDLE(archive(cereal::make_size_tag(s)), "Failed to deserialize cpu buffer.  Failed to read capacity.");
+                CALL_AND_HANDLE(archive(cereal::make_nvp("capacity", _cap)), "Failed to deserialise cpu buffer.  Failed to read size.");
+                CALL_AND_HANDLE(archive(cereal::make_nvp("data", val)), "Failed to deserialise cpu buffer.  Failed to read buffer.");
+
+                if (buf == nullptr)
                 {
-                    CALL_AND_HANDLE(*buf = allocator::allocate(s), "Failed to deserialize cpu buffer.  Error when allocating new buffer to store result in.");
+                    CALL_AND_HANDLE(*buf = allocator::allocate(_cap), "Failed to deserialize cpu buffer.  Error when allocating new buffer to store result in.");
                 }
                 else
                 {
-                    if (s != *cap)
+                    if (_cap != *cap)
                     {
                         CALL_AND_HANDLE(allocator::deallocate(*buf), "Failed to deserialize cpu buffer.  Error when deallocating previously allocated buffer to overwrite.");
-                        CALL_AND_HANDLE(*buf = allocator::allocate(s), "Failed to deserialize cpu buffer.  Error when allocating new buffer to store result in.");
+                        CALL_AND_HANDLE(*buf = allocator::allocate(_cap), "Failed to deserialize cpu buffer.  Error when allocating new buffer to store result in.");
                     }
                 }
-                for (size_t i = 0; i < s; ++i)
-                {
-                    archive((*buf)[i]);
-                }
-                *cap = s;
+                //std::cerr << "load: " << s << " " << _cap << std::endl;
+                ASSERT(val.size() <= _cap, "Failed to deserialize cpu buffer.  Size read in is smaller than capacity read in.")
+
+                std::copy(val.begin(), val.end(), (*buf));
+                //for (size_t i = 0; i < s; ++i)
+                //{
+                //    archive((*buf)[i]);
+                //}
+                *cap = _cap;
+                *size = val.size();
             }
         };
 
@@ -143,6 +158,7 @@ namespace linalg
         {
             using size_type = cuda_backend::size_type;
             T *buf;
+            size_type size;
             size_type cap;
 
             ~buffer_writer_wrapper() { buf = nullptr; }
@@ -158,8 +174,10 @@ namespace linalg
                 CALL_AND_HANDLE(memtransfer::copy(buf, cap, cpu_buf), "Failed to serialize cuda buffer.  Failed to copy temporary gpu buffer to the temporary cpu buffer.");
 
                 // now do the serialization
-                archive(cereal::make_size_tag(cap));
-                for (size_type i = 0; i < cap; ++i)
+                CALL_AND_HANDLE(archive(cereal::make_size_tag(size)), "Failed to serialize cpu buffer.  Failed to save capacity.");
+                CALL_AND_HANDLE(archive(cereal::make_nvp("capacity", cap)), "Failed to serialise cpu buffer.  Failed to save size.");
+
+                for (size_type i = 0; i < size; ++i)
                 {
                     archive(cpu_buf[i]);
                 }
@@ -177,12 +195,14 @@ namespace linalg
         struct buffer_reader_wrapper<T, cuda_backend>
         {
             using size_type = cuda_backend::size_type;
-            T **buf;
+            T *buf;
+            size_type *size;
             size_type *cap;
 
             ~buffer_reader_wrapper()
             {
                 buf = nullptr;
+                size = nullptr;
                 cap = nullptr;
             }
 
@@ -201,27 +221,28 @@ namespace linalg
                 using gpu_allocator = memory::allocator<T, cuda_backend>;
                 using memtransfer = memory::transfer<blas_backend, cuda_backend>;
 
-                size_type s;
-                archive(cereal::make_size_tag(s));
-
+                size_type s, _cap;
+                CALL_AND_HANDLE(archive(cereal::make_size_tag(s)), "Failed to deserialize cpu buffer.  Failed to read capacity.");
+                CALL_AND_HANDLE(archive(cereal::make_nvp("capacity", _cap)), "Failed to deserialise cpu buffer.  Failed to read size.");
                 // resize the gpu buffer given the new size_type
                 if (*buf == nullptr)
                 {
-                    CALL_AND_HANDLE(*buf = gpu_allocator::allocate(s), "Failed to deserialize buffer.  Error when allocating new buffer to store result in.");
+                    CALL_AND_HANDLE(*buf = gpu_allocator::allocate(_cap), "Failed to deserialize buffer.  Error when allocating new buffer to store result in.");
                 }
                 else
                 {
-                    if (s != *cap)
+                    if (_cap != *cap)
                     {
                         CALL_AND_HANDLE(gpu_allocator::deallocate(*buf), "Failed to deserialize buffer.  Error when deallocating previously allocated buffer to overwrite.");
-                        CALL_AND_HANDLE(*buf = gpu_allocator::allocate(s), "Failed to deserialize buffer.  Error when allocating new buffer to store result in.");
+                        CALL_AND_HANDLE(*buf = gpu_allocator::allocate(_cap), "Failed to deserialize buffer.  Error when allocating new buffer to store result in.");
                     }
                 }
-                *cap = s;
+                *cap = _cap;
+                *size = s;
 
                 // now allocate the cpu buffer and read in the result
                 T *cpu_buf = nullptr;
-                CALL_AND_HANDLE(cpu_buf = cpu_allocator::allocate(s), "Failed to deserialize cuda buffer.  Failed to allocate temporary cpu buffer object.");
+                CALL_AND_HANDLE(cpu_buf = cpu_allocator::allocate(_cap), "Failed to deserialize cuda buffer.  Failed to allocate temporary cpu buffer object.");
                 for (size_t i = 0; i < s; ++i)
                 {
                     archive(cpu_buf[i]);

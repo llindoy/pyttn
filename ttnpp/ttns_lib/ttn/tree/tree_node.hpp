@@ -30,6 +30,10 @@
 #include <iterator>
 #include <list>
 
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/types/list.hpp>
+#endif
+
 namespace ttns
 {
 
@@ -204,6 +208,7 @@ namespace ttns
             m_id = other.m_id;
             m_child_id = other.m_child_id;
             m_level = other.m_level;
+            m_lid = other.m_lid;
             m_index = other.m_index;
             m_data = other.m_data;
             return *this;
@@ -219,16 +224,15 @@ namespace ttns
             m_child_id = std::move(other.m_child_id);
             other.m_child_id = 0;
             m_level = std::move(other.m_level);
+            m_lid = std::move(other.m_lid);
             m_index = std::move(other.m_index);
             m_data = std::move(other.m_data);
             return *this;
         }
 
-    protected:
-#ifdef CEREAL_LIBRARY_FOUND
-        friend class serialisation_node_save_wrapper<node_type, size_type>;
-        friend class serialisation_node_load_wrapper<node_type, size_type>;
 
+#ifdef CEREAL_LIBRARY_FOUND
+    protected:
         tree_node_base &operator=(const serialisation_node_load_wrapper<node_type, size_type> &other)
         {
             m_id = other.m_node.m_id;
@@ -243,6 +247,21 @@ namespace ttns
         {
             return this->operator=(std::move(other.m_node));
         }
+
+    public:
+        template <typename archive>
+        void serialize(archive &ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("index", m_id)), "Failed to serialise tree_node_base object.  Failed to serialise its id.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("local_index", m_child_id)), "Failed to serialise tree_node_base object.  Failed to serialise its local id.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("tree_index", m_index)), "Failed to serialise tree_node_base object.  Failed to serialise its local id.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("level", m_level)), "Failed to serialise tree_node_base object.  Failed to serialise its level.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("data", m_data)), "Failed to serialise tree_node_base object.  Error when serialising the data stored at the node.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("leaf_index", m_lid)), "Failed to serialise tree_node_base object.  Failed to serialise its leaf index.");
+        }
+        
+        friend class serialisation_node_save_wrapper<node_type, size_type>;
+        friend class serialisation_node_load_wrapper<node_type, size_type>;
 #endif
 
     protected:
@@ -455,42 +474,21 @@ namespace ttns
         reverse_iterator rend() { return reverse_iterator(m_children.rend()); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(m_children.rbegin()); }
         const_reverse_iterator rend() const { return const_reverse_iterator(m_children.rend()); }
-
-#ifdef CEREAL_LIBRARY_FOUND
-    public:
-        template <typename archive>
-        void save(archive &ar) const
-        {
-            CALL_AND_HANDLE(ar(cereal::make_nvp("index", m_id)), "Failed to serialise tree_node_base object.  Failed to serialise its id.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("local_index", m_child_id)), "Failed to serialise tree_node_base object.  Failed to serialise its local id.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("tree_index", m_index)), "Failed to serialise tree_node_base object.  Failed to serialise its local id.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("level", m_level)), "Failed to serialise tree_node_base object.  Failed to serialise its level.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("data", m_data)), "Failed to serialise tree_node_base object.  Error when serialising the data stored at the node.");
-            if (m_children.size() == 0)
-            {
-                CALL_AND_HANDLE(ar(cereal::make_nvp("leaf_index", m_lid)), "Failed to serialise tree_node_base object.  Failed to serialise its leaf index.");
-            }
-        }
-
-        template <typename archive>
-        void load(archive &ar)
-        {
-            CALL_AND_HANDLE(ar(cereal::make_nvp("index", m_id)), "Failed to serialise tree_node_base object.  Failed to serialise its id.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("local_index", m_child_id)), "Failed to serialise tree_node_base object.  Failed to serialise its local id.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("tree_index", m_index)), "Failed to serialise tree_node_base object.  Failed to serialise its local id.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("level", m_level)), "Failed to serialise tree_node_base object.  Failed to serialise its level.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("data", m_data)), "Failed to serialise tree_node_base object.  Error when serialising the data stored at the node.");
-            if (m_children.size() == 0)
-            {
-                CALL_AND_HANDLE(ar(cereal::make_nvp("leaf_index", m_lid)), "Failed to serialise tree_node_base object.  Failed to serialise its leaf index.");
-            }
-        }
-#endif
     }; // class tree_node_base
 
     template <typename T>
     class tree_node : public tree_node_base<T>
     {
+    public:
+        using base_type = tree_node_base<T>;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void serialize(archive &ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise tree_node object.  Error when serialising the base object.");
+        }
+#endif
     };
 
     template <typename T, typename U>

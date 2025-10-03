@@ -413,14 +413,7 @@ namespace ttns
 
     public:
         template <typename archive>
-        void save(archive &ar) const
-        {
-        for
-            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn_node object.  Error when serialising the base object.");
-        }
-
-        template <typename archive>
-        void load(archive &ar)
+        void serialize(archive &ar)
         {
             CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn_node object.  Error when serialising the base object.");
         }

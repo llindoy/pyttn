@@ -33,6 +33,10 @@ namespace ttns
 
     class primitive_mode_data
     {
+    protected:
+        size_t m_lhd; // local hilbert space dimension
+        mode_type m_type;
+
     public:
         primitive_mode_data() : m_lhd(1), m_type(mode_type::GENERIC_MODE) {}
         primitive_mode_data(size_t d) : m_lhd(d), m_type(mode_type::GENERIC_MODE) {}
@@ -51,14 +55,22 @@ namespace ttns
 
         const size_t &lhd() const { return m_lhd; }
         size_t &lhd() { return m_lhd; }
-
-    protected:
-        size_t m_lhd; // local hilbert space dimension
-        mode_type m_type;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void serialize(archive &ar) 
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("lhd", m_lhd)), "Failed to serialise sum of primitive mode dataa.  Failed to serialise local Hilbert space dimension.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("type", m_type)), "Failed to serialise sum of primitive mode dataa.  Failed to serialise mode type.");
+        }
+#endif
     };
 
     class mode_data
     {
+    protected:
+        std::vector<primitive_mode_data> m_modes;
+
     public:
         mode_data() {}
         mode_data(size_t d)
@@ -200,8 +212,14 @@ namespace ttns
         const_reverse_iterator rbegin() const { return const_reverse_iterator(m_modes.rbegin()); }
         const_reverse_iterator rend() const { return const_reverse_iterator(m_modes.rend()); }
 
-    protected:
-        std::vector<primitive_mode_data> m_modes;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void serialize(archive &ar) 
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("modes", m_modes)), "Failed to serialise mode_data.  Failed to serialise modes.");
+        }
+#endif
     };
 
     inline primitive_mode_data fermion_mode() { return primitive_mode_data(2, mode_type::FERMION_MODE); }
@@ -217,6 +235,10 @@ namespace ttns
     public:
         friend system_modes combine_systems(const system_modes &a, const system_modes &b);
 
+    protected:
+        std::vector<mode_data> m_modes;
+        std::vector<size_t> m_tree_leaf_indices;
+        
     public:
         using iterator = typename std::vector<mode_data>::iterator;
         using const_iterator = typename std::vector<mode_data>::const_iterator;
@@ -512,9 +534,16 @@ namespace ttns
         const_reverse_iterator rbegin() const { return const_reverse_iterator(m_modes.rbegin()); }
         const_reverse_iterator rend() const { return const_reverse_iterator(m_modes.rend()); }
 
-    protected:
-        std::vector<mode_data> m_modes;
-        std::vector<size_t> m_tree_leaf_indices;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void serialize(archive &ar) 
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("modes", m_modes)), "Failed to serialise system_modes.  Failed to serialise modes.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("leaf_indices", m_tree_leaf_indices)), "Failed to serialise system_modes.  Failed to serialise tree indices.");
+
+        }
+#endif
     };
 
     inline system_modes combine_systems(const system_modes &a, const system_modes &b)

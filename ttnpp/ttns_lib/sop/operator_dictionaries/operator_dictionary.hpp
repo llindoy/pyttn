@@ -91,6 +91,10 @@ namespace ttns
         using dict_type = std::vector<elem_type>;
         using op_type = ops::primitive<T, backend>;
 
+    protected:
+        dict_type m_dict;
+
+    public:
         operator_dictionary() {}
         operator_dictionary(size_t N) : m_dict(N) {}
         operator_dictionary(const dict_type &o) : m_dict(o) {}
@@ -158,8 +162,14 @@ namespace ttns
         size_t size() const { return m_dict.size(); }
         size_t nmodes() const { return m_dict.size(); }
 
-    protected:
-        dict_type m_dict;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void serialize(archive &ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("dict", m_dict)), "Failed to serialise operator dictionary.");
+        }
+#endif
     };
 
 } // namespace ttns

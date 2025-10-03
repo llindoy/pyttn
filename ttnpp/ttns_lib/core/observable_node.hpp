@@ -21,6 +21,10 @@
 
 #include "../ttn/tree/tree_node.hpp"
 
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/types/vector.hpp>
+#endif
+
 namespace ttns
 {
 
@@ -32,6 +36,15 @@ namespace ttns
         using size_type = typename backend_type::size_type;
         using real_type = typename tmp::get_real_type<T>::type;
 
+    protected:
+        std::vector<linalg::matrix<T, B>> m_data;
+        linalg::matrix<T, B> m_id;
+        bool m_has_identity = false;
+        size_type m_capacity = 0;
+        size_type m_dim1 = 0;
+        size_type m_dim2 = 0;
+
+    public:
         observable_node_data() {}
         observable_node_data(const observable_node_data &o) = default;
         observable_node_data(observable_node_data &&o) = default;
@@ -181,13 +194,6 @@ namespace ttns
         }
 #endif
 
-    protected:
-        std::vector<linalg::matrix<T, B>> m_data;
-        linalg::matrix<T, B> m_id;
-        bool m_has_identity = false;
-        size_type m_capacity = 0;
-        size_type m_dim1 = 0;
-        size_type m_dim2 = 0;
     };
 
     namespace node_data_traits

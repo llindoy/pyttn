@@ -28,6 +28,12 @@
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
 
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+#include <fstream>
+#endif
+
 namespace py = pybind11;
 
 template <typename T, typename backend>
@@ -389,7 +395,22 @@ void init_msttn(py::module &m, const std::string &label)
         //ttn& apply_operator(const Op<T, backend>& op, real_type tol = real_type(0), size_type nchi=0)
         
         .def("backend", [](const _msttn &)
-             { return backend::label(); });
+             { return backend::label(); })
+             
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const _msttn & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](_msttn & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const _msttn& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<_msttn>(t);}
+         ))
+#endif             
+             
+             ;
 }
 
 template <typename real_type, typename backend>

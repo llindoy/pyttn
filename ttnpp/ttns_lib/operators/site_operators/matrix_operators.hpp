@@ -42,6 +42,9 @@ namespace ttns
             using typename base_type::tensview;
             using typename base_type::vector_ref;
             using typename base_type::vector_type;
+            
+        protected:
+            matrix_type m_operator;
 
         public:
             dense_matrix_operator() : base_type() {}
@@ -119,29 +122,15 @@ namespace ttns
                 return oss.str();
             }
 
-        protected:
-            matrix_type m_operator;
-
 #ifdef CEREAL_LIBRARY_FOUND
         public:
             template <typename archive>
-            void save(archive &ar) const
+            void serialize(archive &ar)
             {
                 CALL_AND_HANDLE(
-                    ar(cereal::base_class<primitive<T, backend>>(this)),
+                    ar(cereal::virtual_base_class<primitive<T, backend>>(this)),
                     "Failed to serialise dense_matrix operator object.  Error when serialising the base object.");
 
-                CALL_AND_HANDLE(
-                    ar(cereal::make_nvp("matrix", m_operator)),
-                    "Failed to serialise dense_matrix operator object.  Error when serialising the matrix.");
-            }
-
-            template <typename archive>
-            void load(archive &ar)
-            {
-                CALL_AND_HANDLE(
-                    ar(cereal::base_class<primitive<T, backend>>(this)),
-                    "Failed to serialise dense_matrix operator object.  Error when serialising the base object.");
                 CALL_AND_HANDLE(
                     ar(cereal::make_nvp("matrix", m_operator)),
                     "Failed to serialise dense_matrix operator object.  Error when serialising the matrix.");
@@ -209,6 +198,9 @@ namespace ttns
             using typename base_type::tensview;
             using typename base_type::vector_ref;
             using typename base_type::vector_type;
+
+        protected:
+            linalg::csr_matrix<T, backend> m_operator;
 
         public:
             sparse_matrix_operator() : base_type() {}
@@ -286,28 +278,14 @@ namespace ttns
                 return oss.str();
             }
 
-        protected:
-            linalg::csr_matrix<T, backend> m_operator;
 #ifdef CEREAL_LIBRARY_FOUND
         public:
             template <typename archive>
-            void save(archive &ar) const
+            void serialize(archive &ar)
             {
                 CALL_AND_HANDLE(
-                    ar(cereal::base_class<primitive<T, backend>>(this)),
+                    ar(cereal::virtual_base_class<primitive<T, backend>>(this)),
                     "Failed to serialise sparse_matrix operator object.  Error when serialising the base object.");
-                CALL_AND_HANDLE(
-                    ar(cereal::make_nvp("matrix", m_operator)),
-                    "Failed to serialise sparse_matrix operator object.  Error when serialising the matrix.");
-            }
-
-            template <typename archive>
-            void load(archive &ar)
-            {
-                CALL_AND_HANDLE(
-                    ar(cereal::base_class<primitive<T, backend>>(this)),
-                    "Failed to serialise sparse_matrix operator object.  Error when serialising the base object.");
-
                 CALL_AND_HANDLE(
                     ar(cereal::make_nvp("matrix", m_operator)),
                     "Failed to serialise sparse_matrix operator object.  Error when serialising the matrix.");
@@ -334,6 +312,9 @@ namespace ttns
             using typename base_type::tensview;
             using typename base_type::vector_ref;
             using typename base_type::vector_type;
+
+        protected:
+            linalg::diagonal_matrix<T, backend> m_operator;
 
         public:
             diagonal_matrix_operator() : base_type() {}
@@ -412,28 +393,13 @@ namespace ttns
                 return oss.str();
             }
 
-        protected:
-            linalg::diagonal_matrix<T, backend> m_operator;
-
 #ifdef CEREAL_LIBRARY_FOUND
         public:
             template <typename archive>
-            void save(archive &ar) const
+            void serialize(archive &ar)
             {
                 CALL_AND_HANDLE(
-                    ar(cereal::base_class<primitive<T, backend>>(this)),
-                    "Failed to serialise diagonal_matrix operator object.  Error when serialising the base object.");
-
-                CALL_AND_HANDLE(
-                    ar(cereal::make_nvp("matrix", m_operator)),
-                    "Failed to serialise diagonal_matrix operator object.  Error when serialising the matrix.");
-            }
-
-            template <typename archive>
-            void load(archive &ar)
-            {
-                CALL_AND_HANDLE(
-                    ar(cereal::base_class<primitive<T, backend>>(this)),
+                    ar(cereal::virtual_base_class<primitive<T, backend>>(this)),
                     "Failed to serialise diagonal_matrix operator object.  Error when serialising the base object.");
 
                 CALL_AND_HANDLE(
@@ -447,6 +413,9 @@ namespace ttns
 } // namespace ttns
 
 #ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+
 TTNS_REGISTER_SERIALIZATION(ttns::ops::dense_matrix_operator, ttns::ops::primitive)
 TTNS_REGISTER_SERIALIZATION(ttns::ops::sparse_matrix_operator, ttns::ops::primitive)
 TTNS_REGISTER_SERIALIZATION(ttns::ops::diagonal_matrix_operator, ttns::ops::primitive)

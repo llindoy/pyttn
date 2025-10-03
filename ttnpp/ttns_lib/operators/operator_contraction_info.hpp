@@ -38,6 +38,23 @@ namespace ttns
         template <typename Y, typename V>
         friend class operator_info;
 
+    protected:
+        bool m_is_identity_spf;
+        bool m_is_identity_mf;
+        bool m_is_time_dependent;
+
+        spf_index_type m_spf_index;
+        mf_index_type m_mf_index;
+
+        T m_coeff;
+        literal::coeff<T> _m_coeff;
+
+        accum_coeff_type m_spf_coeff;
+        accum_coeff_type m_mf_coeff;
+        accum_coeff_int_type _m_spf_coeff;
+        accum_coeff_int_type _m_mf_coeff;
+
+
     public:
         operator_contraction_info() : m_is_identity_spf(false), m_is_identity_mf(false), m_is_time_dependent(false) {}
         operator_contraction_info(const operator_contraction_info &o) = default;
@@ -156,22 +173,6 @@ namespace ttns
             CALL_AND_HANDLE(ar(cereal::make_nvp("mf_index", m_mf_index)), "Failed to serialise operator term object.  Error when serialising the mf indexing info.");
         }
 #endif
-
-    protected:
-        bool m_is_identity_spf;
-        bool m_is_identity_mf;
-        bool m_is_time_dependent;
-
-        spf_index_type m_spf_index;
-        mf_index_type m_mf_index;
-
-        T m_coeff;
-        literal::coeff<T> _m_coeff;
-
-        accum_coeff_type m_spf_coeff;
-        accum_coeff_type m_mf_coeff;
-        accum_coeff_int_type _m_spf_coeff;
-        accum_coeff_int_type _m_mf_coeff;
     };
 
     template <typename T>

@@ -49,6 +49,11 @@ namespace ttns
         template <typename Y, typename V>
         friend class operator_container;
 
+    protected:
+        std::vector<operator_contraction_info<T>> m_terms;
+        size_t m_i_index = 0;
+        size_t m_j_index = 0;
+
     public:
         sttn_node_data() {}
 
@@ -138,10 +143,6 @@ namespace ttns
         }
 #endif
 
-    protected:
-        std::vector<operator_contraction_info<T>> m_terms;
-        size_t m_i_index = 0;
-        size_t m_j_index = 0;
     }; // sop_node_data
 
     namespace node_data_traits
@@ -749,7 +750,7 @@ namespace ttns
             CALL_AND_HANDLE(ar(cereal::make_nvp("operators", m_mode_operators)), "Failed to serialise sum of product operator.  Failed to serialise array of product operators.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("mode_dimension", m_mode_dimension)), "Failed to serialise sum of product operator.  Failed to serialise the number of modes.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("Eshift", m_Eshift)), "Failed to serialise operator node object.  Error when serialising Eshift.");
-            CALL_AND_HANDLE(ar(cereal::make_nvp("Eshift_int", _m_Eshift)), "Failed to serialise operator node object.  Error when serialising Eshift.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("Eshiftv", _m_Eshift)), "Failed to serialise operator node object.  Error when serialising Eshift.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("time_dependent_coeffs", m_time_dependent_coefficients)), "Failed to serialise operator node object.  Error when serialising time dependence.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("time_dependent_operators", m_time_dependent_operators)), "Failed to serialise operator node object.  Error when serialising time dependence.");
         }
@@ -759,3 +760,4 @@ namespace ttns
 } // namespace ttns
 
 #endif // PYTTN_TTNS_LIB_OPERATORS_SOP_OPERATOR_HPP_
+

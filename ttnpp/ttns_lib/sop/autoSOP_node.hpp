@@ -118,6 +118,15 @@ namespace ttns
         template <typename T>
         class operator_data
         {
+        protected:
+            opinfo m_opdef;
+            utils::term_indexing_array<size_t> m_inds;
+
+            // the coefficients used when accumulating the terms together to form a composite operator.
+            // If the m_opdef only contains a single element then this is simply set to vector of length 1
+            // containing static_cast<T>(1.0), as we never need to accumulate this term
+            std::vector<literal::coeff<T>> m_accum_coeff;
+
         public:
             operator_data() {}
             operator_data(const opinfo &op) : m_opdef(op) {}
@@ -172,15 +181,6 @@ namespace ttns
             utils::term_indexing_array<size_t> &indices() { return m_inds; }
             std::vector<literal::coeff<T>> &accumulation_coefficients() { return m_accum_coeff; }
 
-        protected:
-            opinfo m_opdef;
-            utils::term_indexing_array<size_t> m_inds;
-
-            // the coefficients used when accumulating the terms together to form a composite operator.
-            // If the m_opdef only contains a single element then this is simply set to vector of length 1
-            // containing static_cast<T>(1.0), as we never need to accumulate this term
-            std::vector<literal::coeff<T>> m_accum_coeff;
-
             friend class node_op_info<T>;
             friend class autoSOP<T>;
         };
@@ -188,6 +188,11 @@ namespace ttns
         template <typename T>
         class node_op_info
         {
+        protected:
+            std::vector<operator_data<T>> m_spf;
+            std::vector<operator_data<T>> m_mf;
+            std::vector<literal::coeff<T>> m_coeff;
+            
         public:
             node_op_info() {}
             node_op_info(const std::vector<operator_data<T>> &spf, const std::vector<operator_data<T>> &mf) : m_spf(spf), m_mf(mf) {}
@@ -239,17 +244,11 @@ namespace ttns
             }
 
 #endif
-
         protected:
-            std::vector<operator_data<T>> m_spf;
-            std::vector<operator_data<T>> m_mf;
-            std::vector<literal::coeff<T>> m_coeff;
-
             friend class autoSOP<T>;
-
             friend class tree_node<tree_base<auto_sop::node_op_info<T>>>;
 
-        protected:
+
             static inline void generate_r_array(const std::vector<operator_data<T>> &op, size_t nterms, std::vector<size_t> &rs)
             {
                 ASSERT(op.size() > 0, "Cannot generate r array object if this object has no operators bound.")

@@ -22,12 +22,18 @@
 #include <linalg/linalg.hpp>
 #include <common/tmp_funcs.hpp>
 
-#include "serialisation_helper.hpp"
-
 #ifdef CEREAL_LIBRARY_FOUND
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/archives/portable_binary.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+
+
 #endif
+
+#include "serialisation_helper.hpp"
+
+
 
 namespace ttns
 {
@@ -100,23 +106,10 @@ namespace ttns
 
             size_type size() const { return m_size; }
             bool is_identity() const { return m_is_identity; }
-
+            
 #ifdef CEREAL_LIBRARY_FOUND
-        public:
             template <typename archive>
-            void save(archive &ar) const
-            {
-                CALL_AND_HANDLE(
-                    ar(cereal::make_nvp("size", m_size)),
-                    "Failed to primitive operator.  Failed to serialise its size.");
-
-                CALL_AND_HANDLE(
-                    ar(cereal::make_nvp("is_identity", m_is_identity)),
-                    "Failed to primitive operator.  Failed to serialise whether or not it is the identity operator.");
-            }
-
-            template <typename archive>
-            void load(archive &ar)
+            void serialize(archive &ar) 
             {
                 CALL_AND_HANDLE(
                     ar(cereal::make_nvp("size", m_size)),
@@ -127,6 +120,7 @@ namespace ttns
             }
 #endif
         };
+        
 
         // implementation of the identity ops ops
         template <typename T, typename backend = linalg::blas_backend>
@@ -191,18 +185,10 @@ namespace ttns
 #ifdef CEREAL_LIBRARY_FOUND
         public:
             template <typename archive>
-            void save(archive &ar) const
+            void serialize(archive &ar) 
             {
                 CALL_AND_HANDLE(
-                    ar(cereal::base_class<primitive<T, backend>>(this)),
-                    "Failed to serialise identity operator object.  Error when serialising the base object.");
-            }
-
-            template <typename archive>
-            void load(archive &ar)
-            {
-                CALL_AND_HANDLE(
-                    ar(cereal::base_class<primitive<T, backend>>(this)),
+                    ar(cereal::virtual_base_class<primitive<T, backend>>(this)),
                     "Failed to serialise identity operator object.  Error when serialising the base object.");
             }
 #endif
@@ -215,8 +201,9 @@ namespace ttns
 #ifdef PYTTN_BUILD_CUDA
 #define SERIALIZE_CUDA_TYPES
 #endif
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
 TTNS_REGISTER_SERIALIZATION(ttns::ops::identity, ttns::ops::primitive)
-TTNS_REGISTER_SERIALIZATION(ttns::ops::test_operator, ttns::ops::primitive)
 #endif
 
 #endif // PYTTN_TTNS_LIB_OPERATORS_SITE_OPERATORS_PRIMITIVE_OPERATOR_HPP_//

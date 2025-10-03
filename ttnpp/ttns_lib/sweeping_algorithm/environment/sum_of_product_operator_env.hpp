@@ -72,6 +72,16 @@ namespace ttns
         using buffer_type = matrix_element_buffer<T, backend>;
 
     public:
+        buffer_type m_buf;
+        bond_action fha;
+        site_action_leaf cel;
+        site_action_branch ceb;
+        size_type m_operator_sum_nthreads = 1;
+        size_type m_set_var_nthreads = 1;
+        size_type m_maxcapacity = 0;
+        size_type m_maxsize = 0;
+
+    public:
         sop_environment() {}
         sop_environment(const sop_environment &o) = default;
         sop_environment(sop_environment &&o) = default;
@@ -106,6 +116,8 @@ namespace ttns
                 m_operator_sum_nthreads = os_nt;
                 m_set_var_nthreads = sv_nt;
 
+                m_maxcapacity = maxcapacity;
+                m_maxsize = maxsize;
                 // resize the working arrays.  We will resize these to the maximum possible array sizes
                 try
                 {
@@ -151,6 +163,8 @@ namespace ttns
         void clear()
         {
             CALL_AND_HANDLE(m_buf.clear(), "Failed to clear sop object.");
+            m_maxsize = 0;
+            m_maxcapacity = 0;
         }
 
         inline void update_env_down(const environment_type &op, const hnode &_a1, node_type &_h)
@@ -189,13 +203,42 @@ namespace ttns
         static size_type maximum_dimension(const ttn_type & /*A*/) { return 0; }
 #endif
 
-    public:
-        buffer_type m_buf;
-        bond_action fha;
-        site_action_leaf cel;
-        site_action_branch ceb;
-        size_type m_operator_sum_nthreads = 1;
-        size_type m_set_var_nthreads = 1;
+#ifdef CEREAL_LIBRARY_FOUND
+    template <typename archive>
+    void save(archive& ar) const
+    {
+        CALL_AND_HANDLE(ar(cereal::make_nvp("opsum_nthreads", m_operator_sum_nthreads)), "Failed to serialise sum of product operator env.  Failed to serialise opsum nthreads.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("setvar_nthreads", m_set_var_nthreads)), "Failed to serialise sum of product operator env.  Failed to serialise set var nthreads.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("maxcapacity", m_maxcapacity)), "Failed to serialise sum of product operator env.  Failed to serialise max capacity.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("maxsize", m_maxsize)), "Failed to serialise sum of product operator env.  Failed to serialise max size.");
+       
+    }
+
+    template <typename archive>
+    void load(archive& ar)
+    {
+        CALL_AND_HANDLE(ar(cereal::make_nvp("opsum_nthreads", m_operator_sum_nthreads)), "Failed to serialise sum of product operator env.  Failed to serialise opsum nthreads.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("setvar_nthreads", m_set_var_nthreads)), "Failed to serialise sum of product operator env.  Failed to serialise set var nthreads.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("maxcapacity", m_maxcapacity)), "Failed to serialise sum of product operator env.  Failed to serialise max capacity.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("maxsize", m_maxsize)), "Failed to serialise sum of product operator env.  Failed to serialise max size.");
+
+        // resize the working arrays.  We will resize these to the maximum possible array sizes
+        try
+        {
+            m_buf.reallocate(m_maxcapacity, m_operator_sum_nthreads*m_set_var_nthreads);
+            m_buf.resize(1, m_maxsize);
+            fha = bond_action( m_operator_sum_nthreads, m_set_var_nthreads);
+            cel = site_action_leaf( m_operator_sum_nthreads, m_set_var_nthreads);
+            ceb = site_action_branch( m_operator_sum_nthreads, m_set_var_nthreads);
+        }
+        catch (const std::exception &ex)
+        {
+            std::cerr << ex.what() << std::endl;
+            RAISE_EXCEPTION("Failed to reallocate internal buffers required for the sop environment");
+        }
+    }
+#endif
+
     };
 
 }

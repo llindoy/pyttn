@@ -325,7 +325,7 @@ class ntree(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def load(self, tree: str):
+    def load_from_string(self, tree: str):
         """Load an ntree object from a string representation of a tree.  Here we use a set of nested parentheses to represent
         a tree e.g.:
 

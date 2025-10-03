@@ -63,6 +63,7 @@ namespace utils
         linalg::vector<bool> m_converged;
 
         size_type m_krylov_dim;
+        size_type m_dim;
         size_type m_istride;
         size_type m_max_iter;
         size_type m_niters;
@@ -76,8 +77,8 @@ namespace utils
         bool m_invert_mode;
 
     public:
-        arnoldi() : m_arnoldi(), m_krylov_dim(0), m_istride(1), m_max_iter(10), m_neigs(0), m_eps(std::numeric_limits<real_type>::epsilon() * 1e3), m_rel_eps(0.0), m_mode(eigenvalue_target::largest_magnitude), m_verbose(false), m_invert_mode(false) {}
-        arnoldi(size_type krylov_dim, size_type dim, real_type eps = std::numeric_limits<real_type>::epsilon() * 1e3) : m_arnoldi(), m_krylov_dim(krylov_dim), m_istride(1), m_max_iter(10), m_neigs(0), m_eps(eps), m_rel_eps(0.0), m_mode(eigenvalue_target::largest_magnitude), m_verbose(false), m_invert_mode(false) { CALL_AND_HANDLE(resize(krylov_dim, dim), "Failed to construct krylov subspace integrator."); }
+        arnoldi() : m_arnoldi(), m_krylov_dim(0), m_dim(0), m_istride(1), m_max_iter(10), m_niters(0), m_neigs(0), m_eps(std::numeric_limits<real_type>::epsilon() * 1e3), m_rel_eps(0.0), m_mode(eigenvalue_target::largest_magnitude), m_verbose(false), m_invert_mode(false) {}
+        arnoldi(size_type krylov_dim, size_type dim, real_type eps = std::numeric_limits<real_type>::epsilon() * 1e3) : m_arnoldi(), m_krylov_dim(krylov_dim), m_dim(dim), m_istride(1), m_max_iter(10), m_niters(0), m_neigs(0), m_eps(eps), m_rel_eps(0.0), m_mode(eigenvalue_target::largest_magnitude), m_verbose(false), m_invert_mode(false) { CALL_AND_HANDLE(resize(krylov_dim, dim), "Failed to construct krylov subspace integrator."); }
         arnoldi(const arnoldi &o) = default;
         arnoldi(arnoldi &&o) = default;
 
@@ -89,6 +90,7 @@ namespace utils
             try
             {
                 m_krylov_dim = krylov_dim;
+                m_dim = dim;
                 CALL_AND_HANDLE(m_arnoldi.resize(krylov_dim, dim), "Failed to resize arnoldi iteration engine.");
                 CALL_AND_HANDLE(m_eigensolver.resize(krylov_dim, false), "Failed to resize upper_hessenberg_eigensolver.");
 
@@ -111,6 +113,7 @@ namespace utils
             {
                 m_niters = 0;
                 m_krylov_dim = 0;
+                m_dim = 0;
                 CALL_AND_HANDLE(m_arnoldi.clear(), "Failed to resize arnoldi iteration engine.");
                 CALL_AND_HANDLE(m_eigensolver.clear(), "Failed to resize upper_hessenberg_eigensolver.");
                 m_mode = eigenvalue_target::largest_magnitude;
@@ -144,6 +147,7 @@ namespace utils
         real_type &rel_tol() { return m_rel_eps; }
 
         const size_type &krylov_dim() const { return m_krylov_dim; }
+        const size_type &dim() const { return m_dim; }
 
         const linalg::matrix<real_type> &residues() const { return m_residues; }
         const real_type &residue(size_t i, size_t j) const
@@ -634,6 +638,41 @@ namespace utils
                 RAISE_EXCEPTION("Failed to sort eigenvalues and eigenvectors.");
             }
         }
+
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive &ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("krylov_dim", m_krylov_dim)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("dim", m_dim)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("istride", m_istride)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("maxiter", m_max_iter)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eps", m_eps)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("releps", m_rel_eps)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("mode", m_mode)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("verbose", m_verbose)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("invert", m_invert_mode)), "Failed to serialise arnoldi eigensolver.");
+        }
+        template <typename archive>
+        void load(archive &ar)
+        {
+            size_type krylov_dim, dim;
+            CALL_AND_HANDLE(ar(cereal::make_nvp("krylov_dim", krylov_dim)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("dim", dim)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("istride", m_istride)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("maxiter", m_max_iter)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eps", m_eps)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("releps", m_rel_eps)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("mode", m_mode)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("verbose", m_verbose)), "Failed to serialise arnoldi eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("invert", m_invert_mode)), "Failed to serialise arnoldi eigensolver.");            
+            m_neigs = 0;
+            m_niters = 0;
+            resize(krylov_dim, dim);
+        }
+#endif
+
     };
 
 }

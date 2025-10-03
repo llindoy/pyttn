@@ -881,7 +881,7 @@ namespace ttns
         }
 
     public:
-        size_type get_leaf_index(size_type lid)
+        size_type get_leaf_index(size_type lid) const
         {
             ASSERT(lid < m_nleaves, "Invalid leaf index.");
             return m_leaf_indices[lid];
@@ -1107,7 +1107,6 @@ namespace ttns
             }
         }
 
-    protected:
 #ifdef CEREAL_LIBRARY_FOUND
     public:
         template <typename archive>
@@ -1116,20 +1115,27 @@ namespace ttns
             CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn object.  Error when serialising the base object.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nset", m_nset)), "Failed to serialise ttn object.  Failed to serialise its set dimension.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("mode_dimensions", m_dim_sizes)), "Failed to serialise ttn object.  Failed to serialise its mode_dimensions.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("mode_dimensions_lhd", m_dim_sizes_lhd)), "Failed to serialise ttn object.  Failed to serialise its mode_dimensions.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("leaf_indices", m_leaf_indices)), "Failed to serialise ttn object.  Failed to serialise its leaf_indices.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("orthogonality_centre", m_orthogonality_centre)), "Failed to seriesalise ttn object. Failed to serialise orthogonality centre.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("has_orthogonality_centre", m_has_orthogonality_centre)), "Failed to seriesalise ttn object. Failed to serialise orthogonality centre.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("nset_lhd", m_nset_lhd)), "Failed to seriesalise ttn object. Failed to serialise orthogonality centre.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("purification", m_purification)), "Failed to seriesalise ttn object. Failed to serialise orthogonality centre.");
         }
 
         template <typename archive>
-        void load(archive &ar)
+        void load(archive &ar) 
         {
             CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn object.  Error when serialising the base object.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nset", m_nset)), "Failed to serialise ttn object.  Failed to serialise its set dimension.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("mode_dimensions", m_dim_sizes)), "Failed to serialise ttn object.  Failed to serialise its mode_dimensions.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("mode_dimensions_lhd", m_dim_sizes_lhd)), "Failed to serialise ttn object.  Failed to serialise its mode_dimensions.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("leaf_indices", m_leaf_indices)), "Failed to serialise ttn object.  Failed to serialise its leaf_indices.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("orthogonality_centre", m_orthogonality_centre)), "Failed to seriesalise ttn object. Failed to serialise orthogonality centre.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("has_orthogonality_centre", m_has_orthogonality_centre)), "Failed to seriesalise ttn object. Failed to serialise orthogonality centre.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("nset_lhd", m_nset_lhd)), "Failed to seriesalise ttn object. Failed to serialise orthogonality centre.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("purification", m_purification)), "Failed to seriesalise ttn object. Failed to serialise orthogonality centre.");
+            m_euler_tour_initialised=false;
         }
 #endif
 

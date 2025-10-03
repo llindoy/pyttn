@@ -57,7 +57,18 @@ void init_sSOP(py::module &m)
 
         .def("__str__", [](const sOP &o)
              { return static_cast<std::string>(o); })
-
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const sOP & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](sOP & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const sOP& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<sOP>(t);}
+         ))  
+#endif     
         .def("__add__", [](const sOP &a, const sOP &b)
              { return a + b; })
         .def("__add__", [](const sOP &a, const sPOP &b)
@@ -290,6 +301,20 @@ void init_sSOP(py::module &m)
              { return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
         .def("__str__", [](const sPOP &o)
              { return static_cast<std::string>(o); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const sPOP & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](sPOP & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const sPOP& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<sPOP>(t);}
+         ))  
+#endif  
+
+
         .def("__imul__", [](sPOP &a, const sPOP &b)
              { return a *= b; })
         .def("__imul__", [](sPOP &a, const sOP &b)
@@ -449,6 +474,20 @@ void init_sSOP(py::module &m)
 
             .def("__str__", [](const coef &o)
                  {std::ostringstream oss; oss << o; return oss.str(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const coef & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](coef & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const coef& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<coef>(t);}
+         ))  
+#endif  
+
+
             .def("__iadd__", [](coef &a, const real_type &b)
                  { return a += b; })
             .def("__iadd__", [](coef &a, const coef &b)
@@ -564,6 +603,21 @@ void init_sSOP(py::module &m)
 
             .def("__str__", [](const coef &o)
                  {std::ostringstream oss; oss << o; return oss.str(); })
+
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const coef & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](coef & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const coef& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<coef>(t);}
+         ))  
+#endif  
+
+
             .def("__iadd__", [](coef &a, const real_type &b)
                  { return a += b; })
             .def("__isub__", [](coef &a, const real_type &b)
@@ -665,6 +719,20 @@ void init_sSOP(py::module &m)
 
             .def("__str__", [](const NBO &o)
                  { return static_cast<std::string>(o); })
+
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const NBO & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](NBO & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const NBO& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<NBO>(t);}
+         ))  
+#endif  
+
             .def("__imul__", [](NBO &a, const sOP &b)
                  { return a *= b; })
             .def("__imul__", [](NBO &a, const sPOP &b)
@@ -773,6 +841,20 @@ void init_sSOP(py::module &m)
                  { return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
             .def("__str__", [](const NBO &o)
                  { return static_cast<std::string>(o); })
+
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const NBO & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](NBO & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const NBO& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<NBO>(t);}
+         ))  
+#endif  
+
             .def("__imul__", [](NBO &a, const sOP &b)
                  { return a *= b; })
             .def("__imul__", [](NBO &a, const sPOP &b)
@@ -877,6 +959,19 @@ void init_sSOP(py::module &m)
             .def("__getitem__", static_cast<sNBO<real_type> &(_SOP::*)(size_t)>(&_SOP::operator[]), py::return_value_policy::reference)
             .def("__str__", [](const _SOP &o)
                  {std::ostringstream oss; oss << o; return oss.str(); })
+
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const _SOP & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](_SOP & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const _SOP& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<_SOP>(t);}
+         ))  
+#endif  
 
             .def("__iadd__", [](_SOP &a, const sOP &b)
                  { return a += b; })
@@ -1009,6 +1104,19 @@ void init_sSOP(py::module &m)
             .def("__getitem__", static_cast<sNBO<complex_type> &(_SOP::*)(size_t)>(&_SOP::operator[]), py::return_value_policy::reference)
             .def("__str__", [](const _SOP &o)
                  {std::ostringstream oss; oss << o; return oss.str(); })
+
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const _SOP & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](_SOP & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const _SOP& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<_SOP>(t);}
+         ))  
+#endif  
 
             .def("__iadd__", [](_SOP &a, const sOP &b)
                  { return a += b; })

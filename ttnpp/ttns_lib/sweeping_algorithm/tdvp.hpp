@@ -123,6 +123,21 @@ namespace ttns
             this->subspace_weighting_factor() = this->dt() / 2.0;
             CALL_AND_RETHROW(return static_cast<base_type *>(this)->operator()(std::forward<Args>(args)...));
         }
+
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive &ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise one site dmrg object..");
+        }
+        template <typename archive>
+        void load(archive &ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise one site dmrg object..");
+        }
+#endif
+
     };
 
     template <typename T, typename backend>
@@ -180,6 +195,21 @@ namespace ttns
             this->subspace_weighting_factor() = this->dt() / 2.0;
             CALL_AND_RETHROW(return static_cast<base_type *>(this)->operator()(std::forward<Args>(args)...));
         }
+
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive &ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise one site dmrg object..");
+        }
+        template <typename archive>
+        void load(archive &ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise one site dmrg object..");
+        }
+#endif
+
     };
 
     template <typename T, typename backend>

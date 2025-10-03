@@ -40,13 +40,13 @@
 #endif
 
 #ifdef TTNS_REGISTER_COMPLEX_FLOAT
-#define TTNS_REGISTER_COMPLEX_FLOAT_CUDA(op_name, base_name) TTNS_REGISTER_POLYMORPHIC_SERIALIZATION(op_name, base_name, ttns::complex<float>, linalg::cuda_backend)
+#define TTNS_REGISTER_COMPLEX_FLOAT_CUDA(op_name, base_name) TTNS_REGISTER_POLYMORPHIC_SERIALIZATION(op_name, base_name, linalg::complex<float>, linalg::cuda_backend)
 #else
 #define TTNS_REGISTER_COMPLEX_FLOAT_CUDA(op_name, base_name)
 #endif
 
 #ifdef TTNS_REGISTER_COMPLEX_DOUBLE
-#define TTNS_REGISTER_COMPLEX_DOUBLE_CUDA(op_name, base_name) TTNS_REGISTER_POLYMORPHIC_SERIALIZATION(op_name, base_name, ttns::complex<double>, linalg::cuda_backend)
+#define TTNS_REGISTER_COMPLEX_DOUBLE_CUDA(op_name, base_name) TTNS_REGISTER_POLYMORPHIC_SERIALIZATION(op_name, base_name, linalg::complex<double>, linalg::cuda_backend)
 #else
 #define TTNS_REGISTER_COMPLEX_DOUBLE_CUDA(op_name, base_name)
 #endif
@@ -71,13 +71,13 @@
 #endif
 
 #ifdef TTNS_REGISTER_COMPLEX_FLOAT
-#define TTNS_REGISTER_COMPLEX_FLOAT_BLAS(op_name, base_name) TTNS_REGISTER_POLYMORPHIC_SERIALIZATION(op_name, base_name, ttns::complex<float>, linalg::blas_backend)
+#define TTNS_REGISTER_COMPLEX_FLOAT_BLAS(op_name, base_name) TTNS_REGISTER_POLYMORPHIC_SERIALIZATION(op_name, base_name, linalg::complex<float>, linalg::blas_backend)
 #else
 #define TTNS_REGISTER_COMPLEX_FLOAT_BLAS(op_name, base_name)
 #endif
 
 #ifdef TTNS_REGISTER_COMPLEX_DOUBLE
-#define TTNS_REGISTER_COMPLEX_DOUBLE_BLAS(op_name, base_name) TTNS_REGISTER_POLYMORPHIC_SERIALIZATION(op_name, base_name, ttns::complex<double>, linalg::blas_backend)
+#define TTNS_REGISTER_COMPLEX_DOUBLE_BLAS(op_name, base_name) TTNS_REGISTER_POLYMORPHIC_SERIALIZATION(op_name, base_name, linalg::complex<double>, linalg::blas_backend)
 #else
 #define TTNS_REGISTER_COMPLEX_DOUBLE_BLAS(op_name, base_name)
 #endif

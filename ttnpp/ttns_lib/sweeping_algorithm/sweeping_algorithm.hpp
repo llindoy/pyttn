@@ -70,6 +70,19 @@ namespace ttns
 
         using buffer_type = typename environment_type::buffer_type;
 
+    protected:
+        environment_type m_env;
+        size_type m_nh_evals = 0;
+
+        bool m_env_set = false;
+
+        size_type m_operator_sum_nthreads = 1;
+        size_type m_set_var_nthreads = 1;   
+ 
+        bool m_validate_inputs = true;
+
+        env_container_type m_ham;
+
     public:
         sweeping_algorithm() {}
         sweeping_algorithm(const ttn_type &A, const env_type &ham, size_type set_var_nthreads = 1)
@@ -472,18 +485,38 @@ namespace ttns
     public:
         size_type nh_applications() const { return m_nh_evals; }
 
-    protected:
-        environment_type m_env;
-        size_type m_nh_evals = 0;
+#ifdef CEREAL_LIBRARY_FOUND
+    template <typename archive>
+    void save(archive& ar) const
+    {
+        CALL_AND_HANDLE(ar(cereal::base_class<update_type>(this)), "Failed to serialise sweeping algorithm.  Error when serialising the update object.");
+        CALL_AND_HANDLE(ar(cereal::base_class<subspace_type>(this)), "Failed to serialise sweeping algorithm.  Error when serialising the subspace object.");
 
-        bool m_env_set = false;
+        CALL_AND_HANDLE(ar(cereal::make_nvp("env", m_env)), "Failed to serialise sweeping algorithm.  Failed to serialise environment.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("env_evals", m_nh_evals)), "Failed to serialise sweeping algorithm.  Failed to serialise the number of environment evaluations.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("envset", m_env_set)), "Failed to serialise sweeping algorithm.  Failed to serialise whether the environment has been set.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("opsum_nthreads", m_operator_sum_nthreads)), "Failed to serialise sweeping algorithm.  Failed to serialise the number of threads for operator sums.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("setvar_nthreads", m_set_var_nthreads)), "Failed to serialise sweeping algorithm.  Failed to serialise the number of threads for set variables.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("validate", m_validate_inputs)), "Failed to serialise sweeping algorithm.  Failed to serialise whether or not to validate inputs.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("ham", m_ham)), "Failed to serialise sweeping algorithm.  Failed to serialise the current Hamiltonian matrix.");
+    }
 
-        size_type m_operator_sum_nthreads = 1;
-        size_type m_set_var_nthreads = 1;   
- 
-        bool m_validate_inputs = true;
+    template <typename archive>
+    void load(archive& ar)
+    {
+        CALL_AND_HANDLE(ar(cereal::base_class<update_type>(this)), "Failed to serialise sweeping algorithm.  Error when serialising the update object.");
+        CALL_AND_HANDLE(ar(cereal::base_class<subspace_type>(this)), "Failed to serialise sweeping algorithm.  Error when serialising the subspace object.");
 
-        env_container_type m_ham;
+        CALL_AND_HANDLE(ar(cereal::make_nvp("env", m_env)), "Failed to serialise sweeping algorithm.  Failed to serialise environment.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("env_evals", m_nh_evals)), "Failed to serialise sweeping algorithm.  Failed to serialise the number of environment evaluations.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("envset", m_env_set)), "Failed to serialise sweeping algorithm.  Failed to serialise whether the environment has been set.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("opsum_nthreads", m_operator_sum_nthreads)), "Failed to serialise sweeping algorithm.  Failed to serialise the number of threads for operator sums.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("setvar_nthreads", m_set_var_nthreads)), "Failed to serialise sweeping algorithm.  Failed to serialise the number of threads for set variables.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("validate", m_validate_inputs)), "Failed to serialise sweeping algorithm.  Failed to serialise whether or not to validate inputs.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("ham", m_ham)), "Failed to serialise sweeping algorithm.  Failed to serialise the current Hamiltonian matrix.");
+    }
+#endif
+
     }; // class sweeping_algorithm
 
     template <typename T, typename backend>

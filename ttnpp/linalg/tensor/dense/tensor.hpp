@@ -20,6 +20,8 @@
 #include "tensor_view.hpp"
 #include "tensor_details.hpp"
 #include "tensor_slice_traits.hpp"
+#include "../../utils/serialisation.hpp"
+
 
 // TODO: Implement stl allocators (and potentially an aligned allocator) to handle memory rather than the hacky approach I have currently taken.
 namespace linalg
@@ -410,14 +412,17 @@ namespace linalg
         template <typename archive>
         void save(archive &ar) const
         {
-            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", buffer_writer_type{m_buffer, m_totcapacity})), "Failed to serialise tensor object.  Error when serialising the data buffer.");
+            auto bwriter = buffer_writer_type{m_buffer, m_totsize, m_totcapacity};
+            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", bwriter)), "Failed to serialise tensor object.  Error when serialising the data buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("shape", m_shape)), "Failed to serialise tensor object.  Failed to serialise the tensor shape.");
         }
 
         template <typename archive>
         void load(archive &ar)
         {
-            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", buffer_reader_type{&m_buffer, &m_totcapacity})), "Failed to deserialise tensor object.  Error when deserialising the data buffer.");
+            size_type totsize;
+            auto breader = buffer_reader_type{&m_buffer, &totsize, &m_totcapacity};
+            CALL_AND_HANDLE(ar(cereal::make_nvp("buffer", breader)), "Failed to deserialise tensor object.  Error when deserialising the data buffer.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("shape", m_shape)), "Failed to deserialise tensor object.  Failed to deserialise the tensor shape.");
             m_totsize = 1;
             for (size_type i = 0; i < rank; ++i)
@@ -425,6 +430,7 @@ namespace linalg
                 m_totsize *= m_shape[i];
             }
             ASSERT(m_totsize <= m_totcapacity, "Failed to deserialise tensor object. The total size of the tensor is incompatible with the storage buffer size.");
+            ASSERT(m_totsize == totsize, "Failed to deserialise tensor object. The total size of the tensor is incompatible with the shape.");
             init_stride();
         }
 #endif

@@ -45,9 +45,13 @@ namespace ttns
             using typename base_type::vector_ref;
             using typename base_type::vector_type;
 
-        public:
             using mode_container_type = std::vector<std::shared_ptr<base_type>>;
             using container_type = std::vector<std::pair<size_type, mode_container_type>>;
+
+        protected:
+            container_type m_operators;
+            std::vector<size_type> m_dims;
+            vector_type m_temp;
 
         public:
             site_product_operator() : base_type() {}
@@ -365,23 +369,10 @@ namespace ttns
                 return oss.str();
             }
 
-        protected:
-            container_type m_operators;
-            std::vector<size_type> m_dims;
-            vector_type m_temp;
-
 #ifdef CEREAL_LIBRARY_FOUND
         public:
             template <typename archive>
-            void save(archive &ar) const
-            {
-                CALL_AND_HANDLE(ar(cereal::base_class<primitive<T, backend>>(this)), "Failed to serialise site_product operator object.  Error when serialising the base object.");
-                CALL_AND_HANDLE(ar(cereal::make_nvp("matrix", m_operators)), "Failed to serialise site_product operator object.  Error when serialising the matrix.");
-                CALL_AND_HANDLE(ar(cereal::make_nvp("temp", m_temp)), "Failed to serialise site_product operator object.  Error when serialising the matrix.");
-            }
-
-            template <typename archive>
-            void load(archive &ar)
+            void serialize(archive &ar)
             {
                 CALL_AND_HANDLE(ar(cereal::base_class<primitive<T, backend>>(this)), "Failed to serialise site_product operator object.  Error when serialising the base object.");
                 CALL_AND_HANDLE(ar(cereal::make_nvp("matrix", m_operators)), "Failed to serialise site_product operator object.  Error when serialising the matrix.");

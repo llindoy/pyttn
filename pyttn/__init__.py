@@ -1,5 +1,5 @@
 # This files is part of the pyTTN package.
-#(C) Copyright 2025 NPL Management Limited
+# (C) Copyright 2025 NPL Management Limited
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -65,6 +65,7 @@ from .ttns import (  # noqa: I001
     primitive_mode_data,
     product_operator,
     qubit_mode,
+    rdm,
     sepState,
     set_bond_dimensions,
     set_dims,
@@ -106,6 +107,7 @@ __all__: list[str] = [
     "TDVP",
     "matrix_element",
     "MatrixElement",
+    "rdm",
     "ops",
     "Op",
     "site_operator",
@@ -160,7 +162,7 @@ __all__: list[str] = [
     "ttnNode",
     "ttnNodeData",
     "ttn_node_data",
-    "ttn_node", 
+    "ttn_node",
     "msttn",
     "ms_ttn",
     "multiset_ttn",

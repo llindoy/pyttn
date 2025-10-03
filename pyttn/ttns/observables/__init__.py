@@ -11,8 +11,10 @@
 # limitations under the License
 
 from .matrixElementExt import matrix_element, MatrixElement
+from .rdmExt import rdm
 
 __all__ = [
     "matrix_element",
-    "MatrixElement"
+    "MatrixElement",
+    "rdm"
 ]

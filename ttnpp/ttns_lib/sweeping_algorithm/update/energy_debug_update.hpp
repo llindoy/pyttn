@@ -44,6 +44,9 @@ namespace ttns
         using buffer_type = typename environment_type::buffer_type;
 
         using parameter_list = simple_update_parameter_list;
+    
+    protected:
+        linalg::matrix<T, backend> m_res;
 
     public:
         energy_debug_engine() {}
@@ -96,9 +99,12 @@ namespace ttns
         }
 
         void advance_hamiltonian(ttn_type &, environment_type &, env_container_type &, env_type &) {}
+#ifdef CEREAL_LIBRARY_FOUND
+public:
+    template <typename archive>
+    void serialize(archive&){}
+#endif
 
-    protected:
-        linalg::matrix<T, backend> m_res;
     }; // class energy_debug_engine
 
     template <typename T, typename backend>
@@ -122,6 +128,8 @@ namespace ttns
         using buffer_type = typename environment_type::buffer_type;
 
         using parameter_list = simple_update_parameter_list;
+    public:
+        multiset_update_buffer<T, backend> mbuf;
 
     public:
         energy_debug_engine() {}
@@ -202,8 +210,14 @@ namespace ttns
 
         void advance_hamiltonian(ttn_type &, environment_type &, env_container_type &, env_type &) {}
 
-    public:
-        multiset_update_buffer<T, backend> mbuf;
+#ifdef CEREAL_LIBRARY_FOUND
+public:
+    template <typename archive>
+    void save(archive&) const {}
+
+    template <typename archive>
+    void load(archive&) {}
+#endif
     }; // class energy_debug_engine
 
 }

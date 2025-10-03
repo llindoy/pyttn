@@ -39,6 +39,10 @@ namespace ttns
     {
     public:
         using container_type = std::vector<std::array<size_type, 2>>;
+        
+    protected:
+        size_type m_parent_index;
+        container_type m_sibling_indices;
 
     public:
         mf_index() {}
@@ -83,9 +87,6 @@ namespace ttns
             CALL_AND_HANDLE(ar(cereal::make_nvp("sibling_indices", m_sibling_indices)), "Failed to serialise mf_index object.  Error when serialising the sibling_indices.");
         }
 #endif
-    protected:
-        size_type m_parent_index;
-        container_type m_sibling_indices;
     };
 
     template <typename I>

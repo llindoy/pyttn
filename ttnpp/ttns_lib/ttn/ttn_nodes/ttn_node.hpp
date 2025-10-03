@@ -666,15 +666,20 @@ namespace ttns
         template <typename archive>
         void save(archive &ar) const
         {
-            CALL_AND_HANDLE(ar(cereal::base_class<matrix<T, backend>>(this)), "Failed to serialise ttn_node_data object.  Error when serialising the base matrix object.");
+            CALL_AND_HANDLE(ar(cereal::base_class<linalg::matrix<T, backend>>(this)), "Failed to serialise ttn_node_data object.  Error when serialising the base matrix object.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("dims", m_mode_dims)), "Failed to serialise ttn_node_object object.  Error when serialising mode dimensions.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("capacity", m_mode_capacity)), "Failed to serialise ttn_node_object object.  Error when serialising mode dimensions.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("maxhrank", m_max_hrank)), "Failed to serialise ttn_node_object object.  Error when serialising mode dimensions.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("maxdimen", m_max_dimen)), "Failed to serialise ttn_node_object object.  Error when serialising mode dimensions.");
         }
-
         template <typename archive>
         void load(archive &ar)
         {
-            CALL_AND_HANDLE(ar(cereal::base_class<matrix<T, backend>>(this)), "Failed to serialise ttn_node_data object.  Error when serialising the base matrix object.");
+            CALL_AND_HANDLE(ar(cereal::base_class<linalg::matrix<T, backend>>(this)), "Failed to serialise ttn_node_data object.  Error when serialising the base matrix object.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("dims", m_mode_dims)), "Failed to serialise ttn_node_object object.  Error when serialising mode dimensions.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("capacity", m_mode_capacity)), "Failed to serialise ttn_node_object object.  Error when serialising mode dimensions.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("maxhrank", m_max_hrank)), "Failed to serialise ttn_node_object object.  Error when serialising mode dimensions.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("maxdimen", m_max_dimen)), "Failed to serialise ttn_node_object object.  Error when serialising mode dimensions.");
         }
 #endif
 
@@ -1427,15 +1432,9 @@ namespace ttns
 
     public:
         template <typename archive>
-        void save(archive &ar) const
+        void serialize(archive &ar)
         {
-            CALL_AND_HANDLE(ar(cereal::base_class<tree_node_base<tree_base<ttn_node_data<T, backend>>>>(this)), "Failed to serialise ttn_node object.  Error when serialising the base object.");
-        }
-
-        template <typename archive>
-        void load(archive &ar)
-        {
-            CALL_AND_HANDLE(ar(cereal::base_class<tree_node_base<tree_base<ttn_node_data<T, backend>>>>(this)), "Failed to serialise ttn_node object.  Error when serialising the base object.");
+            CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn_node object.  Error when serialising the base object.");
         }
 #endif
 

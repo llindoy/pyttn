@@ -95,7 +95,15 @@ public:
   void advance_hamiltonian(ttn_type &, const environment_type &,
                            env_container_type &, env_type &) {}
 
-protected:
+#ifdef CEREAL_LIBRARY_FOUND
+public:
+    template <typename archive>
+    void save(archive&) const {}
+
+    template <typename archive>
+    void load(archive&) {}
+#endif
+
 }; // class assignment_engine
 
 } // namespace ttns

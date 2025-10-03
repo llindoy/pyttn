@@ -17,6 +17,10 @@
 
 #include "../../ttn/ms_ttn.hpp"
 
+#ifdef CEREAL_LIBRARY_FOUND
+#include <cereal/types/vector.hpp>
+#endif
+
 namespace ttns
 {
 
@@ -25,6 +29,13 @@ namespace ttns
   {
     using size_type = typename backend::size_type;
     using ttn_type = ms_ttn<T, backend>;
+
+protected:
+    linalg::vector<T, backend> m_Abuf;
+    linalg::vector<T, backend> m_resbuf;
+    std::vector<linalg::matrix<T, backend>> m_res;
+    size_type m_maxcapacity;
+    std::vector<size_t> m_set_capacity;
 
   public:
     template <typename buftype>
@@ -56,7 +67,7 @@ namespace ttns
         clear();
 
         size_type maxcapacity = 0;
-        std::vector<size_t> set_capacity(A.nset(), 0);
+        m_set_capacity = std::vector<size_t>(A.nset(), 0);
         for (const auto &a : A)
         {
             size_type capacity = a.buffer_maxcapacity();
@@ -67,12 +78,14 @@ namespace ttns
             for (size_t i = 0; i < A.nset(); ++i)
             {
                 size_type scap = a()[i].capacity();
-                if (scap > set_capacity[i])
+                if (scap > m_set_capacity[i])
                 {
-                    set_capacity[i] = scap;
+                    m_set_capacity[i] = scap;
                 }
             }
-      }
+        }
+
+        m_maxcapacity = maxcapacity;
         CALL_AND_HANDLE(m_Abuf.reallocate(maxcapacity),
                         "Failed to reserve storage for internal types.");
         CALL_AND_HANDLE(m_resbuf.reallocate(maxcapacity),
@@ -80,7 +93,7 @@ namespace ttns
         m_res.resize(A.nset());
         for (size_t i = 0; i < A.nset(); ++i)
         {
-            m_res[i].reallocate(set_capacity[i]);
+            m_res[i].reallocate(m_set_capacity[i]);
         }
     }
 
@@ -102,10 +115,33 @@ namespace ttns
     std::vector<linalg::matrix<T, backend>> &res() { return m_res; }
     const std::vector<linalg::matrix<T, backend>> &re() const { return m_res; }
 
-  protected:
-    linalg::vector<T, backend> m_Abuf;
-    linalg::vector<T, backend> m_resbuf;
-    std::vector<linalg::matrix<T, backend>> m_res;
+
+#ifdef CEREAL_LIBRARY_FOUND
+    template <typename archive>
+    void save(archive& ar) const
+    {
+        CALL_AND_HANDLE(ar(cereal::make_nvp("maxcapacity", m_maxcapacity)), "Failed to serialise multiset update buffer.  Failed to serialise max capacity.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("set_capacity", m_set_capacity)), "Failed to serialise multiset update buffer.  Failed to serialise set capacity.");
+    }
+    template <typename archive>
+    void load(archive& ar)
+    {
+        CALL_AND_HANDLE(ar(cereal::make_nvp("maxcapacity", m_maxcapacity)), "Failed to serialise multiset update buffer.  Failed to serialise max capacity.");
+        CALL_AND_HANDLE(ar(cereal::make_nvp("set_capacity", m_set_capacity)), "Failed to serialise multiset update buffer.  Failed to serialise set capacity.");
+
+
+        CALL_AND_HANDLE(m_Abuf.reallocate(m_maxcapacity),
+                        "Failed to reserve storage for internal types.");
+        CALL_AND_HANDLE(m_resbuf.reallocate(m_maxcapacity),
+                        "Failed to reserve storage for internal types.");
+        m_res.resize(m_set_capacity.size());
+        for (size_t i = 0; i < m_set_capacity.size(); ++i)
+        {
+            m_res[i].reallocate(m_set_capacity[i]);
+        }
+    }
+#endif
+
   };
 
 } // namespace ttns

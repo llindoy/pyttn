@@ -111,6 +111,20 @@ void init_dmrg_core(py::module &m, const std::string &label)
           )mydelim")
         .def("backend", [](const dmrg &)
              { return backend::label(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const dmrg & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](dmrg & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const dmrg& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<dmrg>(t);}
+         ))  
+#endif  
+
+
         .doc() = R"mydelim(
             A class implementing the one site DMRG algorithm on trees.
           )mydelim";
@@ -235,6 +249,19 @@ void init_dmrg_adaptive(py::module &m, const std::string &label)
           )mydelim")
         .def("backend", [](const admrg &)
              { return backend::label(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const admrg & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](admrg & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const admrg& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<admrg>(t);}
+         ))  
+#endif  
+
         .doc() = R"mydelim(
               A class implementing the adaptive one site DMRG algorithm on trees.
             )mydelim";

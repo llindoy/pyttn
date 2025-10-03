@@ -49,6 +49,12 @@ namespace ttns
 
         using parameter_list = simple_update_parameter_list;
 
+    protected:
+        // the krylov subspace engine
+        eigensolver_type m_eigensolver;
+
+        T m_curr_E;
+
     public:
         gso_engine() : m_curr_E(0) {}
         gso_engine(const ttn_type &A, size_type krylov_dim = 4) : m_curr_E(0)
@@ -146,11 +152,23 @@ namespace ttns
         void update_bond_tensor(bond_matrix_type & /* r */, const environment_type & /* env */, env_node_type & /* h */, env_type & /* op */) {}
         void advance_hamiltonian(ttn_type &, environment_type &, env_container_type &, env_type &) {}
 
-    protected:
-        // the krylov subspace engine
-        eigensolver_type m_eigensolver;
 
-        T m_curr_E;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive& ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eigensolver", m_eigensolver)), "Failed to serialise ground state optimisation engine.  Failed to serialise eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("E", m_curr_E)), "Failed to serialise ground state optimisation engine.  Failed to serialise current energy.");
+        }
+        template <typename archive>
+        void load(archive& ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eigensolver", m_eigensolver)), "Failed to serialise ground state optimisation engine.  Failed to serialise eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("E", m_curr_E)), "Failed to serialise ground state optimisation engine.  Failed to serialise current energy.");
+        }
+#endif
+
     }; // class gso_engine
 
     template <typename T, typename backend>
@@ -179,6 +197,13 @@ namespace ttns
         using eigensolver_type = utils::arnoldi<T, backend>;
 
         using parameter_list = simple_update_parameter_list;
+
+    protected:
+        // the krylov subspace engine
+        eigensolver_type m_eigensolver;
+
+        T m_curr_E;
+        multiset_update_buffer<T, backend> mbuf;
 
     public:
         gso_engine() : m_curr_E(0) {}
@@ -285,12 +310,26 @@ namespace ttns
 
         void advance_hamiltonian(ttn_type &, environment_type &, env_container_type &, env_type &) {}
 
-    protected:
-        // the krylov subspace engine
-        eigensolver_type m_eigensolver;
+#ifdef CEREAL_LIBRARY_FOUND
+    public:
+        template <typename archive>
+        void save(archive& ar) const
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eigensolver", m_eigensolver)), "Failed to serialise ground state optimisation engine.  Failed to serialise eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("E", m_curr_E)), "Failed to serialise ground state optimisation engine.  Failed to serialise current energy.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("buf", mbuf)), "Failed to serialise ground state optimisation engine.  Failed to serialise buffer.");
 
-        T m_curr_E;
-        multiset_update_buffer<T, backend> mbuf;
+        }
+        template <typename archive>
+        void load(archive& ar)
+        {
+            CALL_AND_HANDLE(ar(cereal::make_nvp("eigensolver", m_eigensolver)), "Failed to serialise ground state optimisation engine.  Failed to serialise eigensolver.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("E", m_curr_E)), "Failed to serialise ground state optimisation engine.  Failed to serialise current energy.");
+            CALL_AND_HANDLE(ar(cereal::make_nvp("buf", mbuf)), "Failed to serialise ground state optimisation engine.  Failed to serialise buffer.");
+
+        }
+#endif
+
     }; // class gso_engine
 
 }
