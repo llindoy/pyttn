@@ -33,6 +33,9 @@
 !examples/*/
 !examples/anderson_impurity_model/
 !examples/anderson_impurity_model/*.py
+!examples/vibronic/
+!examples/vibronic/*.py
+!examples/vibronic/*.pkl
 !examples/spin_models/
 !examples/spin_models/dissipative_xy/
 !examples/spin_models/dissipative_xy/cayley_tree/
