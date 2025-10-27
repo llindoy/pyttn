@@ -124,6 +124,11 @@ class CMakeBuild(build_ext):
                 ["cmake", "--build", ".", "--target", "install"], cwd=build_temp, check=True
             )
 
+rebuild_lib=os.environ.get('SKIP_BUILD_TTNPP_LIBRARY')
+rebuild=True
+if rebuild_lib is not None:
+    if rebuild_lib.lower() in ('true', '1', 't'):
+        rebuild = False
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
@@ -134,7 +139,7 @@ setup(
     author_email="lachlan.lindoy@npl.co.uk",
     description="python bindings of ttnpp using pybind11",
     long_description="",
-    ext_modules=[CMakeExtension("pyttn.ttnpp", rebuild=True, parallel=16)],
+    ext_modules=[CMakeExtension("pyttn.ttnpp", rebuild=rebuild, parallel=16)],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={},

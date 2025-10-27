@@ -9,6 +9,9 @@ before_script:
     - apt-get update --yes
     - apt-get install --yes cmake
     - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
+    - pip install virtualenv
+    - python -m venv .venv
+    - source .venv/bin/activate
 
 build:
   stage: build
@@ -23,10 +26,13 @@ lint:
   stage: lint
   script:
     - python -m pip -v install .[lint]
+    - export SKIP_BUILD_TTNPP_LIBRARY=0
     - ruff check
 
 test:
   stage: test
   script:
     - python -m pip -v install .[test]
+    - export SKIP_BUILD_TTNPP_LIBRARY=0
     - python -m pytest
+
