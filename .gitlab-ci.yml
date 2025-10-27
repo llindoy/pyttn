@@ -10,7 +10,7 @@ build_and_test:
     - apt-get install --yes cmake
     - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
     - export CMAKE_BUILD_PARALLEL_LEVEL=4
-    - python -m pip -v install .[test, lint]
+    - python -m pip -v install .[test,lint]
     - python -m pytest
     - ruff check
 
