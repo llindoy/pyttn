@@ -2,19 +2,15 @@ image: python:3.13
 
 stages:
   - build_and_test
-  
+
 build_and_test:
   stage: build_and_test
   script:
-  - apt-get update --yes
-  - apt-get install --yes cmake
-  - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
-  - python -m pip install pytest
-  - python -m pip install numpy
-  - python -m pip install h5py
-  - python -m pip install ruff
-  - export CMAKE_BUILD_PARALLEL_LEVEL=4
-  - python -m pip -v install ./
-  - python -m pytest
-  - ruff check
+    - apt-get update --yes
+    - apt-get install --yes cmake
+    - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
+    - export CMAKE_BUILD_PARALLEL_LEVEL=4
+    - python -m pip -v install .[test, lint]
+    - python -m pytest
+    - ruff check
 
