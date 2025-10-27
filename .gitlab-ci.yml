@@ -1,16 +1,32 @@
 image: python:3.13
 
 stages:
-  - build_and_test
+  - build
+  - lint
+  - test
 
-build_and_test:
-  stage: build_and_test
-  script:
+before_script:
     - apt-get update --yes
     - apt-get install --yes cmake
     - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
+
+build:
+  stage: build
+  script:
     - export CMAKE_BUILD_PARALLEL_LEVEL=4
-    - python -m pip -v install .[test,lint]
-    - python -m pytest
+    - python -m pip -v install .
+
+  artifacts:
+    paths:
+        - build/
+lint:
+  stage: lint
+  script:
+    - python -m pip -v install .[lint]
     - ruff check
 
+test:
+  stage: test
+  script:
+    - python -m pip -v install .[test]
+    - python -m pytest
