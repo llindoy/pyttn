@@ -21,7 +21,7 @@ build:
 
   artifacts:
     paths:
-        - build/
+        - build/lib.*
 lint:
   stage: lint
   script:
