@@ -29,6 +29,7 @@ class CMakeExtension(Extension):
             if rebuild_lib.lower() in ('true', '1', 't'):
                 rebuild = False
 
+        print(rebuild_lib,file=sys.stderr)
         if rebuild:
             print("Rebuilding module",file=sys.stderr)
         else:
