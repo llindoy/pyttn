@@ -67,9 +67,8 @@ pages:
     - python -m pip -v install .[docs]
     - cd docs
     - make html
-    - cp -r html ../public
+    - cp -r build/html ../public
     - cd ../
-    - echo $CI_PAGES_URL
   artifacts:
     paths:
       - public
