@@ -21,7 +21,7 @@ build:
 
   artifacts:
     paths:
-        - build/lib.*
+        - /builds/quantum-software/pyttn/pyttn/
 lint:
   stage: lint
   script:
