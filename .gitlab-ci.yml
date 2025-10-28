@@ -21,6 +21,11 @@ cache:
     
 build:
   stage: build
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "docs"'
+    when: never
+  - when: always
+
   script:
     - export CMAKE_BUILD_PARALLEL_LEVEL=4
     - export PARALLEL_BUILD_TTNPP=8
@@ -56,15 +61,8 @@ test:
 pages:
   stage: pages
   script:
-    - echo $CI_PAGES_URL
-    - export SKIP_BUILD_TTNPP_LIBRARY=True
-    - python -m pip -v install .[docs]
-    - cd docs
-    - make html
-    - cp -r html ../public
-    - cd ../
-    - echo $CI_PAGES_URL
+    - echo "The site will be deployed to $CI_PAGES_URL"
   artifacts:
     paths:
-    - public
+      - public
 
