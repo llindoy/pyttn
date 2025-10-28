@@ -17,7 +17,7 @@ cache:
   key: pip-global-cache
   paths:
     - $CI_PROJECT_DIR/.cache/pip
-
+    
 build:
   stage: build
   script:
@@ -27,7 +27,7 @@ build:
 
   artifacts:
     paths:
-        - /builds/quantum-software/pyttn/
+        - /builds/quantum-software/pyttn/pyttn/
 lint:
   stage: lint
   script:
