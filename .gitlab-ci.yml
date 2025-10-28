@@ -62,6 +62,7 @@ pages:
   stage: pages
   script:
     - echo "The site will be deployed to $CI_PAGES_URL"
+    - sudo apt-get install pandoc
     - export SKIP_BUILD_TTNPP_LIBRARY=True
     - python -m pip -v install .[docs]
     - cd docs
