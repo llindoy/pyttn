@@ -4,18 +4,18 @@ pyTTN: An Open Source Toolbox for Quantum Dynamics Simulations Using Tree Tensor
 
 |ArXiv| |Python| |Contributor Covenant| |License|
 
+Links
+-----
+-  Gitlab: https://gitlab.npl.co.uk/quantum-software/pyttn
+-  Documentation [WIP]: https://qsm.gitlab-docs.npl.co.uk/pyttn
+-  arXiv: https://arxiv.org/abs/2503.15460
+-  National Physical Laboratory: https://www.npl.co.uk/
+
 Welcome to the pyTTN documentation.  pyTTN is a python library for performing calculations with Tree Tensor Network states.  
 It is designed to make getting started with TTNs quick and easy.  
 
-The library provides implementations of several algorithms for updating the properties of TTNs including: 
-
-   - the Density Matrix Renormalisation Group (DMRG) algorithm applied to Tree structures for ground state evaluation 
-   - the Time-Dependent Variational Principle (TDVP) based approach for performing time evolution. 
-
-A key focus on the design of the library being was to provide an easy to use interface for setting up calculations 
-involving new Hamiltonians and different tree structures.  Additionally, pyTTN provides direct support for using 
-tensor network approaches to solve equation of motion based approaches for open quantum system dynamics.
-
+About pyTTN
+This open source project aims to provide an easy to use python interface for working with generic Tree Tensor Networks States to efficiently compute dynamics properties of quantum systems.  A key focus of this library is the easy setup of calculations employing either single or multiset tensor networks with generic tree structured connectivity.  Easy setup of Hamiltonians for arbitrary problems, with the ability to automatically apply techniques such as mode combination to reduce the total number of modes present in the system. Additionally, this library includes several tools to help facilitate applications of these approaches to study the dynamics of quantum systems that are strongly coupled to structured environment using both unitary methods (e.g. TEDOPA, T-TEDOPA and other representations of the system-bath Hamiltonian) as well as non-unitary approaches (e.g. Hierarchical Equations of Motion and Generalised Pseudomode method).
 
 .. image::  images/pyttn_schematic_light.svg
    :target: https://gitlab.npl.co.uk/qsm/pyttn/
@@ -70,15 +70,16 @@ Examples:
 .. toctree::
    :maxdepth: 2
 
-   Examples </Examples/index>
+   Examples </Tutorials/Examples/index>
 
-pyTTN API:
-----------
+API:
+----
 .. toctree::
    :maxdepth: 1
 
-   API </pyttn/index>
-   API Overview </pyttn/API overview> 
+   Package Structure </PackageStructure/package_structure> 
+   pyTTN </pyttn/index>
+   TTNPP </ttnpp/ttnpp>
 
 
 Indices and Tables

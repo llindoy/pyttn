@@ -1,11 +1,11 @@
-pyTTN package
-=============
+Package Overview
+================
 
-The pyTTN package: An Open Source Toolbox for Quantum Dynamics Simulations Using Tree Tensor Networks.
+pyTTN: An Open Source Toolbox for Quantum Dynamics Simulations Using Tree Tensor Networks.
 
 
-Objectives (Functional Requirements + User Requirements)
---------------------------------------------------------
+Objectives
+----------
 
 | This package is intended to provide an easy-to-use and scalable method
   for simulating ground state and dynamics properties of quantum states
@@ -47,8 +47,8 @@ application of the resultant methods to develop hybrid classical and
 quantum approaches relevant to the simulation of quantum impurity models
 relevant to materials systems.
 
-General Software Layout (Functional Requirements)
--------------------------------------------------
+General Software Layout
+-----------------------
 
 The core data structures and algorithms for creating, accessing
 properties of, and editting Tree Tensor Network States are implemented

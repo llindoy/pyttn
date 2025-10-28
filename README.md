@@ -110,9 +110,9 @@ python3 -m pip install .
 
 ### Multithreaded Build
 
-By default, this will make use of a single threaded build for compiling the Pybind11 wrapper and can take a number of minutes to complete.  It is recommended to make use of multi-threaded builds when compiling the Pybind11.  This can be done by setting the environment variable `CMAKE_BUILD_PARALLEL_LEVEL`, e.g.
+By default, this will make use of a single threaded build for compiling the Pybind11 wrapper and can take a number of minutes to complete.  It is recommended to make use of multi-threaded builds when compiling the Pybind11.  This can be done by setting the environment variable `PARALLEL_BUILD_TTNPP`, e.g.
 ```
-export CMAKE_BUILD_PARALLEL_LEVEL=8
+export PARALLEL_BUILD_TTNPP=8
 ```
 to allow for the use of 8 threads when compiling.
 
