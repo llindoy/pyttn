@@ -13,6 +13,11 @@ before_script:
     - python -m venv .venv
     - source .venv/bin/activate
 
+cache:
+  key: pip-global-cache
+  paths:
+    - $CI_PROJECT_DIR/.cache/pip
+
 build:
   stage: build
   script:
@@ -22,7 +27,7 @@ build:
 
   artifacts:
     paths:
-        - /builds/quantum-software/pyttn/pyttn/
+        - /builds/quantum-software/pyttn/
 lint:
   stage: lint
   script:
