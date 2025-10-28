@@ -29,19 +29,18 @@ class CMakeExtension(Extension):
             if rebuild_lib.lower() in ('true', '1', 't'):
                 rebuild = False
 
-        print(rebuild_lib,file=sys.stderr)
-        if rebuild:
-            print("Rebuilding module",file=sys.stderr)
-        else:
-            print("Reusing module",file=sys.stderr)
-
         parallel_build=os.environ.get('PARALLEL_BUILD_TTNPP')
         parallel=8
         if parallel_build is not None:
             if parallel_build.isdecimal():
                 parallel = int(parallel_build)
 
-        print("building with ", parallel, " threads", file=sys.stderr)
+        print(rebuild_lib,file=sys.stderr)
+        if rebuild:
+            print("rebuilding with", parallel, "threads", file=sys.stderr)
+        else:
+            print("Reusing module",file=sys.stderr)
+
 
         self.rebuild = rebuild
         self.parallel=parallel

@@ -26,14 +26,14 @@ build:
 lint:
   stage: lint
   script:
-    - python -m pip -v install .[lint]
     - export SKIP_BUILD_TTNPP_LIBRARY=True
+    - python -m pip -v install .[lint]
     - ruff check
 
 test:
   stage: test
   script:
-    - python -m pip -v install .[test]
     - export SKIP_BUILD_TTNPP_LIBRARY=True
+    - python -m pip -v install .[test]
     - python -m pytest
 
