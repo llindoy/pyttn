@@ -4,17 +4,16 @@ pyTTN: An Open Source Toolbox for Quantum Dynamics Simulations Using Tree Tensor
 
 |ArXiv| |Python| |Contributor Covenant| |License|
 
-Links
------
+Welcome to the pyTTN documentation.  pyTTN is a python library for performing calculations with Tree Tensor Network states.  
+It is designed to make getting started with TTNs quick and easy.  
+
 -  Gitlab: https://gitlab.npl.co.uk/quantum-software/pyttn
 -  Documentation [WIP]: https://qsm.gitlab-docs.npl.co.uk/pyttn
 -  arXiv: https://arxiv.org/abs/2503.15460
 -  National Physical Laboratory: https://www.npl.co.uk/
 
-Welcome to the pyTTN documentation.  pyTTN is a python library for performing calculations with Tree Tensor Network states.  
-It is designed to make getting started with TTNs quick and easy.  
-
 About pyTTN
+-----------
 This open source project aims to provide an easy to use python interface for working with generic Tree Tensor Networks States to efficiently compute dynamics properties of quantum systems.  A key focus of this library is the easy setup of calculations employing either single or multiset tensor networks with generic tree structured connectivity.  Easy setup of Hamiltonians for arbitrary problems, with the ability to automatically apply techniques such as mode combination to reduce the total number of modes present in the system. Additionally, this library includes several tools to help facilitate applications of these approaches to study the dynamics of quantum systems that are strongly coupled to structured environment using both unitary methods (e.g. TEDOPA, T-TEDOPA and other representations of the system-bath Hamiltonian) as well as non-unitary approaches (e.g. Hierarchical Equations of Motion and Generalised Pseudomode method).
 
 .. image::  images/pyttn_schematic_light.svg
@@ -51,29 +50,29 @@ If you publish working using pyTTN, please cite the paper
     }
 
 
-Installation:
--------------
+Installation
+------------
 .. toctree::
    :maxdepth: 2
 
    Installation </Installation/index>
 
-Tutorials:
-----------
+Tutorials
+---------
 .. toctree::
    :maxdepth: 2
 
    Tutorials </Tutorials/index>
 
-Examples:
----------
+Examples
+--------
 .. toctree::
    :maxdepth: 2
 
    Examples </Tutorials/Examples/index>
 
-API:
-----
+API
+---
 .. toctree::
    :maxdepth: 1
 
