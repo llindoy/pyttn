@@ -20,9 +20,20 @@ __version__ = "0.0.1"
 # The name must be the _single_ output extension from the CMake build.
 # If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
-    def __init__(self, name: str, sourcedir: str = "", rebuild: bool = False, parallel: int = None) -> None:
+    def __init__(self, name: str, sourcedir: str = "", parallel: int = None) -> None:
         super().__init__(name, sources=[])
         self.sourcedir = os.fspath(Path(sourcedir).resolve())
+        rebuild_lib=os.environ.get('SKIP_BUILD_TTNPP_LIBRARY')
+        rebuild=True
+        if rebuild_lib is not None:
+            if rebuild_lib.lower() in ('true', '1', 't'):
+                rebuild = False
+
+        if rebuild:
+            print("Rebuilding module",file=sys.stderr)
+        else:
+            print("Reusing module",file=sys.stderr)
+
         self.rebuild = rebuild
         self.parallel=parallel
 
@@ -124,17 +135,6 @@ class CMakeBuild(build_ext):
                 ["cmake", "--build", ".", "--target", "install"], cwd=build_temp, check=True
             )
 
-rebuild_lib=os.environ.get('SKIP_BUILD_TTNPP_LIBRARY')
-rebuild=True
-if rebuild_lib is not None:
-    if rebuild_lib.lower() in ('true', '1', 't'):
-        rebuild = False
-
-if rebuild:
-    print("Rebuilding module")
-else:
-    print("Reusing module")
-
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
@@ -144,7 +144,7 @@ setup(
     author_email="lachlan.lindoy@npl.co.uk",
     description="python bindings of ttnpp using pybind11",
     long_description="",
-    ext_modules=[CMakeExtension("pyttn.ttnpp", rebuild=rebuild, parallel=16)],
+    ext_modules=[CMakeExtension("pyttn.ttnpp", parallel=16)],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={},
