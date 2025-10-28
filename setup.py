@@ -20,7 +20,7 @@ __version__ = "0.0.1"
 # The name must be the _single_ output extension from the CMake build.
 # If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
-    def __init__(self, name: str, sourcedir: str = "", parallel: int = None) -> None:
+    def __init__(self, name: str, sourcedir: str = "") -> None:
         super().__init__(name, sources=[])
         self.sourcedir = os.fspath(Path(sourcedir).resolve())
         rebuild_lib=os.environ.get('SKIP_BUILD_TTNPP_LIBRARY')
@@ -33,6 +33,14 @@ class CMakeExtension(Extension):
             print("Rebuilding module",file=sys.stderr)
         else:
             print("Reusing module",file=sys.stderr)
+
+        parallel_build=os.environ.get('PARALLEL_BUILD_TTNPP')
+        parallel=8
+        if parallel_build is not None:
+            if parallel_build.isdecimal():
+                parallel = int(parallel_build)
+
+        print("building with ", parallel, " threads", file=sys.stderr)
 
         self.rebuild = rebuild
         self.parallel=parallel
@@ -144,7 +152,7 @@ setup(
     author_email="lachlan.lindoy@npl.co.uk",
     description="python bindings of ttnpp using pybind11",
     long_description="",
-    ext_modules=[CMakeExtension("pyttn.ttnpp", parallel=16)],
+    ext_modules=[CMakeExtension("pyttn.ttnpp")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={},
