@@ -4,6 +4,7 @@ stages:
   - build
   - lint
   - test
+  - pages
 
 before_script:
     - apt-get update --yes
