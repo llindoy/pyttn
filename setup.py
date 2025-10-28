@@ -130,6 +130,11 @@ if rebuild_lib is not None:
     if rebuild_lib.lower() in ('true', '1', 't'):
         rebuild = False
 
+if rebuild:
+    print("Rebuilding module")
+else:
+    print("Reusing module")
+
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
