@@ -7,7 +7,7 @@ pyTTN: An Open Source Toolbox for Quantum Dynamics Simulations Using Tree Tensor
 Welcome to the pyTTN documentation.  pyTTN is a python library for performing calculations with Tree Tensor Network states.  
 It is designed to make getting started with TTNs quick and easy.  
 
--  Gitlab: https://gitlab.npl.co.uk/quantum-software/pyttn
+-  Gitlab: https://gitlab.npl.co.uk/qsm/pyttn
 -  Documentation [WIP]: https://qsm.gitlab-docs.npl.co.uk/pyttn
 -  arXiv: https://arxiv.org/abs/2503.15460
 -  National Physical Laboratory: https://www.npl.co.uk/
