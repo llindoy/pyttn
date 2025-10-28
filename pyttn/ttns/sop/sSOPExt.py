@@ -81,7 +81,7 @@ class sOP(OPBase):
 
     N Level System Modes
 
-      - :math:`\\left\|m\\right\\rangle\\left\\langle n \\right\|` : {"\|m><n\|"}
+      - :math:`\\left|m\\right\\rangle\\left\\langle n \\right|` : {"`|m><n|`"}
 
     """
 

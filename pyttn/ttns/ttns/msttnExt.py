@@ -386,7 +386,7 @@ class msttn(metaclass=ABCMeta):
         :type i: int
 
         :return: A slice of the multiset ttn used for accessing the tensor network associated with a single system state
-        :rtype: msttnSlice
+        :rtype: "msttnSlice"
 
         """
 

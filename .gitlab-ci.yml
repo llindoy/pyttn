@@ -20,6 +20,11 @@ cache:
     
 build:
   stage: build
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "docs"'
+    when: never
+  - when: always
+
   script:
     - export CMAKE_BUILD_PARALLEL_LEVEL=4
     - export PARALLEL_BUILD_TTNPP=8
@@ -30,6 +35,11 @@ build:
         - /builds/quantum-software/pyttn/pyttn/
 lint:
   stage: lint
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "docs"'
+    when: never
+  - when: always
+
   script:
     - export SKIP_BUILD_TTNPP_LIBRARY=True
     - python -m pip -v install .[lint]
@@ -37,8 +47,27 @@ lint:
 
 test:
   stage: test
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "docs"'
+    when: never
+  - when: always
+
   script:
     - export SKIP_BUILD_TTNPP_LIBRARY=True
     - python -m pip -v install .[test]
     - python -m pytest
+
+pages:
+  stage: pages
+    - echo $CI_PAGES_URL
+    - export SKIP_BUILD_TTNPP_LIBRARY=True
+    - python -m pip -v install .[docs]
+    - cd docs
+    - make html
+    - cp -r html ../public
+    - cd ../
+    - echo $CI_PAGES_URL
+  artifacts:
+    paths:
+    - public
 

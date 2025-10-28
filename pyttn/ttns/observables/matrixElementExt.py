@@ -55,7 +55,7 @@ class MatrixElement(metaclass=ABCMeta):
             - **nbuffers** (int, optional) - The number of buffers to allocate.
             - **use_capacity** (bool, optional) - Whether or not to use the capacity of the TTNs to determine the size of the buffers.
         :returns: The MatrixElement object
-        :rtype: MatrixElement_
+        :rtype: MatrixElement
         """
 
         if _use_real_matel:

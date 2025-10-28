@@ -61,7 +61,7 @@ class product_operator(metaclass=ABCMeta):
         :type h: Union[sOP, sPOP, sNBO]
         :param sysinf: The composition of the system defining the default dictionary to be considered for each node
         :type sysinf: system_modes
-        :type *args: Variable length list of arguments. Valid options are:
+        :type ``*args``: Variable length list of arguments. Valid options are:
 
             - Empty: Build the product operator using the default operator dictionaries
             - opdict (:class:`operator_dictionary`): Build the product operator using a user defined operator dictionary
@@ -92,7 +92,7 @@ class product_operator(metaclass=ABCMeta):
         :type op: Union[sOP, sPOP, sNBO]
         :param sysinf: The information about the system degrees of freedom
         :type sysinf: system_modes
-        :type *args: Variable length list of arguments. Valid options are:
+        :type ``*args``: Variable length list of arguments. Valid options are:
 
             - Empty: Build the product operator using the default operator dictionaries
             - opdict (:class:`operator_dictionary`): Build the product operator using a user defined operator dictionary

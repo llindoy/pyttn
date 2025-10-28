@@ -353,7 +353,7 @@ class CorrelatedBosonicBath(Bath):
         :type discretisation_engine: np.ndarray
         :param scalar_func: An optional scalar valued function used for determining the density of frequencies for discretisation, defaults to None
         :type scalar_func: Optional[str | Callable[ [Union[np.ndarray, float]], Union[np.ndarray, float] ]]
-        :param `**kwargs`: Additional dictionary arguments that are currently not used by this function
+        :param ``**kwargs``: Additional dictionary arguments that are currently not used by this function
         
         :return: Discrete system bath coupling constants :math:`g_k`and bath frequencies :math:`\\omega_k`
         :rtype: np.ndarray, np.ndarray
@@ -383,8 +383,8 @@ class CorrelatedBosonicBath(Bath):
         :param fitting_engine: An object defining how to decompose a correlation function for a continuous bath into a sum-of-exponential decomposition
         :type fitting_engine: np.ndarray
         :param scalar_func: An optional scalar valued function used for determining the density of frequencies, defaults to None
-        :type scalar_func: Optional[str | Callable[ [Union[np.ndarray, float]], float |Union[np.ndarray, complex]]]
-        :param `**kwargs`: Additional dictionary arguments used in the evaluation of the bath correlation if using a CtExpFitDecomposition
+        :type scalar_func: Optional[str | Callable[ [Union[np.ndarray, float]], float | Union[np.ndarray, complex]]]
+        :param ``**kwargs``: Additional dictionary arguments used in the evaluation of the bath correlation if using a CtExpFitDecomposition
 
         :return: Discrete system bath coupling constants :math:`g_k` and bath frequencies :math:`\\omega_k`
         :rtype: np.ndarray, np.ndarray

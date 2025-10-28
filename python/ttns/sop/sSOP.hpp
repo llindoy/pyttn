@@ -85,10 +85,10 @@ void init_sSOP(py::module &m)
               depending on the dtype used.  
 
               :Parameters:  - **a** (:class:`sOP`) - The left term in the expression
-                            - **b** (class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex` or :class:`sSOP_real` or :class:`sSOP_complex`) - The right term in the expression
+                            - **b** (class:`sOP` | :class:`sPOP` | :class:`sNBO_real` | :class:`sNBO_complex` | :class:`sSOP_real` | :class:`sSOP_complex`) - The right term in the expression
 
               :returns: The result of the sum
-              :rtype: :class:`sSOP_real` or :class:`sSOP_complex`
+              :rtype: :class:`sSOP_real` | :class:`sSOP_complex`
 
 
               )mydelim")
@@ -110,10 +110,10 @@ void init_sSOP(py::module &m)
 
 
               :Parameters:  - **a** (:class:`sOP`) - The left term in the expression sOP
-                            - **b** (class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex` or :class:`sSOP_real` or :class:`sSOP_complex`) - The right term in the expression
+                            - **b** (class:`sOP` | :class:`sPOP` | :class:`sNBO_real` | :class:`sNBO_complex` | :class:`sSOP_real` | :class:`sSOP_complex`) - The right term in the expression
 
               :returns: The result of a-b
-              :rtype: :class:`sSOP_real` or :class:`sSOP_complex`
+              :rtype: :class:`sSOP_real` | :class:`sSOP_complex`
 
 
 
@@ -152,11 +152,11 @@ void init_sSOP(py::module &m)
               Functions for multiplying a sOP by a scalar or another expression.
 
               :Parameters:  - **a** (:class:`sOP`) - The left term in the expression
-                            - **b** (float or complex or :class:`coeff_real` or :class:`coeff_complex` or :class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex`) - The term to multiply sOP by
+                            - **b** (float or complex | :class:`coeff_real` | :class:`coeff_complex` | :class:`sOP` | :class:`sPOP` | :class:`sNBO_real` | :class:`sNBO_complex`) - The term to multiply sOP by
               :type b: 
 
               :returns: The result of a*b
-              :rtype: :class:`sNBO_real` or :class:`sNBO_complex`
+              :rtype: :class:`sNBO_real` | :class:`sNBO_complex`
 
               )mydelim")
 
@@ -167,10 +167,10 @@ void init_sSOP(py::module &m)
               Functions for multiplying a sOP by a sSOP.
 
               :Parameters:  - **a** (:class:`sOP`) - The left term in the expression
-                            - **b** (:class:`sSOP_real` or :class:`sSOP_complex`) - The term to multiply sOP by
+                            - **b** (:class:`sSOP_real` | :class:`sSOP_complex`) - The term to multiply sOP by
 
               :Returns: The result of a*b
-              :Return Type: :class:`sSOP_real` or :class:`sSOP_complex`
+              :Return Type: :class:`sSOP_real` | :class:`sSOP_complex`
 
               )mydelim")
 
@@ -185,10 +185,10 @@ void init_sSOP(py::module &m)
               Functions for multiplying a sOP by a scalar from the right.
 
               :Parameters:  - **a** (:class:`sOP`) - The sOP
-                            - **b** (float or complex or :class:`coeff_real` or :class:`coeff_complex`) - The term to multiply sOP by
+                            - **b** (float | complex | :class:`coeff_real` | :class:`coeff_complex`) - The term to multiply sOP by
 
               :Returns: The result of b*a
-              :Return Type: :class:`sNBO_real` or :class:`sNBO_complex`
+              :Return Type: :class:`sNBO_real` | :class:`sNBO_complex`
 
               )mydelim")
         .doc() = R"mydelim(
@@ -321,7 +321,7 @@ void init_sSOP(py::module &m)
              { return a *= b; }, R"mydelim(
               Inplace multiplication of a sPOP with a sPOP or sOP
 
-              :Parameters:  - **b** (class:`sOP` or :class:`sPOP`) - The right term in the expression
+              :Parameters:  - **b** (class:`sOP` | :class:`sPOP`) - The right term in the expression
 
               )mydelim")
 
@@ -341,10 +341,10 @@ void init_sSOP(py::module &m)
               depending on the dtype used.  
 
               :Parameters:  - **a** (:class:`sPOP`) - The sPOP
-                            - **b** (class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex` or :class:`sSOP_real` or :class:`sSOP_complex`) - The right term in the expression
+                            - **b** (class:`sOP` | :class:`sPOP` | :class:`sNBO_real` | :class:`sNBO_complex` | :class:`sSOP_real` | :class:`sSOP_complex`) - The right term in the expression
 
               :returns: The result of the sum
-              :rtype: :class:`sSOP_real` or :class:`sSOP_complex`
+              :rtype: :class:`sSOP_real` | :class:`sSOP_complex`
 
               )mydelim")
 
@@ -364,10 +364,10 @@ void init_sSOP(py::module &m)
               depending on the dtype used.  
 
               :Parameters:  - **a** (:class:`sPOP`) - The sPOP
-                            - **b** (class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex` or :class:`sSOP_real` or :class:`sSOP_complex`) - The right term in the expression
+                            - **b** (class:`sOP` | :class:`sPOP` | :class:`sNBO_real` | :class:`sNBO_complex` | :class:`sSOP_real` | :class:`sSOP_complex`) - The right term in the expression
 
               :returns: The result of a-b
-              :rtype: :class:`sSOP_real` or :class:`sSOP_complex`
+              :rtype: :class:`sSOP_real` | :class:`sSOP_complex`
 
               )mydelim")
 
@@ -378,10 +378,10 @@ void init_sSOP(py::module &m)
               Functions for dividing a sPOP by a scalar .
 
               :Parameters:  - **a** (:class:`sPOP`) - The sPOP
-                            - **b** (float or complex ) - The scalar to divide the sPOP by
+                            - **b** (float | complex ) - The scalar to divide the sPOP by
 
               :returns: The result of a/b
-              :rtype: :class:`sNBO_real` or :class:`sNBO_complex`
+              :rtype: :class:`sNBO_real` | :class:`sNBO_complex`
 
               )mydelim")
 
@@ -404,11 +404,11 @@ void init_sSOP(py::module &m)
               Functions for multiplying a sPOP by a scalar or another expression.
 
               :Parameters:  - **a** (:class:`sPOP`) - The sPOP
-                            - **b** (float or complex or :class:`coeff_real` or :class:`coeff_complex` or :class:`sOP` or :class:`sPOP` or :class:`sNBO_real` or :class:`sNBO_complex`) - The term to multiply sPOP by
+                            - **b** (float | complex | :class:`coeff_real` | :class:`coeff_complex` | :class:`sOP` | :class:`sPOP` | :class:`sNBO_real` | :class:`sNBO_complex`) - The term to multiply sPOP by
               :type b: 
 
               :returns: The result of a*b
-              :rtype: :class:`sNBO_real` or :class:`sNBO_complex`
+              :rtype: :class:`sNBO_real` | :class:`sNBO_complex`
 
               )mydelim")
         .def("__mul__", [](const sPOP &a, const sSOP<real_type> &b)
@@ -418,10 +418,10 @@ void init_sSOP(py::module &m)
               Functions for multiplying a sPOP by a sSOP.
 
               :Parameters:  - **a** (:class:`sPOP`) - The sPOP
-                            - **b** (:class:`sSOP_real` or :class:`sSOP_complex`) - The term to multiply sPOP by
+                            - **b** (:class:`sSOP_real` | :class:`sSOP_complex`) - The term to multiply sPOP by
 
               :Returns: The result of a*b
-              :Return Type: :class:`sSOP_real` or :class:`sSOP_complex`
+              :Return Type: :class:`sSOP_real` | :class:`sSOP_complex`
 
               )mydelim")
 
@@ -436,10 +436,10 @@ void init_sSOP(py::module &m)
               Functions for multiplying a sPOP by a scalar from the right.
 
               :Parameters:  - **a** (:class:`sPOP`) - The sPOP
-                            - **b** (float or complex or :class:`coeff_real` or :class:`coeff_complex`) - The term to multiply sPOP by
+                            - **b** (float | complex | :class:`coeff_real` | :class:`coeff_complex`) - The term to multiply sPOP by
 
               :Returns: The result of b*a
-              :Return Type: :class:`sNBO_real` or :class:`sNBO_complex`
+              :Return Type: :class:`sNBO_real` | :class:`sNBO_complex`
 
               )mydelim")
         .doc() = R"mydelim(
