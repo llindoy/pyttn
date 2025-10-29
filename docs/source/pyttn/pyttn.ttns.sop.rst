@@ -72,7 +72,6 @@ Operator Dictionaries
    :undoc-members:
    :show-inheritance:
 
-
 System
 ------
 .. autoclass:: pyttn.ttns.sop.system_modes
@@ -186,7 +185,6 @@ States
 .. autofunction:: pyttn.ttns.sop.isSepState
 
 
-
 Helper Functions
 ----------------
 .. autofunction:: pyttn.ttns.sop.convert_to_dense
@@ -195,14 +193,15 @@ Helper Functions
 
 Aliases
 -------
-.. autoclass:: pyttn.ttns.sop.operator_dictionary
+
+.. autoclass:: pyttn.ttns.sop.ms_SOP
    :members:
    :special-members: __new__,__init__,__call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
    :exclude-members: __module__,__annotations__
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: pyttn.ttns.sop.ms_SOP
+.. autoclass:: pyttn.ttns.sop.operator_dictionary
    :members:
    :special-members: __new__,__init__,__call__,__copy__,__deepcopy__,__radd__,__rsub__,__rdiv__,__rmul__,__add__,__sub__,__div__,__mul__,__iadd__,__isub__,__idiv__,__imul__, __iter__,__len__,__setitem__,__getitem__,__str__
    :exclude-members: __module__,__annotations__
