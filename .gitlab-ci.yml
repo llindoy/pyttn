@@ -21,6 +21,10 @@ cache:
     
 build:
   stage: build
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "docs"'
+    when: never
+  - when: always
 
   script:
     - export CMAKE_BUILD_PARALLEL_LEVEL=4
@@ -65,7 +69,8 @@ pages:
     - echo $CI_REPOSITORY_URL
     - echo "The site will be deployed to $CI_PAGES_URL"
     - apt-get install --yes pandoc
-    - export SKIP_BUILD_TTNPP_LIBRARY=True
+    - export CMAKE_BUILD_PARALLEL_LEVEL=4
+    - export PARALLEL_BUILD_TTNPP=8
     - python -m pip -v install .[docs]
     - cd docs
     - make html
