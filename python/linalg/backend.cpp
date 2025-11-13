@@ -55,14 +55,18 @@ void initialise_cuda_backend(py::module &m)
         .def(py::init<int, int>(), R"mydelim(
             Construct a cuda environment specifying the device id and number of streams
 
-            :Parameters:    - **device_id** (int) - The cuda device index
-                            - **nstreams** (int) - The number of cuda streams to use
+            :param device_id: The cuda device index
+            :type device_id: int
+            :param nstreams: The number of cuda streams to use
+            :type nstreams: int
             )mydelim")
         .def("init", &cuda_environment::init, py::arg(), py::arg("nstreams") = 1, R"mydelim(
             Construct a cuda environment specifying the device id and number of streams
 
-            :Parameters:    - **device_id** (int) - The cuda device index
-                            - **nstreams** (int, optional) - The number of cuda streams to use (Default: 1)
+            :param device_id: The cuda device index
+            :type device_id: int
+            :param nstreams: The number of cuda streams to use
+            :type nstreams: int, Optional
             )mydelim")
         .def("destroy", &cuda_environment::destroy, R"mydelim(
             Destroys the cuda environment object deallocating any internal memory.

@@ -58,7 +58,7 @@ def _multiset_sop_operator_blas(h, A, sysinf, *args, compress: bool = True, iden
             return multiset_sop_operator_complex(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a multiset_sop_operator."
+                "Invalid argument for the creation of a MultisetSOPOperator."
             )
     else:
         if (
@@ -71,7 +71,7 @@ def _multiset_sop_operator_blas(h, A, sysinf, *args, compress: bool = True, iden
             return multiset_sop_operator_complex(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a multiset_sop_operator."
+                "Invalid argument for the creation of a MultisetSOPOperator."
             )
 
 
@@ -81,7 +81,7 @@ def _multiset_sop_operator_cuda(h, A, sysinf, *args, compress: bool = True, iden
             return multiset_sop_operator_complex_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a multiset_sop_operator."
+                "Invalid argument for the creation of a MultisetSOPOperator."
             )
     else:
         if (
@@ -94,14 +94,14 @@ def _multiset_sop_operator_cuda(h, A, sysinf, *args, compress: bool = True, iden
             return multiset_sop_operator_complex_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a multiset_sop_operator."
+                "Invalid argument for the creation of a MultisetSOPOperator."
             )
 
 
-class multiset_sop_operator(metaclass=ABCMeta):
+class MultisetSOPOperator(metaclass=ABCMeta):
     def __new__(cls, 
         h: multiset_SOP, A: multiset_ttn, sysinf: system_modes, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,
-    ) -> "multiset_sop_operator":
+    ) -> "MultisetSOPOperator":
         """Function for constructing the multiset hierarchical sum of product operator of a string operator
 
         :param h: The multiset sum of product operator representation of the Hamiltonian
@@ -122,12 +122,12 @@ class multiset_sop_operator(metaclass=ABCMeta):
         :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
         :type use_sparse: bool, optional
         :returns: The multiset sop operator
-        :rtype: multiset_sop_operator
+        :rtype: MultisetSOPOperator
         """
         if len(args) > 0:
             if args[0].backend() != A.backend():
                 raise RuntimeError(
-                    "Attempted to construct multiset_sop_operator with opdict but opdict backend is not compatible with ms_ttn backend."
+                    "Attempted to construct MultisetSOPOperator with opdict but opdict backend is not compatible with ms_ttn backend."
                 )
 
         if A.backend() == "blas":
@@ -135,13 +135,13 @@ class multiset_sop_operator(metaclass=ABCMeta):
         elif _cuda_import and A.backend() == "cuda":
             return _multiset_sop_operator_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
-            raise RuntimeError("Invalid backend type for multiset_sop_operator")
+            raise RuntimeError("Invalid backend type for MultisetSOPOperator")
         
     @abstractmethod
     def initialise( 
         self, op: multiset_SOP, sysinf: system_modes, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,
     ) -> None:
-        """Initialise the multiset_sop_operator object given a sOP and system_modes information
+        """Initialise the MultisetSOPOperator object given a sOP and system_modes information
 
         :param h: The multiset  sum of product operator representation of the Hamiltonian
         :type h: multiset_SOP
@@ -160,17 +160,17 @@ class multiset_sop_operator(metaclass=ABCMeta):
         :type identity_opt: bool, optional
         :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
         :type use_sparse: bool, optional
-        :return: The multiset_sop_operator representation of the input SOP
+        :return: The MultisetSOPOperator representation of the input SOP
         :rtype: sop_operator
         """
         pass
 
     @abstractmethod
-    def assign(self, o: "multiset_sop_operator"):
+    def assign(self, o: "MultisetSOPOperator"):
         """Assign the value of the multiset sum-of product product operator from another
 
         :param o: The multiset sum-of-product operator to copy into this one
-        :type o: multiset_sop_operator
+        :type o: MultisetSOPOperator
         """
         pass
 
@@ -186,7 +186,7 @@ class multiset_sop_operator(metaclass=ABCMeta):
 
     @abstractmethod
     def Eshift(self, i: int, j: int) -> Union[float, complex]:
-        """Return the value of the energy shift associated with the [i, j]th term of the multiset_sop_operator
+        """Return the value of the energy shift associated with the [i, j]th term of the MultisetSOPOperator
 
         :param i: Index i
         :type i: int
@@ -199,7 +199,7 @@ class multiset_sop_operator(metaclass=ABCMeta):
 
     @abstractmethod
     def clear(self):
-        """Clear and deallocate all internal buffers of the multiset_sop_operator"""
+        """Clear and deallocate all internal buffers of the MultisetSOPOperator"""
         pass
 
     @abstractmethod
@@ -234,29 +234,30 @@ class multiset_sop_operator(metaclass=ABCMeta):
 
     @abstractmethod
     def complex_dtype(self) -> bool:
-        """Returns whether or not the multiset_sop_operator is storing a complex valued dtype
+        """Returns whether or not the MultisetSOPOperator is storing a complex valued dtype
 
-        :return: whether or not the multiset_sop_operator is storing a complex valued dtype
+        :return: whether or not the MultisetSOPOperator is storing a complex valued dtype
         :rtype: bool
         """
         pass
 
     @abstractmethod
     def backend(self) -> str:
-        """Returns the backend type of the multiset_sop_operator
+        """Returns the backend type of the MultisetSOPOperator
 
         :return: The backend type of the object
         :rtype: str
         """
         pass
 
-multiset_sop_operator.register(multiset_sop_operator_complex)
+MultisetSOPOperator.register(multiset_sop_operator_complex)
 if _real_ttn_import:
-    multiset_sop_operator.register(multiset_sop_operator_real)
+    MultisetSOPOperator.register(multiset_sop_operator_real)
 
 if _cuda_import:
-    multiset_sop_operator.register(multiset_sop_operator_complex_cuda)
+    MultisetSOPOperator.register(multiset_sop_operator_complex_cuda)
     if _real_ttn_import:
-        multiset_sop_operator.register(multiset_sop_operator_real_cuda)
+        MultisetSOPOperator.register(multiset_sop_operator_real_cuda)
 
-ms_sop_operator = multiset_sop_operator
+ms_sop_operator = MultisetSOPOperator
+multiset_sop_operator = MultisetSOPOperator

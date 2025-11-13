@@ -41,7 +41,7 @@ except ImportError:
     _cuda_import = False
 
 
-class product_operator(metaclass=ABCMeta):
+class ProductOperator(metaclass=ABCMeta):
     """A class for handling product operators."""
 
     def __new__(
@@ -54,8 +54,8 @@ class product_operator(metaclass=ABCMeta):
         ] = np.complex128,
         backend: str = "blas",
         use_sparse: bool = True,
-    ) -> "product_operator":
-        """Function for constructing a product_operator
+    ) -> "ProductOperator":
+        """Function for constructing a ProductOperator
 
         :param h: The product operator representation of the Hamiltonian
         :type h: Union[sOP, sPOP, sNBO]
@@ -86,7 +86,7 @@ class product_operator(metaclass=ABCMeta):
 
     @abstractmethod
     def initialise(self, op: Union[sOP, sPOP, sNBO], sysinf: system_modes, *args, use_sparse: bool = True):
-        """Initialise the product_operator object given a sOP and system_modes information
+        """Initialise the ProductOperator object given a sOP and system_modes information
 
         :param op: The product operator representation of the Hamiltonian
         :type op: Union[sOP, sPOP, sNBO]
@@ -103,45 +103,45 @@ class product_operator(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def assign(self, o: "product_operator"):
+    def assign(self, o: "ProductOperator"):
         """Assign the value of the product operator from another 
 
         :param o: The product operator to copy into this one
-        :type o: product_operator
+        :type o: ProductOperator
         """
         pass
 
     @abstractmethod
     def complex_dtype(self) -> bool:
-        """Returns whether or not the product_operator is storing a complex valued dtype
+        """Returns whether or not the ProductOperator is storing a complex valued dtype
 
-        :return: whether or not the product_operator is storing a complex valued dtype
+        :return: whether or not the ProductOperator is storing a complex valued dtype
         :rtype: bool
         """
         pass
 
     @abstractmethod
     def __copy__(self):
-        """Function implementing shallow copy of the product_operator object"""
+        """Function implementing shallow copy of the ProductOperator object"""
         pass
 
     @abstractmethod
     def __deepcopy__(self, memo):
-        """Function implementing deep copy of the product_operator object"""
+        """Function implementing deep copy of the ProductOperator object"""
         pass
 
     @abstractmethod
     def __str__(self) -> str:
-        """Return the string representation of the product_operator object
+        """Return the string representation of the ProductOperator object
 
-        :return: The string representation of the product_operator
+        :return: The string representation of the ProductOperator
         :rtype: str
         """
         pass
 
     @abstractmethod
     def backend(self) -> str:
-        """Returns the backend type of the product_operator
+        """Returns the backend type of the ProductOperator
 
         :return: The backend type of the object
         :rtype: str
@@ -161,13 +161,13 @@ class product_operator(metaclass=ABCMeta):
         """
         pass
 
-product_operator.register(product_operator_complex)
+ProductOperator.register(product_operator_complex)
 if _real_ttn_import:
-    product_operator.register(product_operator_real)
+    ProductOperator.register(product_operator_real)
 
 if _cuda_import:
-    product_operator.register(product_operator_complex_cuda)
+    ProductOperator.register(product_operator_complex_cuda)
     if _real_ttn_import:
-        product_operator.register(product_operator_real_cuda)
+        ProductOperator.register(product_operator_real_cuda)
 
-product_operator = product_operator
+product_operator = ProductOperator

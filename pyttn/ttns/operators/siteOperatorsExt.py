@@ -60,7 +60,7 @@ def _site_operator_blas(*args, mode=None, optype=None, dtype=np.complex128, **kw
                 ret = site_operator_real(*args, **kwargs)
         else:
             raise RuntimeError(
-                "Failed to construct site_operator object invalid arguments."
+                "Failed to construct SiteOperator object invalid arguments."
             )
     else:
         try:
@@ -70,7 +70,7 @@ def _site_operator_blas(*args, mode=None, optype=None, dtype=np.complex128, **kw
             else:
                 ret = site_operator_real(M)
         except RuntimeError:
-            message = "Failed to construct site_operator object.  optype not recognized."
+            message = "Failed to construct SiteOperator object.  optype not recognized."
             raise RuntimeError(message) from None
     if mode is not None:
         ret.mode = mode
@@ -92,7 +92,7 @@ def _site_operator_cuda(*args, mode=None, optype=None, dtype=np.complex128, **kw
                 ret = site_operator_real_cuda(*args, **kwargs)
         else:
             raise RuntimeError(
-                "Failed to construct site_operator object invalid arguments."
+                "Failed to construct SiteOperator object invalid arguments."
             )
     else:
         try:
@@ -102,13 +102,13 @@ def _site_operator_cuda(*args, mode=None, optype=None, dtype=np.complex128, **kw
             else:
                 ret = site_operator_real_cuda(M)
         except RuntimeError:
-            message = "Failed to construct site_operator object.  optype not recognized."
+            message = "Failed to construct SiteOperator object.  optype not recognized."
             raise RuntimeError(message) from None
     if mode is not None:
         ret.mode = mode
     return ret
 
-class site_operator(metaclass=ABCMeta):
+class SiteOperator(metaclass=ABCMeta):
     """A class for handling a single site operator acting on"""
 
     def __new__(
@@ -121,17 +121,17 @@ class site_operator(metaclass=ABCMeta):
         ] = np.complex128,
         backend: str = "blas",
         **kwargs,
-    ) -> "site_operator":
+    ) -> "SiteOperator":
         """Factory function for constructing a one site operator.
 
         :param `*args`: Variable length list of arguments. There are several valid options for the `*args` parameters.  If the optype variable is None the allowed options are
 
             - Default construct the site operator object
-            - site_op (:class:`ops.siteOp`) - Construct a new site_operator object from a siteOp object
-            - site_op (:class:`site_operator`) - Construct a new site_operator object from the existing object
-            - site_op (:class:`site_operator`) - Construct a new site_operator object from the existing object
-            - op (:class:`sOP`), sysinf (:class:`system_modes`) - Construct a new site_operator from the string operator and system information
-            - op (:class:`sOP`), sysinf (:class:`system_modes`), opdict (:class:`operator_dictionary`) -  Construct a new site_operator from the string operator, system information and used defined operator dictionary.
+            - site_op (:class:`ops.siteOp`) - Construct a new SiteOperator object from a siteOp object
+            - site_op (:class:`SiteOperator`) - Construct a new SiteOperator object from the existing object
+            - site_op (:class:`SiteOperator`) - Construct a new SiteOperator object from the existing object
+            - op (:class:`sOP`), sysinf (:class:`system_modes`) - Construct a new SiteOperator from the string operator and system information
+            - op (:class:`sOP`), sysinf (:class:`system_modes`), opdict (:class:`operator_dictionary`) -  Construct a new SiteOperator from the string operator, system information and used defined operator dictionary.
 
             Otherwise, if the optype variable has been set then the valid arguments are determined by the specified optype see opsExt.py for details.
 
@@ -143,7 +143,7 @@ class site_operator(metaclass=ABCMeta):
         :type dtype: {np.float64, np.complex128}, optional
         :param backend: The computational backend to use for the product operator  (Default: "blas")
         :type backend: {"blas", "cuda"}, optional
-        :param `**kwargs`: Additional keyword arguments. To construct the site_operator object.  Valid options:
+        :param `**kwargs`: Additional keyword arguments. To construct the SiteOperator object.  Valid options:
             
             - use_sparse (bool)
         """
@@ -156,11 +156,11 @@ class site_operator(metaclass=ABCMeta):
                 *args, mode=mode, optype=optype, dtype=dtype, **kwargs
             )
         else:
-            raise RuntimeError("Invalid backend type for site_operator")
+            raise RuntimeError("Invalid backend type for SiteOperator")
 
     @abstractmethod
     def initialise(self, op: sOP, sysinf: system_modes, *args, use_sparse: bool = True):
-        """Initialise the site_operator object given a sOP and system_modes information
+        """Initialise the SiteOperator object given a sOP and system_modes information
 
         :param op: The string representation of the mode opertor
         :type op: sOP
@@ -169,7 +169,7 @@ class site_operator(metaclass=ABCMeta):
         :param `*args`: A variable length array of arguments: Valid options are:
 
             - If no `*args` are provided construct using standard dictionaries
-            - opdict (:class:`operator_dictionary`): Construct site_operator using a user created operator dictionary.
+            - opdict (:class:`operator_dictionary`): Construct SiteOperator using a user created operator dictionary.
        
         :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
         :type use_sparse: bool, optional
@@ -178,24 +178,24 @@ class site_operator(metaclass=ABCMeta):
 
     @abstractmethod
     def complex_dtype(self) -> bool:
-        """Returns whether or not the site_operator is storing a complex valued dtype
+        """Returns whether or not the SiteOperator is storing a complex valued dtype
 
-        :return: whether or not the site_operator is storing a complex valued dtype
+        :return: whether or not the SiteOperator is storing a complex valued dtype
         :rtype: bool
         """
         pass
 
     @abstractmethod
     def clear(self):
-        """Clear and deallocate all internal buffers of the site_operator"""
+        """Clear and deallocate all internal buffers of the SiteOperator"""
         pass
 
     @abstractmethod
-    def transpose(self) -> "site_operator":
+    def transpose(self) -> "SiteOperator":
         """Returns the transpose of the operator
 
         :return: The transpose of the operator
-        :rtype: site_operator
+        :rtype: SiteOperator
         """
         pass
 
@@ -210,11 +210,11 @@ class site_operator(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def assign(self, o: Union["site_operator", siteOp]):
+    def assign(self, o: Union["SiteOperator", siteOp]):
         """Assign the value of the site operator from another or a siteOp
 
         :param o: The site operator to copy into this one
-        :type o: Union[site_operator, siteOp]
+        :type o: Union[SiteOperator, siteOp]
         """
         pass
 
@@ -229,12 +229,12 @@ class site_operator(metaclass=ABCMeta):
 
     @abstractmethod
     def __copy__(self):
-        """Function implementing shallow copy of the site_operator object"""
+        """Function implementing shallow copy of the SiteOperator object"""
         pass
 
     @abstractmethod
     def __deepcopy__(self, memo):
-        """Function implementing deep copy of the site_operator object"""
+        """Function implementing deep copy of the SiteOperator object"""
         pass
 
     @abstractmethod
@@ -273,7 +273,7 @@ class site_operator(metaclass=ABCMeta):
 
     @abstractmethod
     def resize(self, size: int):
-        """Resize the site_operator object so that it can describe a system with size modes
+        """Resize the SiteOperator object so that it can describe a system with size modes
 
         :param size: The number of modes
         :type size: int
@@ -292,28 +292,29 @@ class site_operator(metaclass=ABCMeta):
 
     @abstractmethod
     def __str__(self) -> str:
-        """Return the string representation of the site_operator object
+        """Return the string representation of the SiteOperator object
 
-        :return: The string representation of the site_operator
+        :return: The string representation of the SiteOperator
         :rtype: str
         """
         pass
 
     @abstractmethod
     def backend(self) -> str:
-        """Returns the backend type of the site_operator
+        """Returns the backend type of the SiteOperator
 
         :return: The backend type of the object
         :rtype: str
         """
         pass
 
-site_operator.register(site_operator_complex)
+SiteOperator.register(site_operator_complex)
 if _real_ttn_import:
-    site_operator.register(site_operator_real)
+    SiteOperator.register(site_operator_real)
 
 if _cuda_import:
-    site_operator.register(site_operator_complex_cuda)
+    SiteOperator.register(site_operator_complex_cuda)
     if _real_ttn_import:
-        site_operator.register(site_operator_real_cuda)
+        SiteOperator.register(site_operator_real_cuda)
 
+site_operator = SiteOperator

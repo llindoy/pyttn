@@ -51,12 +51,16 @@ void init_tdvp_core(py::module &m, const std::string &label)
              py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1, R"mydelim(
             Construct a new one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.
 
-            :Parameters:    - **A** (:class:`ttn_complex`) - The Tree Tensor Network Object that will be optimised using the DMRG algorithm
-                            - **H** (:class:`sop_operator_complex`) - The Hamiltonian sop operator object
-                            - **krylov_dim** (int, optional) - The krylov subspace dimension used for the eigensolver steps. (Default: 16)
-                            - **nstep** (int, optional): The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)
-                            - **num_threads** (int, optional) - The number of openmp threads to be used for parallelising over the Hamiltonian sum in the solver. (Default: 1)
-                            - **set_var_num_threads** (int, optional) - The number of openmp threads to be used for parallelising over the set by the solver. (Default: 1)
+            :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            :type krylov_dim: int, optional
+            :param num_threads: The number of openmp threads to be used for parallelising over the Hamiltonian sum in the solver. (Default: 1)
+            :type num_threads: int, optional
+            :param set_var_num_threads: The number of openmp threads to be used for parallelising over the set by the solver. (Default: 1)
+            :type set_var_num_threads: int, optional
           )mydelim")
         .def("assign", [](tdvp &self, const tdvp &o)
              { self = o; })
@@ -67,12 +71,16 @@ void init_tdvp_core(py::module &m, const std::string &label)
         .def("initialise", &tdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1, R"mydelim(
             Initialise one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.
 
-            :Parameters:    - **A** (:class:`ttn_complex`) - The Tree Tensor Network Object that will be optimised using the DMRG algorithm
-                            - **H** (:class:`sop_operator_complex`) - The Hamiltonian sop operator object
-                            - **krylov_dim** (int, optional) - The krylov subspace dimension used for the eigensolver steps. (Default: 16)
-                            - **nstep** (int, optional): The number of internal steps to use for evaluation of the matrix exponential. (Default: 1)
-                            - **num_threads** (int, optional) - The number of openmp threads to be used for parallelising over the Hamiltonian sum in the solver. (Default: 1)
-                            - **set_var_num_threads** (int, optional) - The number of openmp threads to be used for parallelising over the set by the solver. (Default: 1)
+            :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            :type krylov_dim: int, optional
+            :param num_threads: The number of openmp threads to be used for parallelising over the Hamiltonian sum in the solver. (Default: 1)
+            :type num_threads: int, optional
+            :param set_var_num_threads: The number of openmp threads to be used for parallelising over the set by the solver. (Default: 1)
+            :type set_var_num_threads: int, optional
           )mydelim")
         .def_property("coefficient", [](const tdvp &o)
                       { return _T(o.coefficient()); }, [](tdvp &o, const _T &i)

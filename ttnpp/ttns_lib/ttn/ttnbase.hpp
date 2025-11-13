@@ -1051,7 +1051,13 @@ namespace ttns
                 CALL_AND_RETHROW(ancestor_indexing(li, inds));
             }
         }
-
+        
+        void initialise_euler_tour()
+        {
+            if(m_euler_tour_initialised){m_euler_tour.clear();}
+            sweeping::traversal_path::initialise_euler_tour(*this, m_euler_tour);
+            m_euler_tour_initialised = true;
+        }
     protected:
         void _orthogonalise()
         {

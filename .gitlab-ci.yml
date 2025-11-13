@@ -56,7 +56,7 @@ test:
   script:
     - export SKIP_BUILD_TTNPP_LIBRARY=True
     - python -m pip -v install .[test]
-    - python -m pytest
+    - python -m pytest -n 2
 
 pages:
   stage: pages

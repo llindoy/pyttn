@@ -10,11 +10,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+from .correlationMeasures import CorrelationMeasures
 from .matrixElementExt import matrix_element, MatrixElement
 from .rdmExt import rdm
 
 __all__ = [
     "matrix_element",
     "MatrixElement",
-    "rdm"
+    "rdm", 
+    "CorrelationMeasures"
 ]

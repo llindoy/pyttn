@@ -14,19 +14,26 @@ from . import opsExt as ops
 from .mssopOperatorExt import (
     ms_sop_operator,
     multiset_sop_operator,
+    MultisetSOPOperator
 )
-from .productOperatorExt import product_operator
-from .siteOperatorsExt import site_operator
-from .sopOperatorExt import sop_operator
-from .opExt import Op
+from .productOperatorExt import ProductOperator, product_operator
+from .siteOperatorsExt import SiteOperator, site_operator
+from .sopOperatorExt import SOPOperator, sop_operator
+from .opExt import op, Op
 
 __all__: list[str] = [
     "Op",
+    "op",
     "ops",
+    "SiteOperator",
     "site_operator",
+    "ProductOperator",
     "product_operator",
+    "SOPOperator",
     "sop_operator",
+    "MultisetSOPOperator",
     "multiset_sop_operator",
     "ms_sop_operator",
-    "product_operator",
 ]
+
+

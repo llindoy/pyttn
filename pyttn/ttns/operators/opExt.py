@@ -219,3 +219,4 @@ class Op(metaclass=ABCMeta):
         """
         pass
  
+op = Op

@@ -88,7 +88,7 @@ class SumSpectralDensity(RationalFunctionSpectralDensity):
 class DebyeSpectralDensity(RationalFunctionSpectralDensity):
     """A class for managing a Debye spectral density, that is
         .. math::
-            J(\\omega) = \\frac{\\Lambda}\\frac{2}\\frac{\\omega_c\\omega}{\\omega^2+\\omega_c^2}
+            J(\\omega) = \\frac{\\Lambda}{2}\\frac{\\omega_c\\omega}{\\omega^2+\\omega_c^2}
 
     :param Lambda: The bath reorganisation energy
     :type Lambda: float
@@ -146,7 +146,7 @@ class DebyeSpectralDensity(RationalFunctionSpectralDensity):
 class BrownianOscillatorSpectralDensity(RationalFunctionSpectralDensity):
     """A class for managing a Debye spectral density, that is
         .. math::
-            J(\\omega) = \\frac{\\Lambda}\\frac{2}\\frac{\\gamma\\Omega^2\\omega}{(\\omega^2-\\Omega^2)^2+\\gamma^2\\omega^2}
+            J(\\omega) = \\frac{\\Lambda}{2}\\frac{\\gamma\\Omega^2\\omega}{(\\omega^2-\\Omega^2)^2+\\gamma^2\\omega^2}
 
     :param Lambda: The bath reorganisation energy
     :type Lambda: float

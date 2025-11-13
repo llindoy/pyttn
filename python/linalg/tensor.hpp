@@ -51,7 +51,8 @@ void init_matrix_cpu(py::module &m, const std::string &label)
             Construct a linear algebra tensor object from a python buffer object.  This is the internal type used for linear
             algebra operations by the pyTTN package.
 
-            :Parameters:    - **in** (:class:`np.ndarray`) - The Input numpy array buffer
+            :param in: The Input numpy array buffer
+            :type in: np.ndarray
             )mydelim")
         .def(py::init<const ttype &>(),
              R"mydelim(
@@ -69,7 +70,7 @@ void init_matrix_cpu(py::module &m, const std::string &label)
             Construct a linear algebra tensor object from a cuda linear algebra object.  This is the internal type used for linear
             algebra operations by the pyTTN package.
 
-            :Parameters:    - **in** - The Input cuda linear algebra type
+            :param in: The Input cuda array buffer
             )mydelim")
 #endif
         .def_buffer([](ttype &mi) -> py::buffer_info
@@ -147,7 +148,8 @@ void init_tensor_cpu(py::module &m, const std::string &label)
             Construct a linear algebra tensor object from a python buffer object.  This is the internal type used for linear
             algebra operations by the pyTTN package.
 
-            :Parameters:    - **in** (:class:`np.ndarray`) - The Input numpy array buffer
+            :param in: The Input numpy array buffer
+            :type in: np.ndarray            
             )mydelim")
         .def(py::init<const ttype &>(),
              R"mydelim(
@@ -165,7 +167,7 @@ void init_tensor_cpu(py::module &m, const std::string &label)
             Construct a linear algebra tensor object from a cuda linear algebra object.  This is the internal type used for linear
             algebra operations by the pyTTN package.
 
-            :Parameters:    - **in** - The Input cuda linear algebra type
+            :param in: The Input cuda array buffer
             )mydelim")
 #endif
         .def_buffer([](ttype &mi) -> py::buffer_info
@@ -241,7 +243,8 @@ void init_matrix_gpu(py::module &m, const std::string &label)
             Construct a cuda linear algebra tensor object from a python buffer object.  This is the internal type used for 
             cuda accelerated linear algebra operations by the pyTTN package.
 
-            :Parameters:    - **in** (:class:`np.ndarray`) - The Input numpy array buffer
+            :param in: The Input numpy array buffer
+            :type in: np.ndarray            
             )mydelim")
         .def(py::init<const ttype &>(),
              R"mydelim(
@@ -253,7 +256,7 @@ void init_matrix_gpu(py::module &m, const std::string &label)
             Construct a cuda linear algebra tensor object from a linear algebra tensor object.  This is the internal type used for 
             cuda accelerated linear algebra operations by the pyTTN package.
 
-            :Parameters:    - **in**  - The input linear algebra tensor object
+            :param in: The Input linear algebra array buffer
             )mydelim")
         .def("complex_dtype", [](const ttype &)
              { return !std::is_same<T, real_type>::value; })
@@ -310,7 +313,8 @@ void init_tensor_gpu(py::module &m, const std::string &label)
             Construct a cuda linear algebra tensor object from a python buffer object.  This is the internal type used for 
             cuda accelerated linear algebra operations by the pyTTN package.
 
-            :Parameters:    - **in** (:class:`np.ndarray`) - The Input numpy array buffer
+            :param in: The Input numpy array buffer
+            :type in: np.ndarray            
             )mydelim")
         .def(py::init<const ttype &>(),
              R"mydelim(
@@ -322,7 +326,7 @@ void init_tensor_gpu(py::module &m, const std::string &label)
             Construct a cuda linear algebra tensor object from a linear algebra tensor object.  This is the internal type used for 
             cuda accelerated linear algebra operations by the pyTTN package.
 
-            :Parameters:    - **in**  - The input linear algebra tensor object
+            :param in: The Input linalg array buffer
             )mydelim")
         .def("complex_dtype", [](const ttype &)
              { return !std::is_same<T, real_type>::value; })
