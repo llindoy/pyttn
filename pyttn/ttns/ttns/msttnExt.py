@@ -227,7 +227,7 @@ if _cuda_import:
         msttnNode.register(ms_ttn_node_real_cuda)
 
 ms_ttn_node = msttnNode
-
+multiset_ttn_node = msttnNode
 def is_ms_ttn(A) -> bool:
     """A function for determining whether a given object is a multiset ttn
     :param A: The object to test
@@ -386,7 +386,7 @@ class msttn(metaclass=ABCMeta):
         :type i: int
 
         :return: A slice of the multiset ttn used for accessing the tensor network associated with a single system state
-        :rtype: msttnSlice
+        :rtype: "msttnSlice"
 
         """
 

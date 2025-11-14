@@ -49,6 +49,7 @@ class RDM(metaclass=ABCMeta):
         :param dtype: The type to be stored in the rdm object object.  This is ignored if the a TTN object is passed in the first argument.
         :type dtype: {np.float64, np.complex128}, optional
         :param `**kwargs`: A dictionary containing optional input arguments.
+        
             - **two_body** (bool, optional) - Whether or not the buffers for computing two-body RDMs should be allocated
         :returns: The RDM object
         :rtype: RDM
@@ -107,8 +108,7 @@ class RDM(metaclass=ABCMeta):
 
         :param `**kwargs`: A dictionary containing optional input arguments.
 
-            - **nbuffers** (int, optional) - The number of buffers to allocate.
-            - **use_capacity** (bool, optional) - Whether or not to use the capacity of the TTNs to determine the size of the buffers.
+            - **two_body** (int, optional) - Whether or not to allocate buffers needed to compute 2 rdm
         """
         pass
 

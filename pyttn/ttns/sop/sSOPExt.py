@@ -32,10 +32,10 @@ class OPBase(metaclass=ABCMeta):
     def __init__(self):
         """Base class for all symbolic string operator types:
         
-            - :class:`sOP`
-            - :class:`sPOP` 
-            - :class:`sNBO`
-            - :class:`sSOP`
+            - sOP
+            - sPOP 
+            - sNBO
+            - sSOP
         """
         pass
 
@@ -60,7 +60,7 @@ class sOP(OPBase):
       - Number operator :math:`\\hat{c}^\\dagger\\hat{c}` :  {"n", "cdagc", "adaga", "bdagb", "cdc", "ada", "bdb"}
       - Position operator :math:`\\hat{q}` : {"q", "x"}
       - Momentum operator :math:`\\hat{p}` : "p"
-      - Kinetic Energy Operator :math:`\\frac{1}{2} \\hat{p}^2 : "ke"
+      - Kinetic Energy Operator :math:`\\frac{1}{2} \\hat{p}^2` : "ke"
       - Powers of any of the above operators (x) :math:`\\hat{x}^n` Y "x^n"
 
     Spin Modes for arbitrary spin S
@@ -81,7 +81,7 @@ class sOP(OPBase):
 
     N Level System Modes
 
-      - :math:`\\left\|m\\right\\rangle\\left\\langle n \\right\|` : {"\|m><n\|"}
+      - :math:`\\left|m\\right\\rangle\\left\\langle n \\right|` : {"`|m><n|`"}
 
     """
 

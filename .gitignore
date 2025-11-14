@@ -19,6 +19,9 @@
 !cmake
 !cmake/FindCUTENSOR.cmake
 
+!public
+!public/*
+
 #now we add the docs folder and its required folders
 !docs
 !docs/make.bat

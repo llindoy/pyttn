@@ -49,19 +49,23 @@ inline void init_system_info(py::module &m)
         .def(py::init<size_t>(), R"mydelim(
             Constructs a primitive_mode_data object with a generic_mode mode_type of a given dimensionality
 
-            :Parameters:    - **d** (int) - Local Hilbert space dimension of mode
+            :param d: Local Hilbert space dimension of mode
+            :type d: int
         )mydelim")
 
         .def(py::init<size_t, mode_type>(), R"mydelim(
             Constructs a primitive_mode_data object with a given mode_type of a given dimensionality
 
-            :Parameters:    - **d** (int) - Local Hilbert space dimension of mode
-                            - **type** (:class:`mode_type`) - The type of the mode
+            :param d: Local Hilbert space dimension of mode
+            :type d: int       
+            :param type: The type of the mode
+            :type type: mode_type                              
         )mydelim")
         .def(py::init<const primitive_mode_data &>(), R"mydelim(
             Copy constructs a primitive_mode_data object from another primitive_mode_data object
 
-            :Parameters:    - **other** (:class:`primitive_mode_data`) - The other primitive mode data type
+            :param other: The other primitive mode data type
+            :type other: primitive_mode_data
         )mydelim")
         .def("assign", [](primitive_mode_data &self, const primitive_mode_data &o)
              { self = o; }, R"mydelim(
@@ -121,57 +125,66 @@ inline void init_system_info(py::module &m)
         .def(py::init<size_t>(), R"mydelim(
             Construct a mode data object consisting of a single generic primitive mode with a given local Hilbert space dimension
 
-            :Parameters:    - **d** (int) - Local Hilbert space dimension
-        )mydelim")
+            :param d: Local Hilbert Space dimension
+            :type d: int        )mydelim")
         .def(py::init<size_t, mode_type>(), R"mydelim(
             Construct a mode data object consisting of a single mode primitive mode with a given local Hilbert space dimension
 
-            :Parameters:    - **d** (int) - Local Hilbert space dimension
-                            - **type** (:class:`mode_type`) - The type of mode to construct
+            :param d: Local Hilbert Space dimension
+            :type d: int
+            :param type: The type of mode to construct
+            :type type: mode_type
         )mydelim")
 
         .def(py::init<const mode_data &>(), R"mydelim(
             Construct a mode data object from another mode data object
 
-            :Parameters:    - **data** (:class:`mode_data`) - The mode data object to construct from
+            :param data: The mode data object to construct from
+            :type data: mode_data
         )mydelim")
 
         .def(py::init<const primitive_mode_data &>(), R"mydelim(
             Construct a mode data object consisting of a single primitive mode 
 
-            :Parameters:    - **data** (:class:`primitive_mode_data`) - The value of the primitive mode to use
+            :param data: The value of the primitive mode to use
+            :type data: primitive_mode_data
         )mydelim")
 
         .def(py::init<const std::vector<primitive_mode_data> &>(), R"mydelim(
             Construct a mode data object from a vector of primitive_mode_data objects 
 
-            :Parameters:    - **data** (list[:class:`primitive_mode_data`]) - A list of primitive mode data objects that form the composite mode
+            :param data: A list of primitive mode data objects that form the composite mode
+            :type data: list[primitive_mode_data]
         )mydelim")
 
         .def("assign", [](mode_data &self, const mode_data &o)
              { self = o; }, R"mydelim(
             Assign the value of the mode data object from another mode data object
 
-            :Parameters:    - **data** (:class:`mode_data`) - The mode data object used to assing this value
+            :param data:  The mode data object used to assing this value
+            :type data: mode_data
         )mydelim")
         .def("assign", [](mode_data &self, const primitive_mode_data &o)
              { self = o; }, R"mydelim(
             Assign the value of the mode data object so that it contains a single primitive mode data object
 
-            :Parameters:    - **data** (:class:`primitive_mode_data`) - The primitive mode data object used to assing this value
+            :param data: The primitive mode data object used to assing this value
+            :type data: primitive_mode_data
         )mydelim")
 
         .def("assign", [](mode_data &self, const std::vector<primitive_mode_data> &o)
              { self = o; }, R"mydelim(
             Assign the value of the mode data object so that it contains a list single primitive mode data object
 
-            :Parameters:    - **data** (list[:class:`primitive_mode_data`]) - The list of primitive_mode_data objects used to set the value of this object.
+            :param data: The list of primitive_mode_data objects used to set the value of this object.
+            :type data: list[primitive_mode_data]
         )mydelim")
 
         .def("append", static_cast<void (mode_data::*)(const primitive_mode_data &)>(&mode_data::append), R"mydelim(
             Append a primitive mode to the current mode
 
-            :Parameters:    - **data** (:class:`primitive_mode_data`) - The primitive mode information to append to this object
+            :param data: The primitive mode information to append to this object
+            :type data: primitive_mode_data
         )mydelim")
         .def("__len__", &mode_data::nmodes, R"mydelim(
             :returns: The number of primitive modes in the composite mode
@@ -183,24 +196,29 @@ inline void init_system_info(py::module &m)
         )mydelim")
         .def("__getitem__", static_cast<primitive_mode_data &(mode_data::*)(size_t)>(&mode_data::operator[]), py::return_value_policy::reference,
              R"mydelim(
-                :Parameters:    - **i** (int) - The index of the mode to access
+                :param i: The index of the mode to access
+                :type i: int
 
-                :Returns:       The primitive_mode_data object in location i
-                :Return Type:   :class:`primitive_mode_data`
+                :return: The primitive_mode_data object in location i
+                :rtype:  primitive_mode_data
         )mydelim")
         .def("__setitem__", [](mode_data &o, size_t i, const primitive_mode_data &mode)
              { o[i] = mode; },
              R"mydelim(
-                Set the value of the primitive_mode_data object at position i in the mode_data object
-                :Parameters:    - **i** (int) - The index of the mode to access
-                                - **mode** (:class:`primitive_mode_data`) - The primitive_mode_data object used to construct the new mode
+            Set the value of the primitive_mode_data object at position i in the mode_data object
+
+            :param i: The index of the mode to acces
+            :type i : int
+            :param mode: The primitive_mode_data object used to construct the new mode
+            :type mode: primitive_mode_data
 
         )mydelim")
 
         .def("append", static_cast<void (mode_data::*)(const mode_data &)>(&mode_data::append), R"mydelim(
             Append all primitive modes contained in another mode data object to the current mode
 
-            :Parameters:    - **data** (:class:`mode_data`) - The mode data object containing a list of primitive modes to append to this object
+            :param data: The mode data object containing a list of primitive modes to append to this object
+            :type data: mode_data
         )mydelim")
 
         .def("__copy__", [](const mode_data &o)
@@ -319,56 +337,70 @@ inline void init_system_info(py::module &m)
         .def(py::init<size_t>(), R"mydelim(
             Construct a system_modes object containing N modes
 
-            :Parameters:    - **N** (int) - The number of modes defining the system
+            :param N: The number of modes defining the system
+            :type N: int
         )mydelim")
 
         .def(py::init<size_t, size_t>(), R"mydelim(
             Construct a system_modes object containing N modes, where each mode is a generic mode of sizes d
 
-            :Parameters:    - **N** (int) - The number of modes defining the system
-                            - **d** (int) - The local Hilbert space dimension of the modes
+            :param N: The number of modes defining the system
+            :type N: int                            
+            :param d:The local Hilbert space dimension of the modes
+            :type d: int
         )mydelim")
 
         .def(py::init<size_t, size_t, const std::vector<size_t> &>(), R"mydelim(
             Construct a system_modes object containing N modes, where each mode is a generic mode of sizes d.  Additionally
             provide a user defined ordering of the modes
 
-            :Parameters:    - **N** (int) - The number of modes defining the system
-                            - **d** (int) - The local Hilbert space dimension of the modes
-                            - **ordering** (list[int]) - The ordering of modes
+            :param N: The number of modes defining the system
+            :type N: int                            
+            :param d:The local Hilbert space dimension of the modes
+            :type d: int
+            :param ordering: The ordering of modes
+            :type ordering: list[int]
         )mydelim")
         .def(py::init<const system_modes &>(), R"mydelim(
             Copy construct the system mode from another system mode
 
-            :Parameters:    - **other** (:class:`system_modes`) - The other system_modes object
+            :param other: The other system_modes object
+            :type other: system_modes
         )mydelim")
         .def(py::init<const primitive_mode_data &>(), R"mydelim(
             Construt a system containing one primitive mode 
 
-            :Parameters:    - **mode** (:class:`primitive_mode_data`) - The single primitive mode information
+            :param mode: The single primitive mode information
+            :type mode: primitive_mode_data
         )mydelim")
         .def(py::init<const mode_data &>(), R"mydelim(
             Construct a system containing one composite mode 
 
-            :Parameters:    - **mode** (:class:`mode_data`) - The single composite mode information
+            :param mode: The single composite mode information
+            :type mode: mode_data
         )mydelim")
         .def(py::init<const std::vector<mode_data> &>(), R"mydelim(
-            Construct a system from a vector of modes 
 
-            :Parameters:    - **mode** (list[:class:`mode_data`]) - The list of composite mode information
+            Construct a system from a vector of modes 
+            :param mode: The list of composite mode information
+            :type mode: list[mode_data]
         )mydelim")
         .def(py::init<const std::vector<mode_data> &, const std::vector<size_t> &>(), R"mydelim(
             Construct a system from a vector of modes and user defined mode ordering
 
-            :Parameters:    - **mode** (list[:class:`mode_data`]) - The list of composite mode information
-                            - **ordering** (list[int]) - The ordering of modes
+            Construct a system from a vector of modes 
+            :param mode: The list of composite mode information
+            :type mode: list[mode_data]
+            :param ordering: The ordering of modes
+            :type ordering: list[int]
         )mydelim")
         .def("assign", [](system_modes &self, const system_modes &o)
              { self = o; }, R"mydelim(
             Assign the value of the system_modes object from another system mode
 
-            :Parameters:    - **other** (:class:`system_modes`) - The other system_modes object
-        )mydelim")
+            :param other: The other system_modes object
+            :type other: system_modes        
+            )mydelim")
         .def("__copy__", [](const system_modes &o)
              { return system_modes(o); })
         .def("__deepcopy__", [](const system_modes &o, py::dict)
@@ -412,26 +444,32 @@ inline void init_system_info(py::module &m)
         .def("add_mode", static_cast<void (system_modes::*)(const primitive_mode_data &)>(&system_modes::add_mode), R"mydelim(
             Append a new mode to the end of the system constructed from a single primitive_mode_data
 
-            :Parameters:    - **mode** (:class:`primitive_mode_data`) - The mode to append
+            :param mode: The mode to append
+            :type mode: primitive_mode_data
         )mydelim")
 
         .def("add_mode", static_cast<void (system_modes::*)(const primitive_mode_data &, size_t)>(&system_modes::add_mode), R"mydelim(
             Append a new mode to the end of the system constructed from a single primitive_mode_data.  Providing and integer giving the index of this new mode in the system
 
-            :Parameters:    - **mode** (:class:`primitive_mode_data`) - The mode to append
-                            - **index** (int) - The index of this mode
+            :param mode: The mode to append
+            :type mode: primitive_mode_data
+            :param index: The index of this mode
+            :type index: int
         )mydelim")
 
         .def("add_mode", static_cast<void (system_modes::*)(const mode_data &)>(&system_modes::add_mode), R"mydelim(
             Append a new mode to the end of the system specified in a mode_data object.
 
-            :Parameters:    - **mode** (:class:`mode_data`) - The mode to append
-        )mydelim")
+            :param mode: The mode to append
+            :type mode: mode_data        
+            )mydelim")
         .def("add_mode", static_cast<void (system_modes::*)(const mode_data &, size_t)>(&system_modes::add_mode), R"mydelim(
             Append a new mode to the end of the system specified in a mode_data object.  Providing and integer giving the index of this new mode in the system
-
-            :Parameters:    - **mode** (:class:`mode_data`) - The mode to append
-                            - **index** (int) - The index of this mode
+            
+            :param mode: The mode to append
+            :type mode: mode_data       
+            :param index: The index of this mode
+            :type index: int
         )mydelim")
         .def("__str__", [](const system_modes &o)
              {std::stringstream oss;   oss << o; return oss.str(); })
@@ -464,24 +502,31 @@ inline void init_system_info(py::module &m)
              { o[j] = i; },
              R"mydelim(
                 Set the value of the mode data object at position i to the mode_data object specified by mode
-                :Parameters:    - **i** (int) - The index of the mode to access
-                                - **mode** (:class:`mode_data`) - The new value to set this mode to
+
+                :param i: The index of the mode to access
+                :type i: int
+                :param mode: The new value to set this mode to
+                :type mode: mode_data
 
         )mydelim")
         .def("__setitem__", [](system_modes &o, size_t j, const primitive_mode_data &i)
              { o[j] = i; },
              R"mydelim(
                 Set the value of the mode data object at position i to the mode_data object containing a single primitive mode defined by the variable mode
-                :Parameters:    - **i** (int) - The index of the mode to access
-                                - **mode** (:class:`primitive_mode_data`) - The primitive_mode_data object used to construct the new mode
+                :param i: The index of the mode to access
+                :type i: int
+                :param mode: The new value to set this mode to
+                :type mode: primitive_mode_data
 
         )mydelim")
         .def("__setitem__", [](system_modes &o, size_t j, const std::vector<primitive_mode_data> &i)
              { o[j] = i; },
              R"mydelim(
                 Set the value of the mode data object at position i to the mode_data object containing a list of primitive mode defined by the variable mode
-                :Parameters:    - **i** (int) - The index of the mode to access
-                                - **mode** (list[:class:`primitive_mode_data`]) - A list primitive_mode_data object used to construct the new mode
+                :param i: The index of the mode to access
+                :type i: int
+                :param mode: The new value to set this mode to
+                :type mode: iist[primitive_mode_data]
 
         )mydelim")
         .def("mode_dimensions", [](const system_modes &o)
@@ -516,8 +561,11 @@ inline void init_system_info(py::module &m)
              { o.primitive_mode(i) = d; },
              R"mydelim(
                 Set the value of the ith primitive mode to the mode_data in the system.  This does not necessarily correspond to a primitive mode in the ith composite mode
-                :Parameters:    - **i** (int) - The index of the primitive mode to access
-                                - **mode** (list[:class:`primitive_mode_data`]) - A list primitive_mode_data object used to construct the new mode
+
+                :param i: The index of the primitive mode to access
+                :type i: int
+                :param mode: A list primitive_mode_data object used to construct the new mode
+                :type mode: list[:class:`primitive_mode_data`]
 
         )mydelim")
         .def("as_combined_mode", &system_modes::as_combined_mode, R"mydelim(

@@ -14,7 +14,7 @@
 from abc import ABCMeta, abstractmethod
 
 import pyttn.ttnpp.ops as ops
-from pyttn.linalg import DiagonalMatrix, Matrix, SparseMatrix
+import pyttn.linalg as la
 
 if hasattr(ops, "identity_real"):
     _real_ops=True
@@ -189,7 +189,7 @@ def _diagonal_matrix(*args, dtype=np.complex128, backend="blas"):
         raise RuntimeError("Invalid backend type for ops.diagonal_matrix")
 
 
-class siteOp(metaclass=ABCMeta):
+class SiteOp(metaclass=ABCMeta):
     def __new__(cls, *args, type=None, dtype=np.complex128, backend="blas"):
         if type == "identity":
             return _identity(*args, dtype=dtype, backend=backend)
@@ -237,7 +237,7 @@ class siteOp(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def clone(self) -> "siteOp":
+    def clone(self) -> "SiteOp":
         """Returns a copy of the present operator
 
         :return: A copy of the operator
@@ -246,7 +246,7 @@ class siteOp(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def transpose(self) -> "siteOp":
+    def transpose(self) -> "SiteOp":
         """Returns the transpose present operator
 
         :return: The transpose of the operator
@@ -281,8 +281,9 @@ class siteOp(metaclass=ABCMeta):
         """
         pass
 
+siteOp=SiteOp
 
-class identity(siteOp):
+class Identity(SiteOp):
     """A class for handling identity valued site operators"""
 
     def __new__(cls, *args, dtype=np.complex128, backend="blas"):
@@ -302,18 +303,18 @@ class identity(siteOp):
         return _identity(*args, dtype=dtype, backend=backend)
 
 
-identity.register(ops.identity_complex)
+Identity.register(ops.identity_complex)
 
 if _real_ops:
-    identity.register(ops.identity_real)
+    Identity.register(ops.identity_real)
 
 if _cuda_import:
-    identity.register(cuops.identity_complex)
+    Identity.register(cuops.identity_complex)
     if _real_ops:
-        identity.register(cuops.identity_real)
+        Identity.register(cuops.identity_real)
 
-
-class matrix(siteOp):
+identity = Identity
+class Matrix(SiteOp):
     """A class for handling matrix valued site operators"""
 
     def __new__(cls, *args, dtype=np.complex128, backend="blas"):
@@ -330,27 +331,27 @@ class matrix(siteOp):
         """
         return _matrix(*args, dtype=dtype, backend=backend)
 
-    def matrix(self) -> Matrix:
+    def Matrix(self) -> la.Matrix:
         """Return the Matrix object defining this operator
 
         :return: The matrix representation of this operator
-        :rtype: Matrix
+        :rtype: pyttn.linalg.Matrix
         """
         pass
 
 
-matrix.register(ops.matrix_complex)
+Matrix.register(ops.matrix_complex)
 if _real_ops:
-    matrix.register(ops.matrix_real)
+    Matrix.register(ops.matrix_real)
 
 if _cuda_import:
-    matrix.register(cuops.matrix_complex)
+    Matrix.register(cuops.matrix_complex)
 
     if _real_ops:
-        matrix.register(cuops.matrix_real)
+        Matrix.register(cuops.matrix_real)
 
-
-class sparse_matrix(siteOp):
+matrix=Matrix
+class SparseMatrix(SiteOp):
     """A class for handling sparse matrix valued site operators"""
 
     def __new__(cls, *args, dtype=np.complex128, backend="blas"):
@@ -367,28 +368,29 @@ class sparse_matrix(siteOp):
         """
         return _sparse_matrix(*args, dtype=dtype, backend=backend)
 
-    def matrix(self) -> SparseMatrix:
+    def matrix(self) -> la.SparseMatrix:
         """Return the SparseMatrix object defining this operator
 
         :return: The matrix representation of this operator
-        :rtype: SparseMatrix
+        :rtype: pyttn.linalg.SparseMatrix
         """
         pass
 
 
-sparse_matrix.register(ops.sparse_matrix_complex)
+SparseMatrix.register(ops.sparse_matrix_complex)
 
 if _real_ops:
-    sparse_matrix.register(ops.sparse_matrix_real)
+    SparseMatrix.register(ops.sparse_matrix_real)
 
 if _cuda_import:
-    sparse_matrix.register(cuops.sparse_matrix_complex)
+    SparseMatrix.register(cuops.sparse_matrix_complex)
 
     if _real_ops:
-        sparse_matrix.register(cuops.sparse_matrix_real)
+        SparseMatrix.register(cuops.sparse_matrix_real)
 
+sparse_matrix = SparseMatrix
 
-class diagonal_matrix(siteOp):
+class DiagonalMatrix(SiteOp):
     """A class for handling diagonal matrix valued site operators"""
 
     def __new__(cls, *args, dtype=np.complex128, backend="blas"):
@@ -405,22 +407,24 @@ class diagonal_matrix(siteOp):
         """
         return _diagonal_matrix(*args, dtype=dtype, backend=backend)
 
-    def matrix(self) -> DiagonalMatrix:
+    def matrix(self) -> la.DiagonalMatrix:
         """Return the DiagonalMatrix object defining this operator
 
         :return: The matrix representation of this operator
-        :rtype: DiagonalMatrix
+        :rtype: pyttn.linalg.DiagonalMatrix
         """
         pass
 
 
-diagonal_matrix.register(ops.diagonal_matrix_complex)
+DiagonalMatrix.register(ops.diagonal_matrix_complex)
 
 if _real_ops:
-    diagonal_matrix.register(ops.diagonal_matrix_real)
+    DiagonalMatrix.register(ops.diagonal_matrix_real)
 
 if _cuda_import:
-    diagonal_matrix.register(cuops.diagonal_matrix_complex)
+    DiagonalMatrix.register(cuops.diagonal_matrix_complex)
 
     if _real_ops:
-        diagonal_matrix.register(cuops.diagonal_matrix_real)
+        DiagonalMatrix.register(cuops.diagonal_matrix_real)
+
+diagonal_matrix = DiagonalMatrix

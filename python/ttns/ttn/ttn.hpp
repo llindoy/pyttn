@@ -267,7 +267,7 @@ void init_ttn(py::module &m, const std::string &label)
               { return o.maximum_bond_entropy(); }, "For details see :meth:`pyttn.ttn_dtype.maximum_bond_entropy`")
          .def("bond_entropy", &_ttn::bond_entropy, "For details see :meth:`pyttn.ttn_dtype.bond_entropy`")
          .def("maximum_bond_dimension", [](const _ttn &o)
-              { return o.maximum_bond_dimension(); }, "For details see :meth:`pyttn.ttn_dtype.maximum_bond_dimension")
+              { return o.maximum_bond_dimension(); }, "For details see :meth:`pyttn.ttn_dtype.maximum_bond_dimension`")
          .def("minimum_bond_dimension", [](const _ttn &o)
               { return o.minimum_bond_dimension(); }, "For details see :meth:`pyttn.ttn_dtype.minimum_bond_dimension`")
 

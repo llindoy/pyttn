@@ -1,20 +1,82 @@
 image: python:3.13
 
 stages:
-  - build_and_test
-  
-build_and_test:
-  stage: build_and_test
+  - build
+  - lint
+  - test
+  - pages
+
+before_script:
+    - apt-get update --yes
+    - apt-get install --yes cmake
+    - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
+    - pip install virtualenv
+    - python -m venv .venv
+    - source .venv/bin/activate
+
+cache:
+  key: pip-global-cache
+  paths:
+    - $CI_PROJECT_DIR/.cache/pip
+    
+build:
+  stage: build
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "docs"'
+    when: never
+  - when: always
+
   script:
-  - apt-get update --yes
-  - apt-get install --yes cmake
-  - apt-get install --yes libblas3 liblapack3 liblapack-dev libblas-dev
-  - python -m pip install pytest
-  - python -m pip install numpy
-  - python -m pip install h5py
-  - python -m pip install ruff
-  - export CMAKE_BUILD_PARALLEL_LEVEL=4
-  - python -m pip -v install ./
-  - python -m pytest
-  - ruff check
+    - export CMAKE_BUILD_PARALLEL_LEVEL=4
+    - export PARALLEL_BUILD_TTNPP=8
+    - python -m pip -v install .
+
+  artifacts:
+    paths:
+        - /builds/quantum-software/pyttn/pyttn/
+lint:
+  stage: lint
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "docs"'
+    when: never
+  - when: always
+
+  script:
+    - export SKIP_BUILD_TTNPP_LIBRARY=True
+    - python -m pip -v install .[lint]
+    - ruff check
+
+test:
+  stage: test
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "docs"'
+    when: never
+  - when: always
+
+  script:
+    - export SKIP_BUILD_TTNPP_LIBRARY=True
+    - python -m pip -v install .[test]
+    - python -m pytest -n 2
+
+pages:
+  stage: pages
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "docs"'
+    when: always
+  - when: never
+
+  script:
+    - echo $CI_REPOSITORY_URL
+    - echo "The site will be deployed to $CI_PAGES_URL"
+    - apt-get install --yes pandoc
+    - export CMAKE_BUILD_PARALLEL_LEVEL=4
+    - export PARALLEL_BUILD_TTNPP=8
+    - python -m pip -v install .[docs]
+    - cd docs
+    - make html
+    - cp -r build/html ../public
+    - cd ../
+  artifacts:
+    paths:
+      - public
 

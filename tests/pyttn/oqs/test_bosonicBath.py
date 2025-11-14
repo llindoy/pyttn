@@ -111,8 +111,8 @@ def test_AAA(beta, expected_error):
 
 @pytest.mark.parametrize("beta, expected_error", [(None, 2e-6), (1, 3e-6)])
 def test_ESPRIT(beta, expected_error):
-    dt = 0.005
-    tmax = 10
+    dt = 0.01
+    tmax = 5
     alpha = 0.1
     wc = 5
     s = 1

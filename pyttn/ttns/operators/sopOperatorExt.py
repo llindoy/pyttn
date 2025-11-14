@@ -47,7 +47,7 @@ def _sop_operator_blas(h, A, sysinf, *args, compress: bool = True, identity_opt:
             return sop_operator_complex(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a sop_operator.")
+                "Invalid argument for the creation of a SOPOperator.")
     else:
         if isinstance(A, ttn_real) and isinstance(h, SOP_real):
             return sop_operator_real(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
@@ -55,7 +55,7 @@ def _sop_operator_blas(h, A, sysinf, *args, compress: bool = True, identity_opt:
             return sop_operator_complex(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a sop_operator.")
+                "Invalid argument for the creation of a SOPOperator.")
 
 
 def _sop_operator_cuda(h, A, sysinf, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True):
@@ -64,7 +64,7 @@ def _sop_operator_cuda(h, A, sysinf, *args, compress: bool = True, identity_opt:
             return sop_operator_complex_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a sop_operator.")
+                "Invalid argument for the creation of a SOPOperator.")
     else:
         if isinstance(A, ttn_real_cuda) and isinstance(h, SOP_real):
             return sop_operator_real_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
@@ -72,15 +72,15 @@ def _sop_operator_cuda(h, A, sysinf, *args, compress: bool = True, identity_opt:
             return sop_operator_complex_cuda(h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,)
         else:
             raise RuntimeError(
-                "Invalid argument for the creation of a sop_operator.")
+                "Invalid argument for the creation of a SOPOperator.")
 
 
-class sop_operator(metaclass=ABCMeta):
+class SOPOperator(metaclass=ABCMeta):
     """A class for handling the sum-of-product operators."""
 
     def __new__( 
         cls, h: SOP, A: ttn, sysinf: system_modes, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,
-    ) -> "sop_operator":
+    ) -> "SOPOperator":
         """Function for constructing the hierarchical sum of product operator of a string operator
 
         :param h: The sum of product operator representation of the Hamiltonian
@@ -100,14 +100,14 @@ class sop_operator(metaclass=ABCMeta):
         :type identity_opt: bool, optional
         :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
         :type use_sparse: bool, optional
-        :return: The sop_operator representation of the input SOP
-        :rtype: sop_operator
+        :return: The SOPOperator representation of the input SOP
+        :rtype: SOPOperator
         """
 
         if len(args) > 0:
             if args[0].backend() != A.backend():
                 raise RuntimeError(
-                    "Attempted to construct sop_operator with opdict but opdict backend is not compatible with ttn backend."
+                    "Attempted to construct SOPOperator with opdict but opdict backend is not compatible with ttn backend."
                 )
         if A.backend() == "blas":
             return _sop_operator_blas(
@@ -118,13 +118,13 @@ class sop_operator(metaclass=ABCMeta):
                 h, A, sysinf, *args, compress=compress, identity_opt=identity_opt, use_sparse=use_sparse,
             )
         else:
-            raise RuntimeError("Invalid backend type for sop_operator")
+            raise RuntimeError("Invalid backend type for SOPOperator")
         
     @abstractmethod
     def initialise( 
         self, op: SOP, A: ttn, sysinf: system_modes, *args, compress: bool = True, identity_opt: bool = True, use_sparse: bool = True,
     ):
-        """Initialise the sop_operator object given a sOP and system_modes information
+        """Initialise the SOPOperator object given a sOP and system_modes information
 
         :param h: The sum of product operator representation of the Hamiltonian
         :type h: SOP
@@ -143,17 +143,17 @@ class sop_operator(metaclass=ABCMeta):
         :type identity_opt: bool, optional
         :param use_sparse: Whether or not to use sparse matrix representations of operators, defaults to True
         :type use_sparse: bool, optional
-        :return: The sop_operator representation of the input SOP
-        :rtype: sop_operator
+        :return: The SOPOperator representation of the input SOP
+        :rtype: SOPOperator
         """
         pass
 
     @abstractmethod
-    def assign(self, o: "sop_operator"):
+    def assign(self, o: "SOPOperator"):
         """Assign the value of the sum-of-product operator from another
 
         :param o: The sum-of-product operator to copy into this one
-        :type o: sop_operator
+        :type o: SOPOperator
         """
         pass
 
@@ -184,7 +184,7 @@ class sop_operator(metaclass=ABCMeta):
 
     @abstractmethod
     def clear(self):
-        """Clear and deallocate all internal buffers of the sop_operator"""
+        """Clear and deallocate all internal buffers of the SOPOperator"""
         pass
 
     @abstractmethod
@@ -219,16 +219,16 @@ class sop_operator(metaclass=ABCMeta):
 
     @abstractmethod
     def complex_dtype(self) -> bool:
-        """Returns whether or not the sop_operator is storing a complex valued dtype
+        """Returns whether or not the SOPOperator is storing a complex valued dtype
 
-        :return: whether or not the sop_operator is storing a complex valued dtype
+        :return: whether or not the SOPOperator is storing a complex valued dtype
         :rtype: bool
         """
         pass
 
     @abstractmethod
     def backend(self) -> str:
-        """Returns the backend type of the sop_operator
+        """Returns the backend type of the SOPOperator
 
         :return: The backend type of the object
         :rtype: str
@@ -236,11 +236,13 @@ class sop_operator(metaclass=ABCMeta):
         pass
 
 
-sop_operator.register(sop_operator_complex)
+SOPOperator.register(sop_operator_complex)
 if _real_ttn_import:
-    sop_operator.register(sop_operator_real)
+    SOPOperator.register(sop_operator_real)
 
 if _cuda_import:
-    sop_operator.register(sop_operator_complex_cuda)
+    SOPOperator.register(sop_operator_complex_cuda)
     if _real_ttn_import:
-        sop_operator.register(sop_operator_real_cuda)
+        SOPOperator.register(sop_operator_real_cuda)
+
+sop_operator=SOPOperator

@@ -21,7 +21,7 @@
 
 <!-- Add links when complete -->
 ## Links
-* Documentation:  Coming Soon!<!-- <https://qsm.gitlab-docs.npl.co.uk/pyttn> -->
+* Documentation [WIP]: <https://qsm.gitlab-docs.npl.co.uk/pyttn>
 * arXiv: <https://arxiv.org/abs/2503.15460>
 * Gitlab:         <https://gitlab.npl.co.uk/quantum-software/pyttn>
 * National Physical Laboratory: <https://www.npl.co.uk/>
@@ -110,9 +110,9 @@ python3 -m pip install .
 
 ### Multithreaded Build
 
-By default, this will make use of a single threaded build for compiling the Pybind11 wrapper and can take a number of minutes to complete.  It is recommended to make use of multi-threaded builds when compiling the Pybind11.  This can be done by setting the environment variable `CMAKE_BUILD_PARALLEL_LEVEL`, e.g.
+By default, this will make use of a single threaded build for compiling the Pybind11 wrapper and can take a number of minutes to complete.  It is recommended to make use of multi-threaded builds when compiling the Pybind11.  This can be done by setting the environment variable `PARALLEL_BUILD_TTNPP`, e.g.
 ```
-export CMAKE_BUILD_PARALLEL_LEVEL=8
+export PARALLEL_BUILD_TTNPP=8
 ```
 to allow for the use of 8 threads when compiling.
 
@@ -139,13 +139,13 @@ In addition to the example scripts discussed above the pyTTN repository contains
  - [A tutorial on the types of operations that can be applied to Tree Tensor Networks that are supported by pyTTN](tutorials/ttn_operations.ipynb)
 
  Additionally a set of introductory tutorials are provided that demonstrate the use of pyTTN for the simulation of physical systems including:
- - [A tutorial on computing the ground state of the 1D Transverse Field Ising Model using a Matrix Product State Ansatz](tutorials/dmrg_TFIM.ipynb)
- - [A tutorial on computing the ground state of the 1D Transverse Field Ising Model using a Binary Tree Tensor Network Ansatz](tutorials/dmrg_TFIM_ttn.ipynb)
- - [A tutorial on computing the ground state of the 1D Fermi-Hubbard Model using a Matrix Product State Ansatz](tutorials/dmrg_fermi_Hubbard.ipynb)
- - [A tutorial on computing the ground state of the 1D Transverse Field Ising Model using a Matrix Product State Ansatz](tutorials/dmrg_TFIM.ipynb)
+ - [A tutorial on computing the ground state of the 1D Transverse Field Ising Model using a Matrix Product State Ansatz](tutorials/DMRG/dmrg_TFIM.ipynb)
+ - [A tutorial on computing the ground state of the 1D Transverse Field Ising Model using a Binary Tree Tensor Network Ansatz](tutorials/DMRG/dmrg_TFIM_ttn.ipynb)
+ - [A tutorial on computing the ground state of the 1D Fermi-Hubbard Model using a Matrix Product State Ansatz](tutorials/DMRG/dmrg_fermi_Hubbard.ipynb)
+
 
 Finally, a set of more advanced tutorials are provided including:
- - [A tutorial showing the simulation of real time dynamics of an anisotropic XY model on a Cayley Tree using more advanced tree creation tools](tutorials/tdvp_cayley_XY.ipynb)
+ - [A tutorial showing the simulation of real time dynamics of an anisotropic XY model on a Cayley Tree using more advanced tree creation tools](tutorials/TDVP/tdvp_cayley_XY.ipynb)
  - [A tutorial applying pyTTN to evaluate spectral properties of the 24 mode pyrazine model](tutorials/tdvp_pyrazine.ipynb)
  - [A set of tutorials applying pyTTN to simulate Open Quantum System Dynamics](tutorials/open_quantum_systems/)
  - [A set of tutorials applying pyTTN to simulate exciton dynamics in Holstein models using multiset Tensor Network Ansatze](tutorials/multiset_ansatz/)

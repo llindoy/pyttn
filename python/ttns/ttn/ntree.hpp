@@ -170,8 +170,9 @@ void init_ntree(py::module &m)
         .def(py::init(), "Default construct an empty ntree.")
         .def(py::init<const ntree<T> &>(), R"mydelim(
             Copy construct an ntree from another ntree object
-
-            :Parameters:    - **tree** (:class:`ntree`) - Input ntree to construct a copy of
+            
+            :param tree: The input ntree to construct a copy of
+            :type tree: ntree
 
             )mydelim")
         .def(py::init<const std::string &>(), R"mydelim(
@@ -182,15 +183,18 @@ void init_ntree(py::module &m)
 
             corresponds to the tree
 
-                  1
-                 x x
-                x   x
-               2     5
-              x x   x x  
-             x   x x   x
-            3    4 6    7
+            .. code-block:: text
 
-            :Parameters:    - **tree** (str) - A string representation of a tree
+                      1
+                     x_x
+                    x___x
+                   2_____5
+                  x_x___x_x
+                 x___x_x___x
+                3____4_6____7
+
+            :param tree: A string representation of the ntree
+            :type tree: str
 
             )mydelim")
 
@@ -227,22 +231,24 @@ void init_ntree(py::module &m)
 
             )mydelim")
         .def("load_from_string", &ntree<T>::load_from_string, R"mydelim(
-            Load an ntree object from a string representation of a tree.  Here we use a set of nested parentheses to represent
+            Load an ntree object from a string representation of a tree.  Here we use a set of nested parentheses to represent            
             a tree e.g.:
 
-            (1(2(3)(4))(5(6)(7)) 
+            (1(2(3)(4))(5(6)(7)))
 
             corresponds to the tree
 
-                  1
-                 x x
-                x   x
-               2     5
-              x x   x x  
-             x   x x   x
-            3    4 6    7
-
-            :Parameters:    - **tree** (str) - A string representation of a tree
+            .. code-block:: text
+                      1
+                     x_x
+                    x___x
+                   2_____5
+                  x_x___x_x
+                 x___x_x___x
+                3____4_6____7
+        
+            :param tree: A string representation of the ntree
+            :type tree: str
 
             )mydelim")
         .def("insert", &ntree<T>::insert, R"mydelim(
@@ -368,7 +374,7 @@ void init_ntree(py::module &m)
              R"mydelim(
 
                 :Returns: The value of the root node
-                :Return Type: int
+                :rtype: int
 
                 )mydelim")
         .def("__call__",
@@ -376,8 +382,8 @@ void init_ntree(py::module &m)
              py::return_value_policy::reference,
              R"mydelim(
 
-                :Returns: The value of the root node
-                :Return Type: int
+                :returns: The value of the root node
+                :rtype: int
 
                 )mydelim")
         .def("__getitem__",
@@ -401,8 +407,8 @@ void init_ntree(py::module &m)
 
                 :Paramters:     - **inds** (list[int]) - The index of the node where we aim to insert a child.  
 
-                :Returns: A constant reference to the specified node
-                :Return Type: :class:`ntreeNode`
+                :returns: A constant reference to the specified node
+                :rtype: :class:`ntreeNode`
 
                 )mydelim")
         .def("at",
@@ -413,8 +419,8 @@ void init_ntree(py::module &m)
 
                 :Paramters:     - **inds** (list[int]) - The index of the node where we aim to insert a child.  
 
-                :Returns: A reference to the specified node
-                :Return Type: :class:`ntreeNode`
+                :returns: A reference to the specified node
+                :rtype: :class:`ntreeNode`
 
                 )mydelim")
         .def("root",
@@ -422,16 +428,16 @@ void init_ntree(py::module &m)
              py::return_value_policy::reference,
              R"mydelim(
 
-                :Returns: A constant reference to the root node
-                :Return Type: :class:`ntreeNode`
+                :returns: A constant reference to the root node
+                :rtype: :class:`ntreeNode`
 
                 )mydelim")
         .def("root", static_cast<node_type &(ntree<T>::*)()>(&ntree<T>::root),
              py::return_value_policy::reference,
              R"mydelim(
 
-                :Returns: A reference to the root node
-                :Return Type: :class:`ntreeNode`
+                :returns: A reference to the root node
+                :rtype: :class:`ntreeNode`
 
                 )mydelim")
         .def(
@@ -536,13 +542,17 @@ void init_ntree_builder(py::module &m)
             R"mydelim(
                         Construct a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using an integer to specify the internal bond dimensions.
 
-                        :Parameters:    - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **chi** (int) - A fixed internal bond dimension to use throughout the tree.
-                                        - **include_local_basis_transformation** (bool, optional) - A flag as to or not to include a set of bond matrices at the leaves of the tree defining a local basis transformation.  (Default: True)
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param chi: A fixed internal bond dimension to use throughout the tree.
+                        :type chi: int
+                        :param include_local_basis_transformation: A flag as to or not to include a set of bond matrices at the leaves of the tree defining a local basis transformation.  (Default: True)
+                        :type include_local_basis_transformation: bool, optional
                         
-                        :Returns: A balanced tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :returns: A balanced tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
 
                         )mydelim")
         .def_static(
@@ -555,13 +565,17 @@ void init_ntree_builder(py::module &m)
             R"mydelim(
                         Construct a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using a function that depends on the distance from the root to specify the internal bond dimensions.
 
-                        :Parameters:    - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **fchi** (callable(int)) - A function specifying the bond dimension as a function of depth.  
-                                        - **include_local_basis_transformation** (bool, optional) - A flag as to or not to include a set of bond matrices at the leaves of the tree defining a local basis transformation.  (Default: True)
-                        
-                        :Returns: A balanced tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param fchi: A function specifying the bond dimension as a function of depth. 
+                        :typef fchi: callable[int]
+                        :param include_local_basis_transformation: A flag as to or not to include a set of bond matrices at the leaves of the tree defining a local basis transformation.  (Default: True)
+                        :type include_local_basis_transformation: bool, optional
+
+                        :returns: A balanced tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
 
                         )mydelim")
         .def_static(
@@ -571,14 +585,18 @@ void init_ntree_builder(py::module &m)
             R"mydelim(
                         Construct a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using a function that depends on the distance from the root to specify the internal bond dimensions.
                         Additionally, this function inserts a local basis transformation with a user specified dimension to each of the leaf nodes. 
-
-                        :Parameters:    - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **chi** (int) - A fixed internal bond dimension to use throughout the tree.
-                                        - **lhd** (int) - The variable used for defining the number of individual mode states to retain in the tree structure
                         
-                        :Returns: A balanced tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param chi: A fixed internal bond dimension to use throughout the tree.
+                        :type chi: int
+                        :param lhd: The variable used for defining the number of individual mode states to retain in the tree structure
+                        :type lhd: int
+
+                        :returns: A balanced tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
                         )mydelim")
         .def_static(
             "mlmctdh_tree",
@@ -589,13 +607,17 @@ void init_ntree_builder(py::module &m)
                         Construct a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using a function that depends on the distance from the root to specify the internal bond dimensions.
                         Additionally, this function inserts a local basis transformation with a user specified dimension to each of the leaf nodes. 
 
-                        :Parameters:    - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **fchi** (callable(int)) - A function specifying the bond dimension as a function of depth.  
-                                        - **lhd** (int) - The variable used for defining the number of individual mode states to retain in the tree structure
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param fchi: A function specifying the bond dimension as a function of depth. 
+                        :typef fchi: callable[int]
+                        :param lhd: The variable used for defining the number of individual mode states to retain in the tree structure
+                        :type lhd: int
                         
-                        :Returns: A balanced tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :returns: A balanced tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
                         )mydelim")
         .def_static("mlmctdh_tree",
                     static_cast<ntree<T> (*)(const std::vector<T> &, size_t,
@@ -605,13 +627,17 @@ void init_ntree_builder(py::module &m)
                         Construct a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using a function that depends on the distance from the root to specify the internal bond dimensions.
                         Additionally, this function inserts a local basis transformation with a user specified dimension to each of the leaf nodes. 
 
-                        :Parameters:    - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **chi** (int) - A fixed internal bond dimension to use throughout the tree.
-                                        - **lhd** (list[int]) - The variable used for defining the number of individual mode states to retain in the tree structure.  Here this is different for each leaf of the tree.
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param chi: A fixed internal bond dimension to use throughout the tree.
+                        :type chi: int
+                        :param lhd: The variable used for defining the number of individual mode states to retain in the tree structure
+                        :type lhd: int
                         
-                        :Returns: A balanced tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :returns: A balanced tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
                         )mydelim")
         .def_static(
             "mlmctdh_tree",
@@ -623,13 +649,17 @@ void init_ntree_builder(py::module &m)
                         Construct a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using a function that depends on the distance from the root to specify the internal bond dimensions.
                         Additionally, this function inserts a local basis transformation with a user specified dimension to each of the leaf nodes. 
 
-                        :Parameters:    - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **fchi** (callable(int)) - A function specifying the bond dimension as a function of depth.  
-                                        - **lhd** (list[int]) - The variable used for defining the number of individual mode states to retain in the tree structure.  Here this is different for each leaf of the tree.
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param fchi: A function specifying the bond dimension as a function of depth. 
+                        :typef fchi: callable[int]
+                        :param lhd: The variable used for defining the number of individual mode states to retain in the tree structure
+                        :type lhd: int
                         
-                        :Returns: A balanced tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :returns: A balanced tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
                         )mydelim")
 
         .def_static(
@@ -642,11 +672,16 @@ void init_ntree_builder(py::module &m)
             R"mydelim(
                         Append a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using an integer to specify the internal bond dimensions.
 
-                        :Parameters:    - **node** (:class:`ntreeNode`) - The node to append the tree to
-                                        - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **chi** (int) - A fixed internal bond dimension to use throughout the tree.
-                                        - **include_local_basis_transformation** (bool, optional) - A flag as to or not to include a set of bond matrices at the leaves of the tree defining a local basis transformation.  (Default: True)
+                        :param node: The node to append the tree to
+                        :type node: ntreeNode
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param chi: A fixed internal bond dimension to use throughout the tree.
+                        :type chi: int
+                        :param include_local_basis_transformation: A flag as to or not to include a set of bond matrices at the leaves of the tree defining a local basis transformation.  (Default: True)
+                        :type include_local_basis_transformation: bool, optional
                         )mydelim")
         .def_static(
             "mlmctdh_subtree",
@@ -658,11 +693,17 @@ void init_ntree_builder(py::module &m)
             R"mydelim(
                         Append a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using a function that depends on the distance from the root to specify the internal bond dimensions.
 
-                        :Parameters:    - **node** (:class:`ntreeNode`) - The node to append the tree to
-                                        - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **fchi** (callable(int)) - A function specifying the bond dimension as a function of depth.  
-                                        - **include_local_basis_transformation** (bool, optional) - A flag as to or not to include a set of bond matrices at the leaves of the tree defining a local basis transformation.  (Default: True)
+                        :param node: The node to append the tree to
+                        :type node: ntreeNode
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param fchi: A function specifying the bond dimension as a function of depth. 
+                        :typef fchi: callable[int]
+                        :param include_local_basis_transformation: A flag as to or not to include a set of bond matrices at the leaves of the tree defining a local basis transformation.  (Default: True)
+                        :type include_local_basis_transformation: bool, optional
+                        
                         )mydelim")
         .def_static(
             "mlmctdh_subtree",
@@ -673,11 +714,16 @@ void init_ntree_builder(py::module &m)
                         Append a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using a function that depends on the distance from the root to specify the internal bond dimensions.
                         Additionally, this function inserts a local basis transformation with a user specified dimension to each of the leaf nodes. 
 
-                        :Parameters:    - **node** (:class:`ntreeNode`) - The node to append the tree to
-                                        - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **chi** (int) - A fixed internal bond dimension to use throughout the tree.
-                                        - **lhd** (int) - The variable used for defining the number of individual mode states to retain in the tree structure
+                        :param node: The node to append the tree to
+                        :type node: ntreeNode
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param chi: A fixed internal bond dimension to use throughout the tree.
+                        :type chi: int
+                        :param lhd: The variable used for defining the number of individual mode states to retain in the tree structure
+                        :type lhd: int
                         
                         )mydelim")
         .def_static(
@@ -689,11 +735,16 @@ void init_ntree_builder(py::module &m)
                         Append a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using a function that depends on the distance from the root to specify the internal bond dimensions.
                         Additionally, this function inserts a local basis transformation with a user specified dimension to each of the leaf nodes. 
 
-                        :Parameters:    - **node** (:class:`ntreeNode`) - The node to append the tree to
-                                        - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **fchi** (callable(int)) - A function specifying the bond dimension as a function of depth.  
-                                        - **lhd** (int) - The variable used for defining the number of individual mode states to retain in the tree structure
+                        :param node: The node to append the tree to
+                        :type node: ntreeNode
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param fchi: A function specifying the bond dimension as a function of depth. 
+                        :typef fchi: callable[int]
+                        :param lhd: The variable used for defining the number of individual mode states to retain in the tree structure
+                        :type lhd: int
                         
                         )mydelim")
         .def_static(
@@ -706,11 +757,16 @@ void init_ntree_builder(py::module &m)
                         Append a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using a function that depends on the distance from the root to specify the internal bond dimensions.
                         Additionally, this function inserts a local basis transformation with a user specified dimension to each of the leaf nodes. 
 
-                        :Parameters:    - **node** (:class:`ntreeNode`) - The node to append the tree to
-                                        - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **chi** (int) - A fixed internal bond dimension to use throughout the tree.
-                                        - **lhd** (list[int]) - The variable used for defining the number of individual mode states to retain in the tree structure.  Here this is different for each leaf of the tree.
+                        :param node: The node to append the tree to
+                        :type node: ntreeNode
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param chi: A fixed internal bond dimension to use throughout the tree.
+                        :type chi: int
+                        :param lhd: The variable used for defining the number of individual mode states to retain in the tree structure
+                        :type lhd: int
                         
                         )mydelim")
         .def_static(
@@ -722,11 +778,16 @@ void init_ntree_builder(py::module &m)
                         Append a new balanced ntree for representing a tensor with dimensions specified in a list, of degree d, using a function that depends on the distance from the root to specify the internal bond dimensions.
                         Additionally, this function inserts a local basis transformation with a user specified dimension to each of the leaf nodes. 
 
-                        :Parameters:    - **node** (:class:`ntreeNode`) - The node to append the tree to
-                                        - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
-                                        - **degree** (int) - The degree of the tree structure.  2 corresponds to a balanced binary tree.
-                                        - **fchi** (callable(int)) - A function specifying the bond dimension as a function of depth.  
-                                        - **lhd** (list[int]) - The variable used for defining the number of individual mode states to retain in the tree structure.  Here this is different for each leaf of the tree.
+                        :param node: The node to append the tree to
+                        :type node: ntreeNode
+                        :param dims: The local Hilbert space dimensions of each leaf of the tree
+                        :type dims: list[int]
+                        :param degree: The degree of the tree structure.  2 corresponds to a balanced binary tree.
+                        :type degree: int
+                        :param fchi: A function specifying the bond dimension as a function of depth. 
+                        :typef fchi: callable[int]
+                        :param lhd: The variable used for defining the number of individual mode states to retain in the tree structure
+                        :type lhd: int
                         
                         )mydelim")
         // construct degenerate trees representing mps's
@@ -739,8 +800,8 @@ void init_ntree_builder(py::module &m)
                         :Parameters:    - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
                                         - **chi** (int) - A fixed internal bond dimension to use throughout the tree.
                         
-                        :Returns: A MPS tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :returns: A MPS tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
 
                         )mydelim")
         .def_static(
@@ -755,8 +816,8 @@ void init_ntree_builder(py::module &m)
                                         - **chi** (int) - A fixed internal bond dimension to use throughout the tree.
                                         - **lhd** (int) - A vector specifying the local basis size.
                         
-                        :Returns: A MPS tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :returns: A MPS tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
 
                         )mydelim")
         .def_static(
@@ -770,8 +831,8 @@ void init_ntree_builder(py::module &m)
                         :Parameters:    - **dims** (list[int]) - The local Hilbert space dimensions of each leaf of the tree
                                         - **fchi** (callable(int)) - A function specifying the bond dimension as a function of depth.  
                         
-                        :Returns: A MPS tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :returns: A MPS tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
 
                         )mydelim")
         .def_static(
@@ -788,8 +849,8 @@ void init_ntree_builder(py::module &m)
                                         - **fchi** (callable(int)) - A function specifying the bond dimension as a function of depth.  
                                         - **flhd** (callable(int)) - A function specifying the local basis size.
                         
-                        :Returns: A MPS tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :returns: A MPS tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
 
                         )mydelim")
 
@@ -805,8 +866,8 @@ void init_ntree_builder(py::module &m)
                                         - **chi** (int) - A fixed internal bond dimension to use throughout the tree.
                                         - **lhd** (list[int]) - A vector specifying the local basis size.
                         
-                        :Returns: A MPS tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :returns: A MPS tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
 
                         )mydelim")
         .def_static(
@@ -822,8 +883,8 @@ void init_ntree_builder(py::module &m)
                                         - **fchi** (callable(int)) - A function specifying the bond dimension as a function of depth.  
                                         - **lhd** (list[int]) - A vector specifying the local basis size.
                         
-                        :Returns: A MPS tree with the structure determined by the users inputs
-                        :Return Type: :class:`ntree`
+                        :returns: A MPS tree with the structure determined by the users inputs
+                        :rtype: :class:`ntree`
 
                         )mydelim")
         .def_static(

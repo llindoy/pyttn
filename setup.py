@@ -20,9 +20,28 @@ __version__ = "0.0.1"
 # The name must be the _single_ output extension from the CMake build.
 # If you need multiple extensions, see scikit-build.
 class CMakeExtension(Extension):
-    def __init__(self, name: str, sourcedir: str = "", rebuild: bool = False, parallel: int = None) -> None:
+    def __init__(self, name: str, sourcedir: str = "") -> None:
         super().__init__(name, sources=[])
         self.sourcedir = os.fspath(Path(sourcedir).resolve())
+        rebuild_lib=os.environ.get('SKIP_BUILD_TTNPP_LIBRARY')
+        rebuild=True
+        if rebuild_lib is not None:
+            if rebuild_lib.lower() in ('true', '1', 't'):
+                rebuild = False
+
+        parallel_build=os.environ.get('PARALLEL_BUILD_TTNPP')
+        parallel=8
+        if parallel_build is not None:
+            if parallel_build.isdecimal():
+                parallel = int(parallel_build)
+
+        print(rebuild_lib,file=sys.stderr)
+        if rebuild:
+            print("rebuilding with", parallel, "threads", file=sys.stderr)
+        else:
+            print("Reusing module",file=sys.stderr)
+
+
         self.rebuild = rebuild
         self.parallel=parallel
 
@@ -110,7 +129,7 @@ class CMakeBuild(build_ext):
 
         build_temp = Path(self.build_temp) / ext.name
 
-        if not build_temp.exists() or ext.rebuild:
+        if ext.rebuild:
             if not build_temp.exists():
                 build_temp.mkdir(parents=True)   
                 
@@ -124,7 +143,6 @@ class CMakeBuild(build_ext):
                 ["cmake", "--build", ".", "--target", "install"], cwd=build_temp, check=True
             )
 
-
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
@@ -134,7 +152,7 @@ setup(
     author_email="lachlan.lindoy@npl.co.uk",
     description="python bindings of ttnpp using pybind11",
     long_description="",
-    ext_modules=[CMakeExtension("pyttn.ttnpp", rebuild=True, parallel=16)],
+    ext_modules=[CMakeExtension("pyttn.ttnpp")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={},

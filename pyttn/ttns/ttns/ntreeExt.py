@@ -17,7 +17,6 @@ from pyttn.ttnpp import ntreeBuilder as _ntreeBuilder
 from abc import ABCMeta, abstractmethod
 from typing import Callable, Iterator, Optional, Union
 
-
 class ntreeNode(metaclass=ABCMeta):
     """A class for handling nodes in an ntree object"""
 
@@ -145,7 +144,7 @@ class ntreeNode(metaclass=ABCMeta):
     @property
     @abstractmethod
     def value(self) -> int:
-        """Retun the value stored in the node
+        """Return the value stored in the node
 
         :return: The value stored in the node
         :rtype: int
@@ -155,7 +154,7 @@ class ntreeNode(metaclass=ABCMeta):
     @property
     @abstractmethod
     def data(self) -> int:
-        """Retun the value stored in the node
+        """Return the value stored in the node
 
         :return: The value stored in the node
         :rtype: int
@@ -329,7 +328,7 @@ class ntree(metaclass=ABCMeta):
         """Load an ntree object from a string representation of a tree.  Here we use a set of nested parentheses to represent
         a tree e.g.:
 
-        (1(2(3)(4))(5(6)(7))
+        (1(2(3)(4))(5(6)(7)))
 
         corresponds to the tree
 

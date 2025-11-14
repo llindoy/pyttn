@@ -131,7 +131,7 @@ class msttnSlice(metaclass=ABCMeta):
             - msttn (:class:`multiset_ttn`), index (int) - Construct a multiset TTN slice as a slice of a given multiset ttn
 
         :returns: The Multiset Tree Tensor Network State Slice object
-        :rtype: msttnSlice
+        :rtype: `msttnSlice`
         """   
         if len(args) == 1:
             return _msttn_slice_1(args[0])

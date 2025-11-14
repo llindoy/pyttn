@@ -305,9 +305,6 @@ namespace ttns
         {
             if(compute_2_dm)
             {
-                m_temp1.clear();
-                m_temp2.clear();
-
                 //allocate the maximum sized buffers at each node of the tree
                 tree<size_type> max_dims;
                 max_dims.construct_topology(A); 
@@ -346,8 +343,15 @@ namespace ttns
                         }
                     }
                 }
-                CALL_AND_HANDLE(m_temp1.reallocate(mdim*mdim), "Failed to allocate internal buffers for two body density matrix evaluation.");
-                CALL_AND_HANDLE(m_temp2.reallocate(mdim*mdim), "Failed to allocate internal buffers for two body density matrix evaluation.");
+
+                if(mdim*mdim > m_temp1.capacity())
+                {
+                    m_temp1.clear();
+                    m_temp2.clear();
+                    CALL_AND_HANDLE(m_temp1.reallocate(mdim*mdim), "Failed to allocate internal buffers for two body density matrix evaluation.");
+                    CALL_AND_HANDLE(m_temp2.reallocate(mdim*mdim), "Failed to allocate internal buffers for two body density matrix evaluation.");
+                }
+
             }
         }
 
