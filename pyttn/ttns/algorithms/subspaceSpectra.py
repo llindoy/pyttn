@@ -10,13 +10,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from abc import ABCMeta, abstractmethod
-from typing import Union 
+#from abc import ABCMeta
 import numpy as np
 
-from pyttn.ttns.operators.sopOperatorExt import MultisetSOPOperator, SOPOperator
-
-class SubspaceEngine(metaclass=ABCMeta):
+class SubspaceEngine:
     def __init__(self):
         self._vectors = []
         self._Hp = None

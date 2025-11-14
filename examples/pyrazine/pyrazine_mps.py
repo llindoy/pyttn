@@ -32,8 +32,6 @@ from pyttn import (
     generate_hierarchical_clustering_tree,
     convert_nx_to_tree,
     ntreeBuilder, 
-    set_topology_properties,
-    NodeIncrementSetter
 )
 
 fs = 41.341374575751

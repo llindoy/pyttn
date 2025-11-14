@@ -33,7 +33,6 @@ from pyttn import (
     convert_nx_to_tree,
     ntreeBuilder, 
     set_topology_properties,
-    NodeIncrementSetter
 )
 
 fs = 41.341374575751
