@@ -127,7 +127,7 @@ class ModeCombination:
 
     def mode_combination_system(
         self, system: system_modes, _blocksize: Optional[int] = None
-    ) -> list[list[int]]:
+    ) -> system_modes:
         """Perform the mode combination process on a system_modes object.
 
         :param system: the system_modes object defining all mode data
@@ -135,7 +135,7 @@ class ModeCombination:
         :param blocksize: An optional blocksize argument, used to ignore the globally set blocksize (default is None)
         :type blocksize: int or None, optional
         :returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode
-        :rtype: list of list
+        :rtype: system_modes
         """
         # extract the composite mode dimensions from the system
         mode_dims = [system[i].lhd() for i in range(len(system))]
@@ -153,7 +153,7 @@ class ModeCombination:
 
     def __call__(
         self, system: system_modes, _blocksize: Optional[int] = None
-    ) -> list[list[int]]:
+    ) -> system_modes:
         """Perform the mode combination process on a system_modes object.
 
         :param system: the system_modes object defining all mode data
@@ -161,6 +161,6 @@ class ModeCombination:
         :param blocksize: An optional blocksize argument, used to ignore the globally set blocksize (default is None)
         :type blocksize: int or None, optional
         :returns: The mode indices used to construct each composite mode.  ret[0] contains the indices of the first composite mode
-        :rtype: list of list
+        :rtype: system_modes
         """
         return self.mode_combination_system(system, _blocksize=_blocksize)

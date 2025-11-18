@@ -118,7 +118,6 @@ class CorrelationMeasures:
         Sij = CorrelationMeasures.__von_neumann_entropy(rdm_ij)
         Si = CorrelationMeasures.__von_neumann_entropy(rdm_i)
         Sj = CorrelationMeasures.__von_neumann_entropy(rdm_j)
-        print(Si, Sj, Sij)
         return Si + Sj - Sij
 
 

@@ -1141,7 +1141,7 @@ namespace ttns
             CALL_AND_HANDLE(ar(cereal::make_nvp("has_orthogonality_centre", m_has_orthogonality_centre)), "Failed to seriesalise ttn object. Failed to serialise orthogonality centre.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nset_lhd", m_nset_lhd)), "Failed to seriesalise ttn object. Failed to serialise orthogonality centre.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("purification", m_purification)), "Failed to seriesalise ttn object. Failed to serialise orthogonality centre.");
-            m_euler_tour_initialised=false;
+            initialise_euler_tour();
         }
 #endif
 
