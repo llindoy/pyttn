@@ -34,6 +34,8 @@ build:
   artifacts:
     paths:
         - /builds/quantum-software/pyttn/pyttn/
+        - /builds/qsm/pyttn/pyttn/
+
 lint:
   stage: lint
   rules:
