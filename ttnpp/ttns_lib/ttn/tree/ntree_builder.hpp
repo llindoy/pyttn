@@ -458,6 +458,29 @@ namespace ttns
                     }
                 }
             }
+
+            //now iterate down the tree and set bond dimensions to be no larger than the
+            // we need to correctly implement the post_order_iterator here
+            for (typename tree_type::dfs_iterator tree_iter = tree.dfs_begin(); tree_iter != tree.dfs_end(); ++tree_iter)
+            {
+                if (!(tree_iter->is_root()) && !(tree_iter->is_leaf()) )
+                {
+                    T size2 = tree_iter->parent().value();
+
+                    // iterate over all of the siblings of the node and calculate the product of their values.  If the
+                    // product of their values is less than the value stored at the current node we set the value at the
+                    // current node to their product.                  
+                    for (auto & topology_sibling: tree_iter->parent())
+                    {
+                        size2 *= topology_sibling.value();
+                    }
+                    size2 /= tree_iter->value();
+                    if (size2 < tree_iter->value())
+                    {
+                        tree_iter->value() = size2;
+                    }
+                }
+            }
         }
 
     protected:

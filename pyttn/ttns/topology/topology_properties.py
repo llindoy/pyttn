@@ -58,7 +58,8 @@ def __setup_bond_properties_internal(
                 node.value = dims[node.at(0).value]
             elif isinstance(dims, int):
                 node.value = dims
-        node.value = chiv
+        else:
+            node.value = chiv
     elif update_internal_nodes:
         node.value = __get_value(chi, level)
 

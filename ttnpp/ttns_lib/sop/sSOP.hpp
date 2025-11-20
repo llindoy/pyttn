@@ -89,7 +89,6 @@ namespace ttns
             }
         }
 
-
 #ifdef CEREAL_LIBRARY_FOUND
     public:
         template <typename archive>
