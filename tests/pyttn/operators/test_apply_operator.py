@@ -2,11 +2,11 @@ import os
 
 os.environ["OMP_NUM_THREADS"] = "1"
 
+import copy
 import numpy as np
 
 from pyttn import matrix_element
 from pyttn import sop_operator
-
 
 
 import pytest
@@ -86,7 +86,9 @@ def test_apply_pops(request, op, a, b, expected_result):
         ("Stot", "ttn_1", "ttn_3", 0),
         ("Stot", "ttn_2", "ttn_3", 8),
         ("Stot", "ttn_3", "ttn_3", 16),
-        ("H", "ttn_4", "ttn_4", -1.2510242438*16)
+        ("H", "ttn_4", "ttn_4", -1.2510242438*16), 
+        ("S0tot", "ttn_1", "ttn_1", 1),
+        ("S0tot", "ttn_2", "ttn_1", 0)
 
     ],
 )
@@ -103,7 +105,86 @@ def test_apply_sop(request, op, a, b, expected_result):
 
     assert res == pytest.approx(expected_result, abs=1e-8)
 
+@pytest.mark.parametrize(
+    "op, a, b, expected_result",
+    [
+        ("Sztot", "ttn_1", "ttn_1", 16),
+        ("Sztot", "ttn_2", "ttn_1", 0),
+        ("Sztot", "ttn_3", "ttn_1", 0),
+        ("Sztot", "ttn_1", "ttn_2", 0),
+        ("Sztot", "ttn_2", "ttn_2", -2),
+        ("Sztot", "ttn_3", "ttn_2", -4),
+        ("Sztot", "ttn_1", "ttn_3", 0),
+        ("Sztot", "ttn_2", "ttn_3", -4),
+        ("Sztot", "ttn_3", "ttn_3", -8),
+        ("Stot", "ttn_1", "ttn_1", 16 * 16),
+        ("Stot", "ttn_2", "ttn_1", 0),
+        ("Stot", "ttn_3", "ttn_1", 0),
+        ("Stot", "ttn_1", "ttn_2", 0),
+        ("Stot", "ttn_2", "ttn_2", 4),
+        ("Stot", "ttn_3", "ttn_2", 8),
+        ("Stot", "ttn_1", "ttn_3", 0),
+        ("Stot", "ttn_2", "ttn_3", 8),
+        ("Stot", "ttn_3", "ttn_3", 16),
+        ("H", "ttn_4", "ttn_4", -1.2510242438*16),
+        ("S0tot", "ttn_1", "ttn_1", 1),
+        ("S0tot", "ttn_2", "ttn_1", 0)
+    ],
+)
+def test_apply_sop_inplace(request, op, a, b, expected_result):
+    A = request.getfixturevalue(a)
+    B = request.getfixturevalue(b)
+    op, sysinf = request.getfixturevalue(op)
+    op = sop_operator(op, A, sysinf)
+    mel = matrix_element(A, nbuffers=1)
+    C = copy.deepcopy(A)
+    C @= op
+    res = np.real(mel(C, B))
+    assert len(C) == len(A)
+    assert C.mode_dimensions() == A.mode_dimensions()
 
+    assert res == pytest.approx(expected_result, abs=1e-8)
+
+
+@pytest.mark.parametrize(
+    "op, a, b, expected_result",
+    [
+        ("Sztot", "ttn_1", "ttn_1", 16),
+        ("Sztot", "ttn_2", "ttn_1", 0),
+        ("Sztot", "ttn_3", "ttn_1", 0),
+        ("Sztot", "ttn_1", "ttn_2", 0),
+        ("Sztot", "ttn_2", "ttn_2", -2),
+        ("Sztot", "ttn_3", "ttn_2", -4),
+        ("Sztot", "ttn_1", "ttn_3", 0),
+        ("Sztot", "ttn_2", "ttn_3", -4),
+        ("Sztot", "ttn_3", "ttn_3", -8),
+        ("Stot", "ttn_1", "ttn_1", 16 * 16),
+        ("Stot", "ttn_2", "ttn_1", 0),
+        ("Stot", "ttn_3", "ttn_1", 0),
+        ("Stot", "ttn_1", "ttn_2", 0),
+        ("Stot", "ttn_2", "ttn_2", 4),
+        ("Stot", "ttn_3", "ttn_2", 8),
+        ("Stot", "ttn_1", "ttn_3", 0),
+        ("Stot", "ttn_2", "ttn_3", 8),
+        ("Stot", "ttn_3", "ttn_3", 16),
+        ("H", "ttn_4", "ttn_4", -1.2510242438*16),
+        ("S0tot", "ttn_1", "ttn_1", 1),
+        ("S0tot", "ttn_2", "ttn_1", 0)
+    ],
+)
+def test_apply_sop_inplace_2(request, op, a, b, expected_result):
+    A = request.getfixturevalue(a)
+    B = request.getfixturevalue(b)
+    op, sysinf = request.getfixturevalue(op)
+    op = sop_operator(op, A, sysinf)
+    mel = matrix_element(A, nbuffers=1)
+    C = copy.deepcopy(A)
+    C = op@C
+    res = np.real(mel(C, B))
+    assert len(C) == len(A)
+    assert C.mode_dimensions() == A.mode_dimensions()
+
+    assert res == pytest.approx(expected_result, abs=1e-8)
 
 #now test the application of Op objects onto the mode
 @pytest.mark.parametrize(
@@ -149,6 +230,7 @@ def test_apply_op_1d(request, op, a, b, expected_result):
     assert C.mode_dimensions() == A.mode_dimensions()
 
     assert res == pytest.approx(expected_result, abs=1e-8)
+
 
 
 #now test the application of Op objects onto the mode

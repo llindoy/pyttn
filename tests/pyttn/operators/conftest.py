@@ -237,6 +237,20 @@ def Stot():
 
     return op, sysinf
 
+
+@pytest.fixture
+def S0tot():
+    N = 16
+    op = SOP(N)
+    # set up the system object
+    sysinf = system_modes(N)
+    for i in range(N):
+        sysinf[i] = tls_mode()
+
+    op += sOP("sz", 0)
+
+    return op, sysinf
+
 @pytest.fixture
 def H():
     J = 1.0
