@@ -125,6 +125,23 @@ namespace ttns
     public:
         using base_type::size;
 
+        template <typename U, typename be>
+        void copy_mode_structure(const ttn_base<node_class, U, be> &other)
+        {
+            m_dim_sizes = other.mode_dimensions();
+            m_dim_sizes_lhd = other.mode_dimensions_lhd();
+            m_leaf_indices = other.leaf_indices();
+            m_nset = other.m_nset;
+            m_nset_lhd = other.m_nset_lhd;       
+            
+            if (other.m_euler_tour_initialised)
+            {
+                m_euler_tour = other.m_euler_tour;
+                m_euler_tour_initialised = other.m_euler_tour_initialised;
+            }
+
+        }
+
     public:
         ttn_base() : base_type(), m_dim_sizes(), m_orthog() {}
 

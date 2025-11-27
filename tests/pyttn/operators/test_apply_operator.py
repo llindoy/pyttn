@@ -59,6 +59,8 @@ def test_apply_pops(request, op, a, b, expected_result):
     mel = matrix_element(A, nbuffers=1)
     C = op@A
     res = np.real(mel(C, B))
+    assert len(C) == len(A)
+    assert C.mode_dimensions() == A.mode_dimensions()
 
     assert res == pytest.approx(expected_result, abs=1e-8)
 
@@ -96,6 +98,8 @@ def test_apply_sop(request, op, a, b, expected_result):
     mel = matrix_element(A, nbuffers=1)
     C = op@A
     res = np.real(mel(C, B))
+    assert len(C) == len(A)
+    assert C.mode_dimensions() == A.mode_dimensions()
 
     assert res == pytest.approx(expected_result, abs=1e-8)
 
@@ -141,6 +145,8 @@ def test_apply_op_1d(request, op, a, b, expected_result):
     mel = matrix_element(A, nbuffers=1)
     C = op@A
     res = np.real(mel(C, B))
+    assert len(C) == len(A)
+    assert C.mode_dimensions() == A.mode_dimensions()
 
     assert res == pytest.approx(expected_result, abs=1e-8)
 
@@ -158,6 +164,9 @@ def test_apply_op_2d(request, op, a, b, expected_result):
     B = request.getfixturevalue(b)
     mel = matrix_element(A, nbuffers=1)
     C = op@A
+
+    assert len(C) == len(A)
+    assert C.mode_dimensions() == A.mode_dimensions()
     res = np.real(mel(C, B))
 
     assert res == pytest.approx(expected_result, abs=1e-8)

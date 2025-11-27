@@ -64,7 +64,7 @@ namespace ttns
             if (!has_same_structure(A, B))
             {
                 B.reallocate(A);
-                B.initialise_euler_tour();
+                B.copy_mode_structure(A);
             }
 
             bool include_constant_contribution = (linalg::abs(Op.Eshift()) > cutoff);
