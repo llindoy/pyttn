@@ -21,6 +21,8 @@
 
 !public
 !public/*
+!patches
+!patches/*
 
 #now we add the docs folder and its required folders
 !docs
