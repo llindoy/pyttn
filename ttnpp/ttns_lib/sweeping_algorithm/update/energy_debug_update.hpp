@@ -44,7 +44,8 @@ namespace ttns
         using buffer_type = typename environment_type::buffer_type;
 
         using parameter_list = simple_update_parameter_list;
-    
+        static constexpr std::string_view class_info = "energy debug:";
+
     protected:
         linalg::matrix<T, backend> m_res;
 
@@ -68,6 +69,9 @@ namespace ttns
 
         size_type update_site_tensor(hnode &A, const environment_type &env, env_node_type &h, env_type &op)
         {
+#ifdef TRACE_LOG
+            logging::trace("engine debug site tensor.");
+#endif
             m_res.resize(A().shape(0), A().shape(1));
             if (!A.is_leaf())
             {
@@ -91,6 +95,9 @@ namespace ttns
         }
         void update_bond_tensor(bond_matrix_type &r, const environment_type &env, env_node_type &h, env_type &op)
         {
+#ifdef TRACE_LOG
+            logging::trace("energy debug bond tensor.");
+#endif
             m_res = r;
             CALL_AND_HANDLE(env.fha(r, h, op, env.buffer(), m_res), "Failed to compute action of hamiltonian on node");
             auto t1 = m_res.reinterpret_shape(r.size());
@@ -128,6 +135,8 @@ public:
         using buffer_type = typename environment_type::buffer_type;
 
         using parameter_list = simple_update_parameter_list;
+        static constexpr std::string_view class_info = "energy debug:";
+
     public:
         multiset_update_buffer<T, backend> mbuf;
 
@@ -157,6 +166,9 @@ public:
 
         size_type update_site_tensor(hnode &A, const environment_type &env, env_node_type &h, env_type &op)
         {
+#ifdef TRACE_LOG
+            logging::trace("energy debug site tensor.");
+#endif
             mbuf.setup(A());
 
             if (!A.is_leaf())
@@ -190,6 +202,9 @@ public:
 
         void update_bond_tensor(bond_matrix_type &r, const environment_type &env, env_node_type &h, env_type &op)
         {
+#ifdef TRACE_LOG
+            logging::trace("energy debug bond tensor.");
+#endif
             mbuf.setup(r);
 
             env.fha.set_pointer(&(r));

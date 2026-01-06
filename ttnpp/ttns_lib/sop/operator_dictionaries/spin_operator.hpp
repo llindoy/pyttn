@@ -85,7 +85,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct S_+ as csr.");
                 }
             }
@@ -111,7 +111,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct S_+ as dense.");
                 }
             }
@@ -184,7 +184,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct S_- as csr.");
                 }
             }
@@ -210,7 +210,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct S_- as dense.");
                 }
             }
@@ -294,7 +294,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct S_x as csr.");
                 }
             }
@@ -326,7 +326,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct S_x as dense.");
                 }
             }
@@ -455,7 +455,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct S_y as csr.");
                 }
             }
@@ -487,7 +487,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct S_y as dense.");
                 }
             }
@@ -527,7 +527,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct S_z as dense.");
                 }
             }
@@ -558,7 +558,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct S_z as csr.");
                 }
             }
@@ -581,7 +581,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct S_z as dense.");
                 }
             }

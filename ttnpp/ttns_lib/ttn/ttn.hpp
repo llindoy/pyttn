@@ -18,6 +18,7 @@
 #include <random>
 #include <common/tmp_funcs.hpp>
 #include <common/exception_handling.hpp>
+#include <common/logging.hpp>
 
 #include "ttn_nodes/ms_ttn_node.hpp"
 #include "ttn_nodes/ttn_node.hpp"
@@ -60,6 +61,7 @@ namespace ttns
 
         template <typename U, typename be>
         friend class ttn;
+        static constexpr std::string_view class_info = "ttn:";
 
     private:
         // provide access to base class operators
@@ -74,13 +76,16 @@ namespace ttns
         using base_type::rng;
 
     public:
-        ttn() : base_type() {}
+        ttn() : base_type() 
+        {
+            logging::info("creating empty ttn.");
+        }
 
         ttn(const ttn &other)
         try : base_type(other) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct TTN object.");
         }
 
@@ -89,13 +94,14 @@ namespace ttns
         try : base_type(other) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct TTN object.");
         }
 
         template <typename U, typename be, bool CONST>
         ttn(multiset_ttn_slice<U, be, CONST> other) : base_type()
         {
+            logging::info("constructing ttn from multiset slice.");
             CALL_AND_RETHROW(tree_type::construct_topology(static_cast<const typename ms_ttn<U, be>::tree_type &>(other.obj())));
             for (auto z : common::zip(m_nodes, other.obj()))
             {
@@ -126,7 +132,7 @@ namespace ttns
         try : base_type(topology, 1, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct TTN object.");
         }
 
@@ -135,7 +141,7 @@ namespace ttns
         try : base_type(topology, capacity, 1, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct TTN object.");
         }
 
@@ -143,7 +149,7 @@ namespace ttns
         try : base_type(_topology, 1, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct TTN object.");
         }
 
@@ -151,7 +157,7 @@ namespace ttns
         try : base_type(_topology, _capacity, 1, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct TTN object.");
         }
 
@@ -162,6 +168,7 @@ namespace ttns
         template <typename U, typename be>
         ttn &operator=(const ttn<U, be> &other)
         {
+            logging::info("copy assigning ttn");
             CALL_AND_RETHROW(base_type::operator=(other));
             return *this;
         }
@@ -170,6 +177,7 @@ namespace ttns
         template <typename U, typename be, bool CONST>
         ttn &operator=(multiset_ttn_slice<U, be, CONST> other)
         {
+            logging::info("assigning ttn from multiset slice.");
             // if these are all the same size then we just do the simple assignment operator
             if (has_same_structure(other.obj(), *this) && other.obj().mode_dimensions() == this->mode_dimensions())
             {
@@ -255,16 +263,25 @@ namespace ttns
 
     public:
         template <typename int_type>
-        void set_state(const std::vector<int_type> &si, bool random_unoccupied_initialisation = true, bool randomise_internal = true) { CALL_AND_RETHROW(this->_set_state(si, 0, false, random_unoccupied_initialisation, randomise_internal)); }
+        void set_state(const std::vector<int_type> &si, bool random_unoccupied_initialisation = true, bool randomise_internal = true) 
+        { 
+            CALL_AND_RETHROW(this->_set_state(si, 0, false, random_unoccupied_initialisation, randomise_internal)); 
+        }
 
         template <typename int_type>
         void set_state_purification(const std::vector<int_type> &si, bool random_initialisation = true, bool randomise_internal = true) { CALL_AND_RETHROW(this->_set_state(si, 0, true, random_initialisation, randomise_internal)); }
 
         template <typename U, typename be>
-        void set_product(const std::vector<linalg::vector<U, be>> &ps, bool randomise_internal = true) { CALL_AND_RETHROW(this->_set_product(ps, 0, randomise_internal)); }
+        void set_product(const std::vector<linalg::vector<U, be>> &ps, bool randomise_internal = true) 
+        { 
+            CALL_AND_RETHROW(this->_set_product(ps, 0, randomise_internal)); 
+        }
 
         template <typename Rvec>
-        void sample_product_state(std::vector<size_t> &state, const std::vector<Rvec> &relval, bool randomise_internal = true) { CALL_AND_RETHROW(this->_sample_product_state(state, relval, 0, randomise_internal)); }
+        void sample_product_state(std::vector<size_t> &state, const std::vector<Rvec> &relval, bool randomise_internal = true) 
+        { 
+            CALL_AND_RETHROW(this->_sample_product_state(state, relval, 0, randomise_internal)); 
+        }
 
         void set_identity_purification(bool randomise_internal = true)
         {
@@ -314,7 +331,7 @@ namespace ttns
                     }
                     catch(const std::exception& ex)
                     {
-                        std::cerr << ex.what() << std::endl;
+                        logging::error(ex.what());
                         RAISE_EXCEPTION("Failed to shift orthogonality centre.");
                     }
             */
@@ -374,7 +391,7 @@ namespace ttns
                     }
                     catch(const std::exception& ex)
                     {
-                        std::cerr << ex.what() << std::endl;
+                        logging::error(ex.what());
                         RAISE_EXCEPTION("Failed to truncate ttn object.");
                     }
             */
@@ -425,8 +442,10 @@ namespace ttns
 
         void _apply_one_body_operator(const linalg::matrix<T, backend> &M, size_type index, bool shift_orthogonality = true)
         {
+#ifdef TRACE_LOG
+            logging::trace("applying matrix valued one body operator."); 
+#endif
             CALL_AND_RETHROW(_setup_orthogonality_1bop(index, shift_orthogonality));
-
             try
             {
                 // now we apply the operator to the state
@@ -435,7 +454,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply one body operator.  Error when contracting one body operator onto state.");
             }
         }
@@ -444,6 +463,9 @@ namespace ttns
         typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, void>::type
         _apply_one_body_operator(OpType &op, size_type index, bool shift_orthogonality = true)
         {
+#ifdef TRACE_LOG
+            logging::trace("applying operator valued one body operator."); 
+#endif
             CALL_AND_RETHROW(_setup_orthogonality_1bop(index, shift_orthogonality));
 
             try
@@ -454,12 +476,15 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply one body operator.  Error when contracting one body operator onto state.");
             }
         }
         void _apply_one_body_operator(std::shared_ptr<ops::primitive<T, backend>> op, size_type index, bool shift_orthogonality = true)
         {
+#ifdef TRACE_LOG
+            logging::trace("applying primitive one body operator."); 
+#endif
             CALL_AND_RETHROW(_setup_orthogonality_1bop(index, shift_orthogonality));
 
             try
@@ -470,7 +495,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply one body operator.  Error when contracting one body operator onto state.");
             }
         }
@@ -480,6 +505,9 @@ namespace ttns
         //performs this contraction using a two site approach
         void _apply_two_body_operator(const linalg::tensor<T, 4, backend>& _A, const linalg::tensor<T, 4, backend>& _B, size_type i1, size_type i2, real_type tol = real_type(-1), size_type nchi=0, bool zipup = false)
         {
+#ifdef TRACE_LOG
+            logging::trace("applying two body operator."); 
+#endif
             try
             {
                 if(_A.shape(0) != 1 || _B.shape(3) != 1)
@@ -531,13 +559,19 @@ namespace ttns
                         //node and it is connected by the bond corresponding to the previous nodes parent index.
                         if(i == 0)
                         {
+                            logging::trace("traversing tree upwards."); 
+
                             curr = m_nodes[prev].parent_pointer()->id();
                             curr_found = true;
                             m1 = m_nodes[prev].child_id();
                         }
                         
                         //if we aren't moving up decrement i so it points in the children index
-                        else{--i;}
+                        else
+                        {
+                            logging::trace("traversing tree downwards."); 
+                            --i;
+                        }
                     }
 
                     //now at this stage if we haven't assigned the current node the only option is the ith
@@ -623,6 +657,9 @@ namespace ttns
                 //now set the value of active_tensor so that it can set the leaf tensor value.  
                 //Here we make it so that the dangling bond becomes the first index pointing upwards
                 //of the bond
+#ifdef TRACE_LOG
+                logging::trace("applying final tensor to path."); 
+#endif
                 CALL_AND_HANDLE(m_nodes[i1]().resize_bond(m_nodes[i1]().nmodes(), d[1]*d[2]), "Failed to resize tensor node so that it can fit the required node");
                 CALL_AND_HANDLE(m_nodes[i1]().as_matrix() = active_tensor.reinterpret_shape(d[0], d[1]*d[2]), "Failed to set node of tensor given active tensor");
                 if(zipup)
@@ -642,7 +679,7 @@ namespace ttns
             }
             catch(const std::exception& ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply_two_body operator to ttn.");
             }
         }
@@ -653,6 +690,7 @@ namespace ttns
     public:
         ttn &apply_product_operator(product_operator<T, backend> &op, bool shift_orthogonality = true)
         {
+            logging::info("applying a product of one body operators to ttn."); 
             for (auto &_op : op)
             {
                 CALL_AND_HANDLE(apply_one_body_operator(_op, shift_orthogonality), "Failed to apply product operator error when applying one body operator.");
@@ -670,6 +708,8 @@ namespace ttns
 
         ttn &apply_one_body_operator(const linalg::matrix<T, backend> &op, size_type index, bool shift_orthogonality = true)
         {
+            logging::info("applying a one body operators to ttn."); 
+
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
             ASSERT(op.shape(0) == m_dim_sizes[index] && op.shape(1) == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
 
@@ -679,6 +719,8 @@ namespace ttns
 
         ttn &apply_one_body_operator(const Op<T, backend> &op, bool shift_orthogonality = true)
         {
+            logging::info("applying a one body operators to ttn."); 
+
             ASSERT(op.ndim() == 1, "Failed to apply one body operator.  Operator is not one body.");
             ASSERT(op.indices()[0] < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
             ASSERT(op.dims()[0] == m_dim_sizes[op.indices()[0]], "Failed to apply one body operator to ttn. Incompatible dimensions.");
@@ -691,6 +733,8 @@ namespace ttns
         typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, ttn &>::type
         apply_one_body_operator(OpType &op, size_type index, bool shift_orthogonality = true)
         {
+            logging::info("applying a one body operators to ttn."); 
+
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
             ASSERT(op.size() == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
 
@@ -700,6 +744,8 @@ namespace ttns
 
         ttn &apply_one_body_operator(site_operator<T, backend> &op, bool shift_orthogonality = true)
         {
+            logging::info("applying a one body operators to ttn."); 
+
             size_type index = op.mode();
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
             ASSERT(op.size() == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
@@ -710,6 +756,8 @@ namespace ttns
 
         ttn &apply_one_body_operator(site_operator<T, backend> &op, size_type index, bool shift_orthogonality = true)
         {
+            logging::info("applying a one body operators to ttn."); 
+
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
             ASSERT(op.size() == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
 
@@ -719,6 +767,8 @@ namespace ttns
 
         ttn &apply_one_body_operator(std::shared_ptr<ops::primitive<T, backend>> op, size_type index, bool shift_orthogonality = true)
         {
+            logging::info("applying a one body operators to ttn."); 
+
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
             ASSERT(op.size() == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
 
@@ -730,6 +780,8 @@ namespace ttns
         // ttn& apply_one_body_operator
         ttn &apply_operator(const Op<T, backend> &op, real_type tol = real_type(0), size_type nchi = 0, bool zipup=false)
         {
+            logging::info("applying generic operator to ttn."); 
+
             // first check that the operator is consistent with the TTN we are acting on
             for (size_type i = 0; i < op.ndim(); ++i)
             {
@@ -773,6 +825,7 @@ namespace ttns
         // here the collapse algorithm will be implemented in place.  This will be done iteratively shifting the orthogonality centre of the tree to a leaf.  Computing the probability of observing the state in each possible configuration of that leaf.  Then sampling the state based on this.
         real_type collapse(std::vector<size_t> &state, bool truncate = false, real_type tol = real_type(0), size_type nchi = 0)
         {
+            logging::info("collapsing ttn to a product state."); 
             state.resize(m_nleaves);
             real_type pitot = 1.0;
             this->orthogonalise();
@@ -827,6 +880,7 @@ namespace ttns
 
         real_type collapse_basis(std::vector<linalg::matrix<T, backend>> &U, std::vector<size_t> &state, bool truncate = false, real_type tol = real_type(0), size_type nchi = 0)
         {
+            logging::info("collapsing ttn to a product state in a different local basis."); 
             ASSERT(U.size() == m_nleaves, "Failed to collapse in user specified basis.  Basis transformation vectors are not compatible with ");
             state.resize(m_nleaves);
             real_type pitot = 1.0;
@@ -887,6 +941,7 @@ namespace ttns
         // function for measuring a single qubit
         void measure_without_collapse(size_type i, std::vector<real_type> &res)
         {
+            logging::info("performing projective measurement of ttn without collapsing state."); 
             ASSERT(i < m_nleaves, "Cannot measure on requested mode.  Index out of bounds.");
             res.resize(m_dim_sizes[i]);
             // shift orthogonality centre to leaf index

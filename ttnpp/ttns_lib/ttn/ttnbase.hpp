@@ -331,6 +331,9 @@ namespace ttns
 
         void random()
         {
+#ifdef TRACE_LOG
+            logging::trace("initialising ttn with random entries.");
+#endif
             try
             {
                 if (!m_orthog.is_initialised())
@@ -354,13 +357,16 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise random tensors.");
             }
         }
 
         void zero()
         {
+#ifdef TRACE_LOG
+            logging::trace("initialising ttn with zero entries.");
+#endif
             for (auto &ch : reverse(m_nodes))
             {
                 ch.zero();
@@ -372,6 +378,9 @@ namespace ttns
         template <typename int_type>
         void _set_state(const std::vector<int_type> &si, size_type set_index = 0, bool use_purification_info = false, bool random_unoccupied_initialisation = true, bool randomise_internal = true)
         {
+#ifdef TRACE_LOG
+            logging::trace("setting ttn to state."); 
+#endif
             // if we aren't using the set_state_purification function or we don't have a purification then we just set as usual
             if (!use_purification_info || !m_purification)
             {
@@ -421,6 +430,9 @@ namespace ttns
         template <typename U, typename be>
         void _set_product(const std::vector<linalg::vector<U, be>> &ps, size_type set_index = 0, bool randomise_internal = true)
         {
+#ifdef TRACE_LOG
+            logging::trace("setting ttn to product state."); 
+#endif
             ASSERT(set_index < this->nset(), "Cannot set ttnbase to specified state.  Set index out of bounds.");
             ASSERT(ps.size() == this->nmodes(), "Cannot set ttn to specified state.  The state does not have the required numbers of modes.");
 
@@ -444,6 +456,9 @@ namespace ttns
         template <typename Rvec>
         void _sample_product_state(std::vector<size_t> &state, const std::vector<Rvec> &relval, size_type set_index = 0, bool randomise_internal = true)
         {
+#ifdef TRACE_LOG
+            logging::trace("sampling ttn state from product distribution."); 
+#endif
             ASSERT(set_index < this->nset(), "Cannot set ttnbase to specified state.  Set index out of bounds.");
             ASSERT(relval.size() == this->nmodes(), "Cannot set ttn to specified state.  The state does not have the required numbers of modes.");
             state.resize(this->nmodes());
@@ -472,6 +487,9 @@ namespace ttns
 
         void _set_purification(size_type set_index = 0, bool randomise_internal = true)
         {
+#ifdef TRACE_LOG
+            logging::trace("setting ttn to purification state"); 
+#endif
             // now zero the state
             this->zero();
             this->initialise_logical_tensors_product_state(set_index, randomise_internal);
@@ -488,6 +506,9 @@ namespace ttns
     protected:
         void initialise_logical_tensors_product_state(size_type set_index = 0, bool randomise_internal = true)
         {
+#ifdef TRACE_LOG
+            logging::trace("initialising internal tensors of ttn for product state initialisation.");
+#endif
             for (auto &c : m_nodes)
             {
                 if (c.is_leaf())
@@ -518,6 +539,9 @@ namespace ttns
     public:
         void clear()
         {
+#ifdef TRACE_LOG
+            logging::trace("clearing ttn.");
+#endif
             try
             {
                 CALL_AND_RETHROW(base_type::clear());
@@ -532,7 +556,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to clear ttn object.");
             }
         }
@@ -621,6 +645,9 @@ namespace ttns
     public:
         void force_set_orthogonality_centre(size_t index)
         {
+#ifdef TRACE_LOG
+            logging::trace(std::string("force setting orthogonality centre of ttn to node: ")+std::to_string(index));
+#endif
             ASSERT(index < m_nodes.size(), "Failed to set orthogonality centre. Index out of bounds.");
             m_orthogonality_centre = index;
             m_has_orthogonality_centre = true;
@@ -628,6 +655,9 @@ namespace ttns
 
         void force_set_orthogonality_centre(const std::list<size_type> &index)
         {
+#ifdef TRACE_LOG
+            logging::trace("force setting orthogonality centre of ttn to node by index.");
+#endif
             size_type id;
             CALL_AND_HANDLE(id = this->id_at(index), "Failed to set orthogonality centre.   Failed to find the specified node by index.");
             m_orthogonality_centre = id;
@@ -638,8 +668,12 @@ namespace ttns
         // and are less than the current dimension of this bond
         void shift_orthogonality_centre(size_t bond_index, real_type tol = real_type(0), size_type nchi = 0)
         {
+
             try
             {
+#ifdef TRACE_LOG
+                logging::trace(std::string("shifting orthogonality centre of tree along bond: " ) + std::to_string(bond_index) + std::string( " of the current orthogonality centre: ") + std::to_string(m_orthogonality_centre));
+#endif
                 if (!m_orthog.is_initialised())
                 {
                     m_orthog.init(*this);
@@ -677,7 +711,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to shift orthogonality centre.");
             }
         }
@@ -686,6 +720,9 @@ namespace ttns
         {
             try
             {
+#ifdef TRACE_LOG
+                logging::trace(std::string("setting orthogonality centre of ttn to node: " ) + std::to_string(index));
+#endif
                 ASSERT(index < m_nodes.size(), "Failed to set orthogonality centre. Index out of bounds.");
 
                 if (!m_orthog.is_initialised())
@@ -701,13 +738,16 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to set orthogonality centre for ttn.");
             }
         }
 
         void set_orthogonality_centre(const std::list<size_type> &index, real_type tol = real_type(0), size_type nchi = 0)
         {
+#ifdef TRACE_LOG
+                logging::trace(std::string("setting orthogonality centre of ttn by node index." ) );
+#endif
             size_type id;
             CALL_AND_HANDLE(id = this->id_at(index), "Failed to set orthogonality centre.   Failed to find the specified node by index.");
             CALL_AND_RETHROW(this->set_orthogonality_centre(id, tol, nchi));
@@ -716,6 +756,9 @@ namespace ttns
         // takes a generic TTN and shifts the orthogonality centre to the root node
         void orthogonalise(bool force = false)
         {
+#ifdef TRACE_LOG
+            logging::trace("orthogonalising ttn.");
+#endif
             try
             {
                 if (!m_orthog.is_initialised())
@@ -735,13 +778,16 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to orthogonalise general ttn.");
             }
         }
 
         real_type truncate(real_type tol = real_type(0), size_type nchi = 0)
         {
+#ifdef TRACE_LOG
+            logging::trace("truncating ttn.");
+#endif
             // RAISE_EXCEPTION("Truncate currently doesn't work.");
             try
             {
@@ -797,13 +843,16 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to truncate ttn object.");
             }
         }
 
         real_type normalise()
         {
+#ifdef TRACE_LOG
+            logging::trace("normalising ttn.");
+#endif
             try
             {
                 if (!this->has_orthogonality_centre())
@@ -824,13 +873,16 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to normalise ttn object.");
             }
         }
 
         void conj()
         {
+#ifdef TRACE_LOG
+            logging::trace("conjugating ttn.");
+#endif
             try
             {
                 for (auto &a : m_nodes)
@@ -840,13 +892,16 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to conjugate ttn object.");
             }
         }
 
         real_type norm() const
         {
+#ifdef TRACE_LOG
+            logging::trace("computing norm of ttn.");
+#endif
             real_type norm = 0;
             try
             {
@@ -861,7 +916,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to normalise ttn object.");
             }
             return norm;
@@ -872,6 +927,9 @@ namespace ttns
         template <typename U>
         typename std::enable_if<linalg::is_number<U>::value, ttn_base &>::type operator*=(const U &u)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing inplace scalar multiplication of ttn."); 
+#endif
             if (this->has_orthogonality_centre())
             {
                 m_nodes[m_orthogonality_centre] *= u;
@@ -886,6 +944,9 @@ namespace ttns
         template <typename U>
         typename std::enable_if<linalg::is_number<U>::value, ttn_base &>::type operator/=(const U &u)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing inplace scalar division of ttn."); 
+#endif
             if (this->has_orthogonality_centre())
             {
                 m_nodes[m_orthogonality_centre] /= u;
@@ -961,7 +1022,9 @@ namespace ttns
         size_t leaf_path(size_t li, size_t lj, std::list<size_type> &path)
         {
             ASSERT(li < m_nleaves && lj < m_nleaves, "Invalid leaf index.");
-
+#ifdef TRACE_LOG
+            logging::trace(std::string("constructing traversal path from leaf index: ") + std::to_string(li)+std::string(" to leaf index: ") + std::to_string(lj));
+#endif
             // for the trivial case of the same leaf node the root is the current node and the path is empty
             if (li == lj)
             {
@@ -975,6 +1038,10 @@ namespace ttns
         // a function for obtaining the traversal path from node i to node j.  This also returns the index of the smallest subtree containing the entire path
         size_t path(size_t ind_i, size_t ind_j, std::list<size_type> &path)
         {
+#ifdef TRACE_LOG
+            logging::trace(std::string("constructing traversal path from node: ") + std::to_string(ind_i)+std::string(" to node: ") + std::to_string(ind_j));
+#endif
+
             ASSERT(ind_i < m_nodes.size() && ind_j < m_nodes.size(), "Failed to find path between nodes.  Index out of bounds.");
             path.clear();
             size_t root = ind_i;
@@ -1078,6 +1145,9 @@ namespace ttns
     protected:
         void _orthogonalise()
         {
+#ifdef TRACE_LOG
+            logging::trace("performing leaf to root decomposition to orthogonalise ttn.");
+#endif
             try
             {
                 using common::rzip;
@@ -1094,18 +1164,21 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("Orthogonalising the TTN object.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to orthogonalise the TTN object.");
             }
         }
 
         void _set_orthogonality_centre(size_type index, real_type tol = real_type(0), size_type nchi = 0)
         {
+#ifdef TRACE_LOG
+            logging::trace(std::string("shifting orthogonality centre of tree to node: " ) + std::to_string(index));
+#endif
             try
             {
                 if (m_orthogonality_centre == index)
@@ -1125,7 +1198,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to transfer orthogonality centre to index.");
             }
         }
@@ -1135,6 +1208,9 @@ namespace ttns
         template <typename archive>
         void save(archive &ar) const
         {
+#ifdef TRACE_LOG
+            logging::trace("saving ttn.");
+#endif
             CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn object.  Error when serialising the base object.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nset", m_nset)), "Failed to serialise ttn object.  Failed to serialise its set dimension.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("mode_dimensions", m_dim_sizes)), "Failed to serialise ttn object.  Failed to serialise its mode_dimensions.");
@@ -1149,6 +1225,9 @@ namespace ttns
         template <typename archive>
         void load(archive &ar) 
         {
+#ifdef TRACE_LOG
+            logging::trace("loading ttn.");
+#endif
             CALL_AND_HANDLE(ar(cereal::base_class<base_type>(this)), "Failed to serialise ttn object.  Error when serialising the base object.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("nset", m_nset)), "Failed to serialise ttn object.  Failed to serialise its set dimension.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("mode_dimensions", m_dim_sizes)), "Failed to serialise ttn object.  Failed to serialise its mode_dimensions.");
@@ -1178,6 +1257,8 @@ namespace ttns
         template <typename INTEGER, typename Alloc>
         void construct_topology(const ntree<INTEGER, Alloc> &__tree, const ntree<INTEGER, Alloc> &_capacity, size_type nset = 1, bool collapse_bond_matrices = true)
         {
+            logging::trace("constructing ttn from topology tree.");
+
             ntree<INTEGER, Alloc> _tree(__tree);
             ntree<INTEGER, Alloc> capacity(_capacity);
 

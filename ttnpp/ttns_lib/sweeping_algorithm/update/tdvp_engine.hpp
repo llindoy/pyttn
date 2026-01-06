@@ -16,6 +16,7 @@
 #define PYTTN_TTNS_LIB_SWEEPING_ALGORITHM_UPDATE_TDVP_ENGINE_HPP_
 
 #include <common/omp.hpp>
+#include <string_view>
 #include <utils/iterative_linear_algebra/expmv.hpp>
 
 #include "simple_update_parameter_list.hpp"
@@ -47,6 +48,7 @@ namespace ttns
 
         using parameter_list = simple_update_parameter_list;
 
+        static constexpr std::string_view class_info = "tdvp:";
     protected:
         // the krylov subspace engine
         expmv_type m_expmv;
@@ -71,6 +73,9 @@ namespace ttns
 
         void initialise(const ttn_type &A, size_type krylov_dim = 16, size_type ndt = 1)
         {
+#ifdef TRACE_LOG
+            logging::trace("initialising tdvp engine.");
+#endif
             try
             {
                 CALL_AND_HANDLE(clear(), "Failed to clear the projector_splitting_intgrator.");
@@ -89,7 +94,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise the projector_spliting_engine object.");
             }
         }
@@ -99,13 +104,16 @@ namespace ttns
 
         void clear()
         {
+#ifdef TRACE_LOG
+            logging::trace("clearing tdvp engine.");
+#endif
             try
             {
                 CALL_AND_HANDLE(m_expmv.clear(), "Failed to clear the krylov subspace engine.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to clear the projector_spliting_engine object.");
             }
         }
@@ -135,6 +143,9 @@ namespace ttns
 
         size_type update_site_tensor(hnode &A, const environment_type &env, env_node_type &h, env_type &op)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing tdvp site update.");
+#endif
             try
             {
                 if (!A.is_leaf())
@@ -156,30 +167,33 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("Failed to update node tensor.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to update node tensor.");
             }
         }
 
         void update_bond_tensor(bond_matrix_type &r, const environment_type &env, env_node_type &h, env_type &op)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing tdvp bond tensor update.");
+#endif
             try
             {
                 CALL_AND_HANDLE(m_expmv(r, -m_dt / 2.0, m_coeff, env.fha, h, op, env.buffer()), "Failed to time evolve the r matrix backwards in time.");
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("Failed to update R tensor.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to update R tensor.");
             }
         }
@@ -188,6 +202,9 @@ namespace ttns
         {
             if (m_use_time_dependent_hamiltonian && op.is_time_dependent())
             {
+#ifdef TRACE_LOG
+                logging::trace("updating hamiltonian for tdvp engine.");
+#endif
                 op.update_coefficients(m_t + (m_dt / 4.0));
                 if (op.has_time_dependent_operators())
                 {
@@ -206,6 +223,9 @@ namespace ttns
         template <typename archive>
         void save(archive& ar) const
         {
+#ifdef TRACE_LOG
+            logging::trace("saving tdvp engine.");
+#endif
             CALL_AND_HANDLE(ar(cereal::make_nvp("expmv", m_expmv)), "Failed to serialise tdvp engine.  Failed to serialise expmv.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("t", m_t)), "Failed to serialise tdvp engine.  Failed to serialise current time.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("dt", m_dt)), "Failed to serialise tdvp engine.  Failed to serialise timestep.");
@@ -216,6 +236,9 @@ namespace ttns
         template <typename archive>
         void load(archive& ar)
         {
+#ifdef TRACE_LOG
+            logging::trace("loading tdvp engine.");
+#endif
             CALL_AND_HANDLE(ar(cereal::make_nvp("expmv", m_expmv)), "Failed to serialise tdvp engine.  Failed to serialise expmv.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("t", m_t)), "Failed to serialise tdvp engine.  Failed to serialise current time.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("dt", m_dt)), "Failed to serialise tdvp engine.  Failed to serialise timestep.");
@@ -248,6 +271,7 @@ namespace ttns
         using expmv_type = utils::expmv<T, backend, false>;
 
         using parameter_list = simple_update_parameter_list;
+        static constexpr std::string_view class_info = "tdvp:";
 
     protected:
         // the krylov subspace engine
@@ -275,6 +299,9 @@ namespace ttns
 
         void initialise(const ttn_type &A, size_type krylov_dim = 16, size_type ndt = 1)
         {
+#ifdef TRACE_LOG
+            logging::trace("initialising tdvp engine.");
+#endif
             try
             {
                 CALL_AND_HANDLE(clear(), "Failed to clear the projector_splitting_intgrator.");
@@ -294,7 +321,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise the projector_spliting_engine object.");
             }
         }
@@ -304,6 +331,9 @@ namespace ttns
 
         void clear()
         {
+#ifdef TRACE_LOG
+            logging::trace("clearing tdvp engine.");
+#endif
             try
             {
                 CALL_AND_RETHROW(mbuf.clear());
@@ -311,7 +341,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to clear the projector_spliting_engine object.");
             }
         }
@@ -341,6 +371,9 @@ namespace ttns
 
         size_type update_site_tensor(hnode &A, const environment_type &env, env_node_type &h, env_type &op)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing tdvp site update.");
+#endif
             try
             {
                 size_type nevals = 0;
@@ -369,18 +402,21 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("Failed to update node tensor.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to update node tensor.");
             }
         }
 
         void update_bond_tensor(bond_matrix_type &r, const environment_type &env, env_node_type &h, env_type &op)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing tdvp bond tensor update.");
+#endif
             try
             {
                 mbuf.setup(r);
@@ -391,12 +427,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("Failed to update R tensor.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to update R tensor.");
             }
         }
@@ -405,6 +441,9 @@ namespace ttns
         {
             if (m_use_time_dependent_hamiltonian && op.is_time_dependent())
             {
+#ifdef TRACE_LOG
+            logging::trace("updating time dependent hamiltonian.");
+#endif
                 op.update_coefficients(m_t + (m_dt / 4.0));
 
                 if (op.has_time_dependent_operators())
@@ -424,6 +463,9 @@ namespace ttns
         template <typename archive>
         void save(archive& ar) const
         {
+#ifdef TRACE_LOG
+            logging::trace("saving tdvp engine.");
+#endif
             CALL_AND_HANDLE(ar(cereal::make_nvp("expmv", m_expmv)), "Failed to serialise tdvp engine.  Failed to serialise expmv.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("t", m_t)), "Failed to serialise tdvp engine.  Failed to serialise current time.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("dt", m_dt)), "Failed to serialise tdvp engine.  Failed to serialise timestep.");
@@ -434,6 +476,9 @@ namespace ttns
         template <typename archive>
         void load(archive& ar)
         {
+#ifdef TRACE_LOG
+            logging::trace("loading tdvp engine.");
+#endif
             CALL_AND_HANDLE(ar(cereal::make_nvp("expmv", m_expmv)), "Failed to serialise tdvp engine.  Failed to serialise expmv.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("t", m_t)), "Failed to serialise tdvp engine.  Failed to serialise current time.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("dt", m_dt)), "Failed to serialise tdvp engine.  Failed to serialise timestep.");

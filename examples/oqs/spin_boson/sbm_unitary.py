@@ -20,6 +20,7 @@ from numba import jit
 
 import pyttn
 from pyttn import oqs, utils
+import spdlog
 
 
 def output_results(ofname, t, Sz, maxchi):
@@ -232,7 +233,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Dynamics of the spin boson model with unitary dynamics methods"
     )
+    pyttn.init_logger("file_logger", "sbm_unitary.log")
+    pyttn.set_logging_level(spdlog.LogLevel.INFO)
 
+    
     # exponential bath cutoff parameters
     parser.add_argument("alpha", type=float)
     parser.add_argument("--wc", type=float, default=5)

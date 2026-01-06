@@ -54,6 +54,8 @@ namespace ttns
 
         using twosite = two_site_variations<T, backend>;
         using eigensolver_type = utils::arnoldi<T, backend>;
+        
+        static constexpr std::string_view class_info = "population:";
 
         struct parameter_list
         {
@@ -82,6 +84,9 @@ namespace ttns
 
         void initialise(const ttn_type &A, const env_type &ham)
         {
+#ifdef TRACE_LOG
+            logging::trace("initialising popullation based subspace expansion engine.");
+#endif
             try
             {
                 ASSERT(A.is_orthogonalised(), "The input hierarchical tucker tensor must "
@@ -103,7 +108,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION(
                     "Failed to initialise the projector_spliting_engine object.");
             }
@@ -121,6 +126,9 @@ namespace ttns
 
         void clear()
         {
+#ifdef TRACE_LOG
+            logging::trace("clearing popullation based subspace expansion engine.");
+#endif
             try
             {
                 CALL_AND_HANDLE(m_ss_expand.clear(),
@@ -128,7 +136,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to clear the projector_spliting_engine object.");
             }
         }
@@ -189,6 +197,9 @@ namespace ttns
                                      const env_type & /* op */, environment_type &env,
                                      linalg::random_engine<backend> &rng)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing downward sweeping subspace expansion.");
+#endif
             try
             {
                 for (size_t i = 0; i < A1.nset(); ++i)
@@ -200,7 +211,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to perform the subspace expansion when "
                                 "traversing down the tree.");
             }
@@ -213,6 +224,9 @@ namespace ttns
                                    const env_type & /* op */, environment_type &env,
                                    linalg::random_engine<backend> &rng)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing upward sweeping subspace expansion.");
+#endif
             try
             {
                 return m_ss_expand.up(A1, A2, r, S, rng, env.buffer(),
@@ -220,7 +234,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to perform the subspace expansion when "
                                 "traversing up the tree.");
             }
@@ -235,6 +249,9 @@ namespace ttns
         template <typename archive>
         void save(archive& ar) const
         {
+#ifdef TRACE_LOG
+            logging::trace("saving population based subspace expansion engine.");
+#endif
             CALL_AND_HANDLE(ar(cereal::make_nvp("ssexpander", m_ss_expand)), "Failed to serialise population subspace expansions engine.  Failed to serialise subspace expander.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("weighting", m_subspace_weighting_factor)), "Failed to serialise population subspace expansion engine.  Failed to serialise weighting factor.");
         }
@@ -242,6 +259,9 @@ namespace ttns
         template <typename archive>
         void load(archive& ar)
         {
+#ifdef TRACE_LOG
+            logging::trace("loading population based subspace expansion engine.");
+#endif
             CALL_AND_HANDLE(ar(cereal::make_nvp("ssexpander", m_ss_expand)), "Failed to serialise population subspace expansions engine.  Failed to serialise subspace expander.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("weighting", m_subspace_weighting_factor)), "Failed to serialise population subspace expansion engine.  Failed to serialise weighting factor.");
         }

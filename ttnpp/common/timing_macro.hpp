@@ -16,11 +16,13 @@
 #define PYTTN_COMMON_TIMING_MACRO_HPP_
 
 #include <chrono>
+#include <sstream>
+#include "logging.hpp"
 
 #ifdef TIMING
 #define INIT_TIMER auto start = std::chrono::high_resolution_clock::now();
 #define START_TIMER start = std::chrono::high_resolution_clock::now();
-#define STOP_TIMER(name) std::cerr << "RUNTIME of " << name << ": " << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start).count() << " us " << std::endl;
+#define STOP_TIMER(name) {std::stringstream _ss; _ss << "RUNTIME of " << name << ": " << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start).count() << " us "; logging::info(_ss.str());}
 #else
 #define INIT_TIMER
 #define START_TIMER
@@ -30,7 +32,7 @@
 #ifdef TIMING_T
 #define INIT_TIMER_T auto start_T = std::chrono::high_resolution_clock::now();
 #define START_TIMER_T start_T = std::chrono::high_resolution_clock::now();
-#define STOP_TIMER_T(name) std::cerr << "RUNTIME of " << name << ": " << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start_T).count() << " us " << std::endl;
+#define STOP_TIMER_T(name) {std::stringstream _ss; _ss << "RUNTIME of " << name << ": " << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start).count() << " us "; logging::info(_ss.str());}
 #else
 #define INIT_TIMER_T
 #define START_TIMER_T

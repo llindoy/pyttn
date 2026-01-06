@@ -131,7 +131,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to resize krylov integrator.");
             }
         }
@@ -152,7 +152,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to resize krylov integrator.");
             }
         }
@@ -266,12 +266,12 @@ namespace utils
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("performing krylov subspace integration");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to perform krylov subspace integration.");
             }
         }
@@ -409,7 +409,7 @@ namespace utils
                     }
                     catch (const std::exception &ex)
                     {
-                        std::cerr << ex.what() << std::endl;
+                        logging::error(ex.what());
                         RAISE_EXCEPTION("Error when attempting to compute eigenvalues.");
                     }
                 }
@@ -420,12 +420,12 @@ namespace utils
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("performing krylov subspace integration");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to perform krylov subspace integration.");
             }
         }
@@ -469,7 +469,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to sort eigenvalues and eigenvectors.");
             }
         }
@@ -604,7 +604,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to resize working arrays.");
             }
             try
@@ -619,7 +619,7 @@ namespace utils
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC(
                     "computing krylov subspace representation of the propagator.");
             }
@@ -639,12 +639,12 @@ namespace utils
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("applying propagator.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply propagator.");
             }
         }
@@ -705,12 +705,12 @@ namespace utils
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing local error estimate.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute local error estimate.");
             }
         }

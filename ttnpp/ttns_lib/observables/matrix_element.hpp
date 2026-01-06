@@ -113,11 +113,22 @@ namespace ttns
         linalg::matrix<T> m_hmat;
 
     public:
-        matrix_element() {}
+        matrix_element() 
+        {
+            logging::info("default constructed matrix element object.");
+        }
         template <typename state_type>
-        matrix_element(const state_type &A, size_type numbuff = 1, bool use_capacity = false) { CALL_AND_HANDLE(resize(A, numbuff, use_capacity), "Failed to construct matrix_element object.  Failed to allocate internal buffers."); }
+        matrix_element(const state_type &A, size_type numbuff = 1, bool use_capacity = false) 
+        { 
+            logging::info("constructing matrix element object with buffer allocated to store temporary arrays need to compute expectation values for a single ttn.");
+            CALL_AND_HANDLE(resize(A, numbuff, use_capacity), "Failed to construct matrix_element object.  Failed to allocate internal buffers.");
+        }
         template <typename state_type>
-        matrix_element(const state_type &A, const state_type &B, size_type numbuff = 1, bool use_capacity = false) { CALL_AND_HANDLE(resize(A, B, numbuff, use_capacity), "Failed to construct matrix_element object.  Failed to allocate internal buffers."); }
+        matrix_element(const state_type &A, const state_type &B, size_type numbuff = 1, bool use_capacity = false) 
+        { 
+            logging::info("constructing matrix element object with buffer allocated to store temporary arrays need to compute matrix elements values for two ttns.");
+            CALL_AND_HANDLE(resize(A, B, numbuff, use_capacity), "Failed to construct matrix_element object.  Failed to allocate internal buffers."); 
+        }
 
         template <typename state_type>
         matrix_element(const state_type &A, const typename ttn_sop_type<state_type>::sop_type &sop, size_type numbuff = 1, bool use_capacity = false) { CALL_AND_HANDLE(resize(A, sop, numbuff, use_capacity), "Failed to construct matrix_element object.  Failed to allocate internal buffers."); }
@@ -132,6 +143,7 @@ namespace ttns
 
         void clear()
         {
+            logging::info("cleared matrix element object.");
             try
             {
                 m_matel.clear();
@@ -141,7 +153,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to clear matrix element object.");
             }
         }
@@ -163,7 +175,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to resize internal buffers of the matrix_element object.");
             }
         }
@@ -186,7 +198,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to resize internal buffers of the matrix_element object.");
             }
         }
@@ -195,6 +207,8 @@ namespace ttns
         template <typename state_type>
         void compute_norm_internal(const state_type &psi, bool use_sparsity, size_t set_index, size_t r = 0)
         {
+            logging::info("matrix element: computing norm.");
+
             try
             {
                 CALL_AND_RETHROW(resize_to_fit(psi, psi));
@@ -238,12 +252,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing inner product of hierarchical tucker tensor with itself.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute inner product of hierarchical tucker tensor with itself.");
             }
         }
@@ -312,12 +326,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing inner product of hierarchical tucker tensor with itself.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute inner product of hierarchical tucker tensor with itself.");
             }
         }
@@ -349,6 +363,8 @@ namespace ttns
         template <typename state_type, typename optype, typename mode_type>
         inline T expectation_value_internal(optype &&op, const mode_type &mode, const state_type &psi, bool use_sparsity = true)
         {
+            logging::info("matrix element: computing expectation value.");
+
             ASSERT(validate_operator(std::forward<optype>(op), mode, psi), "The mode that the input operator acts on is out of bounds.");
             CALL_AND_RETHROW(resize_to_fit(psi, psi));
 
@@ -495,6 +511,8 @@ namespace ttns
         template <typename state_type>
         T operator()(const state_type &bra, const state_type &ket)
         {
+            logging::info("matrix element: computing overlap.");
+
             try
             {
                 if (&bra == &ket)
@@ -521,12 +539,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing inner product of two hierarchical tucker tensors.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute inner product of two hierarchical tucker tensors.");
             }
         }
@@ -535,6 +553,8 @@ namespace ttns
         template <typename state_type, typename mode_type, typename optype>
         inline T matrix_element_internal(optype &&op, const mode_type &mode, const state_type &bra, const state_type &ket)
         {
+            logging::info("matrix element: computing general matrix element.");
+
             if (&bra == &ket)
             {
                 CALL_AND_RETHROW(return expectation_value_internal(op, mode, bra));
@@ -681,12 +701,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing inner product of two hierarchical tucker tensors.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute inner product of two hierarchical tucker tensors.");
             }
         }
@@ -731,12 +751,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing inner product of two hierarchical tucker tensors.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute inner product of two hierarchical tucker tensors.");
             }
         }
@@ -1053,7 +1073,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to resize internal buffers of the matrix_element object.");
             }
         }
@@ -1119,7 +1139,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to resize internal buffers of the matrix_element object.");
             }
         }

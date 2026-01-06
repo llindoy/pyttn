@@ -354,7 +354,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to resize singular value decomposition object.");
                 }
             }
@@ -381,7 +381,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to clear singular value decomposition object.");
                 }
             }
@@ -402,12 +402,12 @@ namespace linalg
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("evaluating singular values.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate singular values.");
                 }
             }
@@ -430,12 +430,12 @@ namespace linalg
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("evaluating singular values.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate singular values.");
                 }
             }
@@ -464,12 +464,12 @@ namespace linalg
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("evaluating singular value decomposition.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate singular value decomposition.");
                 }
             }
@@ -495,12 +495,12 @@ namespace linalg
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("evaluating singular value decomposition.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate singular value decomposition.");
                 }
             }
@@ -539,12 +539,12 @@ namespace linalg
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("evaluating singular value decomposition.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate singular value decomposition.");
                 }
             }

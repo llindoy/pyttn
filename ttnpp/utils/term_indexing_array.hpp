@@ -200,7 +200,7 @@ namespace utils
         try : m_store_complement(false), m_maxr(maxr) { set(r); }
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct term_indexing_array object.");
         }
         term_indexing_array(const term_indexing_array &o) = default;

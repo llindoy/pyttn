@@ -40,6 +40,9 @@ namespace ttns
         template <typename T, typename vtype, typename soptype, typename cinftype, typename buffer_type, typename rtype>
         static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads, size_t tid = 0)
         {
+#ifdef TRACE_LOG
+            logging::trace("bond action: id operation.");
+#endif
             bool add_Eshift = Eshift != T(0.0);
             size_t nadd = add_Eshift ? 1 : 0;
 
@@ -104,6 +107,9 @@ namespace ttns
         template <typename T, typename vtype, typename soptype, typename cinftype, typename buffer_type, typename rtype>
         static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads, size_t tid = 0)
         {
+#ifdef TRACE_LOG
+            logging::trace("bond action: overlap operation.");
+#endif
             bool add_Eshift = Eshift != T(0.0);
             size_t nadd = add_Eshift ? 1 : 0;
 
@@ -165,6 +171,9 @@ namespace ttns
         template <typename T, typename vtype, typename soptype, typename cinftype, typename buffer_type, typename rtype>
         static inline void evaluate(const vtype &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type &buffer, rtype &res, bool use_identity = true, size_t opsum_nthreads = 1, size_t tid = 0)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating action on bond tensor.");
+#endif
             if (use_identity)
             {
                 CALL_AND_RETHROW(evaluate_id(v, h, cinf, Eshift, buffer, res, opsum_nthreads, tid));
@@ -182,6 +191,9 @@ namespace ttns
         template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename buffer_type, typename rtype>
         static inline void evaluate_id(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type &buffer, rtype &res, size_t opsum_nthreads = 1, size_t tid=0)
         {
+#ifdef TRACE_LOG
+            logging::trace("site action leaf: id operation.");
+#endif
             try
             {
                 bool add_Eshift = Eshift != T(0.0);
@@ -272,13 +284,16 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply the leaf coefficient evolution operator at a node.");
             }
         }
         template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename buffer_type, typename rtype>
         static inline void evaluate_olap(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1, size_t tid=0)
         {
+#ifdef TRACE_LOG
+            logging::trace("site action leaf: olap operation.");
+#endif
             try
             {
                 bool add_Eshift = Eshift != T(0.0);
@@ -360,7 +375,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply the leaf coefficient evolution operator at a node.");
             }
         }
@@ -369,6 +384,9 @@ namespace ttns
         template <typename T, typename vtype, typename soptype, typename env_type, typename cinftype, typename buffer_type, typename rtype>
         static inline void evaluate(const vtype &v, const soptype &h, const cinftype &cinf, const env_type &hprim, const T &Eshift, buffer_type& buffer, rtype &res, bool use_identity = true, size_t opsum_nthreads = 1, size_t tid = 0)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating site action operation on leaf node.");
+#endif
             if (use_identity)
             {
                 CALL_AND_RETHROW(evaluate_id(v, h, cinf, hprim, Eshift, buffer, res, opsum_nthreads, tid));
@@ -386,6 +404,9 @@ namespace ttns
         template <typename T, typename backend, typename soptype, typename cinftype, typename buffer_type, typename rtype>
         static inline void evaluate(const ttn_node_data<T, backend> &v, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1, size_t tid=0)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating site actiont operation on branch node.");
+#endif
             using spo_core = single_particle_operator_engine<T, backend>;
 
             bool add_Eshift = Eshift != T(0.0);
@@ -475,6 +496,9 @@ namespace ttns
         template <typename T, typename backend, typename soptype, typename cinftype, typename buffer_type, typename rtype>
         static inline void evaluate(const ttn_node_data<T, backend> &v, const ttn_node_data<T, backend> &vb, const soptype &h, const cinftype &cinf, const T &Eshift, buffer_type& buffer, rtype &res, size_t opsum_nthreads = 1, size_t tid=0)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating site actiont operation on branch node.");
+#endif
             using kpo = kronecker_product_operator_mel<T, backend>;
             using spo_core = single_particle_operator_engine<T, backend>;
 
@@ -578,6 +602,9 @@ namespace ttns
             template <typename vtype, typename buffer_type, typename rtype>
             inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating bond action.");
+#endif
                 try
                 {
                     res.fill_zeros();
@@ -586,7 +613,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to apply the action of the full Hamiltonian at a node.");
                 }
             }
@@ -610,6 +637,9 @@ namespace ttns
             template <typename vtype, typename buffer_type, typename rtype>
             inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating leaf site action.");
+#endif
                 try
                 {
                     res.fill_zeros();
@@ -618,7 +648,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to apply the leaf coefficient evolution operator at a node.");
                 }
             }
@@ -646,6 +676,9 @@ namespace ttns
             template <typename vtype, typename buffer_type, typename rtype>
             inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating branch site action.");
+#endif
                 try
                 {
                     ASSERT(node_inf != nullptr, "Cannot apply site action branch without first binding a node_type object to this.");
@@ -654,7 +687,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to apply the branch coefficient evolution operator at a node.");
                 }
             }
@@ -662,6 +695,9 @@ namespace ttns
             template <typename buffer_type, typename rtype>
             inline void operator()(const hdata &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating branch site action.");
+#endif
                 try
                 {
                     res.fill_zeros();
@@ -670,7 +706,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to apply the branch coefficient evolution operator at a node.");
                 }
             }
@@ -721,6 +757,9 @@ namespace ttns
             template <typename vtype, typename buffer_type, typename rtype, typename mrestype>
             inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, std::vector<mrestype> &m_res, rtype &res) const
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating bond action.");
+#endif
                 ASSERT(node_inf != nullptr, "Cannot apply branch action without first binding a node_type object to this.");
                 CALL_AND_HANDLE(ttn_type::unpack(v, (*node_inf)), "Failed to copy bufffer to bond matrix type.");
 
@@ -731,6 +770,9 @@ namespace ttns
             template <typename buffer_type, typename rtype>
             inline void operator()(const bond_matrix_type &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, std::vector<rtype> &res) const
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating multiset bond action.");
+#endif
                 try
                 {
                     const auto &cinf = hprim.contraction_info()[h.id()]();
@@ -755,7 +797,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to apply the action of the full Hamiltonian at a node.");
                 }
             }
@@ -784,6 +826,9 @@ namespace ttns
             template <typename vtype, typename buffer_type, typename rtype, typename mrestype>
             inline void operator()(const vtype &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, std::vector<mrestype> &m_res, rtype &res) const
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating leaf site action.");
+#endif
                 ASSERT(node_inf != nullptr, "Cannot apply site action leaf without first binding a node_type object to this.");
                 CALL_AND_HANDLE(ttn_type::unpack(v, (*node_inf)), "Failed to copy bufffer to bond matrix type.");
 
@@ -794,6 +839,9 @@ namespace ttns
             template <typename buffer_type, typename rtype>
             inline void operator()(const ms_hdata &v, const node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating multiset leaf site action.");
+#endif
                 try
                 {
                     const auto &cinf = hprim.contraction_info()[h.id()]();
@@ -818,7 +866,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to apply the action of the full Hamiltonian at a node.");
                 }
             }
@@ -848,6 +896,9 @@ namespace ttns
             template <typename vtype, typename buffer_type, typename rtype, typename mrestype>
             inline void operator()(const vtype &v, node_type &h, const environment_type &hprim, buffer_type& buffer, std::vector<mrestype> &m_res, rtype &res) const
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating branch site action.");
+#endif
                 ASSERT(node_inf != nullptr, "Cannot apply site action branch action without first binding a node_type object to this.");
                 CALL_AND_HANDLE(ttn_type::unpack(v, (*node_inf)), "Failed to copy bufffer to bond matrix type.");
 
@@ -858,6 +909,9 @@ namespace ttns
             template <typename buffer_type, typename rtype>
             inline void operator()(const ms_hdata &v, node_type &h, const environment_type &hprim, buffer_type& buffer, rtype &res) const
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating multiset branch site action.");
+#endif
                 try
                 {
                     const auto &cinf = hprim.contraction_info()[h.id()]();
@@ -892,7 +946,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to apply the action of the full Hamiltonian at a node.");
                 }
             }

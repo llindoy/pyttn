@@ -14,7 +14,9 @@ option(USE_OPENMP "Compile with openmp" ON)
 option(BUILD_REAL_TTN "build wrapper for real valued tensor network objects." OFF)
 option(USE_GEMM3M "Compile with openmp" OFF)
 option(EVAL_BUT_DONT_APPLY "Compile with eval but don't apply option set" OFF)
-
+option(DEBUG "Compile with debug messages" OFF)
+option(USE_SPDLOG "Compile with spdlog" ON)
+option(TRACE_LOG "Compile including more expensive trace logging operations" ON)
 
 if(USE_OPENMP)
   add_definitions(-DUSE_OPENMP)
@@ -25,6 +27,13 @@ if(BUILD_REAL_TTN)
   add_definitions(-DBUILD_REAL_TTN)
 endif()
 
+if(DEBUG)
+    add_definitions(-DDEBUG)
+endif()
+
+if(TRACE_LOG)
+    add_definitions(-DTRACE_LOG)
+endif()
 
 include(CheckLanguage)
 check_language(CUDA)
@@ -181,27 +190,25 @@ if(NOT pybind11_POPULATED)
 endif()
 add_definitions(-DPYBIND11)
 
-
 set (BUILD_DOC OFF CACHE INTERNAL "Turn off cereal docs")
 set (BUILD_SANDBOX OFF CACHE INTERNAL "Turn off cereal sandbox")
 set (SKIP_PERFORMANCE_COMPARISON ON CACHE INTERNAL "Turn on skipping cereal/boost performance comparison")
-
-
 set(CEREAL_ROOT_DIR ${CMAKE_SOURCE_DIR}/external/cereal)
 if(NOT EXISTS ${CEREAL_ROOT_DIR})
     FetchContent_Declare(
         cereal
         GIT_REPOSITORY "https://github.com/USCiLab/cereal.git"
+        GIT_TAG v1.3.2
         SOURCE_DIR ${CEREAL_ROOT_DIR}
+        PATCH_COMMAND git apply ${CMAKE_SOURCE_DIR}/patches/patch_cereal.patch
+        UPDATE_DISCONNECTED 1
     )
-
 else()
     message(STATUS "${CEREAL_ROOT_DIR}")
     FetchContent_Declare(
         cereal SOURCE_DIR ${CEREAL_ROOT_DIR}
     )
 endif()
-
 FetchContent_GetProperties(cereal)
 if(NOT cereal_POPULATED)
     FetchContent_Populate(cereal)
@@ -211,11 +218,43 @@ add_definitions(-DCEREAL_LIBRARY_FOUND)
 set(cereal_INCLUDE_DIR ${cereal_SOURCE_DIR}/include)
 message(STATUS "${cereal_INCLUDE_DIR}")
 
+if(USE_SPDLOG)
+    set(BUILD_TESTING OFF)
+    set(spdlog_ROOT_DIR ${CMAKE_SOURCE_DIR}/external/spdlog)
+    if(NOT EXISTS ${spdlog_ROOT_DIR})
+        FetchContent_Declare(
+            spdlog  
+            GIT_REPOSITORY "https://github.com/gabime/spdlog.git"
+            GIT_TAG v1.x
+            SOURCE_DIR ${spdlog_ROOT_DIR}
+        )
+
+    else()
+        message(STATUS "${spdlog_ROOT_DIR}")
+        FetchContent_Declare(
+            spdlog SOURCE_DIR ${spdlog_ROOT_DIR}
+        )
+    endif()
+
+    FetchContent_GetProperties(spdlog)
+    if (NOT spdlog_POPULATED)
+        FetchContent_Populate(spdlog)
+        add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
+    endif ()
+
+    add_definitions(-DSPDLOG_LIBRARY_FOUND)
+    set(spdlog_INCLUDE_DIR ${spdlog_SOURCE_DIR}/include)
+    message(STATUS "${spdlog_INCLUDE_DIR}")
+else()
+    set(spdlog_INCLUDE_DIR "")
+
+endif()
+
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 message(STATUS "${PYTHON_BINDINGS_SRC}")
 pybind11_add_module(ttnpp ${PYTHON_BINDINGS_SRC})
-target_include_directories(ttnpp PUBLIC ${TTNS_INCLUDE_DIRECTORIES} ${cereal_INCLUDE_DIR})
+target_include_directories(ttnpp PUBLIC ${TTNS_INCLUDE_DIRECTORIES} ${cereal_INCLUDE_DIR} ${spdlog_INCLUDE_DIR})
 
 if(USE_CUDA AND CMAKE_CUDA_COMPILER)
     target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver CUDA::curand CUDA::cutensor Thrust ) 
@@ -224,6 +263,9 @@ else()
     target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 
 endif()
 
+if(APPLE)
+  set_target_properties(${MODULE} PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+endif(APPLE)
 
 add_library(restore_default_visibility INTERFACE)
 target_compile_options(restore_default_visibility INTERFACE -fvisibility=default)

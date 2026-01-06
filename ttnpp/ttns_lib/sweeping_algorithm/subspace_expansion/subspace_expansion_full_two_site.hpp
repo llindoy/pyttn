@@ -97,6 +97,9 @@ namespace ttns
 
         void initialise(const ttn<T, backend> &A, const env_type &sop)
         {
+#ifdef TRACE_LOG
+            logging::trace("initialising twosite subspace expansion engine.");
+#endif
             try
             {
                 CALL_AND_HANDLE(clear(), "Failed to clear the projector_splitting_intgrator.");
@@ -179,13 +182,16 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise the projector_spliting_engine object.");
             }
         }
 
         void clear()
         {
+#ifdef TRACE_LOG
+            logging::trace("clearing twosite subspace expansion engine.");
+#endif
             try
             {
                 for (size_type i = 0; i < m_2s_1.size(); ++i)
@@ -211,7 +217,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to clear the projector_spliting_engine object.");
             }
         }
@@ -219,6 +225,9 @@ namespace ttns
         template <typename BufType>
         bool down(hnode &A1, hnode &A2, bond_matrix_type &r, const dmat_type &pops, env_node_type &h, const env_type &op, linalg::random_engine<backend> &rng, BufType &buf, real_type svd_scale)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing downward sweeping subspace expansion.");
+#endif
             try
             {
                 bool unoccupied_spawning = m_unoccupied_threshold > 0;
@@ -410,7 +419,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to perform the subspace expansion when traversing down the tree.");
             }
         }
@@ -418,6 +427,9 @@ namespace ttns
         template <typename BufType>
         bool up(hnode &A1, hnode &A2, bond_matrix_type &r, const dmat_type &pops, env_node_type &h, const env_type &op, linalg::random_engine<backend> &rng, BufType &buf, real_type svd_scale)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing upward sweeping subspace expansion.");
+#endif
             try
             {
                 bool unoccupied_spawning = m_unoccupied_threshold > 0;
@@ -611,7 +623,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to perform the subspace expansion when traversing up the tree.");
             }
         }
@@ -689,6 +701,9 @@ namespace ttns
         template <typename archive>
         void save(archive& ar) const
         {
+#ifdef TRACE_LOG
+            logging::trace("saving twosite subspace expansion engine.");
+#endif
             CALL_AND_HANDLE(ar(cereal::make_nvp("maxmodes", m_inds.size())), "Failed to serialise twosite subspace expansions engine.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("maxtwosite", m_max_two_site_energy_terms)), "Failed to serialise twosite subspace expansions engine.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("spawning_threshold", m_spawning_threshold)), "Failed to serialise twosite subspace expansions engine.");
@@ -709,6 +724,9 @@ namespace ttns
         template <typename archive>
         void load(archive& ar) 
         {
+#ifdef TRACE_LOG
+            logging::trace("loading twosite subspace expansion engine.");
+#endif
             size_type maxnmodes;
             CALL_AND_HANDLE(ar(cereal::make_nvp("maxmodes", maxnmodes)), "Failed to serialise twosite subspace expansions engine.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("maxtwosite", m_max_two_site_energy_terms)), "Failed to serialise twosite subspace expansions engine.");

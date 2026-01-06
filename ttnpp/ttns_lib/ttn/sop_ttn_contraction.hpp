@@ -126,7 +126,7 @@ namespace ttns
                     }
                     catch (const std::exception &ex)
                     {
-                        std::cerr << ex.what() << std::endl;
+                        logging::error(ex.what());
                         RAISE_EXCEPTION("Failed to determine size of output TN.  Error at branch node.");
                     }
                 }
@@ -154,7 +154,7 @@ namespace ttns
                     }
                     catch (const std::exception &ex)
                     {
-                        std::cerr << ex.what() << std::endl;
+                        logging::error(ex.what());
                         RAISE_EXCEPTION("Failed to determine size of output TN.  Error at branch node.");
                     }
                 }

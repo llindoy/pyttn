@@ -79,7 +79,7 @@ namespace linalg
             try : base_type(coeff, A.dims(), B.shape(), transA, transB, conjA, conjB), m_Abuffer(A.buffer()), m_rowptr(A.rowptr()), m_colind(A.colind()), m_Bbuffer(B.buffer()), m_Asize(A.size()), m_Bsize(B.size()), m_ldB(B.shape(1)), m_ldBt(B.shape(0)), m_transpose_result(false) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sparse dense matrix matrix product object.");
             }
 
@@ -90,7 +90,7 @@ namespace linalg
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sparse dense matrix matrix product object.");
             }
 
@@ -99,7 +99,7 @@ namespace linalg
             try : base_type(coeff, A.dims(), B.shape(), working_buffer, transA, transB, conjA, conjB), m_Abuffer(A.buffer()), m_rowptr(A.rowptr()), m_colind(A.colind()), m_Bbuffer(B.buffer()), m_Asize(A.nnz()), m_Bsize(B.size()), m_ldB(B.shape(1)), m_ldBt(B.shape(0)), m_transpose_result(false) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sparse dense matrix matrix product object.");
             }
 
@@ -111,7 +111,7 @@ namespace linalg
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sparse dense matrix matrix product object.");
             }
 
@@ -119,7 +119,7 @@ namespace linalg
             try : base_type(o, factor), m_Abuffer(o.m_Abuffer), m_rowptr(o.m_rowptr), m_colind(o.m_colind), m_Bbuffer(o.m_Bbuffer), m_Asize(o.m_Asize), m_Bsize(o.m_Bsize), m_ldB(o.m_ldB), m_ldBt(o.m_ldBt), m_transpose_result(o.m_transpose_result) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sparse dense matrix matrix product object.");
             }
 
@@ -142,7 +142,7 @@ namespace linalg
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sparse dense matrix matrix product object.");
             }
 
@@ -169,7 +169,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate csr matrix dense matrix product.");
                 }
             }

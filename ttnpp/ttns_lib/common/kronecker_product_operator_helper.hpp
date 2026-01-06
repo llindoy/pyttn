@@ -41,6 +41,9 @@ namespace ttns
         // kronecker product operators for matrix types
         static void apply(const matnode &op, const hdata &A, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of a kronecker product of one-body operators on a site tensor.");
+#endif
             try
             {
                 bool first_call = true;
@@ -80,17 +83,21 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("applying kronecker product operator.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
         static void apply(const matnode &op, size_type nuskip, const hdata &A, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of a kronecker product of one-body operators, skipping one mode, on a site tensor.");
+#endif    
+
             try
             {
                 bool first_call = true;
@@ -133,12 +140,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("applying kronecker product operator.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
@@ -146,6 +153,9 @@ namespace ttns
         // kronecker product operators for matrix types
         static void apply(const matnode &op, const boolnode &is_id, const hdata &A, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of a kronecker product of one-body operators on a site tensor accounting for operators being the identity.");
+#endif
             try
             {
                 bool first_call = true;
@@ -188,18 +198,21 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("applying kronecker product operator.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
 
         static void apply(const matnode &op, const boolnode &is_id, size_type nuskip, const hdata &A, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of a kronecker product of one-body operators on a site tensor accounting for operators being the identity and skipping a mode.");
+#endif
             try
             {
                 bool first_call = true;
@@ -242,12 +255,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("applying kronecker product operator.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
@@ -256,6 +269,9 @@ namespace ttns
         // kronecker product operators for the operator ype
         static void apply(const opnode &op, size_type ind, size_type ri, const hdata &A, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of a kronecker product of one-body operators on a site tensor.");
+#endif
             try
             {
                 bool first_call = true;
@@ -300,12 +316,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("applying kronecker product operator.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
@@ -313,6 +329,9 @@ namespace ttns
         // kronecker product operators for the operator ype
         static void apply(const opnode &op, size_type ind, size_type ri, const hdata &B, const hdata &A, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of a kronecker product of one-body operators on a site tensor.");
+#endif
             try
             {
                 bool first_call = true;
@@ -426,12 +445,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("applying kronecker product operator.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
@@ -440,6 +459,9 @@ namespace ttns
         template <typename Atype, typename dimstype>
         static void apply(const opnode &op, size_type ind, size_type ri, size_type hrank, const dimstype &dims, const Atype &A, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of a kronecker product of one-body operators on a site tensor.");
+#endif
             try
             {
                 size_type ndim = 1;
@@ -504,7 +526,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
@@ -513,6 +535,9 @@ namespace ttns
         // kronecker product operators for matrix types -  currently unsure if this works need to check it in the future.
         static void apply_rectangular(const matnode &op, const hdata &A, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of a kronecker product of one-body operators on a site tensor.  Allowing for the operators to be rectangular matrices.");
+#endif
             try
             {
                 bool first_call = true;
@@ -573,12 +598,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("applying kronecker product operator.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }

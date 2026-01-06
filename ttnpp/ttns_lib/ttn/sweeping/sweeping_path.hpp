@@ -17,7 +17,7 @@
 
 #include <vector>
 #include <common/exception_handling.hpp>
-
+#include <common/logging.hpp>
 namespace ttns
 {
 
@@ -45,6 +45,9 @@ namespace ttns
             {
                 try
                 {
+#ifdef TRACE_LOG
+                    logging::trace("Setting up Euler Tour.");
+#endif
                     std::vector<size_type> times_visited(A.size());
                     std::fill(std::begin(times_visited), std::end(times_visited), 0);
                     // resize the traversal order array
@@ -91,7 +94,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to resize tdvp_tree_traversal object.");
                 }
             }
@@ -116,7 +119,10 @@ namespace ttns
             }
 
             void initialise(const std::vector<size_type> &path)
-            {
+            {                    
+#ifdef TRACE_LOG
+                logging::trace("Initialise tree traversal path.");
+#endif
                 // first we set the traversal order array.  This stores the order in which we visit the nodes
                 m_traversal_order = path;
 
@@ -143,6 +149,9 @@ namespace ttns
 
             void clear()
             {
+#ifdef TRACE_LOG
+                logging::trace("cleared tree traversal path.");
+#endif
                 try
                 {
                     CALL_AND_HANDLE(m_traversal_order.clear(), "Failed to clear traversal order array.");
@@ -151,7 +160,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to clear tdvp_tree_traversal object.");
                 }
             }

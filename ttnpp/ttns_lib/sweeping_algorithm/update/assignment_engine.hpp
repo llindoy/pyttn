@@ -48,6 +48,7 @@ public:
 
   using buffer_type = typename environment_type::buffer_type;
   using eigensolver_type = utils::arnoldi<T, backend>;
+    static constexpr std::string_view class_info = "assignment:";
 
   struct parameter_list {};
 
@@ -67,7 +68,7 @@ public:
       CALL_AND_HANDLE(clear(),
                       "Failed to clear the projector_splitting_intgrator.");
     } catch (const std::exception &ex) {
-      std::cerr << ex.what() << std::endl;
+      logging::error(ex.what());
       RAISE_EXCEPTION(
           "Failed to initialise the projector_spliting_engine object.");
     }

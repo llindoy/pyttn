@@ -57,6 +57,9 @@ namespace ttns
         template <typename spfnode, typename Atype>
         static inline void evaluate(const soptype &h, const cinfnode &cinf, Atype &&A, spfnode &hspf, buffer_type& buffer, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t /*set_var_nthreads*/ = 1)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the value of a single particle operator given a site tensor and surrounding environment tensors.");
+#endif            
             // resize the matrices in the event that the tensor objects have changed size
             if (A.is_leaf())
             {
@@ -71,6 +74,9 @@ namespace ttns
         template <typename spfnode, typename Btype, typename Atype>
         static inline void evaluate(const soptype &h, const cinfnode &cinf, Btype &&B, Atype &&A, spfnode &hspf, buffer_type& buffer, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads=1, size_t /*set_var_nthreads*/=1)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the value of a single particle operator given a site tensor and surrounding environment tensors.");
+#endif        
             // resize the matrices in the event that the tensor objects have changed size
             if (A.is_leaf())
             {
@@ -98,6 +104,9 @@ namespace ttns
         template <typename spfnode>
         static inline void evaluate(const ms_soptype &h, const ms_cinfnode &cinf, const ms_hnode &A, spfnode &hspf, buffer_type &buffer, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t set_var_nthreads =1)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the value of a single particle operator given a site tensor and surrounding environment tensors.");
+#endif        
             // resize the matrices in the event that the tensor objects have changed size
             if (A.is_leaf())
             {
@@ -112,6 +121,9 @@ namespace ttns
         template <typename spfnode>
         static inline void evaluate(const ms_soptype &h, const ms_cinfnode &cinf, const ms_hnode &B, const ms_hnode &A, spfnode &hspf, buffer_type &buffer, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t set_var_nthreads =1)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the value of a single particle operator given a site tensor and surrounding environment tensors.");
+#endif        
             // resize the matrices in the event that the tensor objects have changed size
             if (A.is_leaf())
             {
@@ -126,6 +138,9 @@ namespace ttns
         template <typename spfnode>
         static inline void evaluate(const ms_soptype &h, const ms_cinfnode &cinf, const ms_hnode &A, size_t i, size_t c, spfnode &hspf, buffer_type &buffer, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the value of a single particle operator given a site tensor and surrounding environment tensors.");
+#endif        
             // resize the matrices in the event that the tensor objects have changed size
             if (A.is_leaf())
             {
@@ -140,6 +155,9 @@ namespace ttns
         template <typename spfnode>
         static inline void evaluate(const ms_soptype &h, const ms_cinfnode &cinf, const ms_hnode &B, const ms_hnode &A, size_t i, size_t c, spfnode &hspf, buffer_type &buffer, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the value of a single particle operator given a site tensor and surrounding environment tensors.");
+#endif        
             // resize the matrices in the event that the tensor objects have changed size
             if (A.is_leaf())
             {
@@ -155,6 +173,9 @@ namespace ttns
         template <typename spftype>
         static inline void evaluate_leaf(const op_container &h, const cinftype &cinf, const hdata &B, const hdata &A, buffer_type &buffer, spftype &hspf, bool compute_identity = false, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the value of a single particle operator given a leaf site tensor and surrounding environment tensors.");
+#endif        
             try
             {
                 CALL_AND_HANDLE(hspf.resize_matrices(B.size(1), A.size(1)), "Failed to resize the single-particle Hamiltonian operator matrices.");
@@ -196,12 +217,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("evaluating single particle operator at a leaf node.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to evaluate single particle operator at a leaf node.");
             }
         }
@@ -267,6 +288,9 @@ namespace ttns
         template <typename spfnode>
         static inline void _evaluate_branch(const cinftype &cinf, const hdata &A, buffer_type &buffer, spfnode &hspf, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the value of a single particle operator given a branch site tensor and surrounding environment tensors.");
+#endif        
             try
             {
                 CALL_AND_HANDLE(hspf().resize_matrices(A.size(1), A.size(1)), "Failed to resize the single-particle Hamiltonian operator matrices.");
@@ -299,12 +323,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("evaluating single particle operator at a branch node.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to evaluate single particle operator at a branch node.");
             }
         }
@@ -312,6 +336,9 @@ namespace ttns
         template <typename spfnode>
         static inline void _evaluate_branch(const cinftype &cinf, const hdata &B, const hdata &A, buffer_type &buffer, spfnode &hspf, bool update_all = true, size_t operator_sum_nthreads = 1, size_t tid = 0)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the value of a single particle operator given a branch site tensor and surrounding environment tensors.");
+#endif     
             try
             {
                 CALL_AND_HANDLE(buffer.HA[tid].resize(A.size(0), A.size(1)), "Failed to resize hamiltonian action object.");
@@ -353,12 +380,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("evaluating single particle operator at a branch node.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to evaluate single particle operator at a branch node.");
             }
         }

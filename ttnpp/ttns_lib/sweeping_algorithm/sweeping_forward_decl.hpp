@@ -15,6 +15,8 @@
 #ifndef PYTTN_TTNS_LIB_SWEEPING_ALGORITHM_UPDATE_SWEEPING_FORWARD_DECL_HPP_
 #define PYTTN_TTNS_LIB_SWEEPING_ALGORITHM_UPDATE_SWEEPING_FORWARD_DECL_HPP_
 
+#include <string_view>
+
 namespace ttns
 {
 
@@ -27,6 +29,7 @@ namespace ttns
     public:
         using size_type = typename backend::size_type;
         using ttn_type = ttn_class<T, backend>;
+        static constexpr std::string_view class_info = "noenv:";
 
         struct environment_type
         {
@@ -119,6 +122,7 @@ namespace ttns
         using population_matrix_type = typename ttn_type::population_matrix_type;
 
         using buffer_type = typename environment_type::buffer_type;
+        static constexpr std::string_view class_info = "onesite:";
 
         struct parameter_list
         {
@@ -188,6 +192,7 @@ namespace ttns
 
         using hnode = typename ttn_type::node_type;
         using mat_type = linalg::matrix<T, backend>;
+        static constexpr std::string_view class_info = "trivial:";
 
         using buffer_type = typename environment_type::buffer_type;
         struct parameter_list

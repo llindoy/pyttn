@@ -116,7 +116,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to construct singular value decomposition object.");
                 }
             }
@@ -128,7 +128,7 @@ namespace linalg
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct singular value decomposition object.");
             }
 
@@ -137,7 +137,7 @@ namespace linalg
             try : dense_matrix_singular_value_decomposition(mat.shape(0), mat.shape(1), requires_square_matrix) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct singular value decomposition object.");
             }
 
@@ -163,7 +163,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to resize singular value decomposition engine object.");
                 }
             }
@@ -194,7 +194,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to clear singular value decomposition engine object.");
                 }
             }
@@ -239,12 +239,12 @@ namespace linalg
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("computing singular values of matrix.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to compute singular values of matrix.");
                 }
             }
@@ -320,12 +320,12 @@ namespace linalg
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("computing singular value decomposition of matrix.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to compute singular value decomposition of matrix.");
                 }
             }

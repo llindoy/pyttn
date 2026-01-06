@@ -118,7 +118,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to resize krylov integrator.");
             }
         }
@@ -137,7 +137,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to resize krylov integrator.");
             }
         }
@@ -271,7 +271,7 @@ namespace utils
                             }
                             catch (const std::exception &ex)
                             {
-                                std::cerr << ex.what() << std::endl;
+                                logging::error(ex.what());
                                 RAISE_EXCEPTION("Error when attempting to compute eigenvalues.");
                             }
                         }
@@ -285,12 +285,12 @@ namespace utils
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("performing krylov subspace integration");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to perform krylov subspace integration.");
             }
         }
@@ -319,7 +319,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to sort eigenvalues and eigenvectors.");
             }
         }

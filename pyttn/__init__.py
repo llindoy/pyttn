@@ -99,7 +99,13 @@ from .ttns import (  # noqa: I001
 )
 from . import linalg, models, oqs, utils
 
+from pyttn.ttnpp import set_logging_level, set_logger, get_logger, init_logger
+
 __all__: list[str] = [
+    "set_logging_level",
+    "set_logger",
+    "get_logger",
+    "init_logger",
     "oqs",
     "models",
     "linalg",

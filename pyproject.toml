@@ -29,6 +29,7 @@ dependencies = [
     "h5py",
     "numba",
     "networkx",
+    "spdlog",
 ]
 
 [project.optional-dependencies]

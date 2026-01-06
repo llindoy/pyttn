@@ -52,7 +52,7 @@ namespace linalg
         try : base_type(std::forward<Args>(args)...) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct symmetric_tridiagonal matrix object.");
         }
         template <typename Args>
@@ -113,7 +113,7 @@ namespace linalg
         try : base_type(std::forward<Args>(args)...) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct symmetric tridiagonal matrix object.");
         }
         template <typename... Args>
@@ -207,7 +207,7 @@ namespace linalg
         try : base_type(std::forward<Args>(args)...) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct symmetric tridiagonal matrix object.");
         }
         template <typename... Args>

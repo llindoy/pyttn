@@ -57,6 +57,7 @@ namespace ttns
 
         using slice_type = multiset_ttn_slice<T, backend, false>;
         using const_slice_type = multiset_ttn_slice<T, backend, true>;
+        static constexpr std::string_view class_info = "msttn:";
 
         template <typename U, typename be>
         friend class ttn;
@@ -84,7 +85,7 @@ namespace ttns
         try : base_type(other) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
         }
 
@@ -93,7 +94,7 @@ namespace ttns
         try : base_type(other) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
         }
 
@@ -102,7 +103,7 @@ namespace ttns
         try : base_type(topology, nset, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
         }
 
@@ -111,7 +112,7 @@ namespace ttns
         try : base_type(topology, capacity, nset, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
         }
 
@@ -119,7 +120,7 @@ namespace ttns
         try : base_type(_topology, nset, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
         }
 
@@ -127,7 +128,7 @@ namespace ttns
         try : base_type(_topology, _capacity, nset, collapse_bond_matrices, purification) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct Multiset_TTN object.");
         }
 
@@ -378,7 +379,7 @@ namespace ttns
                     }
                     catch(const std::exception& ex)
                     {
-                        std::cerr << ex.what() << std::endl;
+                        logging::error(ex.what());
                         RAISE_EXCEPTION("Failed to shift orthogonality centre.");
                     }
                     */
@@ -437,7 +438,7 @@ namespace ttns
                     }
                     catch(const std::exception& ex)
                     {
-                        std::cerr << ex.what() << std::endl;
+                        logging::error(ex.what());
                         RAISE_EXCEPTION("Failed to truncate ttn object.");
                     }
             */

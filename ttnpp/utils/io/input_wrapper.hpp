@@ -196,7 +196,7 @@ public:
         }
         catch(const std::exception& ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to get complex number from rapidjson value object.");
         }
     }
@@ -324,7 +324,7 @@ public:
         }
         catch(const std::exception& ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to load vector from rapidjson value.");
         }
     }
@@ -382,7 +382,7 @@ public:
         }
         catch(const std::exception& ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to load vector from rapidjson value.");
         }
     }
@@ -431,7 +431,7 @@ public:
         }
         catch(const std::exception& ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to load diagonal matrix from rapidjson value.");
         }
     }
@@ -502,7 +502,7 @@ public:
         }
         catch(const std::exception& ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to load matrix from rapidjson value.");
         }
     }
@@ -615,7 +615,7 @@ public:
         }
         catch(const std::exception& ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to load matrix from rapidjson value.");
         }
     }
@@ -783,7 +783,7 @@ public:
         }
         catch(const std::exception& ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to load csr matrix from rapidjson value.");
         }
     }

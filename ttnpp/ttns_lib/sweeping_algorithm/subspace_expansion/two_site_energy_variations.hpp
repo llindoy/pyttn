@@ -92,6 +92,9 @@ namespace ttns
         // bond dimension
         static inline void construct_two_site_energy_terms_lower(hnode &A, const sop_node_type &hinf, const env_node_type &h, const env_type &hprim, triad &res, triad &HA, triad &temp, const linalg::vector<size_type> &hinds, const mat &rmat, bool apply_projector = true)
         {
+#ifdef TRACE_LOG
+            logging::trace("constructing terms required to evaluate the two site energy terms on the node further from the root of the ttn.");
+#endif
             try
             {
                 const auto &a = A().as_matrix();
@@ -146,13 +149,16 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute the one site objects used in the construction of the two site Hamiltonian.");
             }
         }
 
         static inline void construct_two_site_energy_terms_upper(hnode &A, const sop_node_type &hinf, const env_node_type &h, rank_4 &res, triad &HA, triad &temp, triad &temp2, const linalg::vector<size_type> &hinds, bool apply_projector = true)
         {
+#ifdef TRACE_LOG
+            logging::trace("constructing terms required to evaluate the two site energy terms on the node closer to the root of the ttn.");
+#endif
             try
             {
                 size_type mode = h.child_id();
@@ -209,7 +215,7 @@ namespace ttns
                         }
                         catch (const std::exception &ex)
                         {
-                            std::cerr << ex.what() << std::endl;
+                            logging::error(ex.what());
                             RAISE_EXCEPTION("Failed to form temporary reinterpreted tensors and perform contraction over the outer indices to form the mean field Hamiltonian.");
                         }
                     }
@@ -217,13 +223,16 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute the one site objects used in the construction of the two site Hamiltonian.");
             }
         }
 
         static inline void construct_two_site_energy(const linalg::vector<T> &hcoeff, const triad &h2s1, const rank_4 &h2s2, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("computing the two site energy variance associated with two tensors.");
+#endif
             try
             {
                 ASSERT(h2s1.size() == h2s2.size(), "Incorrect site terms.");
@@ -246,7 +255,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute two site energy.");
             }
         }
@@ -256,6 +265,9 @@ namespace ttns
         template <typename vtype, typename rtype>
         inline void operator()(const vtype &v, const linalg::vector<T> &hcoeff, triad &op1, rank_4 &op2, size_type nterms, mat &t1, mat &t2, mat &temp2, bool MconjM, rtype &res) const
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of the projected two site hamiltonian on a vector.");
+#endif
             try
             {
                 if (op2.size() == 0 || nterms == 0)
@@ -325,13 +337,16 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply two-site energy variance object.");
             }
         }
 
         static inline void expand_matrix(mat &r, mat &temp, size_type iadd)
         {
+#ifdef TRACE_LOG
+            logging::trace("expanding the size of a matrix by adding rows and columns to it.");
+#endif
             CALL_AND_HANDLE(temp.resize(r.shape(0), r.shape(1)), "Failed to resize temporary array.");
             CALL_AND_HANDLE(temp = r, "Failed to copy array into temporary buffer.");
             CALL_AND_HANDLE(r.resize(r.shape(0) + iadd, r.shape(1) + iadd), "Failed to resize matrix.");

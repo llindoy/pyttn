@@ -86,6 +86,9 @@ namespace ttns
         template <typename opnode>
         static inline void evaluate(const cinfnode &hinf, const hnode &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads=1, size_t /*set_var_nthreads*/=1)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the value of a mean field operator given a site tensor and surrounding environment tensors.");
+#endif
             if (!h.is_root())
             {
                 size_type mode = h.child_id();
@@ -97,6 +100,9 @@ namespace ttns
         template <typename opnode>
         static inline void evaluate(const ms_cinfnode &hinf, const ms_hnode &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads=1, size_t set_var_nthreads=1)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the value of a mean field operator given a site tensor and surrounding environment tensors.");
+#endif
             if (!h.is_root())
             {
                 size_type mode = h.child_id();
@@ -181,7 +187,7 @@ namespace ttns
                             }
                             catch (const std::exception &ex)
                             {
-                                std::cerr << ex.what() << std::endl;
+                                logging::error(ex.what());
                                 RAISE_EXCEPTION("Failed to form temporary reinterpreted tensors and perform contraction over the outer indices to form the mean field Hamiltonian.");
                             }
                         }
@@ -190,7 +196,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to evaluate mean field operator at a node.");
             }
         }
@@ -226,7 +232,7 @@ namespace ttns
                     }
                     catch (const std::exception &ex)
                     {
-                        std::cerr << ex.what() << std::endl;
+                        logging::error(ex.what());
                         RAISE_EXCEPTION("Failed to form temporary reinterpreted tensors and perform contraction over the outer indices to form the mean field Hamiltonian.");
                     }
                 }
@@ -283,7 +289,7 @@ namespace ttns
                             }
                             catch (const std::exception &ex)
                             {
-                                std::cerr << ex.what() << std::endl;
+                                logging::error(ex.what());
                                 RAISE_EXCEPTION("Failed to form temporary reinterpreted tensors and perform contraction over the outer indices to form the mean field Hamiltonian.");
                             }
                         }
@@ -292,7 +298,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to evaluate mean field operator at a node.");
             }
         }
@@ -300,6 +306,9 @@ namespace ttns
         template <typename opnode>
         static inline void evaluate_term(const cinftype &hinf, const cinftype &hinf_p, size_type mode, const hdata &B, const hdata &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads = 1)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating a single term of in the mean field operator given a site tensor and surrounding environment tensors.");
+#endif
             if (&A == &B)
             {
                 CALL_AND_RETHROW(_evaluate_term(hinf, hinf_p, mode, A, buffer, h, operator_sum_nthreads));

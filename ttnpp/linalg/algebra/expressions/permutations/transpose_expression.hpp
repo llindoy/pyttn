@@ -47,7 +47,7 @@ namespace linalg
             try : base_type(shape_type{{arr.shape(1), arr.shape(0)}}), m_arr(arr), m_alpha(alpha) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct transpose expression object.");
             }
 
@@ -68,7 +68,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate matrix transpose expression.");
                 }
             }
@@ -109,7 +109,7 @@ namespace linalg
             try : base_type(shape_type{{arr.shape(1), arr.shape(0)}}), m_arr(arr), m_alpha(alpha) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct transpose expression object.");
             }
 
@@ -137,7 +137,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate diagonal matrix transpose expression.");
                 }
             }
@@ -164,7 +164,7 @@ namespace linalg
             try : base_type(shape_type{{arr.shape(1), arr.shape(0)}}), m_arr(arr), m_alpha(alpha) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct transpose expression object.");
             }
 
@@ -199,7 +199,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to symmetric diagonal matrix transpose expression.");
                 }
             }
@@ -224,7 +224,7 @@ namespace linalg
             try : base_type(arr.topology()), m_arr(arr), m_alpha(alpha) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct transpose expression object.");
             }
 

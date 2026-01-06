@@ -150,6 +150,9 @@ namespace ttns
             template <typename engine>
             static inline size_type evaluate(engine &eng, const hdata &A, mat &U, mat &R, dmat &S, mat &tm, size_type mode, real_type tol = real_type(0), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation, bool save_svd = false)
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating root to leaf decomposition.");
+#endif
                 ASSERT(mode < A.nmodes(), "Failed to perform the root to leaf decomposition.  The node to be decomposed does not have the requested mode.");
 
                 size_type d1 = (A.hrank() * A.dimen()) / A.dim(mode);
@@ -209,6 +212,9 @@ namespace ttns
 
             static inline void apply_to_node(hdata &a, const mat &u)
             {
+#ifdef TRACE_LOG
+                logging::trace("applying result of root to leaf decomposition to current node.");
+#endif
                 ASSERT(a.as_matrix().shape() == u.shape(), "The U matrix and hierarchical tucker tensor node matrix are not the same size.");
                 CALL_AND_HANDLE(a.as_matrix() = u, "Failed to set the value of the hierarchial tucker tensor node matrix.");
             }
@@ -216,6 +222,9 @@ namespace ttns
             // applies the result of the root to leaf decomposition of a nodes parent to the node.
             static inline void apply_bond_matrix(hdata &a, const mat &pr, mat &tm)
             {
+#ifdef TRACE_LOG
+                logging::trace("contracting bond matrix from root to leaf decomposition to child of current tensor.");
+#endif
                 mat &A = a.as_matrix();
 
                 ASSERT(A.size() <= tm.capacity(), "The temporary working matrix is not large enough to store the result.");
@@ -227,7 +236,10 @@ namespace ttns
             }
 
             static inline void apply_with_truncation(hdata &a, hdata &c, size_type bond_index, const mat &pr, mat &tm)
-            {
+            {                
+#ifdef TRACE_LOG
+                logging::trace("contracting bond matrix from root to leaf decomposition to child of current tensor with truncation.");
+#endif
                 CALL_AND_HANDLE(a.as_matrix() = tm, "Failed to set the value of the hierarchial tucker tensor node matrix.");
 
                 a.set_dim(bond_index, pr.shape(1));

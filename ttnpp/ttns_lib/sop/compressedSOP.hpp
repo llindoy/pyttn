@@ -196,7 +196,7 @@ namespace ttns
         // try : m_mode_operators(nmodes), m_op_dict(nmodes), m_composite_operators(nmodes), m_nterms(nterms), m_coeff(nterms){}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct sum of product operator object.");
         }
 
@@ -211,7 +211,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sum of product operator object.");
             }
         }
@@ -227,7 +227,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sum of product operator object.");
             }
         }
@@ -320,7 +320,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise compressed sum of product operator object.");
             }
         }
@@ -464,7 +464,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to insert identity operators into object.");
             }
         }
@@ -482,7 +482,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to resize sp hamiltonian object.");
             }
         }
@@ -504,7 +504,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to insert operator into compressedSOP");
             }
         }

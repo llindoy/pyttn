@@ -52,7 +52,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate the work size required for computing the leaf-to-root decomposition.");
                 }
             }
@@ -67,6 +67,9 @@ namespace ttns
             template <typename engine>
             static inline size_type evaluate(engine &eng, const hdata &a, mat &U, mat &R, dmat &S, real_type tol = real_type(0), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation, bool save_svd = false)
             {
+#ifdef TRACE_LOG
+                logging::trace("evaluating leaf to root decomposition.");
+#endif
                 const auto &A = a.as_matrix();
                 CALL_AND_HANDLE(U.resize(A.shape(0), A.shape(1)), "Failed when resizing the U matrix so that it has the correct shape.");
                 CALL_AND_HANDLE(R.resize(A.shape(1), A.shape(1)), "Failed when resizing the R matrix so that it has the correct shape.");
@@ -79,6 +82,9 @@ namespace ttns
             // obtained as A^{n-1}_I;j A^{n}_kji,l = U^{n-1}_I;j (R_{jj'} A^{n}_kj'i, l) = U^{n-1}_I;j X^{n}_kji,l
             static inline void apply_bond_matrix(hdata &a, hdata &pa, size_type mode, const mat &R, mat &pt)
             {
+#ifdef TRACE_LOG
+                logging::trace("contracting bond matrix from leaf to root decomposition of tensor to parent.");
+#endif
                 pt.resize(pa.shape(0), pa.shape(1));
                 CALL_AND_HANDLE(pt.resize(pa.as_matrix().shape()), "Failed to resize the temporary working matrix so that it has the correct shape.");
 
@@ -95,6 +101,9 @@ namespace ttns
             // this function applies the transformation to both the present node and it's parent.
             static inline void apply_with_truncation(hdata &a, hdata &pa, size_type mode, const mat &R, mat &u)
             {
+#ifdef TRACE_LOG
+                logging::trace("contracting bond matrix from leaf to root decomposition of tensor to parent with bond dimension truncation.");
+#endif
                 //first set a to the new u tensor.  This will update its hrank if u has been truncated.
                 CALL_AND_HANDLE(a.as_matrix() = u, "Failed to set the value of the hierarchial tucker tensor node matrix.");
 

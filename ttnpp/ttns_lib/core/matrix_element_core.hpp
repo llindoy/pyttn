@@ -42,6 +42,9 @@ namespace ttns
     public:
         static inline void compute_leaf(const hdata &p, observable_node &res, size_type r, boolnode &is_identity)
         {
+#ifdef TRACE_LOG
+            logging::trace("computing norm contraction at leaf.");
+#endif     
             try
             {
                 CALL_AND_HANDLE(res()[r].resize(p.hrank(), p.hrank()), "Failed to resize matel object.");
@@ -52,12 +55,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing leaf node norm squared of hierarchical tucker tensor.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute leaf node norm squared of hierarchical tucker tensor.");
             }
         }
@@ -65,6 +68,9 @@ namespace ttns
         template <typename op_type>
         static inline typename std::enable_if<std::is_base_of<op_base, op_type>::value, void>::type compute_leaf(op_type &op, const hdata &p, triad_type &temp, observable_node &res, size_type r, boolnode &is_identity)
         {
+#ifdef TRACE_LOG
+            logging::trace("computing expectation value contraction at leaf.");
+#endif 
             try
             {
                 if (op.is_identity())
@@ -87,18 +93,21 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing operator expectation value for a leaf node of the hierarchical tucker tensor.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute operator expectation value for a leaf node of the hierarchical tucker tensor.");
             }
         }
 
         static inline void compute_leaf(std::shared_ptr<op_base> op, const hdata &p, triad_type &temp, observable_node &res, size_type r, boolnode &is_identity)
         {
+#ifdef TRACE_LOG
+            logging::trace("computing expectation value contraction at leaf.");
+#endif 
             try
             {
                 if (op->is_identity())
@@ -121,18 +130,21 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing operator expectation value for a leaf node of the hierarchical tucker tensor.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute operator expectation value for a leaf node of the hierarchical tucker tensor.");
             }
         }
 
         static inline void compute_leaf(site_operator<T, backend> &op, const hdata &p, triad_type &temp, observable_node &res, size_type r, boolnode &is_identity)
         {
+#ifdef TRACE_LOG
+            logging::trace("computing expectation value contraction at leaf.");
+#endif 
             try
             {
                 if (op.is_identity())
@@ -155,18 +167,21 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing operator expectation value for a leaf node of the hierarchical tucker tensor.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute operator expectation value for a leaf node of the hierarchical tucker tensor.");
             }
         }
 
         static inline void compute_branch(const hdata &p, triad_type &HA, triad_type &temp, observable_node &res, size_type r, boolnode &is_identity)
         {
+#ifdef TRACE_LOG
+            logging::trace("computing norm contraction at branch.");
+#endif 
             try
             {
                 ASSERT(!res.is_leaf(), "Cannot apply branch contraction to a leaf node.");
@@ -194,12 +209,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing branch contraction required for evaluating matrix elements using a hierarchical tucker tensor representation of states.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute branch contraction required for evaluating matrix elements using a hierarchical tucker tensor representation of states.");
             }
         }
@@ -207,6 +222,9 @@ namespace ttns
     public:
         static inline void compute_leaf(const hdata &b, const hdata &k, observable_node &res, size_type r)
         {
+    #ifdef TRACE_LOG
+            logging::trace("computing overlap contraction at leaf.");
+#endif 
             try
             {
                 CALL_AND_HANDLE(res()[r].resize(b.hrank(), k.hrank()), "Failed to resize matel object.");
@@ -216,12 +234,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing leaf node inner product between two hierarchical tucker tensors.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute leaf node inner product between two hierarchical tucker tensors.");
             }
         }
@@ -229,6 +247,9 @@ namespace ttns
         template <typename op_type>
         static inline typename std::enable_if<std::is_base_of<op_base, op_type>::value, void>::type compute_leaf(op_type &op, const hdata &b, const hdata &k, triad_type &temp, observable_node &res, size_type r)
         {
+#ifdef TRACE_LOG
+            logging::trace("computing matrix element contraction at leaf.");
+#endif 
             try
             {
                 ASSERT(op.nmodes() == b.dimen(), "The dimension of the operator must be the same as the dimension of the primitive dimensions of the ttn node.");
@@ -244,18 +265,21 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing matrix element of an operator between the leaf nodes of two hierarchical tucker tensors.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute a matrix element of an operator between the leaf nodes of two hierarchical tucker tensors.");
             }
         }
 
         static inline void compute_leaf(std::shared_ptr<op_base> op, const hdata &b, const hdata &k, triad_type &temp, observable_node &res, size_type r)
         {
+#ifdef TRACE_LOG
+            logging::trace("computing matrix element contraction at leaf.");
+#endif 
             try
             {
                 ASSERT(op->size() == b.dimen(), "The dimension of the operator must be the same as the dimension of the primitive dimensions of the ttn node.");
@@ -271,12 +295,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing matrix element of an operator between the leaf nodes of two hierarchical tucker tensors.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute a matrix element of an operator between the leaf nodes of two hierarchical tucker tensors.");
             }
         }
@@ -288,6 +312,9 @@ namespace ttns
 
         static inline void compute_branch(const hdata &b, const hdata &k, triad_type &HA, triad_type &temp, observable_node &res, size_type r)
         {
+#ifdef TRACE_LOG
+            logging::trace("computing overlap contraction at branch.");
+#endif 
             try
             {
                 ASSERT(!res.is_leaf(), "Cannot apply branch contraction to a leaf node.");
@@ -312,12 +339,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("computing branch contraction required for evaluating matrix elements using a hierarchical tucker tensor representation of states.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to compute branch contraction required for evaluating matrix elements using a hierarchical tucker tensor representation of states.");
             }
         }

@@ -91,7 +91,7 @@ namespace utils
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION(
                         "Failed to test whether input file type object was loadable.");
                 }
@@ -152,7 +152,7 @@ namespace utils
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to create object from input.");
                 }
             }

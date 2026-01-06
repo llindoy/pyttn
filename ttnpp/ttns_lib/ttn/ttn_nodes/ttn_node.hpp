@@ -346,7 +346,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to reinterpret hierarchical tucker tensor node as a rank 3 tensor.");
             }
         }
@@ -400,7 +400,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to reinterpret hierarchical tucker tensor node as a rank 3 tensor.");
             }
         }
@@ -482,7 +482,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to reinterpret hierarchical tucker tensor node as a rank 5 tensor.");
             }
         }
@@ -534,7 +534,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to reinterpret hierarchical tucker tensor node as a rank 5 tensor.");
             }
         }
@@ -568,7 +568,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to expand tensor.");
             }
         }
@@ -598,7 +598,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to expand tensor.");
             }
         }
@@ -626,7 +626,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to expand tensor.");
             }
         }
@@ -656,7 +656,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to expand tensor.");
             }
         }
@@ -1233,7 +1233,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to resize the decomposition engine object to handle matrix.");
                 }
             }
@@ -1267,7 +1267,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to resize the decomposition engine object.");
                 }
                 m_initialised = true;

@@ -60,7 +60,7 @@ namespace linalg
             try : base_type(coeff, A.shape(), B.shape(), transA, transB, conjA, conjB), m_Abuffer(A.buffer()), m_Bbuffer(B.buffer()), m_Asize(A.size()), m_Bsize(B.size()), m_ldA(A.shape(1)), m_ldB(B.shape(1)) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct dense dense matrix matrix product object.");
             }
 
@@ -69,7 +69,7 @@ namespace linalg
             try : base_type(coeff, A.shape(), B.shape(), working, transA, transB, conjA, conjB), m_Abuffer(A.buffer()), m_Bbuffer(B.buffer()), m_Asize(A.size()), m_Bsize(B.size()), m_ldA(A.shape(1)), m_ldB(B.shape(1)) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct dense dense matrix matrix product object.");
             }
 
@@ -78,7 +78,7 @@ namespace linalg
             try : base_type(o, factor), m_Abuffer(o.m_Abuffer), m_Bbuffer(o.m_Bbuffer), m_Asize(o.m_Asize), m_Bsize(o.m_Bsize), m_ldA(o.m_ldA), m_ldB(o.m_ldB) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct dense dense matrix matrix product object.");
             }
 
@@ -106,7 +106,7 @@ namespace linalg
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct dense dense matrix matrix product object.");
             }
 
@@ -175,7 +175,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to compute dense matrix - dense matrix product.");
                 }
             }

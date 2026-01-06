@@ -144,7 +144,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to initialise the state of a rank 3 and rank 2 tensor contraction expression.");
                 }
             }
@@ -157,7 +157,7 @@ namespace linalg
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct tensor_contraction_1_mt object.");
             }
 
@@ -165,7 +165,7 @@ namespace linalg
             try : tensor_contraction_1_mt(coeff, B, A, Bind, Aind, conjB, conjA) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct tensor_contraction_1_mt object.");
             }
 
@@ -178,7 +178,7 @@ namespace linalg
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct tensor_contraction_1_mt object.");
             }
 
@@ -187,7 +187,7 @@ namespace linalg
             try : tensor_contraction_1_mt(coeff, B, A, Bind, Aind, working, conjB, conjA) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct tensor_contraction_1_mt object.");
             }
 
@@ -195,7 +195,7 @@ namespace linalg
             try : base_type(o.shape()), m_coeff(o.m_coeff * factor), m_Abuffer(o.m_Abuffer), m_Bbuffer(o.m_Bbuffer), m_working(o.m_working), m_working_size(o.m_working_size), m_batched(o.m_batched), m_opA(o.m_opA), m_opB(o.m_opB), m_t(o.m_t), m_m(o.m_m), m_n(o.m_n), m_k(o.m_k), m_ldA(o.m_ldA), m_ldB(o.m_ldB), m_strideA(o.m_strideA), m_strideB(o.m_strideB), m_Asize(o.m_Asize), m_Bsize(o.m_Bsize) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct tensor_contraction_1_mt object.");
             }
 
@@ -214,7 +214,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to bind conj array.");
                 }
             }
@@ -294,7 +294,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate a contraction between a rank 2 and rank 3 tensor.");
                 }
             }
@@ -335,7 +335,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate contraction.");
                 }
             }

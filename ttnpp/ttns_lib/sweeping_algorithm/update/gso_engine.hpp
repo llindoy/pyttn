@@ -48,6 +48,7 @@ namespace ttns
         using eigensolver_type = utils::arnoldi<T, backend>;
 
         using parameter_list = simple_update_parameter_list;
+        static constexpr std::string_view class_info = "gso:";
 
     protected:
         // the krylov subspace engine
@@ -69,6 +70,9 @@ namespace ttns
 
         void initialise(const ttn_type &A, size_type krylov_dim = 4)
         {
+#ifdef TRACE_LOG
+            logging::trace("initialising gso engine.");
+#endif
             try
             {
                 CALL_AND_HANDLE(clear(), "Failed to clear the projector_splitting_intgrator.");
@@ -88,7 +92,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise the projector_spliting_engine object.");
             }
         }
@@ -98,13 +102,16 @@ namespace ttns
 
         void clear()
         {
+#ifdef TRACE_LOG
+            logging::trace("clearing gso engine.");
+#endif
             try
             {
                 CALL_AND_HANDLE(m_eigensolver.clear(), "Failed to clear the krylov subspace engine.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to clear the projector_spliting_engine object.");
             }
         }
@@ -130,6 +137,9 @@ namespace ttns
 
         size_type update_site_tensor(hnode &A, const environment_type &env, env_node_type &h, env_type &op)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing gso site tensor update.");
+#endif
             size_type ret = 0;
             // update the node tensor.  To do this we solve the effective eigenproblem
             if (!A.is_leaf())
@@ -158,12 +168,18 @@ namespace ttns
         template <typename archive>
         void save(archive& ar) const
         {
+#ifdef TRACE_LOG
+            logging::trace("saving gso engine.");
+#endif
             CALL_AND_HANDLE(ar(cereal::make_nvp("eigensolver", m_eigensolver)), "Failed to serialise ground state optimisation engine.  Failed to serialise eigensolver.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("E", m_curr_E)), "Failed to serialise ground state optimisation engine.  Failed to serialise current energy.");
         }
         template <typename archive>
         void load(archive& ar)
         {
+#ifdef TRACE_LOG
+            logging::trace("loading gso engine.");
+#endif
             CALL_AND_HANDLE(ar(cereal::make_nvp("eigensolver", m_eigensolver)), "Failed to serialise ground state optimisation engine.  Failed to serialise eigensolver.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("E", m_curr_E)), "Failed to serialise ground state optimisation engine.  Failed to serialise current energy.");
         }
@@ -197,6 +213,7 @@ namespace ttns
         using eigensolver_type = utils::arnoldi<T, backend>;
 
         using parameter_list = simple_update_parameter_list;
+        static constexpr std::string_view class_info = "gso:";
 
     protected:
         // the krylov subspace engine
@@ -219,6 +236,9 @@ namespace ttns
 
         void initialise(const ttn_type &A, size_type krylov_dim = 4)
         {
+#ifdef TRACE_LOG
+            logging::trace("initialising gso engine.");
+#endif
             try
             {
                 CALL_AND_HANDLE(clear(), "Failed to clear the projector_splitting_intgrator.");
@@ -239,7 +259,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise the projector_spliting_engine object.");
             }
         }
@@ -249,6 +269,9 @@ namespace ttns
 
         void clear()
         {
+#ifdef TRACE_LOG
+            logging::trace("clearing gso engine.");
+#endif
             try
             {
                 mbuf.clear();
@@ -256,7 +279,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to clear the projector_spliting_engine object.");
             }
         }
@@ -282,6 +305,9 @@ namespace ttns
 
         size_type update_site_tensor(hnode &A, const environment_type &env, env_node_type &h, env_type &op)
         {
+#ifdef TRACE_LOG
+            logging::trace("performing gso site tensor update.");
+#endif
             size_type ret = 0;
 
             mbuf.setup(A());
@@ -315,14 +341,19 @@ namespace ttns
         template <typename archive>
         void save(archive& ar) const
         {
+#ifdef TRACE_LOG
+            logging::trace("saving gso engine.");
+#endif
             CALL_AND_HANDLE(ar(cereal::make_nvp("eigensolver", m_eigensolver)), "Failed to serialise ground state optimisation engine.  Failed to serialise eigensolver.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("E", m_curr_E)), "Failed to serialise ground state optimisation engine.  Failed to serialise current energy.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("buf", mbuf)), "Failed to serialise ground state optimisation engine.  Failed to serialise buffer.");
-
         }
         template <typename archive>
         void load(archive& ar)
         {
+#ifdef TRACE_LOG
+            logging::trace("loading gso engine.");
+#endif
             CALL_AND_HANDLE(ar(cereal::make_nvp("eigensolver", m_eigensolver)), "Failed to serialise ground state optimisation engine.  Failed to serialise eigensolver.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("E", m_curr_E)), "Failed to serialise ground state optimisation engine.  Failed to serialise current energy.");
             CALL_AND_HANDLE(ar(cereal::make_nvp("buf", mbuf)), "Failed to serialise ground state optimisation engine.  Failed to serialise buffer.");

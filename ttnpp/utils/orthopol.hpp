@@ -327,7 +327,7 @@ namespace utils
         }
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct Jacobi polynomial object.");
         }
     }
@@ -390,7 +390,7 @@ namespace utils
         }
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct Associated Laguerre polynomial object.");
         }
     }
@@ -423,7 +423,7 @@ namespace utils
         }
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct Hermite polynomial object.");
         }
     }
@@ -459,7 +459,7 @@ namespace utils
         }
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct orthonormal polynomials that are orthogonal to a non-classical weight function. ");
         }
     }
@@ -493,7 +493,7 @@ namespace utils
         }
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct modified momentswith respect to function.");
         }
     }
@@ -592,7 +592,7 @@ namespace utils
         }
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct orthonormal polynomials that are orthogonal to a non-classical weight function. ");
         }
     }
@@ -623,7 +623,7 @@ namespace utils
         }
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct orthonormal polynomials that are orthogonal to a non-classical weight function. ");
         }
     }

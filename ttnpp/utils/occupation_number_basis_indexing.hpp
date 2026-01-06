@@ -142,7 +142,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise occupation number indexing object.");
             }
         }
@@ -165,7 +165,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise occupation number indexing object.");
             }
         }
@@ -180,7 +180,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise occupation number indexing object.");
             }
         }
@@ -509,7 +509,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise occupation number indexing object.");
             }
         }
@@ -617,7 +617,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise occupation number indexing object.");
             }
         }
@@ -632,7 +632,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise occupation number indexing object.");
             }
         }
@@ -938,7 +938,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise occupation number indexing object.");
             }
         }
@@ -955,7 +955,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise occupation number indexing object.");
             }
         }
@@ -969,7 +969,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise occupation number indexing object.");
             }
         }
@@ -988,7 +988,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise occupation number indexing object.");
             }
         }
@@ -1187,7 +1187,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct raised index for composite basis.");
             }
             return index;
@@ -1222,7 +1222,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct lowered index for composite basis.");
             }
             return index;
@@ -1264,7 +1264,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct adjacent index for composite basis.");
             }
             return index;

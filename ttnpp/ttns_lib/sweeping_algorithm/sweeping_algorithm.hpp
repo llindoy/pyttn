@@ -69,7 +69,7 @@ namespace ttns
         using population_matrix_type = typename ttn_type::population_matrix_type;
 
         using buffer_type = typename environment_type::buffer_type;
-
+        static constexpr auto class_info = join_v<update_type::class_info, subspace_type::class_info, environment_type::class_info, ttn_type::class_info>;
     protected:
         environment_type m_env;
         size_type m_nh_evals = 0;
@@ -84,21 +84,43 @@ namespace ttns
         env_container_type m_ham;
 
     public:
-        sweeping_algorithm() {}
+        sweeping_algorithm() 
+        {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " default constructing";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
+        }
         sweeping_algorithm(const ttn_type &A, const env_type &ham, size_type set_var_nthreads = 1)
         {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " constructing with default addition params";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
             m_validate_inputs = true;
             CALL_AND_HANDLE(initialise_default(A, ham, set_var_nthreads), "Failed to construct sweeping_algorithm using minimum parameters.");
         }
 
         sweeping_algorithm(const ttn_type &A, const env_type &ham, const update_params &upd, const environment_params &env, const subspace_params &sub, size_type set_var_nthreads = 1)
         {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " constructing with user specified additional parameters";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
             m_validate_inputs = true;
             CALL_AND_HANDLE(initialise(A, ham, upd, env, sub, set_var_nthreads), "Failed to construct sweeping_algorithm.");
         }
 
         sweeping_algorithm(const ttn_type &A, const env_type &ham, update_params &&upd, environment_params &&env, subspace_params &&sub, size_type set_var_nthreads = 1)
         {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " default constructing";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
             m_validate_inputs = true;
             CALL_AND_HANDLE(initialise(A, ham, std::forward<update_params>(upd), std::forward<environment_params>(env), std::forward<subspace_params>(sub), set_var_nthreads), "Failed to construct sweeping_algorithm.");
         }
@@ -111,6 +133,11 @@ namespace ttns
 
         void initialise_default(const ttn_type &A, const env_type &ham, size_type set_var_nthreads = 1)
         {
+    #ifdef TRACE_LOG
+            static constexpr std::string_view info = " default initialisation";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
             try
             {
                 set_var_nthreads = set_var_nthreads < 1 ? 1 : set_var_nthreads;
@@ -121,13 +148,18 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise sweeping algorithm object.");
             }
         }
 
         void initialise(const ttn_type &A, const env_type &ham, const update_params &upd, const environment_params &env, const subspace_params &sub, size_type set_var_nthreads = 1)
         {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " initialising with user specified additional parameters";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
             try
             {
                 set_var_nthreads = set_var_nthreads < 1 ? 1 : set_var_nthreads;  
@@ -138,13 +170,18 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise sweeping algorithm object.");
             }
         }
 
         void initialise(const ttn_type &A, const env_type &ham, update_params &&upd, environment_params &&env, subspace_params &&sub, size_type set_var_nthreads = 1)
         {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " initialising with user specified additional parameters";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
             try
             {
                 set_var_nthreads = set_var_nthreads < 1 ? 1 : set_var_nthreads;   
@@ -155,13 +192,18 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise sweeping algorithm object.");
             }
         }
 
         void clear()
         {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " clearing sweeping engine";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
             try
             {
                 // clear all of the structures needed for updating
@@ -173,7 +215,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to clear the projector_spliting_engine object.");
             }
         }
@@ -188,6 +230,10 @@ namespace ttns
          */
         bool operator()(ttn_type &A, env_type &op, bool update_environment = false)
         {
+            static constexpr std::string_view info = " performing sweeping engine step";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::info(joined);
+            
             try
             {
                 A.setup_orthogonality();
@@ -208,12 +254,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("Failed to apply sweeping algorithm.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply sweeping algorithm.");
             }
         }
@@ -221,6 +267,11 @@ namespace ttns
         /* The function for preparing the environment arrays for an updating step*/
         bool prepare_environment(ttn_type &A, env_type &op, bool attempt_expansion = false)
         {
+            static constexpr std::string_view info = " preparing environment tensors for sweeping algorithm loop.";
+            static constexpr auto joined = join_v<class_info, info>;
+
+            logging::info(joined);
+
             // ASSERT(has_same_structure(A, op), "Incompatible tensor and environment object.");
             using common::rzip;
             using common::zip;
@@ -286,6 +337,11 @@ namespace ttns
         template <typename NodeFunc, typename RFunc, typename SubspaceFuncDown, typename SubspaceFuncUp, typename EnvFuncDown, typename EnvFuncUp>
         bool update(ttn_type &A, env_type &op, NodeFunc &&nf, RFunc &&rf, SubspaceFuncDown &&sfd, SubspaceFuncUp &&sfu, EnvFuncDown &&evd, EnvFuncUp &&evu)
         {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " performing sweeping algorithm update step.";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
             if (m_validate_inputs)
             {
                 // ASSERT(has_same_structure(A, op), "Incompatible tensor and environment object.");
@@ -326,6 +382,11 @@ namespace ttns
         template <typename NodeFunc, typename RFunc, typename SubspaceFunc, typename EnvFuncDown, typename EnvFuncUp>
         bool forward_loop_step(ttn_type &psi, env_type &op, NodeFunc &&nf, RFunc &&rf, SubspaceFunc &&sf, EnvFuncDown &&evd, EnvFuncUp &&evu)
         {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " performing forward loop";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
             bool subspace_expanded = false;
             psi.euler_tour().reset_visits();
 
@@ -406,6 +467,12 @@ namespace ttns
         template <typename NodeFunc, typename RFunc, typename SubspaceFunc, typename EnvFuncDown, typename EnvFuncUp>
         bool backward_loop_step(ttn_type &psi, env_type &op, NodeFunc &&nf, RFunc &&rf, SubspaceFunc &&sf, EnvFuncDown &&evd, EnvFuncUp &&evu)
         {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " performing backward loop";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
+
             bool subspace_expanded = false;
             psi.euler_tour().reset_visits();
 
@@ -489,6 +556,11 @@ namespace ttns
     template <typename archive>
     void save(archive& ar) const
     {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " saving";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
         CALL_AND_HANDLE(ar(cereal::base_class<update_type>(this)), "Failed to serialise sweeping algorithm.  Error when serialising the update object.");
         CALL_AND_HANDLE(ar(cereal::base_class<subspace_type>(this)), "Failed to serialise sweeping algorithm.  Error when serialising the subspace object.");
 
@@ -504,6 +576,11 @@ namespace ttns
     template <typename archive>
     void load(archive& ar)
     {
+#ifdef TRACE_LOG
+            static constexpr std::string_view info = " loading";
+            static constexpr auto joined = join_v<class_info, info>;
+            logging::trace(joined);
+#endif
         CALL_AND_HANDLE(ar(cereal::base_class<update_type>(this)), "Failed to serialise sweeping algorithm.  Error when serialising the update object.");
         CALL_AND_HANDLE(ar(cereal::base_class<subspace_type>(this)), "Failed to serialise sweeping algorithm.  Error when serialising the subspace object.");
 

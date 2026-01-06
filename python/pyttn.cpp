@@ -75,6 +75,12 @@
 #include "ttns/algorithms/dmrg.hpp"
 #include "ttns/algorithms/tdvp.hpp"
 
+#ifdef SPDLOG_LIBRARY_FOUND
+    #include <spdlog/spdlog.h>
+    #include <spdlog/sinks/basic_file_sink.h>
+    #include "spdlog/sinks/stdout_color_sinks.h"
+#endif
+
 namespace py = pybind11;
 
 template <typename... Args>
@@ -116,6 +122,25 @@ PYBIND11_MODULE(ttnpp, m)
         Operator submodule for TTNS library.
         )mydelimiter");
 
+#endif
+
+#ifdef SPDLOG_LIBRARY_FOUND
+    m.def("set_logger", &spdlog::set_default_logger);
+    m.def("get_logger", &spdlog::default_logger);
+    m.def("init_logger", [](const std::string& label, const std::string& ofname)
+    {        
+        auto logger = spdlog::basic_logger_mt(label, ofname);
+        spdlog::set_default_logger(logger);
+    });
+    m.def("init_logger", [](const std::string& label)
+    {        
+        auto logger = spdlog::stderr_color_mt(label);
+        spdlog::set_default_logger(logger);
+    });
+    m.def("set_logging_level", [](const int& level)
+    {   
+        spdlog::default_logger()->set_level(static_cast<spdlog::level::level_enum>(level));}
+    );
 #endif
 
     //

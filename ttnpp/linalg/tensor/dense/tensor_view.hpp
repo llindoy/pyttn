@@ -519,7 +519,7 @@ namespace linalg
         try : base_type(std::forward<Args>(args)...) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct tensor view object.");
         }
         template <typename... Args>
@@ -644,7 +644,7 @@ namespace linalg
         try : base_type(std::forward<Args>(args)...) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct tensor view object.");
         }
         template <typename... Args>
@@ -712,7 +712,7 @@ namespace linalg
         try : base_type(std::forward<Args>(args)...) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct tensor view object.");
         }
         template <typename... Args>
@@ -769,7 +769,7 @@ namespace linalg
         try : base_type(std::forward<Args>(args)...) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct tensor view object.");
         }
         template <typename... Args>
@@ -804,7 +804,7 @@ namespace linalg
         try : base_type(std::forward<Args>(args)...) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct reinterpreted tensor object.");
         }
         template <typename... Args>
@@ -830,7 +830,7 @@ namespace linalg
         try : base_type(std::forward<Args>(args)...) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct hermitian matrix object.");
         }
         template <typename... Args>
@@ -858,7 +858,7 @@ namespace linalg
         try : base_type(std::forward<Args>(args)...), m_ordering(MATRIX_ORDERING::ROW_MAJOR) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct upper hessenberg matrix object.");
         }
 
@@ -867,7 +867,7 @@ namespace linalg
         try : base_type(std::forward<Args>(args)...), m_ordering(morder) {}
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to construct upper hessenberg matrix object.");
         }
 

@@ -109,7 +109,7 @@ def xychain_dynamics(Ns, Nb, alpha, wc, eta, chi, chiS, chiB, nbose, dt, nbose_m
 
         if Nb != 0:
             # add on the bath and system bath contributions of the bath hamiltonian
-            H = discbath.add_system_bath_hamiltonian(H, pyttn.sOP("sz", 0), geom=geom, bskip=skip+1)
+            H = discbath.add_system_bath_hamiltonian(H, pyttn.sOP("sz", skip), geom=geom, bskip=skip+1)
 
     print("hamiltonian string setup")
 

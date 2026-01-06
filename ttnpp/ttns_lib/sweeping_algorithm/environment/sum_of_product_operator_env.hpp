@@ -56,6 +56,7 @@ namespace ttns
 
         using hnode = typename ttn_type::node_type;
         using hdata = typename hnode::value_type;
+        static constexpr std::string_view class_info = "sopenv:";
 
         struct parameter_list
         {
@@ -97,6 +98,9 @@ namespace ttns
 
         void initialise(const ttn_type &A, const environment_type &sop, container_type &ham, const parameter_list & params, size_type set_var_nthreads = 1)
         {
+#ifdef TRACE_LOG
+            logging::trace("initialising sum of product operator environment.");
+#endif
             using common::rzip;
             using common::zip;
             try
@@ -130,7 +134,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to reallocate internal buffers required for the sop environment");
                 }
 
@@ -148,7 +152,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise the sop environment");
             }
         }
@@ -162,6 +166,9 @@ namespace ttns
 
         void clear()
         {
+#ifdef TRACE_LOG
+            logging::trace("clearing sum of product operator environment.");
+#endif
             CALL_AND_HANDLE(m_buf.clear(), "Failed to clear sop object.");
             m_maxsize = 0;
             m_maxcapacity = 0;
@@ -169,11 +176,17 @@ namespace ttns
 
         inline void update_env_down(const environment_type &op, const hnode &_a1, node_type &_h)
         {
+#ifdef TRACE_LOG
+            logging::trace("updating all mean field operators in the sum of product operator environment.");
+#endif
             CALL_AND_HANDLE(mfo_core::evaluate(op.contraction_info()[_h.id()], _a1, m_buf, _h, m_operator_sum_nthreads, m_set_var_nthreads), "Failed to evaluate the mean field operator.");
         }
 
         inline void update_env_up(const environment_type &op, const hnode &_a1, node_type &_h, bool force_update = true)
         {
+#ifdef TRACE_LOG
+            logging::trace("updating all single particle operators in the sum of product operator environment.");
+#endif
             CALL_AND_HANDLE(spo_core::evaluate(op, op.contraction_info()[_h.id()], _a1, _h, m_buf, false, force_update, m_operator_sum_nthreads, m_set_var_nthreads), "Failed to evaluate the single particle operator.");
         }
 
@@ -207,6 +220,9 @@ namespace ttns
     template <typename archive>
     void save(archive& ar) const
     {
+#ifdef TRACE_LOG
+        logging::trace("saving the sum of product operator environment.");
+#endif
         CALL_AND_HANDLE(ar(cereal::make_nvp("opsum_nthreads", m_operator_sum_nthreads)), "Failed to serialise sum of product operator env.  Failed to serialise opsum nthreads.");
         CALL_AND_HANDLE(ar(cereal::make_nvp("setvar_nthreads", m_set_var_nthreads)), "Failed to serialise sum of product operator env.  Failed to serialise set var nthreads.");
         CALL_AND_HANDLE(ar(cereal::make_nvp("maxcapacity", m_maxcapacity)), "Failed to serialise sum of product operator env.  Failed to serialise max capacity.");
@@ -217,6 +233,9 @@ namespace ttns
     template <typename archive>
     void load(archive& ar)
     {
+#ifdef TRACE_LOG
+        logging::trace("loading the sum of product operator environment.");
+#endif
         CALL_AND_HANDLE(ar(cereal::make_nvp("opsum_nthreads", m_operator_sum_nthreads)), "Failed to serialise sum of product operator env.  Failed to serialise opsum nthreads.");
         CALL_AND_HANDLE(ar(cereal::make_nvp("setvar_nthreads", m_set_var_nthreads)), "Failed to serialise sum of product operator env.  Failed to serialise set var nthreads.");
         CALL_AND_HANDLE(ar(cereal::make_nvp("maxcapacity", m_maxcapacity)), "Failed to serialise sum of product operator env.  Failed to serialise max capacity.");
@@ -233,7 +252,7 @@ namespace ttns
         }
         catch (const std::exception &ex)
         {
-            std::cerr << ex.what() << std::endl;
+            logging::error(ex.what());
             RAISE_EXCEPTION("Failed to reallocate internal buffers required for the sop environment");
         }
     }

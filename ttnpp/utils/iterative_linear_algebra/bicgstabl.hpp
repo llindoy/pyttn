@@ -123,7 +123,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to resize bicgstab(l) engine.");
             }
         }
@@ -320,7 +320,7 @@ namespace utils
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to solve linear system of equations using "
                                 "bicgstab(l) algorithm.");
             }

@@ -17,6 +17,7 @@
 
 #include <common/exception_handling.hpp>
 #include <common/zip.hpp>
+#include <common/logging.hpp>
 #include <linalg/decompositions/singular_value_decomposition/singular_value_decomposition.hpp>
 
 namespace ttns
@@ -44,7 +45,12 @@ namespace ttns
             using svd_engine = linalg::singular_value_decomposition<matrix_type, use_divide_and_conquer>;
 
         public:
-            decomposition_engine() {}
+            decomposition_engine() 
+            {
+#ifdef TRACE_LOG
+                logging::trace("default construct decomposition engine.");
+#endif
+            }
             decomposition_engine(const decomposition_engine &o) = default;
             decomposition_engine(decomposition_engine &&o) = default;
 
@@ -55,6 +61,9 @@ namespace ttns
             template <typename mat_type>
             void resize(const mat_type& m)
             {
+#ifdef TRACE_LOG
+                logging::trace("resized decomposition engine.");
+#endif
                 try
                 {
                     if(m_temp.capacity() < m.capacity())
@@ -77,7 +86,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to resize decomposition engine object.");
                 }            
             }
@@ -85,6 +94,9 @@ namespace ttns
             template <typename decomp_type, typename resize_obj, typename Utype, typename Rtype>
             void resize(const resize_obj &A, Utype &U, Rtype &r, bool use_capacity = false)
             {
+#ifdef TRACE_LOG
+                logging::trace("resized decomposition engine.");
+#endif
                 try
                 {
                     CALL_AND_HANDLE(resize_buffers<decomp_type>(A, use_capacity), "Failed to resize the buffers.");
@@ -104,13 +116,16 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to resize decomposition engine object.");
                 }
             }
 
             void clear()
             {
+#ifdef TRACE_LOG
+                logging::trace("cleared decomposition engine.");
+#endif
                 try
                 {
                     CALL_AND_HANDLE(m_s.clear(), "Failed to clear the s matrix.");
@@ -120,7 +135,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to clear the decomposition engine object.");
                 }
             }
@@ -137,7 +152,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed when querying the work size for the decomposition engine object.");
                 }
             }
@@ -147,6 +162,9 @@ namespace ttns
             template <typename Stype>
             size_type get_truncated_bond_dimension(Stype &S, size_type ashape, real_type tol = real_type(-1), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation)
             {
+#ifdef TRACE_LOG
+                logging::trace("determining truncated bond dimension of tensor.");
+#endif
                 // determine the bond dimension to retain given the user specified tol and nchi arrays
                 size_type bond_dimension = ashape;
                 if (nchi > 0)
@@ -278,6 +296,9 @@ namespace ttns
             template <typename Atype, typename Utype, typename Vtype, typename Stype>
             size_type operator()(const Atype &A, Utype &U, Vtype &V, Stype &S, real_type tol = real_type(-1), size_type nchi = 0, bool rel_truncate = false, truncation_mode trunc_mode = truncation_mode::singular_values_truncation, bool save_shost = false)
             {
+#ifdef TRACE_LOG
+                logging::trace("decomposing site tensor.");
+#endif
                 try
                 {
                     // check that the temporary arrays have the correct capacity
@@ -310,12 +331,12 @@ namespace ttns
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("applying the decomposition engine.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to apply the decomposition engine.");
                 }
             }
@@ -324,6 +345,9 @@ namespace ttns
             template <typename Atype, typename Utype, typename Stype>
             void pad_buffer(const Atype &A, Utype &U, Stype &S, size_type bond_dimension)
             {
+#ifdef TRACE_LOG
+                logging::trace("padding tensor buffers to correct bond dimension.");
+#endif
                 CALL_AND_HANDLE(m_temp2.resize(A.shape(0), bond_dimension), "Failed to resize the second temporary matrix so that it has the correct shape.");
 
                 using memfill = linalg::memory::filler<real_type, backend>;
@@ -356,6 +380,9 @@ namespace ttns
             template <typename Utype>
             void truncateU(Utype &U, size_type bond_dimension)
             {
+#ifdef TRACE_LOG
+                logging::trace("truncating U tensor to correct bond dimension.");
+#endif
                 CALL_AND_HANDLE(m_temp2.resize(U.shape(0), bond_dimension), "Failed to resize temp buffer");
                 try
                 {
@@ -363,7 +390,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::critical(ex.what());
                     RAISE_EXCEPTION("Failed to zero pad the U matrix so that it has the correct shape.");
                 }
                 CALL_AND_HANDLE(U.resize(U.shape(0), bond_dimension), "Failed to resize the U matrix.");
@@ -373,6 +400,9 @@ namespace ttns
             template <typename Utype>
             void truncateV(Utype &V, size_type bond_dimension)
             {
+#ifdef TRACE_LOG
+                logging::trace("truncating V tensor to correct bond dimension.");
+#endif
                 CALL_AND_HANDLE(m_temp2.resize(bond_dimension, V.shape(1)), "Failed to resize temp buffer");
                 try
                 {
@@ -380,7 +410,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::critical(ex.what());
                     RAISE_EXCEPTION("Failed to zero pad the U matrix so that it has the correct shape.");
                 }
                 CALL_AND_HANDLE(V.resize(bond_dimension, V.shape(1)), "Failed to resize the U matrix.");
@@ -391,6 +421,9 @@ namespace ttns
             template <typename Vtype>
             void transposeV(Vtype &V)
             {
+#ifdef TRACE_LOG
+                logging::trace("transposing V tensor following operations.");
+#endif                
                 try
                 {
                     if (std::is_same<backend, linalg::blas_backend>::value && V.shape(0) == V.shape(1))
@@ -405,12 +438,12 @@ namespace ttns
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::critical(ex.what());
                     RAISE_NUMERIC("applying transposeV.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::critical(ex.what());
                     RAISE_EXCEPTION("Failed to apply transposeV on result of decomposition engine.");
                 }
             }
@@ -431,6 +464,9 @@ namespace ttns
             template <typename decomp_type, typename resize_obj>
             void resize_buffers(const resize_obj &A, bool use_capacity = false)
             {
+#ifdef TRACE_LOG
+                logging::trace("resizing decomposition engine buffers given input tensor.");
+#endif
                 try
                 {
                     std::array<size_type, 2> max_dim{{0, 0}};
@@ -463,7 +499,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::critical(ex.what());
                     RAISE_EXCEPTION("Failed to resize decomposition engine object.");
                 }
             }

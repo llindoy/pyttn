@@ -52,6 +52,7 @@ namespace ttns
 
         using twosite = two_site_variations<T, backend>;
         using eigensolver_type = utils::arnoldi<T, backend>;
+        static constexpr std::string_view class_info = "twosite:";
 
         struct parameter_list
         {
@@ -92,7 +93,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to initialise the projector_spliting_engine object.");
             }
         }
@@ -108,7 +109,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to clear the projector_spliting_engine object.");
             }
         }
@@ -150,7 +151,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to perform the subspace expansion when traversing down the tree.");
             }
         }
@@ -164,7 +165,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to perform the subspace expansion when traversing up the tree.");
             }
         }

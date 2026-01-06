@@ -490,7 +490,7 @@ namespace utils
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate integral.");
                 }
             }
@@ -524,7 +524,7 @@ namespace utils
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate integral over entire upper real line.");
                 }
             }
@@ -538,7 +538,7 @@ namespace utils
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate integral.");
                 }
             }
@@ -572,7 +572,7 @@ namespace utils
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate integral over entire upper real line.");
                 }
             }

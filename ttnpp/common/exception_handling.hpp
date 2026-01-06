@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include "logging.hpp"
 
 namespace common
 {
@@ -79,12 +80,12 @@ namespace common
     }                                                                          \
     catch (const common::invalid_value &ex)                                    \
     {                                                                          \
-        std::cerr << ex.what() << std::endl;                                   \
+        logging::error(ex.what());                                             \
         throw common::invalid_value(AT_MACRO("Invalid value: " error_string)); \
     }                                                                          \
     catch (const std::exception &ex)                                           \
     {                                                                          \
-        std::cerr << ex.what() << std::endl;                                   \
+        logging::error(ex.what());                                             \
         throw std::runtime_error(AT_MACRO(error_string));                      \
     }
 

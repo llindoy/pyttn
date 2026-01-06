@@ -65,7 +65,7 @@ namespace linalg
             try : base_type(coeff, A.shape(), X.shape(), transA, conjA, conjX), m_Abuffer(A.buffer()), m_Xbuffer(X.buffer()), m_Asize(A.size()), m_Xsize(X.size()), m_incA(A.incx()), m_incX(X.incx()) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sparse dense matrix vector product object.");
             }
 
@@ -74,7 +74,7 @@ namespace linalg
             try : base_type(coeff, A.shape(), X.shape(), working_buffer, transA, conjA, conjX), m_Abuffer(A.buffer()), m_Xbuffer(X.buffer()), m_Asize(A.nnz()), m_Xsize(X.size()), m_incA(A.incx()), m_incX(X.incx()) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sparse dense matrix vector product object.");
             }
 
@@ -82,7 +82,7 @@ namespace linalg
             try : base_type(o, factor), m_Abuffer(o.m_Abuffer), m_Xbuffer(o.m_Xbuffer), m_Asize(o.m_Asize), m_Xsize(o.m_Xsize), m_incA(o.m_incA), m_incX(o.m_incX) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sparse dense matrix vector product object.");
             }
 
@@ -90,7 +90,7 @@ namespace linalg
             try : base_type(o, conjugate), m_Abuffer(o.m_Abuffer), m_Xbuffer(o.m_Xbuffer), m_Asize(o.m_Asize), m_Xsize(o.m_Xsize), m_incA(o.m_incA), m_incX(o.m_incX) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to construct sparse dense matrix vector product object.");
             }
 
@@ -112,7 +112,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate diagonal matrix vector product.");
                 }
             }

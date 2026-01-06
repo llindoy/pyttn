@@ -46,6 +46,9 @@ namespace ttns
         // kronecker product operators for matrix types
         static void apply(const observable_node &op, size_type r, const hdata &A, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of a kronecker product of one-body operators on a site tensor.");
+#endif
             try
             {
                 bool first_call = true;
@@ -85,18 +88,21 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("applying kronecker product operator.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
 
         static void apply(const observable_node &op, size_type r, const boolnode &is_id, const hdata &A, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of a kronecker product of one-body operators on a site tensor, allowing for identity tensors.");
+#endif
             try
             {
                 bool first_call = true;
@@ -139,12 +145,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("applying kronecker product operator.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
@@ -152,6 +158,9 @@ namespace ttns
         // kronecker product operators for matrix types -  currently unsure if this works need to check it in the future.
         static void apply_rectangular(const observable_node &op, size_type r, const hdata &A, mat &temp, mat &res)
         {
+#ifdef TRACE_LOG
+            logging::trace("evaluating the action of a kronecker product of one-body operators on a site tensor.  Allowing for the operators to be rectangular matrices.");
+#endif
             try
             {
                 bool first_call = true;
@@ -212,12 +221,12 @@ namespace ttns
             }
             catch (const common::invalid_value &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_NUMERIC("applying kronecker product operator.");
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
@@ -292,7 +301,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
@@ -402,7 +411,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
@@ -457,7 +466,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
@@ -511,7 +520,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }
@@ -582,7 +591,7 @@ namespace ttns
             }
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to apply kronecker product operator.");
             }
         }

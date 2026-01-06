@@ -211,7 +211,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to resize eigensolver object.");
                 }
             }
@@ -235,7 +235,7 @@ namespace linalg
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to clear eigensolver object.");
                 }
             }
@@ -255,12 +255,12 @@ namespace linalg
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigenvalues of hermitian matrix.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to compute eigenvalues of hermitian matrix.");
                 }
             }
@@ -282,12 +282,12 @@ namespace linalg
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigenvalues of hermitian matrix.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to compute eigenvalues of hermitian matrix. ");
                 }
             }
@@ -304,12 +304,12 @@ namespace linalg
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigendecomposition of hermitian matrix.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to compute eigendecomposition of hermitian matrix. ");
                 }
             }
@@ -331,12 +331,12 @@ namespace linalg
                 }
                 catch (const common::invalid_value &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigendecomposition of hermitian matrix.");
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to compute eigendecomposition of hermitian matrix.");
                 }
             }

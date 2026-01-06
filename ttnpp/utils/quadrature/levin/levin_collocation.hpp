@@ -84,7 +84,7 @@ namespace utils
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to resize levin_base object.");
                 }
             }
@@ -194,7 +194,7 @@ namespace utils
                 }
                 catch (const std::exception &ex)
                 {
-                    std::cerr << ex.what() << std::endl;
+                    logging::error(ex.what());
                     RAISE_EXCEPTION("Failed to evaluate oscillatory integral using levin collocation.");
                 }
             }
@@ -231,7 +231,7 @@ namespace utils
             try : base_type(p), m_nu(0) {}
             catch (const std::exception &ex)
             {
-                std::cerr << ex.what() << std::endl;
+                logging::error(ex.what());
                 RAISE_EXCEPTION("Failed to conclass levin_bessel object.");
             }
 
