@@ -51,13 +51,16 @@ template <typename T> static inline void critical(const T& msg){std::cerr << "cr
 template <typename T> static inline void error(const T& msg){std::cerr << "error:" << msg << std::endl;}
 template <typename T> static inline void warn(const T& msg){std::cerr << "warn:" << msg << std::endl;}
 template <typename T> static inline void info(const T& msg){std::cout << "info:" << msg << std::endl;}
+#ifdef DEBUG
 template <typename T> static inline void debug(const T& msg)
 {
-#ifdef DEBUG
     std::cout << "debug:" << msg << std::endl;
-#endif
 }
-template <typename T> static inline void trace(const T& msg){}
+#else
+template <typename T> static inline void debug(const T& /*msg*/){}
+#endif
+
+template <typename T> static inline void trace(const T& /*msg*/){}
 
 #endif
 };   //struct logging

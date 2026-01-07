@@ -78,7 +78,7 @@ namespace ttns
     public:
         ttn() : base_type() 
         {
-            logging::info("creating empty ttn.");
+            logging::debug("creating empty ttn.");
         }
 
         ttn(const ttn &other)
@@ -101,7 +101,7 @@ namespace ttns
         template <typename U, typename be, bool CONST>
         ttn(multiset_ttn_slice<U, be, CONST> other) : base_type()
         {
-            logging::info("constructing ttn from multiset slice.");
+            logging::debug("constructing ttn from multiset slice.");
             CALL_AND_RETHROW(tree_type::construct_topology(static_cast<const typename ms_ttn<U, be>::tree_type &>(other.obj())));
             for (auto z : common::zip(m_nodes, other.obj()))
             {
@@ -168,7 +168,7 @@ namespace ttns
         template <typename U, typename be>
         ttn &operator=(const ttn<U, be> &other)
         {
-            logging::info("copy assigning ttn");
+            logging::debug("copy assigning ttn");
             CALL_AND_RETHROW(base_type::operator=(other));
             return *this;
         }
@@ -177,7 +177,7 @@ namespace ttns
         template <typename U, typename be, bool CONST>
         ttn &operator=(multiset_ttn_slice<U, be, CONST> other)
         {
-            logging::info("assigning ttn from multiset slice.");
+            logging::debug("assigning ttn from multiset slice.");
             // if these are all the same size then we just do the simple assignment operator
             if (has_same_structure(other.obj(), *this) && other.obj().mode_dimensions() == this->mode_dimensions())
             {
@@ -690,7 +690,7 @@ namespace ttns
     public:
         ttn &apply_product_operator(product_operator<T, backend> &op, bool shift_orthogonality = true)
         {
-            logging::info("applying a product of one body operators to ttn."); 
+            logging::debug("applying a product of one body operators to ttn."); 
             for (auto &_op : op)
             {
                 CALL_AND_HANDLE(apply_one_body_operator(_op, shift_orthogonality), "Failed to apply product operator error when applying one body operator.");
@@ -708,7 +708,7 @@ namespace ttns
 
         ttn &apply_one_body_operator(const linalg::matrix<T, backend> &op, size_type index, bool shift_orthogonality = true)
         {
-            logging::info("applying a one body operators to ttn."); 
+            logging::debug("applying a one body operators to ttn."); 
 
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
             ASSERT(op.shape(0) == m_dim_sizes[index] && op.shape(1) == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
@@ -719,7 +719,7 @@ namespace ttns
 
         ttn &apply_one_body_operator(const Op<T, backend> &op, bool shift_orthogonality = true)
         {
-            logging::info("applying a one body operators to ttn."); 
+            logging::debug("applying a one body operators to ttn."); 
 
             ASSERT(op.ndim() == 1, "Failed to apply one body operator.  Operator is not one body.");
             ASSERT(op.indices()[0] < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
@@ -733,7 +733,7 @@ namespace ttns
         typename std::enable_if<std::is_base_of<ops::primitive<T, backend>, OpType>::value, ttn &>::type
         apply_one_body_operator(OpType &op, size_type index, bool shift_orthogonality = true)
         {
-            logging::info("applying a one body operators to ttn."); 
+            logging::debug("applying a one body operators to ttn."); 
 
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
             ASSERT(op.size() == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
@@ -744,7 +744,7 @@ namespace ttns
 
         ttn &apply_one_body_operator(site_operator<T, backend> &op, bool shift_orthogonality = true)
         {
-            logging::info("applying a one body operators to ttn."); 
+            logging::debug("applying a one body operators to ttn."); 
 
             size_type index = op.mode();
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
@@ -756,7 +756,7 @@ namespace ttns
 
         ttn &apply_one_body_operator(site_operator<T, backend> &op, size_type index, bool shift_orthogonality = true)
         {
-            logging::info("applying a one body operators to ttn."); 
+            logging::debug("applying a one body operators to ttn."); 
 
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
             ASSERT(op.size() == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
@@ -767,7 +767,7 @@ namespace ttns
 
         ttn &apply_one_body_operator(std::shared_ptr<ops::primitive<T, backend>> op, size_type index, bool shift_orthogonality = true)
         {
-            logging::info("applying a one body operators to ttn."); 
+            logging::debug("applying a one body operators to ttn."); 
 
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
             ASSERT(op.size() == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
@@ -780,7 +780,7 @@ namespace ttns
         // ttn& apply_one_body_operator
         ttn &apply_operator(const Op<T, backend> &op, real_type tol = real_type(0), size_type nchi = 0, bool zipup=false)
         {
-            logging::info("applying generic operator to ttn."); 
+            logging::debug("applying generic operator to ttn."); 
 
             // first check that the operator is consistent with the TTN we are acting on
             for (size_type i = 0; i < op.ndim(); ++i)
@@ -825,7 +825,7 @@ namespace ttns
         // here the collapse algorithm will be implemented in place.  This will be done iteratively shifting the orthogonality centre of the tree to a leaf.  Computing the probability of observing the state in each possible configuration of that leaf.  Then sampling the state based on this.
         real_type collapse(std::vector<size_t> &state, bool truncate = false, real_type tol = real_type(0), size_type nchi = 0)
         {
-            logging::info("collapsing ttn to a product state."); 
+            logging::debug("collapsing ttn to a product state."); 
             state.resize(m_nleaves);
             real_type pitot = 1.0;
             this->orthogonalise();
@@ -880,7 +880,7 @@ namespace ttns
 
         real_type collapse_basis(std::vector<linalg::matrix<T, backend>> &U, std::vector<size_t> &state, bool truncate = false, real_type tol = real_type(0), size_type nchi = 0)
         {
-            logging::info("collapsing ttn to a product state in a different local basis."); 
+            logging::debug("collapsing ttn to a product state in a different local basis."); 
             ASSERT(U.size() == m_nleaves, "Failed to collapse in user specified basis.  Basis transformation vectors are not compatible with ");
             state.resize(m_nleaves);
             real_type pitot = 1.0;
@@ -941,7 +941,7 @@ namespace ttns
         // function for measuring a single qubit
         void measure_without_collapse(size_type i, std::vector<real_type> &res)
         {
-            logging::info("performing projective measurement of ttn without collapsing state."); 
+            logging::debug("performing projective measurement of ttn without collapsing state."); 
             ASSERT(i < m_nleaves, "Cannot measure on requested mode.  Index out of bounds.");
             res.resize(m_dim_sizes[i]);
             // shift orthogonality centre to leaf index

@@ -17,15 +17,22 @@ target_include_directories(ttns_lib INTERFACE
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 
 #compiler flags
-option(PYTTN_BUILD_CUDA "Compile with cuda" OFF)
+option(USE_CUDA "Compile with cuda" OFF)
 option(USE_OPENMP "Compile with openmp" ON)
-option(USE_GEMM3M "Compile with openmp" OFF)
-option(BUILD_TESTS "Build Tests" OFF)
-option(BUILD_PYTHON_BINDINGS "Build Python Bindings" ON)
-option(BUILD_SRC "Build C++ src" OFF)
+option(BUILD_REAL_TTN "build wrapper for real valued tensor network objects." OFF)
+option(USE_GEMM3M "Compile with gemm3m" OFF)
+option(EVAL_BUT_DONT_APPLY "Compile with eval but don't apply option set" OFF)
+option(DEBUG "Compile with debug messages" OFF)
+option(USE_SPDLOG "Compile with spdlog" ON)
+option(TRACE_LOG "Compile including more expensive trace logging operations" ON)
 
+set(OpenMP_LIBS "")
 if(USE_OPENMP)
-    add_compile_definitions(USE_OPENMP)
+  find_package(OpenMP)
+  if(OpenMP_FOUND)
+    add_definitions(-DUSE_OPENMP)
+    set(OpenMP_LIBS OpenMP::OpenMP_CXX CACHE INTERNAL "")
+  endif()
 endif()
 
 if(USE_GEMM3M)

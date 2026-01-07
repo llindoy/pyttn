@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.16)
 project(ttnpp)
 
 include(CheckIPOSupported)
@@ -9,18 +9,6 @@ set(CMAKE_BUILD_TYPE "Release")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 #compiler flags
-option(USE_CUDA "Compile with cuda" OFF)
-option(USE_OPENMP "Compile with openmp" ON)
-option(BUILD_REAL_TTN "build wrapper for real valued tensor network objects." OFF)
-option(USE_GEMM3M "Compile with openmp" OFF)
-option(EVAL_BUT_DONT_APPLY "Compile with eval but don't apply option set" OFF)
-option(DEBUG "Compile with debug messages" OFF)
-option(USE_SPDLOG "Compile with spdlog" ON)
-option(TRACE_LOG "Compile including more expensive trace logging operations" ON)
-
-if(USE_OPENMP)
-  add_definitions(-DUSE_OPENMP)
-endif()
 
 
 if(BUILD_REAL_TTN)
@@ -68,10 +56,6 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
     else()
         set(CMAKE_CUDA_FLAGS " -x cu -Xptxas -O3 -g --extended-lambda ${CMAKE_CUDA_FLAGS}")
 
-        if(USE_OPENMP)
-            set(CMAKE_CUDA_FLAGS "-x cu ${CMAKE_CUDA_FLAGS} -fopenmp")
-        endif()
-
         if(NOT DEFINED CMAKE_CUDA_STANDARD)
             set(CMAKE_CUDA_STANDARD 17)
             set(CMAKE_CUDA_STANDARD_REQUIRED ON)
@@ -97,7 +81,7 @@ else()
         if(MSVC)
             message(FATAL_ERROR "Request MSVC compiler.  I don't know how this works so exiting.")
         else()
-            set(CMAKE_CXX_FLAGS "-O3 -g -Wall -Wextra -Wshadow -pedantic -Wold-style-cast -Wno-dangling-reference")
+            set(CMAKE_CXX_FLAGS "-O3")
             option(WITH_WERROR "Compile with '-Werror' C++ compiler flag" ON)
             if(WITH_WERROR)
                 #set(CMAKE_CXX_FLAGS "-Werror ${CMAKE_CXX_FLAGS}")
@@ -106,23 +90,12 @@ else()
             #additional compilation flags for GNU compilers
             if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
                 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcx-fortran-rules -march=native -mtune=native -flto=auto")
-                if(USE_OPENMP)
-                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-                endif()
             #additional compilation flags for inteal compilers
             elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
                 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -qopt-report=3 -O3 -xHost -restrict")
                 message(STATUS "using intel compiler.")
-                if(USE_OPENMP)
-                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -openmp")
-                endif()
-
             elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM")
                 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -qopt-report=3 ")
-                if(USE_OPENMP)
-                    message(STATUS "Using Openmp")
-                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -openmp")
-                endif()
 
             elseif ( ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") )
                 find_package(LLVM REQUIRED)
@@ -140,11 +113,6 @@ else()
 
                 set(CMAKE_CXX_FLAGS "-stdlib=libc++ ${CMAKE_CXX_FLAGS}")
                 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ ")
-
-
-                if(USE_OPENMP)
-                    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp=libomp -flto=thin")
-                endif()
             endif()
             
 
@@ -250,17 +218,21 @@ else()
 
 endif()
 
+if(NOT MSVC)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wshadow -pedantic -Wold-style-cast -Wno-dangling-reference ")
+endif()
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+message(STATUS ${CMAKE_CXX_FLAGS})
 
 message(STATUS "${PYTHON_BINDINGS_SRC}")
 pybind11_add_module(ttnpp ${PYTHON_BINDINGS_SRC})
-target_include_directories(ttnpp PUBLIC ${TTNS_INCLUDE_DIRECTORIES} ${cereal_INCLUDE_DIR} ${spdlog_INCLUDE_DIR})
+target_include_directories(ttnpp SYSTEM PUBLIC ${TTNS_INCLUDE_DIRECTORIES} ${cereal_INCLUDE_DIR} ${spdlog_INCLUDE_DIR})
 
 if(USE_CUDA AND CMAKE_CUDA_COMPILER)
-    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver CUDA::curand CUDA::cutensor Thrust ) 
+    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} ${OpenMP_LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver CUDA::curand CUDA::cutensor Thrust ) 
     set_target_properties(ttnpp PROPERTIES CUDA_ARCHITECTURES "86")
 else()
-    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS}) 
+    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} ${OpenMP_LIBS}) 
 endif()
 
 if(APPLE)

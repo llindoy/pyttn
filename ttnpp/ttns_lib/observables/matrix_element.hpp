@@ -115,18 +115,18 @@ namespace ttns
     public:
         matrix_element() 
         {
-            logging::info("default constructed matrix element object.");
+            logging::debug("default constructed matrix element object.");
         }
         template <typename state_type>
         matrix_element(const state_type &A, size_type numbuff = 1, bool use_capacity = false) 
         { 
-            logging::info("constructing matrix element object with buffer allocated to store temporary arrays need to compute expectation values for a single ttn.");
+            logging::debug("constructing matrix element object with buffer allocated to store temporary arrays need to compute expectation values for a single ttn.");
             CALL_AND_HANDLE(resize(A, numbuff, use_capacity), "Failed to construct matrix_element object.  Failed to allocate internal buffers.");
         }
         template <typename state_type>
         matrix_element(const state_type &A, const state_type &B, size_type numbuff = 1, bool use_capacity = false) 
         { 
-            logging::info("constructing matrix element object with buffer allocated to store temporary arrays need to compute matrix elements values for two ttns.");
+            logging::debug("constructing matrix element object with buffer allocated to store temporary arrays need to compute matrix elements values for two ttns.");
             CALL_AND_HANDLE(resize(A, B, numbuff, use_capacity), "Failed to construct matrix_element object.  Failed to allocate internal buffers."); 
         }
 
@@ -143,7 +143,7 @@ namespace ttns
 
         void clear()
         {
-            logging::info("cleared matrix element object.");
+            logging::debug("cleared matrix element object.");
             try
             {
                 m_matel.clear();
@@ -207,7 +207,7 @@ namespace ttns
         template <typename state_type>
         void compute_norm_internal(const state_type &psi, bool use_sparsity, size_t set_index, size_t r = 0)
         {
-            logging::info("matrix element: computing norm.");
+            logging::debug("matrix element: computing norm.");
 
             try
             {
@@ -363,7 +363,7 @@ namespace ttns
         template <typename state_type, typename optype, typename mode_type>
         inline T expectation_value_internal(optype &&op, const mode_type &mode, const state_type &psi, bool use_sparsity = true)
         {
-            logging::info("matrix element: computing expectation value.");
+            logging::debug("matrix element: computing expectation value.");
 
             ASSERT(validate_operator(std::forward<optype>(op), mode, psi), "The mode that the input operator acts on is out of bounds.");
             CALL_AND_RETHROW(resize_to_fit(psi, psi));
@@ -511,7 +511,7 @@ namespace ttns
         template <typename state_type>
         T operator()(const state_type &bra, const state_type &ket)
         {
-            logging::info("matrix element: computing overlap.");
+            logging::debug("matrix element: computing overlap.");
 
             try
             {
@@ -553,7 +553,7 @@ namespace ttns
         template <typename state_type, typename mode_type, typename optype>
         inline T matrix_element_internal(optype &&op, const mode_type &mode, const state_type &bra, const state_type &ket)
         {
-            logging::info("matrix element: computing general matrix element.");
+            logging::debug("matrix element: computing general matrix element.");
 
             if (&bra == &ket)
             {

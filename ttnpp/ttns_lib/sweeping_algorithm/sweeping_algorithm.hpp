@@ -232,7 +232,7 @@ namespace ttns
         {
             static constexpr std::string_view info = " performing sweeping engine step";
             static constexpr auto joined = join_v<class_info, info>;
-            logging::info(joined);
+            logging::debug(joined);
             
             try
             {
@@ -270,7 +270,7 @@ namespace ttns
             static constexpr std::string_view info = " preparing environment tensors for sweeping algorithm loop.";
             static constexpr auto joined = join_v<class_info, info>;
 
-            logging::info(joined);
+            logging::debug(joined);
 
             // ASSERT(has_same_structure(A, op), "Incompatible tensor and environment object.");
             using common::rzip;
