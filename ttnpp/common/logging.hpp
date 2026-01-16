@@ -17,13 +17,13 @@ struct join
     static constexpr auto impl() noexcept
     {
         constexpr std::size_t len = (Strs.size() + ... + 0);
-        std::array<char, len + 1> arr{};
-        auto append = [i = 0, &arr](auto const& s) mutable {
-            for (auto c : s) arr[i++] = c;
+        std::array<char, len + 1> _arr{};
+        auto append = [i = 0, &_arr](auto const& s) mutable {
+            for (auto c : s) _arr[i++] = c;
         };
         (append(Strs), ...);
-        arr[len] = 0;
-        return arr;
+        _arr[len] = 0;
+        return _arr;
     }
     // Give the joined string static storage
     static constexpr auto arr = impl();

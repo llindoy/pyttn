@@ -225,7 +225,7 @@ namespace ttns
         void set_product(size_type sind, const std::vector<linalg::vector<U, be>> &ps, bool randomise_internal = true) { CALL_AND_RETHROW(this->_set_product(ps, sind, randomise_internal)); }
 
         template <typename Rvec>
-        void sample_product_state(size_type sind, std::vector<size_t> &state, const std::vector<Rvec> &relval, bool randomise_internal = true) { CALL_AND_RETHROW(this->_sample_product_state(state, relval, sind)); }
+        void sample_product_state(size_type sind, std::vector<size_t> &state, const std::vector<Rvec> &relval, bool randomise_internal = true) { CALL_AND_RETHROW(this->_sample_product_state(state, relval, sind, randomise_internal)); }
 
         template <typename U, typename int_type>
         void set_state(const std::vector<U> &coeff, const std::vector<std::vector<int_type>> &si, bool random_unoccupied_initialisation = false, bool randomise_internal = true)
@@ -337,7 +337,7 @@ namespace ttns
         size_type &nthreads() { return m_orthog.nthreads(); }
         void set_nthreads(size_t nthreads) const{m_orthog.nthreads() = nthreads;}
 
-        real_type bond_entropy(size_t bond_index)
+        real_type bond_entropy(size_t /*bond_index*/)
         {
             /*
                     try

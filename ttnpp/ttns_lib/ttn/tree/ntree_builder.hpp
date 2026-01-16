@@ -33,7 +33,7 @@ namespace ttns
         using leaf_index = std::vector<std::vector<size_type>>;
 
     protected:
-        static size_type get_nlevels_for_tree(size_type nchild, size_type nbranch)
+        static size_type get_nlevels_for_tree(size_type /*nchild*/, size_type /*nbranch*/)
         {
             return 1;
         }

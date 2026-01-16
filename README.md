@@ -83,10 +83,11 @@ Additional python dependencies introduced by the core functionality of the pyTTN
  - [h5py](https://www.h5py.org/) 
  - [numba](https://numba.pydata.org/)
 
-  Finally, full tree visualisation functionality provided by the `visualise_tree` function depends upon the packages
+Full tree visualisation functionality provided by the `visualise_tree` function depends upon the packages
  - [matplotlib](https://matplotlib.org/)
  - [pydot](https://github.com/pydot/pydot)
  - [graphviz](https://graphviz.org/)
+
 
 With the final two dependencies only required for use of improved tree plotting functionality, e.g. when using `prog = "dot"`.  In order to use this improved tree plotting functionality it is necessary to install the system graphviz in addition to the graphviz python package.
 
@@ -110,11 +111,18 @@ python3 -m pip install .
 
 ### Multithreaded Build
 
-By default, this will make use of a single threaded build for compiling the Pybind11 wrapper and can take a number of minutes to complete.  It is recommended to make use of multi-threaded builds when compiling the Pybind11.  This can be done by setting the environment variable `PARALLEL_BUILD_TTNPP`, e.g.
+By default, this will make use of a single threaded build for compiling the Pybind11 wrapper and can take a number of minutes to complete.  It is recommended to make use of multi-threaded builds when compiling the Pybind11.  This can be done by setting the environment variable `PYTTN_PARALLELISE_COMPILATION`, e.g.
 ```
-export PARALLEL_BUILD_TTNPP=8
+export PYTTN_PARALLELISE_COMPILATION=8
 ```
 to allow for the use of 8 threads when compiling.
+
+### Other Build Options
+
+Several other environment variables exist for altering the compilation of pyTTN.  These are:
+ - `PYTTN_SKIP_BUILD_TTNPP_LIBRARY`: A boolean flag that will skip the compilation of the underlying C++ module, useful when modifying the python interface.
+ - `PYTTN_CXX_COMPILER`: Allowing for the user to specialise an alternative C++ compiler compared to the default selected by CMake.
+ - `PYTTN_BUILD_SERIAL`: A boolean flag as to whether to build a serial or parallel version of pyTTN.  Setting this variable to `true` will disable OpenMP parallelisation.
 
 ### Selecting BLAS 
 

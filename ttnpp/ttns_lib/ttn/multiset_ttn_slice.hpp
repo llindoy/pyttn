@@ -152,13 +152,13 @@ namespace ttns
         using const_slice_data = const ttn_node_data<T, backend> &;
 
         template <typename U, typename be>
-        void set_slice(const ttn<U, be> &o, size_type sind)
+        void set_slice(const ttn<U, be> &/*o*/, size_type /*sind*/)
         {
             RAISE_EXCEPTION("Cannot assign const multiset storage slice.");
         }
 
         template <typename U, typename be, bool C2>
-        void set_slice(const multiset_ttn_slice<U, be, C2> &o, size_type sind, size_type sind2)
+        void set_slice(const multiset_ttn_slice<U, be, C2> &/*o*/, size_type /*sind*/, size_type /*sind2*/)
         {
             RAISE_EXCEPTION("Cannot assign const multiset storage slice.");
         }

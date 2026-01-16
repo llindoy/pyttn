@@ -114,7 +114,6 @@ namespace ttns
                     CALL_AND_HANDLE(temp[ti].resize(A().size(0), A().size(1)), "Failed to resize temporary array.");
                     CALL_AND_HANDLE(res[r].fill_zeros(), "Failed to fill array with zeros.");
 
-                    using spo_core = single_particle_operator_engine<T, backend>;
                     if (A.is_leaf())
                     {
                         for (size_type i = 0; i < hinf()[ind].nspf_terms(); ++i)

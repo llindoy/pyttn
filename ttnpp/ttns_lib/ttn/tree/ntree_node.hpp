@@ -186,7 +186,7 @@ namespace ttns
     protected:
         bool uninitialised() const { return (m_parent == nullptr && m_tree == nullptr); }
 
-        ntree_node(const ntree_node &node) : m_tree(node->m_node), m_parent(node->m_parent), m_children(node->m_children), m_data(node->m_data), m_size(node->m_size), m_nleaves(node->m_nleaves), m_level(0) {}
+        ntree_node(const ntree_node &node) : m_tree(node.m_tree), m_parent(node.m_parent), m_children(node.m_children), m_data(node.m_data), m_size(node.m_size), m_nleaves(node.m_nleaves), m_level(node.m_level) {}
         ntree_node(const value_type &val) : m_tree(nullptr), m_parent(nullptr), m_children(), m_data(val), m_size(1), m_nleaves(1), m_level(0) {}
 
         ntree_node &operator=(const ntree_node &other)
@@ -729,3 +729,4 @@ namespace ttns
 } // namespace ttns
 
 #endif //  PYTTN_TTNS_LIB_TTN_TREE_NTREE_NODE_HPP_ //
+

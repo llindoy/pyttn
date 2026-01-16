@@ -717,10 +717,8 @@ namespace ttns
             if (rbound.size() != nterms)
             {
                 // iterate over each subgraph
-                size_t sbpg_ind = 0;
                 for (const auto &g : sbpg)
                 {
-                    ++sbpg_ind;
                     utils::bipartite_matching bpm(g);
                     auto m = bpm.edges();
 

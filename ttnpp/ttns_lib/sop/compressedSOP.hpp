@@ -651,7 +651,7 @@ namespace ttns
     }; // class compressedSOP
 
     template <typename T>
-    std::ostream &operator<<(std::ostream &os, const compressedSOP<T> &op)
+    std::ostream &operator<<(std::ostream &/*os*/, const compressedSOP<T> &/*op*/)
     {
         RAISE_EXCEPTION("Stream operator not currently working for compressedSOP operator.");
         // if(!op.label().empty()){os << op.label() << ": " << std::endl;}

@@ -66,15 +66,15 @@ namespace ttns
         };
 
     public:
-        void initialise(const ttn_type &A, const environment_type &, container_type &ham, size_type set_var_nthreads = 1)
+        void initialise(const ttn_type &A, const environment_type &, container_type &ham, size_type /*set_var_nthreads*/ = 1)
         {
             ham.construct_topology(A);
         }
-        static inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, const parameter_list &, size_type set_var_nthreads = 1)
+        static inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, const parameter_list &, size_type /*set_var_nthreads*/ = 1)
         {
             CALL_AND_RETHROW(initialise(A, h, ham));
         }
-        static inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, parameter_list &&, size_type set_var_nthreads = 1)
+        static inline void initialise(const ttn_type &A, const environment_type &h, container_type &ham, parameter_list &&, size_type /*set_var_nthreads*/ = 1)
         {
             CALL_AND_RETHROW(initialise(A, h, ham));
         }

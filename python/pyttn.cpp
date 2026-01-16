@@ -141,6 +141,15 @@ PYBIND11_MODULE(ttnpp, m)
     {   
         spdlog::default_logger()->set_level(static_cast<spdlog::level::level_enum>(level));}
     );
+
+    py::enum_<spdlog::level::level_enum>(m, "LogLevel")
+        .value("trace", spdlog::level::level_enum::trace)
+        .value("debug", spdlog::level::level_enum::debug)
+        .value("info", spdlog::level::level_enum::info)
+        .value("warn", spdlog::level::level_enum::warn)
+        .value("err", spdlog::level::level_enum::err)
+        .value("critical", spdlog::level::level_enum::critical)
+        .value("off", spdlog::level::level_enum::off);
 #endif
 
     //

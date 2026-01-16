@@ -23,17 +23,19 @@ class CMakeExtension(Extension):
     def __init__(self, name: str, sourcedir: str = "") -> None:
         super().__init__(name, sources=[])
         self.sourcedir = os.fspath(Path(sourcedir).resolve())
-        rebuild_lib=os.environ.get('SKIP_BUILD_TTNPP_LIBRARY')
+        rebuild_lib=os.environ.get('PYTTN_SKIP_BUILD_TTNPP_LIBRARY')
         rebuild=True
         if rebuild_lib is not None:
             if rebuild_lib.lower() in ('true', '1', 't'):
                 rebuild = False
+        self.rebuild = rebuild
 
-        parallel_build=os.environ.get('PARALLEL_BUILD_TTNPP')
+        parallel_build=os.environ.get('PYTTN_PARALLELISE_COMPILATION')
         parallel=8
         if parallel_build is not None:
             if parallel_build.isdecimal():
                 parallel = int(parallel_build)
+        self.parallel=parallel
 
         print(rebuild_lib,file=sys.stderr)
         if rebuild:
@@ -41,9 +43,14 @@ class CMakeExtension(Extension):
         else:
             print("Reusing module",file=sys.stderr)
 
+        self.cxx_compiler_path=os.environ.get('PYTTN_CXX_COMPILER')
 
-        self.rebuild = rebuild
-        self.parallel=parallel
+        self.openmp = True
+        use_openmp=os.environ.get('PYTTN_BUILD_SERIAL')
+        if use_openmp is not None:
+            if use_openmp.lower() in ('true', '1', 't'):
+                self.openmp = False
+        
 
 class CMakeBuild(build_ext):
     def build_extension(self, ext: CMakeExtension) -> None:
@@ -68,12 +75,20 @@ class CMakeBuild(build_ext):
         cmake_args = [
             "-DBUILD_SRC=OFF",
             "-DBUILD_TESTS=OFF",
-            "-DUSE_OPENMP=ON",
             "-DBUILD_PYTHON_BINDINGS=ON",
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}{os.sep}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
             f"-DCMAKE_BUILD_TYPE={cfg}",  # not used on MSVC, but no harm
         ]
+
+        if ext.openmp:
+            cmake_args.append("-DUSE_OPENMP=ON")
+            print("building with OpenMP")
+
+        if ext.cxx_compiler_path is not None:
+            cmake_args.append(f"-DCMAKE_CXX_COMPILER={ext.cxx_compiler_path}")
+            print(f"building with {ext.cxx_compiler_path}")
+
         build_args = []
         # Adding CMake arguments set as environment variable
         # (needed e.g. to build for ARM OSx on conda-forge)

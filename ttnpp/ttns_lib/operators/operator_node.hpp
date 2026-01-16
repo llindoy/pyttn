@@ -386,7 +386,7 @@ namespace ttns
             return m_idmatspf;
         }
 
-        const linalg::matrix<T, B> &id_mf(size_t i) const
+        const linalg::matrix<T, B> &id_mf(size_t /*i*/) const
         {
             ASSERT(m_has_idmat, "Failed to access id matrix modes out of bounds.");
             return m_idmatmf;

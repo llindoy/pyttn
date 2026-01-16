@@ -97,8 +97,13 @@ namespace ttns
             }
         }
 
+#ifdef USE_OPENMP
         template <typename opnode>
         static inline void evaluate(const ms_cinfnode &hinf, const ms_hnode &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads=1, size_t set_var_nthreads=1)
+#else
+        template <typename opnode>
+        static inline void evaluate(const ms_cinfnode &hinf, const ms_hnode &A, buffer_type& buffer, opnode &h, size_t operator_sum_nthreads=1, size_t /*set_var_nthreads*/=1)
+#endif
         {
 #ifdef TRACE_LOG
             logging::trace("evaluating the value of a mean field operator given a site tensor and surrounding environment tensors.");
