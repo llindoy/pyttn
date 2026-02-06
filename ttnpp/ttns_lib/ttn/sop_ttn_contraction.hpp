@@ -173,7 +173,7 @@ namespace ttns
             // For all interior nodes.  This just corresponds to a kronecker product.
             // For all exterior nodes.  We actually need to perform the required contractions.
 #ifdef USE_OPENMP
-#pragma omp parallel for default(shared)
+#pragma omp parallel for default(shared) schedule(static)
 #endif
             for (size_type i = 0; i < A.size(); ++i)
             {

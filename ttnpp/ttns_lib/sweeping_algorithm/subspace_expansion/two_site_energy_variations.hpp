@@ -100,9 +100,7 @@ namespace ttns
                 const auto &a = A().as_matrix();
                 // compute the action of the Hamiltonian on the lower of the two nodes and store the result in res
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_HAMILTONIAN_SUM
-#pragma omp parallel for default(shared) schedule(dynamic, 1) num_threads(HA.size())
-#endif
+#pragma omp parallel for default(shared) schedule(static) num_threads(HA.size())
 #endif
                 for (size_type r = 0; r < hinds.size(); ++r)
                 {
@@ -165,9 +163,7 @@ namespace ttns
                 const auto &hinf_p = hinf.parent();
                 // compute the action of the Hamiltonian on the upper of the two nodes and store the result in res
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_HAMILTONIAN_SUM
-#pragma omp parallel for default(shared) schedule(dynamic, 1) num_threads(HA.size())
-#endif
+#pragma omp parallel for default(shared) schedule(static) num_threads(HA.size())
 #endif
                 for (size_type r = 0; r < hinds.size(); ++r)
                 {

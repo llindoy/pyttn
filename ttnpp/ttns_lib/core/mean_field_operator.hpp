@@ -150,7 +150,7 @@ namespace ttns
                 const auto &h_p = h.parent();
 
 #ifdef USE_OPENMP
-                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(dynamic, 1)
+                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(static)
 #endif
                 for (size_type ind = 0; ind < hinf.nterms(); ++ind)
                 {
@@ -243,7 +243,7 @@ namespace ttns
                 }
 
 #ifdef USE_OPENMP
-                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(dynamic, 1)
+                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(static)
 #endif
                 for (size_type ind = 0; ind < hinf.nterms(); ++ind)
                 {

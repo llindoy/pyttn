@@ -189,7 +189,7 @@ namespace ttns
                 }
 
 #ifdef USE_OPENMP
-                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(dynamic, 1) 
+                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(static) 
 #endif
                 for (size_type ind = 0; ind < cinf.nterms(); ++ind)
                 {
@@ -267,7 +267,7 @@ namespace ttns
 #endif
         {
 #ifdef USE_OPENMP
-#pragma omp parallel for num_threads( (buffer.buf < set_var_nthreads ? buffer.buf : set_var_nthreads)) default(shared) if (buffer.buf > 1 && cinf().size() > 1) 
+#pragma omp parallel for num_threads( (buffer.buf < set_var_nthreads ? buffer.buf : set_var_nthreads)) default(shared) if (buffer.buf > 1 && cinf().size() > 1)  schedule(static)
 #endif
             for (size_t row = 0; row < cinf().size(); ++row)
             {
@@ -296,7 +296,7 @@ namespace ttns
                 CALL_AND_HANDLE(hspf().resize_matrices(A.size(1), A.size(1)), "Failed to resize the single-particle Hamiltonian operator matrices.");
                 const auto &a = A.as_matrix();
 #ifdef USE_OPENMP
-                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(dynamic, 1)
+                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(static)
 #endif
                 for (size_type ind = 0; ind < cinf.nterms(); ++ind)
                 {    
@@ -353,7 +353,7 @@ namespace ttns
                 }
 
 #ifdef USE_OPENMP
-                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(dynamic, 1)
+                #pragma omp parallel for num_threads(operator_sum_nthreads) default(shared) schedule(static)
 #endif
                 for (size_type ind = 0; ind < cinf.nterms(); ++ind)
                 {
@@ -443,7 +443,7 @@ namespace ttns
 #endif
         {
 #ifdef USE_OPENMP
-#pragma omp parallel for default(shared) if (buffer.buf > 1 && cinf().size() > 1) num_threads( (buffer.buf < set_var_nthreads ? buffer.buf : set_var_nthreads))
+#pragma omp parallel for default(shared) if (buffer.buf > 1 && cinf().size() > 1) num_threads( (buffer.buf < set_var_nthreads ? buffer.buf : set_var_nthreads)) schedule(static)
 #endif
             for (size_t row = 0; row < cinf().size(); ++row)
             {

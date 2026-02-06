@@ -1017,7 +1017,7 @@ namespace ttns
         {
             orth.resize_data(A);
 #ifdef USE_OPENMP
-#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
+#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1) schedule(static)
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -1032,7 +1032,7 @@ namespace ttns
         {
             orth.resize_data(A);
 #ifdef USE_OPENMP
-#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
+#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1) schedule(static)
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -1049,7 +1049,7 @@ namespace ttns
         static void apply_to_node(node_type &A, orthogonality_type &orth)
         {
 #ifdef USE_OPENMP
-#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
+#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1) schedule(static)
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -1069,7 +1069,7 @@ namespace ttns
             ASSERT(orth.most_recent_node() == A.id(), "Cannot apply bond matrix to parent.  The most recently decomposed node is not this node.");
             // apply the action of the current bond matrix to the node.  Here this applies the matrix along the bond pointing down into the node
 #ifdef USE_OPENMP
-#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
+#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1) schedule(static)
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -1084,7 +1084,7 @@ namespace ttns
         {
             ASSERT(orth.most_recent_node() == A.parent().id(), "Cannot apply bond matrix from parent.  The most recently decomposed node is not the parent of this node.");
 #ifdef USE_OPENMP
-#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
+#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1) schedule(static)
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -1099,7 +1099,7 @@ namespace ttns
             ASSERT(orth.most_recent_node() == A.id(), "Cannot apply bond matrix to child.  The most recently decomposed node is not this node.");
             // apply the action of the current bond matrix to the node.  Here this applies the matrix along the bond pointing down into the node
 #ifdef USE_OPENMP
-#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
+#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1) schedule(static)
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -1114,7 +1114,7 @@ namespace ttns
             ASSERT(orth.most_recent_node() == A[mode].id(), "Cannot apply bond matrix from child.  The most recently decomposed node is not the expected child of this node.");
             // apply the action of the current bond matrix to the node.  Here this applies the matrix along the bond pointing down into the node
 #ifdef USE_OPENMP
-#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
+#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1) schedule(static)
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -1130,7 +1130,7 @@ namespace ttns
         static void shift_orthogonality_down(node_type &A, orthogonality_type &orth, size_type mode, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false)
         {
 #ifdef USE_OPENMP
-#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
+#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1) schedule(static)
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {
@@ -1149,7 +1149,7 @@ namespace ttns
         static void shift_orthogonality_up(node_type &A, orthogonality_type &orth, real_type tol = real_type(0), size_type nchi = 0, bool save_svd = false)
         {
 #ifdef USE_OPENMP
-#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1)
+#pragma omp parallel for num_threads(orth.nthreads()) default(shared) if (orth.parallelise() && A.nset() > 1) schedule(static)
 #endif
             for (size_type i = 0; i < A.nset(); ++i)
             {

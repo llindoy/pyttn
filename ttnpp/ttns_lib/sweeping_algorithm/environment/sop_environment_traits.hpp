@@ -49,7 +49,7 @@ namespace ttns
             buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 
 #ifdef USE_OPENMP
-            #pragma omp parallel for num_threads(opsum_nthreads) default(shared) schedule(dynamic, 1)
+            #pragma omp parallel for num_threads(opsum_nthreads) default(shared) schedule(static)
 #endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
@@ -116,7 +116,7 @@ namespace ttns
             buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 
 #ifdef USE_OPENMP
-            #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
+            #pragma omp parallel for num_threads(opsum_nthreads) default(shared) schedule(static)
 #endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
@@ -202,7 +202,7 @@ namespace ttns
                 buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 
 #ifdef USE_OPENMP
-                #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
+                 #pragma omp parallel for num_threads(opsum_nthreads) default(shared)  schedule(static)
 #endif
                 for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
                 {
@@ -301,7 +301,7 @@ namespace ttns
 
                 buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 #ifdef USE_OPENMP
-                #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
+                #pragma omp parallel for num_threads(opsum_nthreads) default(shared) schedule(static)
 #endif
                 for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
                 {
@@ -414,7 +414,7 @@ namespace ttns
 
             buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 #ifdef USE_OPENMP
-            #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
+            #pragma omp parallel for num_threads(opsum_nthreads) default(shared) schedule(static)
 #endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
@@ -508,7 +508,7 @@ namespace ttns
             buffer.reset_result_buffer(tid, opsum_nthreads, v.shape(0), v.shape(1));
 
 #ifdef USE_OPENMP
-            #pragma omp parallel for num_threads(opsum_nthreads) default(shared)
+            #pragma omp parallel for num_threads(opsum_nthreads) default(shared) schedule(static)
 #endif
             for (size_t indx = 0; indx < cinf.nterms() + nadd; ++indx)
             {
@@ -777,7 +777,7 @@ namespace ttns
                 {
                     const auto &cinf = hprim.contraction_info()[h.id()]();
 #ifdef USE_OPENMP
-                    #pragma omp parallel for num_threads(m_set_nthreads) default(shared) if (buffer.buf > 1 && v.size() > 1) 
+                    #pragma omp parallel for num_threads(m_set_nthreads) default(shared) if (buffer.buf > 1 && v.size() > 1)  schedule(static)
 #endif
                     for (size_t row = 0; row < v.size(); ++row)
                     {
@@ -846,7 +846,7 @@ namespace ttns
                 {
                     const auto &cinf = hprim.contraction_info()[h.id()]();
 #ifdef USE_OPENMP
-                    #pragma omp parallel for num_threads(m_set_nthreads) default(shared) if (buffer.buf > 1 && v.size() > 1) 
+                    #pragma omp parallel for num_threads(m_set_nthreads) default(shared) if (buffer.buf > 1 && v.size() > 1)  schedule(static)
 #endif
                     for (size_t row = 0; row < v.size(); ++row)
                     {
@@ -916,7 +916,7 @@ namespace ttns
                 {
                     const auto &cinf = hprim.contraction_info()[h.id()]();
 #ifdef USE_OPENMP
-                    #pragma omp parallel for num_threads(m_set_nthreads) default(shared) if (buffer.buf > 1 && v.size() > 1) 
+                    #pragma omp parallel for num_threads(m_set_nthreads) default(shared) if (buffer.buf > 1 && v.size() > 1)  schedule(static)
 #endif
                     for (size_t row = 0; row < v.size(); ++row)
                     {
