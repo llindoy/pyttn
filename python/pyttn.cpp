@@ -164,14 +164,16 @@ PYBIND11_MODULE(ttnpp, m)
     // initialise the blas backend objects
     initialise_blas_backend(m_linalg);
 
+
 #ifdef PYTTN_BUILD_CUDA
     // the GPU implementations
     initialise_tensors_cuda<pyttn_real_type>(m_linalg_gpu);
-    initialise_sparse_matrices_cuda<pyttn_real_type>(m_linalg_gpu);
-    initialise_orthogonal_vector<pyttn_real_type, linalg::cuda_backend>(m_linalg_gpu);
 
+    initialise_sparse_matrices_cuda<pyttn_real_type>(m_linalg_gpu);
+    //initialise_orthogonal_vector<pyttn_real_type, linalg::cuda_backend>(m_linalg_gpu);
     // initialise the cuda environment objects
     initialise_cuda_backend(m_linalg_gpu);
+
 #endif
 
     //
@@ -190,7 +192,6 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
     initialise_liouville_space<pyttn_real_type>(m);
     initialise_convert_to_dense<pyttn_real_type>(m);
-    initialise_Op<pyttn_real_type, linalg::blas_backend>(m);
 
     //
     // Wrap the models functionality included in SOP
@@ -200,7 +201,6 @@ PYBIND11_MODULE(ttnpp, m)
 #ifdef PYTTN_BUILD_CUDA
     // the GPU implementations
     initialise_operator_dictionary<pyttn_real_type, linalg::cuda_backend>(m_cuda);
-    initialise_Op<pyttn_real_type, linalg::cuda_backend>(m_cuda);
 
 #endif
 
@@ -212,8 +212,8 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_msttn<pyttn_real_type, linalg::blas_backend>(m);
 
 #ifdef PYTTN_BUILD_CUDA
-    initialise_ttn<pyttn_real_type, linalg::cuda_backend>(m_cuda);
-    initialise_msttn<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    //initialise_ttn<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    //initialise_msttn<pyttn_real_type, linalg::cuda_backend>(m_cuda);
 #endif
 
     initialise_matrix_element<pyttn_real_type, linalg::blas_backend>(m);
@@ -222,14 +222,17 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_site_operators<pyttn_real_type, linalg::blas_backend>(m_ops);
     initialise_product_operator<pyttn_real_type, linalg::blas_backend>(m);
     initialise_sop_operator<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_Op<pyttn_real_type, linalg::blas_backend>(m);
 
-#ifdef PYTTN_BUILD_CUDA
+#ifdef PYTTN_BUILD_CUDA_NO
     initialise_matrix_element<pyttn_real_type, linalg::cuda_backend>(m_cuda);
     initialise_rdm<pyttn_real_type, linalg::cuda_backend>(m_cuda);
 
     initialise_site_operators<pyttn_real_type, linalg::cuda_backend>(m_ops_gpu);
     initialise_product_operator<pyttn_real_type, linalg::cuda_backend>(m_cuda);
     initialise_sop_operator<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    initialise_Op<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+
 #endif
 
     //
@@ -241,11 +244,12 @@ PYBIND11_MODULE(ttnpp, m)
     initialise_tdvp<pyttn_real_type, linalg::blas_backend>(m);
     initialise_tdvp_adaptive<pyttn_real_type, linalg::blas_backend>(m);
 
-#ifdef PYTTN_BUILD_CUDA
+#ifdef PYTTN_BUILD_CUDA_NO
     initialise_dmrg<pyttn_real_type, linalg::cuda_backend>(m);
-    // initialise_dmrg_adaptive<pyttn_real_type, linalg::cuda_backend>(m);
+    initialise_dmrg_adaptive<pyttn_real_type, linalg::cuda_backend>(m);
 
     initialise_tdvp<pyttn_real_type, linalg::cuda_backend>(m);
-    // initialise_tdvp_adaptive<pyttn_real_type, linalg::cuda_backend>(m);
+    initialise_tdvp_adaptive<pyttn_real_type, linalg::cuda_backend>(m);
 #endif
+
 }

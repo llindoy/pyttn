@@ -69,6 +69,10 @@ namespace linalg
         static constexpr size_type rank = 1;
         static constexpr bool is_mutable = (!std::is_const<U>::value) && ctraits::is_mutable;
 
+        using value_type = typename traits<ArrType>::value_type;
+        using pointer = typename std::add_pointer<value_type>::type;
+        using const_pointer = typename std::add_pointer<typename std::add_const<value_type>::type>::type;
+
         static_assert(1 <= container_rank, "Invalid tensor_slice_traits object.  The dimension of the slice object must be less than the tensor slice dimension");
         using container_type = ArrType;
         using container_pointer = typename std::add_pointer<typename std::conditional<is_mutable, ArrType, typename std::add_const<ArrType>::type>::type>::type;

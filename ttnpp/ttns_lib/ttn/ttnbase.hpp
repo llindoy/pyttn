@@ -67,7 +67,7 @@ namespace ttns
 
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         using node_reference = typename base_type::node_reference;
         using const_node_reference = typename base_type::const_node_reference;

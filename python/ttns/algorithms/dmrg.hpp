@@ -115,7 +115,7 @@ void init_dmrg_core(py::module &m, const std::string &label)
             :type update_env: bool, optional
           )mydelim")
         .def("backend", [](const dmrg &)
-             { return backend::label(); })
+             { return linalg::traits<backend>::label(); })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const dmrg & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -260,7 +260,7 @@ void init_dmrg_adaptive(py::module &m, const std::string &label)
             :type attempt_expansion: bool, optional
           )mydelim")
         .def("backend", [](const admrg &)
-             { return backend::label(); })
+             { return linalg::traits<backend>::label(); })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const admrg & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -298,7 +298,7 @@ void init_dmrg_subspace(py::module &m, const std::string &label)
 template <typename real_type, typename backend>
 void initialise_dmrg(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
     // init_dmrg<real_type, backend>(m, "real");
@@ -309,7 +309,7 @@ void initialise_dmrg(py::module &m)
 template <typename real_type, typename backend>
 void initialise_dmrg_adaptive(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
     // init_dmrg<real_type, backend>(m, "real");

@@ -29,6 +29,7 @@ try:
         mulitset_one_site_dmrg_complex as multiset_one_site_dmrg_complex_cuda,
     )
     from pyttn.ttnpp.cuda import one_site_dmrg_complex as one_site_dmrg_complex_cuda
+    from pyttn.ttnpp.cuda import adaptive_one_site_dmrg_complex as adaptive_one_site_dmrg_complex_cuda
 
     _cuda_import = True
 
@@ -76,9 +77,7 @@ def _subspace_dmrg_blas(A, H, **kwargs):
 
 def _subspace_dmrg_cuda(A, H, **kwargs):
     if isinstance(A, ttn) and isinstance(H, sop_operator):
-        raise RuntimeError(
-            "Subspace expansion based integrator has not yet been implemented for CUDA"
-        )
+        return adaptive_one_site_dmrg_complex_cuda(A, H, **kwargs)
     elif isinstance(A, ms_ttn) and isinstance(H, ms_sop_operator):
         raise RuntimeError(
             "Subspace expansion based integrator has not yet been implemented for Multiset TTNs"

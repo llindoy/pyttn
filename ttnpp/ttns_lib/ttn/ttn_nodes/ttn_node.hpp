@@ -34,8 +34,8 @@ namespace ttns
     {
     public:
         using matrix_type = linalg::matrix<T, backend>;
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
     protected:
         std::vector<size_type> m_mode_dims;
@@ -1000,8 +1000,8 @@ namespace ttns
         using value_type = node_data_type<T, backend>;
         using tree_type = tree_base<value_type>;
         using base_type = tree_node_base<tree_type>;
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using node_type = typename tree_type::node_type;
         using orthogonality_type = typename node_type::orthogonality_type;
 
@@ -1176,8 +1176,8 @@ namespace ttns
         using value_type = ttn_node_data<T, backend>;
         using tree_type = tree_base<value_type>;
         using base_type = tree_node_base<tree_type>;
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using node_type = typename tree_type::node_type;
         using self_type = node_type;
         using node_helper = ttn_node_helper<ttn_node_data, T, backend>;
@@ -1446,7 +1446,7 @@ namespace ttns
         real_type norm() const
         {
             auto vec = m_data.as_rank_1();
-            return std::sqrt(linalg::real(linalg::dot_product(linalg::conj(vec), vec)));
+            return std::sqrt(std::real(linalg::dot_product(linalg::conj(vec), vec)));
         }
 
         template <typename U>

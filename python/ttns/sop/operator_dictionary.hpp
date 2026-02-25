@@ -19,13 +19,6 @@
 #include <ttns_lib/operators/sop_operator.hpp>
 #include <sstream>
 
-#include <pybind11/operators.h>
-#include <pybind11/stl.h>
-#include <pybind11/cast.h>
-#include <pybind11/stl_bind.h>
-#include <pybind11/pytypes.h>
-#include <pybind11/complex.h>
-#include <pybind11/functional.h>
 
 namespace py = pybind11;
 
@@ -83,7 +76,7 @@ void init_operator_dictionary(py::module &m, const std::string &label)
             }
             return oss.str(); })
         .def("backend", [](const opdict &)
-             { return backend::label(); })
+             { return linalg::traits<backend>::label(); })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const opdict & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -103,7 +96,7 @@ void init_operator_dictionary(py::module &m, const std::string &label)
 template <typename real_type, typename backend>
 void initialise_operator_dictionary(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
 
     init_operator_dictionary<real_type, backend>(m, "real");
     init_operator_dictionary<complex_type, backend>(m, "complex");

@@ -99,7 +99,7 @@ void init_state(py::module &m, const std::string &label)
      using value_type = T;
      using numpy_value_type = typename linalg::numpy_converter<T>::type;
      using real_type = typename linalg::get_real_type<T>::type;
-     using complex_type = linalg::complex<real_type>;
+     using complex_type = std::complex<real_type>;
      using numpy_complex_type = typename linalg::numpy_converter<complex_type>::type;
 
      using _sepState = ttns::sepState<T>;

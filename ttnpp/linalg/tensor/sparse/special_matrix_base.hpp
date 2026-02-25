@@ -16,8 +16,8 @@
 #define PYTTN_LINALG_TENSOR_SPARSE_SPECIAL_MATRIX_BASE_HPP_
 
 #include <vector>
-#include "../../linalg_forward_decl.hpp"
 #include "../../utils/serialisation.hpp"
+#include "../../linalg_forward_decl.hpp"
 
 namespace linalg
 {
@@ -45,7 +45,7 @@ namespace linalg
         using traits_type = traits<impl>;
         using backend_type = typename traits_type::backend_type;
         using value_type = typename traits_type::value_type;
-        using size_type = typename backend_type::size_type;
+        using size_type = typename traits<backend_type>::size_type;
 
         static constexpr size_type rank = traits_type::rank;
 

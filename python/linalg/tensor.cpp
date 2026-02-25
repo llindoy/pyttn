@@ -19,7 +19,14 @@
 template <>
 void initialise_tensors<pyttn_real_type>(py::module &m);
 
-#ifdef PYTTN_BUILD_CUDA
-template <>
-void initialise_tensors_cuda<pyttn_real_type>(py::module &m);
-#endif
+//#ifdef PYTTN_BUILD_CUDA
+//extern template class linalg::tensor<pyttn_real_type, 1, linalg::cuda_backend>;
+//extern template class linalg::tensor<pyttn_real_type, 2, linalg::cuda_backend>;
+//extern template class linalg::tensor<pyttn_real_type, 3, linalg::cuda_backend>;
+//extern template class linalg::tensor<pyttn_real_type, 4, linalg::cuda_backend>;
+//
+//extern template class linalg::tensor<std::complex<pyttn_real_type>, 1, linalg::cuda_backend>;
+//extern template class linalg::tensor<std::complex<pyttn_real_type>, 2, linalg::cuda_backend>;
+//extern template class linalg::tensor<std::complex<pyttn_real_type>, 3, linalg::cuda_backend>;
+//extern template class linalg::tensor<std::complex<pyttn_real_type>, 4, linalg::cuda_backend>;
+//#endif

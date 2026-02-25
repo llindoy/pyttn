@@ -174,7 +174,7 @@ void init_matrix_element(py::module &m, const std::string &label)
       .def("__call__", [](matel &o, ms_sop_op &sop, const _msttn &A, const _msttn &B)
            { return _T(o(sop, A, B)); })
       .def("backend", [](const matel &)
-           { return backend::label(); });
+           { return linalg::traits<backend>::label(); });
 
   // inline typename std::enable_if<std::is_base_of<op_base, op_type>::value, std::vector<T>&>::type operator()(std::vector<site_operator<T, backend>>& op, size_type mode, const state_type& bra, const state_type& ket, std::vector<T>& res)
   // inline std::vector<T>& operator()(std::vector<std::vector<site_operator<T, backend>>& ops, const std::vector<size_type>& modes, const state_type& bra, const state_type& ket, std::vector<T>& res)
@@ -183,7 +183,7 @@ void init_matrix_element(py::module &m, const std::string &label)
 template <typename real_type, typename backend>
 void initialise_matrix_element(py::module &m)
 {
-  using complex_type = linalg::complex<real_type>;
+  using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
   init_matrix_element<real_type, backend>(m, "real");

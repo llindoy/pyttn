@@ -33,7 +33,7 @@ namespace py = pybind11;
 template <typename real_type>
 void init_sSOP(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
     using numpy_complex_type = typename linalg::numpy_converter<complex_type>::type;
     using namespace ttns;
     using namespace literal;

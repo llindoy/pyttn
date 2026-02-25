@@ -33,8 +33,8 @@ namespace ttns
     {
     public:
         using backend_type = B;
-        using size_type = typename backend_type::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend_type>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
     protected:
         std::vector<linalg::matrix<T, B>> m_data;

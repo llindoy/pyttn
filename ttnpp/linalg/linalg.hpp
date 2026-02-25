@@ -15,9 +15,12 @@
 #ifndef PYTTN_LINALG_LINALG_HPP_
 #define PYTTN_LINALG_LINALG_HPP_
 
-#include "utils/linalg_utils.hpp"
+#include "linalg_forward_decl.hpp"
 #include "dense.hpp"
 #include "sparse.hpp"
+#include "backends/blas/blas_backend.hpp"
+
+#include "utils/genrandom.hpp"
 #include "utils/orthogonal_vector.hpp"
 
 #endif // PYTTN_LINALG_LINALG_HPP_

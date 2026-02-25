@@ -29,17 +29,32 @@ check_language(CUDA)
 #attempt to set up cuda if the user has requested it and cuda is installed
 if(USE_CUDA AND CMAKE_CUDA_COMPILER)
     add_definitions(-DPYTTN_BUILD_CUDA)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 
     set(CUTENSOR_INCLUDE /usr/include)
     set(CUTENSOR_LIBRARY_PATH /usr/lib/x86_64-linux-gnu/)
     enable_language(CUDA)
     find_package(CUDAToolkit REQUIRED)
-    find_package(Thrust REQUIRED)
     find_package(CUTENSOR REQUIRED)
-    thrust_create_target(Thrust)
 
     message(STATUS ${CUTENSOR_LIBRARY})
     message(STATUS ${CUTENSOR_INCLUDE_PATH})
+
+    add_library(cudalib OBJECT 
+        cuda/cuda_backend.cu cuda/cuda_environment.cu cuda/cuda_kernels.cu
+        cuda/linalg/sparseMatrix.cu cuda/linalg/tensor.cu cuda/linalg/orthogonal_vector_gen.cu
+        cuda/ttns/sop/operator_dictionary.cu          
+        #cuda/ttns/ttn/ttn.cu #cuda/ttns/ttn/ms_ttn.cu
+        #cuda/ttns/observables/matrix_element.cu cuda/ttns/observables/rdm.cu 
+        #cuda/ttns/operators/siteOperators.cu cuda/ttns/operators/product_operator.cu cuda/ttns/operators/sop_operator.cu cuda/ttns/operators/Op.cu
+        #cuda/ttns/algorithms/tdvp.cu cuda/ttns/algorithms/dmrg.cu   
+        )
+
+    set_target_properties(cudalib PROPERTIES
+        CUDA_SEPARABLE_COMPILATION ON
+        POSITION_INDEPENDENT_CODE ON
+    )
 
     set(PYTHON_BINDINGS_SRC pyttn.cpp 
           linalg/tensor.cpp linalg/sparseMatrix.cpp linalg/backend.cpp linalg/orthogonal_vector_gen.cpp
@@ -51,18 +66,16 @@ if(USE_CUDA AND CMAKE_CUDA_COMPILER)
           ttns/operators/siteOperators.cpp ttns/operators/product_operator.cpp ttns/operators/sop_operator.cpp ttns/operators/Op.cpp
           ttns/algorithms/tdvp.cpp ttns/algorithms/dmrg.cpp
           )
-    set_source_files_properties(${PYTHON_BINDINGS_SRC} PROPERTIES LANGUAGE CUDA)
-    if(COMPILER_SET)
-    else()
-        set(CMAKE_CUDA_FLAGS " -x cu -Xptxas -O3 -g --extended-lambda ${CMAKE_CUDA_FLAGS}")
+        #set_source_files_properties(${PYTHON_BINDINGS_SRC} PROPERTIES LANGUAGE CUDA)
 
-        if(NOT DEFINED CMAKE_CUDA_STANDARD)
-            set(CMAKE_CUDA_STANDARD 17)
-            set(CMAKE_CUDA_STANDARD_REQUIRED ON)
-        endif()
+        set(CMAKE_CUDA_FLAGS "-v -Xptxas -O3 --extended-lambda ${CMAKE_CUDA_FLAGS}")
+        set(CMAKE_CUDA_STANDARD 17)
+        set(CMAKE_CXX_STANDARD 17)
+        set(CMAKE_CUDA_STANDARD_REQUIRED ON)
+        set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 
         set(LINALG_LIBS ${LINALG_LIBS} ${LLVM_LIBRARIES} ${CLANG_LIBS} ${CUDA_cusparse_LIBRARY})
-    endif()
 else()
     set(PYTHON_BINDINGS_SRC pyttn.cpp 
           utils/orthopol.cpp utils/discretisation.cpp
@@ -120,7 +133,7 @@ else()
                 set(CMAKE_USE_PTHREADS_INIT 1)
                 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-                set(CMAKE_CXX_FLAGS "-stdlib=libc++ ${CMAKE_CXX_FLAGS}")
+                set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS}")
                 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ ")
 
             endif()
@@ -239,8 +252,14 @@ pybind11_add_module(ttnpp ${PYTHON_BINDINGS_SRC})
 target_include_directories(ttnpp SYSTEM PUBLIC ${TTNS_INCLUDE_DIRECTORIES} ${cereal_INCLUDE_DIR} ${spdlog_INCLUDE_DIR})
 
 if(USE_CUDA AND CMAKE_CUDA_COMPILER)
-    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} ${OpenMP_LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver CUDA::curand CUDA::cutensor Thrust ) 
     set_target_properties(ttnpp PROPERTIES CUDA_ARCHITECTURES "86")
+    set_target_properties(ttnpp PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    target_include_directories(cudalib SYSTEM PUBLIC ${TTNS_INCLUDE_DIRECTORIES} ${cereal_INCLUDE_DIR} ${spdlog_INCLUDE_DIR})
+    target_sources(ttnpp PRIVATE $<TARGET_OBJECTS:cudalib>)
+    #target_link_libraries(cudalib ${LINALG_LIBS} ${LIBS} ${OpenMP_LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver CUDA::curand CUDA::cutensor cUDA::cudart) 
+
+    target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} ${OpenMP_LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver CUDA::curand CUDA::cutensor CUDA::cudart ) 
+
 else()
     target_link_libraries(ttnpp PUBLIC pybind11::module ${LINALG_LIBS} ${LIBS} ${OpenMP_LIBS}) 
 endif()

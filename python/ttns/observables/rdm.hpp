@@ -59,13 +59,13 @@ void init_rdm(py::module &m, const std::string &label)
       .def("__call__", [](_rdm &o, _ttn& A, size_t m1, size_t m2){matrix_type mat; o(A, m1, m2, mat); return mat;})
 
       .def("backend", [](const _rdm &)
-           { return backend::label(); });
+           { return linalg::traits<backend>::label(); });
 }
 
 template <typename real_type, typename backend>
 void initialise_rdm(py::module &m)
 {
-  using complex_type = linalg::complex<real_type>;
+  using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
   init_rdm<real_type, backend>(m, "real");

@@ -21,16 +21,15 @@ namespace linalg
 {
     namespace internal
     {
-
         template <typename T, typename backend>
         struct hermitian_eigensolver_helper;
-
+    
         template <typename T>
         struct hermitian_eigensolver_helper<T, blas_backend>
         {
-            using int_type = blas_backend::int_type;
+            using int_type = typename traits<blas_backend>::int_type;
             static_assert(is_number<T>::value && !is_complex<T>::value, "Failed to initialise hermitian eigensolver working space object.");
-            using size_type = blas_backend::size_type;
+            using size_type = typename traits<blas_backend>::size_type;
 
             struct additional_working
             {
@@ -52,11 +51,11 @@ namespace linalg
         };
 
         template <typename T>
-        struct hermitian_eigensolver_helper<complex<T>, blas_backend>
+        struct hermitian_eigensolver_helper<std::complex<T>, blas_backend>
         {
-            using int_type = blas_backend::int_type;
+            using int_type = typename traits<blas_backend>::int_type;
             static_assert(is_number<T>::value, "Failed to initialise hermitian eigensolver working space object.");
-            using size_type = blas_backend::size_type;
+            using size_type = typename traits<blas_backend>::size_type;
 
             struct additional_working
             {
@@ -65,109 +64,18 @@ namespace linalg
                 void clear() { CALL_AND_RETHROW(m_rwork.clear()); }
             };
 
-            static inline void call(const char JOBZ, const char UPLO, const int_type N, complex<T> *A, const int_type LDA, T *W, complex<T> *WORK, const int_type LWORK, additional_working &working)
+            static inline void call(const char JOBZ, const char UPLO, const int_type N, std::complex<T> *A, const int_type LDA, T *W, std::complex<T> *WORK, const int_type LWORK, additional_working &working)
             {
                 CALL_AND_RETHROW(blas_backend::heev(JOBZ, UPLO, N, A, LDA, W, WORK, LWORK, working.m_rwork.buffer()););
             }
-            static inline int_type query_worksize(const char JOBZ, const char UPLO, const int_type N, complex<T> *A, const int_type LDA, T *W, additional_working &working)
+            static inline int_type query_worksize(const char JOBZ, const char UPLO, const int_type N, std::complex<T> *A, const int_type LDA, T *W, additional_working &working)
             {
-                complex<T> worksize;
+                std::complex<T> worksize;
                 int_type lwork = -1;
                 CALL_AND_HANDLE(blas_backend::heev(JOBZ, UPLO, N, A, LDA, W, &worksize, lwork, working.m_rwork.buffer()), "Failed to query the optimal workspace for the eigensolver.");
                 CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
             }
         };
-
-#ifdef PYTTN_BUILD_CUDA
-        template <typename T>
-        struct hermitian_eigensolver_helper<T, cuda_backend>
-        {
-            static_assert(is_number<T>::value, "Failed to initialise hermitian eigensolver working space object.");
-            using size_type = cuda_backend::size_type;
-            using int_type = cuda_backend::int_type;
-
-            struct additional_working
-            {
-                tensor<int, 1, cuda_backend> m_gpu_info;
-                tensor<int, 1> m_cpu_info;
-                void resize(size_type n)
-                {
-                    if (m_gpu_info.size() == 0)
-                    {
-                        m_gpu_info.resize(1);
-                        m_cpu_info.resize(1);
-                    }
-                }
-                void clear() {}
-            };
-
-            static inline void call(const char JOBZ, const char UPLO, const int_type N, T *A, const int_type LDA, typename get_real_type<T>::type *W, T *WORK, const int_type LWORK, additional_working &working)
-            {
-                int_type n = N;
-                int_type lda = LDA;
-                int_type lwork = LWORK;
-                cusolverEigMode_t jobz;
-                CALL_AND_RETHROW(jobz = get_jobz(JOBZ));
-                cublasFillMode_t uplo;
-                CALL_AND_RETHROW(uplo = get_uplo(UPLO));
-
-                CALL_AND_RETHROW(cuda_backend::heev(jobz, uplo, n, A, lda, W, WORK, lwork, working.m_gpu_info.buffer());)
-                working.m_cpu_info = working.m_gpu_info;
-                CALL_AND_RETHROW(cusolver::heev_error_handling(working.m_cpu_info(0), 'a'));
-            }
-
-            static inline int_type query_worksize(const char JOBZ, const char UPLO, const int_type N, T *A, const int_type LDA, typename get_real_type<T>::type *W, additional_working & /* working */)
-            {
-                int_type n = N;
-                int_type lda = LDA;
-                cusolverEigMode_t jobz;
-                CALL_AND_RETHROW(jobz = get_jobz(JOBZ));
-                cublasFillMode_t uplo;
-                CALL_AND_RETHROW(uplo = get_uplo(UPLO));
-                int_type worksize;
-                CALL_AND_RETHROW(cuda_backend::heev_buffersize(jobz, uplo, n, A, lda, W, &worksize);)
-                return worksize;
-            }
-
-            static inline cusolverEigMode_t get_jobz(const char JOBZ)
-            {
-                switch (JOBZ)
-                {
-                case ('N'):
-                {
-                    return CUSOLVER_EIG_MODE_NOVECTOR;
-                }
-                case ('V'):
-                {
-                    return CUSOLVER_EIG_MODE_VECTOR;
-                }
-                default:
-                {
-                    RAISE_EXCEPTION("Invalid JOBZ argument.");
-                }
-                };
-            }
-
-            static inline cublasFillMode_t get_uplo(const char UPLO)
-            {
-                switch (UPLO)
-                {
-                case ('U'):
-                {
-                    return CUBLAS_FILL_MODE_UPPER;
-                }
-                case ('L'):
-                {
-                    return CUBLAS_FILL_MODE_LOWER;
-                }
-                default:
-                {
-                    RAISE_EXCEPTION("Invalid UPLO argument.");
-                }
-                };
-            }
-        };
-#endif
 
         template <typename matrix_type>
         class hermitian_eigensolver
@@ -177,7 +85,7 @@ namespace linalg
         public:
             using value_type = typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
             using helper = hermitian_eigensolver_helper<value_type, backend_type>;
             using int_type = typename helper::int_type;

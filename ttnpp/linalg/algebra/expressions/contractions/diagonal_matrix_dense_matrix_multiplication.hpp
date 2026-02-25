@@ -33,7 +33,7 @@ namespace linalg
         public:
             static_assert(dense_type::rank == 2, "Failed to construct matrix_matrix_product object.  The two input tensor must both be rank 2.");
             using backend_type = typename traits<dense_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using left_type = sparse_type;
             using right_type = dense_type;
             using lvalue_type = typename traits<left_type>::value_type;

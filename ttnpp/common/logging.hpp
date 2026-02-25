@@ -28,7 +28,7 @@ struct join
     // Give the joined string static storage
     static constexpr auto arr = impl();
     // View as a std::string_view
-    static constexpr std::string_view value {arr.data(), arr.size() - 1};
+    static constexpr std::string_view value = std::string_view(arr.data(), (arr.size() - 1));
 };
 // Helper to get the value out
 template <std::string_view const&... Strs>

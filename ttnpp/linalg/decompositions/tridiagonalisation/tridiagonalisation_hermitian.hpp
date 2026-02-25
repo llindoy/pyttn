@@ -32,9 +32,9 @@ namespace linalg
             using value_type = typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using real_type = typename get_real_type<value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
-            using int_type = typename backend_type::int_type;
+            using int_type = typename traits<backend_type>::int_type;
 
         protected:
             tensor<value_type, 1, backend_type> m_work;

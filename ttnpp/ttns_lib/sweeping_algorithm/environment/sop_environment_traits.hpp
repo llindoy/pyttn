@@ -583,7 +583,7 @@ namespace ttns
         using bond_matrix_type = typename hnode::bond_matrix_type;
 
         using node_type = typename container_type::node_type;
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
     public:
         class bond_action
@@ -732,7 +732,7 @@ namespace ttns
         using bond_matrix_type = typename ms_hnode::bond_matrix_type;
 
         using node_type = typename container_type::node_type;
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         using ttn_type = ms_ttn<T, backend>;
 

@@ -12,15 +12,18 @@
  * limitations under the License
  */
 
-#ifndef PYTTN_LINALG_TENSOR_DENSE_TENSOR_HPP_
-#define PYTTN_LINALG_TENSOR_DENSE_TENSOR_HPP_
+#ifndef PYTTN_LINALG_TENSOR_DENSE_TENSOR_BASE_HPP_
+#define PYTTN_LINALG_TENSOR_DENSE_TENSOR_BASE_HPP_
 
 #include "../../linalg_forward_decl.hpp"
-#include "../../linalg_traits.hpp"
+#include "../../linalg_type_traits.hpp"
+
 #include "tensor_view.hpp"
 #include "tensor_details.hpp"
 #include "tensor_slice_traits.hpp"
+
 #include "../../utils/serialisation.hpp"
+#include "../../utils/memory_helper.hpp"
 
 
 // TODO: Implement stl allocators (and potentially an aligned allocator) to handle memory rather than the hacky approach I have currently taken.
@@ -63,7 +66,7 @@ namespace linalg
     public:
         using backend_type = typename traits<tensor_impl>::backend_type;
         using value_type = typename traits<tensor_impl>::value_type;
-        using size_type = typename backend_type::size_type;
+        using size_type = typename traits<backend_type>::size_type;
         static constexpr size_type rank = traits<tensor_impl>::rank;
 
         using pointer = typename std::add_pointer<value_type>::type;
@@ -828,211 +831,16 @@ namespace linalg
         }
     }; // class tensor
 
+
     ///////////////////////////////////////////////////////////////////////////////////////
-    // D dimensional implementation of the general tensor object for use with the blas   //
+    // D dimensional interfaces of the general tensor object for use with the general    //
     //                                     backend                                       //
     ///////////////////////////////////////////////////////////////////////////////////////
-    template <typename T, size_t D>
-    class tensor<T, D, blas_backend> : public tensor_base<tensor<T, D, blas_backend>>
+    template <typename T, size_t D, typename backend>
+    class tensor : public tensor_base<tensor<T, D, backend>>
     {
     public:
-        using self_type = tensor<T, D, blas_backend>;
-        using size_type = typename traits<self_type>::size_type;
-        using base_type = tensor_base<self_type>;
-
-        using value_type = T;
-        using reference = typename std::add_lvalue_reference<T>::type;
-        using const_reference = typename std::add_lvalue_reference<typename std::add_const<T>::type>::type;
-
-        using const_slice_traits = tensor_slice_traits<self_type, typename std::add_const<T>::type, D>;
-        using slice_traits = tensor_slice_traits<self_type, T, D>;
-
-        using const_slice_type = typename const_slice_traits::slice_type;
-        using slice_type = typename slice_traits::slice_type;
-
-        friend class internal::tensor_buffer_swap;
-
-    protected:
-        using base_type::m_buffer;
-        using base_type::m_shape;
-        using base_type::m_stride;
-        using base_type::m_totsize;
-
-    public:
-        template <typename... Args>
-        tensor(Args &&...args)
-        try : base_type(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct tensor object.");
-        }
-        template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(base_type::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
-
-        // accessor operator[] for returning slices
-        inline slice_type operator[](size_type i) { return slice_traits::make(this, i); }
-        inline const_slice_type operator[](size_type i) const { return const_slice_traits::make(this, i); }
-        inline slice_type slice(size_type i)
-        {
-            ASSERT(internal::compare_bounds(i, m_shape[0]), "Unable to return slice of array.  Slice index out of bounds.");
-            return slice_traits::make(this, i);
-        }
-        inline const_slice_type slice(size_type i) const
-        {
-            ASSERT(internal::compare_bounds(i, m_shape[0]), "Unable to return slice of array.  Slice index out of bounds.");
-            return const_slice_traits::make(this, i);
-        }
-
-        // accessor which accesses the tensor as a 1d array
-        inline reference operator()(size_type index) { return m_buffer[index]; }
-        inline const_reference operator()(size_type index) const { return m_buffer[index]; }
-        inline reference at(size_type i)
-        {
-            ASSERT(internal::compare_bounds(i, m_totsize), "Unable to access tensor element using at.  Index out of bounds.");
-            return m_buffer[i];
-        }
-        inline const_reference at(size_type i) const
-        {
-            ASSERT(internal::compare_bounds(i, m_totsize), "Unable to access tensor element using at.  Index out of bounds.");
-            return m_buffer[i];
-        }
-
-        // general accessor functions
-        template <typename... Inds>
-        inline reference operator()(Inds... indices)
-        {
-            static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
-            return m_buffer[get_index<pack_type>(indices...)];
-        }
-
-        template <typename... Inds>
-        inline const_reference operator()(Inds... indices) const
-        {
-            static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
-            return m_buffer[get_index<pack_type>(indices...)];
-        }
-
-        template <typename... Inds>
-        inline reference at(Inds... indices)
-        {
-            static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
-            size_type index;
-            CALL_AND_HANDLE(index = get_index_bounds_check<pack_type>(indices...), "Unable to access tensor element.  Failed to determine flattened index.");
-            return m_buffer[index];
-        }
-
-        template <typename... Inds>
-        inline const_reference at(Inds... indices) const
-        {
-            static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
-            size_type index;
-            CALL_AND_HANDLE(index = get_index_bounds_check<pack_type>(indices...), "Unable to access tensor element.  Failed to determine flattened index.");
-            return m_buffer[index];
-        }
-
-    private:
-        ///@cond INTERNAL - we might want to move this elsewhere - this should be common to all dense tensor types.
-        // get the index in the array corresponding to the parameter pack.
-        template <typename IntegerType, typename... Args>
-        inline size_type get_index_bounds_check(IntegerType i, Args... args) const
-        {
-            ASSERT(internal::compare_bounds(i, m_shape[D - sizeof...(args) - 1]), "Unable to get flattened index.  One of the unflattened indices was out of bounds.");
-            CALL_AND_HANDLE(return i * m_stride[D - sizeof...(args) - 1] + get_index_bounds_check<IntegerType>(args...), "Unable to get flattened index.  Error on iterated get_index call.");
-        }
-        template <typename IntegerType>
-        inline size_type get_index_bounds_check(IntegerType i) const
-        {
-            ASSERT(internal::compare_bounds(i, m_shape[D - 1]), "Unable to get flattened index.  Final unflattened index was out of bounds.");
-            return i;
-        }
-
-        template <typename IntegerType, typename... Args>
-        inline size_type get_index(IntegerType i, Args... args) const { return i * m_stride[D - sizeof...(args) - 1] + get_index<IntegerType>(args...); }
-        template <typename IntegerType>
-        inline size_type get_index(IntegerType i) const { return i; }
-        ///@endcond
-    }; // class tensor
-
-    template <typename T>
-    class tensor<T, 1, blas_backend> : public tensor_base<tensor<T, 1, blas_backend>>
-    {
-    public:
-        using self_type = tensor<T, 1, blas_backend>;
-        using size_type = typename blas_backend::size_type;
-        using base_type = tensor_base<self_type>;
-
-        using value_type = T;
-        using reference = typename std::add_lvalue_reference<T>::type;
-        using const_reference = typename std::add_lvalue_reference<typename std::add_const<T>::type>::type;
-
-        friend class internal::tensor_buffer_swap;
-
-    protected:
-        using base_type::m_buffer;
-        using base_type::m_totsize;
-
-    public:
-        template <typename... Args>
-        tensor(Args &&...args)
-        try : base_type(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct tensor object.");
-        }
-        template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(base_type::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
-
-        inline reference operator[](size_type i) { return m_buffer[i]; }
-        inline reference operator()(size_type i) { return m_buffer[i]; }
-        inline const_reference operator[](size_type i) const { return m_buffer[i]; }
-        inline const_reference operator()(size_type i) const { return m_buffer[i]; }
-
-        inline reference slice(size_type i)
-        {
-            ASSERT(internal::compare_bounds(i, m_totsize), "Failed to access element. Index out of bounds.");
-            return m_buffer[i];
-        }
-        inline reference at(size_type i)
-        {
-            ASSERT(internal::compare_bounds(i, m_totsize), "Failed to access element. Index out of bounds.");
-            return m_buffer[i];
-        }
-        inline const_reference slice(size_type i) const
-        {
-            ASSERT(internal::compare_bounds(i, m_totsize), "Failed to access element. Index out of bounds.");
-            return m_buffer[i];
-        }
-        inline const_reference at(size_type i) const
-        {
-            ASSERT(internal::compare_bounds(i, m_totsize), "Failed to access element. Index out of bounds.");
-            return m_buffer[i];
-        }
-    };
-
-#ifdef PYTTN_BUILD_CUDA
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // D dimensional implementation of the general tensor object for use with the cuda   //
-    //                                     backend                                       //
-    ///////////////////////////////////////////////////////////////////////////////////////
-    template <typename T, size_t D>
-    class tensor<T, D, cuda_backend> : public tensor_base<tensor<T, D, cuda_backend>>
-    {
-    public:
-        using self_type = tensor<T, D, cuda_backend>;
+        using self_type = tensor<T, D, backend>;
         using value_type = typename traits<self_type>::value_type;
         using size_type = typename traits<self_type>::size_type;
         using base_type = tensor_base<self_type>;
@@ -1041,250 +849,78 @@ namespace linalg
 
         using pointer = typename base_type::pointer;
         using const_pointer = typename base_type::const_pointer;
-        friend class internal::tensor_buffer_swap;
-
-    protected:
-        using base_type::m_buffer;
-        using base_type::m_shape;
-        using base_type::m_totsize;
+        using reference = T&;
+        using const_reference = const value_type&;
 
     public:
         template <typename... Args>
-        tensor(Args &&...args)
-        try : base_type(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct tensor object.");
-        }
+        tensor(Args &&...args);
+
         template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(base_type::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
+        self_type &operator=(Args &&...args);
+        template <typename... Inds> inline const_reference operator()(Inds... indices) const;
+        template <typename... Inds> inline reference operator()(Inds... indices);
+        template <typename... Inds> inline const_reference at(Inds... indices) const;
+        template <typename... Inds> inline reference at(Inds... indices);
 
         // slice accessor operator[]
-        inline typename slice_traits::slice_type operator[](size_type i) { return slice_traits::make(this, i); }
-        inline typename const_slice_traits::slice_type operator[](size_type i) const { return const_slice_traits::make(this, i); }
+        inline typename slice_traits::slice_type operator[](size_type i);
+        inline typename const_slice_traits::slice_type operator[](size_type i) const;
 
-        inline typename slice_traits::slice_type slice(size_type i)
-        {
-            ASSERT(internal::compare_bounds(i, m_shape[0]), "Unable to return slice of array.  Slice index out of bounds.");
-            return slice_traits::make(this, i);
-        }
-        inline typename const_slice_traits::slice_type slice(size_type i) const
-        {
-            ASSERT(internal::compare_bounds(i, m_shape[0]), "Unable to return slice of array.  Slice index out of bounds.");
-            return const_slice_traits::make(this, i);
-        }
+        inline typename slice_traits::slice_type slice(size_type i);
+        inline typename const_slice_traits::slice_type slice(size_type i) const;
 
     public:
-        __host__ __device__ pointer buffer() { return m_buffer; }
-        __host__ __device__ const_pointer buffer() const { return m_buffer; }
-        __host__ __device__ pointer data() { return m_buffer; }
-        __host__ __device__ const_pointer data() const { return m_buffer; }
-
+        pointer buffer();
+        const_pointer buffer() const;
+        pointer data();
+        const_pointer data() const;
     }; // class tensor
 
-    template <typename T>
-    class tensor<T, 1, cuda_backend> : public tensor_base<tensor<T, 1, cuda_backend>>
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // 1 dimensional interface of the general tensor object for use with the general     //
+    //                                     backend                                       //
+    ///////////////////////////////////////////////////////////////////////////////////////
+    template <typename T, typename backend>
+    class tensor<T, 1, backend> : public tensor_base<tensor<T, 1, backend>>
     {
     public:
-        using self_type = tensor<T, 1, cuda_backend>;
-        using size_type = typename cuda_backend::size_type;
+        using self_type = tensor<T, 1, backend>;
+        using size_type = typename traits<backend>::size_type;
         using base_type = tensor_base<self_type>;
+        using reference = T&;
+        using const_reference = const T&;
 
         using pointer = typename base_type::pointer;
         using const_pointer = typename base_type::const_pointer;
         friend class internal::tensor_buffer_swap;
 
-    protected:
-        using base_type::m_buffer;
-        using base_type::m_totsize;
-
     public:
         template <typename... Args>
-        tensor(Args &&...args)
-        try : base_type(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct tensor object.");
-        }
+        tensor(Args &&...args);
         template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(base_type::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
+        self_type &operator=(Args &&...args);
+    
+        void from_host() const;
+        template <typename... Inds> inline const_reference operator()(Inds... indices) const;
+        template <typename... Inds> inline reference operator()(Inds... indices);
+        template <typename... Inds> inline const_reference at(Inds... indices) const;
+        template <typename... Inds> inline reference at(Inds... indices);        
+        inline const_reference operator[](size_t i) const;
+        inline reference operator[](size_t i);
 
     public:
-        __host__ __device__ pointer buffer() { return m_buffer; }
-        __host__ __device__ const_pointer buffer() const { return m_buffer; }
-        __host__ __device__ pointer data() { return m_buffer; }
-        __host__ __device__ const_pointer data() const { return m_buffer; }
+        pointer buffer();
+        const_pointer buffer() const;
+        pointer data();
+        const_pointer data() const;
     };
 
-#endif // PYTTN_BUILD_CUDA
-
-} // namespace linalg
-
-#include "tensor_slice.hpp"
-
-namespace linalg
-{
-
-    ///////////////////////////////////////////////////////////////////////////////////////
-    //            ostream operators for the D dimensional blas tensor objects            //
-    ///////////////////////////////////////////////////////////////////////////////////////
-    template <typename array_type, typename = typename std::enable_if<is_dense_tensor<array_type>::value && std::is_same<blas_backend, typename traits<array_type>::backend_type>::value, void>::type>
-    typename std::enable_if<traits<array_type>::rank == 1 && !is_complex<typename traits<array_type>::value_type>::value, std::ostream &>::type operator<<(std::ostream &os, const array_type &t)
-    {
-        os << "[";
-        for (size_t i = 0; i < t.shape(0); ++i)
-        {
-            os << t(i) << (i + 1 == t.shape(0) ? "]" : ", ");
-        }
-        return os;
-    }
-
-    template <typename array_type, typename = typename std::enable_if<is_dense_tensor<array_type>::value && std::is_same<blas_backend, typename traits<array_type>::backend_type>::value, void>::type>
-    typename std::enable_if<traits<array_type>::rank == 2 && !is_complex<typename traits<array_type>::value_type>::value, std::ostream &>::type operator<<(std::ostream &os, const array_type &t)
-    {
-        os << "[";
-        for (size_t i = 0; i < t.shape(0); ++i)
-        {
-            os << "[";
-            for (size_t j = 0; j < t.shape(1); ++j)
-            {
-                os << t(i, j) << (j + 1 == t.shape(1) ? "]" : ", ");
-            }
-            os << (i + 1 == t.shape(0) ? "]" : ",") << std::endl;
-        }
-        return os;
-    }
-
-    template <typename array_type, typename = typename std::enable_if<is_dense_tensor<array_type>::value && std::is_same<blas_backend, typename traits<array_type>::backend_type>::value, void>::type>
-    typename std::enable_if<traits<array_type>::rank == 3 && !is_complex<typename traits<array_type>::value_type>::value, std::ostream &>::type operator<<(std::ostream &os, const array_type &t)
-    {
-        os << "[";
-        for (size_t i = 0; i < t.shape(0); ++i)
-        {
-            os << "[";
-            for (size_t j = 0; j < t.shape(1); ++j)
-            {
-                os << "[";
-                for (size_t k = 0; k < t.shape(2); ++k)
-                {
-                    os << t(i, j, k) << (k + 1 == t.shape(2) ? "]" : ", ");
-                }
-                os << (j + 1 == t.shape(1) ? "]" : ",");
-            }
-            os << (i + 1 == t.shape(0) ? "]" : ",");
-        }
-        return os;
-    }
-
-    template <typename array_type, typename = typename std::enable_if<is_dense_tensor<array_type>::value && std::is_same<blas_backend, typename traits<array_type>::backend_type>::value, void>::type>
-    typename std::enable_if<(traits<array_type>::rank > 3) && !is_complex<typename traits<array_type>::value_type>::value, std::ostream &>::type operator<<(std::ostream &os, const array_type &t)
-    {
-        os << "shape: [";
-        for (size_t i = 0; i < t.rank; ++i)
-        {
-            os << t.shape(i) << (i + 1 == t.rank ? "]" : ", ");
-        }
-        os << std::endl
-           << "data : [";
-        for (size_t i = 0; i < t.size(); ++i)
-        {
-            os << t(i) << (i + 1 == t.size() ? "]" : ", ");
-        }
-        return os;
-    }
-
-    template <typename array_type, typename = typename std::enable_if<is_dense_tensor<array_type>::value && std::is_same<blas_backend, typename traits<array_type>::backend_type>::value, void>::type>
-    typename std::enable_if<traits<array_type>::rank == 1 && is_complex<typename traits<array_type>::value_type>::value, std::ostream &>::type operator<<(std::ostream &os, const array_type &t)
-    {
-        using std::abs;
-        os << "[";
-        for (size_t i = 0; i < t.shape(0); ++i)
-        {
-            os << t(i).real() << (t(i).imag() < 0.0 ? "-" : "+") << abs(t(i).imag()) << "i" << (i + 1 == t.shape(0) ? "]" : ", ");
-        }
-        return os;
-    }
-
-    template <typename array_type, typename = typename std::enable_if<is_dense_tensor<array_type>::value && std::is_same<blas_backend, typename traits<array_type>::backend_type>::value, void>::type>
-    typename std::enable_if<traits<array_type>::rank == 2 && is_complex<typename traits<array_type>::value_type>::value, std::ostream &>::type operator<<(std::ostream &os, const array_type &t)
-    {
-        using std::abs;
-        os << "[";
-        for (size_t i = 0; i < t.shape(0); ++i)
-        {
-            os << "[";
-            for (size_t j = 0; j < t.shape(1); ++j)
-            {
-                os << t(i, j).real() << (t(i, j).imag() < 0.0 ? "-" : "+") << abs(t(i, j).imag()) << "i" << (j + 1 == t.shape(1) ? "]" : ", ");
-            }
-            os << (i + 1 == t.shape(0) ? "]" : ",") << std::endl;
-        }
-        return os;
-    }
-
-    template <typename array_type, typename = typename std::enable_if<is_dense_tensor<array_type>::value && std::is_same<blas_backend, typename traits<array_type>::backend_type>::value, void>::type>
-    typename std::enable_if<traits<array_type>::rank == 3 && is_complex<typename traits<array_type>::value_type>::value, std::ostream &>::type operator<<(std::ostream &os, const array_type &t)
-    {
-        using std::abs;
-        os << "[";
-        for (size_t i = 0; i < t.shape(0); ++i)
-        {
-            os << "[";
-            for (size_t j = 0; j < t.shape(1); ++j)
-            {
-                os << "[";
-                for (size_t k = 0; k < t.shape(2); ++k)
-                {
-                    os << t(i, j, k).real() << (t(i, j, k).imag() < 0.0 ? "-" : "+") << abs(t(i, j, k).imag()) << "i" << (k + 1 == t.shape(2) ? "]" : ", ");
-                }
-                os << (j + 1 == t.shape(1) ? "]" : ",");
-            }
-            os << (i + 1 == t.shape(0) ? "]" : ",");
-        }
-        return os;
-    }
-
-    template <typename array_type, typename = typename std::enable_if<is_dense_tensor<array_type>::value && std::is_same<blas_backend, typename traits<array_type>::backend_type>::value, void>::type>
-    typename std::enable_if<(traits<array_type>::rank > 3) && is_complex<typename traits<array_type>::value_type>::value, std::ostream &>::type operator<<(std::ostream &os, const array_type &t)
-    {
-        using std::abs;
-        os << "shape: [";
-        for (size_t i = 0; i < t.rank; ++i)
-        {
-            os << t.shape(i) << (i + 1 == t.rank ? "]" : ", ");
-        }
-        os << std::endl
-           << "data : [";
-        for (size_t i = 0; i < t.size(); ++i)
-        {
-            os << t(i).real() << (t(i).imag() < 0.0 ? "-" : "+") << abs(t(i).imag()) << "i" << (i + 1 == t.size() ? "]" : ", ");
-        }
-        return os;
-    }
-
-#ifdef PYTTN_BUILD_CUDA
-    template <typename array_type, typename = typename std::enable_if<is_dense_tensor<array_type>::value && std::is_same<cuda_backend, typename traits<array_type>::backend_type>::value, void>::type>
-    std::ostream &operator<<(std::ostream &os, const array_type &t)
-    {
-        tensor<typename array_type::value_type, traits<array_type>::rank, blas_backend> _t(t);
-        os << _t;
-        return os;
-        // os << "shape: ["; for(size_t i=0; i < t.rank; ++i){os << t.shape(i) << (i+1 == t.rank ? "]": ", ");}
-        // os << "cuda buffer" << std::endl;
-        // return os;
-    }
-#endif
-
+    ///////////////////////////////////////////////////////
+    //            ostream operators interface            //
+    ///////////////////////////////////////////////////////
+    //template <typename T, size_t D, typename backend>
+    //std::ostream& operator<<(std::ostream &os, const tensor<T,D,backend> &t);
 }
 
 #endif // PYTTN_LINALG_TENSOR_DENSE_TENSOR_HPP_//

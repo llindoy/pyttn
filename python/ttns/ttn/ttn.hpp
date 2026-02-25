@@ -51,7 +51,7 @@ void init_ttn(py::module &m, const std::string &label)
 
      using conv = linalg::pybuffer_converter<backend>;
 
-#ifdef PYTTN_BUILD_CUDA
+#ifdef PYTTN_BUILD_CUDA_NO
      using otherbackend = typename other_backend<backend>::type;
 #endif
 
@@ -92,7 +92,7 @@ void init_ttn(py::module &m, const std::string &label)
 
          .def("set_matrix", [](_ttn_node_data &i, const linalg::matrix<T, backend> &mat)
               { i.as_matrix() = mat; })
-#ifdef PYTTN_BUILD_CUDA
+#ifdef PYTTN_BUILD_CUDA_NO
          .def("set_matrix", [](_ttn_node_data &i, const linalg::matrix<T, otherbackend> &mat)
               { i.as_matrix() = mat; })
 #endif
@@ -108,7 +108,7 @@ void init_ttn(py::module &m, const std::string &label)
              static_cast<linalg::matrix<T, backend> &(_ttn_node_data::*)()>(&_ttn_node_data::as_matrix),
              py::return_value_policy::reference)
          .def("backend", [](const _ttn_node_data &)
-              { return backend::label(); });
+              { return linalg::traits<backend>::label(); });
 
      py::class_<_ttn_node>(m, (std::string("ttn_node_") + label).c_str())
          .def(py::init())
@@ -133,7 +133,7 @@ void init_ttn(py::module &m, const std::string &label)
          .def("__iter__", [](_ttn_node &s)
               { return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
          .def("backend", [](const _ttn_node &)
-              { return backend::label(); });
+              { return linalg::traits<backend>::label(); });
 
      // expose the ttn node class.  This is our core tensor network object.
      py::class_<_ttn>(m, (std::string("ttn_") + label).c_str())
@@ -143,8 +143,8 @@ void init_ttn(py::module &m, const std::string &label)
          .def(py::init<const ttn<real_type, backend> &>())
 #endif
 
-#ifdef PYTTN_BUILD_CUDA
-         .def(py::init<const ttn<T, otherbackend> &>())
+#ifdef PYTTN_BUILD_CUDA_NO
+         //.def(py::init<const ttn<T, otherbackend> &>())
 #ifdef BUILD_REAL_TTN
          .def(py::init<const ttn<real_type, otherbackend> &>())
 #endif
@@ -306,7 +306,7 @@ void init_ttn(py::module &m, const std::string &label)
               { return i[ind]; }, py::return_value_policy::reference)
          .def("site_tensor", [](_ttn &self, size_t i)
               { CALL_AND_HANDLE(return self.site_tensor(i).as_matrix(), "Failed to return site tensor.");}, py::return_value_policy::reference, "For details see :meth:`pyttn.ttn_dtype.site_tensor`")
-#ifdef PYTTN_BUILD_CUDA
+#ifdef PYTTN_BUILD_CUDA_NO
          .def("set_site_tensor", [](_ttn &self, size_t i, const linalg::matrix<T, otherbackend> &mat)
               { CALL_AND_HANDLE(self.site_tensor(i).as_matrix() = mat, "Failed to set site tensor."); })
 #endif
@@ -330,7 +330,7 @@ void init_ttn(py::module &m, const std::string &label)
      //        }
      //    )
      //
-#ifdef PYTTN_BUILD_CUDA
+#ifdef PYTTN_BUILD_CUDA_NO
          .def("collapse_basis", [](_ttn &o, std::vector<linalg::matrix<T, otherbackend>> &U, bool truncate = true, real_type tol = real_type(0), size_t nchi = 0)
               {
                     std::vector<linalg::matrix<T, backend>> Uop(U.size());
@@ -435,7 +435,7 @@ void init_ttn(py::module &m, const std::string &label)
                     CALL_AND_RETHROW(contr::sop_ttn_contraction(op, o, i));
                     return i; }, "For details see :meth:`pyttn.ttn_dtype.__rmatmul__`")
          .def("backend", [](const _ttn &)
-              { return backend::label(); })
+              { return linalg::traits<backend>::label(); })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const _ttn & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -463,7 +463,7 @@ void init_ttn(py::module &m, const std::string &label)
 template <typename real_type, typename backend>
 void initialise_ttn(py::module &m)
 {
-     using complex_type = linalg::complex<real_type>;
+     using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
      init_ttn<real_type, backend>(m, "real");

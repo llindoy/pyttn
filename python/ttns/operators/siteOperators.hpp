@@ -118,7 +118,7 @@ void init_site_operators(py::module &m, const std::string &label)
         .def("apply", static_cast<void (siteop::*)(const_vector_ref, vector_ref, real_type, real_type)>(&siteop::apply))
         .def("__str__", &siteop::to_string)
         .def("backend", [](const siteop &)
-             { return backend::label(); })
+             { return linalg::traits<backend>::label(); })
     #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const siteop & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -148,7 +148,7 @@ void init_site_operators(py::module &m, const std::string &label)
              { return !std::is_same<T, real_type>::value; })
         .def("__str__", &prim::to_string)
         .def("backend", [](const prim &)
-             { return backend::label(); });
+             { return linalg::traits<backend>::label(); });
 
     // a type for storing a trivial representation of the identity operator
     py::class_<ident, prim>(m, (std::string("identity_") + label).c_str())
@@ -261,7 +261,7 @@ void init_site_operators(py::module &m, const std::string &label)
 template <typename real_type, typename backend>
 void initialise_site_operators(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
     init_site_operators<real_type, backend>(m, "real");

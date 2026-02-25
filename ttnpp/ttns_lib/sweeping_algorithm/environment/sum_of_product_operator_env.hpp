@@ -51,12 +51,12 @@ namespace ttns
 
         using sop_node_type = typename environment_type::node_type;
 
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
         using hnode = typename ttn_type::node_type;
         using hdata = typename hnode::value_type;
-        static constexpr std::string_view class_info = "sopenv:";
+        static constexpr std::string_view class_info{"sopenv:"};
 
         struct parameter_list
         {

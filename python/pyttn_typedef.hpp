@@ -31,7 +31,7 @@ public:
 };
 
 template <>
-class pyttn_type_label<linalg::complex<pyttn_real_type>>
+class pyttn_type_label<std::complex<pyttn_real_type>>
 {
 public:
     static std::string label() { return std::string("C"); }

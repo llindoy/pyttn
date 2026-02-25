@@ -25,7 +25,7 @@ namespace ttns
     {
     public:
         using real_type = typename linalg::get_real_type<T>::type;
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         Op() {}
         Op(const Op &o) : m_op(o.m_op), m_indices(o.m_indices), m_dims(o.m_dims) {}
@@ -180,7 +180,7 @@ namespace ttns
 
                 linalg::tensor<T, 5, backend> Umt(dims1, m_dims[0], m_dims[0], strides[0], strides[0]);
 
-                linalg::singular_value_decomposition<linalg::matrix<T, backend>, true> m_svd;
+                linalg::singular_value_decomposition<linalg::matrix<T, backend>, false> m_svd;
 
                 linalg::matrix<T, backend> _U, _Vh;
                 linalg::diagonal_matrix<real_type, backend> S;

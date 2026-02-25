@@ -28,7 +28,7 @@ namespace linalg
 
         public:
             using int_type = blas_backend::blas_int_type;
-            using size_type = blas_backend::size_type;
+            using size_type = typename traits<blas_backend>::size_type;
             using mem_trans = memory::transfer<blas_backend, blas_backend>;
             using value_type = typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
 

@@ -22,17 +22,12 @@ namespace ttns
 {
 
     template <typename T, typename backend = linalg::blas_backend>
-    class two_site_variations;
-
-    template <typename U>
-    class two_site_variations<linalg::complex<U>, linalg::blas_backend>
+    class two_site_variations
     {
     public:
-        using value_type = linalg::complex<U>;
-        using real_type = U;
-        using T = linalg::complex<U>;
-        using backend = linalg::blas_backend;
-        using size_type = typename backend::size_type;
+        using value_type = T;
+        using real_type = typename linalg::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         using environment_type = sop_environment<T, backend>;
         using spo_core = typename environment_type::spo_core;

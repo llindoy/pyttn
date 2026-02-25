@@ -65,8 +65,8 @@ namespace ttns
         using value_type = multiset_node_data<T, backend>;
         using tree_type = tree_base<value_type>;
         using base_type = tree_node_base<tree_type>;
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using node_type = tree_node<tree_base<value_type>>;
         using self_type = node_type;
         using hrank_type = std::vector<size_type>;
@@ -444,7 +444,7 @@ namespace ttns
             for (size_type i = 0; i < this->nset(); ++i)
             {
                 auto vec = m_data[i].as_rank_1();
-                _norm += linalg::real(linalg::dot_product(linalg::conj(vec), vec));
+                _norm += std::real(linalg::dot_product(linalg::conj(vec), vec));
             }
             return std::sqrt(_norm);
         }

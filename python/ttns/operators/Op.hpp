@@ -15,7 +15,8 @@
 #ifndef PYTHON_BINDING_TTNS_OP_HPP
 #define PYTHON_BINDING_TTNS_OP_HPP
 
-#include <ttns_lib/operators/product_operator.hpp>
+#include "../../utils.hpp"
+#include <ttns_lib/op.hpp>
 
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
@@ -37,15 +38,18 @@ void init_Op(py::module &m, const std::string &label)
     using conv = linalg::pybuffer_converter<backend>;    
     using mat = linalg::matrix<T, backend>;
 
+#ifdef PYTTN_BUILD_CUDA_NO
+     using otherbackend = typename other_backend<backend>::type;
+#endif
 
     // the base primitive operator type
     py::class_<Optype>(m, (std::string("Op_") + label).c_str())
         .def(py::init())
         .def(py::init<const Optype &>())
-        .def(py::init<const Op<real_type, backend> &>())
- #ifdef PYTTN_BUILD_CUDA
+        //.def(py::init<const Op<real_type, backend> &>())
+ #ifdef PYTTN_BUILD_CUDA_NO
         .def(py::init<const Op<T, otherbackend> &>())
-        .def(py::init<const Op<real_type, otherbackend> &>())
+        //.def(py::init<const Op<real_type, otherbackend> &>())
 #endif       
         .def(py::init<const mat &, const std::vector<size_t>&, const std::vector<size_t>&>())
         .def(py::init([](py::buffer& b, const std::vector<size_t>& inds, const std::vector<size_t>& dim)
@@ -57,10 +61,10 @@ void init_Op(py::module &m, const std::string &label)
                     )   
                 )
         .def("assign", &Optype::template operator= <T, backend>)
-        .def("assign", &Optype::template operator= <real_type, backend>)
- #ifdef PYTTN_BUILD_CUDA
+        //.def("assign", &Optype::template operator= <real_type, backend>)
+ #ifdef PYTTN_BUILD_CUDA_NO
         .def("assign", &Optype::template operator= <T, otherbackend>)
-        .def("assign", &Optype::template operator= <real_type, otherbackend>)
+        //.def("assign", &Optype::template operator= <real_type, otherbackend>)
 #endif       
         .def("clear", &Optype::clear)
         .def("complex_dtype", [](const Optype &)
@@ -68,7 +72,7 @@ void init_Op(py::module &m, const std::string &label)
         .def("__str__", [](const Optype &o)
              {std::ostringstream oss; oss << o; return oss.str(); })
         .def("backend", [](const Optype &)
-             { return backend::label(); })
+             { return linalg::traits<backend>::label(); })
         .def("set_operator", 
             [](Optype& op, const mat& _m)
             {
@@ -112,7 +116,7 @@ void init_Op(py::module &m, const std::string &label)
 template <typename real_type, typename backend>
 void initialise_Op(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
     init_Op<real_type, backend>(m, "real");

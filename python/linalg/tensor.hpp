@@ -123,7 +123,7 @@ void init_matrix_cpu(py::module &m, const std::string &label)
                  return b;
              })
         .def("backend", [](const ttype &)
-             { return backend::label(); });
+             { return linalg::traits<backend>::label(); });
 }
 
 template <typename T, size_t D>
@@ -203,13 +203,13 @@ void init_tensor_cpu(py::module &m, const std::string &label)
                  return b;
              })
         .def("backend", [](const ttype &)
-             { return backend::label(); });
+             { return linalg::traits<backend>::label(); });
 }
 
 template <typename real_type>
 void initialise_tensors(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
     init_tensor_cpu<real_type, 1>(m, "vector_real");
     init_matrix_cpu<real_type>(m, "matrix_real");
     init_tensor_cpu<real_type, 3>(m, "tensor_3_real");
@@ -222,6 +222,7 @@ void initialise_tensors(py::module &m)
 }
 
 #ifdef PYTTN_BUILD_CUDA
+namespace py = pybind11;
 
 template <typename T>
 void init_matrix_gpu(py::module &m, const std::string &label)
@@ -267,8 +268,8 @@ void init_matrix_gpu(py::module &m, const std::string &label)
                  ret = a * b;
                  return ret;
              })
-        .def("__str__", [](const ttype &o)
-             {std::stringstream oss;   oss << o; return oss.str(); })
+        //.def("__str__", [](const ttype &o)
+        //     {std::stringstream oss;   oss << o; return oss.str(); })
         .def("shape", [](const ttype& o, size_t i){return o.shape(i);})
         .def("ndim", [](const ttype&){return 2;})
         .def("set_subblock", [](ttype &o, py::buffer &b)
@@ -289,7 +290,7 @@ void init_matrix_gpu(py::module &m, const std::string &label)
                  return b;
              })
         .def("backend", [](const ttype &)
-             { return backend::label(); });
+             { return linalg::traits<backend>::label(); });
     //.def("clear", &ttype::clear);
 }
 
@@ -330,8 +331,8 @@ void init_tensor_gpu(py::module &m, const std::string &label)
             )mydelim")
         .def("complex_dtype", [](const ttype &)
              { return !std::is_same<T, real_type>::value; })
-        .def("__str__", [](const ttype &o)
-             {std::stringstream oss;   oss << o; return oss.str(); })
+        //.def("__str__", [](const ttype &o)
+        //     {std::stringstream oss;   oss << o; return oss.str(); })
         .def("ndim", [](const ttype&){return D;})
 
         .def("shape", [](const ttype& o, size_t i){return o.shape(i);})
@@ -342,14 +343,14 @@ void init_tensor_gpu(py::module &m, const std::string &label)
                  return b;
              })
         .def("backend", [](const ttype &)
-             { return backend::label(); });
+             { return linalg::traits<backend>::label(); });
     //.def("clear", &ttype::clear);
 }
 
 template <typename real_type>
 void initialise_tensors_cuda(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
     init_tensor_gpu<real_type, 1>(m, "vector_real");
     init_matrix_gpu<real_type>(m, "matrix_real");
     init_tensor_gpu<real_type, 3>(m, "tensor_3_real");

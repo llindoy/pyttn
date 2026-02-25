@@ -42,9 +42,9 @@ namespace linalg
             using value_type =
                 typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
-            using int_type = typename backend_type::int_type;
+            using int_type = typename traits<backend_type>::int_type;
 
         protected:
             tensor<value_type, 1, backend_type> m_work;
@@ -631,7 +631,7 @@ namespace linalg
                 // sensible normalisation
                 CALL_AND_HANDLE(
                     for (size_type i = 0; i < vecs_r.shape(0); ++i) {
-                        complex<value_type> scaling = static_cast<value_type>(1.0) /
+                        std::complex<value_type> scaling = static_cast<value_type>(1.0) /
                                                       dot_product(conj(vecs_l[i]), vecs_r[i]);
                         vecs_r[i] *= scaling;
                     },
@@ -752,9 +752,9 @@ namespace linalg
         public:
             using value_type = typename traits<matrix_type>::value_type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
-            using int_type = typename backend_type::int_type;
+            using int_type = typename traits<backend_type>::int_type;
 
         protected:
             tensor<typename get_real_type<value_type>::type, 1, backend_type> m_rwork;

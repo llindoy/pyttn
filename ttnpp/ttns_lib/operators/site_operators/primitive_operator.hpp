@@ -46,12 +46,12 @@ namespace ttns
         public:
             using vector_type = linalg::vector<T, backend>;
             using matrix_type = linalg::matrix<T, backend>;
-            using size_type = typename backend::size_type;
+            using size_type = typename linalg::traits<backend>::size_type;
             using matrix_ref = matrix_type &;
             using const_matrix_ref = const matrix_type &;
             using vector_ref = vector_type &;
             using const_vector_ref = const vector_type &;
-            using real_type = typename tmp::get_real_type<T>::type;
+            using real_type = typename linalg::get_real_type<T>::type;
 
             // objects needed for applying operators to views
             using matview = linalg::reinterpreted_tensor<const T, 2, backend>;

@@ -16,11 +16,14 @@
 #define PYTTN_LINALG_ALGEBRA_EXPRESSIONS_EXPRESSION_BASE_HPP_
 
 #include "../../linalg_forward_decl.hpp"
+#include "../../linalg_traits.hpp"
 
 namespace linalg
 {
     namespace expression_templates
     {
+        template <typename derived, bool has_buffers = true>
+        class expression_base;
 
         // crtp base class for arbitrary expressions.  This allows for much cleaner implementation of the assignments of expressions to tensors
         template <typename derived>

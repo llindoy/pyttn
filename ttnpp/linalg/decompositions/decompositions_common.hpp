@@ -17,7 +17,7 @@
 
 #include <common/exception_handling.hpp>
 #include "../linalg_forward_decl.hpp"
-#include "../backends/lapack_wrapper.hpp"
+#include "../backends/blas/lapack_wrapper.hpp"
 
 namespace linalg
 {
@@ -57,62 +57,62 @@ namespace linalg
         {
         };
 
-        static inline blas_backend::size_type worksize_as_integer(float a)
+        static inline typename traits<blas_backend>::size_type worksize_as_integer(float a)
         {
             ASSERT(a > 0.0f, "Failed to convert worksize to integer type.  The worksize is negative");
-            return static_cast<blas_backend::size_type>(a + 0.5f);
+            return static_cast<typename traits<blas_backend>::size_type>(a + 0.5f);
         }
-        static inline blas_backend::size_type worksize_as_integer(double a)
+        static inline typename traits<blas_backend>::size_type worksize_as_integer(double a)
         {
             ASSERT(a > 0.0, "Failed to convert worksize to integer type.  The worksize is negative");
-            return static_cast<blas_backend::size_type>(a + 0.5);
+            return static_cast<typename traits<blas_backend>::size_type>(a + 0.5);
         }
-        static inline blas_backend::size_type worksize_as_integer(complex<float> a)
+        static inline typename traits<blas_backend>::size_type worksize_as_integer(std::complex<float> a)
         {
             ASSERT(a.real() > 0.0f, "Failed to convert worksize to integer type.  The worksize is negative");
-            return static_cast<blas_backend::size_type>(a.real() + 0.5f);
+            return static_cast<typename traits<blas_backend>::size_type>(a.real() + 0.5f);
         }
-        static inline blas_backend::size_type worksize_as_integer(complex<double> a)
+        static inline typename traits<blas_backend>::size_type worksize_as_integer(std::complex<double> a)
         {
             ASSERT(a.real() > 0.0, "Failed to convert worksize to integer type.  The worksize is negative");
-            return static_cast<blas_backend::size_type>(a.real() + 0.5);
+            return static_cast<typename traits<blas_backend>::size_type>(a.real() + 0.5);
         }
 
         template <typename T>
-        void interleave_eigenvalues(typename blas_backend::size_type N, const T *wr, typename blas_backend::size_type incwr, const T *wi, typename blas_backend::size_type incwi, complex<T> *w, typename blas_backend::size_type incw)
+        void interleave_eigenvalues(typename traits<blas_backend>::size_type N, const T *wr, typename traits<blas_backend>::size_type incwr, const T *wi, typename traits<blas_backend>::size_type incwi, std::complex<T> *w, typename traits<blas_backend>::size_type incw)
         {
             static_assert(is_number<T>::value && !is_complex<T>::value, "Failed to instantiate interleave eigenvalues routine.");
-            for (typename blas_backend::size_type i = 0; i < N; ++i)
+            for (typename traits<blas_backend>::size_type i = 0; i < N; ++i)
             {
-                w[i * incw] = complex<T>(wr[i * incwr], wi[i * incwi]);
+                w[i * incw] = std::complex<T>(wr[i * incwr], wi[i * incwi]);
             }
         }
 
         template <typename T>
-        void set_real_eigenvects(typename blas_backend::size_type N, const T *vecs, complex<T> *working)
+        void set_real_eigenvects(typename traits<blas_backend>::size_type N, const T *vecs, std::complex<T> *working)
         {
             static_assert(is_number<T>::value && !is_complex<T>::value, "Failed to instantiate interleave eigenvalues routine.");
-            for (typename blas_backend::size_type i = 0; i < N; ++i)
+            for (typename traits<blas_backend>::size_type i = 0; i < N; ++i)
             {
-                working[i] = complex<T>(vecs[i], 0.0);
+                working[i] = std::complex<T>(vecs[i], 0.0);
             }
         }
 
         template <typename T>
-        void unpack_complex_eigenvector(typename blas_backend::size_type N, const T *re, const T *im, complex<T> *w1, complex<T> *w2)
+        void unpack_complex_eigenvector(typename traits<blas_backend>::size_type N, const T *re, const T *im, std::complex<T> *w1, std::complex<T> *w2)
         {
             static_assert(is_number<T>::value && !is_complex<T>::value, "Failed to instantiate interleave eigenvalues routine.");
-            for (typename blas_backend::size_type i = 0; i < N; ++i)
+            for (typename traits<blas_backend>::size_type i = 0; i < N; ++i)
             {
-                w1[i] = complex<T>(re[i], im[i]);
-                w2[i] = complex<T>(re[i], -im[i]);
+                w1[i] = std::complex<T>(re[i], im[i]);
+                w2[i] = std::complex<T>(re[i], -im[i]);
             }
         }
 
         template <typename T>
-        void unpack_eigenvectors(typename blas_backend::size_type N, T *iw, const T *vecs, complex<T> *out)
+        void unpack_eigenvectors(typename traits<blas_backend>::size_type N, T *iw, const T *vecs, std::complex<T> *out)
         {
-            using size_type = typename blas_backend::size_type;
+            using size_type = typename traits<blas_backend>::size_type;
             static_assert(is_number<T>::value && !is_complex<T>::value, "Failed to instantiate interleave eigenvectors routine.");
 
             for (size_type i = 0; i < N; ++i)
@@ -144,7 +144,7 @@ namespace linalg
         template <typename vals_type, typename T, typename B>
         struct validate_complex_vals_type
         {
-            static constexpr bool value = (!is_complex<T>::value && valid_decomposition_vector_type<vals_type, complex<T>, B>::value);
+            static constexpr bool value = (!is_complex<T>::value && valid_decomposition_vector_type<vals_type, std::complex<T>, B>::value);
         };
 
         template <typename vecs_type, typename T, typename B>
@@ -156,7 +156,7 @@ namespace linalg
         template <typename vecs_type, typename T, typename B>
         struct validate_complex_vecs_type
         {
-            static constexpr bool value = (!is_complex<T>::value && valid_decomposition_matrix<vecs_type, complex<T>, B>::value);
+            static constexpr bool value = (!is_complex<T>::value && valid_decomposition_matrix<vecs_type, std::complex<T>, B>::value);
         };
 
         template <typename vecs_typer, typename vecs_typel, typename T, typename B>
@@ -168,7 +168,7 @@ namespace linalg
         template <typename vecs_typer, typename vecs_typel, typename T, typename B>
         struct validate_complex_vecs_rl_type
         {
-            static constexpr bool value = (!is_complex<T>::value && valid_decomposition_matrix<vecs_typer, complex<T>, B>::value && valid_decomposition_matrix<vecs_typel, complex<T>, B>::value);
+            static constexpr bool value = (!is_complex<T>::value && valid_decomposition_matrix<vecs_typer, std::complex<T>, B>::value && valid_decomposition_matrix<vecs_typel, std::complex<T>, B>::value);
         };
 
         template <typename vals_type, typename vecs_type, typename T, typename B>
@@ -186,13 +186,13 @@ namespace linalg
         template <typename vals_type, typename vecs_type, typename T, typename B>
         struct validate_complex_vals_vecs_type
         {
-            static constexpr bool value = !is_complex<T>::value && valid_decomposition_vector_type<vals_type, complex<T>, B>::value && valid_decomposition_matrix<vecs_type, complex<T>, B>::value;
+            static constexpr bool value = !is_complex<T>::value && valid_decomposition_vector_type<vals_type, std::complex<T>, B>::value && valid_decomposition_matrix<vecs_type, std::complex<T>, B>::value;
         };
 
         template <typename vals_type, typename vecs_typer, typename vecs_typel, typename T, typename B>
         struct validate_complex_vals_vecs_rl_type
         {
-            static constexpr bool value = !is_complex<T>::value && valid_decomposition_vector_type<vals_type, complex<T>, B>::value && valid_decomposition_matrix<vecs_typer, complex<T>, B>::value && valid_decomposition_matrix<vecs_typel, complex<T>, B>::value;
+            static constexpr bool value = !is_complex<T>::value && valid_decomposition_vector_type<vals_type, std::complex<T>, B>::value && valid_decomposition_matrix<vecs_typer, std::complex<T>, B>::value && valid_decomposition_matrix<vecs_typel, std::complex<T>, B>::value;
         };
 
         template <typename vals_type, typename vecs_type, typename T, typename B>

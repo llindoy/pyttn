@@ -97,8 +97,8 @@ namespace ttns
         using observable_node = typename tree<observable_node_data<T, backend>>::node_type;
         using boolnode = typename tree<bool>::node_type;
 
-        using real_type = typename tmp::get_real_type<T>::type;
-        using size_type = typename backend::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         using me_core = matrix_element_engine<T, backend>;
         using op_base = typename me_core::op_base;
@@ -306,7 +306,7 @@ namespace ttns
                             auto &is_id = m_is_identity[ind];
                             update_expectation_value(p, set_index, mel, r, is_id, m_buf);
                         }
-                        CALL_AND_HANDLE(retval += linalg::real(gather_result(m_matel[0]()[r])), "Failed to return result.");
+                        CALL_AND_HANDLE(retval += std::real(gather_result(m_matel[0]()[r])), "Failed to return result.");
                     }
                 }
                 else
@@ -318,7 +318,7 @@ namespace ttns
                             size_t ind = psi.size() - (i + 1);
                             update_expectation_value(psi[ind], set_index, m_matel[ind], r, m_is_identity[ind], m_buf);
                         }
-                        CALL_AND_HANDLE(retval += linalg::real(gather_result(m_matel[0]()[r])), "Failed to return result.");
+                        CALL_AND_HANDLE(retval += std::real(gather_result(m_matel[0]()[r])), "Failed to return result.");
                     }
                 }
 
@@ -674,11 +674,11 @@ namespace ttns
                         T Eshift = sop.Eshift_val(set_index, nr);
                         size_t col = sop.column_index(set_index, nr);
                         bool compute_identity = !(psi.is_orthogonalised()) || (set_index != col);
-                        if (col == set_index && sop.is_scalar(set_index, nr) && linalg::abs(Eshift) > 1e-14)
+                        if (col == set_index && sop.is_scalar(set_index, nr) && std::abs(Eshift) > 1e-14)
                         {
                             CALL_AND_HANDLE(this->compute_norm_internal(psi, true, set_index, 0), "Failed to compute norm of diagonal term.");
                             T val(0);
-                            CALL_AND_HANDLE(val += linalg::real(gather_result(m_matel[0]()[0])), "Failed to return result.");
+                            CALL_AND_HANDLE(val += std::real(gather_result(m_matel[0]()[0])), "Failed to return result.");
                             retval += Eshift * val;
                         }
                         else

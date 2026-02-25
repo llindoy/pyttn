@@ -16,6 +16,8 @@
 #define PYTTN_LINALG_ALGEBRA_EXPRESSIONS_ELEMENTAL_RESULT_TYPE_HPP_
 
 #include "../../../linalg_forward_decl.hpp"
+#include "../../../utils/linalg_utils.hpp"
+#include "../../../linalg_type_traits.hpp"
 
 // TODO: comment this file
 
@@ -41,7 +43,7 @@ namespace linalg
             using backend_type = backend;
             static constexpr size_t rank = D;
             using type = dense_tensor_type<rank>;
-            using shape_type = std::array<typename backend_type::size_type, rank>;
+            using shape_type = std::array<typename traits<backend_type>::size_type, rank>;
             using const_shape_reference = const shape_type &;
         };
 
@@ -52,7 +54,7 @@ namespace linalg
             using backend_type = typename traits<ArrType>::backend_type;
             static constexpr size_t rank = D;
             using type = dense_tensor_type<rank>;
-            using shape_type = std::array<typename backend_type::size_type, rank>;
+            using shape_type = std::array<typename traits<backend_type>::size_type, rank>;
             using const_shape_reference = const shape_type &;
         };
 
@@ -63,7 +65,7 @@ namespace linalg
             using backend_type = backend;
             static constexpr size_t rank = D;
             using type = dense_tensor_type<rank>;
-            using shape_type = std::array<typename backend_type::size_type, rank>;
+            using shape_type = std::array<typename traits<backend_type>::size_type, rank>;
             using const_shape_reference = const shape_type &;
         };
 
@@ -74,7 +76,7 @@ namespace linalg
             using backend_type = backend;
             static constexpr size_t rank = 2;
             using type = dense_tensor_type<rank>;
-            using shape_type = std::array<typename backend_type::size_type, rank>;
+            using shape_type = std::array<typename traits<backend_type>::size_type, rank>;
             using const_shape_reference = const shape_type &;
         };
 
@@ -85,7 +87,7 @@ namespace linalg
             using backend_type = backend;
             static constexpr size_t rank = 2;
             using type = dense_tensor_type<rank>;
-            using shape_type = std::array<typename backend_type::size_type, rank>;
+            using shape_type = std::array<typename traits<backend_type>::size_type, rank>;
             using const_shape_reference = const shape_type &;
         };
 
@@ -108,7 +110,7 @@ namespace linalg
             using backend_type = backend;
             static constexpr size_t rank = 2;
             using type = symmetric_tridiagonal_matrix_type;
-            using shape_type = std::array<typename backend_type::size_type, 2>;
+            using shape_type = std::array<typename traits<backend_type>::size_type, 2>;
             using const_shape_reference = const shape_type &;
         };
 
@@ -119,7 +121,7 @@ namespace linalg
             using backend_type = backend;
             static constexpr size_t rank = 2;
             using type = diagonal_matrix_type;
-            using shape_type = std::array<typename backend_type::size_type, 2>;
+            using shape_type = std::array<typename traits<backend_type>::size_type, 2>;
             using const_shape_reference = const shape_type &;
         };
 
@@ -221,7 +223,7 @@ namespace linalg
             using vt = typename rtraits::value_type;
             static_assert(is_number<vt>::value, "Failed to construct unit_polar_op result type, input type is not real.");
             static_assert(!is_complex<vt>::value, "Failed to construct unit_polar_op result type, input type is not real.");
-            using value_type = complex<vt>;
+            using value_type = std::complex<vt>;
             using type = typename rtraits::type;
 
             static_assert(std::is_same<typename rtraits::backend_type, backend>::value, "Invalid backend.");
@@ -318,7 +320,7 @@ namespace linalg
             using vt2 = typename result_type<arr2>::value_type;
             static_assert(is_number<vt1>::value && is_number<vt2>::value, "Invalid result type.  Cannot form complex of two objects if the underlying data types are not valid number types.");
             static_assert(!is_complex<vt1>::value && !is_complex<vt2>::value, "Invalid result type.  Cannot form complex of two objects if the underlying data types are not valid number types.");
-            using value_type = complex<decltype(vt1() + vt2())>;
+            using value_type = std::complex<decltype(vt1() + vt2())>;
             static_assert(is_number<value_type>::value, "Invalid result type.  The resultant value type of the addition of two objects is not a valid number type.");
 
             // the result type tag
@@ -349,7 +351,7 @@ namespace linalg
             using vt2 = typename result_type<arr2>::value_type;
             static_assert(is_number<vt1>::value && is_number<vt2>::value, "Invalid result type.  Cannot form polar complex of two objects if the underlying data types are not valid number types.");
             static_assert(!is_complex<vt1>::value && !is_complex<vt2>::value, "Invalid result type.  Cannot form polar complex of two objects if the underlying data types are not valid number types.");
-            using value_type = complex<decltype(vt1() + vt2())>;
+            using value_type = std::complex<decltype(vt1() + vt2())>;
             static_assert(is_number<value_type>::value, "Invalid result type.  The resultant value type of the addition of two objects is not a valid number type.");
 
             // the result type tag

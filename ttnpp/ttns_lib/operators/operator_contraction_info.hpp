@@ -27,7 +27,7 @@ namespace ttns
     {
     public:
         using size_type = size_t;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
         using accum_coeff_int_type = std::vector<literal::coeff<T>>;
         using accum_coeff_type = std::vector<T>;

@@ -175,12 +175,12 @@ namespace utils
                 _r[0] = _rtilde;
 
                 real_type bnrm =
-                    std::sqrt(linalg::real(linalg::dot_product(linalg::conj(b), b)));
+                    std::sqrt(std::real(linalg::dot_product(linalg::conj(b), b)));
                 if (bnrm == 0)
                     bnrm = 1.0;
 
                 // normalise rtilde
-                real_type normfac = 1.0 / sqrt(linalg::real(linalg::dot_product(
+                real_type normfac = 1.0 / sqrt(std::real(linalg::dot_product(
                                               linalg::conj(_rtilde), _rtilde)));
                 _rtilde *= normfac;
 
@@ -196,12 +196,12 @@ namespace utils
 
                 // we keep iterating until the solution is converged, we have run into an
                 // error or we have reached the maximum number of iterations
-                while (std::sqrt(linalg::real(
+                while (std::sqrt(std::real(
                            linalg::dot_product(linalg::conj(_r[0]), _r[0]))) > _tol &&
                        iter < _max_iter && !broken_down)
                 {
                     m_residues[iter] = std::sqrt(
-                        linalg::real(linalg::dot_product(linalg::conj(_r[0]), _r[0])));
+                        std::real(linalg::dot_product(linalg::conj(_r[0]), _r[0])));
                     rho = -omega * rho; // update the value of rho used to compute the BiCG
                                         // coefficients
 

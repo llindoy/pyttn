@@ -155,7 +155,7 @@ namespace ttns
             {
                 for (size_t q = 0; q < Nt; ++q)
                 {
-                    if (linalg::abs(m_T(p, q)) > tol)
+                    if (std::abs(m_T(p, q)) > tol)
                     {
                         H += m_T(p, q) * fermion_operator("cdag", p) * fermion_operator("c", q);
                     }
@@ -175,7 +175,7 @@ namespace ttns
                         for (size_t s = 0; s < Nimp; ++s)
                         {
                             size_t si = m_impurity_indices[s];
-                            if (linalg::abs(m_U(p, q, r, s)) > tol)
+                            if (std::abs(m_U(p, q, r, s)) > tol)
                             {
                                 H += m_U(p, q, r, s) * fermion_operator("cdag", pi) * fermion_operator("cdag", qi) * fermion_operator("c", si) * fermion_operator("c", ri);
                             }

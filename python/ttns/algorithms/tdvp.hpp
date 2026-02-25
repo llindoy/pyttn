@@ -139,7 +139,7 @@ void init_tdvp_core(py::module &m, const std::string &label)
          ))  
 #endif  
         .def("backend", [](const tdvp &)
-             { return backend::label(); });
+             { return linalg::traits<backend>::label(); });
 }
 
 template <typename T, template <typename, typename> class ttn_class, typename backend>
@@ -205,7 +205,7 @@ void init_tdvp_adaptive(py::module &m, const std::string &label)
              { return o(A, sop, update_environment); }, py::arg(), py::arg(), py::arg("update_env") = false)
         .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion") = false)
         .def("backend", [](const atdvp &)
-             { return backend::label(); })
+             { return linalg::traits<backend>::label(); })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const atdvp & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -280,7 +280,7 @@ void init_tdvp_adaptive_ts_cost(py::module &m, const std::string &label)
              { return o(A, sop, update_environment); }, py::arg(), py::arg(), py::arg("update_env") = false)
         .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion") = false)
         .def("backend", [](const atdvp &)
-             { return backend::label(); })
+             { return linalg::traits<backend>::label(); })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const atdvp & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -313,7 +313,7 @@ void init_tdvp_subspace(py::module &m, const std::string &label)
 template <typename real_type, typename backend>
 void initialise_tdvp(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
     // init_tdvp<real_type, backend>(m, "real");
@@ -324,7 +324,7 @@ void initialise_tdvp(py::module &m)
 template <typename real_type, typename backend>
 void initialise_tdvp_adaptive(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
     // init_tdvp<real_type, backend>(m, "real");

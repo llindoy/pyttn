@@ -16,6 +16,7 @@
 #define PYTTN_LINALG_ALGEBRA_EXPRESSIONS_ELEMENTAL_STORAGE_TRAITS_HPP_
 
 #include "../../../linalg_forward_decl.hpp"
+#include "../../../linalg_type_traits.hpp"
 
 namespace linalg
 {
@@ -109,28 +110,13 @@ namespace linalg
         namespace internal
         {
             template <typename T, typename backend>
-            struct diagonal_matrix_view_storage_type;
-
-            template <typename T>
-            struct diagonal_matrix_view_storage_type<T, blas_backend>
+            struct diagonal_matrix_view_storage_type
             {
-                using size_type = typename blas_backend::size_type;
+                using size_type = typename traits<backend>::size_type;
                 T *buffer;
                 size_type incx;
-                T operator[](size_type i) const { return buffer[i * incx]; }
+                T operator[](size_type i) const;
             };
-
-#ifdef PYTTN_BUILD_CUDA
-            template <typename T>
-            struct diagonal_matrix_view_storage_type<T, cuda_backend>
-            {
-                using size_type = typename cuda_backend::size_type;
-                T *buffer;
-                size_type incx;
-                __host__ __device__ T operator[](size_type i) const { return buffer[i * incx]; }
-            };
-
-#endif
         } // namespace intenral
 
         // traits for the tensor objects

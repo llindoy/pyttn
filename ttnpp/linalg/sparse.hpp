@@ -19,9 +19,10 @@
  *  Class includes all of the required headers to use the sparse linear algebra section of the linear algebra library
  */
 
-#include "tensor/sparse/csr_matrix.hpp"
-#include "tensor/sparse/diagonal_matrix.hpp"
-#include "tensor/sparse/symmetric_tridiagonal_matrix.hpp"
+#include "backends/blas/blas_backend.hpp"
+#include "tensor/sparse/blas/csr_matrix.hpp"
+#include "tensor/sparse/blas/diagonal_matrix.hpp"
+#include "tensor/sparse/blas/symmetric_tridiagonal_matrix.hpp"
 #include "utils/tosparse.hpp"
 
 #endif // PYTTN_LINALG_SPARSE_HPP_

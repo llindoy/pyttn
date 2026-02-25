@@ -16,17 +16,23 @@
 #define PYTTN_LINALG_ALGEBRA_EXPRESSIONS_PERMUTATIONS_TRANSPOSE_EXPRESSION_HPP_
 
 #include "../../../linalg_forward_decl.hpp"
+#include "../expression_base.hpp"
+
 #include <array>
+#include <type_traits>
 
 namespace linalg
 {
 
     namespace expression_templates
     {
+        //template <typename arrtype, bool conjugate, typename enabler = void>
+        //class transpose_expression;
+
+    
 
         template <typename _mat_type, bool conjugate>
-        class transpose_expression<_mat_type, conjugate,
-                                   typename std::enable_if<is_dense_matrix<_mat_type>::value, void>::type>
+        class transpose_expression<_mat_type, conjugate, typename std::enable_if<is_dense_matrix<_mat_type>::value, void>::type>
             : public expression_base<transpose_expression<_mat_type, conjugate, void>, false>, public dense_type
         {
         public:
@@ -34,7 +40,7 @@ namespace linalg
             using value_type = typename std::remove_cv<typename traits<_mat_type>::value_type>::type;
             using backend_type = typename traits<_mat_type>::backend_type;
             using matrix_type = const _mat_type &;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using shape_type = std::array<size_type, 2>;
 
         protected:
@@ -96,7 +102,7 @@ namespace linalg
             using value_type = typename traits<_mat_type>::value_type;
             using backend_type = typename traits<_mat_type>::backend_type;
             using matrix_type = const _mat_type &;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using shape_type = std::array<size_type, 2>;
 
         protected:
@@ -151,7 +157,7 @@ namespace linalg
             using value_type = typename traits<_mat_type>::value_type;
             using backend_type = typename traits<_mat_type>::backend_type;
             using matrix_type = const _mat_type &;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using shape_type = std::array<size_type, 2>;
 
         protected:

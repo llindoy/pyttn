@@ -120,7 +120,7 @@ if(BUILD_PYTHON_BINDINGS)
 endif()
 
 if(BUILD_SRC)
-    add_subdirectory(src)
+    add_subdirectory(cuda_test)
 endif()
 
 if(BUILD_TESTS)

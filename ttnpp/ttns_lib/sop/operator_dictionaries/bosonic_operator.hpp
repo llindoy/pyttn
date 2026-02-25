@@ -80,7 +80,7 @@ namespace ttns
                         if (op->contains_lowered_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * linalg::sqrt((1.0 * n));
+                            buffer[counter] = coeff_a * std::sqrt((1.0 * n));
                             colind[counter] = op->get_lowered_index(i, index);
                             ++counter;
                         }
@@ -112,7 +112,7 @@ namespace ttns
                         size_t n = op->get_occupation(i, index);
                         if (op->contains_lowered_state(i, index))
                         {
-                            mat(i, op->get_lowered_index(i, index)) = coeff_a * linalg::sqrt((1.0 * n));
+                            mat(i, op->get_lowered_index(i, index)) = coeff_a * std::sqrt((1.0 * n));
                         }
                     }
                 }
@@ -131,10 +131,10 @@ namespace ttns
         };
 
         template <typename RT>
-        class creation<linalg::complex<RT>, true> : public single_site_operator<linalg::complex<RT>>
+        class creation<std::complex<RT>, true> : public single_site_operator<std::complex<RT>>
         {
         public:
-            using T = linalg::complex<RT>;
+            using T = std::complex<RT>;
 
         public:
             creation() {}
@@ -204,14 +204,14 @@ namespace ttns
                     T coeff_b = 0.0;
                     if (m_has_squeeze)
                     {
-                        RT r = linalg::abs(m_squeeze);
+                        RT r = std::abs(m_squeeze);
 
-                        coeff_a = linalg::cosh(r);
-                        coeff_b = linalg::sinh(r);
+                        coeff_a = std::cosh(r);
+                        coeff_b = std::sinh(r);
                         if (linalg::is_complex<T>::value)
                         {
-                            RT theta = linalg::arg(m_squeeze);
-                            coeff_b *= linalg::exp(T(0, -1) * theta);
+                            RT theta = std::arg(m_squeeze);
+                            coeff_b *= std::exp(T(0, -1) * theta);
                         }
                     }
 
@@ -221,7 +221,7 @@ namespace ttns
                         if (op->contains_lowered_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * linalg::sqrt((1.0 * n));
+                            buffer[counter] = coeff_a * std::sqrt((1.0 * n));
                             colind[counter] = op->get_lowered_index(i, index);
                             ++counter;
                         }
@@ -248,7 +248,7 @@ namespace ttns
                             if (op->contains_raised_state(i, index))
                             {
                                 size_t n = op->get_occupation(i, index);
-                                buffer[counter] = -coeff_b * linalg::sqrt((n + 1.0));
+                                buffer[counter] = -coeff_b * std::sqrt((n + 1.0));
                                 colind[counter] = op->get_raised_index(i, index);
                                 ++counter;
                             }
@@ -275,14 +275,14 @@ namespace ttns
                     T coeff_b = 0.0;
                     if (m_has_squeeze)
                     {
-                        RT r = linalg::abs(m_squeeze);
+                        RT r = std::abs(m_squeeze);
 
-                        coeff_a = linalg::cosh(r);
-                        coeff_b = linalg::sinh(r);
+                        coeff_a = std::cosh(r);
+                        coeff_b = std::sinh(r);
                         if (linalg::is_complex<T>::value)
                         {
-                            RT theta = linalg::arg(m_squeeze);
-                            coeff_b *= linalg::exp(T(0, -1) * theta);
+                            RT theta = std::arg(m_squeeze);
+                            coeff_b *= std::exp(T(0, -1) * theta);
                         }
                     }
 
@@ -291,7 +291,7 @@ namespace ttns
                         size_t n = op->get_occupation(i, index);
                         if (op->contains_lowered_state(i, index))
                         {
-                            mat(i, op->get_lowered_index(i, index)) = coeff_a * linalg::sqrt((1.0 * n));
+                            mat(i, op->get_lowered_index(i, index)) = coeff_a * std::sqrt((1.0 * n));
                         }
 
                         if (m_has_disp)
@@ -310,7 +310,7 @@ namespace ttns
                         {
                             if (op->contains_raised_state(i, index))
                             {
-                                mat(i, op->get_raised_index(i, index)) = -coeff_b * linalg::sqrt((n + 1.0));
+                                mat(i, op->get_raised_index(i, index)) = -coeff_b * std::sqrt((n + 1.0));
                             }
                         }
                     }
@@ -390,7 +390,7 @@ namespace ttns
                         if (op->contains_raised_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * linalg::sqrt((n + 1.0));
+                            buffer[counter] = coeff_a * std::sqrt((n + 1.0));
                             colind[counter] = op->get_raised_index(i, index);
                             ++counter;
                         }
@@ -421,7 +421,7 @@ namespace ttns
                         if (op->contains_raised_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            mat(i, op->get_raised_index(i, index)) = coeff_a * linalg::sqrt((n + 1.0));
+                            mat(i, op->get_raised_index(i, index)) = coeff_a * std::sqrt((n + 1.0));
                         }
                     }
                 }
@@ -439,10 +439,10 @@ namespace ttns
         };
 
         template <typename RT>
-        class annihilation<linalg::complex<RT>, true> : public single_site_operator<linalg::complex<RT>>
+        class annihilation<std::complex<RT>, true> : public single_site_operator<std::complex<RT>>
         {
         public:
-            using T = linalg::complex<RT>;
+            using T = std::complex<RT>;
 
         public:
             annihilation() {}
@@ -512,14 +512,14 @@ namespace ttns
                     T coeff_b = 0.0;
                     if (m_has_squeeze)
                     {
-                        RT r = linalg::abs(m_squeeze);
+                        RT r = std::abs(m_squeeze);
 
-                        coeff_a = linalg::cosh(r);
-                        coeff_b = linalg::sinh(r);
+                        coeff_a = std::cosh(r);
+                        coeff_b = std::sinh(r);
                         if (linalg::is_complex<T>::value)
                         {
-                            RT theta = linalg::arg(m_squeeze);
-                            coeff_b *= linalg::exp(T(0, 1) * theta);
+                            RT theta = std::arg(m_squeeze);
+                            coeff_b *= std::exp(T(0, 1) * theta);
                         }
                     }
 
@@ -531,7 +531,7 @@ namespace ttns
                             if (op->contains_lowered_state(i, index))
                             {
                                 size_t n = op->get_occupation(i, index);
-                                buffer[counter] = -coeff_b * linalg::sqrt((1.0 * n));
+                                buffer[counter] = -coeff_b * std::sqrt((1.0 * n));
                                 colind[counter] = op->get_lowered_index(i, index);
                                 ++counter;
                             }
@@ -557,7 +557,7 @@ namespace ttns
                         if (op->contains_raised_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * linalg::sqrt((n + 1.0));
+                            buffer[counter] = coeff_a * std::sqrt((n + 1.0));
                             colind[counter] = op->get_raised_index(i, index);
                             ++counter;
                         }
@@ -583,14 +583,14 @@ namespace ttns
                     T coeff_b = 0.0;
                     if (m_has_squeeze)
                     {
-                        RT r = linalg::abs(m_squeeze);
+                        RT r = std::abs(m_squeeze);
 
-                        coeff_a = linalg::cosh(r);
-                        coeff_b = linalg::sinh(r);
+                        coeff_a = std::cosh(r);
+                        coeff_b = std::sinh(r);
                         if (linalg::is_complex<T>::value)
                         {
-                            RT theta = linalg::arg(m_squeeze);
-                            coeff_b *= linalg::exp(T(0, -1) * theta);
+                            RT theta = std::arg(m_squeeze);
+                            coeff_b *= std::exp(T(0, -1) * theta);
                         }
                     }
 
@@ -601,7 +601,7 @@ namespace ttns
                         {
                             if (op->contains_lowered_state(i, index))
                             {
-                                mat(i, op->get_lowered_index(i, index)) = -coeff_b * linalg::sqrt((1.0 * n));
+                                mat(i, op->get_lowered_index(i, index)) = -coeff_b * std::sqrt((1.0 * n));
                             }
                         }
 
@@ -619,7 +619,7 @@ namespace ttns
 
                         if (op->contains_raised_state(i, index))
                         {
-                            mat(i, op->get_raised_index(i, index)) = coeff_a * linalg::sqrt((n + 1.0));
+                            mat(i, op->get_raised_index(i, index)) = coeff_a * std::sqrt((n + 1.0));
                         }
                     }
                 }
@@ -754,9 +754,9 @@ namespace ttns
                 // form the dense displacement operator associated with a single mode.
                 T alpha = a;
                 T nalpha_conj = -linalg::conj(alpha);
-                real_type abs_alpha = linalg::abs(alpha);
+                real_type abs_alpha = std::abs(alpha);
                 real_type a2 = abs_alpha * abs_alpha;
-                real_type expa2 = linalg::exp(-a2 / 2.0);
+                real_type expa2 = std::exp(-a2 / 2.0);
 
                 Dk.resize(ni, ni);
                 Dk(0, 0) = expa2;
@@ -920,10 +920,10 @@ namespace ttns
         };
 
         template <typename RT>
-        class displacement<linalg::complex<RT>, true> : public single_site_operator<linalg::complex<RT>>
+        class displacement<std::complex<RT>, true> : public single_site_operator<std::complex<RT>>
         {
         protected:
-            using T = linalg::complex<RT>;
+            using T = std::complex<RT>;
             T m_alpha = T(0);
 
         public:
@@ -1024,14 +1024,14 @@ namespace ttns
 
                     size_t counter = 0;
 
-                    RT coeff_a = 1.0 / linalg::sqrt(2.0);
+                    RT coeff_a = 1.0 / std::sqrt(2.0);
 
                     for (size_t i = 0; i < op->nstates(); ++i)
                     {
                         if (op->contains_lowered_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * linalg::sqrt((1.0 * n));
+                            buffer[counter] = coeff_a * std::sqrt((1.0 * n));
                             colind[counter] = op->get_lowered_index(i, index);
                             ++counter;
                         }
@@ -1046,7 +1046,7 @@ namespace ttns
                         if (op->contains_raised_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * linalg::sqrt((n + 1.0));
+                            buffer[counter] = coeff_a * std::sqrt((n + 1.0));
                             colind[counter] = op->get_raised_index(i, index);
                             ++counter;
                         }
@@ -1070,14 +1070,14 @@ namespace ttns
 
                     using RT = typename linalg::get_real_type<T>::type;
 
-                    RT coeff_a = 1.0 / linalg::sqrt(2.0);
+                    RT coeff_a = 1.0 / std::sqrt(2.0);
 
                     for (size_t i = 0; i < op->nstates(); ++i)
                     {
                         size_t n = op->get_occupation(i, index);
                         if (op->contains_lowered_state(i, index))
                         {
-                            mat(i, op->get_lowered_index(i, index)) = coeff_a * linalg::sqrt((1.0 * n));
+                            mat(i, op->get_lowered_index(i, index)) = coeff_a * std::sqrt((1.0 * n));
                         }
 
                         if (m_has_disp)
@@ -1087,7 +1087,7 @@ namespace ttns
 
                         if (op->contains_raised_state(i, index))
                         {
-                            mat(i, op->get_raised_index(i, index)) = coeff_a * linalg::sqrt((n + 1.0));
+                            mat(i, op->get_raised_index(i, index)) = coeff_a * std::sqrt((n + 1.0));
                         }
                     }
                 }
@@ -1146,10 +1146,10 @@ namespace ttns
         };
 
         template <typename RT>
-        class momentum<linalg::complex<RT>, true> : public single_site_operator<linalg::complex<RT>>
+        class momentum<std::complex<RT>, true> : public single_site_operator<std::complex<RT>>
         {
         public:
-            using T = linalg::complex<RT>;
+            using T = std::complex<RT>;
 
         public:
             momentum() {}
@@ -1193,7 +1193,7 @@ namespace ttns
                         if (op->contains_lowered_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = T(0, 1.0) * linalg::sqrt(n / 2.0);
+                            buffer[counter] = T(0, 1.0) * std::sqrt(n / 2.0);
                             colind[counter] = op->get_lowered_index(i, index);
                             ++counter;
                         }
@@ -1201,7 +1201,7 @@ namespace ttns
                         if (op->contains_raised_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = T(0, -1.0) * linalg::sqrt((n + 1.0) / 2.0);
+                            buffer[counter] = T(0, -1.0) * std::sqrt((n + 1.0) / 2.0);
                             colind[counter] = op->get_raised_index(i, index);
                             ++counter;
                         }
@@ -1228,12 +1228,12 @@ namespace ttns
                         size_t n = op->get_occupation(i, index);
                         if (op->contains_lowered_state(i, index))
                         {
-                            mat(i, op->get_lowered_index(i, index)) = T(0, 1.0) * linalg::sqrt(n / 2.0);
+                            mat(i, op->get_lowered_index(i, index)) = T(0, 1.0) * std::sqrt(n / 2.0);
                         }
 
                         if (op->contains_raised_state(i, index))
                         {
-                            mat(i, op->get_raised_index(i, index)) = T(0, -1.0) * linalg::sqrt((n + 1.0) / 2.0);
+                            mat(i, op->get_raised_index(i, index)) = T(0, -1.0) * std::sqrt((n + 1.0) / 2.0);
                         }
                     }
                 }

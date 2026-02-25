@@ -39,7 +39,7 @@ namespace linalg
 
     // norm of an array
     template <typename T, typename = typename std::enable_if<is_linalg_object<T>::value, void>::type>
-    typename linalg::get_real_type<typename traits<T>::value_type>::type abs(const T &a)
+    typename get_real_type<typename traits<T>::value_type>::type abs(const T &a)
     {
         using value_type = typename std::remove_cv<typename traits<T>::value_type>::type;
         using backend_type = typename traits<T>::backend_type;
@@ -47,7 +47,7 @@ namespace linalg
         value_type val;
         CALL_AND_HANDLE(val = backend_type::dot(true, a.size(), a.buffer(), a.incx(), a.buffer(), a.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
 
-        return std::sqrt(linalg::real(val));
+        return std::sqrt(std::real(val));
     }
 
     // dot product of two arrays
@@ -93,7 +93,7 @@ namespace linalg
     {
         using value_type = typename std::remove_cv<typename traits<T1>::value_type>::type;
         using backend_type = typename traits<T1>::backend_type;
-        using std::conj;
+        using linalg::conj;
 
         ASSERT(a.obj().size() == b.obj().size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
@@ -131,7 +131,7 @@ namespace linalg
     {
         using value_type = typename std::remove_cv<typename traits<T1>::value_type>::type;
         using backend_type = typename traits<T1>::backend_type;
-        using std::conj;
+        using linalg::conj;
 
         ASSERT(a.right().obj().size() == b.right().obj().size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
@@ -145,7 +145,7 @@ namespace linalg
     {
         using value_type = typename std::remove_cv<typename traits<T1>::value_type>::type;
         using backend_type = typename traits<T1>::backend_type;
-        using std::conj;
+        using linalg::conj;
 
         ASSERT(a.right().obj().size() == b.obj().size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
@@ -158,7 +158,7 @@ namespace linalg
     {
         using value_type = typename std::remove_cv<typename traits<T1>::value_type>::type;
         using backend_type = typename traits<T1>::backend_type;
-        using std::conj;
+        using linalg::conj;
 
         ASSERT(a.obj().size() == b.right().obj().size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;

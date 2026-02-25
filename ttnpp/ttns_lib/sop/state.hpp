@@ -474,7 +474,7 @@ namespace ttns
         {
             for (auto it = m_terms.begin(); it != m_terms.end();)
             {
-                if (linalg::abs(std::get<1>(*it))< tol)
+                if (std::abs(std::get<1>(*it))< tol)
                 {
                     it = m_terms.erase(it);
                 }
@@ -496,7 +496,7 @@ namespace ttns
         const auto plus = "+";
         for (const auto &t : op)
         {
-            sep = linalg::real(std::get<1>(t))>0 ? plus : separator;
+            sep = std::real(std::get<1>(t))>0 ? plus : separator;
             os << sep << std::get<1>(t) << " " << std::get<0>(t) << std::endl;
         }
         return os;

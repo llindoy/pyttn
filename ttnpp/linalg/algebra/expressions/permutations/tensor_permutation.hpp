@@ -38,7 +38,7 @@ public:
   using value_type =
       typename std::remove_cv<typename traits<tensor_type>::value_type>::type;
   using backend_type = typename traits<tensor_type>::backend_type;
-  using size_type = typename backend_type::size_type;
+  using size_type = typename traits<backend_type>::size_type;
   using shape_type = std::array<size_type, 3>;
 
 protected:
@@ -150,7 +150,7 @@ struct traits<
     expression_templates::tensor_permutation_3_expression<tensor_type, conj>> {
   using value_type = typename traits<tensor_type>::value_type;
   using backend_type = typename traits<tensor_type>::backend_type;
-  using shape_type = std::array<typename backend_type::size_type, 3>;
+  using shape_type = std::array<typename traits<backend_type>::size_type, 3>;
   using const_shape_reference = const shape_type &;
   static constexpr size_t rank = 3;
 };

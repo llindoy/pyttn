@@ -36,7 +36,7 @@ namespace linalg
             using tensor_type = _tensor_type;
             using value_type = typename std::remove_cv<typename traits<tensor_type>::value_type>::type;
             using backend_type = typename traits<tensor_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using shape_type = std::array<size_type, traits<tensor_type>::rank>;
 
         protected:
@@ -81,7 +81,7 @@ namespace linalg
         using value_type = typename traits<tensor_type>::value_type;
         using backend_type = typename traits<tensor_type>::backend_type;
         static constexpr size_t rank = traits<tensor_type>::rank;
-        using shape_type = std::array<typename backend_type::size_type, rank>;
+        using shape_type = std::array<typename traits<backend_type>::size_type, rank>;
         using const_shape_reference = const shape_type &;
     };
 

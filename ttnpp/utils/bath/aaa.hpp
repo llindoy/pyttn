@@ -29,16 +29,16 @@ namespace utils
     class AAA_algorithm;
 
     template <typename T>
-    linalg::complex<T> Ct(T t, const linalg::vector<linalg::complex<T>> &p,
-                          const linalg::vector<linalg::complex<T>> &r)
+    std::complex<T> Ct(T t, const linalg::vector<std::complex<T>> &p,
+                          const linalg::vector<std::complex<T>> &r)
     {
-        linalg::complex<T> ret(0, 0);
-        linalg::complex<T> ii(0, 1);
+        std::complex<T> ret(0, 0);
+        std::complex<T> ii(0, 1);
         for (size_t i = 0; i < p.size(); ++i)
         {
-            if (linalg::imag(p(i)) > 0)
+            if (std::imag(p(i)) > 0)
             {
-                ret += ii * r(i) * linalg::exp(ii * p(i) * t);
+                ret += ii * r(i) * std::exp(ii * p(i) * t);
             }
         }
         return ret;
@@ -48,7 +48,7 @@ namespace utils
     class baryocentric_rational_function
     {
     public:
-        using complex_type = linalg::complex<T>;
+        using complex_type = std::complex<T>;
         baryocentric_rational_function() {}
         baryocentric_rational_function(const baryocentric_rational_function &o) =
             default;
@@ -129,7 +129,7 @@ namespace utils
             size_t npoles = 0;
             for (size_t i = 0; i < m + 1; ++i)
             {
-                if (linalg::abs(beta(i)) > std::numeric_limits<T>::epsilon() * T(10))
+                if (std::abs(beta(i)) > std::numeric_limits<T>::epsilon() * T(10))
                 {
                     ++npoles;
                 }
@@ -141,7 +141,7 @@ namespace utils
             size_t ind = 0;
             for (size_t i = 0; i < m + 1; ++i)
             {
-                if (linalg::abs(beta(i)) > std::numeric_limits<T>::epsilon() * T(10))
+                if (std::abs(beta(i)) > std::numeric_limits<T>::epsilon() * T(10))
                 {
                     p(ind) = alpha(i) / beta(i);
                     ++ind;
@@ -160,7 +160,7 @@ namespace utils
             size_t nzeros = 0;
             for (size_t i = 0; i < m + 1; ++i)
             {
-                if (linalg::abs(beta(i)) > std::numeric_limits<T>::epsilon() * T(10))
+                if (std::abs(beta(i)) > std::numeric_limits<T>::epsilon() * T(10))
                 {
                     ++nzeros;
                 }
@@ -171,7 +171,7 @@ namespace utils
             ind = 0;
             for (size_t i = 0; i < m + 1; ++i)
             {
-                if (linalg::abs(beta(i)) > std::numeric_limits<T>::epsilon() * T(10))
+                if (std::abs(beta(i)) > std::numeric_limits<T>::epsilon() * T(10))
                 {
                     z(ind) = alpha(i) / beta(i);
                     ++ind;
@@ -193,7 +193,7 @@ namespace utils
                 {
                     if (i != j)
                     {
-                        T dist = linalg::real(linalg::abs(p(i) - p(j)));
+                        T dist = std::real(std::abs(p(i) - p(j)));
                         if (rs < 0 || rs > dist)
                         {
                             rs = dist;
@@ -226,7 +226,7 @@ namespace utils
     class AAA_algorithm
     {
     public:
-        using complex_type = linalg::complex<T>;
+        using complex_type = std::complex<T>;
         AAA_algorithm(T tol = 1e-12, int64_t nmax = -1, bool print_outputs = false,
                       bool use_inf_norm = false)
             : m_tol(tol), m_nmax(nmax), m_print_outputs(print_outputs),
@@ -345,12 +345,12 @@ namespace utils
 
                         if (m_use_inf_norm)
                         {
-                            T eloc = linalg::real(linalg::abs(R(i) - FZ(i)));
+                            T eloc = std::real(std::abs(R(i) - FZ(i)));
                             if (eloc > err)
                             {
                                 err = eloc;
                             }
-                            eloc = linalg::real(linalg::abs(FZ(i)));
+                            eloc = std::real(std::abs(FZ(i)));
                             if (eloc > Fznorm)
                             {
                                 Fznorm = eloc;
@@ -358,8 +358,8 @@ namespace utils
                         }
                         else
                         {
-                            err += linalg::real(linalg::norm(R(i) - FZ(i)));
-                            Fznorm += linalg::real(linalg::norm(FZ(i)));
+                            err += std::real(linalg::norm(R(i) - FZ(i)));
+                            Fznorm += std::real(linalg::norm(FZ(i)));
                         }
                     }
                     if (m_print_outputs)
@@ -456,9 +456,9 @@ namespace utils
             T max = -T(1.0);
             for (size_t i = 0; i < FZ.size(); ++i)
             {
-                T val = linalg::real(linalg::abs(FZ(i) - R(i)));
+                T val = std::real(std::abs(FZ(i) - R(i)));
                 if (val > max &&
-                    linalg::abs(val - max) > std::numeric_limits<T>::epsilon() * T(10))
+                    std::abs(val - max) > std::numeric_limits<T>::epsilon() * T(10))
                 {
                     max = val;
                     argmax = i;

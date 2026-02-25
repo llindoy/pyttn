@@ -113,7 +113,7 @@ namespace ttns
             {
                 for (size_t q = 0; q < N; ++q)
                 {
-                    if (linalg::abs(m_T(p, q)) > tol)
+                    if (std::abs(m_T(p, q)) > tol)
                     {
                         H += m_T(p, q) * fermion_operator("cdag", p) * fermion_operator("c", q);
                     }
@@ -129,7 +129,7 @@ namespace ttns
                     {
                         for (size_t s = 0; s < N; ++s)
                         {
-                            if (linalg::abs(m_U(p, q, r, s)) > tol)
+                            if (std::abs(m_U(p, q, r, s)) > tol)
                             {
                                 H += m_U(p, q, r, s) * fermion_operator("cdag", p) * fermion_operator("cdag", q) * fermion_operator("c", s) * fermion_operator("c", r);
                             }

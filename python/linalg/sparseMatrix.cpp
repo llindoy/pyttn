@@ -18,7 +18,12 @@
 template <>
 void initialise_sparse_matrices<pyttn_real_type>(py::module &m);
 
-#ifdef PYTTN_BUILD_CUDA
-template <>
-void initialise_sparse_matrices_cuda<pyttn_real_type>(py::module &m);
-#endif
+
+//#ifdef PYTTN_BUILD_CUDA
+//extern template class linalg::csr_matrix<pyttn_real_type, linalg::cuda_backend>;
+//extern template class linalg::csr_matrix<std::complex<pyttn_real_type>, linalg::cuda_backend>;
+//
+//extern template class linalg::diagonal_matrix<pyttn_real_type, linalg::cuda_backend>;
+//extern template class linalg::diagonal_matrix<std::complex<pyttn_real_type>, linalg::cuda_backend>;
+//#endif
+

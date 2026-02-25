@@ -83,7 +83,7 @@ void init_msttn(py::module &m, const std::string &label)
             { return py::make_iterator(s.begin(), s.end()); },
             py::keep_alive<0, 1>())
         .def("backend", [](const _msttn_node &)
-             { return backend::label(); });
+             { return linalg::traits<backend>::label(); });
 
     // TODO: Figure out why the commented out assign functions don't compile
     using sobj_type = typename _msttn_slice::obj_type;
@@ -98,7 +98,7 @@ void init_msttn(py::module &m, const std::string &label)
              { return !std::is_same<T, real_type>::value; })
         .def("nset", &_msttn_slice::nset)
         .def("backend", [](const _msttn_slice &)
-             { return backend::label(); });
+             { return linalg::traits<backend>::label(); });
 
     // expose the ttn node class.  This is our core tensor network object.
     py::class_<_msttn>(m, (std::string("ms_ttn_") + label).c_str())
@@ -106,8 +106,8 @@ void init_msttn(py::module &m, const std::string &label)
 #ifdef BUILD_REAL_TTN
         .def(py::init<const ms_ttn<real_type, backend> &>())
 #endif
-#ifdef PYTTN_BUILD_CUDA
-         .def(py::init<const ms_ttn<T, otherbackend> &>())
+#ifdef PYTTN_BUILD_CUDA_NO
+         //.def(py::init<const ms_ttn<T, otherbackend> &>())
 #ifdef BUILD_REAL_TTN
          .def(py::init<const ms_ttn<real_type, otherbackend> &>())
 #endif
@@ -395,7 +395,7 @@ void init_msttn(py::module &m, const std::string &label)
         //ttn& apply_operator(const Op<T, backend>& op, real_type tol = real_type(0), size_type nchi=0)
         
         .def("backend", [](const _msttn &)
-             { return backend::label(); })
+             { return linalg::traits<backend>::label(); })
              
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
@@ -416,7 +416,7 @@ void init_msttn(py::module &m, const std::string &label)
 template <typename real_type, typename backend>
 void initialise_msttn(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
     init_msttn<real_type, backend>(m, "real");

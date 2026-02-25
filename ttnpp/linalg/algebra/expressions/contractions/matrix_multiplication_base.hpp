@@ -32,7 +32,7 @@ namespace linalg
             using lvalue_type = typename traits<impl>::lvalue_type;
             using rvalue_type = typename traits<impl>::rvalue_type;
             using backend_type = typename traits<impl>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using shape_type = std::array<size_type, 2>;
             using ttype = typename backend_type::transform_type;
 
@@ -105,7 +105,7 @@ namespace linalg
 
             matrix_matrix_product_base(const matrix_matrix_product_base &o, bool make_transpose = false, bool conjugate = false) : base_type(shape_type{{0, 0}}), m_working(o.m_working), m_working_size(o.m_working_size)
             {
-                // using std::conj;
+                // using linalg::conj;
                 if (make_transpose)
                 {
                     m_coeff = conjugate ? conj(o.m_coeff) : o.m_coeff;
@@ -281,7 +281,7 @@ namespace linalg
         using lvalue_type = typename traits<impl>::lvalue_type;
         using rvalue_type = typename traits<impl>::rvalue_type;
         using backend_type = typename traits<impl>::backend_type;
-        using shape_type = std::array<typename backend_type::size_type, 2>;
+        using shape_type = std::array<typename traits<backend_type>::size_type, 2>;
         using const_shape_reference = const shape_type &;
         static constexpr size_t rank = 2;
     };

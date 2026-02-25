@@ -46,7 +46,7 @@ namespace ttns
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         using node_reference = typename base_type::node_reference;
         using const_node_reference = typename base_type::const_node_reference;
@@ -61,7 +61,7 @@ namespace ttns
 
         template <typename U, typename be>
         friend class ttn;
-        static constexpr std::string_view class_info = "ttn:";
+        static constexpr std::string_view class_info{"ttn:"};
 
     private:
         // provide access to base class operators
@@ -898,7 +898,7 @@ namespace ttns
                 real_type pisum = 0.0;
                 for (size_t j = 0; j < m_dim_sizes[i]; ++j)
                 {
-                    pi[j] = linalg::real(linalg::dot_product(linalg::conj(b[j]), b[j]));
+                    pi[j] = std::real(linalg::dot_product(linalg::conj(b[j]), b[j]));
                     pisum += pi[j];
                 }
 
@@ -951,7 +951,7 @@ namespace ttns
             const auto &a = A().as_matrix();
             for (size_t j = 0; j < m_dim_sizes[i]; ++j)
             {
-                res[j] = linalg::real(linalg::dot_product(linalg::conj(a[j]), a[j]));
+                res[j] = std::real(linalg::dot_product(linalg::conj(a[j]), a[j]));
             }
         }
 
@@ -967,7 +967,7 @@ namespace ttns
     };
 
     template <typename T, typename backend, typename real_type = typename linalg::get_real_type<T>::type>
-    real_type collapse_wavefunction(const ttn<T, backend> &o, ttn<T, backend> &res, std::vector<size_t> &state, bool truncate = false, real_type tol = real_type(0), typename backend::size_type nchi = 0)
+    real_type collapse_wavefunction(const ttn<T, backend> &o, ttn<T, backend> &res, std::vector<size_t> &state, bool truncate = false, real_type tol = real_type(0), typename linalg::traits<backend>::size_type nchi = 0)
     {
         // first we copy the res array into o
         res = o;

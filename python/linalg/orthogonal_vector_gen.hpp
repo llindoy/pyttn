@@ -65,7 +65,7 @@ void init_orthogonal_vector(py::module &m, const std::string &label)
                     :rtype: Vector
                     )mydelim")
         .def("backend", [](const ttype &)
-             { return backend::label(); });
+             { return linalg::traits<backend>::label(); });
 }
 
 template <typename backend>
@@ -79,7 +79,7 @@ void init_random_engine(py::module &m, const std::string &label)
                     Python wrapper of the C++ random number generator object
                     )mydelim")
         .def("backend", [](const ttype &)
-             { return backend::label(); }, R"mydelim(
+             { return linalg::traits<backend>::label(); }, R"mydelim(
                     Returns the backend type of the C++ random number generator.
                     )mydelim");
 }
@@ -87,7 +87,7 @@ void init_random_engine(py::module &m, const std::string &label)
 template <typename real_type, typename backend>
 void initialise_orthogonal_vector(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
 
     init_random_engine<backend>(m, "random_engine");
     init_orthogonal_vector<real_type, backend>(m, "orthogonal_vector_real");

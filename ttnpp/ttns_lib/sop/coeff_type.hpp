@@ -39,7 +39,7 @@ namespace ttns
         class coeff
         {
         public:
-            using real_type = typename tmp::get_real_type<T>::type;
+            using real_type = typename linalg::get_real_type<T>::type;
             using function_type = std::function<T(real_type)>;
             using real_function_type = std::function<real_type(real_type)>;
 
@@ -50,7 +50,7 @@ namespace ttns
         public:
             coeff() : m_constant(T(0.0)), m_funcs() {}
             // constructors
-            template <typename U, typename = typename std::enable_if<tmp::is_number<U>::value, void>::type>
+            template <typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
             coeff(const U &c) : m_constant(c), m_funcs() {}
 
             template <typename U>
@@ -62,7 +62,7 @@ namespace ttns
 
             coeff(function_type &&f) : m_constant(T(0.0)), m_funcs() { m_funcs.push_back(std::make_pair(T(1.0), std::move(f))); }
 
-            template <typename U, typename = typename std::enable_if<tmp::is_number<U>::value, void>::type>
+            template <typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
             coeff(const coeff<U> &o)
             {
                 m_constant = o.constant();
@@ -83,7 +83,7 @@ namespace ttns
             coeff &operator=(const coeff &o) = default;
             coeff &operator=(coeff &&o) = default;
 
-            template <typename U, typename = typename std::enable_if<tmp::is_number<U>::value, void>::type>
+            template <typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
             coeff &operator=(const coeff<U> &o)
             {
                 m_funcs.clear();
@@ -99,7 +99,7 @@ namespace ttns
                 return *this;
             }
 
-            template <typename U, typename = typename std::enable_if<tmp::is_number<U>::value, void>::type>
+            template <typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
             coeff &operator=(const T &c)
             {
                 m_funcs.clear();
@@ -132,19 +132,19 @@ namespace ttns
         public:
             // arithemetic operators for updating coefficients types.
             // inplace addition, subtraction, multiplication and division of scalars
-            template <typename U, typename = typename std::enable_if<tmp::is_number<U>::value, void>::type>
+            template <typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
             coeff &operator+=(const U &c)
             {
                 m_constant += c;
                 return *this;
             }
-            template <typename U, typename = typename std::enable_if<tmp::is_number<U>::value, void>::type>
+            template <typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
             coeff &operator-=(const U &c)
             {
                 m_constant -= c;
                 return *this;
             }
-            template <typename U, typename = typename std::enable_if<tmp::is_number<U>::value, void>::type>
+            template <typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
             coeff &operator*=(const U &c)
             {
                 m_constant *= c;
@@ -154,7 +154,7 @@ namespace ttns
                 }
                 return *this;
             }
-            template <typename U, typename = typename std::enable_if<tmp::is_number<U>::value, void>::type>
+            template <typename U, typename = typename std::enable_if<linalg::is_number<U>::value, void>::type>
             coeff &operator/=(const U &c)
             {
                 m_constant /= c;
@@ -190,7 +190,7 @@ namespace ttns
                 if (o.m_funcs.size() == 0)
                 {
                     m_constant *= o.m_constant;
-                    if (linalg::abs(o.m_constant) < 1e-14)
+                    if (std::abs(o.m_constant) < 1e-14)
                     {
                         m_funcs.clear();
                     }
@@ -204,7 +204,7 @@ namespace ttns
                 }
                 else if (m_funcs.size() == 0)
                 {
-                    if (linalg::abs(m_constant) < 1e-14)
+                    if (std::abs(m_constant) < 1e-14)
                     {
                     }
                     else
@@ -221,7 +221,7 @@ namespace ttns
                 {
                     std::vector<std::pair<T, function_type>> funcs;
                     // now add on the acoeff terms
-                    if (linalg::abs(m_constant) > 1e-14)
+                    if (std::abs(m_constant) > 1e-14)
                     {
                         for (size_t i = 0; i < o.m_funcs.size(); ++i)
                         {
@@ -229,7 +229,7 @@ namespace ttns
                             funcs.push_back(std::make_pair(std::get<0>(bi) * m_constant, std::get<1>(bi)));
                         }
                     }
-                    if (linalg::abs(o.m_constant) > 1e-14)
+                    if (std::abs(o.m_constant) > 1e-14)
                     {
                         for (size_t i = 0; i < m_funcs.size(); ++i)
                         {
@@ -267,12 +267,12 @@ namespace ttns
             {
                 if (m_funcs.size() == 0)
                 {
-                    return linalg::abs(m_constant) < tol;
+                    return std::abs(m_constant) < tol;
                 }
                 return false;
             }
 
-            bool is_positive() const { return linalg::real(m_constant) >= 0; }
+            bool is_positive() const { return std::real(m_constant) >= 0; }
 
         public:
             // Functions for accessing the coefficient
@@ -321,28 +321,28 @@ namespace ttns
 
 // arithemetic operators for updating coefficients types.
 // addition, subtraction, multiplication and division of scalars
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
 ttns::literal::coeff<V> operator+(const ttns::literal::coeff<T> &o, const U &c)
 {
     ttns::literal::coeff<V> ret(o);
     ret += c;
     return ret;
 }
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
 ttns::literal::coeff<V> operator+(const U &c, const ttns::literal::coeff<T> &o)
 {
     ttns::literal::coeff<V> ret(o);
     ret += c;
     return ret;
 }
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
 ttns::literal::coeff<V> operator-(const ttns::literal::coeff<T> &o, const U &c)
 {
     ttns::literal::coeff<V> ret(o);
     ret -= c;
     return ret;
 }
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
 ttns::literal::coeff<V> operator-(const U &c, const ttns::literal::coeff<T> &o)
 {
     ttns::literal::coeff<V> ret(c);
@@ -350,14 +350,14 @@ ttns::literal::coeff<V> operator-(const U &c, const ttns::literal::coeff<T> &o)
     return ret;
 }
 
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
 ttns::literal::coeff<V> operator*(const ttns::literal::coeff<T> &o, const U &c)
 {
     ttns::literal::coeff<V> ret(o);
     ret *= c;
     return ret;
 }
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
 ttns::literal::coeff<V> operator*(const U &c, const ttns::literal::coeff<T> &o)
 {
     ttns::literal::coeff<V> ret(o);
@@ -365,7 +365,7 @@ ttns::literal::coeff<V> operator*(const U &c, const ttns::literal::coeff<T> &o)
     return ret;
 }
 
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
 ttns::literal::coeff<V> operator/(const ttns::literal::coeff<T> &o, const U &c)
 {
     ttns::literal::coeff<V> ret(o);
@@ -374,67 +374,67 @@ ttns::literal::coeff<V> operator/(const ttns::literal::coeff<T> &o, const U &c)
 }
 
 // addition of functions
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
-ttns::literal::coeff<V> operator+(const ttns::literal::coeff<T> &o, const std::function<U(const typename tmp::get_real_type<T>::type &)> &c)
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
+ttns::literal::coeff<V> operator+(const ttns::literal::coeff<T> &o, const std::function<U(const typename linalg::get_real_type<T>::type &)> &c)
 {
     ttns::literal::coeff<V> ret(o);
     ret += c;
     return ret;
 }
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
-ttns::literal::coeff<V> operator+(const std::function<T(const typename tmp::get_real_type<T>::type &)> &c, const ttns::literal::coeff<U> &o)
-{
-    ttns::literal::coeff<V> ret(o);
-    ret += c;
-    return ret;
-}
-
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
-ttns::literal::coeff<V> operator+(const ttns::literal::coeff<T> &o, std::function<U(const typename tmp::get_real_type<T>::type &)> &&c)
-{
-    ttns::literal::coeff<V> ret(o);
-    ret += c;
-    return ret;
-}
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
-ttns::literal::coeff<V> operator+(std::function<T(const typename tmp::get_real_type<T>::type &)> &&c, const ttns::literal::coeff<U> &o)
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
+ttns::literal::coeff<V> operator+(const std::function<T(const typename linalg::get_real_type<T>::type &)> &c, const ttns::literal::coeff<U> &o)
 {
     ttns::literal::coeff<V> ret(o);
     ret += c;
     return ret;
 }
 
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
-ttns::literal::coeff<V> operator-(const ttns::literal::coeff<T> &o, const std::function<T(const typename tmp::get_real_type<U>::type &)> &c)
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
+ttns::literal::coeff<V> operator+(const ttns::literal::coeff<T> &o, std::function<U(const typename linalg::get_real_type<T>::type &)> &&c)
+{
+    ttns::literal::coeff<V> ret(o);
+    ret += c;
+    return ret;
+}
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
+ttns::literal::coeff<V> operator+(std::function<T(const typename linalg::get_real_type<T>::type &)> &&c, const ttns::literal::coeff<U> &o)
+{
+    ttns::literal::coeff<V> ret(o);
+    ret += c;
+    return ret;
+}
+
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
+ttns::literal::coeff<V> operator-(const ttns::literal::coeff<T> &o, const std::function<T(const typename linalg::get_real_type<U>::type &)> &c)
 {
     ttns::literal::coeff<V> ret(o);
     ret -= c;
     return ret;
 }
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
-ttns::literal::coeff<V> operator-(const std::function<T(const typename tmp::get_real_type<T>::type &)> &c, const ttns::literal::coeff<U> &o)
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
+ttns::literal::coeff<V> operator-(const std::function<T(const typename linalg::get_real_type<T>::type &)> &c, const ttns::literal::coeff<U> &o)
 {
     ttns::literal::coeff<V> ret(c);
     ret -= o;
     return ret;
 }
 
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
-ttns::literal::coeff<V> operator-(const ttns::literal::coeff<T> &o, std::function<U(const typename tmp::get_real_type<T>::type &)> &&c)
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
+ttns::literal::coeff<V> operator-(const ttns::literal::coeff<T> &o, std::function<U(const typename linalg::get_real_type<T>::type &)> &&c)
 {
     ttns::literal::coeff<V> ret(o);
     ret -= std::move(c);
     return ret;
 }
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
-ttns::literal::coeff<V> operator-(std::function<T(const typename tmp::get_real_type<T>::type &)> &&c, const ttns::literal::coeff<U> &o)
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
+ttns::literal::coeff<V> operator-(std::function<T(const typename linalg::get_real_type<T>::type &)> &&c, const ttns::literal::coeff<U> &o)
 {
     ttns::literal::coeff<V> ret(std::move(c));
     ret -= o;
     return ret;
 }
 
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
 ttns::literal::coeff<V> operator+(const ttns::literal::coeff<T> &c, const ttns::literal::coeff<U> &o)
 {
     ttns::literal::coeff<V> ret(o);
@@ -442,7 +442,7 @@ ttns::literal::coeff<V> operator+(const ttns::literal::coeff<T> &c, const ttns::
     return ret;
 }
 
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
 ttns::literal::coeff<V> operator-(const ttns::literal::coeff<T> &c, const ttns::literal::coeff<U> &o)
 {
     ttns::literal::coeff<V> ret(c);
@@ -450,14 +450,14 @@ ttns::literal::coeff<V> operator-(const ttns::literal::coeff<T> &c, const ttns::
     return ret;
 }
 
-template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<tmp::is_number<U>::value and tmp::is_number<T>::value, void>::type>
+template <typename T, typename U, typename V = decltype(T() + U()), typename = typename std::enable_if<linalg::is_number<U>::value and linalg::is_number<T>::value, void>::type>
 ttns::literal::coeff<V> operator*(const ttns::literal::coeff<T> &a, const ttns::literal::coeff<U> &b)
 {
-    using real_type = typename tmp::get_real_type<T>::type;
+    using real_type = typename linalg::get_real_type<T>::type;
     ttns::literal::coeff<V> ret(a.constant() * b.constant());
     using function_type = typename ttns::literal::coeff<V>::function_type;
     // now add on the acoeff terms
-    if (linalg::abs(a.constant()) > 1e-14)
+    if (std::abs(a.constant()) > 1e-14)
     {
         for (size_t i = 0; i < b.funcs().size(); ++i)
         {
@@ -467,7 +467,7 @@ ttns::literal::coeff<V> operator*(const ttns::literal::coeff<T> &a, const ttns::
                                                                                                { return bif(t); })));
         }
     }
-    if (linalg::abs(b.constant()) > 1e-14)
+    if (std::abs(b.constant()) > 1e-14)
     {
         for (size_t i = 0; i < a.funcs().size(); ++i)
         {

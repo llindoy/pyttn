@@ -36,7 +36,7 @@ template <typename real_type>
 void initialise_liouville_space(py::module &m)
 {
   using namespace ttns;
-  using complex_type = linalg::complex<real_type>;
+  using complex_type = std::complex<real_type>;
   using _T = typename linalg::numpy_converter<complex_type>::type;
 
 #ifdef BUILD_REAL_TTN
@@ -44,7 +44,7 @@ void initialise_liouville_space(py::module &m)
 #endif
   using opdictc = operator_dictionary<complex_type, linalg::blas_backend>;
 
-#ifdef PYTTN_BUILD_CUDA
+#ifdef PYTTN_BUILD_CUDA_NO
 #ifdef BUILD_REAL_TTN
   using opdictr_gpu = operator_dictionary<real_type, linalg::cuda_backend>;
 #endif
@@ -84,7 +84,7 @@ void initialise_liouville_space(py::module &m)
           "anticommutator_superoperator",
           static_cast<void (*)(const SOP<complex_type> &, const system_modes &, const opdictc &, SOP<complex_type> &, opdictc &, _T)>(&liouville_space::anticommutator_superoperator),
           py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
-#ifdef PYTTN_BUILD_CUDA
+#ifdef PYTTN_BUILD_CUDA_NO
       .def_static(
           "left_superoperator",
           static_cast<void (*)(const SOP<complex_type> &, const system_modes &, const opdictc_gpu &, SOP<complex_type> &, opdictc_gpu &, _T)>(&liouville_space::left_superoperator),
@@ -134,7 +134,7 @@ void initialise_liouville_space(py::module &m)
           "anticommutator_superoperator",
           static_cast<void (*)(const sSOP<complex_type> &, const system_modes &, const opdictc &, sSOP<complex_type> &, opdictc &, _T)>(&liouville_space::anticommutator_superoperator),
           py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
-#ifdef PYTTN_BUILD_CUDA
+#ifdef PYTTN_BUILD_CUDA_NO
       .def_static(
           "left_superoperator",
           static_cast<void (*)(const sSOP<complex_type> &, const system_modes &, const opdictc_gpu &, sSOP<complex_type> &, opdictc_gpu &, _T)>(&liouville_space::left_superoperator),
@@ -219,7 +219,7 @@ void initialise_liouville_space(py::module &m)
           "anticommutator_superoperator",
           static_cast<void (*)(const sSOP<real_type> &, const system_modes &, const opdictr &, sSOP<real_type> &, opdictr &, real_type)>(&liouville_space::anticommutator_superoperator),
           py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
-#ifdef PYTTN_BUILD_CUDA
+#ifdef PYTTN_BUILD_CUDA_NO
       .def_static(
           "left_superoperator",
           static_cast<void (*)(const SOP<real_type> &, const system_modes &, const opdictr_gpu &, SOP<real_type> &, opdictr_gpu &, real_type)>(&liouville_space::left_superoperator),

@@ -25,11 +25,11 @@ namespace linalg
         template <typename T>
         struct qr_helper<T, blas_backend>
         {
-            using int_type = blas_backend::int_type;
+            using int_type = typename traits<blas_backend>::int_type;
             static_assert(is_number<T>::value && !is_complex<T>::value,
                           "Failed to initialise singular value decomposition working "
                           "space object.");
-            using size_type = blas_backend::size_type;
+            using size_type = typename traits<blas_backend>::size_type;
             using memfill = memory::filler<T, blas_backend>;
 
             struct additional_working
@@ -65,13 +65,13 @@ namespace linalg
         };
 
         template <typename T>
-        struct qr_helper<complex<T>, blas_backend>
+        struct qr_helper<std::complex<T>, blas_backend>
         {
-            using int_type = blas_backend::int_type;
+            using int_type = typename traits<blas_backend>::int_type;
             static_assert(is_number<T>::value && !is_complex<T>::value,
                           "Failed to initialise singular value decomposition working "
                           "space object.");
-            using size_type = blas_backend::size_type;
+            using size_type = typename traits<blas_backend>::size_type;
             using memfill = memory::filler<T, blas_backend>;
 
             struct additional_working
@@ -84,25 +84,25 @@ namespace linalg
                 void clear() { CALL_AND_RETHROW(m_rwork.clear()); }
             };
 
-            static inline void call_lq(const int_type m, const int_type n, complex<T> *a,
-                                       const int_type lda, complex<T> *tau,
-                                       complex<T> *work, const int_type lwork)
+            static inline void call_lq(const int_type m, const int_type n, std::complex<T> *a,
+                                       const int_type lda, std::complex<T> *tau,
+                                       std::complex<T> *work, const int_type lwork)
             {
                 CALL_AND_HANDLE(blas_backend::gelqf(m, n, a, lda, tau, work, lwork),
                                 "Failed to perform lq call.");
             }
 
-            static inline void call_qr(const int_type m, const int_type n, complex<T> *a,
-                                       const int_type lda, complex<T> *tau,
-                                       complex<T> *work, const int_type lwork)
+            static inline void call_qr(const int_type m, const int_type n, std::complex<T> *a,
+                                       const int_type lda, std::complex<T> *tau,
+                                       std::complex<T> *work, const int_type lwork)
             {
                 CALL_AND_HANDLE(blas_backend::geqrf(m, n, a, lda, tau, work, lwork),
                                 "Failed to perform qr call.");
             }
 
-            static inline void call_qr(const int_type m, const int_type n, complex<T> *a,
+            static inline void call_qr(const int_type m, const int_type n, std::complex<T> *a,
                                        const int_type lda, int_type *jpvt,
-                                       complex<T> *tau, complex<T> *work,
+                                       std::complex<T> *tau, std::complex<T> *work,
                                        const int_type lwork,
                                        additional_working &working)
             {
@@ -127,11 +127,11 @@ namespace linalg
                 void>::type>
         {
         public:
-            using int_type = blas_backend::int_type;
+            using int_type = typename traits<blas_backend>::int_type;
             using value_type =
                 typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
 
             using helper = qr_helper<value_type, backend_type>;
@@ -364,11 +364,11 @@ namespace linalg
                 void>::type>
         {
         public:
-            using int_type = blas_backend::int_type;
+            using int_type = typename traits<blas_backend>::int_type;
             using value_type =
                 typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
 
             using helper = qr_helper<value_type, backend_type>;

@@ -49,7 +49,7 @@ namespace linalg
             using base_type = expression_base<tensordot_expr<a_tensor_type, b_tensor_type, D>, true>;
             static constexpr size_t rank = traits<a_tensor_type>::rank + traits<b_tensor_type>::rank - (2 * D);
             using backend_type = typename traits<a_tensor_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using shape_type = std::array<size_type, rank>;
             using ttype = typename backend_type::transform_type;
 
@@ -290,7 +290,7 @@ namespace linalg
         using value_type = typename traits<a_tensor_type>::value_type;
         using backend_type = typename traits<a_tensor_type>::backend_type;
         static constexpr size_t rank = traits<a_tensor_type>::rank + traits<b_tensor_type>::rank - (2 * D);
-        using shape_type = std::array<typename backend_type::size_type, rank>;
+        using shape_type = std::array<typename traits<backend_type>::size_type, rank>;
         using const_shape_reference = const shape_type &;
     };
 } // namespace linalg

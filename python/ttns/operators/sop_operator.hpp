@@ -74,7 +74,7 @@ void init_sop_operator(py::module &m, const std::string &label)
         .def("complex_dtype", [](const _sop &)
              { return !std::is_same<T, real_type>::value; })
         .def("backend", [](const _sop &)
-             { return backend::label(); })
+             { return linalg::traits<backend>::label(); })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const _sop & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -116,7 +116,7 @@ void init_sop_operator(py::module &m, const std::string &label)
              { return !std::is_same<T, real_type>::value; })
         .def("nmodes", &_mssop::nmodes)
         .def("backend", [](const _mssop &)
-             { return backend::label(); })
+             { return linalg::traits<backend>::label(); })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const _mssop & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -136,7 +136,7 @@ void init_sop_operator(py::module &m, const std::string &label)
 template <typename real_type, typename backend>
 void initialise_sop_operator(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
     init_sop_operator<real_type, backend>(m, "real");

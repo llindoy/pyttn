@@ -100,13 +100,13 @@ void init_product_operator(py::module &m, const std::string &label)
 #endif  
 
         .def("backend", [](const pop &)
-             { return backend::label(); });
+             { return linalg::traits<backend>::label(); });
 }
 
 template <typename real_type, typename backend>
 void initialise_product_operator(py::module &m)
 {
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
 
 #ifdef BUILD_REAL_TTN
     init_product_operator<real_type, backend>(m, "real");

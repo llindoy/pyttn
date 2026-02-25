@@ -28,8 +28,8 @@ template <typename T, typename backend,
           class Environment>
 class assigment_engine<T, backend, Environment> {
 public:
-  using size_type = typename backend::size_type;
-  using real_type = typename tmp::get_real_type<T>::type;
+  using size_type = typename linalg::traits<backend>::size_type;
+  using real_type = typename linalg::get_real_type<T>::type;
   using environment_type = Environment<T, backend, ttn_class>;
 
   using env_container_type = typename environment_type::container_type;
@@ -48,7 +48,7 @@ public:
 
   using buffer_type = typename environment_type::buffer_type;
   using eigensolver_type = utils::arnoldi<T, backend>;
-    static constexpr std::string_view class_info = "assignment:";
+    static constexpr std::string_view class_info{"assignment:"};
 
   struct parameter_list {};
 

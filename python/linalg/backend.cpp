@@ -13,7 +13,6 @@
  */
 
 #include "backend.hpp"
-
 #include <linalg/linalg.hpp>
 #include <sstream>
 
@@ -43,7 +42,8 @@ void initialise_blas_backend(py::module &m)
             )mydelim");
 }
 
-#ifdef PYTTN_BUILD_CUDA
+
+#ifdef PYTTN_BUILD_CUDA_NO
 void initialise_cuda_backend(py::module &m)
 {
     using namespace linalg;

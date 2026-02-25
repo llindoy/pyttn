@@ -34,9 +34,9 @@ namespace linalg
         public:
             using value_type = typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
-            using int_type = typename backend_type::int_type;
+            using int_type = typename traits<backend_type>::int_type;
 
         protected:
             tensor<value_type, 1, backend_type> m_work;
@@ -411,7 +411,7 @@ namespace linalg
                 CALL_AND_HANDLE(mem_trans::copy(rvecsl, N * N, mat.buffer()), "Failed to copy the packed eigenvector buffer to the mat buffer.");
                 CALL_AND_HANDLE(internal::unpack_eigenvectors(N, m_eigs_i.buffer(), mat.buffer(), vecs_l.buffer()), "Failed to unpack eigenvectors buffer to complex format.");
                 // take the inner product of the left and right eigenvectors to allow for a sensible normalisation
-                CALL_AND_HANDLE(for (size_type i = 0; i < vecs_r.shape(0); ++i) {complex<value_type> scaling = static_cast<value_type>(1.0)/dot_product(conj(vecs_l[i]), vecs_r[i]); vecs_r[i] *= scaling; }, "Failed to compute eigendecomposition of general matrix.  Failed to rescale the right eigenvectors.");
+                CALL_AND_HANDLE(for (size_type i = 0; i < vecs_r.shape(0); ++i) {std::complex<value_type> scaling = static_cast<value_type>(1.0)/dot_product(conj(vecs_l[i]), vecs_r[i]); vecs_r[i] *= scaling; }, "Failed to compute eigendecomposition of general matrix.  Failed to rescale the right eigenvectors.");
                 CALL_AND_HANDLE(vecs_r = trans(vecs_r), "Failed to compute eigendecomposition of general matrix.  Failed to construct right eigenvectors in row major order.");
                 CALL_AND_HANDLE(vecs_l = trans(vecs_l), "Failed to compute eigendecomposition of general matrix.  Failed to construct left eigenvectors in row major order.");
             }
@@ -454,9 +454,9 @@ namespace linalg
         public:
             using value_type = typename traits<matrix_type>::value_type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
-            using int_type = typename backend_type::int_type;
+            using int_type = typename traits<backend_type>::int_type;
 
         protected:
             tensor<typename get_real_type<value_type>::type, 1, backend_type> m_rwork;

@@ -38,7 +38,7 @@ namespace linalg
             using value_ptr = typename std::add_pointer<typename std::add_const<value_type>::type>::type;
 
             using backend_type = typename traits<T1>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using shape_type = std::array<size_type, 3>;
             using ttype = typename backend_type::transform_type;
 
@@ -348,7 +348,7 @@ namespace linalg
 
         using value_type = typename traits<T1>::value_type;
         using backend_type = typename traits<T1>::backend_type;
-        using shape_type = std::array<typename backend_type::size_type, 3>;
+        using shape_type = std::array<typename traits<backend_type>::size_type, 3>;
         using const_shape_reference = const shape_type &;
         static constexpr size_t rank = 3;
     };

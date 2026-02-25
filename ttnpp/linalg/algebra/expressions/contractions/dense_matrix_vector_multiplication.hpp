@@ -205,7 +205,7 @@ namespace linalg
         using rvalue_type = typename traits<T2>::value_type;
         using value_type = decltype(lvalue_type() * rvalue_type());
         using backend_type = typename traits<T1>::backend_type;
-        using shape_type = std::array<typename backend_type::size_type, 1>;
+        using shape_type = std::array<typename traits<backend_type>::size_type, 1>;
         using const_shape_reference = const shape_type &;
         static constexpr size_t rank = 1;
     };

@@ -37,8 +37,8 @@ namespace ttns
         class decomposition_engine
         {
         public:
-            using real_type = typename tmp::get_real_type<T>::type;
-            using size_type = typename backend::size_type;
+            using real_type = typename linalg::get_real_type<T>::type;
+            using size_type = typename linalg::traits<backend>::size_type;
             using matrix_type = linalg::matrix<T, backend>;
             using dmat_type = linalg::diagonal_matrix<real_type, backend>;
             using dmat_host_type = linalg::diagonal_matrix<real_type>;
