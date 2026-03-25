@@ -12,9 +12,18 @@
  * limitations under the License
  */
 
-#include <linalg/utils/genrandom.cuh>
+#include <linalg/linalg.cuh>
+#include <linalg/linalg.hpp>
 
-namespace linalg
+#include "../../linalg/orthogonal_vector_gen.tpp"
+#include "../../pyttn_typedef.hpp"
+
+void initialise_orthogonal_vector(py::module &m)
 {
-    template class random_engine<cuda_backend>;
+    initialise_orthogonal_vector_types<pyttn_real_type, linalg::blas_backend>(m);
+}
+
+void initialise_orthogonal_vector_cuda(py::module &m)
+{
+    initialise_orthogonal_vector_types<pyttn_real_type, linalg::cuda_backend>(m);
 }

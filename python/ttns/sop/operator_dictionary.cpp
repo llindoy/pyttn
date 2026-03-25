@@ -12,8 +12,11 @@
  * limitations under the License
  */
 
-#include "operator_dictionary.hpp"
+#include <linalg/linalg.hpp>
+#include "operator_dictionary.tpp"
 #include "../../pyttn_typedef.hpp"
 
-template <>
-void initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(py::module &m);
+void initialise_operator_dictionary(py::module &m)
+{
+    initialise_operator_dictionary_types<pyttn_real_type, linalg::blas_backend>(m);
+}

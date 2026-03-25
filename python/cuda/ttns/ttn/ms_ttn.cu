@@ -12,25 +12,18 @@
  * limitations under the License
  */
 
-#include <ttns_lib/ttn/ms_ttn.hpp>
-#include <ttns_lib/ttn/multiset_ttn_slice.hpp>
-#include <ttns_lib/ttn/ttn_nodes/ms_ttn_node.hpp>
-#include <ttns_lib/operators/site_operators/site_operator.hpp>
+#include <linalg/linalg.cuh>
+#include <linalg/linalg.hpp>
+
+#include "../../../ttns/ttn/ms_ttn.tpp"
 #include "../../../pyttn_typedef.hpp"
 
-namespace ttns
+void initialise_msttn(py::module &m)
 {
-#ifdef BUILD_REAL_TTN
-    template class ms_ttn<pyttn_real_type, linalg::cuda_backend>;
-    template class ms_ttn_node<pyttn_real_type, linalg::cuda_backend>;
-    template class tree_node<tree_base<std::vector<ttn_node_data<pyttn_real_type, linalg::cuda_backend>>>>;
-    template class ttn_node_data<pyttn_real_type, linalg::cuda_backend>;
-    template class multiset_ttn_slice<pyttn_real_type, linalg::cuda_backend, false>;
-    template class multiset_ttn_slice<pyttn_real_type, linalg::cuda_backend, true>;
-#endif
-    template class ms_ttn<std::complex<pyttn_real_type>, linalg::cuda_backend>;
-    template class tree_node<tree_base<std::vector<ttn_node_data<std::complex<pyttn_real_type>, linalg::cuda_backend>>>>;
-    template class ttn_node_data<std::complex<pyttn_real_type>, linalg::cuda_backend>;
-    template class multiset_ttn_slice<std::complex<pyttn_real_type>, linalg::cuda_backend, false>;
-    template class multiset_ttn_slice<std::complex<pyttn_real_type>, linalg::cuda_backend, true>;
+    initialise_msttn_types<pyttn_real_type, linalg::blas_backend>(m);
+}
+
+void initialise_msttn_cuda(py::module &m)
+{
+    initialise_msttn_types<pyttn_real_type, linalg::cuda_backend>(m);
 }

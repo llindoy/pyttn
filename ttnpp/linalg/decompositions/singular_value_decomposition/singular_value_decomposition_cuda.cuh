@@ -17,11 +17,15 @@
 
 #include "singular_value_decomposition_base.hpp"
 
+#include "../../backends/cuda/cuda_backend.cuh"
 #include "../../backends/cuda/cusolver_wrapper.cuh"
 
+//TODO: Need to fix the code here.  We want to get this working like the CPU code with both inplace and out of place operations.
+//In general we want to have this working with the decomposition engine object defined in singular_value_decomposition_blas.hpp
+//which we will want to move to singular_value_decomposition.hpp.
+//ToDO: Add support for minimal and inplace decompositions.  Additionally add support for gesvdj.
 namespace linalg
 {
-
     namespace internal
     {
 
@@ -29,7 +33,8 @@ namespace linalg
         template <typename T>
         struct singular_value_decomposition_helper<T, cuda_backend, true>
         {
-            using int_type = typename traits<cuda_backend>::int_type;
+            using backend_type = cuda_backend;
+            using int_type = typename traits<backend_type>::int_type;
             static_assert(is_number<T>::value, "Failed to initialise singular value decomposition working space object.");
             using size_type = typename traits<cuda_backend>::size_type;
             using memfill = memory::filler<T, cuda_backend>;
@@ -58,32 +63,120 @@ namespace linalg
             };
 
             template <typename mat_type>
-            static inline void call(bool compute_vectors, bool economy, mat_type &mat, T *S, T *U, const int_type LDU, T *VT, const int_type LDVT, T *WORK, const int_type LWORK, additional_working &working)
+            static inline void call(bool compute_vectors, bool economy, mat_type &mat, real_type *S, value_type *U, const int_type LDU, value_type *VT, const int_type LDVT, value_type *WORK, const int_type LWORK, additional_working &working)
             {
                 CALL_AND_RETHROW(call(compute_vectors, economy, mat.shape(0), mat.shape(1), mat.buffer(), mat.shape(1), S, U, LDU, VT, LDVT, WORK, LWORK, working));
             }
 
-            static inline void call(bool compute_vectors, bool economy, const int_type M, const int_type N, T *A, const int_type LDA, T *S, T *U, const int_type LDU, T *VT, const int_type LDVT, T *WORK, const int_type LWORK, additional_working &working)
+            static inline void call(bool compute_vectors, bool economy, const int_type M, const int_type N, value_type *A, const int_type LDA, real_type *S, value_type *U, const int_type LDU, value_type *VT, const int_type LDVT, value_type *WORK, const int_type LWORK, additional_working &working)
             {
                 // we need to compute A^T = VT^T S U^T as the lapack expects a column major matrix but we are passing in a row major matrix.
                 cusolverEigMode_t JOBZ = (compute_vectors ? CUSOLVER_EIG_MODE_VECTOR : CUSOLVER_EIG_MODE_NOVECTOR);
                 int_type econ = economy ? 1 : 0;
-                CALL_AND_RETHROW(cuda_backend::gesvdj(JOBZ, econ, N, M, A, LDA, S, VT, LDVT, U, LDU, WORK, LWORK, working.m_gpu_info.buffer(), working.m_params));
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesvdj(JOBZ, econ, N, M, A, LDA, S, VT, LDVT, U, LDU, WORK, LWORK, working.m_gpu_info.buffer(), working.m_params));
                 working.m_cpu_info = working.m_gpu_info;
                 CALL_AND_RETHROW(cusolver::gesvd_error_handling(working.m_cpu_info(0), 'a'));
             }
 
-            static inline int_type query_worksize(bool compute_vectors, bool economy, const int_type M, const int_type N, T *A, const int_type LDA, T *S, T *U, const int_type LDU, T *VT, const int_type LDVT, additional_working &working)
+            static inline int_type query_worksize(bool compute_vectors, bool economy, const int_type M, const int_type N, value_type *A, const int_type LDA, real_type *S, value_type *U, const int_type LDU, value_type *VT, const int_type LDVT, additional_working &working)
             {
                 cusolverEigMode_t JOBZ = (compute_vectors ? CUSOLVER_EIG_MODE_VECTOR : CUSOLVER_EIG_MODE_NOVECTOR);
                 int_type econ = economy ? 1 : 0;
                 int_type worksize;
-                CALL_AND_RETHROW(cuda_backend::gesvdj_buffersize(JOBZ, econ, N, M, A, LDA, S, VT, LDVT, U, LDU, worksize, working.m_params));
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesvdj_buffersize(JOBZ, econ, N, M, A, LDA, S, VT, LDVT, U, LDU, worksize, working.m_params));
                 return worksize;
             }
         };
 
 #endif
+
+        template <typename T>
+        struct singular_value_decomposition_helper<T, cuda_backend, false>
+        {
+            using backend_type = cuda_backend;
+
+            using int_type = typename traits<backend_type>::int_type;
+            using size_type = typename traits<backend_type>::size_type;
+            using value_type = typename linalg::device_type<T, backend_type>::type;
+            using memfill = memory::filler<T, backend_type>;
+            using real_type = typename linalg::get_real_type<T>::type;
+
+            struct additional_working
+            {
+                tensor<real_type, 1, cuda_backend> m_rwork;
+                tensor<int, 1, backend_type> m_gpu_info;
+                tensor<int, 1> m_cpu_info;
+                void resize(size_type m, size_type n)
+                {
+                    size_type mn = m < n ? m : n;
+                    CALL_AND_HANDLE(m_rwork.resize(mn - 1), "Failed to resize rwork array.");
+                    m_gpu_info.resize(1);
+                    m_cpu_info.resize(1);
+
+                }
+                void clear() { CALL_AND_RETHROW(m_rwork.clear()); CALL_AND_RETHROW(m_cpu_info.clear()); CALL_AND_RETHROW(m_gpu_info.clear());}
+            };
+            static inline void call(bool compute_vectors, const int_type M, const int_type N, value_type *A, const int_type LDA, real_type *S, value_type *U, const int_type LDU, value_type *VT, const int_type LDVT, value_type *WORK, const int_type LWORK, additional_working &working)
+            {
+                char JOBZ = (compute_vectors ? 'A' : 'N');
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd(JOBZ, JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, WORK, LWORK, working.m_rwork.buffer(), working.m_gpu_info.buffer()));
+                CALL_AND_HANDLE(working.m_cpu_info = working.m_gpu_info, "Failed to copy status of cusolver gesvd call from device to host.");
+                CALL_AND_HANDLE(cusolver::gesvd_error_handling(working.m_cpu_info(0), 'a'), "Cusolver gesvd call failed.");
+            }
+
+            static inline int_type query_worksize(bool compute_vectors, const int_type M, const int_type N, value_type *A, const int_type LDA, real_type *S, value_type *U, const int_type LDU, value_type *VT, const int_type LDVT, additional_working &working)
+            {
+                value_type worksize;
+                int_type lwork = -1;
+                char JOBZ = (compute_vectors ? 'A' : 'N');
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd(JOBZ, JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, &worksize, lwork, working.m_rwork.buffer(), working.m_gpu_info.buffer()));
+
+                CALL_AND_HANDLE(working.m_cpu_info = working.m_gpu_info, "Failed to copy status of cusolver gesvd call from device to host.");
+                CALL_AND_HANDLE(cusolver::gesvd_error_handling(working.m_cpu_info(0), 'a'), "Cusolver gesvd call failed.");
+                CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
+            }
+
+            static inline void call_inplace(const int_type M, const int_type N, value_type *A, const int_type LDA, real_type *S, value_type *R, const int_type LDR, value_type *WORK, const int_type LWORK, additional_working &working)
+            {
+                int_type MM = N;
+                int_type NN = M;
+                value_type nref;
+                // if MM < NN then the second possible result argument (U^T) is not referenced so R must store (VT^T) and A will store U^T on exit
+                if (MM < NN)
+                {
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('A', 'O', MM, NN, A, LDA, S, R, LDR, &nref, 1, WORK, LWORK, working.m_rwork.buffer(), working.m_gpu_info.buffer()));
+                }
+                // otherwise the first result argument (VT^T) is not referenced
+                else
+                {
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('O', 'A', MM, NN, A, LDA, S, &nref, 1, R, LDR, WORK, LWORK, working.m_rwork.buffer(), working.m_gpu_info.buffer()));
+                }
+                CALL_AND_HANDLE(working.m_cpu_info = working.m_gpu_info, "Failed to copy status of cusolver gesvd call from device to host.");
+                CALL_AND_HANDLE(cusolver::gesvd_error_handling(working.m_cpu_info(0), 'a'), "Cusolver gesvd call failed.");
+            }
+
+            static inline int_type query_worksize_inplace(const int_type M, const int_type N, value_type *A, const int_type LDA, real_type *S, value_type *R, const int_type LDR, additional_working &working)
+            {
+                value_type worksize, nref;
+                int_type lwork = -1;
+                int_type MM = N;
+                int_type NN = M;
+                // if MM < NN then the second possible result argument (U^T) is not referenced so R must store (VT^T) and A will store U^T on exit
+                if (MM < NN)
+                {
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('A', 'O', MM, NN, A, LDA, S, R, LDR, &nref, 1, &worksize, lwork, working.m_rwork.buffer(), working.m_gpu_info.buffer()));
+                }
+                // otherwise the first result argument (VT^T) is not referenced
+                else
+                {
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('O', 'A', MM, NN, A, LDA, S, &nref, 1, R, LDR, &worksize, lwork, working.m_rwork.buffer(), working.m_gpu_info.buffer()));
+                }
+
+                CALL_AND_HANDLE(working.m_cpu_info = working.m_gpu_info, "Failed to copy status of cusolver gesvd call from device to host.");
+                CALL_AND_HANDLE(cusolver::gesvd_error_handling(working.m_cpu_info(0), 'a'), "Cusolver gesvd call failed.");
+                CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
+            }
+        };
 
         template <typename matrix_type>
         class dense_matrix_singular_value_decomposition<matrix_type, false, typename std::enable_if<is_dense_matrix<matrix_type>::value && std::is_same<typename traits<matrix_type>::backend_type, cuda_backend>::value, void>::type>
@@ -92,7 +185,7 @@ namespace linalg
             using int_type = typename traits<cuda_backend>::int_type;
             using value_type = typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using real_type = typename get_real_type<value_type>::type;
-            using backend_type = typename traits<matrix_type>::backend_type;
+            using backend_type = cuda_backend;
             using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
 
@@ -100,10 +193,10 @@ namespace linalg
             tensor<value_type, 1, backend_type> m_work;
             tensor<value_type, 2, backend_type> m_mat;
 
-            tensor<real_type, 1, cuda_backend> m_rwork;
-            tensor<int, 1, cuda_backend> m_gpu_info;
+            tensor<real_type, 1, backend_type> m_rwork;
+            tensor<int, 1, backend_type> m_gpu_info;
             tensor<int, 1> m_cpu_info;
-            tensor<value_type, 1, cuda_backend> m_nref;
+            tensor<value_type, 1, backend_type> m_nref;
 
         public:
             dense_matrix_singular_value_decomposition()
@@ -178,7 +271,6 @@ namespace linalg
             {
                 if (m_work.size() < worksize)
                 {
-                    std::cerr << worksize << std::endl;
                     CALL_AND_HANDLE(m_work.resize(worksize), "Failed to resize workspace of eigensolver object.");
                 }
             }
@@ -231,7 +323,7 @@ namespace linalg
                     value_type U;
                     value_type VT;
                     CALL_AND_HANDLE(
-                        cuda_backend::gesvd(jobu, jobvt, N, M, m_mat.buffer(), m_mat.shape(1), S.buffer(), &VT, 1, &U, 1, m_work.buffer(), m_work.size(), m_rwork.buffer(), m_gpu_info.buffer()),
+                        backend_algebra<backend_type>::gesvd(jobu, jobvt, N, M, m_mat.buffer(), m_mat.shape(1), S.buffer(), &VT, 1, &U, 1, m_work.buffer(), worksize, m_rwork.buffer(), m_gpu_info.buffer()),
                         "Failed to evaluate cuda_backend gesvd call.");
 
                     CALL_AND_HANDLE(m_cpu_info = m_gpu_info, "Failed to copy status of cusolver gesvd call from device to host.");
@@ -255,46 +347,57 @@ namespace linalg
                 try
                 {
                     char jobu, jobvt;
-                    if (compute_full)
-                    {
-                        CALL_AND_RETHROW(validate(mat, S, U, Vh));
-                        jobu = 'A';
-                        jobvt = 'A';
-                    }
-                    else
-                    {
-                        CALL_AND_RETHROW(validate_minimal(mat, S, U, Vh));
-                        jobu = 'S';
-                        jobvt = 'S';
-                    }
 
-                    size_type M = mat.shape(0);
-                    size_type N = mat.shape(1);
-                    size_type MM = M;
-                    size_type NN = N;
-                    // if N < M we need to transpose our input matrix and reorder the results
+                    size_type MM = mat.shape(0);
+                    size_type NN = mat.shape(1);
+                    //cusolverDn<X>gesvd only supports m>=n.  This is for column major matrices
+                    //Here we work with row-major matrices so we are inherently working with transpose matrices
+                    //as such the call will fail if N < M and we need to transpose the input matrix.  This gives us the matrix
                     if (NN < MM)
                     {
-                        N = mat.shape(0);
-                        M = mat.shape(1);
+                        if (compute_full)
+                        {
+                            CALL_AND_RETHROW(validate(mat, S, U, Vh));
+                            jobu = 'A';
+                            jobvt = 'A';
+                        }
+                        else
+                        {
+                            CALL_AND_RETHROW(validate_minimal(mat, S, U, Vh));
+                            jobu = 'S';
+                            jobvt = 'S';
+                        }
                         CALL_AND_HANDLE(m_mat = trans(mat), "Failed to compute matrix transpose necessary to form correct matrix shape for cusolver gesvd call.");
                     }
                     else
                     {
+                        if (compute_full || true)
+                        {
+                            CALL_AND_RETHROW(validate(mat, S, U, Vh));
+                            jobu = 'A';
+                            jobvt = 'A';
+                        }
+                        else
+                        {
+                            CALL_AND_RETHROW(validate_minimal(mat, S, U, Vh));
+                            jobu = 'S';
+                            jobvt = 'S';
+                        }
                         CALL_AND_HANDLE(m_mat = mat, "Failed to copy input matrix for cusolver gesvd call.");
                     }
+                    size_type M = m_mat.shape(0);
+                    size_type N = m_mat.shape(1);
                     size_type worksize;
+                    size_type old_worksize = m_work.size();
                     CALL_AND_HANDLE(worksize = query_work_space(m_mat, S), "Failed to query the optimal worksize of the input array.");
                     CALL_AND_HANDLE(resize_work_space(worksize), "Failed tor resize workspace buffer.");
-
                     // if we have transposed the input matrix we need to take that into account
                     if (NN < MM)
                     {
                         auto Ur = U.reinterpret_shape(U.shape(1), U.shape(0));
                         auto Vhr = Vh.reinterpret_shape(Vh.shape(1), Vh.shape(0));
-
                         CALL_AND_HANDLE(
-                            cuda_backend::gesvd(jobu, jobvt, N, M, m_mat.buffer(), m_mat.shape(1), S.buffer(), U.buffer(), U.shape(0), Vh.buffer(), Vh.shape(0), m_work.buffer(), m_work.size(), m_rwork.buffer(), m_gpu_info.buffer()),
+                            backend_algebra<backend_type>::gesvd(jobu, jobvt, N, M, m_mat.buffer(), m_mat.shape(1), S.buffer(), U.buffer(), U.shape(0), Vh.buffer(), Vh.shape(0), m_work.buffer(), m_work.size(), m_rwork.buffer(), m_gpu_info.buffer()),
                             "Failed to evaluate cuda_backend gesvd call.");
 
                         CALL_AND_HANDLE(m_cpu_info = m_gpu_info, "Failed to copy status of cusolver gesvd call from device to host.");
@@ -311,7 +414,7 @@ namespace linalg
                     else
                     {
                         CALL_AND_HANDLE(
-                            cuda_backend::gesvd(jobu, jobvt, N, M, m_mat.buffer(), m_mat.shape(1), S.buffer(), Vh.buffer(), Vh.shape(1), U.buffer(), U.shape(1), m_work.buffer(), m_work.size(), m_rwork.buffer(), m_gpu_info.buffer()),
+                            backend_algebra<backend_type>::gesvd(jobu, jobvt, N, M, m_mat.buffer(), m_mat.shape(1), S.buffer(), Vh.buffer(), Vh.shape(1), U.buffer(), U.shape(1), m_work.buffer(), m_work.size(), m_rwork.buffer(), m_gpu_info.buffer()),
                             "Failed to evaluate cuda_backend gesvd call.");
 
                         CALL_AND_HANDLE(m_cpu_info = m_gpu_info, "Failed to copy status of cusolver gesvd call from device to host.");
@@ -344,16 +447,19 @@ namespace linalg
             template <typename mat_type, typename vals_type>
             valid_decomp_func<matrix_type, mat_type, size_type, validate_vals_type, vals_type> query_work_space(const mat_type &mat, vals_type &S)
             {
+                using device_value_type = typename device_type<value_type, backend_type>::type;
                 int_type worksize;
                 int_type M = mat.shape(0);
                 int_type N = mat.shape(1);
-                if (M <= N)
+
+                using gesvd_buff = backend_algebra<backend_type>::gesvd_buffersize<device_value_type>;
+                if (N < M)
                 {
-                    CALL_AND_HANDLE(cuda_backend::gesvd_buffersize<value_type>(M, N, worksize), "Failed to determine optimal buffer size for cusolver gesvd call.");
+                    CALL_AND_HANDLE(gesvd_buff::eval(M, N, worksize), "Failed to determine optimal buffer size for cusolver gesvd call.");
                 }
                 else
                 {
-                    CALL_AND_HANDLE(cuda_backend::gesvd_buffersize<value_type>(N, M, worksize), "Failed to determine optimal buffer size for cusolver gesvd call.");
+                    CALL_AND_HANDLE(gesvd_buff::eval(N, M, worksize), "Failed to determine optimal buffer size for cusolver gesvd call.");
                 }
                 return static_cast<size_type>(worksize);
             }
@@ -403,7 +509,6 @@ namespace linalg
         };
 
     } // namespace internal
-
 } // namespace linalg
 
 #endif // PYTTN_LINALG_DECOMPOSITIONS_SINGULAR_VALUE_DECOMPOSITION_CUDA_HPP_

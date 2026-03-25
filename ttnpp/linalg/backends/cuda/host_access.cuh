@@ -26,6 +26,11 @@ namespace linalg
     protected:
         using host_allocator = memory::allocator<T, blas_backend>;
         using host_memtransfer = memory::transfer<cuda_backend, blas_backend>;
+
+        using host_pointer = T*;
+        using device_value_type = typename device_type<T, cuda_backend>::type;
+        using device_pointer = device_value_type*;
+
         mutable T* m_host_buffer;
         mutable size_t m_host_buffer_size;
         mutable bool m_copied_from_host;
@@ -54,7 +59,7 @@ namespace linalg
             m_host_buffer_size = 0;
         }
 
-        void _from_host(T* buffer, size_t totsize) const
+        void _from_host(device_pointer buffer, size_t totsize) const
         {
             if(m_host_buffer == nullptr)
             {

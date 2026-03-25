@@ -70,9 +70,9 @@ namespace ttns
             }
 
             template <typename engine>
-            static inline size_type maximum_work_size_node(engine &eng, const hdata &A, mat &U, mat &R, bool use_capacity = false)
+            static inline size_type maximum_work_size_node(engine &eng, const hdata &A, mat &U, mat &R, bool is_root, bool use_capacity = false)
             {
-                size_type max_work_size;
+                size_type max_work_size = 0;
 
                 // determine the maximum dimension of the hierarchical tucker decomposition object
                 size_type max_dim = A.hrank(use_capacity);
@@ -90,8 +90,11 @@ namespace ttns
                 CALL_AND_HANDLE(U.resize(A.dimen(use_capacity), A.hrank(use_capacity)), "Failed when resizing the U matrix so that it has the correct shape.");
                 CALL_AND_HANDLE(R.resize(A.hrank(use_capacity), A.hrank(use_capacity)), "Failed when resizing the R matrix so that it has the correct shape.");
 
-                // first check the default ordering decomposition
-                CALL_AND_HANDLE(max_work_size = eng.query_work_size(A.as_rank_2(use_capacity), U, R), "Failed to query work size of the decomposition engine.");
+                if(!is_root || true)
+                {
+                    // first check the default ordering decomposition, but only if this node is not the root node
+                    CALL_AND_HANDLE(max_work_size = eng.query_work_size(A.as_rank_2(use_capacity), U, R), "Failed to query work size of the decomposition engine.");
+                }
 
                 // now we test all of the possible reordering sizes
                 if (A.nmodes() != 1)
@@ -119,12 +122,12 @@ namespace ttns
             }
 
             template <typename engine>
-            static inline size_type maximum_work_size_node(engine &eng, const std::vector<hdata> &A, std::vector<mat> &U, std::vector<mat> &R, bool use_capacity = false)
+            static inline size_type maximum_work_size_node(engine &eng, const std::vector<hdata> &A, std::vector<mat> &U, std::vector<mat> &R, bool is_root, bool use_capacity = false)
             {
                 size_type maxdim = 0;
                 for (size_type i = 0; i < A.size(); ++i)
                 {
-                    size_type mi = maximum_work_size_node(eng, A[i], U[i], R[i], use_capacity);
+                    size_type mi = maximum_work_size_node(eng, A[i], U[i], R[i], is_root, use_capacity);
                     if (mi > maxdim)
                     {
                         maxdim = mi;

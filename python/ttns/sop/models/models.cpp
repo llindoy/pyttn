@@ -15,8 +15,7 @@
 #include "models.hpp"
 #include "../../../pyttn_typedef.hpp"
 
-template <>
-void initialise_models<pyttn_real_type>(py::module &m)
+void initialise_models(py::module &m)
 {
     using real_type = pyttn_real_type;
     using complex_type = std::complex<real_type>;

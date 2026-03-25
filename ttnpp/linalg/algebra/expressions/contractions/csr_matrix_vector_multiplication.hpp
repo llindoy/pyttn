@@ -40,15 +40,18 @@ namespace linalg
             using right_type = dense_type;
             using lvalue_type = typename traits<left_type>::value_type;
             using rvalue_type = typename traits<right_type>::value_type;
+            using ldevice_value_type = typename traits<left_type>::device_value_type;
+            using rdevice_value_type = typename traits<right_type>::device_value_type;
 
-            using lvalue_ptr = typename std::add_pointer<typename std::add_const<lvalue_type>::type>::type;
-            using rvalue_ptr = typename std::add_pointer<typename std::add_const<rvalue_type>::type>::type;
+            using lvalue_ptr = typename std::add_pointer<typename std::add_const<ldevice_value_type>::type>::type;
+            using rvalue_ptr = typename std::add_pointer<typename std::add_const<rdevice_value_type>::type>::type;
             using index_ptr = typename std::add_pointer<typename std::add_const<index_type>::type>::type;
 
             using value_type = decltype(rvalue_type() * lvalue_type());
+            using device_value_type = typename device_type<value_type, backend_type>::type;
             using self_type = matrix_vector_product<left_type, right_type>;
             using base_type = matrix_vector_product_base<self_type>;
-            using ttype = typename backend_type::transform_type;
+            using ttype = typename backend_algebra<backend_type>::transform_type;
 
             static constexpr size_t rank = 1;
 
@@ -105,19 +108,20 @@ namespace linalg
 
             // This routine expects dense matrices in row major order.  And as such there is no need to perform the reordering of operations required for the dense dense matrix products.
             template <typename T3>
-            void applicative_impl(T3 &res, value_type beta = 0.0, value_type coeff_scale = 1.0)
+            void applicative_impl(T3 &res, value_type _beta = 0.0, value_type coeff_scale = 1.0)
             {
                 try
                 {
                     ASSERT(res.buffer() != m_Xbuffer, "The matrix vector product does not support inplace products.");
-                    value_type coeff = m_coeff * coeff_scale;
+                    device_value_type coeff(m_coeff * coeff_scale);
+                    device_value_type beta(_beta);
                     size_type incc = res.incx();
 
                     ASSERT(m_opA == backend_type::op_h || m_opA == backend_type::op_t, "Transposed csr matrices are currently not supported.");
                     ttype opA = (m_opA == backend_type::op_h) ? backend_type::op_c : backend_type::op_n;
                     bool conjB = (m_opX == backend_type::op_c || m_opX == backend_type::op_h);
 
-                    CALL_AND_HANDLE(backend_type::csrmv(opA, conjB, m_n, m_m, m_Asize, coeff, m_Abuffer, m_rowptr, m_colind, m_Xbuffer, m_incX, beta, res.buffer(), incc), "Error when making call to backend::csrmv");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::csrmv(opA, conjB, m_n, m_m, m_Asize, coeff, m_Abuffer, m_rowptr, m_colind, m_Xbuffer, m_incX, beta, res.buffer(), incc), "Error when making call to backend::csrmv");
                 }
                 catch (const std::exception &ex)
                 {

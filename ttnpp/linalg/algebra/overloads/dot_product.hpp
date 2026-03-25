@@ -45,7 +45,7 @@ namespace linalg
         using backend_type = typename traits<T>::backend_type;
 
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::dot(true, a.size(), a.buffer(), a.incx(), a.buffer(), a.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::dot(true, a.size(), a.buffer(), a.incx(), a.buffer(), a.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
 
         return std::sqrt(std::real(val));
     }
@@ -59,7 +59,7 @@ namespace linalg
 
         ASSERT(a.size() == b.size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::dot(false, a.size(), a.buffer(), a.incx(), b.buffer(), b.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::dot(false, a.size(), a.buffer(), a.incx(), b.buffer(), b.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
         return val;
     }
 
@@ -72,7 +72,7 @@ namespace linalg
 
         ASSERT(a.obj().size() == b.size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::dot(true, b.size(), a.obj().buffer(), a.obj().incx(), b.buffer(), b.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::dot(true, b.size(), a.obj().buffer(), a.obj().incx(), b.buffer(), b.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
         return val;
     }
 
@@ -84,7 +84,7 @@ namespace linalg
 
         ASSERT(a.size() == b.obj().size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::dot(true, a.size(), b.obj().buffer(), b.obj().incx(), a.buffer(), a.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::dot(true, a.size(), b.obj().buffer(), b.obj().incx(), a.buffer(), a.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
         return val;
     }
 
@@ -97,7 +97,7 @@ namespace linalg
 
         ASSERT(a.obj().size() == b.obj().size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::dot(false, a.obj().size(), a.obj().buffer(), a.obj().incx(), b.obj().buffer(), b.obj().incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::dot(false, a.obj().size(), a.obj().buffer(), a.obj().incx(), b.obj().buffer(), b.obj().incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
         return conj(val);
     }
 
@@ -110,7 +110,7 @@ namespace linalg
 
         ASSERT(a.right().obj().size() == b.size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::dot(true, b.size(), a.right().obj().buffer(), a.right().obj().incx(), b.buffer(), b.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::dot(true, b.size(), a.right().obj().buffer(), a.right().obj().incx(), b.buffer(), b.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
         return val * a.left()();
     }
 
@@ -122,7 +122,7 @@ namespace linalg
 
         ASSERT(a.size() == b.right().obj().size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::dot(false, a.size(), b.right().obj().buffer(), b.right().obj().incx(), a.buffer(), a.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::dot(false, a.size(), b.right().obj().buffer(), b.right().obj().incx(), a.buffer(), a.incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
         return val * b.left()();
     }
 
@@ -135,7 +135,7 @@ namespace linalg
 
         ASSERT(a.right().obj().size() == b.right().obj().size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::dot(false, a.right().obj().size(), a.right().obj().buffer(), a.right().obj().incx(), b.right().obj().buffer(), b.right().obj().incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::dot(false, a.right().obj().size(), a.right().obj().buffer(), a.right().obj().incx(), b.right().obj().buffer(), b.right().obj().incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
         return conj(val) * a.left()() * b.right()();
     }
 
@@ -149,7 +149,7 @@ namespace linalg
 
         ASSERT(a.right().obj().size() == b.obj().size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::dot(false, b.obj().size(), a.right().obj().buffer(), a.right().obj().incx(), b.obj().buffer(), b.obj().incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::dot(false, b.obj().size(), a.right().obj().buffer(), a.right().obj().incx(), b.obj().buffer(), b.obj().incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
         return conj(val) * a.left()();
     }
 
@@ -162,7 +162,7 @@ namespace linalg
 
         ASSERT(a.obj().size() == b.right().obj().size(), "Failed to evaluate dot product between two arrays.  The two arrays do not have the same size.");
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::dot(false, a.obj().size(), a.obj().buffer(), a.obj().incx(), b.right().obj().buffer(), b.right().obj().incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::dot(false, a.obj().size(), a.obj().buffer(), a.obj().incx(), b.right().obj().buffer(), b.right().obj().incx()), "Failed to evaluate dot product between two arrays.  Failed to call the dot routine.");
         return conj(val) * b.left()();
     }
 

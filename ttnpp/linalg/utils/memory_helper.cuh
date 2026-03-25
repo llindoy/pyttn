@@ -18,6 +18,7 @@
 #include <common/exception_handling.hpp>
 #include "memory_helper.hpp"
 #include "../backends/cuda/cuda_backend.hpp"
+#include "../backends/cuda/cuda_algebra.cuh"
 #include "../backends/cuda/cuda_utils.cuh"
 
 #include "../linalg_forward_decl.hpp"
@@ -32,9 +33,9 @@ namespace linalg
             using size_type = typename traits<cuda_backend>::size_type;
 
         public:
-            static inline T *allocate(size_type n)
+            static inline T* allocate(size_type n)
             {
-                T *res;
+                T* res;
                 CALL_AND_HANDLE(cuda_safe_call(cudaMalloc(&res, n * sizeof(T))), "Failed to allocate memory buffer.");
                 return res;
             }
@@ -87,29 +88,28 @@ namespace linalg
         class transfer<blas_backend, cuda_backend>
         {
             using size_type = typename traits<cuda_backend>::size_type;
-
         public:
-            template <typename T>
-            static inline void copy(const T *const src, size_type n, T *const dest) { CALL_AND_HANDLE(internal::cuda_transfer::copy(src, n, dest, cudaMemcpyHostToDevice), "Failed to perform host to device memory transfer."); }
-            template <typename T>
-            static inline void copy(const T *const src, size_type n, T *const dest, cudaStream_t stream) { CALL_AND_HANDLE(internal::cuda_transfer::copy(src, n, dest, cudaMemcpyHostToDevice, stream), "Failed to perform asynchronous host to device memory transfer."); }
+            template <typename T, typename DT =  typename device_type<T, cuda_backend>::type>
+            static inline void copy(const T *const src, size_type n, DT *const dest) { CALL_AND_HANDLE(internal::cuda_transfer::copy(reinterpret_cast<const DT*>(src), n, dest, cudaMemcpyHostToDevice), "Failed to perform host to device memory transfer."); }
+            template <typename T, typename DT =  typename device_type<T, cuda_backend>::type>
+            static inline void copy(const T *const src, size_type n, DT *const dest, cudaStream_t stream) { CALL_AND_HANDLE(internal::cuda_transfer::copy(reinterpret_cast<const DT*>(src), n, dest, cudaMemcpyHostToDevice, stream), "Failed to perform asynchronous host to device memory transfer."); }
 
-            template <typename T, size_t D>
-            static inline void copy_noncontiguous(const T *const src, const std::array<size_t, D> &strides, size_type n, T *const dest)
+            template <typename T, size_t D,  typename DT =  typename device_type<T, cuda_backend>::type>
+            static inline void copy_noncontiguous(const T *const src, const std::array<size_t, D> &strides, size_type n, DT *const dest)
             {
-                CALL_AND_RETHROW(internal::cuda_transfer::copy_noncontiguous(src, strides, n, dest, cudaMemcpyHostToDevice));
+                CALL_AND_RETHROW(internal::cuda_transfer::copy_noncontiguous(reinterpret_cast<const DT*>(src), strides, n, dest, cudaMemcpyHostToDevice));
             }
 
-            template <typename T, size_t D>
-            static inline void copy_noncontiguous(const T *const src, const std::array<size_type, D> &size, const std::array<size_type, D> &s_strides, T *dest, const std::array<size_type, D> &d_strides)
+            template <typename T, size_t D,  typename DT =  typename device_type<T, cuda_backend>::type>
+            static inline void copy_noncontiguous(const T *const src, const std::array<size_type, D> &size, const std::array<size_type, D> &s_strides, DT *dest, const std::array<size_type, D> &d_strides)
             {
-                CALL_AND_RETHROW(internal::cuda_transfer::copy_noncontiguous(src, size, s_strides, dest, d_strides, cudaMemcpyHostToDevice));
+                CALL_AND_RETHROW(internal::cuda_transfer::copy_noncontiguous(reinterpret_cast<const DT*>(src), size, s_strides, dest, d_strides, cudaMemcpyHostToDevice));
             }
 
-            template <typename T, size_t D>
-            static inline void copy_noncontiguous(const T *const src, const std::array<size_type, D> &size, const std::array<size_type, D> &s_strides, T *dest, const std::array<size_type, D> &d_strides, cudaStream_t stream)
+            template <typename T, size_t D, typename DT =  typename device_type<T, cuda_backend>::type>
+            static inline void copy_noncontiguous(const T *const src, const std::array<size_type, D> &size, const std::array<size_type, D> &s_strides, DT *dest, const std::array<size_type, D> &d_strides, cudaStream_t stream)
             {
-                CALL_AND_RETHROW(internal::cuda_transfer::copy_noncontiguous(src, size, s_strides, dest, d_strides, cudaMemcpyHostToDevice, stream));
+                CALL_AND_RETHROW(internal::cuda_transfer::copy_noncontiguous(reinterpret_cast<const DT*>(src), size, s_strides, dest, d_strides, cudaMemcpyHostToDevice, stream));
             }
         };
 
@@ -120,10 +120,10 @@ namespace linalg
             using size_type = typename traits<cuda_backend>::size_type;
 
         public:
-            template <typename T>
-            static inline void copy(const T *const src, size_type n, T *const dest) { CALL_AND_HANDLE(internal::cuda_transfer::copy(src, n, dest, cudaMemcpyDeviceToHost), "Failed to perform device to host memory transfer."); }
-            template <typename T>
-            static inline void copy(const T *const src, size_type n, T *const dest, cudaStream_t stream) { CALL_AND_HANDLE(internal::cuda_transfer::copy(src, n, dest, cudaMemcpyDeviceToHost, stream), "Failed to perform asynchronous device to host memory transfer."); }
+            template <typename T, typename DT =  typename device_type<T, cuda_backend>::type>
+            static inline void copy(const DT *const src, size_type n, T *const dest) { CALL_AND_HANDLE(internal::cuda_transfer::copy(reinterpret_cast<const T*>(src), n, dest, cudaMemcpyDeviceToHost), "Failed to perform device to host memory transfer."); }
+            template <typename T, typename DT =  typename device_type<T, cuda_backend>::type>
+            static inline void copy(const DT *const src, size_type n, T *const dest, cudaStream_t stream) { CALL_AND_HANDLE(internal::cuda_transfer::copy(reinterpret_cast<const T*>(src), n, dest, cudaMemcpyDeviceToHost, stream), "Failed to perform asynchronous device to host memory transfer."); }
         };
 
         // cuda to cuda memory transfer
@@ -157,7 +157,8 @@ namespace linalg
             using size_type = typename traits<cuda_backend>::size_type;
 
         public:
-            static inline void fill(T *dest, size_type n, const T &val) { cuda_backend::fill_n(dest, n, val); }
+            template <typename U>
+            static inline void fill(T *dest, size_type n, const U &val) { backend_algebra<cuda_backend>::fill_n(dest, n, T(val)); }
         }; // class filler<cuda_backend>
     } // namespace memory
 } // namespace linalg

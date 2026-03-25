@@ -12,8 +12,18 @@
  * limitations under the License
  */
 
-#include "product_operator.hpp"
-#include "../../pyttn_typedef.hpp"
+#include <linalg/linalg.cuh>
 
-template <>
-void initialise_product_operator<pyttn_real_type, linalg::cuda_backend>(py::module &m);
+
+#include "../../../ttns/operators/product_operator.tpp"
+#include "../../../pyttn_typedef.hpp"
+
+void initialise_product_operator(py::module &m)
+{
+    initialise_product_operator_types<pyttn_real_type, linalg::blas_backend>(m);
+}
+
+void initialise_product_operator_cuda(py::module &m)
+{
+    initialise_product_operator_types<pyttn_real_type, linalg::cuda_backend>(m);
+}

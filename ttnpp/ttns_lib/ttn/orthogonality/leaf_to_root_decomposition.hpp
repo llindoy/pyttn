@@ -42,7 +42,7 @@ namespace ttns
             }
 
             template <typename engine>
-            static inline size_type maximum_work_size_node(engine &eng, const hdata &A, mat U, mat &R, bool use_capacity = false)
+            static inline size_type maximum_work_size_node(engine &eng, const hdata &A, mat U, mat &R, bool /*is_root*/, bool use_capacity = false)
             {
                 try
                 {

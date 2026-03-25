@@ -19,6 +19,7 @@
 #include "dense.hpp"
 #include "sparse.hpp"
 #include "backends/blas/blas_backend.hpp"
+#include "decompositions.hpp"
 
 #include "utils/genrandom.hpp"
 #include "utils/orthogonal_vector.hpp"

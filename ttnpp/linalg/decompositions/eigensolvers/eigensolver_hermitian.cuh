@@ -56,7 +56,7 @@ namespace linalg
                 fill_mode uplo;
                 CALL_AND_RETHROW(uplo = get_uplo(UPLO));
 
-                CALL_AND_RETHROW(cuda_backend::heev(jobz, uplo, n, A, lda, W, WORK, lwork, working.m_gpu_info.buffer());)
+                CALL_AND_RETHROW(backend_algebra<cuda_backend>::heev(jobz, uplo, n, A, lda, W, WORK, lwork, working.m_gpu_info.buffer());)
                 working.m_cpu_info = working.m_gpu_info;
                 CALL_AND_RETHROW(cusolver::heev_error_handling(working.m_cpu_info(0), 'a'));
             }
@@ -70,7 +70,7 @@ namespace linalg
                 fill_mode uplo;
                 CALL_AND_RETHROW(uplo = get_uplo(UPLO));
                 int_type worksize;
-                CALL_AND_RETHROW(cuda_backend::heev_buffersize(jobz, uplo, n, A, lda, W, &worksize);)
+                CALL_AND_RETHROW(backend_algebra<cuda_backend>::heev_buffersize(jobz, uplo, n, A, lda, W, &worksize);)
                 return worksize;
             }
 
@@ -112,6 +112,7 @@ namespace linalg
                 };
             }
         };
+    }   //namespace internal
 } // namespace linalg
 
 #endif // PYTTN_LINALG_DECOMPOSITIONS_EIGENSOLVERS_EIGENSOLVER_HERMITIAN_CUH_//

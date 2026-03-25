@@ -188,7 +188,13 @@ namespace ttns
                                 auto _HA = buffer.HA[ti].reinterpret_shape(_A.shape(0), _A.shape(1), _A.shape(2));
                                 auto _temp = buffer.temp[ti].reinterpret_shape(_A.shape(0), _A.shape(1), _A.shape(2));
 
-                                CALL_AND_HANDLE(h().mf(ind) += hinf[ind].mf_coeff(it) * (contract(_temp, 0, 2, _HA, 0, 2)), "Failed when evaluating the final contraction.");
+                                auto contract_val = contract(_temp, 0, 2, _HA, 0, 2);
+                                if(contract_val.requires_workspace())
+                                {
+                                    CALL_AND_HANDLE(buffer.temp2[ti].resize(1, contract_val.working_size()), "Failed to resize working buffer.");
+                                }
+                                
+                                CALL_AND_HANDLE(h().mf(ind) += hinf[ind].mf_coeff(it) * (contract_val.bind_workspace(buffer.temp2[ti])), "Failed when evaluating the final contraction.");
                             }
                             catch (const std::exception &ex)
                             {
@@ -221,6 +227,7 @@ namespace ttns
                     size_type ti = tid*operator_sum_nthreads;
                     CALL_AND_HANDLE(buffer.HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
                     CALL_AND_HANDLE(buffer.temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+                    CALL_AND_HANDLE(buffer.temp2[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
 
                     CALL_AND_HANDLE(kpo::kpo_id(h_p, A, mode, buffer.HA[ti], buffer.temp[ti]), "Failed to apply kronecker product operator.");
                     CALL_AND_HANDLE(buffer.HA[ti] = buffer.temp[ti] * trans(h_p().mf_id()), "Failed to apply action of parent mean field operator.");
@@ -232,8 +239,9 @@ namespace ttns
                         auto _B = B.as_rank_3(mode);
                         auto _HA = buffer.HA[ti].reinterpret_shape(_B.shape(0), _A.shape(1), _B.shape(2));
                         auto _temp = buffer.temp[ti].reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
+                        auto _temp2 = buffer.temp2[ti].reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
 
-                        CALL_AND_HANDLE(h().mf_id() = (contract(_temp, 0, 2, _HA, 0, 2)), "Failed when evaluating the final contraction.");
+                        CALL_AND_HANDLE(h().mf_id() = (contract(_temp, 0, 2, _HA, 0, 2).bind_workspace(_temp2)), "Failed when evaluating the final contraction.");
                     }
                     catch (const std::exception &ex)
                     {
@@ -255,8 +263,10 @@ namespace ttns
 #else
                         size_type ti = tid*operator_sum_nthreads;
 #endif                
-                        CALL_AND_HANDLE(buffer.HA[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
-                        CALL_AND_HANDLE(buffer.temp[ti].resize(A.size(0), A.size(1)), "failed to resize working buffers.");
+                        CALL_AND_HANDLE(buffer.HA[ti].resize(B.size(0), B.size(1)), "failed to resize working buffers.");
+                        CALL_AND_HANDLE(buffer.temp[ti].resize(B.size(0), B.size(1)), "failed to resize working buffers.");
+                        CALL_AND_HANDLE(buffer.temp2[ti].resize(B.size(0), B.size(1)), "failed to resize working buffers.");
+
 
                         h().mf(ind).fill_zeros();
                         for (size_type it = 0; it < hinf[ind].nmf_terms(); ++it)
@@ -290,7 +300,9 @@ namespace ttns
                                 auto _HA = buffer.HA[ti].reinterpret_shape(_B.shape(0), _A.shape(1), _B.shape(2));
                                 auto _temp = buffer.temp[ti].reinterpret_shape(_B.shape(0), _B.shape(1), _B.shape(2));
 
-                                CALL_AND_HANDLE(h().mf(ind) += hinf[ind].mf_coeff(it) * (contract(_temp, 0, 2, _HA, 0, 2)), "Failed when evaluating the final contraction.");
+                                auto contraction_op = contract(_temp, 0, 2, _HA, 0, 2);
+                                buffer.temp2[ti].resize(1, contraction_op.working_size());
+                                CALL_AND_HANDLE(h().mf(ind) += hinf[ind].mf_coeff(it) * (contraction_op.bind_workspace(buffer.temp2[ti])), "Failed when evaluating the final contraction.");
                             }
                             catch (const std::exception &ex)
                             {

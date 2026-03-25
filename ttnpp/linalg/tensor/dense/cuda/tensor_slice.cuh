@@ -15,6 +15,7 @@
 #ifndef PYTTN_LINALG_TENSOR_DENSE_TENSOR_SLICE_CUH_
 #define PYTTN_LINALG_TENSOR_DENSE_TENSOR_SLICE_CUH_
 
+#include "../../../utils/serialisation.cuh"
 #include "../../../linalg_forward_decl.hpp"
 #include "../tensor_slice.hpp"
 #include "../../../backends/cuda/cuda_backend.hpp"
@@ -36,8 +37,6 @@ namespace linalg
         using slice_base = tensor_slice_base<self_type>;
         using slice_traits = tensor_slice_traits<array_type, pref, D2>;
 
-        using pointer = typename slice_base::pointer;
-        using const_pointer = typename slice_base::const_pointer;
         using const_slice_traits = tensor_slice_traits<array_type, typename std::add_const<pref>::type, D2>;
         using size_type = typename slice_base::size_type;
         using const_reference = const T&;
@@ -75,11 +74,6 @@ namespace linalg
             ASSERT(internal::compare_bounds(i, slice_base::shape(0)), "Unable to return slice of array.  Slice index out of bounds.");
             return const_slice_traits::make(m_tensor, i);
         }
-
-        pointer buffer() { return slice_base::m_buffer; }
-        const_pointer buffer() const { return slice_base::m_buffer; }
-        pointer data() { return slice_base::m_buffer; }
-        const_pointer data() const { return slice_base::m_buffer; }
 
         void from_host() const
         {
@@ -130,8 +124,6 @@ namespace linalg
         using slice_traits = tensor_slice_traits<array_type, pref, 1>;
         using size_type = typename slice_base::size_type;
 
-        using pointer = typename slice_base::pointer;
-        using const_pointer = typename slice_base::const_pointer;
         using const_reference = const T&;
 
     public:
@@ -160,11 +152,6 @@ namespace linalg
             if(!this->m_copied_from_host){this->from_host();}
             return this->m_host_buffer[i];
         }
-
-        pointer buffer() { return slice_base::m_buffer; }
-        const_pointer buffer() const { return slice_base::m_buffer; }
-        pointer data() { return slice_base::m_buffer; }
-        const_pointer data() const { return slice_base::m_buffer; }
     };
 } // namespace linalg
 

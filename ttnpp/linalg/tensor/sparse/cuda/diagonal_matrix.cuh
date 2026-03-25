@@ -15,7 +15,7 @@
 #ifndef PYTTN_LINALG_TENSOR_SPARSE_DIAGONAL_MATRIX_CUH_
 #define PYTTN_LINALG_TENSOR_SPARSE_DIAGONAL_MATRIX_CUH_
 
-
+#include "../../../utils/serialisation.cuh"
 #include "../../../backends/cuda/cuda_backend.hpp"
 #include "../../../utils/memory_helper.cuh"
 #include "../diagonal_matrix.hpp"
@@ -48,11 +48,6 @@ namespace linalg
             CALL_AND_RETHROW(base_type::operator=(std::forward<Args>(args)...));
             return *this;
         }
-
-        pointer buffer() { return base_type::m_vals; }
-        const_pointer buffer() const { return base_type::m_vals; }
-        pointer data() { return base_type::m_vals; }
-        const_pointer data() const { return base_type::m_vals; }
 
         void from_host() const
         {

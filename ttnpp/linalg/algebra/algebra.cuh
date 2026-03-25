@@ -18,10 +18,11 @@
 // include all the files required to implement the various expression template based operations supported by the code.
 #include "../linalg_forward_decl.hpp"
 #include "expressions/elemental/cuda/expression.cuh"
+#include "expressions/expression_base.hpp"
 
 #include "expressions/permutations/transpose_expression.hpp"
 #include "expressions/permutations/tensor_transpose.hpp"
-// #include "expressions/permutations/tensor_permutation.hpp"
+#include "expressions/permutations/tensor_permutation.hpp"
 
 #include "expressions/contractions/dense_matrix_vector_multiplication.hpp"
 #include "expressions/contractions/csr_matrix_vector_multiplication.hpp"

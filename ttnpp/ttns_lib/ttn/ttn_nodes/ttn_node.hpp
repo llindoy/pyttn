@@ -593,7 +593,7 @@ namespace ttns
                     this->resize(this->hrank(), dims);
                 }
                 this->as_matrix().fill_zeros();
-                backend::rank_3_strided_copy(temp.buffer(), _shape[0], _shape[1], _shape[2], this->as_matrix().buffer(), _shape[1] + iadd);
+                linalg::backend_algebra<backend>::rank_3_strided_copy(temp.buffer(), _shape[0], _shape[1], _shape[2], this->as_matrix().buffer(), _shape[1] + iadd);
                 return _shape;
             }
             catch (const std::exception &ex)
@@ -652,7 +652,7 @@ namespace ttns
             {
                 std::array<size_t, 3> _shape;
                 CALL_AND_RETHROW(_shape = this->expand_bond(mode, iadd, temp));
-                backend::rank_3_strided_append(pad.buffer(), _shape[0], _shape[1], _shape[2], iadd, this->as_matrix().buffer(), _shape[1] + iadd);
+                linalg::backend_algebra<backend>::rank_3_strided_append(pad.buffer(), _shape[0], _shape[1], _shape[2], iadd, this->as_matrix().buffer(), _shape[1] + iadd);
             }
             catch (const std::exception &ex)
             {
@@ -700,7 +700,7 @@ namespace ttns
         void set_random(linalg::random_engine<backend> &rng)
         {
             auto &mat = this->as_matrix();
-            rng.fill_normal(mat);
+            CALL_AND_HANDLE(rng.fill_normal(mat), "Failed to fill node with random normal values.");
         }
 
         void set_node_state(size_type i, linalg::random_engine<backend> &rng, bool random_unoccupied_initialisation = false)
@@ -976,7 +976,7 @@ namespace ttns
     operator<<(std::ostream &os, const ttn_node_data<T, backend> &t)
     {
         ttn_node_data<T, linalg::blas_backend> odata(t);
-        os << t;
+        os << odata;
         return os;
     }
 #endif

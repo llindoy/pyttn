@@ -82,11 +82,11 @@ namespace linalg
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnDgetrf(handle, m, n, A, lda, work, ipiv, devinfo)));
         }
-        static void getrf(cusolverDnHandle_t handle, int m, int n, std::complex<float> *A, int lda, std::complex<float> *work, int *ipiv, int *devinfo)
+        static void getrf(cusolverDnHandle_t handle, int m, int n, cuda::std::complex<float> *A, int lda, cuda::std::complex<float> *work, int *ipiv, int *devinfo)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnCgetrf(handle, m, n, (cuComplex *)A, lda, (cuComplex *)work, ipiv, devinfo)));
         }
-        static void getrf(cusolverDnHandle_t handle, int m, int n, std::complex<double> *A, int lda, std::complex<double> *work, int *ipiv, int *devinfo)
+        static void getrf(cusolverDnHandle_t handle, int m, int n, cuda::std::complex<double> *A, int lda, cuda::std::complex<double> *work, int *ipiv, int *devinfo)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnZgetrf(handle, m, n, (cuDoubleComplex *)A, lda, (cuDoubleComplex *)work, ipiv, devinfo)));
         }
@@ -99,11 +99,11 @@ namespace linalg
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnDgetrf_bufferSize(handle, m, n, A, lda, lwork)));
         }
-        static void getrf_buffersize(cusolverDnHandle_t handle, int m, int n, std::complex<float> *A, int lda, int *lwork)
+        static void getrf_buffersize(cusolverDnHandle_t handle, int m, int n, cuda::std::complex<float> *A, int lda, int *lwork)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnCgetrf_bufferSize(handle, m, n, (cuComplex *)A, lda, lwork)));
         }
-        static void getrf_buffersize(cusolverDnHandle_t handle, int m, int n, std::complex<double> *A, int lda, int *lwork)
+        static void getrf_buffersize(cusolverDnHandle_t handle, int m, int n, cuda::std::complex<double> *A, int lda, int *lwork)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnZgetrf_bufferSize(handle, m, n, (cuDoubleComplex *)A, lda, lwork)));
         }
@@ -143,11 +143,11 @@ namespace linalg
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnDsyevd(handle, jobz, uplo, n, A, lda, W, work, lwork, devinfo)));
         }
-        static void heev(cusolverDnHandle_t handle, cusolverEigMode_t jobz, cublasFillMode_t uplo, int n, std::complex<float> *A, int lda, float *W, std::complex<float> *work, int lwork, int *devinfo)
+        static void heev(cusolverDnHandle_t handle, cusolverEigMode_t jobz, cublasFillMode_t uplo, int n, cuda::std::complex<float> *A, int lda, float *W, cuda::std::complex<float> *work, int lwork, int *devinfo)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnCheevd(handle, jobz, uplo, n, (cuComplex *)A, lda, W, (cuComplex *)work, lwork, devinfo)));
         }
-        static void heev(cusolverDnHandle_t handle, cusolverEigMode_t jobz, cublasFillMode_t uplo, int n, std::complex<double> *A, int lda, double *W, std::complex<double> *work, int lwork, int *devinfo)
+        static void heev(cusolverDnHandle_t handle, cusolverEigMode_t jobz, cublasFillMode_t uplo, int n, cuda::std::complex<double> *A, int lda, double *W, cuda::std::complex<double> *work, int lwork, int *devinfo)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnZheevd(handle, jobz, uplo, n, (cuDoubleComplex *)A, lda, W, (cuDoubleComplex *)work, lwork, devinfo)));
         }
@@ -160,11 +160,11 @@ namespace linalg
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnDsyevd_bufferSize(handle, jobz, uplo, n, A, lda, W, lwork)));
         }
-        static void heev_buffersize(cusolverDnHandle_t handle, cusolverEigMode_t jobz, cublasFillMode_t uplo, int n, std::complex<float> *A, int lda, float *W, int *lwork)
+        static void heev_buffersize(cusolverDnHandle_t handle, cusolverEigMode_t jobz, cublasFillMode_t uplo, int n, cuda::std::complex<float> *A, int lda, float *W, int *lwork)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnCheevd_bufferSize(handle, jobz, uplo, n, (cuComplex *)A, lda, W, lwork)));
         }
-        static void heev_buffersize(cusolverDnHandle_t handle, cusolverEigMode_t jobz, cublasFillMode_t uplo, int n, std::complex<double> *A, int lda, double *W, int *lwork)
+        static void heev_buffersize(cusolverDnHandle_t handle, cusolverEigMode_t jobz, cublasFillMode_t uplo, int n, cuda::std::complex<double> *A, int lda, double *W, int *lwork)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnZheevd_bufferSize(handle, jobz, uplo, n, (cuDoubleComplex *)A, lda, W, lwork)));
         }
@@ -197,12 +197,12 @@ namespace linalg
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnDgesvd(handle, jobu, jobv, m, n, A, lda, S, U, ldu, VT, ldvt, work, lwork, rwork, devinfo)));
         }
 
-        static void gesvd(cusolverDnHandle_t handle, signed char jobu, signed char jobv, const int m, const int n, std::complex<float> *A, const int lda, float *S, std::complex<float> *U, const int ldu, std::complex<float> *VT, const int ldvt, std::complex<float> *work, const int lwork, float *rwork, int *devinfo)
+        static void gesvd(cusolverDnHandle_t handle, signed char jobu, signed char jobv, const int m, const int n, cuda::std::complex<float> *A, const int lda, float *S, cuda::std::complex<float> *U, const int ldu, cuda::std::complex<float> *VT, const int ldvt, cuda::std::complex<float> *work, const int lwork, float *rwork, int *devinfo)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnCgesvd(handle, jobu, jobv, m, n, (cuComplex *)A, lda, S, (cuComplex *)U, ldu, (cuComplex *)VT, ldvt, (cuComplex *)work, lwork, rwork, devinfo)));
         }
 
-        static void gesvd(cusolverDnHandle_t handle, signed char jobu, signed char jobv, const int m, const int n, std::complex<double> *A, const int lda, double *S, std::complex<double> *U, const int ldu, std::complex<double> *VT, const int ldvt, std::complex<double> *work, const int lwork, double *rwork, int *devinfo)
+        static void gesvd(cusolverDnHandle_t handle, signed char jobu, signed char jobv, const int m, const int n, cuda::std::complex<double> *A, const int lda, double *S, cuda::std::complex<double> *U, const int ldu, cuda::std::complex<double> *VT, const int ldvt, cuda::std::complex<double> *work, const int lwork, double *rwork, int *devinfo)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnZgesvd(handle, jobu, jobv, m, n, (cuDoubleComplex *)A, lda, S, (cuDoubleComplex *)U, ldu, (cuDoubleComplex *)VT, ldvt, (cuDoubleComplex *)work, lwork, rwork, devinfo)));
         }
@@ -218,6 +218,16 @@ namespace linalg
         struct gesvd_params<double>
         {
             static inline void buffersize(cusolverDnHandle_t handle, int m, int n, int &lwork) { CALL_AND_RETHROW(cusolver_safe_call(cusolverDnDgesvd_bufferSize(handle, m, n, &lwork))); }
+        };
+        template <>
+        struct gesvd_params<cuda::std::complex<float>>
+        {
+            static inline void buffersize(cusolverDnHandle_t handle, int m, int n, int &lwork) { CALL_AND_RETHROW(cusolver_safe_call(cusolverDnCgesvd_bufferSize(handle, m, n, &lwork))); }
+        };
+        template <>
+        struct gesvd_params<cuda::std::complex<double>>
+        {
+            static inline void buffersize(cusolverDnHandle_t handle, int m, int n, int &lwork) { CALL_AND_RETHROW(cusolver_safe_call(cusolverDnZgesvd_bufferSize(handle, m, n, &lwork))); }
         };
         template <>
         struct gesvd_params<std::complex<float>>
@@ -258,12 +268,12 @@ namespace linalg
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnDgesvdj(handle, jobz, econ, m, n, A, lda, S, U, ldu, VT, ldvt, work, lwork, devinfo, params)));
         }
 
-        static void gesvdj(cusolverDnHandle_t handle, cusolverEigMode_t jobz, const int econ, const int m, const int n, std::complex<float> *A, const int lda, float *S, std::complex<float> *U, const int ldu, std::complex<float> *VT, const int ldvt, std::complex<float> *work, const int lwork, int *devinfo, gesvdjInfo_t params)
+        static void gesvdj(cusolverDnHandle_t handle, cusolverEigMode_t jobz, const int econ, const int m, const int n, cuda::std::complex<float> *A, const int lda, float *S, cuda::std::complex<float> *U, const int ldu, cuda::std::complex<float> *VT, const int ldvt, cuda::std::complex<float> *work, const int lwork, int *devinfo, gesvdjInfo_t params)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnCgesvdj(handle, jobz, econ, m, n, (cuComplex *)A, lda, S, (cuComplex *)U, ldu, (cuComplex *)VT, ldvt, (cuComplex *)work, lwork, devinfo, params)));
         }
 
-        static void gesvdj(cusolverDnHandle_t handle, cusolverEigMode_t jobz, const int econ, const int m, const int n, std::complex<double> *A, const int lda, double *S, std::complex<double> *U, const int ldu, std::complex<double> *VT, const int ldvt, std::complex<double> *work, const int lwork, int *devinfo, gesvdjInfo_t params)
+        static void gesvdj(cusolverDnHandle_t handle, cusolverEigMode_t jobz, const int econ, const int m, const int n, cuda::std::complex<double> *A, const int lda, double *S, cuda::std::complex<double> *U, const int ldu, cuda::std::complex<double> *VT, const int ldvt, cuda::std::complex<double> *work, const int lwork, int *devinfo, gesvdjInfo_t params)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnZgesvdj(handle, jobz, econ, m, n, (cuDoubleComplex *)A, lda, S, (cuDoubleComplex *)U, ldu, (cuDoubleComplex *)VT, ldvt, (cuDoubleComplex *)work, lwork, devinfo, params)));
         }
@@ -279,12 +289,12 @@ namespace linalg
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnDgesvdj_bufferSize(handle, jobz, econ, m, n, A, lda, S, U, ldu, VT, ldvt, &lwork, params)));
         }
 
-        static void gesvdj_buffersize(cusolverDnHandle_t handle, cusolverEigMode_t jobz, const int econ, const int m, const int n, std::complex<float> *A, const int lda, float *S, std::complex<float> *U, const int ldu, std::complex<float> *VT, const int ldvt, int &lwork, gesvdjInfo_t params)
+        static void gesvdj_buffersize(cusolverDnHandle_t handle, cusolverEigMode_t jobz, const int econ, const int m, const int n, cuda::std::complex<float> *A, const int lda, float *S, cuda::std::complex<float> *U, const int ldu, cuda::std::complex<float> *VT, const int ldvt, int &lwork, gesvdjInfo_t params)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnCgesvdj_bufferSize(handle, jobz, econ, m, n, (cuComplex *)A, lda, S, (cuComplex *)U, ldu, (cuComplex *)VT, ldvt, &lwork, params)));
         }
 
-        static void gesvdj_buffersize(cusolverDnHandle_t handle, cusolverEigMode_t jobz, const int econ, const int m, const int n, std::complex<double> *A, const int lda, double *S, std::complex<double> *U, const int ldu, std::complex<double> *VT, const int ldvt, int &lwork, gesvdjInfo_t params)
+        static void gesvdj_buffersize(cusolverDnHandle_t handle, cusolverEigMode_t jobz, const int econ, const int m, const int n, cuda::std::complex<double> *A, const int lda, double *S, cuda::std::complex<double> *U, const int ldu, cuda::std::complex<double> *VT, const int ldvt, int &lwork, gesvdjInfo_t params)
         {
             CALL_AND_RETHROW(cusolver_safe_call(cusolverDnZgesvdj_bufferSize(handle, jobz, econ, m, n, (cuDoubleComplex *)A, lda, S, (cuDoubleComplex *)U, ldu, (cuDoubleComplex *)VT, ldvt, &lwork, params)));
         }

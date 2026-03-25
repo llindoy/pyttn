@@ -17,7 +17,10 @@
 
 #include <common/exception_handling.hpp>
 #include "../linalg_forward_decl.hpp"
-#include "../backends/blas/lapack_wrapper.hpp"
+#include "../linalg_type_traits.hpp"
+#include "../linalg_traits.hpp"
+
+#include <type_traits>
 
 namespace linalg
 {

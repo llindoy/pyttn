@@ -18,6 +18,7 @@
 #include "../../../linalg_forward_decl.hpp"
 #include "../../../utils/linalg_utils.hpp"
 #include "../../../linalg_type_traits.hpp"
+#include "../../../backends/backend.hpp"
 
 // TODO: comment this file
 
@@ -31,6 +32,7 @@ namespace linalg
         {
             using type = literal_type<T, backend>;
             using value_type = T;
+            using device_value_type = typename device_type<T, backend>::type;
             using backend_type = backend;
             static constexpr size_t rank = 0;
         };

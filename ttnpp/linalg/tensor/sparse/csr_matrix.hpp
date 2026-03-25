@@ -329,12 +329,12 @@ namespace linalg
                 return false;
             }
             bool is_equal;
-            CALL_AND_HANDLE(is_equal = backend_type::is_equal(m_colind, other.m_colind, m_nnz), "Failed to compare two csr topology objects.  Failed to determine if the column indices arrays are equal.");
+            CALL_AND_HANDLE(is_equal = backend_algebra<backend_type>::is_equal(m_colind, other.m_colind, m_nnz), "Failed to compare two csr topology objects.  Failed to determine if the column indices arrays are equal.");
             if (!is_equal)
             {
                 return false;
             }
-            CALL_AND_HANDLE(is_equal = backend_type::is_equal(m_rowptr, other.m_rowptr, m_shape[0] + 1), "Failed to compare two csr topology objects.  Failed to determine if the column indices arrays are equal.");
+            CALL_AND_HANDLE(is_equal = backend_algebra<backend_type>::is_equal(m_rowptr, other.m_rowptr, m_shape[0] + 1), "Failed to compare two csr topology objects.  Failed to determine if the column indices arrays are equal.");
             if (!is_equal)
             {
                 return false;
@@ -372,6 +372,11 @@ namespace linalg
 
         using pointer = typename std::add_pointer<value_type>::type;
         using const_pointer = typename std::add_pointer<typename std::add_const<value_type>::type>::type;
+
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+        using device_pointer = typename std::add_pointer<device_value_type>::type;
+        using const_device_pointer = typename std::add_pointer<typename std::add_const<device_value_type>::type>::type;
+
         using index_pointer = typename topology_type::index_pointer;
         using const_index_pointer = typename topology_type::const_index_pointer;
 
@@ -379,8 +384,8 @@ namespace linalg
         using shape_type = std::array<size_type, rank>;
 
         // the classes used for memory allocation and transfer
-        using allocator = memory::allocator<value_type, backend_type>;
-        using memfill = memory::filler<value_type, backend_type>;
+        using allocator = memory::allocator<device_value_type, backend_type>;
+        using memfill = memory::filler<device_value_type, backend_type>;
         template <typename srcbck>
         using memtransfer = memory::transfer<srcbck, backend_type>;
 
@@ -389,7 +394,7 @@ namespace linalg
         friend class csr_matrix_base;
 
     protected:
-        pointer m_vals; ///< The 1-dimensional array used to store the values present in the matrix
+        device_pointer m_vals; ///< The 1-dimensional array used to store the values present in the matrix
         topology_type m_topo;
 
     public:
@@ -479,7 +484,7 @@ namespace linalg
         {
             if (this != &src)
             {
-                pointer temp = src.m_vals;
+                device_pointer temp = src.m_vals;
                 src.m_vals = m_vals;
                 m_vals = temp;
                 m_topo.swap(src.m_topo);
@@ -549,7 +554,7 @@ namespace linalg
         {
             if (m_topo.m_nnz < m_topo.m_max_nnz)
             {
-                value_type *temp2;
+                device_value_type *temp2;
                 CALL_AND_HANDLE(temp2 = allocator::allocate(m_topo.m_nnz), "Failed to resize the csr matrix object.  Failed to allocate the new valus buffer when an increase in size is required.");
                 CALL_AND_HANDLE(memtransfer<backend_type>::copy(m_vals, m_topo.m_nnz, temp2), "Failed to shrink the csr matrix object.  Failed when copying the current vals buffer into the new vals buffer.");
                 CALL_AND_HANDLE(allocator::deallocate(m_vals), "Failed to shrink the csr matrix object.  Failed to deallocate the previous vals buffer object.");
@@ -565,7 +570,7 @@ namespace linalg
         void set_vals(const std::vector<value_type> &_vals)
         {
             ASSERT(_vals.size() == m_topo.m_nnz, "Failed to set csr matrix vals from vector.  The two buffers are not the same size.");
-            CALL_AND_HANDLE(memtransfer<blas_backend>::copy(&_vals[0], m_topo.m_nnz, m_vals), "Failed to set csr matrix vals from vector.  Failed when copying the current vals buffer into the new vals buffer.");
+            CALL_AND_HANDLE(memtransfer<blas_backend>::copy(reinterpret_cast<const device_value_type*>(&_vals[0]), m_topo.m_nnz, m_vals), "Failed to set csr matrix vals from vector.  Failed when copying the current vals buffer into the new vals buffer.");
         }
         void set_colind(const std::vector<index_type> &_colind) { CALL_AND_HANDLE(m_topo.set_colind(_colind), "Failed to set csr matrix colind from buffer.  The two buffers are not the same size."); }
         void set_rowptr(const std::vector<index_type> &_rowptr) { CALL_AND_HANDLE(m_topo.set_rowptr(_rowptr), "Failed to set csr matrix rowptr from buffer.  The two buffers are not the same size."); }
@@ -610,8 +615,8 @@ namespace linalg
         ///////////////////////////////////////////////////////////////////////////////////////////
         //          functions for serialising and deserialising the csr matrix object.           //
         ///////////////////////////////////////////////////////////////////////////////////////////
-        using buffer_reader_type = internal::buffer_reader_wrapper<value_type, backend_type>;
-        using buffer_writer_type = internal::buffer_writer_wrapper<value_type, backend_type>;
+        using buffer_reader_type = internal::buffer_reader_wrapper<device_value_type, backend_type>;
+        using buffer_writer_type = internal::buffer_writer_wrapper<device_value_type, backend_type>;
 
         template <typename archive>
         void save(archive &ar) const
@@ -639,23 +644,23 @@ namespace linalg
         template <typename Vt>
         inline value_update_type<Vt, self_type> operator*=(const Vt &v)
         {
-            CALL_AND_HANDLE(backend_type::scal(m_topo.m_nnz, value_type(v), m_vals, 1), "Failed to perform operator*= on csr matrix object.  scal call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::scal(m_topo.m_nnz, value_type(v), m_vals, 1), "Failed to perform operator*= on csr matrix object.  scal call failed.");
             return *this;
         }
         template <typename Vt>
         inline value_update_type<Vt, self_type> operator/=(const Vt &v)
         {
-            CALL_AND_HANDLE(backend_type::scal(m_topo.m_nnz, value_type(1.0 / v), m_vals, 1), "Failed to perform operator/= on csr matrix object.  scal call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::scal(m_topo.m_nnz, value_type(1.0 / v), m_vals, 1), "Failed to perform operator/= on csr matrix object.  scal call failed.");
             return *this;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         //     functions providing access to the raw buffers storing the csr matrix object.      //
         ///////////////////////////////////////////////////////////////////////////////////////////
-        inline pointer buffer() { return m_vals; }
-        inline const_pointer buffer() const { return m_vals; }
-        inline pointer data() { return m_vals; }
-        inline const_pointer data() const { return m_vals; }
+        inline device_pointer buffer() { return m_vals; }
+        inline const_device_pointer buffer() const { return m_vals; }
+        inline device_pointer data() { return m_vals; }
+        inline const_device_pointer data() const { return m_vals; }
 
         inline index_pointer rowptr() { return m_topo.m_rowptr; }
         inline const_index_pointer rowptr() const { return m_topo.m_rowptr; }
@@ -833,7 +838,7 @@ namespace linalg
             }
 
             CALL_AND_HANDLE(memtransfer<blas_backend>::copy(&_rowptr[0], _rowptr.size(), m_topo.m_rowptr), "Failed to initialise csr_matrix_base object.  Failed when copying the current rowptr buffer into the new rowptr buffer.");
-            CALL_AND_HANDLE(backend_type::transfer_coo_tuple_to_csr(coo, m_vals, m_topo.m_colind), "Failed to initialise csr_matrix_base object.  Failed when copying the vals and colinds from the coo tuple array.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::transfer_coo_tuple_to_csr(coo, m_vals, m_topo.m_colind), "Failed to initialise csr_matrix_base object.  Failed when copying the vals and colinds from the coo tuple array.");
         }
 
     private:
@@ -848,7 +853,7 @@ namespace linalg
                 CALL_AND_HANDLE(resize_buffer(src.nnz()), "Failed to copy assign csr_matrix_base object.  Failed to resize buffers so that they could fit the src matrix.");
             }
             using srcbck = typename traits<Container>::backend_type;
-            CALL_AND_HANDLE(memtransfer<srcbck>::copy(src.buffer(), m_topo.m_nnz, m_vals), "Failed to shrink the csr matrix object.  Failed when copying the src value buffer into m_vals.");
+            CALL_AND_HANDLE(memtransfer<srcbck>::copy(reinterpret_cast<const device_value_type*>(src.buffer()), m_topo.m_nnz, m_vals), "Failed to shrink the csr matrix object.  Failed when copying the src value buffer into m_vals.");
             return *this;
         }
 
@@ -863,7 +868,7 @@ namespace linalg
             {
                 CALL_AND_HANDLE(resize_buffer(src.nnz()), "Failed to copy assign csr_matrix_base object.  Failed to resize buffers so that they could fit the src matrix.");
             }
-            CALL_AND_HANDLE(backend_type::copy_real_to_complex(src.buffer(), m_topo.m_nnz, m_vals), "Failed to shrink the csr matrix object.  Failed when copying the src value buffer into m_vals.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::copy_real_to_complex(src.buffer(), m_topo.m_nnz, m_vals), "Failed to shrink the csr matrix object.  Failed when copying the src value buffer into m_vals.");
             return *this;
         }
 

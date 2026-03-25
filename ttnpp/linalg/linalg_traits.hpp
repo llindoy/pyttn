@@ -27,6 +27,7 @@ namespace linalg
     struct traits<T, validate_value_type<T>>
     {
         using value_type = void;
+        using device_value_type = void;
         using backend_type = void;
         using base_type = void;
         using size_type = void;
@@ -40,6 +41,7 @@ namespace linalg
     struct traits<expression_templates::literal_type<T, backend>, validate_value_type<T>>
     {
         using value_type = T;
+        using device_value_type = typename device_type<T, backend>::type;
         using backend_type = backend;
         using base_type = expression_templates::literal_type<T, backend>;
         using size_type = typename traits<backend>::size_type;
@@ -53,6 +55,7 @@ namespace linalg
     struct traits<tensor<T, D, backend>, validate_backend_type<backend>>
     {
         using value_type = T;
+        using device_value_type = typename device_type<T, backend>::type;
         using backend_type = backend;
         using size_type = typename traits<backend>::size_type;
         using base_type = tensor_base<tensor<T, D, backend>>;
@@ -68,6 +71,8 @@ namespace linalg
     {
         using value_type = data_type;
         using backend_type = typename traits<ArrType>::backend_type;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename traits<backend_type>::size_type;
         using base_type = tensor_slice_base<tensor_slice<ArrType, data_type, D>>;
         using container_type = ArrType;
@@ -82,6 +87,8 @@ namespace linalg
     {
         using value_type = T;
         using backend_type = backend;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename traits<backend_type>::size_type;
         using base_type = tensor_view_base<tensor_view<T, D, backend>>;
         using container_type = tensor_view<T, D, backend>;
@@ -96,6 +103,8 @@ namespace linalg
     {
         using value_type = T;
         using backend_type = backend;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename traits<backend_type>::size_type;
         using base_type = tensor_view<T, D, backend>;
         using container_type = reinterpreted_tensor<T, D, backend>;
@@ -110,6 +119,8 @@ namespace linalg
     {
         using value_type = T;
         using backend_type = backend;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename traits<backend_type>::size_type;
         using base_type = tensor_view<T, 2, backend>;
         using container_type = hermitian_matrix<T, backend>;
@@ -124,6 +135,8 @@ namespace linalg
     {
         using value_type = T;
         using backend_type = backend;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename traits<backend_type>::size_type;
         using base_type = tensor_view<T, 2, backend>;
         using container_type = upper_hessenberg_matrix<T, backend>;
@@ -140,6 +153,8 @@ namespace linalg
         using impl_traits = traits<T>;
         using value_type = typename impl_traits::value_type;
         using backend_type = typename impl_traits::backend_type;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename impl_traits::size_type;
         using container_type = typename impl_traits::container_type;
 
@@ -154,6 +169,8 @@ namespace linalg
         using impl_traits = traits<T>;
         using value_type = typename impl_traits::value_type;
         using backend_type = typename impl_traits::backend_type;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename impl_traits::size_type;
         using container_type = typename impl_traits::container_type;
 
@@ -168,6 +185,8 @@ namespace linalg
         using impl_traits = traits<T>;
         using value_type = typename impl_traits::value_type;
         using backend_type = typename impl_traits::backend_type;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+    
         using size_type = typename impl_traits::size_type;
         using container_type = typename impl_traits::container_type;
 
@@ -184,6 +203,8 @@ namespace linalg
     {
         using value_type = T;
         using backend_type = backend;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename traits<backend>::size_type;
         using index_type = typename traits<backend>::index_type;
         using base_type = csr_matrix_base<csr_matrix<T, backend>>;
@@ -200,6 +221,8 @@ namespace linalg
     {
         using value_type = T;
         using backend_type = backend;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename traits<backend>::size_type;
         using base_type = diagonal_matrix_base<diagonal_matrix<T, backend>>;
         using container_type = diagonal_matrix<T, backend>;
@@ -214,6 +237,8 @@ namespace linalg
     {
         using value_type = T;
         using backend_type = backend;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename traits<backend>::size_type;
         using real_type = symmetric_tridiagonal_matrix<typename get_real_type<T>::type, backend>;
         using base_type = symmetric_tridiagonal_matrix_base<symmetric_tridiagonal_matrix<T, backend>>;
@@ -230,6 +255,8 @@ namespace linalg
         using impl_traits = traits<T>;
         using value_type = typename impl_traits::value_type;
         using backend_type = typename impl_traits::backend_type;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename impl_traits::size_type;
         using container_type = typename impl_traits::container_type;
 
@@ -244,6 +271,8 @@ namespace linalg
         using impl_traits = traits<T>;
         using value_type = typename impl_traits::value_type;
         using backend_type = typename impl_traits::backend_type;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename impl_traits::size_type;
         using container_type = typename impl_traits::container_type;
 
@@ -257,6 +286,8 @@ namespace linalg
         using impl_traits = traits<T>;
         using value_type = typename impl_traits::value_type;
         using backend_type = typename impl_traits::backend_type;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename impl_traits::size_type;
         using container_type = typename impl_traits::container_type;
 
@@ -271,6 +302,8 @@ namespace linalg
         using impl_traits = traits<T>;
         using value_type = typename impl_traits::value_type;
         using backend_type = typename impl_traits::backend_type;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using size_type = typename impl_traits::size_type;
         using container_type = typename impl_traits::container_type;
 

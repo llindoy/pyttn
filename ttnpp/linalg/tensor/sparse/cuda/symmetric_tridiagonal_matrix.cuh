@@ -15,6 +15,8 @@
 #ifndef PYTTN_LINALG_TENSOR_SPARSE_SYMMETRIC_TRIDIAGONAL_MATRIX_CUH_
 #define PYTTN_LINALG_TENSOR_SPARSE_SYMMETRIC_TRIDIAGONAL_MATRIX_CUH_
 
+
+#include "../../../utils/serialisation.cuh"
 #include "../../../backends/cuda/cuda_backend.hpp"
 #include "../../../linalg_forward_decl.hpp"
 #include "../symmetric_tridiagonal_matrix.hpp"
@@ -48,11 +50,6 @@ namespace linalg
             CALL_AND_RETHROW(base_type::operator=(std::forward<Args>(args)...));
             return *this;
         }
-
-        __host__ __device__ pointer buffer() { return base_type::m_vals; }
-        __host__ __device__ const_pointer buffer() const { return base_type::m_vals; }
-        __host__ __device__ pointer data() { return base_type::m_vals; }
-        __host__ __device__ const_pointer data() const { return base_type::m_vals; }
     }; // symmetric_tridiagonal_matrix<T, cuda_backend>
 
 } // namespace linalg

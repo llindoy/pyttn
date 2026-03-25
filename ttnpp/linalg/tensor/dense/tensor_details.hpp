@@ -94,7 +94,7 @@ namespace linalg
         {
             array_type &a = static_cast<array_type &>(*this);
             size_type m = a.shape(0);
-            backend::func_fill_1(a.buffer(), m, std::forward<Func>(f), std::forward<Args>(args)...);
+            backend_algebra<backend>::func_fill_1(a.buffer(), m, std::forward<Func>(f), std::forward<Args>(args)...);
         }
     };
 
@@ -118,13 +118,13 @@ namespace linalg
 
             size_type m = a.shape(0);
             size_type n = a.shape(1);
-            backend::func_fill_2(a.buffer(), m, n, std::forward<Func>(f), std::forward<Args>(args)...);
+            backend_algebra<backend>::func_fill_2(a.buffer(), m, n, std::forward<Func>(f), std::forward<Args>(args)...);
         }
         void set_subblock(const ArrType &block)
         {
             array_type &a = static_cast<array_type &>(*this);
             ASSERT(block.shape(0) <= a.shape(0) && block.shape(1) <= a.shape(1), "Failed to set subblock.  Block is larger than matrix.");
-            CALL_AND_RETHROW(backend::copy_matrix_subblock(block.shape(0), block.shape(1), block.buffer(), block.shape(1), a.buffer(), a.shape(1)));
+            CALL_AND_RETHROW(backend_algebra<backend>::copy_matrix_subblock(block.shape(0), block.shape(1), block.buffer(), block.shape(1), a.buffer(), a.shape(1)));
         }
     };
 
@@ -147,7 +147,7 @@ namespace linalg
             size_type m = a.shape(0);
             size_type n = a.shape(1);
             size_type o = a.shape(2);
-            backend::func_fill_3(a.buffer(), m, n, o, std::forward<Func>(f), std::forward<Args>(args)...);
+            backend_algebra<backend>::func_fill_3(a.buffer(), m, n, o, std::forward<Func>(f), std::forward<Args>(args)...);
         }
     };
     ///@endcond

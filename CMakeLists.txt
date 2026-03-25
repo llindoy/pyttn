@@ -1,47 +1,130 @@
-cmake_minimum_required(VERSION 3.12)
-project(ttns_lib)
+cmake_minimum_required(VERSION 3.18)
+project(ttnpp_project LANGUAGES CXX)
 
-
+# -------------------- Install Location -----------
 set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/pyttn)
 
-if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{CMAKE_TOOLCHAIN_FILE})
-    set(CMAKE_TOOLCHAIN_FILE $ENV{CMAKE_TOOLCHAIN_FILE})
+
+# -------------------- Options --------------------
+option(BUILD_PYTHON_BINDINGS "Build Python bindings" ON)
+option(USE_CUDA "Enable CUDA support" ON)
+option(USE_OPENMP "Enable OpenMP support" ON)
+option(BUILD_REAL_TTN "Build real-valued TTN objects" OFF)
+option(DEBUG "Enable debug messages" OFF)
+option(USE_SPDLOG "Enable spdlog" ON)
+option(USE_GEMM3M "Enable GEMM3M optimization" OFF)
+
+# -------------------- Compiler standards --------------------
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# -------------------- Dependencies --------------------
+include(FetchContent)
+set(EXTERNAL_DIR ${CMAKE_SOURCE_DIR}/external)
+
+
+# =========================================================
+# pybind11
+# =========================================================
+
+set(TTNPP_EXTERNAL_INCLUDE_DIRS "")
+if(BUILD_PYTHON_BINDINGS)
+    set(PYBIND11_ROOT_DIR ${CMAKE_SOURCE_DIR}/external/Pybind11)
+
+    if(NOT EXISTS ${PYBIND11_ROOT_DIR})
+        FetchContent_Declare(
+            pybind11
+            GIT_REPOSITORY "https://github.com/pybind/pybind11.git"
+            SOURCE_DIR ${PYBIND11_ROOT_DIR}
+        )
+
+    else()
+        message(STATUS "${PYBIND11_ROOT_DIR}")
+        FetchContent_Declare(
+            pybind11 SOURCE_DIR ${PYBIND11_ROOT_DIR}
+        )
+    endif()
+
+    FetchContent_GetProperties(pybind11)
+    if(NOT pybind11_POPULATED)
+        FetchContent_Populate(pybind11)
+        add_subdirectory(${pybind11_SOURCE_DIR} ${pybind11_BINARY_DIR})
+    endif()
+    add_definitions(-DPYBIND11)
+    # Extract include dirs
+    get_target_property(PYBIND11_INCLUDE_DIRS pybind11::headers INTERFACE_INCLUDE_DIRECTORIES)
+
 endif()
 
-add_library(ttns_lib INTERFACE)
-target_include_directories(ttns_lib INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ttnpp>
-    $<INSTALL_INTERFACE:include>
+
+# =========================================================
+# cereal (header-only)
+# =========================================================
+set (BUILD_DOC OFF CACHE INTERNAL "Turn off cereal docs")
+set (BUILD_SANDBOX OFF CACHE INTERNAL "Turn off cereal sandbox")
+set (SKIP_PERFORMANCE_COMPARISON ON CACHE INTERNAL "Turn on skipping cereal/boost performance comparison")
+set(CEREAL_ROOT_DIR ${CMAKE_SOURCE_DIR}/external/cereal)
+if(NOT EXISTS ${CEREAL_ROOT_DIR})
+    FetchContent_Declare(
+        cereal
+        GIT_REPOSITORY "https://github.com/USCiLab/cereal.git"
+        GIT_TAG v1.3.2
+        SOURCE_DIR ${CEREAL_ROOT_DIR}
+        PATCH_COMMAND git apply ${CMAKE_SOURCE_DIR}/patches/patch_cereal.patch
+        UPDATE_DISCONNECTED 1
+    )
+else()
+    message(STATUS "${CEREAL_ROOT_DIR}")
+    FetchContent_Declare(
+        cereal SOURCE_DIR ${CEREAL_ROOT_DIR}
+    )
+endif()
+FetchContent_GetProperties(cereal)
+if(NOT cereal_POPULATED)
+    FetchContent_Populate(cereal)
+    add_subdirectory(${cereal_SOURCE_DIR} ${cereal_BINARY_DIR})
+endif()
+add_definitions(-DCEREAL_LIBRARY_FOUND)
+set(cereal_INCLUDE_DIR ${cereal_SOURCE_DIR}/include)
+message(STATUS "${cereal_INCLUDE_DIR}")
+
+
+# cereal is header-only — its include dir is:
+set(CEREAL_INCLUDE_DIRS
+    $<BUILD_INTERFACE:${cereal_SOURCE_DIR}/include>
 )
 
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 
-#compiler flags
-option(USE_CUDA "Compile with cuda" OFF)
-option(USE_OPENMP "Compile with openmp" ON)
-option(BUILD_REAL_TTN "build wrapper for real valued tensor network objects." OFF)
-option(USE_GEMM3M "Compile with gemm3m" OFF)
-option(EVAL_BUT_DONT_APPLY "Compile with eval but don't apply option set" OFF)
-option(DEBUG "Compile with debug messages" OFF)
-option(USE_SPDLOG "Compile with spdlog" ON)
-option(TRACE_LOG "Compile including more expensive trace logging operations" ON)
+# =========================================================
+# spdlog
+# =========================================================
+if(USE_SPDLOG)
 
-set(OpenMP_LIBS "")
+    if(EXISTS ${EXTERNAL_DIR}/spdlog/CMakeLists.txt)
+        message(STATUS "Using local spdlog from external/")
+        add_subdirectory(${EXTERNAL_DIR}/spdlog)
+    else()
+        message(STATUS "Fetching spdlog from GitHub")
+        FetchContent_Declare(
+            spdlog
+            GIT_REPOSITORY https://github.com/gabime/spdlog.git
+            GIT_TAG v1.x
+        )
+        FetchContent_MakeAvailable(spdlog)
+    endif()
+
+    add_definitions(-DSPDLOG_LIBRARY_FOUND)
+
+    get_target_property(SPDLOG_INCLUDE_DIRS spdlog::spdlog INTERFACE_INCLUDE_DIRECTORIES)
+
+endif()
+
+# -------------------- OpenMP --------------------
 if(USE_OPENMP)
-  find_package(OpenMP)
-  if(OpenMP_FOUND)
-    add_definitions(-DUSE_OPENMP)
-    set(OpenMP_LIBS OpenMP::OpenMP_CXX CACHE INTERNAL "")
-  endif()
+    find_package(OpenMP)
 endif()
 
-if(USE_GEMM3M)
-    add_compile_definitions(USE_GEMM3M)
-endif()
-
-set(TTNS_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/ttnpp CACHE INTERNAL "")
-
-#BLAS AND LAPACK VENDORS
+# -------------------- BLAS/LAPACK --------------------
 if(DEFINED BLA_VENDOR)
     if(BLA_VENDOR MATCHES "Intel")
         find_package(LAPACK)
@@ -114,18 +197,35 @@ else()
     set(USE_DEFAULT_FIND_BLAS OFF)
 endif()
 
+# -------------------- External module path --------------------
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+# -------------------- CUDA --------------------
+if(USE_CUDA)
+    # Set default CUDA architectures if not defined
+    if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES OR CMAKE_CUDA_ARCHITECTURES STREQUAL "")
+        set(CMAKE_CUDA_ARCHITECTURES 75 80 86 CACHE STRING "CUDA architectures to build for" FORCE)
+        message(STATUS "CMAKE_CUDA_ARCHITECTURES not set. Defaulting to: ${CMAKE_CUDA_ARCHITECTURES}")
+    endif()
+
+    # Enable CUDA language
+    enable_language(CUDA)
+
+    # Find CUDA toolkit
+    find_package(CUDAToolkit REQUIRED)
+
+    # Find cuTENSOR using custom FindCUTENSOR.cmake
+    find_package(CUTENSOR REQUIRED)
+endif()
+
+# -------------------- Subdirectories --------------------
+add_subdirectory(ttnpp)
+#add_subdirectory(cuda)
 if(BUILD_PYTHON_BINDINGS)
     add_subdirectory(python)
 endif()
 
 if(BUILD_SRC)
     add_subdirectory(cuda_test)
+
 endif()
-
-if(BUILD_TESTS)
-  #add_subdirectory(tests)
-endif()
- 
-
-

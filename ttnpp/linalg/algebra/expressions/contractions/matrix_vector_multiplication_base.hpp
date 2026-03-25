@@ -32,6 +32,8 @@ namespace linalg
             using lvalue_type = typename traits<impl>::lvalue_type;
             using rvalue_type = typename traits<impl>::rvalue_type;
             using backend_type = typename traits<impl>::backend_type;
+            using device_value_type = typename device_type<value_type, backend_type>::type;
+
             using size_type = typename traits<backend_type>::size_type;
             using shape_type = std::array<size_type, 1>;
             using Ashape_type = std::array<size_type, 2>;
@@ -41,7 +43,7 @@ namespace linalg
             value_type m_coeff;
 
             // working buffer
-            value_type *m_working;
+            device_value_type *m_working;
             size_type m_working_size;
 
             ttype m_opA;
@@ -168,7 +170,7 @@ namespace linalg
                 static_assert(std::is_same<typename traits<T3>::value_type, value_type>::value, "Failed to construct evaluate operator for matrix_vector_product object.  The result_type must have a compatible value_type.");
                 static_assert(std::is_same<typename traits<T3>::backend_type, backend_type>::value, "Failed to construct evaluate operator for matrix_vector_product object.  The result_type must have a compatible backend type.");
                 static_assert(is_dense_vector<T3>::value, "Failed to construct evaluate operator for matrix_vector_product object.  The result type must be a dense vector.");
-                CALL_AND_RETHROW(static_cast<impl *>(this)->applicative_impl(res, beta, coeff_scale));
+                CALL_AND_RETHROW(static_cast<impl *>(this)->applicative_impl(res, device_value_type(beta), device_value_type(coeff_scale)));
             }
 
             template <typename T3>
@@ -177,7 +179,7 @@ namespace linalg
                 static_assert(std::is_same<typename traits<T3>::value_type, value_type>::value, "Failed to construct evaluate operator for matrix_vector_product object.  The result_type must have a compatible value_type.");
                 static_assert(std::is_same<typename traits<T3>::backend_type, backend_type>::value, "Failed to construct evaluate operator for matrix_vector_product object.  The result_type must have a compatible backend type.");
                 static_assert(is_dense_vector<T3>::value, "Failed to construct evaluate operator for matrix_vector_product object.  The result type must be a dense vector.");
-                CALL_AND_RETHROW(static_cast<impl *>(this)->applicative_impl(res, 1.0, coeff_scale));
+                CALL_AND_RETHROW(static_cast<impl *>(this)->applicative_impl(res, device_value_type(1.0), device_value_type(coeff_scale)));
             }
 
             template <typename T3>
@@ -186,7 +188,7 @@ namespace linalg
                 static_assert(std::is_same<typename traits<T3>::value_type, value_type>::value, "Failed to construct evaluate operator for matrix_vector_product object.  The result_type must have a compatible value_type.");
                 static_assert(std::is_same<typename traits<T3>::backend_type, backend_type>::value, "Failed to construct evaluate operator for matrix_vector_product object.  The result_type must have a compatible backend type.");
                 static_assert(is_dense_vector<T3>::value, "Failed to construct evaluate operator for matrix_vector_product object.  The result type must be a dense vector.");
-                CALL_AND_RETHROW(static_cast<impl *>(this)->applicative_impl(res, -1.0, coeff_scale));
+                CALL_AND_RETHROW(static_cast<impl *>(this)->applicative_impl(res, device_value_type(-1.0), device_value_type(coeff_scale)));
             }
         }; // matrix_vector_product_base
 
@@ -198,6 +200,8 @@ namespace linalg
         using lvalue_type = typename traits<impl>::lvalue_type;
         using rvalue_type = typename traits<impl>::rvalue_type;
         using backend_type = typename traits<impl>::backend_type;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using shape_type = std::array<typename traits<backend_type>::size_type, 1>;
         using const_shape_reference = const shape_type &;
         static constexpr size_t rank = 1;

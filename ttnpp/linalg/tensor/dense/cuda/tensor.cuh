@@ -15,15 +15,13 @@
 #ifndef PYTTN_LINALG_TENSOR_DENSE_TENSOR_CUH_
 #define PYTTN_LINALG_TENSOR_DENSE_TENSOR_CUH_
 
-#include "../../../linalg_forward_decl.hpp"
-#include "../tensor.hpp"
+#include "../../../utils/serialisation.cuh"
 #include "../../../backends/cuda/cuda_backend.hpp"
 #include "../../../backends/cuda/host_access.cuh"
+#include "../../../linalg_forward_decl.hpp"
+#include "../tensor.hpp"
+#include "../utils.hpp"
 
-// TODO: implement cuda storing the cuda device types internally but exposing the host type externally.  
-//       this is likely easiest done by adding a value_type and internal_type for each container type
-//       and letting the backend set these.  A key aspect of this is that the unary expressions should
-//       probably work with the internal_type as they need to be applicable to devices code.  
 // TODO: Implement stl allocators (and potentially an aligned allocator) to handle memory rather than the hacky approach I have currently taken.
 namespace linalg
 {
@@ -37,6 +35,7 @@ namespace linalg
     public:
         using self_type = tensor<T, D, cuda_backend>;
         using value_type = typename traits<self_type>::value_type;
+
         using size_type = typename traits<self_type>::size_type;
         using base_type = tensor_base<self_type>;
         using const_slice_traits = tensor_slice_traits<self_type, const T, D>;
@@ -81,8 +80,17 @@ namespace linalg
         {
             if(!this->m_copied_from_host){this->from_host();}
             static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
-            return this->m_host_buffer[get_index<pack_type>(indices...)];
+            return this->m_host_buffer[NDIndex<D>::flatten(m_stride, indices...)];
+        }
+
+        template <typename... Inds>
+        inline const_reference at(Inds... indices) const
+        {
+            if(!this->m_copied_from_host){this->from_host();}
+            static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
+            size_type index;
+            CALL_AND_HANDLE(index = NDIndex<D>::flatten_check(m_shape, m_stride, indices...), "Unable to access tensor element.  Failed to determine flattened index.");
+            return this->m_host_buffer[index];
         }
 
         // slice accessor operator[]
@@ -99,34 +107,6 @@ namespace linalg
             ASSERT(internal::compare_bounds(i, m_shape[0]), "Unable to return slice of array.  Slice index out of bounds.");
             return const_slice_traits::make(this, i);
         }
-
-    private:
-        ///@cond INTERNAL - we might want to move this elsewhere - this should be common to all dense tensor types.
-        // get the index in the array corresponding to the parameter pack.
-        template <typename IntegerType, typename... Args>
-        inline size_type get_index_bounds_check(IntegerType i, Args... args) const
-        {
-            ASSERT(internal::compare_bounds(i, m_shape[D - sizeof...(args) - 1]), "Unable to get flattened index.  One of the unflattened indices was out of bounds.");
-            CALL_AND_HANDLE(return i * m_stride[D - sizeof...(args) - 1] + get_index_bounds_check<IntegerType>(args...), "Unable to get flattened index.  Error on iterated get_index call.");
-        }
-        template <typename IntegerType>
-        inline size_type get_index_bounds_check(IntegerType i) const
-        {
-            ASSERT(internal::compare_bounds(i, m_shape[D - 1]), "Unable to get flattened index.  Final unflattened index was out of bounds.");
-            return i;
-        }
-
-        template <typename IntegerType, typename... Args>
-        inline size_type get_index(IntegerType i, Args... args) const { return i * m_stride[D - sizeof...(args) - 1] + get_index<IntegerType>(args...); }
-        template <typename IntegerType>
-        inline size_type get_index(IntegerType i) const { return i; }
-
-    public:
-        pointer buffer() { return m_buffer; }
-        const_pointer buffer() const { return m_buffer; }
-        pointer data() { return m_buffer; }
-        const_pointer data() const { return m_buffer; }
-
     }; // class tensor
 
     template <typename T>
@@ -172,18 +152,21 @@ namespace linalg
             if(!this->m_copied_from_host){this->from_host();}
             return this->m_host_buffer[i];
         }
+        inline const_reference slice(size_t i) const
+        {
+            ASSERT(internal::compare_bounds(i, m_totsize), "Failed to access element. Index out of bounds.");
+            return this->operator()(i);
+        }
+        inline const_reference at(size_t i) const
+        {
+            ASSERT(internal::compare_bounds(i, m_totsize), "Failed to access element. Index out of bounds.");
+            return this->operator()(i);
 
+        }
         inline const_reference operator[](size_t i) const
         {
-            if(!this->m_copied_from_host){this->from_host();}
-            return this->m_host_buffer[i];
+            return this->operator()(i);
         }
-
-    public:
-        pointer buffer() { return m_buffer; }
-        const_pointer buffer() const { return m_buffer; }
-        pointer data() { return m_buffer; }
-        const_pointer data() const { return m_buffer; }
     };
 } // namespace linalg
 

@@ -12,17 +12,26 @@
  * limitations under the License
  */
 
-
-#include <linalg/sparse.cuh>
-
-
+ #include <linalg/linalg.hpp>
+#include "sparseMatrix.cuh"
 #include "../../pyttn_typedef.hpp"
 
-namespace linalg
+void initialise_sparse_matrices(py::module &m)
 {
-    template class csr_matrix<pyttn_real_type, cuda_backend>;
-    template class csr_matrix<std::complex<pyttn_real_type>, cuda_backend>;
+    using real_type = pyttn_real_type;
+    using complex_type = std::complex<real_type>;
+    init_csr_matrix<real_type, linalg::blas_backend>(m, "csr_matrix_real");
+    init_csr_matrix<complex_type, linalg::blas_backend>(m, "csr_matrix_complex");
+    init_diagonal_matrix<real_type>(m, "diagonal_matrix_real");
+    init_diagonal_matrix<complex_type>(m, "diagonal_matrix_complex");
+}
 
-    template class diagonal_matrix<pyttn_real_type, cuda_backend>;
-    template class diagonal_matrix<std::complex<pyttn_real_type>, cuda_backend>;
+void initialise_sparse_matrices_cuda(py::module &m)
+{
+    using real_type = pyttn_real_type;
+    using complex_type = std::complex<real_type>;
+    init_csr_matrix<real_type, linalg::cuda_backend>(m, "csr_matrix_real");
+    init_csr_matrix<complex_type, linalg::cuda_backend>(m, "csr_matrix_complex");
+    init_diagonal_matrix_cuda<real_type>(m, "diagonal_matrix_real");
+    init_diagonal_matrix_cuda<complex_type>(m, "diagonal_matrix_complex");
 }

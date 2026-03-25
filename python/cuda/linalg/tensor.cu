@@ -12,19 +12,38 @@
  * limitations under the License
  */
 
-#include <linalg/tensor/dense/tensor.cuh>
+#include <linalg/linalg.cuh>
+#include <linalg/linalg.hpp>
+#include "tensor.cuh"
+
+
 #include "../../pyttn_typedef.hpp"
 
-namespace linalg
-{
-    template class tensor<pyttn_real_type, 1, cuda_backend>;
-    template class tensor<pyttn_real_type, 2, cuda_backend>;
-    template class tensor<pyttn_real_type, 3, cuda_backend>;
-    template class tensor<pyttn_real_type, 4, cuda_backend>;
 
-    template class tensor<std::complex<pyttn_real_type>, 1, cuda_backend>;
-    template class tensor<std::complex<pyttn_real_type>, 2, cuda_backend>;
-    template class tensor<std::complex<pyttn_real_type>, 3, cuda_backend>;
-    template class tensor<std::complex<pyttn_real_type>, 4, cuda_backend>;
+void initialise_tensors(py::module &m)
+{
+    using complex_type = std::complex<pyttn_real_type>;
+    init_tensor_cpu<pyttn_real_type, 1>(m, "vector_real");
+    init_matrix_cpu<pyttn_real_type>(m, "matrix_real");
+    init_tensor_cpu<pyttn_real_type, 3>(m, "tensor_3_real");
+    init_tensor_cpu<pyttn_real_type, 4>(m, "tensor_4_real");
+
+    init_tensor_cpu<complex_type, 1>(m, "vector_complex");
+    init_matrix_cpu<complex_type>(m, "matrix_complex");
+    init_tensor_cpu<complex_type, 3>(m, "tensor_3_complex");
+    init_tensor_cpu<complex_type, 4>(m, "tensor_4_complex");
 }
 
+void initialise_tensors_cuda(py::module &m)
+{
+    using complex_type = std::complex<pyttn_real_type>;
+    init_tensor_gpu<pyttn_real_type, 1>(m, "vector_real");
+    init_matrix_gpu<pyttn_real_type>(m, "matrix_real");
+    init_tensor_gpu<pyttn_real_type, 3>(m, "tensor_3_real");
+    init_tensor_gpu<pyttn_real_type, 4>(m, "tensor_4_real");
+
+    init_tensor_gpu<complex_type, 1>(m, "vector_complex");
+    init_matrix_gpu<complex_type>(m, "matrix_complex");
+    init_tensor_gpu<complex_type, 3>(m, "tensor_3_complex");
+    init_tensor_gpu<complex_type, 4>(m, "tensor_4_complex");
+}

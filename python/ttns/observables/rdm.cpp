@@ -12,8 +12,10 @@
  * limitations under the License
  */
 
-#include "rdm.hpp"
+#include "rdm.tpp"
 #include "../../pyttn_typedef.hpp"
 
-template <>
-void initialise_rdm<pyttn_real_type, linalg::blas_backend>(py::module &m);
+void initialise_rdm(py::module &m)
+{
+    initialise_rdm_types<pyttn_real_type, linalg::blas_backend>(m);
+}

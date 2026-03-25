@@ -472,7 +472,7 @@ namespace ttns
             size_t iskip = 0;
             for (size_t i = 0; i < buf.size(); ++i)
             {
-                backend::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
+                linalg::backend_algebra<backend>::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
                 iskip += buf[i].size();
             }
         }
@@ -489,7 +489,7 @@ namespace ttns
             size_t iskip = 0;
             for (size_t i = 0; i < buf.size(); ++i)
             {
-                backend::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
+                linalg::backend_algebra<backend>::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
                 iskip += buf[i].size();
             }
         }
@@ -507,7 +507,7 @@ namespace ttns
             size_t iskip = 0;
             for (size_t i = 0; i < buf.size(); ++i)
             {
-                backend::copy(res.buffer() + iskip, buf[i].size(), buf[i].buffer());
+                linalg::backend_algebra<backend>::copy(res.buffer() + iskip, buf[i].size(), buf[i].buffer());
                 iskip += buf[i].size();
             }
         }

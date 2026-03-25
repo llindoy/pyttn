@@ -12,8 +12,18 @@
  * limitations under the License
  */
 
-#include "siteOperators.hpp"
-#include "../../pyttn_typedef.hpp"
+#include <linalg/linalg.cuh>
 
-template <>
-void initialise_site_operators<pyttn_real_type, linalg::cuda_backend>(py::module &m);
+
+#include "../../../ttns/operators/siteOperators.tpp"
+#include "../../../pyttn_typedef.hpp"
+
+void initialise_site_operators(py::module &m)
+{
+    initialise_site_operators_types<pyttn_real_type, linalg::blas_backend>(m);
+}
+
+void initialise_site_operators_cuda(py::module &m)
+{
+    initialise_site_operators_types<pyttn_real_type, linalg::cuda_backend>(m);
+}

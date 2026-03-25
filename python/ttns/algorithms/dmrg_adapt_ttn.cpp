@@ -12,10 +12,14 @@
  * limitations under the License
  */
 
-#include "tdvp.hpp"
+#include "dmrg.tpp"
 #include "../../pyttn_typedef.hpp"
 
-template <>
-void initialise_tdvp<pyttn_real_type, linalg::blas_backend>(py::module &m);
-template <>
-void initialise_tdvp_adaptive<pyttn_real_type, linalg::blas_backend>(py::module &m);
+void initialise_dmrg_adaptive_ttn(py::module &m)
+{
+    using complex_type = std::complex<pyttn_real_type>;
+    init_dmrg_adaptive<complex_type, ttns::ttn, linalg::blas_backend>(m, std::string("adaptive_one_site_dmrg_complex"));
+#ifdef BUILD_REAL_TTN
+    init_dmrg_adaptive<pyttn_real_type, ttns::ttn, linalg::blas_backend>(m, std::string("adaptive_one_site_dmrg_real"));
+#endif
+}

@@ -35,19 +35,21 @@ namespace linalg
             using left_type = T1;
             using right_type = T2;
             using value_type = typename std::remove_cv<typename traits<T1>::value_type>::type;
-            using value_ptr = typename std::add_pointer<typename std::add_const<value_type>::type>::type;
+            using device_value_type = typename std::remove_cv<typename traits<T1>::device_value_type>::type;
 
             using backend_type = typename traits<T1>::backend_type;
             using size_type = typename traits<backend_type>::size_type;
             using shape_type = std::array<size_type, 3>;
             using ttype = typename backend_type::transform_type;
 
+            using value_ptr = typename std::add_pointer<typename std::add_const<device_value_type>::type>::type;
+
         protected:
             value_type m_coeff;
             value_ptr m_Abuffer;
             value_ptr m_Bbuffer;
 
-            value_type *m_working;
+            device_value_type* m_working;
             size_type m_working_size;
 
             bool m_batched;
@@ -250,10 +252,10 @@ namespace linalg
                             if (beta != value_type(0.0))
                             {
                                 beta = conj(beta);
-                                CALL_AND_HANDLE(backend_type::complex_conjugate(res.size(), res.buffer(), res.buffer()), "Failed to compute complex conjugate of result");
+                                CALL_AND_HANDLE(backend_algebra<backend_type>::complex_conjugate(res.size(), res.buffer(), res.buffer()), "Failed to compute complex conjugate of result");
                             }
                             CALL_AND_HANDLE(eval_contraction(res, beta, coeff, m_Abuffer, m_Bbuffer, opA, opB), "Failed to evaluate the required contraction.");
-                            CALL_AND_HANDLE(backend_type::complex_conjugate(res.size(), res.buffer(), res.buffer()), "Failed to compute complex conjugate of result");
+                            CALL_AND_HANDLE(backend_algebra<backend_type>::complex_conjugate(res.size(), res.buffer(), res.buffer()), "Failed to compute complex conjugate of result");
                         }
                         else
                         {
@@ -274,7 +276,7 @@ namespace linalg
                             {
                                 ASSERT(m_working != nullptr, "The workspace array has not been bound.");
                                 ASSERT(m_working_size >= m_Asize, "The workspace array is not large enough to store temporary objects.");
-                                CALL_AND_HANDLE(backend_type::complex_conjugate(m_Asize, m_Abuffer, m_working), "Failed to compute complex conjugate array value.");
+                                CALL_AND_HANDLE(backend_algebra<backend_type>::complex_conjugate(m_Asize, m_Abuffer, m_working), "Failed to compute complex conjugate array value.");
                                 Abuffer = static_cast<value_ptr>(m_working);
                             }
                         }
@@ -285,7 +287,7 @@ namespace linalg
                             {
                                 ASSERT(m_working != nullptr, "The workspace array has not been bound.");
                                 ASSERT(m_working_size >= m_Bsize, "The workspace array is not large enough to store temporary objects.");
-                                CALL_AND_HANDLE(backend_type::complex_conjugate(m_Bsize, m_Bbuffer, m_working), "Failed to compute complex conjugate array value.");
+                                CALL_AND_HANDLE(backend_algebra<backend_type>::complex_conjugate(m_Bsize, m_Bbuffer, m_working), "Failed to compute complex conjugate array value.");
                                 Bbuffer = static_cast<value_ptr>(m_working);
                             }
                         }
@@ -313,8 +315,10 @@ namespace linalg
 
         protected:
             template <typename T3>
-            void eval_contraction(T3 &res, value_type beta, value_type coeff, value_ptr Abuffer, value_ptr Bbuffer, ttype opA, ttype opB)
+            void eval_contraction(T3 &res, value_type _beta, value_type _coeff, value_ptr Abuffer, value_ptr Bbuffer, ttype opA, ttype opB)
             {
+                device_value_type beta(_beta);
+                device_value_type coeff(_coeff);
                 try
                 {
                     if (m_batched)
@@ -322,14 +326,14 @@ namespace linalg
                         size_type strideres = res.size(1) * res.size(2);
                         size_type ldres = res.shape(2);
                         CALL_AND_HANDLE(
-                            backend_type::batched_gemm(opB, opA, m_m, m_n, m_k, coeff, Bbuffer, m_ldB, m_strideB, Abuffer, m_ldA, m_strideA, beta, res.buffer(), ldres, strideres, m_t),
+                            backend_algebra<backend_type>::batched_gemm(opB, opA, m_m, m_n, m_k, coeff, Bbuffer, m_ldB, m_strideB, Abuffer, m_ldA, m_strideA, beta, res.buffer(), ldres, strideres, m_t),
                             "Error when making call to batched_gemm.");
                     }
                     else
                     {
                         size_type ldres = m_m;
                         CALL_AND_HANDLE(
-                            backend_type::gemm(opB, opA, m_m, m_n, m_k, coeff, Bbuffer, m_ldB, Abuffer, m_ldA, beta, res.buffer(), ldres),
+                            backend_algebra<backend_type>::gemm(opB, opA, m_m, m_n, m_k, coeff, Bbuffer, m_ldB, Abuffer, m_ldA, beta, res.buffer(), ldres),
                             "Error when making call to gemm.");
                     }
                 }
@@ -348,6 +352,8 @@ namespace linalg
 
         using value_type = typename traits<T1>::value_type;
         using backend_type = typename traits<T1>::backend_type;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         using shape_type = std::array<typename traits<backend_type>::size_type, 3>;
         using const_shape_reference = const shape_type &;
         static constexpr size_t rank = 3;

@@ -37,10 +37,32 @@ namespace linalg
             static_assert(is_number<T>::value, "Failed to initialise literal type object.  The literal must be a number type.");
 
         public:
-            using value_type = T;
+            using value_type = typename device_type<T, cuda_backend>::type;
             using backend_type = cuda_backend;
             literal_type(T val) : m_value(val) {}
-            inline __host__ __device__ operator value_type() const { return m_value; }
+
+            inline __host__ __device__ operator T() const { return T(m_value); }
+
+            template <typename... Args>
+            inline __host__ __device__ value_type operator()(Args &&...args) { return m_value; }
+
+        private:
+            value_type m_value;
+        };
+
+        template <typename T>
+        class literal_type<std::complex<T>, cuda_backend>
+        {
+            static_assert(is_number<T>::value, "Failed to initialise literal type object.  The literal must be a number type.");
+
+        public:
+            using value_type = cuda::std::complex<T>;
+            using backend_type = cuda_backend;
+            literal_type(std::complex<T> val) : m_value(val) {}
+
+            inline __host__ __device__ operator std::complex<T>() const { return std::complex<T>(m_value); }
+            inline __host__ __device__ operator cuda::std::complex<T>() const { return m_value; }
+
             template <typename... Args>
             inline __host__ __device__ value_type operator()(Args &&...args) { return m_value; }
 
@@ -63,19 +85,19 @@ namespace linalg
                 static inline void apply(res &_res, const expr &_expr)
                 {
                     static_assert(std::is_base_of<type, res>::value, "Failed to instantiate expression applicative object.  The input type is not derived from the result type.");
-                    CALL_AND_HANDLE(cuda_backend::evaluate_expression_tree(_res.buffer(), _res.nelems(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
+                    CALL_AND_HANDLE(backend_algebra<cuda_backend>::evaluate_expression_tree(_res.buffer(), _res.nelems(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
                 }
                 template <typename res>
                 static inline void addition_assign(res &_res, const expr &_expr)
                 {
                     static_assert(std::is_base_of<type, res>::value, "Failed to instantiate expression applicative object.  The input type is not derived from the result type.");
-                    CALL_AND_HANDLE(cuda_backend::evaluate_add_expression_tree(_res.buffer(), _res.nelems(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
+                    CALL_AND_HANDLE(backend_algebra<cuda_backend>::evaluate_add_expression_tree(_res.buffer(), _res.nelems(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
                 }
                 template <typename res>
                 static inline void subtraction_assign(res &_res, const expr &_expr)
                 {
                     static_assert(std::is_base_of<type, res>::value, "Failed to instantiate expression applicative object.  The input type is not derived from the result type.");
-                    CALL_AND_HANDLE(cuda_backend::evaluate_sub_expression_tree(_res.buffer(), _res.nelems(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
+                    CALL_AND_HANDLE(backend_algebra<cuda_backend>::evaluate_sub_expression_tree(_res.buffer(), _res.nelems(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
                 }
             };
 
@@ -88,19 +110,19 @@ namespace linalg
                 static inline void apply(res &_res, const expr &_expr)
                 {
                     static_assert(std::is_base_of<diagonal_matrix_type, res>::value, "Failed to instantiate expression applicative object.  The input type is not derived from the result type.");
-                    CALL_AND_HANDLE(cuda_backend::evaluate_expression_tree_strided(_res.buffer(), _res.nelems(), _res.incx(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
+                    CALL_AND_HANDLE(backend_algebra<cuda_backend>::evaluate_expression_tree_strided(_res.buffer(), _res.nelems(), _res.incx(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
                 }
                 template <typename res>
                 static inline void addition_assign(res &_res, const expr &_expr)
                 {
                     static_assert(std::is_base_of<diagonal_matrix_type, res>::value, "Failed to instantiate expression applicative object.  The input type is not derived from the result type.");
-                    CALL_AND_HANDLE(cuda_backend::evaluate_add_expression_tree_strided(_res.buffer(), _res.nelems(), _res.incx(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
+                    CALL_AND_HANDLE(backend_algebra<cuda_backend>::evaluate_add_expression_tree_strided(_res.buffer(), _res.nelems(), _res.incx(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
                 }
                 template <typename res>
                 static inline void subtraction_assign(res &_res, const expr &_expr)
                 {
                     static_assert(std::is_base_of<diagonal_matrix_type, res>::value, "Failed to instantiate expression applicative object.  The input type is not derived from the result type.");
-                    CALL_AND_HANDLE(cuda_backend::evaluate_sub_expression_tree_strided(_res.buffer(), _res.nelems(), _res.incx(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
+                    CALL_AND_HANDLE(backend_algebra<cuda_backend>::evaluate_sub_expression_tree_strided(_res.buffer(), _res.nelems(), _res.incx(), _expr), "Failed to evaluate expression object.  The cuda backend evaluate expression tree raised an exception.");
                 }
             };
         } // namespace internal
@@ -121,7 +143,7 @@ namespace linalg
             using backend_type = cuda_backend;
             using size_type = typename traits<backend_type>::size_type;
             using op_type = operation<backend_type>;
-            using value_type = typename result_type<self_type>::value_type;
+            using value_type = typename device_type<typename result_type<self_type>::value_type, backend_type>::type;
             using result_type = typename result_type<self_type>::type;
             using eval_type = internal::expression_applicative<result_type, self_type, backend_type>;
 
@@ -156,7 +178,7 @@ namespace linalg
             using backend_type = cuda_backend;
             using size_type = typename traits<backend_type>::size_type;
             using op_type = operation<backend_type>;
-            using value_type = typename result_type<self_type>::value_type;
+            using value_type = typename device_type<typename result_type<self_type>::value_type, backend_type>::type;
             using result_type = typename result_type<self_type>::type;
             using eval_type = internal::expression_applicative<result_type, self_type, backend_type>;
 
@@ -176,5 +198,5 @@ namespace linalg
 
 
 } // namespace linalg
-
+}
 #endif // PYTTN_LINALG_ALGEBRA_EXPRESSIONS_ELEMENTAL_EXPRESSION_CUH_//

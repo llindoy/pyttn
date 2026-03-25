@@ -16,6 +16,8 @@
 #define PYTTN_LINALG_DECOMPOSITIONS_LU_DECOMPOSITION_HPP_
 
 #include "../decompositions_common.hpp"
+#include "../../backends/blas/blas_algebra.hpp"
+#include "../../backends/blas/blas_backend.hpp"
 
 namespace linalg
 {
@@ -75,7 +77,7 @@ namespace linalg
             {
                 CALL_AND_HANDLE(internal::lu_result_validation::validate_ipiv(A, ipiv), "Failed to validate pivot array.");
                 CALL_AND_HANDLE(LU = A, "Failed to copy matrix.");
-                CALL_AND_HANDLE(blas_backend::getrf(LU.size(1), LU.size(0), LU.buffer(), LU.size(1), ipiv.buffer()), "Lapack call failed.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(LU.size(1), LU.size(0), LU.buffer(), LU.size(1), ipiv.buffer()), "Lapack call failed.");
             }
             catch (const common::invalid_value &ex)
             {
@@ -101,7 +103,7 @@ namespace linalg
                 if (is_wide)
                 {
                     CALL_AND_HANDLE(U = A, "Failed to copy matrix.");
-                    CALL_AND_HANDLE(blas_backend::getrf(U.size(1), U.size(0), U.buffer(), U.size(1), ipiv.buffer()), "Lapack call failed.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(U.size(1), U.size(0), U.buffer(), U.size(1), ipiv.buffer()), "Lapack call failed.");
 
                     // transfer the lower triangular part across to the L array.
                     L.fill_zeros();
@@ -118,7 +120,7 @@ namespace linalg
                 else
                 {
                     CALL_AND_HANDLE(L = A, "Failed to copy matrix.");
-                    CALL_AND_HANDLE(blas_backend::getrf(L.size(1), L.size(0), L.buffer(), L.size(1), ipiv.buffer()), "Lapack call failed.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(L.size(1), L.size(0), L.buffer(), L.size(1), ipiv.buffer()), "Lapack call failed.");
 
                     // transfer the upper triangular part across to the U array.
                     U.fill_zeros();
@@ -152,7 +154,7 @@ namespace linalg
             try
             {
                 CALL_AND_HANDLE(internal::lu_result_validation::validate_ipiv(A, ipiv), "Failed to validate pivot array.");
-                CALL_AND_HANDLE(blas_backend::getrf(A.size(1), A.size(0), A.buffer(), A.size(1), ipiv.buffer()), "Lapack call failed.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(A.size(1), A.size(0), A.buffer(), A.size(1), ipiv.buffer()), "Lapack call failed.");
             }
             catch (const common::invalid_value &ex)
             {

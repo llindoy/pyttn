@@ -344,7 +344,6 @@ namespace ttns
                 for (auto &n : reverse(m_nodes))
                 {
                     n.set_node_random(m_rengine);
-
                     if (!n.is_root())
                     {
                         CALL_AND_HANDLE(n.decompose_up(m_orthog), "Failed to shift orthogonality up.");

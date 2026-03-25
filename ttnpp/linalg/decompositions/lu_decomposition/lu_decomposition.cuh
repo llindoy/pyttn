@@ -41,7 +41,7 @@ namespace linalg
         typename std::enable_if<internal::valid_decomposition_matrix<mat_type, value_type, backend_type>::value, int>::type query_worksize(mat_type &A)
         {
             int_type lwork;
-            CALL_AND_HANDLE(cuda_backend::getrf_buffersize(A.size(1), A.size(0), A.buffer(), A.size(1), &lwork), "Failed to query worksize for LU decomposition.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::getrf_buffersize(A.size(1), A.size(0), A.buffer(), A.size(1), &lwork), "Failed to query worksize for LU decomposition.");
             return lwork;
         }
 
@@ -60,7 +60,7 @@ namespace linalg
                 size_type lwork;
                 CALL_AND_HANDLE(lwork = query_worksize(LU), "Failed to query worksize");
                 CALL_AND_HANDLE(d_work.resize(lwork), "Failed to resize workspace array.");
-                CALL_AND_HANDLE(cuda_backend::getrf(LU.size(1), LU.size(0), LU.buffer(), LU.size(1), d_work.buffer(), ipiv.buffer(), m_gpu_info.buffer()), "Lapack call failed.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(LU.size(1), LU.size(0), LU.buffer(), LU.size(1), d_work.buffer(), ipiv.buffer(), m_gpu_info.buffer()), "Lapack call failed.");
                 m_cpu_info = m_gpu_info;
                 CALL_AND_RETHROW(cusolver::getrf_error_handling(m_cpu_info(0), 'a'));
             }
@@ -87,7 +87,7 @@ namespace linalg
                 size_type lwork;
                 CALL_AND_HANDLE(lwork = query_worksize(A), "Failed to query worksize");
                 CALL_AND_HANDLE(d_work.resize(lwork), "Failed to resize workspace array.");
-                CALL_AND_HANDLE(cuda_backend::getrf(A.size(1), A.size(0), A.buffer(), A.size(1), d_work.buffer(), ipiv.buffer(), m_gpu_info.buffer()), "Lapack call failed.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(A.size(1), A.size(0), A.buffer(), A.size(1), d_work.buffer(), ipiv.buffer(), m_gpu_info.buffer()), "Lapack call failed.");
                 m_cpu_info = m_gpu_info;
                 CALL_AND_RETHROW(cusolver::getrf_error_handling(m_cpu_info(0), 'a'));
             }
@@ -116,14 +116,14 @@ namespace linalg
                 if (is_wide)
                 {
                     CALL_AND_HANDLE(U = A, "Failed to copy matrix.");
-                    CALL_AND_HANDLE(blas_backend::getrf(U.size(1), U.size(0), U.buffer(), U.size(1), ipiv.buffer()), "Lapack call failed.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(U.size(1), U.size(0), U.buffer(), U.size(1), ipiv.buffer()), "Lapack call failed.");
 
                     // transfer the lower triangular part across to the L array.
                 }
                 else
                 {
                     CALL_AND_HANDLE(L = A, "Failed to copy matrix.");
-                    CALL_AND_HANDLE(blas_backend::getrf(L.size(1), L.size(0), L.buffer(), L.size(1), ipiv.buffer()), "Lapack call failed.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(L.size(1), L.size(0), L.buffer(), L.size(1), ipiv.buffer()), "Lapack call failed.");
 
                     // transfer the upper triangular part across to the U array.
                 }

@@ -89,7 +89,7 @@ namespace linalg
             ASSERT(m.shape(0) == m.shape(1), "Failed to compute linear_solver.  The input matrix is not square.");
             ASSERT(B.shape(0) == m.shape(0), "Failed to compute linear_solver.  The input vector is not compatible with the input matrix.");
 
-            CALL_AND_HANDLE(blas_backend::getrs('T', m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), B.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::getrs('T', m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), B.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
         }
 
         template <typename mat_type, typename vec_type>
@@ -101,7 +101,7 @@ namespace linalg
             CALL_AND_HANDLE(resize(m.shape(0), true), "Failed to compute linear_solver.  Failed to resize the temporary buffers.");
             CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
             CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
-            CALL_AND_HANDLE(blas_backend::getrs('T', m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), B.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::getrs('T', m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), B.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
         }
 
         template <typename mat_type, typename vec_type>
@@ -114,13 +114,13 @@ namespace linalg
             {
                 CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
                 CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
-                CALL_AND_HANDLE(blas_backend::getrs('T', m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), B.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrs('T', m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), B.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
             }
             else
             {
                 CALL_AND_HANDLE(m_lu(m, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
                 // now we compute the linear_solver from the LU decomposition
-                CALL_AND_HANDLE(blas_backend::getrs('T', m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), B.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrs('T', m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), B.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
             }
         }
         template <typename mat_type, typename vec_type, typename x_type>
@@ -133,7 +133,7 @@ namespace linalg
             CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
             CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
             x = B;
-            CALL_AND_HANDLE(blas_backend::getrs('T', m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), x.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::getrs('T', m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), x.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
         }
 
         template <typename mat_type, typename vec_type, typename x_type>
@@ -148,14 +148,14 @@ namespace linalg
                 CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
                 CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
                 x = B;
-                CALL_AND_HANDLE(blas_backend::getrs('T', m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), x.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrs('T', m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), x.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
             }
             else
             {
                 CALL_AND_HANDLE(m_lu(m, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
                 // now we compute the linear_solver from the LU decomposition
                 x = B;
-                CALL_AND_HANDLE(blas_backend::getrs('T', m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), x.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrs('T', m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), x.buffer(), B.size()), "Failed to solve linear system.  Lapack call failed.");
             }
         }
 

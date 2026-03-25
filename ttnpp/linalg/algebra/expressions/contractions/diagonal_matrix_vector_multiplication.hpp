@@ -36,10 +36,14 @@ namespace linalg
             using right_type = dense_type;
             using lvalue_type = typename traits<left_type>::value_type;
             using rvalue_type = typename traits<right_type>::value_type;
-            using lvalue_ptr = typename std::add_pointer<typename std::add_const<lvalue_type>::type>::type;
-            using rvalue_ptr = typename std::add_pointer<typename std::add_const<rvalue_type>::type>::type;
+            using ldevice_value_type = typename device_type<lvalue_type, backend_type>::type;
+            using rdevice_value_type = typename device_type<rvalue_type, backend_type>::type;
+
+            using lvalue_ptr = typename std::add_pointer<typename std::add_const<ldevice_value_type>::type>::type;
+            using rvalue_ptr = typename std::add_pointer<typename std::add_const<rdevice_value_type>::type>::type;
 
             using value_type = decltype(rvalue_type() * lvalue_type());
+            using device_value_type = typename device_type<value_type, backend_type>::type;
             using self_type = matrix_vector_product<left_type, right_type>;
             using base_type = matrix_vector_product_base<self_type>;
 
@@ -96,19 +100,20 @@ namespace linalg
 
             // This routine expects dense matrices in row major order.  And as such there is no need to perform the reordering of operations required for the dense dense matrix products.
             template <typename T3>
-            void applicative_impl(T3 &res, value_type beta = 0.0, value_type coeff_scale = 1.0)
+            void applicative_impl(T3 &res, value_type _beta = 0.0, value_type coeff_scale = 1.0)
             {
                 try
                 {
                     ASSERT(res.buffer() != m_Xbuffer, "Failed to compute diagonal matrix vector product.  The matrix vector product does not support inplace products.");
-                    value_type coeff = m_coeff * coeff_scale;
+                    device_value_type coeff(m_coeff * coeff_scale);
+                    device_value_type beta(_beta);
                     size_type incc = res.incx();
 
                     bool conjA = (m_opA == backend_type::op_c || m_opA == backend_type::op_h);
                     bool conjB = (m_opX == backend_type::op_c || m_opX == backend_type::op_h);
                     size_type mn = (m_n < m_m ? m_n : m_m);
                     size_type mx = (m_n > m_m ? m_n : m_m);
-                    CALL_AND_HANDLE(backend_type::dgmv(conjA, conjB, mn, mx, coeff, m_Abuffer, m_incA, m_Xbuffer, m_incX, beta, res.buffer(), incc), "Failed to compute diagonal matrix vector product.  Error when making call to backend::dgmv");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::dgmv(conjA, conjB, mn, mx, coeff, m_Abuffer, m_incA, m_Xbuffer, m_incX, beta, res.buffer(), incc), "Failed to compute diagonal matrix vector product.  Error when making call to backend::dgmv");
                 }
                 catch (const std::exception &ex)
                 {

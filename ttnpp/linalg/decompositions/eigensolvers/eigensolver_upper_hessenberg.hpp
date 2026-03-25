@@ -16,7 +16,8 @@
 #define PYTTN_LINALG_DECOMPOSITIONS_EIGENSOLVERS_EIGENSOLVER_UPPER_HESSENBERG_HPP_
 
 #include "eigensolver_base.hpp"
-
+#include "../../backends/blas/blas_algebra.hpp"
+#include "../../backends/blas/blas_backend.hpp"
 namespace linalg
 {
     namespace internal
@@ -325,7 +326,7 @@ namespace linalg
                 int_type LDZ = 1;
                 value_type worksize;
                 int_type LWORK = -1;
-                CALL_AND_HANDLE(backend_type::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, m_eigs_r.buffer(), m_eigs_i.buffer(), &Z, LDZ, &worksize, LWORK), "Failed to query the optimal worksize for hseqr call.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, m_eigs_r.buffer(), m_eigs_i.buffer(), &Z, LDZ, &worksize, LWORK), "Failed to query the optimal worksize for hseqr call.");
                 size_type iworksize;
                 CALL_AND_RETHROW(iworksize = internal::worksize_as_integer(worksize));
                 return (iworksize > 4 * mat.shape(0) ? iworksize : 4 * mat.shape(0));
@@ -344,7 +345,7 @@ namespace linalg
                 int_type LDZ = vecs.shape(1);
                 value_type worksize;
                 int_type LWORK = -1;
-                CALL_AND_HANDLE(backend_type::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, m_eigs_r.buffer(), m_eigs_i.buffer(), vecsb, LDZ, &worksize, LWORK), "Failed to query the optimal worksize for hseqr call.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, m_eigs_r.buffer(), m_eigs_i.buffer(), vecsb, LDZ, &worksize, LWORK), "Failed to query the optimal worksize for hseqr call.");
                 size_type iworksize;
                 CALL_AND_RETHROW(iworksize = internal::worksize_as_integer(worksize));
                 return (iworksize > 4 * mat.shape(0) ? iworksize : 4 * mat.shape(0));
@@ -371,7 +372,7 @@ namespace linalg
                 value_type Z;
                 int_type LDZ = 1;
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, m_eigs_r.buffer(), m_eigs_i.buffer(), &Z, LDZ, m_work.buffer(), LWORK), "Failed to compute eigenvalues of upper_hessenberg matrix.  Failed when calling hseqr.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, m_eigs_r.buffer(), m_eigs_i.buffer(), &Z, LDZ, m_work.buffer(), LWORK), "Failed to compute eigenvalues of upper_hessenberg matrix.  Failed when calling hseqr.");
                 CALL_AND_HANDLE(internal::interleave_eigenvalues(N, m_eigs_r.buffer(), 1, m_eigs_i.buffer(), 1, eigs.buffer(), eigs.incx()), "Failed to compute eigenvalues of upper hessenberg matrix.  Failed to interleave real and imaginary part arrays to form complex array.");
             }
 
@@ -391,7 +392,7 @@ namespace linalg
                 int_type LDH = mat.shape(1);
                 int_type LDZ = vecs.shape(1);
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, m_eigs_r.buffer(), m_eigs_i.buffer(), rvecs, LDZ, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed when computing the eigenvalues using hseqr.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, m_eigs_r.buffer(), m_eigs_i.buffer(), rvecs, LDZ, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed when computing the eigenvalues using hseqr.");
                 CALL_AND_HANDLE(internal::interleave_eigenvalues(N, m_eigs_r.buffer(), 1, m_eigs_i.buffer(), 1, eigs.buffer(), eigs.incx()), "Failed to compute eigendecomposition of upper hessenberg matrix.  Failed to interleave real and imaginary part arrays to form complex array.");
 
                 char SIDE = 'R';
@@ -402,7 +403,7 @@ namespace linalg
                 int_type LDVL = 1;
                 int_type LDVR = vecs.shape(1);
                 int_type MM = 2 * vecs.shape(1);
-                CALL_AND_HANDLE(backend_type::trevc(SIDE, HOWMNY, &select, N, mat.buffer(), LDT, &VL, LDVL, rvecs, LDVR, MM, m_work.buffer()), "Failed to compute eigenvectors of upper_hessenberg matrix.  Failed when computing the eigenvectors using trevc.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::trevc(SIDE, HOWMNY, &select, N, mat.buffer(), LDT, &VL, LDVL, rvecs, LDVR, MM, m_work.buffer()), "Failed to compute eigenvectors of upper_hessenberg matrix.  Failed when computing the eigenvectors using trevc.");
 
                 CALL_AND_HANDLE(mem_trans::copy(rvecs, N * N, mat.buffer()), "Failed to copy the packed eigenvector buffer to the mat buffer.");
                 CALL_AND_HANDLE(internal::unpack_eigenvectors(N, m_eigs_i.buffer(), mat.buffer(), vecs.buffer()), "Failed to unpack eigenvectors buffer to complex format.");
@@ -426,7 +427,7 @@ namespace linalg
                 int_type LDH = mat.shape(1);
                 int_type LDZ = vecs_r.shape(1);
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, m_eigs_r.buffer(), m_eigs_i.buffer(), rvecsr, LDZ, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed when computing the eigenvalues using hseqr.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, m_eigs_r.buffer(), m_eigs_i.buffer(), rvecsr, LDZ, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed when computing the eigenvalues using hseqr.");
                 CALL_AND_HANDLE(internal::interleave_eigenvalues(N, m_eigs_r.buffer(), 1, m_eigs_i.buffer(), 1, eigs.buffer(), eigs.incx()), "Failed to compute eigendecomposition of upper hessenberg matrix.  Failed to interleave real and imaginary part arrays to form complex array.");
 
                 CALL_AND_HANDLE(vecs_l = vecs_r, "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed to copy the unitary matrix returned by hseqr into the left eigenvector matrix.");
@@ -438,7 +439,7 @@ namespace linalg
                 int_type LDVL = vecs_l.shape(1);
                 int_type LDVR = vecs_r.shape(1);
                 int_type MM = vecs_r.shape(1);
-                CALL_AND_HANDLE(backend_type::trevc(SIDE, HOWMNY, &select, N, mat.buffer(), LDT, rvecsl, LDVL, rvecsr, LDVR, MM, m_work.buffer()), "Failed to compute eigenvectors of upper_hessenberg matrix.  Failed when computing the eigenvectors using trevc.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::trevc(SIDE, HOWMNY, &select, N, mat.buffer(), LDT, rvecsl, LDVL, rvecsr, LDVR, MM, m_work.buffer()), "Failed to compute eigenvectors of upper_hessenberg matrix.  Failed when computing the eigenvectors using trevc.");
 
                 CALL_AND_HANDLE(mem_trans::copy(rvecsr, N * N, mat.buffer()), "Failed to copy the packed eigenvector buffer to the mat buffer.");
                 CALL_AND_HANDLE(internal::unpack_eigenvectors(N, m_eigs_i.buffer(), mat.buffer(), vecs_r.buffer()), "Failed to unpack eigenvectors buffer to complex format.");
@@ -685,7 +686,7 @@ namespace linalg
                 int_type LDZ = 1;
                 value_type worksize;
                 int_type LWORK = -1;
-                CALL_AND_HANDLE(backend_type::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, eigs.buffer(), &Z, LDZ, &worksize, LWORK), "Failed to query the optimal worksize for hseqr call.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, eigs.buffer(), &Z, LDZ, &worksize, LWORK), "Failed to query the optimal worksize for hseqr call.");
                 size_type iworksize;
                 CALL_AND_RETHROW(iworksize = internal::worksize_as_integer(worksize));
                 return (iworksize > 4 * mat.shape(0) ? iworksize : 4 * mat.shape(0));
@@ -703,7 +704,7 @@ namespace linalg
                 int_type LDZ = vecs.shape(1);
                 value_type worksize;
                 int_type LWORK = -1;
-                CALL_AND_HANDLE(backend_type::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, eigs.buffer(), vecs.buffer(), LDZ, &worksize, LWORK), "Failed to query the optimal worksize for hseqr call.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, eigs.buffer(), vecs.buffer(), LDZ, &worksize, LWORK), "Failed to query the optimal worksize for hseqr call.");
                 size_type iworksize;
                 CALL_AND_RETHROW(iworksize = internal::worksize_as_integer(worksize));
                 return (iworksize > 4 * mat.shape(0) ? iworksize : 4 * mat.shape(0));
@@ -728,7 +729,7 @@ namespace linalg
                 value_type Z;
                 int_type LDZ = 1;
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, eigs.buffer(), &Z, LDZ, m_work.buffer(), LWORK), "Failed to compute eigenvalues of upper_hessenberg matrix.  Failed when calling hseqr.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, eigs.buffer(), &Z, LDZ, m_work.buffer(), LWORK), "Failed to compute eigenvalues of upper_hessenberg matrix.  Failed when calling hseqr.");
             }
 
             template <typename mat_type, typename vals_type, typename vecs_type>
@@ -746,7 +747,7 @@ namespace linalg
                 int_type LDH = mat.shape(1);
                 int_type LDZ = vecs.shape(1);
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, eigs.buffer(), vecs.buffer(), LDZ, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed when computing the eigenvalues using hseqr.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, eigs.buffer(), vecs.buffer(), LDZ, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed when computing the eigenvalues using hseqr.");
 
                 char SIDE = 'R';
                 char HOWMNY = 'B';
@@ -756,7 +757,7 @@ namespace linalg
                 int_type LDVL = 1;
                 int_type LDVR = vecs.shape(1);
                 int_type MM = vecs.shape(1);
-                CALL_AND_HANDLE(backend_type::trevc(SIDE, HOWMNY, &select, N, mat.buffer(), LDT, &VL, LDVL, vecs.buffer(), LDVR, MM, m_work.buffer(), m_rwork.buffer()), "Failed to compute eigenvectors of upper_hessenberg matrix.  Failed when computing the eigenvectors using trevc.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::trevc(SIDE, HOWMNY, &select, N, mat.buffer(), LDT, &VL, LDVL, vecs.buffer(), LDVR, MM, m_work.buffer(), m_rwork.buffer()), "Failed to compute eigenvectors of upper_hessenberg matrix.  Failed when computing the eigenvectors using trevc.");
 
                 // now vecs is in column major order so we convert it to row major order
                 CALL_AND_HANDLE(vecs = trans(vecs), "Failed to compute eigenvectors of upper hessenberg matrix.  Failed to transpose eigenvalues.");
@@ -777,7 +778,7 @@ namespace linalg
                 int_type LDH = mat.shape(1);
                 int_type LDZ = vecs_r.shape(1);
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, eigs.buffer(), vecs_r.buffer(), LDZ, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed when computing the eigenvalues using hseqr.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::hseqr(JOB, COMPZ, N, ILO, IHI, mat.buffer(), LDH, eigs.buffer(), vecs_r.buffer(), LDZ, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed when computing the eigenvalues using hseqr.");
 
                 CALL_AND_HANDLE(vecs_l = vecs_r, "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed to copy the unitary matrix returned by hseqr into the left eigenvector matrix.");
 
@@ -788,7 +789,7 @@ namespace linalg
                 int_type LDVL = vecs_l.shape(1);
                 int_type LDVR = vecs_r.shape(1);
                 int_type MM = vecs_r.shape(1);
-                CALL_AND_HANDLE(backend_type::trevc(SIDE, HOWMNY, &select, N, mat.buffer(), LDT, vecs_l.buffer(), LDVL, vecs_r.buffer(), LDVR, MM, m_work.buffer(), m_rwork.buffer()), "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed when computing the eigenvectors using trevc.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::trevc(SIDE, HOWMNY, &select, N, mat.buffer(), LDT, vecs_l.buffer(), LDVL, vecs_r.buffer(), LDVR, MM, m_work.buffer(), m_rwork.buffer()), "Failed to compute eigendecomposition of upper_hessenberg matrix.  Failed when computing the eigenvectors using trevc.");
 
                 // take the inner product of the left and right eigenvectors to allow for a sensible normalisation
                 CALL_AND_HANDLE(using std::sqrt; for (size_type i = 0; i < vecs_r.shape(0); ++i) { m_scaling[i] = static_cast<value_type>(1.0) / dot_product(conj(vecs_l[i]), vecs_r[i]); }, "Failed to compute eigendecomposition of upper hessenberg matrix.  Failed to compute the rescaling factor.");

@@ -42,7 +42,8 @@ namespace linalg
                 static_assert(is_same_value<T1, T2>::value, "Unable to swap buffers of tensor objects.  They do not have the same value type.");
                 static_assert(is_same_backend<T1, T2>::value, "Unable to swap buffers of tensor objects.  They do not have the same backend type.");
 
-                using pointer = typename T1::pointer;
+                using value_type = typename traits<T1>::device_value_type;
+                using pointer = typename std::add_pointer<value_type>::type;
                 using size_type = typename T2::size_type;
                 ASSERT(t1.size() <= t2.capacity() && t2.size() <= t1.capacity(), "Unable to swap the two buffers they do not both have sizes less than the capacity of the other.");
 
@@ -66,18 +67,21 @@ namespace linalg
     public:
         using backend_type = typename traits<tensor_impl>::backend_type;
         using value_type = typename traits<tensor_impl>::value_type;
+        using device_value_type = typename traits<tensor_impl>::device_value_type;
         using size_type = typename traits<backend_type>::size_type;
         static constexpr size_type rank = traits<tensor_impl>::rank;
 
         using pointer = typename std::add_pointer<value_type>::type;
         using const_pointer = typename std::add_pointer<typename std::add_const<value_type>::type>::type;
+        using device_pointer = typename std::add_pointer<device_value_type>::type;
+        using const_device_pointer = typename std::add_pointer<typename std::add_const<device_value_type>::type>::type;
 
         using shape_type = std::array<size_type, rank>;
         using self_type = tensor_base<tensor_impl>;
 
         // the classes used for memory allocation and transfer
-        using allocator = memory::allocator<value_type, backend_type>;
-        using memfill = memory::filler<value_type, backend_type>;
+        using allocator = memory::allocator<device_value_type, backend_type>;
+        using memfill = memory::filler<device_value_type, backend_type>;
         template <typename srcbck>
         using memtransfer = memory::transfer<srcbck, backend_type>;
 
@@ -86,7 +90,7 @@ namespace linalg
         friend class internal::tensor_buffer_swap;
 
     protected:
-        pointer m_buffer;        ///< The 1-dimensional array used to store the tensor
+        device_pointer m_buffer; ///< The 1-dimensional array used to store the tensor
         shape_type m_shape;      ///< A static array of size D that stores the shape of the tensor
         shape_type m_stride;     ///< A D-dimensional static array storing
         size_type m_totsize;     ///< The total size of the array
@@ -164,7 +168,7 @@ namespace linalg
         //            Copy assignment from valid value types.  This fills the buffer             //
         ///////////////////////////////////////////////////////////////////////////////////////////
         template <typename U>
-        inline typename std::enable_if<std::is_convertible<U, value_type>::value, self_type &>::type operator=(const U &_val)
+        inline typename std::enable_if<std::is_convertible<U, device_value_type>::value, self_type &>::type operator=(const U &_val)
         {
             ASSERT(m_buffer != nullptr, "Unable to fill tensor object.  The buffer has not been allocated");
             CALL_AND_HANDLE(fill_impl(_val), "Failed to value assign each element of the array.  Failed to fill the buffer.");
@@ -217,18 +221,20 @@ namespace linalg
         {
             ASSERT(m_totsize == src.size(), "Failed to copy buffer from input container.  The two objects do not have the same size.");
             using srcbck = typename Container::backend_type;
-            CALL_AND_HANDLE(memtransfer<srcbck>::copy(src.buffer(), src.size(), m_buffer), "Copy assignment operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(memtransfer<srcbck>::copy(reinterpret_cast<const_device_pointer>(src.buffer()), src.size(), m_buffer), "Copy assignment operator failed.  Error when copying the buffer.");
             return *this;
         }
 
-        inline self_type &set_buffer(const value_type *src, size_type size)
+        template <typename U>
+        inline self_type &set_buffer(const U *src, size_type size)
         {
             ASSERT(m_totsize == size, "Failed to copy buffer from input buffer.  The two objects do not have the same size.");
-            CALL_AND_HANDLE(memtransfer<blas_backend>::copy(src, size, m_buffer), "Copy assignment operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(memtransfer<blas_backend>::copy(reinterpret_cast<const_device_pointer>(src), size, m_buffer), "Copy assignment operator failed.  Error when copying the buffer.");
             return *this;
         }
 
-        inline self_type &set_buffer(const value_type *src, const std::array<size_type, rank> &size, const std::array<size_type, rank> &strides)
+        template <typename U>
+        inline self_type &set_buffer(const U *src, const std::array<size_type, rank> &size, const std::array<size_type, rank> &strides)
         {
             ASSERT(m_shape == size, "Failed to copy buffer from input buffer.  The two objects do not have the same shape.");
             bool strides_equal = true;
@@ -242,11 +248,11 @@ namespace linalg
             }
             if (strides_equal)
             {
-                CALL_AND_HANDLE(memtransfer<blas_backend>::copy(src, m_totsize, m_buffer), "Copy assignment operator failed.  Error when copying the buffer.");
+                CALL_AND_HANDLE(memtransfer<blas_backend>::copy(reinterpret_cast<const_device_pointer>(src), m_totsize, m_buffer), "Copy assignment operator failed.  Error when copying the buffer.");
             }
             else
             {
-                memtransfer<blas_backend>::template copy_noncontiguous<value_type, rank>(src, m_shape, strides, m_buffer, m_stride);
+                memtransfer<blas_backend>::template copy_noncontiguous<device_value_type, rank>(reinterpret_cast<const_device_pointer>(src), m_shape, strides, m_buffer, m_stride);
             }
             return *this;
         }
@@ -260,7 +266,7 @@ namespace linalg
                 swap(m_totcapacity, src.m_totcapacity);
                 swap(m_shape, src.m_shape);
                 swap(m_stride, src.m_stride);
-                pointer temp = src.m_buffer;
+                device_pointer temp = src.m_buffer;
                 src.m_buffer = m_buffer;
                 m_buffer = temp;
             }
@@ -409,8 +415,8 @@ namespace linalg
         inline bool same_shape(const shape_type &_shape) const { return m_shape == _shape; }
 #ifdef CEREAL_LIBRARY_FOUND
     public:
-        using buffer_reader_type = internal::buffer_reader_wrapper<value_type, backend_type>;
-        using buffer_writer_type = internal::buffer_writer_wrapper<value_type, backend_type>;
+        using buffer_reader_type = internal::buffer_reader_wrapper<device_value_type, backend_type>;
+        using buffer_writer_type = internal::buffer_writer_wrapper<device_value_type, backend_type>;
 
         template <typename archive>
         void save(archive &ar) const
@@ -505,32 +511,32 @@ namespace linalg
         }
         inline self_type &fill_zeros()
         {
-            CALL_AND_HANDLE(fill_impl(value_type(0.0)), "Failed to fill buffer to zero.");
+            CALL_AND_HANDLE(fill_impl(device_value_type(0.0)), "Failed to fill buffer to zero.");
             return *this;
         }
         inline self_type &fill_ones()
         {
-            CALL_AND_HANDLE(fill_impl(value_type(1.0)), "Failed to fill buffer to one.");
+            CALL_AND_HANDLE(fill_impl(device_value_type(1.0)), "Failed to fill buffer to one.");
             return *this;
         }
 
     private:
         template <bool _mutable = traits<self_type>::is_mutable, typename U = value_type>
         typename std::enable_if<_mutable && std::is_convertible<U, value_type>::value, void>::type
-        fill_impl(const U &v) { CALL_AND_HANDLE(memfill::fill(m_buffer, size(), value_type(v)), "Failed to set buffer to value.  Error when calling the memfill object fill function."); }
+        fill_impl(const U &v) { CALL_AND_HANDLE(memfill::fill(m_buffer, size(), device_value_type(v)), "Failed to set buffer to value.  Error when calling the memfill object fill function."); }
 
     public:
         // Inplace scalar multiplication/division functions
         template <typename Vt>
         inline value_update_type<Vt, self_type> operator*=(const Vt &v)
         {
-            CALL_AND_HANDLE(backend_type::scal(m_totsize, value_type(v), m_buffer, 1), "Failed to perform operator*= on tensor object.  scal call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::scal(m_totsize, device_value_type(v), m_buffer, 1), "Failed to perform operator*= on tensor object.  scal call failed.");
             return *this;
         }
         template <typename Vt>
         inline value_update_type<Vt, self_type> operator/=(const Vt &v)
         {
-            CALL_AND_HANDLE(backend_type::scal(m_totsize, value_type(1.0 / v), m_buffer, 1), "Failed to perform operator/= on tensor object.  scal call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::scal(m_totsize, device_value_type(1.0 / v), m_buffer, 1), "Failed to perform operator/= on tensor object.  scal call failed.");
             return *this;
         }
 
@@ -567,10 +573,10 @@ namespace linalg
         inline other_move_assignable_type<Container, self_type> operator-=(Container &&src) { CALL_AND_RETHROW(return subtraction_assign_impl(std::forward<Container>(src))); }
 
     public:
-        inline pointer buffer() { return m_buffer; }
-        inline const_pointer buffer() const { return m_buffer; }
-        inline pointer data() { return m_buffer; }
-        inline const_pointer data() const { return m_buffer; }
+        inline device_pointer buffer() { return m_buffer; }
+        inline const_device_pointer buffer() const { return m_buffer; }
+        inline device_pointer data() { return m_buffer; }
+        inline const_device_pointer data() const { return m_buffer; }
 
     protected:
         /** These two functions can and should probably be changed to ensure no additional runtime overhead*/
@@ -617,7 +623,7 @@ namespace linalg
                 m_totcapacity = src.size();
             }
             using srcbck = typename traits<Container>::backend_type;
-            CALL_AND_HANDLE(memtransfer<srcbck>::copy(src.buffer(), src.size(), m_buffer), "Copy operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(memtransfer<srcbck>::copy(reinterpret_cast<const_device_pointer>(src.buffer()), src.size(), m_buffer), "Copy operator failed.  Error when copying the buffer.");
             m_shape = src.shape();
             m_totsize = src.size();
             init_stride();
@@ -637,7 +643,7 @@ namespace linalg
                 CALL_AND_HANDLE(m_buffer = allocator::allocate(src.size()), "Copy assignment failed.  Error when allocating the buffer.")
                 m_totcapacity = src.size();
             }
-            CALL_AND_HANDLE(backend_type::copy_real_to_complex(src.buffer(), src.size(), m_buffer), "Copy operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::copy_real_to_complex(src.buffer(), src.size(), m_buffer), "Copy operator failed.  Error when copying the buffer.");
             m_shape = src.shape();
             m_totsize = src.size();
             init_stride();
@@ -677,7 +683,7 @@ namespace linalg
         {
             static_assert(is_same_backend<Container, self_type>::value, "Unable to instantiate addition_assign_impl.");
             ASSERT(m_shape == src.shape(), "Addition assignment failed.  The two objects are not the same size");
-            CALL_AND_HANDLE(backend_type::addition_assign(src.buffer(), src.size(), m_buffer), "Addition assignment operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::addition_assign(reinterpret_cast<const_device_pointer>(src.buffer()), src.size(), m_buffer), "Addition assignment operator failed.  Error when copying the buffer.");
             return *this;
         }
 
@@ -687,7 +693,7 @@ namespace linalg
         {
             static_assert(is_same_backend<Container, self_type>::value, "Unable to instantiate addition_assign_impl.");
             ASSERT(m_shape == src.shape(), "Addition assignment failed.  The two objects are not the same size");
-            CALL_AND_HANDLE(backend_type::addition_assign_real_to_complex(src.buffer(), src.size(), m_buffer), "Addition assignment operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::addition_assign_real_to_complex(src.buffer(), src.size(), m_buffer), "Addition assignment operator failed.  Error when copying the buffer.");
             return *this;
         }
 
@@ -715,7 +721,7 @@ namespace linalg
         {
             static_assert(is_same_backend<Container, self_type>::value, "Unable to instantiate addition_assign_impl.");
             ASSERT(m_shape == src.shape(), "Addition assignment failed.  The two objects are not the same size");
-            CALL_AND_HANDLE(backend_type::subtraction_assign(src.buffer(), src.size(), m_buffer), "Addition assignment operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::subtraction_assign(reinterpret_cast<const_device_pointer>(src.buffer()), src.size(), m_buffer), "Addition assignment operator failed.  Error when copying the buffer.");
             return *this;
         }
 
@@ -725,7 +731,7 @@ namespace linalg
         {
             static_assert(is_same_backend<Container, self_type>::value, "Unable to instantiate subtraction_assign_impl.");
             ASSERT(m_shape == src.shape(), "Subtraction assignment failed.  The two objects are not the same size");
-            CALL_AND_HANDLE(backend_type::subtraction_assign_real_to_complex(src.buffer(), src.size(), m_buffer), "Subtraction assignment operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::subtraction_assign_real_to_complex(src.buffer(), src.size(), m_buffer), "Subtraction assignment operator failed.  Error when copying the buffer.");
             return *this;
         }
 
@@ -774,7 +780,7 @@ namespace linalg
             m_totcapacity = m_totsize;
             init_stride();
             CALL_AND_HANDLE(m_buffer = allocator::allocate(m_totcapacity), "Failed to initialise tensor object.  Error when allocating the buffer.");
-            CALL_AND_HANDLE(memfill::fill(m_buffer, m_totsize, v), "Failed to initialise tensor object.  Error when filling buffer.");
+            CALL_AND_HANDLE(memfill::fill(m_buffer, m_totsize, device_value_type(v)), "Failed to initialise tensor object.  Error when filling buffer.");
         }
 
         // initialise the array using a functor that defines the elements.
@@ -842,6 +848,7 @@ namespace linalg
     public:
         using self_type = tensor<T, D, backend>;
         using value_type = typename traits<self_type>::value_type;
+        using device_value_type = typename traits<self_type>::device_value_type;
         using size_type = typename traits<self_type>::size_type;
         using base_type = tensor_base<self_type>;
         using const_slice_traits = tensor_slice_traits<self_type, const T, D>;
@@ -858,23 +865,17 @@ namespace linalg
 
         template <typename... Args>
         self_type &operator=(Args &&...args);
-        template <typename... Inds> inline const_reference operator()(Inds... indices) const;
-        template <typename... Inds> inline reference operator()(Inds... indices);
-        template <typename... Inds> inline const_reference at(Inds... indices) const;
-        template <typename... Inds> inline reference at(Inds... indices);
+        template <typename... Inds> const_reference operator()(Inds... indices) const;
+        template <typename... Inds> reference operator()(Inds... indices);
+        template <typename... Inds> const_reference at(Inds... indices) const;
+        template <typename... Inds> reference at(Inds... indices);
 
         // slice accessor operator[]
-        inline typename slice_traits::slice_type operator[](size_type i);
-        inline typename const_slice_traits::slice_type operator[](size_type i) const;
+        typename slice_traits::slice_type operator[](size_type i);
+        typename const_slice_traits::slice_type operator[](size_type i) const;
 
-        inline typename slice_traits::slice_type slice(size_type i);
-        inline typename const_slice_traits::slice_type slice(size_type i) const;
-
-    public:
-        pointer buffer();
-        const_pointer buffer() const;
-        pointer data();
-        const_pointer data() const;
+        typename slice_traits::slice_type slice(size_type i);
+        typename const_slice_traits::slice_type slice(size_type i) const;
     }; // class tensor
 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -908,12 +909,6 @@ namespace linalg
         template <typename... Inds> inline reference at(Inds... indices);        
         inline const_reference operator[](size_t i) const;
         inline reference operator[](size_t i);
-
-    public:
-        pointer buffer();
-        const_pointer buffer() const;
-        pointer data();
-        const_pointer data() const;
     };
 
     ///////////////////////////////////////////////////////

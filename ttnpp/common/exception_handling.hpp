@@ -27,7 +27,7 @@ namespace common
         invalid_value(const char *msg) : m_msg(msg) {}
         invalid_value(const std::string &msg) : m_msg(msg) {}
         virtual const char *what() const throw() { return m_msg.c_str(); }
-    };
+    };  //struct invalid_value
 } // namespace common
 
 #ifndef LINALG_EXCEPTION_HANDLING_MACROS_HPP

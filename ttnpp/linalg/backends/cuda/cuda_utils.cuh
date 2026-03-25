@@ -15,7 +15,6 @@
 #ifndef PYTTN_LINALG_BACKENDS_CUDA_UTILS_CUH_
 #define PYTTN_LINALG_BACKENDS_CUDA_UTILS_CUH_
 
-#include "../../utils/linalg_utils.cuh"
 #include <common/exception_handling.hpp>
 
 #include <complex>
@@ -41,8 +40,6 @@ namespace linalg
     {
     public:
         using type = float;
-        using internal_type = float;
-
         static inline cudaDataType_t type_enum() { return CUDA_R_32F; }
     };
 
@@ -51,29 +48,26 @@ namespace linalg
     {
     public:
         using type = double;
-        using internal_type = double;
-
         static inline cudaDataType_t type_enum() { return CUDA_R_64F; }
     };
 
     template <>
-    class cuda_type<std::complex<float>>
+    class cuda_type<cuda::std::complex<float>>
     {
     public:
         using type = cuComplex;
-        using internal_type = cuda::std::complex<float>;
-
         static inline cudaDataType_t type_enum() { return CUDA_C_32F; }
     };
 
     template <>
-    class cuda_type<std::complex<double>>
+    class cuda_type<cuda::std::complex<double>>
     {
     public:
         using type = cuDoubleComplex;
-        using internal_type = cuda::std::complex<double>;
         static inline cudaDataType_t type_enum() { return CUDA_C_64F; }
     };
+
+
 
     template <typename T>
     class cusparse_index;

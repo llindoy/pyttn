@@ -59,7 +59,7 @@ namespace linalg
         };
 
         template <>
-        class cutensor_type<std::complex<float>>
+        class cutensor_type<cuda::std::complex<float>>
         {
         public:
             static inline cutensorDataType_t type() { return CUTENSOR_C_32F; }
@@ -67,7 +67,7 @@ namespace linalg
         };
 
         template <>
-        class cutensor_type<std::complex<double>>
+        class cutensor_type<cuda::std::complex<double>>
         {
         public:
             static inline cutensorDataType_t type() { return CUTENSOR_C_64F; }

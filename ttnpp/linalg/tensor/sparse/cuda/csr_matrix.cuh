@@ -19,6 +19,7 @@
 #include <tuple>
 #include <algorithm>
 
+#include "../../../utils/serialisation.cuh"
 #include "../../../backends/cuda/cuda_backend.hpp"
 #include "../../../utils/memory_helper.cuh"
 #include "../csr_matrix.hpp"

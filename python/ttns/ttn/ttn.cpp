@@ -12,8 +12,11 @@
  * limitations under the License
  */
 
-#include "ttn.hpp"
+
+#include "ttn.tpp"
 #include "../../pyttn_typedef.hpp"
 
-template <>
-void initialise_ttn<pyttn_real_type, linalg::blas_backend>(py::module &m);
+void initialise_ttn(py::module &m)
+{
+    initialise_ttn_types<pyttn_real_type, linalg::blas_backend>(m);
+}

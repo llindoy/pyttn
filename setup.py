@@ -31,7 +31,7 @@ class CMakeExtension(Extension):
         self.rebuild = rebuild
 
         parallel_build=os.environ.get('PYTTN_PARALLELISE_COMPILATION')
-        parallel=8
+        parallel=4
         if parallel_build is not None:
             if parallel_build.isdecimal():
                 parallel = int(parallel_build)

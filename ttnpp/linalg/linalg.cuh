@@ -12,14 +12,16 @@
  * limitations under the License
  */
 
-#ifndef PYTTN_LINALG_LINALG_HPP_
-#define PYTTN_LINALG_LINALG_HPP_
+#ifndef PYTTN_LINALG_LINALG_CUH_
+#define PYTTN_LINALG_LINALG_CUH_
 
-#include "linalg_forward_decl.hpp"
 #include "backends/cuda/cuda_backend.hpp"
+#include "backends/cuda/cuda_algebra.cuh"
+#include "linalg_forward_decl.hpp"
 
 #include "dense.cuh"
 #include "sparse.cuh"
+#include "decompositions.cuh"
 
 #include "utils/genrandom.cuh"
 #include "utils/orthogonal_vector.hpp"

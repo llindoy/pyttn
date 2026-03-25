@@ -625,7 +625,7 @@ namespace ttns
                     {                 
                         skip[1] = d2[1]*ind;
                         skip[3] = d2[3]*ind;
-                        backend::set_tensor_block(m_nodes[curr]().buffer(), d2, active_tensor.buffer(), dest_dims, skip);
+                        linalg::backend_algebra<backend>::set_tensor_block(m_nodes[curr]().buffer(), d2, active_tensor.buffer(), dest_dims, skip);
                     }
 
                     //now we resize the current node object so that it can fit the active tensor and copy the results
@@ -770,7 +770,7 @@ namespace ttns
             logging::debug("applying a one body operators to ttn."); 
 
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
-            ASSERT(op.size() == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
+            ASSERT(op->size() == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
 
             CALL_AND_RETHROW(_apply_one_body_operator(op, m_leaf_indices[index], shift_orthogonality));
             return *this;

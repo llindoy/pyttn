@@ -20,9 +20,15 @@
  */
 
 #include "backends/blas/blas_backend.hpp"
+#include "backends/cuda/cuda_backend.hpp"
+
+#include "backends/blas/blas_algebra.hpp"
+
+#include "tensor/dense/tensor.hpp"
 #include "tensor/dense/blas/tensor.hpp"
 #include "tensor/dense/blas/tensor_view.hpp"
 #include "tensor/dense/blas/tensor_slice.hpp"
+#include "tensor/dense/dense_typedefs.hpp"
 #include "algebra/algebra.hpp"
 
 namespace linalg

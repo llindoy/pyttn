@@ -16,6 +16,8 @@
 #define PYTTN_LINALG_DECOMPOSITIONS_EIGENSOLVERS_EIGENSOLVER_HERMITIAN_HPP_
 
 #include "eigensolver_base.hpp"
+#include "../../backends/blas/blas_algebra.hpp"
+#include "../../backends/blas/blas_backend.hpp"
 
 namespace linalg
 {
@@ -39,13 +41,13 @@ namespace linalg
 
             static inline void call(const char JOBZ, const char UPLO, const int_type N, T *A, const int_type LDA, T *W, T *WORK, const int_type LWORK, additional_working & /* working */)
             {
-                CALL_AND_RETHROW(blas_backend::heev(JOBZ, UPLO, N, A, LDA, W, WORK, LWORK););
+                CALL_AND_RETHROW(backend_algebra<blas_backend>::heev(JOBZ, UPLO, N, A, LDA, W, WORK, LWORK););
             }
             static inline int_type query_worksize(const char JOBZ, const char UPLO, const int_type N, T *A, const int_type LDA, T *W, additional_working & /* working */)
             {
                 T worksize;
                 int_type lwork = -1;
-                CALL_AND_HANDLE(blas_backend::heev(JOBZ, UPLO, N, A, LDA, W, &worksize, lwork), "Failed to query the optimal workspace for the eigensolver.");
+                CALL_AND_HANDLE(backend_algebra<blas_backend>::heev(JOBZ, UPLO, N, A, LDA, W, &worksize, lwork), "Failed to query the optimal workspace for the eigensolver.");
                 CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
             }
         };
@@ -59,20 +61,20 @@ namespace linalg
 
             struct additional_working
             {
-                tensor<T, 1> m_rwork;
+                tensor<T, 1, blas_backend> m_rwork;
                 void resize(size_type n) { CALL_AND_RETHROW(m_rwork.resize(n > 0 ? 3 * n - 2 : 1)); }
                 void clear() { CALL_AND_RETHROW(m_rwork.clear()); }
             };
 
             static inline void call(const char JOBZ, const char UPLO, const int_type N, std::complex<T> *A, const int_type LDA, T *W, std::complex<T> *WORK, const int_type LWORK, additional_working &working)
             {
-                CALL_AND_RETHROW(blas_backend::heev(JOBZ, UPLO, N, A, LDA, W, WORK, LWORK, working.m_rwork.buffer()););
+                CALL_AND_RETHROW(backend_algebra<blas_backend>::heev(JOBZ, UPLO, N, A, LDA, W, WORK, LWORK, working.m_rwork.buffer()););
             }
             static inline int_type query_worksize(const char JOBZ, const char UPLO, const int_type N, std::complex<T> *A, const int_type LDA, T *W, additional_working &working)
             {
                 std::complex<T> worksize;
                 int_type lwork = -1;
-                CALL_AND_HANDLE(blas_backend::heev(JOBZ, UPLO, N, A, LDA, W, &worksize, lwork, working.m_rwork.buffer()), "Failed to query the optimal workspace for the eigensolver.");
+                CALL_AND_HANDLE(backend_algebra<blas_backend>::heev(JOBZ, UPLO, N, A, LDA, W, &worksize, lwork, working.m_rwork.buffer()), "Failed to query the optimal workspace for the eigensolver.");
                 CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
             }
         };

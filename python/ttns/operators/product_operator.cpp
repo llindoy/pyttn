@@ -12,8 +12,10 @@
  * limitations under the License
  */
 
-#include "product_operator.hpp"
+#include "product_operator.tpp"
 #include "../../pyttn_typedef.hpp"
 
-template <>
-void initialise_product_operator<pyttn_real_type, linalg::blas_backend>(py::module &m);
+void initialise_product_operator(py::module &m)
+{
+    initialise_product_operator_types<pyttn_real_type, linalg::blas_backend>(m);
+}

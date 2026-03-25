@@ -130,26 +130,15 @@ namespace linalg
     struct is_number : std::integral_constant<bool, std::is_arithmetic<T>::value || is_complex<typename std::remove_cv<T>::type>::value>
     {
     };
-
+    
     template <typename T>
     typename std::enable_if<is_number<T>::value && !is_complex<T>::value, T>::type conj(const T &t) { return t; }
     template <typename T>
     typename std::enable_if<is_number<T>::value && is_complex<T>::value, T>::type conj(const T &t) { return std::conj(t); }
-    
+ 
+
     namespace internal
     {
-        template <typename Int, typename size_type>
-        static inline constexpr typename std::enable_if<std::is_unsigned<Int>::value && std::is_unsigned<size_type>::value, bool>::type compare_bounds(const Int &i, const size_type &bounds) { return i < bounds; }
-
-        template <typename Int, typename size_type>
-        static inline constexpr typename std::enable_if<std::is_integral<Int>::value && !std::is_unsigned<Int>::value && std::is_unsigned<size_type>::value, bool>::type compare_bounds(const Int &i, const size_type &bounds) { return (i >= 0 && static_cast<size_type>(i) < bounds); }
-
-        template <typename Int, typename size_type>
-        static inline constexpr typename std::enable_if<std::is_integral<size_type>::value && std::is_unsigned<Int>::value && !std::is_unsigned<size_type>::value, bool>::type compare_bounds(const Int &i, const size_type &bounds) { return (i < static_cast<Int>(bounds) || bounds < 0); }
-
-        template <typename Int, typename size_type>
-        static inline constexpr typename std::enable_if<std::is_integral<Int>::value && std::is_integral<size_type>::value && !std::is_unsigned<Int>::value && !std::is_unsigned<size_type>::value, bool>::type compare_bounds(const Int &i, const size_type &bounds) { return i < bounds; }
-
         template <typename... Args>
         struct check_integral;
 

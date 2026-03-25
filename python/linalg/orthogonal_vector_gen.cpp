@@ -12,11 +12,12 @@
  * limitations under the License
  */
 
-#include "orthogonal_vector_gen.hpp"
+#include "orthogonal_vector_gen.tpp"
 #include <linalg/linalg.hpp>
 
 #include "../pyttn_typedef.hpp"
 
-template <>
-void initialise_orthogonal_vector<pyttn_real_type, linalg::blas_backend>(py::module &m);
-
+void initialise_orthogonal_vector(py::module &m)
+{
+    initialise_orthogonal_vector_types<pyttn_real_type, linalg::blas_backend>;
+}

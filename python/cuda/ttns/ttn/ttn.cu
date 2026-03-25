@@ -12,27 +12,18 @@
  * limitations under the License
  */
 
+#include <linalg/linalg.cuh>
 #include <linalg/linalg.hpp>
-#include <linalg/algebra/algebra.cuh>
-#include <linalg/dense.cuh>
-#include <linalg/sparse.cuh>
 
-#include <linalg/decompositions/singular_value_decomposition/singular_value_decomposition.hpp>
-#include <linalg/decompositions/singular_value_decomposition/singular_value_decomposition_cuda.cuh>
-
-#include <ttns_lib/ttn/ttn.hpp>
-#include <ttns_lib/operators/site_operators/site_operator.hpp>
+#include "../../../ttns/ttn/ttn.tpp"
 #include "../../../pyttn_typedef.hpp"
 
-namespace ttns
+void initialise_ttn(py::module &m)
 {
-#ifdef BUILD_REAL_TTN
-    template class ttn<pyttn_real_type, linalg::cuda_backend>;
-    template class tree_node<tree_base<ttn_node_data<pyttn_real_type, linalg::cuda_backend>>>;
-    template class ttn_node_data<pyttn_real_type, linalg::cuda_backend>;
+    initialise_ttn_types<pyttn_real_type, linalg::blas_backend>(m);
+}
 
-#endif
-    template class ttn<std::complex<pyttn_real_type>, linalg::cuda_backend>;
-    template class tree_node<tree_base<ttn_node_data<std::complex<pyttn_real_type>, linalg::cuda_backend>>>;
-    template class ttn_node_data<std::complex<pyttn_real_type>, linalg::cuda_backend>;
+void initialise_ttn_cuda(py::module &m)
+{
+    initialise_ttn_types<pyttn_real_type, linalg::cuda_backend>(m);
 }

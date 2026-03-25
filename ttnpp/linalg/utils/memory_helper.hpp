@@ -29,8 +29,8 @@ namespace linalg
         {
             using size_type = typename traits<backend>::size_type;
         public:
-            static inline T *allocate(size_type n);
-            static inline void deallocate(T *&v);
+            static T *allocate(size_type n);
+            static void deallocate(T *&v);
 
         };
 
@@ -40,7 +40,7 @@ namespace linalg
             using size_type = typename traits<blas_backend>::size_type;
 
         public:
-            static inline void fill(T *dest, size_type n, const T &val);
+            static void fill(T *dest, size_type n, const T &val);
         }; // class filler<blas_backend>
 
 
@@ -52,9 +52,9 @@ namespace linalg
 
         public:
             template <typename T>
-            static inline void copy(const T *const src, size_type n, T *dest);
+            static void copy(const T *const src, size_type n, T *dest);
             template <typename T, size_t D>
-            static inline void copy_noncontiguous(const T *const src, const std::array<size_type, D> &size, const std::array<size_type, D> &s_strides, T *dest, const std::array<size_type, D> &d_strides);
+            static void copy_noncontiguous(const T *const src, const std::array<size_type, D> &size, const std::array<size_type, D> &s_strides, T *dest, const std::array<size_type, D> &d_strides);
         };
 
 

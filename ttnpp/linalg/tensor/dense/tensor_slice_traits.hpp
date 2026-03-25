@@ -44,8 +44,12 @@ namespace linalg
         using const_container_pointer = typename std::add_pointer<typename std::add_const<ArrType>::type>::type;
 
         using value_type = typename traits<ArrType>::value_type;
+        using device_value_type = typename traits<ArrType>::device_value_type;
+
         using pointer = typename std::add_pointer<value_type>::type;
         using const_pointer = typename std::add_pointer<typename std::add_const<value_type>::type>::type;
+        using device_pointer = typename std::add_pointer<device_value_type>::type;
+        using const_device_pointer = typename std::add_pointer<typename std::add_const<device_value_type>::type>::type;
 
         using slice_type = tensor_slice<ArrType, U, D - 1>;
         using const_slice_type = tensor_slice<ArrType, typename std::add_const<U>::type, D - 1>;
@@ -55,8 +59,8 @@ namespace linalg
         static inline const_slice_type make(const_container_pointer a, size_type i) { return const_slice_type(a, a->buffer(), i); }
 
         template <bool _mutable = is_mutable>
-        static inline typename std::enable_if<_mutable, slice_type>::type make(container_pointer a, pointer p, size_type i) { return slice_type(a, p, i); }
-        static inline const_slice_type make(const_container_pointer a, const_pointer p, size_type i) { return const_slice_type(a, p, i); }
+        static inline typename std::enable_if<_mutable, slice_type>::type make(container_pointer a, device_pointer p, size_type i) { return slice_type(a, p, i); }
+        static inline const_slice_type make(const_container_pointer a, const_device_pointer p, size_type i) { return const_slice_type(a, p, i); }
     };
 
     template <typename ArrType, typename U>
@@ -70,8 +74,12 @@ namespace linalg
         static constexpr bool is_mutable = (!std::is_const<U>::value) && ctraits::is_mutable;
 
         using value_type = typename traits<ArrType>::value_type;
+        using device_value_type = typename traits<ArrType>::device_value_type;
+
         using pointer = typename std::add_pointer<value_type>::type;
         using const_pointer = typename std::add_pointer<typename std::add_const<value_type>::type>::type;
+        using device_pointer = typename std::add_pointer<device_value_type>::type;
+        using const_device_pointer = typename std::add_pointer<typename std::add_const<device_value_type>::type>::type;
 
         static_assert(1 <= container_rank, "Invalid tensor_slice_traits object.  The dimension of the slice object must be less than the tensor slice dimension");
         using container_type = ArrType;

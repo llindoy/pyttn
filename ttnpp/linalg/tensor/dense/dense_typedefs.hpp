@@ -12,8 +12,18 @@
  * limitations under the License
  */
 
-#include "dmrg.hpp"
-#include "../../pyttn_typedef.hpp"
+#ifndef PYTTN_LINALG_TENSOR_DENSE_DENSE_TYPEDEFS_HPP_
+#define PYTTN_LINALG_TENSOR_DENSE_DENSE_TYPEDEFS_HPP_
 
-template <> void initialise_dmrg<pyttn_real_type, linalg::cuda_backend>(py::module &m);
-template <> void initialise_dmrg_adaptive<pyttn_real_type, linalg::cuda_backend>(py::module& m);
+#include "../../linalg_forward_decl.hpp"
+
+namespace linalg
+{
+    template <typename T, typename backend = linalg::blas_backend>
+    using vector = tensor<T, 1, backend>;
+    template <typename T, typename backend = linalg::blas_backend>
+    using matrix = tensor<T, 2, backend>;
+}
+
+
+#endif // PYTTN_LINALG_TENSOR_DENSE_DENSE_TYPEDEFS_HPP_ 

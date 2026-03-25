@@ -12,12 +12,12 @@
  * limitations under the License
  */
 
-#include <linalg/backends/cuda/cuda_backend.hpp>
-#include <ttns_lib/operators/sop_operator.hpp>
+#include <linalg/linalg.hpp>
+#include <linalg/linalg.cuh>
+#include "../../../ttns/sop/operator_dictionary.tpp"
 #include "../../../pyttn_typedef.hpp"
 
-namespace ttns
+void initialise_operator_dictionary_cuda(py::module &m)
 {
-    template class operator_dictionary<pyttn_real_type, linalg::cuda_backend>;
-    template class operator_dictionary<std::complex<pyttn_real_type>, linalg::cuda_backend>;
+    initialise_operator_dictionary_types<pyttn_real_type, linalg::cuda_backend>(m);
 }

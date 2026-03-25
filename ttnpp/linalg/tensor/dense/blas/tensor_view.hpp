@@ -17,6 +17,7 @@
 
 #include "../../../backends/blas/blas_backend.hpp"
 #include "../tensor_view.hpp"
+#include "../utils.hpp"
 
 namespace linalg
 {
@@ -95,25 +96,22 @@ namespace linalg
         inline reference operator()(Inds... indices)
         {
             static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
-            return m_buffer[get_index<pack_type>(indices...)];
+            return m_buffer[NDIndex<D>::flatten(m_stride, indices...)];
         }
 
         template <typename... Inds>
         inline const_reference operator()(Inds... indices) const
         {
             static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
-            return m_buffer[get_index<pack_type>(indices...)];
+            return m_buffer[NDIndex<D>::flatten(m_stride, indices...)];
         }
 
         template <typename... Inds>
         inline reference at(Inds... indices)
         {
             static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
             size_type index;
-            CALL_AND_HANDLE(index = get_index_bounds_check<pack_type>(indices...), "Unable to access tensor element.  Failed to determine flattened index.");
+            CALL_AND_HANDLE(index = NDIndex<D>::flatten_check(m_shape, m_stride, indices...), "Unable to access tensor element.  Failed to determine flattened index.");
             return m_buffer[index];
         }
 
@@ -121,33 +119,10 @@ namespace linalg
         inline const_reference at(Inds... indices) const
         {
             static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
             size_type index;
-            CALL_AND_HANDLE(index = get_index_bounds_check<pack_type>(indices...), "Unable to access tensor element.  Failed to determine flattened index.");
+            CALL_AND_HANDLE(index = NDIndex<D>::flatten_check(m_shape, m_stride, indices...), "Unable to access tensor element.  Failed to determine flattened index.");
             return m_buffer[index];
         }
-
-    private:
-        ///@cond INTERNAL - we might want to move this elsewhere - this should be common to all dense tensor types.
-        // get the index in the array corresponding to the parameter pack.
-        template <typename IntegerType, typename... Args>
-        inline size_type get_index_bounds_check(IntegerType i, Args... args) const
-        {
-            ASSERT(internal::compare_bounds(i, m_shape[D - sizeof...(args) - 1]), "Unable to get flattened index.  One of the unflattened indices was out of bounds.");
-            CALL_AND_HANDLE(return i * m_stride[D - sizeof...(args) - 1] + get_index_bounds_check<IntegerType>(args...), "Unable to get flattened index.  Error on iterated get_index call.");
-        }
-        template <typename IntegerType>
-        inline size_type get_index_bounds_check(IntegerType i) const
-        {
-            ASSERT(internal::compare_bounds(i, m_shape[D - 1]), "Unable to get flattened index.  Final unflattened index was out of bounds.");
-            return i;
-        }
-
-        template <typename IntegerType, typename... Args>
-        inline size_type get_index(IntegerType i, Args... args) const { return i * m_stride[D - sizeof...(args) - 1] + get_index<IntegerType>(args...); }
-        template <typename IntegerType>
-        inline size_type get_index(IntegerType i) const { return i; }
-        ///@endcond
     };
 
     ///////////////////////////////////////////////////////////////////////////////////////

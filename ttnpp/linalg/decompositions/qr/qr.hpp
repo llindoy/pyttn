@@ -15,7 +15,7 @@
 #ifndef PYTTN_LINALG_DECOMPOSITIONS_QR_HPP_
 #define PYTTN_LINALG_DECOMPOSITIONS_QR_HPP_
 
-#include "../../utils/exception_handling.hpp"
+#include <common/exception_handling.hpp>
 #include "qr_blas.hpp"
 
 namespace linalg

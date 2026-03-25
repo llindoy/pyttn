@@ -141,7 +141,7 @@ namespace linalg
                     return mbuf[i * (n + 1)] * ((ipiv[i] != i + 1) ? -1.0 : 1.0);
                 },
                 m.buffer(), m_ipiv.buffer(), N);
-            return cuda_backend::determinant_reduction(m_tred.buffer, N);
+            return backend_algebra<backend_type>::determinant_reduction(m_tred.buffer, N);
         }
 
     }; // class determinant

@@ -22,6 +22,7 @@
 #include "tensor/dense/cuda/tensor.cuh"
 #include "tensor/dense/cuda/tensor_view.cuh"
 #include "tensor/dense/cuda/tensor_slice.cuh"
+#include "tensor/dense/dense_typedefs.hpp"
 #include "algebra/algebra.cuh"
 
 namespace linalg

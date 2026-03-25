@@ -25,12 +25,10 @@ from pyttn.ttns.ttns.ttnExt import ttn
 
 # and attempt to import the cuda backend
 try:
-    from pyttn.ttnpp.cuda import (
-        mulitset_one_site_dmrg_complex as multiset_one_site_dmrg_complex_cuda,
-    )
+    from pyttn.ttnpp.cuda import multiset_one_site_dmrg_complex as multiset_one_site_dmrg_complex_cuda
     from pyttn.ttnpp.cuda import one_site_dmrg_complex as one_site_dmrg_complex_cuda
-    from pyttn.ttnpp.cuda import adaptive_one_site_dmrg_complex as adaptive_one_site_dmrg_complex_cuda
-
+    #from pyttn.ttnpp.cuda import adaptive_one_site_dmrg_complex as adaptive_one_site_dmrg_complex_cuda
+    
     _cuda_import = True
 
 except ImportError:
@@ -58,7 +56,7 @@ def _one_site_dmrg_cuda(A, H, **kwargs):
 def _one_site_dmrg(A, H, **kwargs):
     if A.backend() == "blas" and H.backend() == "blas":
         return _one_site_dmrg_blas(A, H, **kwargs)
-    elif A.backend() == "cuda" and H.backend() == "cuda":
+    elif _cuda_import and A.backend() == "cuda" and H.backend() == "cuda":
         return _one_site_dmrg_cuda(A, H, **kwargs)
     else:
         raise RuntimeError("Invalid backend arguments.")
@@ -77,7 +75,9 @@ def _subspace_dmrg_blas(A, H, **kwargs):
 
 def _subspace_dmrg_cuda(A, H, **kwargs):
     if isinstance(A, ttn) and isinstance(H, sop_operator):
-        return adaptive_one_site_dmrg_complex_cuda(A, H, **kwargs)
+        #return adaptive_one_site_dmrg_complex_cuda(A, H, **kwargs)
+        raise RuntimeError("Invalid inputs for one site dmrg")
+
     elif isinstance(A, ms_ttn) and isinstance(H, ms_sop_operator):
         raise RuntimeError(
             "Subspace expansion based integrator has not yet been implemented for Multiset TTNs"
@@ -87,9 +87,10 @@ def _subspace_dmrg_cuda(A, H, **kwargs):
 
 
 def _subspace_dmrg(A, H, **kwargs):
+    print(_cuda_import)
     if A.backend() == "blas":
         return _subspace_dmrg_blas(A, H, **kwargs)
-    elif A.backend() == "cuda":
+    elif _cuda_import and A.backend() == "cuda":
         return _subspace_dmrg_cuda(A, H, **kwargs)
     else:
         raise RuntimeError("Backend not recognised.")
@@ -438,8 +439,8 @@ class SubspaceExpansionDMRG(DMRG):
         """The maximum bond dimension we can expand to through a subspace expansion step."""
         pass
 
-SubspaceExpansionDMRG.register(multiset_one_site_dmrg_complex)
-if _cuda_import:
-    SubspaceExpansionDMRG.register(multiset_one_site_dmrg_complex_cuda)
+SubspaceExpansionDMRG.register(adaptive_one_site_dmrg_complex)
+#if _cuda_import:
+#    SubspaceExpansionDMRG.register(adaptive_one_site_dmrg_complex_cuda)
 
 dmrg = DMRG

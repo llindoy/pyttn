@@ -35,7 +35,8 @@ namespace linalg
             static_assert(is_number<T>::value, "Failed to initialise literal type object.  The literal must be a number type.");
 
         public:
-            using value_type = T;
+            using value_type = typename device_type<T, backend>::type;
+
             using backend_type = backend;
             literal_type(T val) ;
         };
@@ -86,6 +87,7 @@ namespace linalg
             using size_type = typename traits<backend_type>::size_type;
             using op_type = operation<backend_type>;
             using value_type = typename result_type<self_type>::value_type;
+
             using result_type = typename result_type<self_type>::type;
             using eval_type = internal::expression_applicative<result_type, self_type, backend_type>;
 
@@ -191,6 +193,7 @@ namespace linalg
             using shape_type = typename rtraits::shape_type;
             using const_shape_reference = typename rtraits::const_shape_reference;
             using value_type = typename rtraits::value_type;
+
             static constexpr size_t rank = rtraits::rank;
             static_assert(_rank == rank, "Failed to construct expression_tree object.  The specified rank is not compatible with the result_type rank.");
 

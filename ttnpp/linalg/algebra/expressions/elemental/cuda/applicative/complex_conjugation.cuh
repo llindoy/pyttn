@@ -17,6 +17,7 @@
 
 #include "../../../../../linalg_forward_decl.hpp"
 #include "../../../../../backends/cuda/cuda_backend.hpp"
+#include "../../../../../backends/cuda/cuda_backend.cuh"
 
 namespace linalg
 {
@@ -31,10 +32,10 @@ namespace linalg
 
         public:
             template <typename T>
-            static inline __device__ T apply(const T *a, size_type i) { return conj(a[i]); }
+            static inline __device__ T apply(const T *a, size_type i) { return cuda_conj<T>::eval(a[i]); }
 
             template <typename T>
-            static inline __device__ typename T::value_type apply(const T &a, size_type i) { return conj(a[i]); }
+            static inline __device__ typename T::value_type apply(const T &a, size_type i) { return cuda_conj<T>::eval(a[i]); }
         };
     } // namespace expression_templates
 } // namespace linalg

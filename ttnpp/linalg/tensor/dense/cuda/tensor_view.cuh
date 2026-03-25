@@ -15,10 +15,12 @@
 #ifndef PYTTN_LINALG_TENSOR_DENSE_TENSOR_VIEW_CUH_
 #define PYTTN_LINALG_TENSOR_DENSE_TENSOR_VIEW_CUH_
 
+#include "../../../utils/serialisation.cuh"
 #include "../../../linalg_forward_decl.hpp"
 #include "../tensor_view.hpp"
 #include "../../../backends/cuda/cuda_backend.hpp"
 #include "../../../backends/cuda/host_access.cuh"
+#include "../utils.hpp"
 
 namespace linalg
 {
@@ -29,7 +31,7 @@ namespace linalg
     //                                    cuda backend                                   //
     ///////////////////////////////////////////////////////////////////////////////////////
     template <typename T, size_t D>
-    class tensor_view<T, D, cuda_backend> : public tensor_view_base<tensor_view<T, D, cuda_backend>>
+    class tensor_view<T, D, cuda_backend> : public tensor_view_base<tensor_view<T, D, cuda_backend>>, public host_access<T>
     {
     public:
         using self_type = tensor_view<T, D, cuda_backend>;
@@ -40,7 +42,7 @@ namespace linalg
         using slice_traits = tensor_slice_traits<self_type, T, D>;
         using pointer = typename base_type::pointer;
         using const_pointer = typename base_type::const_pointer;
-
+        using const_reference = const T&;
     protected:
         using base_type::m_buffer;
         using base_type::m_shape;
@@ -63,6 +65,10 @@ namespace linalg
             return *this;
         }
 
+        void from_host() const
+        {
+            this->_from_host(this->m_buffer, this->m_totsize);
+        }
     public:
         // accessor operator[] for returning slices
         inline typename slice_traits::slice_type operator[](size_type i) { return slice_traits::make(this, i); }
@@ -78,10 +84,21 @@ namespace linalg
             return const_slice_traits::make(this, i);
         }
 
-        pointer buffer() { return m_buffer; }
-        const_pointer buffer() const { return m_buffer; }
-        pointer data() { return m_buffer; }
-        const_pointer data() const { return m_buffer; }
+        template <typename... Inds>
+        inline const_reference operator()(Inds... indices) const
+        {
+            static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
+            return this->m_host_buffer[NDIndex<D>::flatten(m_stride, indices...)];
+        }
+
+        template <typename... Inds>
+        inline const_reference at(Inds... indices) const
+        {
+            static_assert(sizeof...(Inds) == D, "Failed to access element of tensor object.  The input index list does not have the correct size.");
+            size_type index;
+            CALL_AND_HANDLE(index = NDIndex<D>::flatten_check(m_shape, m_stride, indices...), "Unable to access tensor element.  Failed to determine flattened index.");
+            return this->m_host_buffer[index];
+        }
     };
 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +106,7 @@ namespace linalg
     //                                    cuda backend                                   //
     ///////////////////////////////////////////////////////////////////////////////////////
     template <typename T>
-    class tensor_view<T, 1, cuda_backend> : public tensor_view_base<tensor_view<T, 1, cuda_backend>>
+    class tensor_view<T, 1, cuda_backend> : public tensor_view_base<tensor_view<T, 1, cuda_backend>>, public host_access<T>
     {
     public:
         using self_type = tensor_view<T, 1, cuda_backend>;
@@ -99,12 +116,18 @@ namespace linalg
 
         using pointer = typename base_type::pointer;
         using const_pointer = typename base_type::const_pointer;
+        using const_reference = const T&;
 
     protected:
         using base_type::m_buffer;
         using base_type::m_totsize;
 
     public:
+        void from_host() const
+        {
+            this->_from_host(this->m_buffer, this->m_totsize);
+        }
+
         template <typename... Args>
         tensor_view(Args &&...args)
         try : base_type(std::forward<Args>(args)...) {}
@@ -120,10 +143,26 @@ namespace linalg
             return *this;
         }
 
-        __host__ __device__ pointer buffer() { return m_buffer; }
-        __host__ __device__ const_pointer buffer() const { return m_buffer; }
-        __host__ __device__ pointer data() { return m_buffer; }
-        __host__ __device__ const_pointer data() const { return m_buffer; }
+        inline const_reference operator()(size_t i) const
+        {
+            if(!this->m_copied_from_host){this->from_host();}
+            return this->m_host_buffer[i];
+        }
+        inline const_reference slice(size_t i) const
+        {
+            ASSERT(internal::compare_bounds(i, m_totsize), "Failed to access element. Index out of bounds.");
+            return this->operator()(i);
+        }
+        inline const_reference at(size_t i) const
+        {
+            ASSERT(internal::compare_bounds(i, m_totsize), "Failed to access element. Index out of bounds.");
+            return this->operator()(i);
+
+        }
+        inline const_reference operator[](size_t i) const
+        {
+            return this->operator()(i);
+        }
     };
 } // namespace linalg
 

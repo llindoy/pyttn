@@ -12,8 +12,18 @@
  * limitations under the License
  */
 
-#include "sop_operator.hpp"
-#include "../../pyttn_typedef.hpp"
+#include <linalg/linalg.cuh>
 
-template <>
-void initialise_sop_operator<pyttn_real_type, linalg::cuda_backend>(py::module &m);
+
+#include "../../../ttns/operators/sop_operator.tpp"
+#include "../../../pyttn_typedef.hpp"
+
+void initialise_sop_operator(py::module &m)
+{
+    initialise_sop_operator_types<pyttn_real_type, linalg::blas_backend>(m);
+}
+
+void initialise_sop_operator_cuda(py::module &m)
+{
+    initialise_sop_operator_types<pyttn_real_type, linalg::cuda_backend>(m);
+}

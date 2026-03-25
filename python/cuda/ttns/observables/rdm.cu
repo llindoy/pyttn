@@ -12,8 +12,16 @@
  * limitations under the License
  */
 
-#include "rdm.hpp"
-#include "../../pyttn_typedef.hpp"
+#include <linalg/linalg.cuh>
+#include "../../../ttns/observables/rdm.tpp"
+#include "../../../pyttn_typedef.hpp"
 
-template <>
-void initialise_rdm<pyttn_real_type, linalg::cuda_backend>(py::module &m);
+void initialise_rdm(py::module &m)
+{
+    initialise_rdm_types<pyttn_real_type, linalg::blas_backend>(m);
+}
+
+void initialise_rdm_cuda(py::module &m)
+{
+    initialise_rdm_types<pyttn_real_type, linalg::cuda_backend>(m);
+}

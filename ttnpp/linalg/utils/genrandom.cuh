@@ -18,6 +18,7 @@
 #include "../linalg_forward_decl.hpp"
 #include "genrandom.hpp"
 
+#include <common/exception_handling.hpp>
 #include <curand.h>
 #include "../backends/cuda/curand_wrapper.cuh"
 #include "../backends/cuda/cuda_backend.hpp"
@@ -36,6 +37,7 @@ namespace linalg
             float mean = 0;
             float stdev = 1;
             curand_safe_call(curandGenerateNormal(gen, buffer, n, mean, stdev));
+            cuda_backend::synchronise();
             return n;
         }
     };
@@ -48,6 +50,7 @@ namespace linalg
             double mean = 0;
             double stdev = 1;
             curand_safe_call(curandGenerateNormalDouble(gen, buffer, n, mean, stdev));
+            cuda_backend::synchronise();
             return n;
         }
     };
@@ -55,25 +58,27 @@ namespace linalg
     // in order to generate normal distributed complex numbers we generate 2 times as many real numbers
     // with a standard deviation that is sqrt(2) smaller.
     template <>
-    struct generate_norm_vec<std::complex<float>>
+    struct generate_norm_vec<cuda::std::complex<float>>
     {
-        static inline uint64_t generate(curandGenerator_t gen, std::complex<float> *buffer, size_t n)
+        static inline uint64_t generate(curandGenerator_t gen, cuda::std::complex<float> *buffer, size_t n)
         {
             float mean = 0;
             float stdev = 1 / std::sqrt(2.0);
             curand_safe_call(curandGenerateNormal(gen, reinterpret_cast<float *>(buffer), 2 * n, mean, stdev));
+            cuda_backend::synchronise();
             return 2 * n;
         }
     };
 
     template <>
-    struct generate_norm_vec<std::complex<double>>
+    struct generate_norm_vec<cuda::std::complex<double>>
     {
-        static inline uint64_t generate(curandGenerator_t gen, std::complex<double> *buffer, size_t n)
+        static inline uint64_t generate(curandGenerator_t gen, cuda::std::complex<double> *buffer, size_t n)
         {
             double mean = 0;
             double stdev = 1 / std::sqrt(2.0);
             curand_safe_call(curandGenerateNormalDouble(gen, reinterpret_cast<double *>(buffer), 2 * n, mean, stdev));
+            cuda_backend::synchronise();
             return 2 * n;
         }
     };
@@ -160,15 +165,16 @@ namespace linalg
         template <typename ArrType, typename = typename std::enable_if<is_dense_tensor<ArrType>::value && has_backend<ArrType, cuda_backend>::value, void>::type>
         void fill_normal(ArrType &array)
         {
-            using T = typename traits<ArrType>::value_type;
-            m_ngenerated += generate_norm_vec<T>::generate(m_gen, array.buffer(), array.size());
+            using T = typename traits<ArrType>::device_value_type;
+            CALL_AND_HANDLE(m_ngenerated += generate_norm_vec<T>::generate(m_gen, array.buffer(), array.size()), "Failed to generate normal valued terms");
         }
 
         template <typename ArrType, typename = typename std::enable_if<is_dense_tensor<ArrType>::value && has_backend<ArrType, cuda_backend>::value, void>::type>
         void fill_normal(ArrType &&array)
         {
-            using T = typename traits<ArrType>::value_type;
-            m_ngenerated += generate_norm_vec<T>::generate(m_gen, array.buffer(), array.size());
+            initialise();
+            using T = typename traits<ArrType>::device_value_type;
+            CALL_AND_HANDLE(m_ngenerated += generate_norm_vec<T>::generate(m_gen, array.buffer(), array.size()), "Failed to generate normal valued terms");
         }
 
     protected:

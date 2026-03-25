@@ -12,8 +12,17 @@
  * limitations under the License
  */
 
-#include "Op.hpp"
-#include "../../pyttn_typedef.hpp"
+#include <linalg/linalg.cuh>
 
-template <>
-void initialise_Op<pyttn_real_type, linalg::cuda_backend>(py::module &m);
+#include "../../../ttns/operators/Op.tpp"
+#include "../../../pyttn_typedef.hpp"
+
+void initialise_Op(py::module &m)
+{
+    initialise_Op_types<pyttn_real_type, linalg::blas_backend>(m);
+}
+
+void initialise_Op_cuda(py::module &m)
+{
+    initialise_Op_types<pyttn_real_type, linalg::cuda_backend>(m);
+}

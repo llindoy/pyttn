@@ -15,15 +15,161 @@
 #ifndef PYTHON_BINDING_LINALG_TENSOR_CUH
 #define PYTHON_BINDING_LINALG_TENSOR_CUH
 
-#include "../utils.hpp"
+#include <linalg/linalg.cuh>
+#include <linalg/linalg.hpp>
 
-#include <pybind11/operators.h>
-#include <pybind11/stl.h>
-#include <pybind11/cast.h>
-#include <pybind11/stl_bind.h>
-#include <pybind11/pytypes.h>
-#include <pybind11/complex.h>
-#include <pybind11/functional.h>
+#include "../../linalg/tensor.hpp"
+#include "../../linalg/tensor.tpp"
 
+namespace py = pybind11;
 
-#endif // PYTHON_BINDING_LINALG_TENSOR_CUH
+template <typename T>
+void init_matrix_gpu(py::module &m, const std::string &label)
+{
+    using namespace linalg;
+    using backend = linalg::cuda_backend;
+    using ttype = tensor<T, 2, backend>;
+    using real_type = typename linalg::get_real_type<T>::type;
+
+    using conv = pybuffer_converter<backend>;
+    // expose the ttn node class.  This is our core tensor network object.
+    py::class_<ttype>(m, (label).c_str())
+        .def(py::init([](py::buffer &b)
+                      {
+                ttype tens;
+                CALL_AND_RETHROW(conv::copy_to_tensor(b, tens));
+                return tens; }),
+             R"mydelim(
+            Construct a cuda linear algebra tensor object from a python buffer object.  This is the internal type used for 
+            cuda accelerated linear algebra operations by the pyTTN package.
+
+            :param in: The Input numpy array buffer
+            :type in: np.ndarray            
+            )mydelim")
+        .def(py::init<const ttype &>(),
+             R"mydelim(
+            Construct an empty cuda linear algebra tensor object.  This is the internal type used for 
+            cuda accelerated linear algebra operations by the pyTTN package.
+            )mydelim")
+        .def(py::init<const tensor<T, 2, linalg::blas_backend> &>(),
+             R"mydelim(
+            Construct a cuda linear algebra tensor object from a linear algebra tensor object.  This is the internal type used for 
+            cuda accelerated linear algebra operations by the pyTTN package.
+
+            :param in: The Input linear algebra array buffer
+            )mydelim")
+        .def("complex_dtype", [](const ttype &)
+             { return !std::is_same<T, real_type>::value; })
+        .def("__matmul__",
+             [](const ttype &a, ttype &b)
+             {
+                 ttype ret;
+                 ret = a * b;
+                 return ret;
+             })
+        .def("__str__", [](const ttype &o)
+             {std::stringstream oss;   oss << o; return oss.str(); })
+        .def("shape", [](const ttype& o, size_t i){return o.shape(i);})
+        .def("ndim", [](const ttype&){return 2;})
+        .def("set_subblock", [](ttype &o, py::buffer &b)
+             {
+                ttype tens;
+                CALL_AND_RETHROW(conv::copy_to_tensor(b, tens));
+                o.set_subblock(tens); })
+        .def("transpose",
+             [](const ttype &o, const std::vector<int> &inds)
+             {
+                 ttype b = linalg::transpose(o, inds);
+                 return b;
+             })
+        .def("transpose",
+             [](const ttype &o)
+             {
+                 ttype b = linalg::trans(o);
+                 return b;
+             })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const ttype & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](ttype & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const ttype& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<ttype>(t);}
+         ))
+#endif
+
+        .def("backend", [](const ttype &)
+             { return linalg::traits<backend>::label(); })
+        .def("clear", &ttype::clear);
+}
+
+template <typename T, size_t D>
+void init_tensor_gpu(py::module &m, const std::string &label)
+{
+    using namespace linalg;
+    using backend = linalg::cuda_backend;
+    using ttype = tensor<T, D, backend>;
+    using real_type = typename linalg::get_real_type<T>::type;
+
+    using conv = pybuffer_converter<backend>;
+    // expose the ttn node class.  This is our core tensor network object.
+    py::class_<ttype>(m, (label).c_str())
+        .def(py::init([](py::buffer &b)
+                      {
+                ttype tens;
+                CALL_AND_RETHROW(conv::copy_to_tensor(b, tens));
+                return tens; }),
+             R"mydelim(
+            Construct a cuda linear algebra tensor object from a python buffer object.  This is the internal type used for 
+            cuda accelerated linear algebra operations by the pyTTN package.
+
+            :param in: The Input numpy array buffer
+            :type in: np.ndarray            
+            )mydelim")
+        .def(py::init<const ttype &>(),
+             R"mydelim(
+            Construct an empty cuda linear algebra tensor object.  This is the internal type used for 
+            cuda accelerated linear algebra operations by the pyTTN package.
+            )mydelim")
+        .def(py::init<const tensor<T, D, linalg::blas_backend> &>(),
+             R"mydelim(
+            Construct a cuda linear algebra tensor object from a linear algebra tensor object.  This is the internal type used for 
+            cuda accelerated linear algebra operations by the pyTTN package.
+
+            :param in: The Input linalg array buffer
+            )mydelim")
+        .def("complex_dtype", [](const ttype &)
+             { return !std::is_same<T, real_type>::value; })
+        .def("__str__", [](const ttype &o)
+             {std::stringstream oss;   oss << o; return oss.str(); })
+        .def("ndim", [](const ttype&){return D;})
+
+        .def("shape", [](const ttype& o, size_t i){return o.shape(i);})
+        .def("transpose",
+             [](const ttype &o, const std::vector<int> &inds)
+             {
+                 ttype b = linalg::transpose(o, inds);
+                 return b;
+             })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const ttype & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](ttype & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const ttype& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<ttype>(t);}
+         ))
+#endif
+
+        .def("backend", [](const ttype &)
+             { return linalg::traits<backend>::label(); })
+        .def("clear", &ttype::clear);
+}
+
+#endif // PYTHON_BINDING_LINALG_TENSOR_HPP

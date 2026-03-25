@@ -51,7 +51,7 @@ namespace ttns
             size_type prod = 1;
             for (size_type i = 0; i < dims.size(); ++i)
             {
-                ASSERT(dims[i] > 0 && indices[i] >= 0, "Failed to construct object indicees or dims invalid.");
+                ASSERT(dims[i] > 0, "Failed to construct object indicees or dims invalid.");
                 prod *= dims[i];
             }
             ASSERT(prod == m.shape(0) && prod == m.shape(1), "Dimensions array is not compatible with specified matrix.");

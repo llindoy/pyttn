@@ -31,13 +31,13 @@ namespace linalg
 
         public:
             template <typename T1, typename T2>
-            static inline __device__ auto apply(const T1 *a, const T2 *b, size_type i) -> std::complex<decltype(a[i] + b[i])> { return std::complex<decltype(a[i] + b[i])>(a[i], b[i]); }
+            static inline __device__ auto apply(const T1 *a, const T2 *b, size_type i) -> cuda::std::complex<decltype(a[i] + b[i])> { return cuda::std::complex<decltype(a[i] + b[i])>(a[i], b[i]); }
 
             template <typename T, typename ltype, typename rtype, template <typename> class op>
-            static inline __device__ auto apply(const T *a, binary_expression<ltype, rtype, op, cuda_backend> b, size_type i) -> std::complex<decltype(a[i] + b[i])> { return std::complex<decltype(a[i] + b[i])>(a[i], b[i]); }
+            static inline __device__ auto apply(const T *a, binary_expression<ltype, rtype, op, cuda_backend> b, size_type i) -> cuda::std::complex<decltype(a[i] + b[i])> { return cuda::std::complex<decltype(a[i] + b[i])>(a[i], b[i]); }
 
             template <typename T, typename vtype, template <typename> class op>
-            static inline __device__ auto apply(const T *a, unary_expression<vtype, op, cuda_backend> b, size_type i) -> std::complex<decltype(a[i] + b[i])> { return std::complex<decltype(a[i] + b[i])>(a[i], b[i]); }
+            static inline __device__ auto apply(const T *a, unary_expression<vtype, op, cuda_backend> b, size_type i) -> cuda::std::complex<decltype(a[i] + b[i])> { return cuda::std::complex<decltype(a[i] + b[i])>(a[i], b[i]); }
         };
 
         template <>
@@ -48,13 +48,13 @@ namespace linalg
 
         public:
             template <typename T1, typename T2>
-            static inline __device__ auto apply(const T1 *a, const T2 *b, size_type i) -> std::complex<decltype(a[i] + b[i])> { return polar(a[i], b[i]); }
+            static inline __device__ auto apply(const T1 *a, const T2 *b, size_type i) -> cuda::std::complex<decltype(a[i] + b[i])> { return cuda::std::polar(a[i], b[i]); }
 
             template <typename T, typename ltype, typename rtype, template <typename> class op>
-            static inline __device__ auto apply(const T *a, binary_expression<ltype, rtype, op, cuda_backend> b, size_type i) -> std::complex<decltype(a[i] + b[i])> { return polar(a[i], b[i]); }
+            static inline __device__ auto apply(const T *a, binary_expression<ltype, rtype, op, cuda_backend> b, size_type i) -> cuda::std::complex<decltype(a[i] + b[i])> { return cuda::std::polar(a[i], b[i]); }
 
             template <typename T, typename vtype, template <typename> class op>
-            static inline __device__ auto apply(const T *a, unary_expression<vtype, op, cuda_backend> b, size_type i) -> std::complex<decltype(a[i] + b[i])> { return polar(a[i], b[i]); }
+            static inline __device__ auto apply(const T *a, unary_expression<vtype, op, cuda_backend> b, size_type i) -> cuda::std::complex<decltype(a[i] + b[i])> { return cuda::std::polar(a[i], b[i]); }
         };
 
         template <>
@@ -65,9 +65,9 @@ namespace linalg
 
         public:
             template <typename T>
-            static inline __device__ auto apply(const T *a, size_type i) -> std::complex<decltype(a[i])> { return std::complex<decltype(a[i])>(cos(a[i]), sin(a[i])); }
+            static inline __device__ auto apply(const T *a, size_type i) -> cuda::std::complex<decltype(a[i])> { return cuda::std::complex<decltype(a[i])>(cos(a[i]), sin(a[i])); }
             template <typename T>
-            static inline __device__ auto apply(const T &a, size_type i) -> std::complex<decltype(a[i])> { return std::complex<decltype(a[i])>(cos(a[i]), sin(a[i])); }
+            static inline __device__ auto apply(const T &a, size_type i) -> cuda::std::complex<decltype(a[i])> { return cuda::std::complex<decltype(a[i])>(cos(a[i]), sin(a[i])); }
         };
 
         template <>

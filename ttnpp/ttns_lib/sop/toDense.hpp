@@ -15,6 +15,7 @@
 #ifndef PYTTN_TTNS_LIB_SOP_TODENSE_HPP_
 #define PYTTN_TTNS_LIB_SOP_TODENSE_HPP_
 
+#include <linalg/linalg.hpp>
 #include "../operators/site_operators/site_operator.hpp"
 #include "../operators/product_operator.hpp"
 #include "SOP.hpp"

@@ -68,14 +68,14 @@ namespace linalg
         // y = a*x+y
         static inline void axpy(cublasHandle_t handle, int N, const float *A, const float *X, int INCX, float *Y, int INCY) { CALL_AND_RETHROW(cublas_safe_call(cublasSaxpy(handle, N, A, X, INCX, Y, INCY))); }
         static inline void axpy(cublasHandle_t handle, int N, const double *A, const double *X, int INCX, double *Y, int INCY) { CALL_AND_RETHROW(cublas_safe_call(cublasDaxpy(handle, N, A, X, INCX, Y, INCY))); }
-        static inline void axpy(cublasHandle_t handle, int N, const std::complex<float> *A, const std::complex<float> *X, int INCX, std::complex<float> *Y, int INCY) { CALL_AND_RETHROW(cublas_safe_call(cublasCaxpy(handle, N, (const cuComplex *)A, (const cuComplex *)X, INCX, (cuComplex *)Y, INCY))); }
-        static inline void axpy(cublasHandle_t handle, int N, const std::complex<double> *A, const std::complex<double> *X, int INCX, std::complex<double> *Y, int INCY) { CALL_AND_RETHROW(cublas_safe_call(cublasZaxpy(handle, N, (const cuDoubleComplex *)A, (const cuDoubleComplex *)X, INCX, (cuDoubleComplex *)Y, INCY))); }
+        static inline void axpy(cublasHandle_t handle, int N, const cuda::std::complex<float> *A, const cuda::std::complex<float> *X, int INCX, cuda::std::complex<float> *Y, int INCY) { CALL_AND_RETHROW(cublas_safe_call(cublasCaxpy(handle, N, (const cuComplex *)A, (const cuComplex *)X, INCX, (cuComplex *)Y, INCY))); }
+        static inline void axpy(cublasHandle_t handle, int N, const cuda::std::complex<double> *A, const cuda::std::complex<double> *X, int INCX, cuda::std::complex<double> *Y, int INCY) { CALL_AND_RETHROW(cublas_safe_call(cublasZaxpy(handle, N, (const cuDoubleComplex *)A, (const cuDoubleComplex *)X, INCX, (cuDoubleComplex *)Y, INCY))); }
 
         // scalar multiplication - x = a*x
         static inline void scal(cublasHandle_t handle, int N, const float *A, float *X, int INCX) { CALL_AND_RETHROW(cublas_safe_call(cublasSscal(handle, N, A, X, INCX))); }
         static inline void scal(cublasHandle_t handle, int N, const double *A, double *X, int INCX) { CALL_AND_RETHROW(cublas_safe_call(cublasDscal(handle, N, A, X, INCX))); }
-        static inline void scal(cublasHandle_t handle, int N, const std::complex<float> *A, std::complex<float> *X, int INCX) { CALL_AND_RETHROW(cublas_safe_call(cublasCscal(handle, N, (const cuComplex *)A, (cuComplex *)X, INCX))); }
-        static inline void scal(cublasHandle_t handle, int N, const std::complex<double> *A, std::complex<double> *X, int INCX) { CALL_AND_RETHROW(cublas_safe_call(cublasZscal(handle, N, (const cuDoubleComplex *)A, (cuDoubleComplex *)X, INCX))); }
+        static inline void scal(cublasHandle_t handle, int N, const cuda::std::complex<float> *A, cuda::std::complex<float> *X, int INCX) { CALL_AND_RETHROW(cublas_safe_call(cublasCscal(handle, N, (const cuComplex *)A, (cuComplex *)X, INCX))); }
+        static inline void scal(cublasHandle_t handle, int N, const cuda::std::complex<double> *A, cuda::std::complex<double> *X, int INCX) { CALL_AND_RETHROW(cublas_safe_call(cublasZscal(handle, N, (const cuDoubleComplex *)A, (cuDoubleComplex *)X, INCX))); }
 
         // overloads of the dot product calls.  Here we also add the abili
         static inline float dot(cublasHandle_t handle, bool /* conj */, int N, const float *X, int INCX, const float *Y, int INCY)
@@ -90,9 +90,9 @@ namespace linalg
             CALL_AND_RETHROW(cublas_safe_call(cublasDdot(handle, N, X, INCX, Y, INCY, &result)));
             return result;
         }
-        static inline std::complex<float> dot(cublasHandle_t handle, bool conj, int N, const std::complex<float> *X, int INCX, const std::complex<float> *Y, int INCY)
+        static inline cuda::std::complex<float> dot(cublasHandle_t handle, bool conj, int N, const cuda::std::complex<float> *X, int INCX, const cuda::std::complex<float> *Y, int INCY)
         {
-            std::complex<float> result;
+            cuda::std::complex<float> result;
             if (conj)
             {
                 CALL_AND_RETHROW(cublas_safe_call(cublasCdotc(handle, N, (const cuComplex *)X, INCX, (const cuComplex *)Y, INCY, (cuComplex *)&result)));
@@ -103,9 +103,9 @@ namespace linalg
             }
             return result;
         }
-        static inline std::complex<double> dot(cublasHandle_t handle, bool conj, int N, const std::complex<double> *X, int INCX, const std::complex<double> *Y, int INCY)
+        static inline cuda::std::complex<double> dot(cublasHandle_t handle, bool conj, int N, const cuda::std::complex<double> *X, int INCX, const cuda::std::complex<double> *Y, int INCY)
         {
-            std::complex<double> result;
+            cuda::std::complex<double> result;
             if (conj)
             {
                 CALL_AND_RETHROW(cublas_safe_call(cublasZdotc(handle, N, (const cuDoubleComplex *)X, INCX, (const cuDoubleComplex *)Y, INCY, (cuDoubleComplex *)&result)));
@@ -126,11 +126,11 @@ namespace linalg
         {
             CALL_AND_RETHROW(cublas_safe_call(cublasDgemm(handle, TRANSA, TRANSB, M, N, K, ALPHA, A, LDA, B, LDB, BETA, C, LDC)));
         }
-        static inline void gemm(cublasHandle_t handle, cublasOperation_t TRANSA, cublasOperation_t TRANSB, int M, int N, int K, const std::complex<float> *ALPHA, const std::complex<float> *A, int LDA, const std::complex<float> *B, int LDB, const std::complex<float> *BETA, std::complex<float> *C, int LDC)
+        static inline void gemm(cublasHandle_t handle, cublasOperation_t TRANSA, cublasOperation_t TRANSB, int M, int N, int K, const cuda::std::complex<float> *ALPHA, const cuda::std::complex<float> *A, int LDA, const cuda::std::complex<float> *B, int LDB, const cuda::std::complex<float> *BETA, cuda::std::complex<float> *C, int LDC)
         {
             CALL_AND_RETHROW(cublas_safe_call(cublasCgemm(handle, TRANSA, TRANSB, M, N, K, (const cuComplex *)ALPHA, (const cuComplex *)A, LDA, (const cuComplex *)B, LDB, (const cuComplex *)BETA, (cuComplex *)C, LDC)));
         }
-        static inline void gemm(cublasHandle_t handle, cublasOperation_t TRANSA, cublasOperation_t TRANSB, int M, int N, int K, const std::complex<double> *ALPHA, const std::complex<double> *A, int LDA, const std::complex<double> *B, int LDB, const std::complex<double> *BETA, std::complex<double> *C, int LDC)
+        static inline void gemm(cublasHandle_t handle, cublasOperation_t TRANSA, cublasOperation_t TRANSB, int M, int N, int K, const cuda::std::complex<double> *ALPHA, const cuda::std::complex<double> *A, int LDA, const cuda::std::complex<double> *B, int LDB, const cuda::std::complex<double> *BETA, cuda::std::complex<double> *C, int LDC)
         {
             CALL_AND_RETHROW(cublas_safe_call(cublasZgemm(handle, TRANSA, TRANSB, M, N, K, (const cuDoubleComplex *)ALPHA, (const cuDoubleComplex *)A, LDA, (const cuDoubleComplex *)B, LDB, (const cuDoubleComplex *)BETA, (cuDoubleComplex *)C, LDC)));
         }
@@ -144,11 +144,11 @@ namespace linalg
         {
             CALL_AND_RETHROW(cublas_safe_call(cublasDgemv(handle, trans, m, n, alpha, A, lda, x, incx, beta, y, incy)));
         }
-        static inline void gemv(cublasHandle_t handle, cublasOperation_t trans, int m, int n, const std::complex<float> *alpha, const std::complex<float> *A, int lda, const std::complex<float> *x, int incx, const std::complex<float> *beta, std::complex<float> *y, int incy)
+        static inline void gemv(cublasHandle_t handle, cublasOperation_t trans, int m, int n, const cuda::std::complex<float> *alpha, const cuda::std::complex<float> *A, int lda, const cuda::std::complex<float> *x, int incx, const cuda::std::complex<float> *beta, cuda::std::complex<float> *y, int incy)
         {
             CALL_AND_RETHROW(cublas_safe_call(cublasCgemv(handle, trans, m, n, (const cuComplex *)alpha, (const cuComplex *)A, lda, (const cuComplex *)x, incx, (const cuComplex *)beta, (cuComplex *)y, incy)));
         }
-        static inline void gemv(cublasHandle_t handle, cublasOperation_t trans, int m, int n, const std::complex<double> *alpha, const std::complex<double> *A, int lda, const std::complex<double> *x, int incx, const std::complex<double> *beta, std::complex<double> *y, int incy)
+        static inline void gemv(cublasHandle_t handle, cublasOperation_t trans, int m, int n, const cuda::std::complex<double> *alpha, const cuda::std::complex<double> *A, int lda, const cuda::std::complex<double> *x, int incx, const cuda::std::complex<double> *beta, cuda::std::complex<double> *y, int incy)
         {
             CALL_AND_RETHROW(cublas_safe_call(cublasZgemv(handle, trans, m, n, (const cuDoubleComplex *)alpha, (const cuDoubleComplex *)A, lda, (const cuDoubleComplex *)x, incx, (const cuDoubleComplex *)beta, (cuDoubleComplex *)y, incy)));
         }
@@ -168,15 +168,15 @@ namespace linalg
             CALL_AND_RETHROW(cublas_safe_call(cublasDgemmStridedBatched(handle, opA, opB, m, n, k, alpha, A, lda, strideA, B, ldb, strideB, beta, C, ldc, strideC, batchCount)));
         }
 
-        static inline void batched_gemm(cublasHandle_t handle, cublasOperation_t opA, cublasOperation_t opB, int m, int n, int k, const std::complex<float> *alpha, const std::complex<float> *A,
-                                        int lda, long long int strideA, const std::complex<float> *B, int ldb, long long int strideB, const std::complex<float> *beta, std::complex<float> *C, int ldc,
+        static inline void batched_gemm(cublasHandle_t handle, cublasOperation_t opA, cublasOperation_t opB, int m, int n, int k, const cuda::std::complex<float> *alpha, const cuda::std::complex<float> *A,
+                                        int lda, long long int strideA, const cuda::std::complex<float> *B, int ldb, long long int strideB, const cuda::std::complex<float> *beta, cuda::std::complex<float> *C, int ldc,
                                         long long int strideC, int batchCount)
         {
             CALL_AND_RETHROW(cublas_safe_call(cublasCgemmStridedBatched(handle, opA, opB, m, n, k, (const cuComplex *)alpha, (const cuComplex *)A, lda, strideA, (const cuComplex *)B, ldb, strideB, (const cuComplex *)beta, (cuComplex *)C, ldc, strideC, batchCount)));
         }
 
-        static inline void batched_gemm(cublasHandle_t handle, cublasOperation_t opA, cublasOperation_t opB, int m, int n, int k, const std::complex<double> *alpha, const std::complex<double> *A,
-                                        int lda, long long int strideA, const std::complex<double> *B, int ldb, long long int strideB, const std::complex<double> *beta, std::complex<double> *C, int ldc,
+        static inline void batched_gemm(cublasHandle_t handle, cublasOperation_t opA, cublasOperation_t opB, int m, int n, int k, const cuda::std::complex<double> *alpha, const cuda::std::complex<double> *A,
+                                        int lda, long long int strideA, const cuda::std::complex<double> *B, int ldb, long long int strideB, const cuda::std::complex<double> *beta, cuda::std::complex<double> *C, int ldc,
                                         long long int strideC, int batchCount)
         {
             CALL_AND_RETHROW(cublas_safe_call(cublasZgemmStridedBatched(handle, opA, opB, m, n, k, (const cuDoubleComplex *)alpha, (const cuDoubleComplex *)A, lda, strideA, (const cuDoubleComplex *)B, ldb, strideB, (const cuDoubleComplex *)beta, (cuDoubleComplex *)C, ldc, strideC, batchCount)));
@@ -191,11 +191,11 @@ namespace linalg
         {
             CALL_AND_RETHROW(cublas_safe_call(cublasDgeam(handle, transA, transB, m, n, alpha, A, lda, beta, B, ldb, C, ldc)));
         }
-        static inline void geam(cublasHandle_t handle, cublasOperation_t transA, cublasOperation_t transB, int m, int n, const std::complex<float> *alpha, const std::complex<float> *A, int lda, const std::complex<float> *beta, const std::complex<float> *B, int ldb, std::complex<float> *C, int ldc)
+        static inline void geam(cublasHandle_t handle, cublasOperation_t transA, cublasOperation_t transB, int m, int n, const cuda::std::complex<float> *alpha, const cuda::std::complex<float> *A, int lda, const cuda::std::complex<float> *beta, const cuda::std::complex<float> *B, int ldb, cuda::std::complex<float> *C, int ldc)
         {
             CALL_AND_RETHROW(cublas_safe_call(cublasCgeam(handle, transA, transB, m, n, (const cuComplex *)alpha, (const cuComplex *)A, lda, (const cuComplex *)beta, (const cuComplex *)B, ldb, (cuComplex *)C, ldc)));
         }
-        static inline void geam(cublasHandle_t handle, cublasOperation_t transA, cublasOperation_t transB, int m, int n, const std::complex<double> *alpha, const std::complex<double> *A, int lda, const std::complex<double> *beta, const std::complex<double> *B, int ldb, std::complex<double> *C, int ldc)
+        static inline void geam(cublasHandle_t handle, cublasOperation_t transA, cublasOperation_t transB, int m, int n, const cuda::std::complex<double> *alpha, const cuda::std::complex<double> *A, int lda, const cuda::std::complex<double> *beta, const cuda::std::complex<double> *B, int ldb, cuda::std::complex<double> *C, int ldc)
         {
             CALL_AND_RETHROW(cublas_safe_call(cublasZgeam(handle, transA, transB, m, n, (const cuDoubleComplex *)alpha, (const cuDoubleComplex *)A, lda, (const cuDoubleComplex *)beta, (const cuDoubleComplex *)B, ldb, (cuDoubleComplex *)C, ldc)));
         }
