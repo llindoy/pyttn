@@ -245,9 +245,9 @@ namespace utils
                                 m_residues(0, iter) = m_arnoldi.hk1k() * std::abs(m_rvecs(m_vals.size() - 1, n));
                                 if (m_verbose)
                                 {
-                                    std::cerr << 0 << " " << iter << " " << iend << " " << m_residues(0, iter) << " " << (m_invert_mode ? 1.0 / m_vals(n, n) : m_vals(n, n)) << std::endl;
+                                    std::cerr << 0 << " " << iter << " " << iend << " " << m_residues(0, iter) << " " << (m_invert_mode ? real_type(1.0) / m_vals(n, n) : m_vals(n, n)) << std::endl;
                                 }
-                                if (m_residues(0, iter) < m_eps || m_residues(0, iter) < m_rel_eps * std::abs((m_invert_mode ? 1.0 / m_vals(n, n) : m_vals(n, n))))
+                                if (m_residues(0, iter) < m_eps || m_residues(0, iter) < m_rel_eps * std::abs((m_invert_mode ? real_type(1.0) / m_vals(n, n) : m_vals(n, n))))
                                 {
                                     do_restart = false;
                                     keep_running = false;
@@ -381,7 +381,7 @@ namespace utils
                                 // and compute the associated residue
                                 m_residues(iter) = m_arnoldi.hk1k() * std::abs(m_rvecs(m_vals.size() - 1, eigindex));
 
-                                if (m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps * std::abs((m_invert_mode ? 1.0 / m_vals(eigindex, eigindex) : m_vals(eigindex, eigindex))))
+                                if (m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps * std::abs((m_invert_mode ? real_type(1.0) / m_vals(eigindex, eigindex) : m_vals(eigindex, eigindex))))
                                 {
                                     do_restart = false;
                                     keep_running = false;
@@ -618,7 +618,7 @@ namespace utils
             try
             {
                 // sort and scale eigenvalues
-                E = m_invert_mode ? 1.0 / m_vals(n, n) : m_vals(n, n);
+                E = m_invert_mode ? real_type(1.0) / m_vals(n, n) : m_vals(n, n);
 
                 // sort eigenvectors in krylov subspace
                 CALL_AND_HANDLE(m_rvecsd.resize(1, m_lvecs.size(0)), "Failed to resize rvecs array.");

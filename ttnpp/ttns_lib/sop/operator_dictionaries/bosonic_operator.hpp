@@ -80,7 +80,7 @@ namespace ttns
                         if (op->contains_lowered_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * std::sqrt((1.0 * n));
+                            buffer[counter] = coeff_a * static_cast<RT>(std::sqrt((1.0 * n)));
                             colind[counter] = op->get_lowered_index(i, index);
                             ++counter;
                         }
@@ -112,7 +112,7 @@ namespace ttns
                         size_t n = op->get_occupation(i, index);
                         if (op->contains_lowered_state(i, index))
                         {
-                            mat(i, op->get_lowered_index(i, index)) = coeff_a * std::sqrt((1.0 * n));
+                            mat(i, op->get_lowered_index(i, index)) = coeff_a *  static_cast<RT>(std::sqrt((1.0 * n)));
                         }
                     }
                 }
@@ -221,7 +221,7 @@ namespace ttns
                         if (op->contains_lowered_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * std::sqrt((1.0 * n));
+                            buffer[counter] = coeff_a *  static_cast<RT>(std::sqrt((1.0 * n)));
                             colind[counter] = op->get_lowered_index(i, index);
                             ++counter;
                         }
@@ -248,7 +248,7 @@ namespace ttns
                             if (op->contains_raised_state(i, index))
                             {
                                 size_t n = op->get_occupation(i, index);
-                                buffer[counter] = -coeff_b * std::sqrt((n + 1.0));
+                                buffer[counter] = -coeff_b *  static_cast<RT>(std::sqrt((n + 1.0)));
                                 colind[counter] = op->get_raised_index(i, index);
                                 ++counter;
                             }
@@ -291,7 +291,7 @@ namespace ttns
                         size_t n = op->get_occupation(i, index);
                         if (op->contains_lowered_state(i, index))
                         {
-                            mat(i, op->get_lowered_index(i, index)) = coeff_a * std::sqrt((1.0 * n));
+                            mat(i, op->get_lowered_index(i, index)) = coeff_a *  static_cast<RT>(std::sqrt((1.0 * n)));
                         }
 
                         if (m_has_disp)
@@ -310,7 +310,7 @@ namespace ttns
                         {
                             if (op->contains_raised_state(i, index))
                             {
-                                mat(i, op->get_raised_index(i, index)) = -coeff_b * std::sqrt((n + 1.0));
+                                mat(i, op->get_raised_index(i, index)) = -coeff_b *  static_cast<RT>(std::sqrt((n + 1.0)));
                             }
                         }
                     }
@@ -390,7 +390,7 @@ namespace ttns
                         if (op->contains_raised_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * std::sqrt((n + 1.0));
+                            buffer[counter] = coeff_a *  static_cast<RT>(std::sqrt((n + 1.0)));
                             colind[counter] = op->get_raised_index(i, index);
                             ++counter;
                         }
@@ -421,7 +421,7 @@ namespace ttns
                         if (op->contains_raised_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            mat(i, op->get_raised_index(i, index)) = coeff_a * std::sqrt((n + 1.0));
+                            mat(i, op->get_raised_index(i, index)) = coeff_a *  static_cast<RT>(std::sqrt((n + 1.0)));
                         }
                     }
                 }
@@ -531,7 +531,7 @@ namespace ttns
                             if (op->contains_lowered_state(i, index))
                             {
                                 size_t n = op->get_occupation(i, index);
-                                buffer[counter] = -coeff_b * std::sqrt((1.0 * n));
+                                buffer[counter] = -coeff_b *  static_cast<RT>(std::sqrt((1.0 * n)));
                                 colind[counter] = op->get_lowered_index(i, index);
                                 ++counter;
                             }
@@ -557,7 +557,7 @@ namespace ttns
                         if (op->contains_raised_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * std::sqrt((n + 1.0));
+                            buffer[counter] = coeff_a *  static_cast<RT>(std::sqrt((n + 1.0)));
                             colind[counter] = op->get_raised_index(i, index);
                             ++counter;
                         }
@@ -601,7 +601,7 @@ namespace ttns
                         {
                             if (op->contains_lowered_state(i, index))
                             {
-                                mat(i, op->get_lowered_index(i, index)) = -coeff_b * std::sqrt((1.0 * n));
+                                mat(i, op->get_lowered_index(i, index)) = -coeff_b *  static_cast<RT>(std::sqrt((1.0 * n)));
                             }
                         }
 
@@ -619,7 +619,7 @@ namespace ttns
 
                         if (op->contains_raised_state(i, index))
                         {
-                            mat(i, op->get_raised_index(i, index)) = coeff_a * std::sqrt((n + 1.0));
+                            mat(i, op->get_raised_index(i, index)) = coeff_a * static_cast<RT>( std::sqrt((n + 1.0)));
                         }
                     }
                 }
@@ -788,7 +788,7 @@ namespace ttns
                     Dk(1, 1) = expa2 * (1 - a2);
                     for (size_t i = 2; i < ni; ++i)
                     {
-                        Dk(i, i) = ((2.0 * i - 1.0 - a2) * Dk(i - 1, i - 1) - (i - 1.0) * Dk(i - 2, i - 2)) / static_cast<real_type>(i);
+                        Dk(i, i) = ( static_cast<real_type>(2.0 * i - 1.0 - a2) * Dk(i - 1, i - 1) -  static_cast<real_type>(i - 1.0) * Dk(i - 2, i - 2)) / static_cast<real_type>(i);
                     }
 
                     // now populate the first column (all values with m=0)
@@ -809,7 +809,7 @@ namespace ttns
                         for (size_t n = d + 2; n < ni; ++n)
                         {
                             size_t m = n - d;
-                            Dk(n, m) = (m + n - 1.0 - a2) / sqrt(static_cast<real_type>(m * n)) * Dk(n - 1, m - 1) - sqrt((m - 1.0) * (n - 1.0) / (m * n)) * Dk(n - 2, m - 2);
+                            Dk(n, m) = (m + n -  static_cast<real_type>(1.0) - a2) / sqrt(static_cast<real_type>(m * n)) * Dk(n - 1, m - 1) -  static_cast<real_type>(sqrt((m - 1.0) * (n - 1.0)) / (m * n)) * Dk(n - 2, m - 2);
                         }
                     }
                     for (size_t d = 1; d < ni; ++d)
@@ -817,7 +817,7 @@ namespace ttns
                         for (size_t m = d + 2; m < ni; ++m)
                         {
                             size_t n = m - d;
-                            Dk(n, m) = (m + n - 1.0 - a2) / sqrt(static_cast<real_type>(m * n)) * Dk(n - 1, m - 1) - sqrt((m - 1.0) * (n - 1.0) / (m * n)) * Dk(n - 2, m - 2);
+                            Dk(n, m) = (m + n -  static_cast<real_type>(1.0) - a2) / sqrt(static_cast<real_type>(m * n)) * Dk(n - 1, m - 1) -  static_cast<real_type>(sqrt((m - 1.0) * (n - 1.0)) / (m * n)) * Dk(n - 2, m - 2);
                         }
                     }
                 }
@@ -1031,7 +1031,7 @@ namespace ttns
                         if (op->contains_lowered_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * std::sqrt((1.0 * n));
+                            buffer[counter] = coeff_a * static_cast<RT>(std::sqrt((1.0 * n)));
                             colind[counter] = op->get_lowered_index(i, index);
                             ++counter;
                         }
@@ -1046,7 +1046,7 @@ namespace ttns
                         if (op->contains_raised_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = coeff_a * std::sqrt((n + 1.0));
+                            buffer[counter] = coeff_a * static_cast<RT>(std::sqrt((n + 1.0)));
                             colind[counter] = op->get_raised_index(i, index);
                             ++counter;
                         }
@@ -1077,7 +1077,7 @@ namespace ttns
                         size_t n = op->get_occupation(i, index);
                         if (op->contains_lowered_state(i, index))
                         {
-                            mat(i, op->get_lowered_index(i, index)) = coeff_a * std::sqrt((1.0 * n));
+                            mat(i, op->get_lowered_index(i, index)) = coeff_a * static_cast<RT>(std::sqrt((1.0 * n)));
                         }
 
                         if (m_has_disp)
@@ -1087,7 +1087,7 @@ namespace ttns
 
                         if (op->contains_raised_state(i, index))
                         {
-                            mat(i, op->get_raised_index(i, index)) = coeff_a * std::sqrt((n + 1.0));
+                            mat(i, op->get_raised_index(i, index)) = coeff_a * static_cast<RT>(std::sqrt((n + 1.0)));
                         }
                     }
                 }
@@ -1193,7 +1193,7 @@ namespace ttns
                         if (op->contains_lowered_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = T(0, 1.0) * std::sqrt(n / 2.0);
+                            buffer[counter] = T(0, 1.0) * static_cast<RT>(std::sqrt(n / 2.0));
                             colind[counter] = op->get_lowered_index(i, index);
                             ++counter;
                         }
@@ -1201,7 +1201,7 @@ namespace ttns
                         if (op->contains_raised_state(i, index))
                         {
                             size_t n = op->get_occupation(i, index);
-                            buffer[counter] = T(0, -1.0) * std::sqrt((n + 1.0) / 2.0);
+                            buffer[counter] = T(0, -1.0) * static_cast<RT>(std::sqrt((n + 1.0) / 2.0));
                             colind[counter] = op->get_raised_index(i, index);
                             ++counter;
                         }
@@ -1228,12 +1228,12 @@ namespace ttns
                         size_t n = op->get_occupation(i, index);
                         if (op->contains_lowered_state(i, index))
                         {
-                            mat(i, op->get_lowered_index(i, index)) = T(0, 1.0) * std::sqrt(n / 2.0);
+                            mat(i, op->get_lowered_index(i, index)) = T(0, 1.0) * static_cast<RT>(std::sqrt(n / 2.0));
                         }
 
                         if (op->contains_raised_state(i, index))
                         {
-                            mat(i, op->get_raised_index(i, index)) = T(0, -1.0) * std::sqrt((n + 1.0) / 2.0);
+                            mat(i, op->get_raised_index(i, index)) = T(0, -1.0) * static_cast<RT>(std::sqrt((n + 1.0) / 2.0));
                         }
                     }
                 }
@@ -1276,6 +1276,8 @@ namespace ttns
             {
                 try
                 {
+                    using RT = typename linalg::get_real_type<T>::type;
+
                     ASSERT(index < op->nmodes(), "Index out of bounds.");
                     mat.resize(op->nstates(), op->nstates());
                     mat.fill_zeros();
@@ -1300,7 +1302,7 @@ namespace ttns
                         for(size_t j = 0; j < op->nstates(); ++j)
                         {
                             size_t m = op->get_occupation(j, index);
-                            mat(i, j) = p2(n, m)/2.0;
+                            mat(i, j) = p2(n, m)/static_cast<RT>(2.0);
 
                         }
                     }
@@ -1487,8 +1489,10 @@ namespace ttns
 
             virtual std::pair<T, std::string> transpose() const
             {
+                using RT = typename linalg::get_real_type<T>::type;
+
                 std::pair<T, std::string> opt = m_op->transpose();
-                std::pair<T, std::string> ret = std::make_pair(std::pow(std::get<0>(opt), m_n), std::get<1>(opt)+std::string("^")+std::to_string(m_n));
+                std::pair<T, std::string> ret = std::make_pair(static_cast<T>(std::pow(std::get<0>(opt), m_n)), std::get<1>(opt)+std::string("^")+std::to_string(m_n));
                 return ret;
             }
 

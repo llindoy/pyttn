@@ -34,7 +34,7 @@ namespace ttns
                 T Sp = (S - 1.0) / 2.0;
                 T m1 = Sp - T(i);
                 T m2 = Sp - T(j);
-                return std::sqrt(Sp * (Sp + 1.0) - m1 * m2);
+                return std::sqrt(Sp * (Sp + T(1.0)) - m1 * m2);
             }
 
         public:
@@ -132,7 +132,7 @@ namespace ttns
                 T Sp = (S - 1.0) / 2.0;
                 T m1 = Sp - T(i);
                 T m2 = Sp - T(j);
-                return std::sqrt(Sp * (Sp + 1.0) - m1 * m2);
+                return std::sqrt(Sp * (Sp + T(1.0)) - m1 * m2);
             }
 
         public:
@@ -230,7 +230,7 @@ namespace ttns
                 T Sp = (S - 1.0) / 2.0;
                 T m1 = Sp - T(i);
                 T m2 = Sp - T(j);
-                return 0.5 * std::sqrt(Sp * (Sp + 1.0) - m1 * m2);
+                return T(0.5) * std::sqrt(Sp * (Sp + T(1.0)) - m1 * m2);
             }
 
         public:
@@ -382,7 +382,7 @@ namespace ttns
                 T Sp = (S - 1.0) / 2.0;
                 T m1 = Sp - T(i);
                 T m2 = Sp - T(j);
-                return T(0, 0.5) * std::sqrt(Sp * (Sp + 1.0) - m1 * m2);
+                return T(0, 0.5) * std::sqrt(Sp * (Sp + T(1.0)) - m1 * m2);
             }
 
             static T val_r(size_t S, size_t i, size_t j)
@@ -390,7 +390,7 @@ namespace ttns
                 T Sp = (S - 1.0) / 2.0;
                 T m1 = Sp - T(i);
                 T m2 = Sp - T(j);
-                return T(0, -0.5) * std::sqrt(Sp * (Sp + 1.0) - m1 * m2);
+                return T(0, -0.5) * std::sqrt(Sp * (Sp + T(1.0)) - m1 * m2);
             }
 
         public:
