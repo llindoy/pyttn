@@ -239,8 +239,8 @@ class ExpFitOQSBath(ExpFitBath):
     def _get_composite_params(
         self,
     ) -> tuple[list[list[np.complex128]], list[list[np.complex128]]]:
-        zks = [[[self._zk[x] for x in cmode]] for cmode in self._composite_modes]
-        dks = [[[self._dk[x] for x in cmode]] for cmode in self._composite_modes]
+        zks = [[self._zk[x] for x in cmode] for cmode in self._composite_modes]
+        dks = [[self._dk[x] for x in cmode] for cmode in self._composite_modes]
         return dks, zks
 
     @property

@@ -72,28 +72,28 @@ class RDM(metaclass=ABCMeta):
         if _use_real_matel:
             if args:
                 if isinstance(args[0], ttn_complex) or isinstance(args[0], ms_ttn_complex):
-                    return rdm__complex(*args, **kwargs)
+                    return rdm_complex(*args, **kwargs)
                 elif _cuda_import and (isinstance(args[0], ttn_complex_cuda) or isinstance(args[0], ms_ttn_complex_cuda)):
-                    return rdm__complex_cuda(*args, **kwargs)
+                    return rdm_complex_cuda(*args, **kwargs)
                 elif isinstance(args[0], ttn_real) or isinstance(args[0], ms_ttn_real):
-                    return rdm__real(*args, **kwargs)
+                    return rdm_real(*args, **kwargs)
                 elif _cuda_import and (isinstance(args[0], ttn_real_cuda) or isinstance(args[0], ms_ttn_real_cuda)):
-                    return rdm__real_cuda(*args, **kwargs)
+                    return rdm_real_cuda(*args, **kwargs)
                 else:
                     raise RuntimeError("Invalid dtype for RDM")
             else:
                 if backend == 'blas':
                     if dtype == np.complex128 or dtype is complex:
-                        return rdm__complex(**kwargs)
+                        return rdm_complex(**kwargs)
                     elif dtype == np.float64 or dtype is float:
-                        return rdm__real(**kwargs)
+                        return rdm_real(**kwargs)
                     else:
                         raise RuntimeError("Invalid dtype for RDM")
                 elif _cuda_import and backend == 'cuda':
                     if dtype == np.complex128 or dtype is complex:
-                        return rdm__complex_cuda(**kwargs)
+                        return rdm_complex_cuda(**kwargs)
                     elif dtype == np.float64 or dtype is float:
-                        return rdm__real_cuda(**kwargs)
+                        return rdm_real_cuda(**kwargs)
                     else:
                         raise RuntimeError("Invalid dtype for RDM")    
                 else:
@@ -101,20 +101,20 @@ class RDM(metaclass=ABCMeta):
         else:
             if args:
                 if isinstance(args[0], ttn_complex) or isinstance(args[0], ms_ttn_complex):
-                    return rdm__complex(*args, **kwargs)
+                    return rdm_complex(*args, **kwargs)
                 elif _cuda_import and (isinstance(args[0], ttn_complex_cuda) or isinstance(args[0], ms_ttn_complex_cuda)):
-                    return rdm__complex_cuda(*args, **kwargs)
+                    return rdm_complex_cuda(*args, **kwargs)
                 else:
                     raise RuntimeError("Invalid dtype for RDM")
             else:
                 if backend == 'blas':
                     if dtype == np.complex128 or dtype is complex:
-                        return rdm__complex(**kwargs)
+                        return rdm_complex(**kwargs)
                     else:
                         raise RuntimeError("Invalid dtype for RDM")
                 elif _cuda_import and backend == 'cuda':
                     if dtype == np.complex128 or dtype is complex:
-                        return rdm__complex_cuda(**kwargs)
+                        return rdm_complex_cuda(**kwargs)
                     else:
                         raise RuntimeError("Invalid dtype for RDM")
                 else:

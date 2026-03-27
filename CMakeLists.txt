@@ -226,6 +226,9 @@ if(BUILD_PYTHON_BINDINGS)
 endif()
 
 if(BUILD_SRC)
-    add_subdirectory(cuda_test)
-
+    if(USE_CUDA)
+        add_subdirectory(cuda_test)
+    else()
+        add_subdirectory(src)
+    endif()
 endif()
