@@ -39,7 +39,7 @@ int main(int /*argc*/, char* /*argv*/[])
 {
     try
     {
-        using real_type = float;
+        using real_type = double;
         using complex_type = std::complex<real_type>;
         using backend_type = linalg::cuda_backend;
         using backend_type2 = linalg::blas_backend;
@@ -129,12 +129,14 @@ int main(int /*argc*/, char* /*argv*/[])
             }
             STOP_TIMER("SOP built");
             std::vector<size_t> chis(5);
-            chis[0] = 192;
-            chis[1] = 192;
-            chis[2] = 80;
-            chis[3] = 192;
+            chis[0] = 16;
+            chis[1] = 24;
+            chis[2] = 32;
+            chis[3] = 48;
+            chis[4] = 64;
             for(size_t chi_ind = 0; chi_ind < 1; ++chi_ind)
             {
+                //size_t chi_ind = 0;
                 std::vector<size_t> dims(N);  std::fill(dims.begin(), dims.end(), D);
 
                 ntree<size_t> topology = ntree_builder<size_t>:: mps_tree(dims, chis[chi_ind]);
@@ -172,12 +174,12 @@ int main(int /*argc*/, char* /*argv*/[])
                     std::cerr << sweep.E() << std::endl;
                 }  
             }
-            chis[0] = 80;
+            chis[0] = 16;
             chis[1] = 24;
             chis[2] = 32;
             chis[3] = 48;
             chis[4] = 64;
-            for(size_t chi_ind = 0; chi_ind < 1; ++chi_ind)
+            for(size_t chi_ind = 0; chi_ind < chis.size(); ++chi_ind)
             {
                 std::vector<size_t> dims(N);  std::fill(dims.begin(), dims.end(), D);
 

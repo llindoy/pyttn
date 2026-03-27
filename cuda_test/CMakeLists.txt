@@ -58,7 +58,6 @@ set(LINALG_LIBS ${LINALG_LIBS} ${LLVM_LIBRARIES} ${CLANG_LIBS} ${CUDA_cusparse_L
 
 target_include_directories(operator_test.x PUBLIC ${CMAKE_SOURCE_DIR}/ttnpp   ${CEREAL_INCLUDE_DIRS}
         $<$<BOOL:${USE_SPDLOG}>:${SPDLOG_INCLUDE_DIRS}>)
-set_target_properties(operator_test.x PROPERTIES CUDA_ARCHITECTURES "86")
 set_target_properties(operator_test.x PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 target_include_directories(operator_test.x SYSTEM PUBLIC ${TTNS_INCLUDE_DIRECTORIES} ${cereal_INCLUDE_DIR} ${spdlog_INCLUDE_DIR})
 #target_link_libraries(cudalib ${LINALG_LIBS} ${LIBS} ${OpenMP_LIBS} CUDA::cusparse CUDA::cublas CUDA::cusolver CUDA::curand CUDA::cutensor cUDA::cudart) 

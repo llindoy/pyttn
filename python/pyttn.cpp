@@ -250,11 +250,11 @@ PYBIND11_MODULE(ttnpp, m)
 #ifdef PYTTN_BUILD_CUDA
 
     initialise_dmrg_onesite_ttn_cuda(m_cuda);
-    initialise_dmrg_adaptive_ttn_cuda(m_cuda);
+    //initialise_dmrg_adaptive_ttn_cuda(m_cuda);
     initialise_dmrg_onesite_msttn_cuda(m_cuda);
 
     initialise_tdvp_onesite_ttn_cuda(m_cuda);
-    initialise_tdvp_adaptive_ttn_cuda(m_cuda);
+    //initialise_tdvp_adaptive_ttn_cuda(m_cuda);
     initialise_tdvp_onesite_msttn_cuda(m_cuda);
 
 #endif
