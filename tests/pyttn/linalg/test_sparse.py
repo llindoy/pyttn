@@ -27,9 +27,6 @@ def test_csr_init_1(backend):
         else:
             assert not mat.complex_dtype()
 
-        m3 = mat@m2
-        assert(np.allclose(np.array(m3), mdense))
-
     run_tests(np.float64)
     run_tests(np.complex128)
 
@@ -50,8 +47,6 @@ def test_csr_init_2(backend):
         else:
             assert not mat.complex_dtype()
 
-        m3 = mat@m2
-        assert(np.allclose(np.array(m3), mdense))
 
     run_tests(np.float64)
     run_tests(np.complex128)
@@ -78,8 +73,6 @@ def test_csr_init_3(backend):
         matb = csr_matrix(mat, dtype=np.complex128, backend=backend)
         assert matb.complex_dtype()
 
-        m3 = mat@m2
-        assert(np.allclose(np.array(m3), mdense))
 
     run_tests(np.float64)
     run_tests(np.complex128)

@@ -21,9 +21,9 @@ from pyttn.linalg.tensorExt import Matrix, Vector
 try:
     import pyttn.ttnpp.cuda.linalg as cula
 
-    __cuda_import = True
+    _cuda_import = True
 except ImportError:
-    __cuda_import = False
+    _cuda_import = False
 
 
 class OrthogonalVector:
@@ -51,7 +51,7 @@ class OrthogonalVector:
             else:
                 la.orthogonal_vector_real.pad_random(a, i, rng)
 
-        elif rng.backend() == "cuda" and __cuda_import:
+        elif rng.backend() == "cuda" and _cuda_import:
             if a.complex_dtype():
                 cula.orthogonal_vector_complex.pad_random(a, i, rng)
             else:
@@ -83,7 +83,7 @@ class OrthogonalVector:
             else:
                 return la.orthogonal_vector_real.generate(a, rng)
 
-        elif rng.backend() == "cuda" and __cuda_import:
+        elif rng.backend() == "cuda" and _cuda_import:
             if a.complex_dtype():
                 return cula.orthogonal_vector_complex.generate(a, rng)
             else:
