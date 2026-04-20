@@ -191,6 +191,7 @@ namespace ttns
         using const_reverse_iterator = typename container_type::const_reverse_iterator;
 
         using site_ops_type = typename autoSOP<T>::site_ops_type;
+        using hrank_info = std::map<std::pair<size_t, size_t>, typename node_type::hrank_type>;
 
     protected:
         tree_type m_contraction_info;
