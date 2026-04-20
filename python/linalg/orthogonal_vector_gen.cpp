@@ -19,5 +19,5 @@
 
 void initialise_orthogonal_vector(py::module &m)
 {
-    initialise_orthogonal_vector_types<pyttn_real_type, linalg::blas_backend>;
+    initialise_orthogonal_vector_types<pyttn_real_type, linalg::blas_backend>(m);
 }

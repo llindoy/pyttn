@@ -65,7 +65,6 @@ void init_sop_operator(py::module &m, const std::string &label)
              {typename _sop::hrank_info res;  o.bond_dimensions(res);   return res; })
         .def("bond_dimensions", [](const _sop &o, typename _sop::hrank_info &res)
              {;  o.bond_dimensions(res); }, "For details see :meth:`pyttn.ttn_dtype.bond_dimensions`")
-
         .def("complex_dtype", [](const _sop &)
              { return !std::is_same<T, real_type>::value; })
         .def("backend", [](const _sop &)
