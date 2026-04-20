@@ -12,16 +12,21 @@
  * limitations under the License
  */
 
-#ifndef PYTTN_LINALG_DOMAIN_MANAGER_CUDA_EXECPROPERTIES_HPP_
-#define PYTTN_LINALG_DOMAIN_MANAGER_CUDA_EXECPROPERTIES_HPP_
+#ifndef PYTTN_LINALG_DOMAIN_MANAGER_CUDA_EXEC_CONTEXT_HPP_
+#define PYTTN_LINALG_DOMAIN_MANAGER_CUDA_EXEC_CONTEXT_HPP_
 
 #include <cstdint>
 #include <cstdlib>
 #include <algorithm>
 #include <complex>
-#include "../../backends/cuda/cuda_backend.cuh"
-#include "cuda_environment.hpp"
-#include "../execProps.hpp"
+
+#include "execDomain.hpp"
+
+#include "../../backends/cuda/cuda_backend.hpp"
+#include "../../backends/cuda/cublas_wrapper.cuh"
+#include "../../backends/cuda/cusolver_wrapper.cuh"
+#include "../../backends/cuda/cusparse_wrapper.cuh"
+#include "../../backends/cuda/cutensor_wrapper.cuh"
 
 namespace linalg
 {
@@ -34,15 +39,11 @@ namespace linalg
         protected:
             int m_mpi_rank;     //purely meta data
             int m_gpu_id;
-        
+
         public:
-            ExecDomain() : m_mpi_rank(0) {}
-            ExecDomain(int mpi_rank) : m_mpi_rank(mpi_rank){}
+            ExecDomain(int mpi_rank=0, int gpu_id=0) : m_mpi_rank(mpi_rank), m_gpu_id(gpu_id){}
             ExecDomain(const ExecDomain& o) = default;
             ExecDomain(ExecDomain&& o) = default;
-
-            ExecDomain& operator=(const ExecDomain& o) = default;
-            ExecDomain& operator=(ExecDomain&& o) = default;
 
             bool operator==(const ExecDomain& o)
             {
@@ -50,8 +51,9 @@ namespace linalg
                 return m_gpu_id == o.m_gpu_id;
             }
 
-            const int& mpi_rank() const{return m_mpi_rank;}
-            int& mpi_rank(){return m_mpi_rank;}
+            int mpi_rank() const{return m_mpi_rank;}
+            int gpu_id() const{return m_gpu_id;}
+
         };
 
         /* A class for handling information about device information for operators acting on linalg objects.*/
@@ -59,27 +61,37 @@ namespace linalg
         class ExecContext<cuda_backend>
         {
         protected:
-            const ExecDomain<cuda_backend>* m_domain;
+            const ExecDomain<cuda_backend>& m_domain;
+
+            struct Impl;
+            std::unique_ptr<Impl> m_impl;
+
+
             cudaStream_t m_stream;
-            std::size_t m_nstreams;
+            cudaEvent_t m_event;
+            bool m_active;
             std::size_t m_id;
+
+            cusparseHandle_t cusparse_handle;
+            cublasHandle_t cublas_handle;
+            cusolverDnHandle_t cusolver_dn_handle;
+            cutensorHandle_t cutensor_handle;
         
             friend class SerialScheduler<cuda_backend>;
             friend class ParallelScheduler<cuda_backend>;
 
         public:
-            ExecContext(const ExecDomain<cuda_backend>& domain, std::size_t nstreams = 1, std::size_t id = 0) : m_domain(&domain),  m_nstreams(nstreams), m_id(id) {}
-            ExecContext(const ExecContext& o) = default;
+            ExecContext(const ExecDomain<cuda_backend>& domain, std::size_t id = 0);s
+            ExecContext(const ExecContext& o) = delete;
             ExecContext(ExecContext&& o) = default;
-            ExecContext& operator=(const ExecContext& o) = default;
-            ExecContext& operator=(ExecContext&& o) = default;
+            ExecContext& operator=(const ExecContext& o) = delete;
+            ExecContext& operator=(ExecContext&& o) = delete;
 
-            const ExecDomain<cuda_backend>& domain() const {return *m_domain;}
+            const ExecDomain<cuda_backend>& domain() const {return m_domain;}
             cudaStream_t stream() const{return m_stream;}
-            std::size_t nstreams() const{return m_nstreams;}
             std::size_t id() const{return m_id;}
         };
     }
 }
 
-#endif //PYTTN_LINALG_DOMAIN_MANAGER_CUDA_EXECPROPERTIES_HPP_
+#endif //PYTTN_LINALG_DOMAIN_MANAGER_CUDA_EXEC_CONTEXT_HPP_

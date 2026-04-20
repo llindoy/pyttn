@@ -39,36 +39,8 @@ namespace linalg
             ExecDomain(const ExecDomain& o) = default;
             ExecDomain(ExecDomain&& o) = default;
 
-            ExecDomain& operator=(const ExecDomain& o) = default;
-            ExecDomain& operator=(ExecDomain&& o) = default;
-
-            bool operator==(const ExecDomain& o){return true}
-
-            const int& mpi_rank() const{return m_mpi_rank;}
-            int& mpi_rank(){return m_mpi_rank;}
-        };
-
-        /* A class for handling information about device information for operators acting on linalg objects.*/
-        template <>
-        class ExecContext<blas_backend>
-        {
-        protected:
-            const ExecDomain<blas_backend>* m_domain;   //MPI rank local domain
-            std::size_t m_nthreads; 
-            std::size_t m_id;
-        
-        public:
-            ExecContext(const ExecDomain<blas_backend>& domain, std::size_t nthreads = 1, std::size_t id = 0) : m_domain(&domain), m_nthreads(nthreads), m_id(id) {}
-            ExecContext(const ExecContext& o) = default;
-            ExecContext(ExecContext&& o) = default;
-            ExecContext& operator=(const ExecContext& o) = default;
-            ExecContext& operator=(ExecContext&& o) = default;
-
-            const ExecDomain<blas_backend>& domain() const {return *m_domain;}
-            std::size_t nthreads() const {return m_nthreads;}
-            std::size_t& nthreads() {return m_nthreads;}
-            std::size_t id() const{return m_id;}
-            std::size_t& id(){return m_id;}
+            bool operator==(const ExecDomain& o){return true;}
+            int mpi_rank() const{return m_mpi_rank;}
         };
     }
 }

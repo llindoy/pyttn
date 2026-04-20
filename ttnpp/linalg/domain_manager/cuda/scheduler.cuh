@@ -20,7 +20,9 @@
 #include <algorithm>
 #include <complex>
 #include "../../backends/cuda/cuda_backend.cuh"
-#include "cuda_environment.hpp"
+#include "../../backends/cuda/cuda_environment.hpp"
+#include "../../backends/cuda/cuda_utils.cuh"
+
 #include "../scheduler.hpp"
 #include "execProps.cuh"
 

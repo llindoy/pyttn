@@ -12,24 +12,32 @@
  * limitations under the License
  */
  
-#ifndef PYTTN_LINALG_DOMAIN_MANAGER_DOMAIN_PARTITION_HPP_
-#define PYTTN_LINALG_DOMAIN_MANAGER_DOMAIN_PARTITION_HPP_
+#ifndef PYTTN_LINALG_DOMAIN_MANAGER_BLAS_MEMORY_TRANSFER_HPP_
+#define PYTTN_LINALG_DOMAIN_MANAGER_BLAS_MEMORY_TRANSFER_HPP_
 
 #include <cstdint>
 #include <cstddef>
 #include <memory>
 #include <unordered_map>
 
-#include "../../linalg_forward_decl.hpp"
-
+#include "../memoryTransfer.hpp"
+#include "../execProps.hpp"
 namespace linalg
 {
     namespace memory
     {
-        template <typename src_backend, typename dst_backend>
-        class MemoryTransfer;
+        template <>
+        class MemoryTransfer<blas_backend, blas_backend>
+        {
+        public:
+            template <typename T>
+            static void copy(const T* src, T* dst, std::size_t n)
+            {
+                std::memcpy(src, dst, n*sizeof(T));
+            }
+        };
 
     }
 }
 
-#endif //PYTTN_LINALG_DOMAIN_MANAGER_EXECDOMAIN_HPP_
+#endif //PYTTN_LINALG_DOMAIN_MANAGER_BLAS_MEMORY_TRANSFER_HPP_

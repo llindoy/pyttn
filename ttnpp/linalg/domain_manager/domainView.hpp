@@ -19,6 +19,7 @@
 #include <cstddef>
 #include <memory>
 #include <unordered_map>
+#include <common/exception_handling.hpp>
 
 #include "../../linalg_forward_decl.hpp"
 
@@ -35,18 +36,34 @@ namespace linalg
             mutable std::unordered__map<const ExecDomain<backend>*, std::unique_ptr<T> > m_replicas;
 
         public:
-            DomainView(const T& src, const ExecDomain<backend>& src_domain) : src(m_src), m_src_domain(&src_domain){}
+            DomainView(const T& src, const ExecDomain<backend>& src_domain) : m_src(src), m_src_domain(&src_domain){}
 
-            const T& get(Allocator<backend>* allocator = nullptr) const
+            const T& get() const
             {
-                auto& ctx = ExecContextScope<blas_backend>::current();
-                return get(ctx.domain(), allocator);
+                try
+                {
+                    auto& ctx = ExecContextScope<backend>::current();
+                    return get(ctx.domain());
+                }
+                catch(const std::exception& e)
+                {
+                    logging::error(e.what());
+                    RAISE_EXCEPTION("Failed to get replica on current execution domain.");
+                }
+                
+
             }
 
-            const T& get(const ExecDomain<backend>& domain, Allocator<backend>* allocator = nullptr) const
+            const T& get(const ExecDomain<backend>& domain) const
             {
-                auto& ctx = ExecContextScope<blas_backend>::current();
+                //if the src is already on this domain we just return it
+                if(&domain == m_src_domain)
+                {
+                    return m_src;
+                }
 
+                //make this set everything up.
+                //now check if it is on any of the replicas
                 auto it = m_replicas.find(&domain);
                 if(it != m_replicas.end())
                 {

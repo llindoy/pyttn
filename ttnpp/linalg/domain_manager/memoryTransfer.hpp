@@ -27,16 +27,7 @@ namespace linalg
     namespace memory
     {
         template <typename src_backend, typename dst_backend>
-        class MemoryTransfer
-        {
-            using size_type = typename traits<B1>::size_type;
-
-        public:
-            template <typename T>
-            static void copy(const T *const src, size_type n, T *dest);
-
-        };
-
+        class MemoryTransfer;
     }
 }
 

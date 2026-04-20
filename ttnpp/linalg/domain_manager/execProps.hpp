@@ -45,6 +45,11 @@ namespace linalg
                 s_current = m_prev;
             }
 
+            static bool is_active()
+            {
+                return s_current != nullptr;
+            }
+
             static ExecContext<backend>& current() 
             {
                 ASSERT(s_current != nullptr, "ExecContext accessed outside of scheduler execution.");
