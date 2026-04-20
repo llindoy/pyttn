@@ -26,7 +26,7 @@ from pyttn.ttns.ttns.ttnExt import ttn
 # and attempt to import the cuda backend
 try:
     from pyttn.ttnpp.cuda import (
-        mulitset_one_site_tdvp_complex as multiset_one_site_tdvp_complex_cuda,
+        multiset_one_site_tdvp_complex as multiset_one_site_tdvp_complex_cuda,
     )
     from pyttn.ttnpp.cuda import one_site_tdvp_complex as one_site_tdvp_complex_cuda
     #from pyttn.ttnpp.cuda import adaptive_one_site_tdvp_complex as adaptive_one_site_tdvp_complex_cuda

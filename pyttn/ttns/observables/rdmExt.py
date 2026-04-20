@@ -15,10 +15,10 @@ from typing import Optional, Union
 
 import numpy as np
 
-from pyttn.ttnpp import rdm_complex, ttn_complex
+from pyttn.ttnpp import rdm_complex, ttn_complex, ms_ttn_complex
 
 try:
-    from pyttn.ttnpp import rdm_real, ttn_real
+    from pyttn.ttnpp import rdm_real, ttn_real, ms_ttn_real
 
     _use_real_matel = True
 
@@ -65,6 +65,7 @@ class RDM(metaclass=ABCMeta):
         :param `**kwargs`: A dictionary containing optional input arguments.
         
             - **two_body** (bool, optional) - Whether or not the buffers for computing two-body RDMs should be allocated
+            - **backend** (str, optional) - The backend used to define the RDM object.  This is only used if no args are passed.
         :returns: The RDM object
         :rtype: RDM
         """
@@ -82,22 +83,26 @@ class RDM(metaclass=ABCMeta):
                 else:
                     raise RuntimeError("Invalid dtype for RDM")
             else:
-                if backend == 'blas':
-                    if dtype == np.complex128 or dtype is complex:
-                        return rdm_complex(**kwargs)
-                    elif dtype == np.float64 or dtype is float:
-                        return rdm_real(**kwargs)
+                if 'backend' in kwargs:
+                    backend = kwargs['backend']
+                    if backend == 'blas':
+                        if dtype == np.complex128 or dtype is complex:
+                            return rdm_complex(**kwargs)
+                        elif dtype == np.float64 or dtype is float:
+                            return rdm_real(**kwargs)
+                        else:
+                            raise RuntimeError("Invalid dtype for RDM")
+                    elif _cuda_import and backend == 'cuda':
+                        if dtype == np.complex128 or dtype is complex:
+                            return rdm_complex_cuda(**kwargs)
+                        elif dtype == np.float64 or dtype is float:
+                            return rdm_real_cuda(**kwargs)
+                        else:
+                            raise RuntimeError("Invalid dtype for RDM")    
                     else:
-                        raise RuntimeError("Invalid dtype for RDM")
-                elif _cuda_import and backend == 'cuda':
-                    if dtype == np.complex128 or dtype is complex:
-                        return rdm_complex_cuda(**kwargs)
-                    elif dtype == np.float64 or dtype is float:
-                        return rdm_real_cuda(**kwargs)
-                    else:
-                        raise RuntimeError("Invalid dtype for RDM")    
+                        raise RuntimeError("Invalid backend for RDM")
                 else:
-                    raise RuntimeError("Invalid backend for RDM")
+                    raise Exception("No backend defined when creating RDM object")
         else:
             if args:
                 if isinstance(args[0], ttn_complex) or isinstance(args[0], ms_ttn_complex):
@@ -107,19 +112,23 @@ class RDM(metaclass=ABCMeta):
                 else:
                     raise RuntimeError("Invalid dtype for RDM")
             else:
-                if backend == 'blas':
-                    if dtype == np.complex128 or dtype is complex:
-                        return rdm_complex(**kwargs)
+                if 'backend' in kwargs:
+                    backend = kwargs['backend']
+                    if backend == 'blas':
+                        if dtype == np.complex128 or dtype is complex:
+                            return rdm_complex(**kwargs)
+                        else:
+                            raise RuntimeError("Invalid dtype for RDM")
+                    elif _cuda_import and backend == 'cuda':
+                        if dtype == np.complex128 or dtype is complex:
+                            return rdm_complex_cuda(**kwargs)
+                        else:
+                            raise RuntimeError("Invalid dtype for RDM")
                     else:
-                        raise RuntimeError("Invalid dtype for RDM")
-                elif _cuda_import and backend == 'cuda':
-                    if dtype == np.complex128 or dtype is complex:
-                        return rdm_complex_cuda(**kwargs)
-                    else:
-                        raise RuntimeError("Invalid dtype for RDM")
+                        raise RuntimeError("Invalid backend for RDM")
                 else:
-                    raise RuntimeError("Invalid backend for RDM")
-                
+                    raise Exception("No backend defined when creating RDM object")
+                    
     @abstractmethod
     def assign(self, o):
         """Assign the value of this rdm object from another rdm object

@@ -1,9 +1,6 @@
 
 try:
-    import pyttn.ttnpp.cuda.linalg as cula
     __cuda_import = True
-
-
     class CudaEnvironment:
         def __init__(self):
             """"""

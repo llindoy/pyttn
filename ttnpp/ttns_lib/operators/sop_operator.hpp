@@ -321,6 +321,17 @@ namespace ttns
             }
         }
 
+        void bond_dimensions(hrank_info &binfo) const
+        {
+            for (const auto &a : m_contraction_info)
+            {
+                if (!a.is_root())
+                {
+                    binfo[std::make_pair(a.id(), a.parent().id())] = a().nterms();
+                }
+            }
+        }
+
         container_type &mode_operators() { return m_mode_operators; }
         const container_type &mode_operators() const { return m_mode_operators; }
 
