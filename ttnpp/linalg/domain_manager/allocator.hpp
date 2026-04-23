@@ -60,7 +60,6 @@ namespace linalg
                 if(!ptr){return;}
                 const std::size_t alignment = alignment_for_type<T>::eval(domain());
                 deallocate_bytes(ptr, alignment);
-
             }
         };
     }
