@@ -21,14 +21,8 @@
 #include <complex>
 
 #include "../execProps.hpp"
-
 #include "../../backends/cuda/cuda_backend.hpp"
-/*
-#include "../../backends/cuda/cublas_wrapper.cuh"
-#include "../../backends/cuda/cusolver_wrapper.cuh"
-#include "../../backends/cuda/cusparse_wrapper.cuh"
-#include "../../backends/cuda/cutensor_wrapper.cuh"
-*/
+
 namespace linalg
 {
     namespace memory
@@ -41,10 +35,17 @@ namespace linalg
             int m_mpi_rank;     //purely meta data
             int m_gpu_id;
 
+            struct Impl;
+            Impl* m_impl;  // opaque, CUDA-backe
+
         public:
-            ExecDomain(int mpi_rank=0, int gpu_id=0) : m_mpi_rank(mpi_rank), m_gpu_id(gpu_id){}
-            ExecDomain(const ExecDomain& o) = default;
-            ExecDomain(ExecDomain&& o) = default;
+            ExecDomain(int mpi_rank=0, int gpu_id=0);
+            ExecDomain(const ExecDomain& o);
+            ExecDomain(ExecDomain&& o) noexcept;
+            ~ExecDomain();
+            ExecDomain& operator=(const ExecDomain& o);
+            ExecDomain& operator=(ExecDomain&& o) noexcept;
+            
 
             bool operator==(const ExecDomain& o)
             {
@@ -52,8 +53,40 @@ namespace linalg
                 return m_gpu_id == o.m_gpu_id;
             }
 
-            int mpi_rank() const{return m_mpi_rank;}
-            int gpu_id() const{return m_gpu_id;}
+            int mpi_rank() const noexcept{return m_mpi_rank;}
+            int gpu_id() const noexcept{return m_gpu_id;}
+
+            const std::string& device_name() const noexcept;
+
+
+            enum class ComputeMode {
+                Default,
+                Exclusive,
+                Prohibited
+            };
+
+            ComputeMode compute_mode() const noexcept;
+            bool concurrent_kernels() const noexcept;
+
+
+            double core_clock_ghz() const noexcept;
+            double memory_clock_ghz() const noexcept;
+
+            size_type total_global_memory() const; 
+            int memory_bus_width_bits() const noexcept;
+            double peak_memory_bandwidth_gbps() const noexcept;
+           
+            int warpsize() const;
+            int max_threads_per_block() const;
+
+            std::array<int,3> max_threads_dim() const noexcept;
+            std::array<int,3> max_grid_size() const noexcept;
+
+            //utilities for accessing properties about the types of devices
+            static int number_of_devices();
+            static std::ostream &list_devices(std::ostream &out);
+
+            friend std::ostream& operator<<(std::ostream& out, const ExecDomain& dom);
 
         };
     }

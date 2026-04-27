@@ -65,30 +65,33 @@ namespace linalg
 
             struct Impl;
             std::unique_ptr<Impl> m_impl;
-
-
-            cudaStream_t m_stream;
-            cudaEvent_t m_event;
-            bool m_active;
-            std::size_t m_id;
-
-            cusparseHandle_t cusparse_handle;
-            cublasHandle_t cublas_handle;
-            cusolverDnHandle_t cusolver_dn_handle;
-            cutensorHandle_t cutensor_handle;
         
             friend class SerialScheduler<cuda_backend>;
             friend class ParallelScheduler<cuda_backend>;
 
         public:
-            ExecContext(const ExecDomain<cuda_backend>& domain, std::size_t id = 0);s
+            ExecContext(const ExecDomain<cuda_backend>& domain, std::size_t id = 0);
             ExecContext(const ExecContext& o) = delete;
             ExecContext(ExecContext&& o) = default;
             ExecContext& operator=(const ExecContext& o) = delete;
             ExecContext& operator=(ExecContext&& o) = delete;
 
+            void prepare_for_reuse();
+            void mark_submitted();
+            void synchronise();
+
+            // Make this context wait on another context
+            void wait_for(const ExecContext& other);
+
+            void* stream() const;
+            void* event() const;
+
+            void* cublas_handle() const;
+            void* cusparse_handle() const;
+            void* cusolver_handle() const;
+            void* cutensor_handle() const;
+
             const ExecDomain<cuda_backend>& domain() const {return m_domain;}
-            cudaStream_t stream() const{return m_stream;}
             std::size_t id() const{return m_id;}
         };
     }
