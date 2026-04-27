@@ -27,20 +27,9 @@
 #add cuda source files and example build
 !cuda
 !cuda/*
-!cuda/linalg
-!cuda/linalg/*
+!cuda/domainManager
+!cuda/domainManager/*
 
-!cuda/ttns/
-!cuda/ttns/algorithms
-!cuda/ttns/algorithms/*
-!cuda/ttns/observables
-!cuda/ttns/observables/*
-!cuda/ttns/operators
-!cuda/ttns/operators/*
-!cuda/ttns/sop
-!cuda/ttns/sop/*
-!cuda/ttns/ttn
-!cuda/ttns/ttn/*
 
 !cuda_test
 !cuda_test/*
