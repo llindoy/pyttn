@@ -12,13 +12,11 @@
  * limitations under the License
  */
 
-#include "matrix_element.hpp"
+#include "matrix_element.tpp"
 #include "../../pyttn_typedef.hpp"
 
-template <>
-void initialise_matrix_element<pyttn_real_type, linalg::blas_backend>(py::module &m);
+void initialise_matrix_element(py::module &m)
+{
+    initialise_matrix_element_types<pyttn_real_type, linalg::blas_backend>(m);
+}
 
-#ifdef PYTTN_BUILD_CUDA
-template <>
-void initialise_matrix_element<pyttn_real_type, linalg::cuda_backend>(py::module &m);
-#endif

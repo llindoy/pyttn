@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     try
     {
         using real_type = double;
-        using complex_type = linalg::complex<real_type>;
+        using complex_type = std::complex<real_type>;
         using backend_type = linalg::blas_backend;
         using size_type = typename backend_type::size_type;
         backend_type::initialise();

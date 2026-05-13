@@ -235,7 +235,15 @@ class SOPOperator(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
+    def bond_dimensions(self) -> dict[tuple[int, int], int]:
+        """Return a dictionary containing the bond (the two sites forming the bond) and bond dimension of all bonds in the network
 
+        :return: All bond dimensions in the network
+        :rtype: dict[tuple[int, int], int]
+        """
+        pass
+    
 SOPOperator.register(sop_operator_complex)
 if _real_ttn_import:
     SOPOperator.register(sop_operator_real)

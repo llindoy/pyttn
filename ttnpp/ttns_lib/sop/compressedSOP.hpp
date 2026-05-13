@@ -15,9 +15,7 @@
 #ifndef PYTTN_TTNS_LIB_SOP_COMPRESSED_SOP_HPP_
 #define PYTTN_TTNS_LIB_SOP_COMPRESSED_SOP_HPP_
 
-#include <linalg/linalg.hpp>
 #include <utils/term_indexing_array.hpp>
-#include <linalg/linalg.hpp>
 
 #include <memory>
 #include <list>

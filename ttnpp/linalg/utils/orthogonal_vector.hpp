@@ -16,7 +16,6 @@
 #define PYTTN_LINALG_UTILS_ORTHOGONAL_VECTOR_HPP_
 
 #include "linalg_utils.hpp"
-#include "genrandom.hpp"
 #include "../dense.hpp"
 
 namespace linalg
@@ -27,7 +26,7 @@ namespace linalg
     {
     public:
         using real_type = typename get_real_type<T>::type;
-        using size_type = typename backend::size_type;
+        using size_type = typename traits<backend>::size_type;
 
     public:
         template <typename mattype>
@@ -44,7 +43,7 @@ namespace linalg
                     rng.fill_normal(ct[i]);
 
                     // now we normalise it
-                    ct[i] /= std::sqrt(real(dot_product(conj(ct[i]), ct[i])));
+                    ct[i] /= std::sqrt(std::real(dot_product(conj(ct[i]), ct[i])));
 
                     // now we attempt to modified gram-schmidt this
                     // if we run into linear dependence then we need to try another random vector
@@ -54,7 +53,7 @@ namespace linalg
                     }
 
                     // now we compute the norm of the new vector
-                    real_type norm = std::sqrt(real(dot_product(conj(ct[i]), ct[i])));
+                    real_type norm = std::sqrt(std::real(dot_product(conj(ct[i]), ct[i])));
                     if (norm > tol)
                     {
                         ct[i] /= norm;
@@ -78,7 +77,7 @@ namespace linalg
                 rng.fill_normal(x);
 
                 // now we normalise it
-                x /= std::sqrt(real(dot_product(conj(x), x)));
+                x /= std::sqrt(std::real(dot_product(conj(x), x)));
 
                 // now we attempt to modified gram-schmidt this
                 // if we run into linear dependence then we need to try another random vector
@@ -88,7 +87,7 @@ namespace linalg
                 }
 
                 // now we compute the norm of the new vector
-                real_type norm = std::sqrt(real(dot_product(conj(x), x)));
+                real_type norm = std::sqrt(std::real(dot_product(conj(x), x)));
                 if (norm > tol)
                 {
                     x /= norm;

@@ -40,7 +40,7 @@ namespace ttns
         using observable_node = typename tree<ob_type>::node_type;
 
         using boolnode = typename tree<bool>::node_type;
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
     public:
         // kronecker product operators for matrix types

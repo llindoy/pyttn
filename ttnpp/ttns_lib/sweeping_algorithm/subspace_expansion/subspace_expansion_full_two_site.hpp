@@ -36,8 +36,8 @@ namespace ttns
         using env_node_type = typename env_container_type::node_type;
         using env_type = typename environment_type::environment_type;
 
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
         using dmat_type = linalg::diagonal_matrix<real_type, backend>;
 
@@ -73,12 +73,13 @@ namespace ttns
 
         orthogonality::truncation_mode m_trunc_mode = orthogonality::truncation_mode::second_order_truncation;
 
-        linalg::singular_value_decomposition<mat_type, true> m_svd;
+        linalg::singular_value_decomposition<mat_type, false> m_svd;
         mat_type m_twosite_energy;
         mat_type m_twosite_temp;
 
         mat_type m_U;
         linalg::diagonal_matrix<real_type, backend> m_S;
+
         mat_type m_V;
         bool m_only_apply_when_no_unoccupied = false;
         bool m_eval_but_dont_apply = false;
@@ -320,16 +321,16 @@ namespace ttns
 
                     CALL_AND_HANDLE(twosite::construct_two_site_energy(m_coeffs, m_2s_1, m_2s_2, m_twosite_temp, m_twosite_energy), "Failed to construct two site energy object.");
                     CALL_AND_HANDLE(m_svd(m_twosite_energy, m_S, m_twosite_temp, m_V), "Failed to compute svd.");
-
+                    m_S.from_host();
                     for (size_type i = 0; i < m_S.size(); ++i)
                     {
                         real_type sv = 0;
                         // check if any of the dominant svds of the Hamiltonian acting on the twosite coefficient tensor are occupied through the half step
                         if (m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
                         {
-                            if (linalg::real(m_S(i, i)) > 0)
+                            if (std::real(m_S(i, i)) > 0)
                             {
-                                sv = std::sqrt(linalg::real(m_S(i, i))) * svd_scale;
+                                sv = std::sqrt(std::real(m_S(i, i))) * svd_scale;
                             }
                             if (!std::isnan(sv))
                             {
@@ -341,9 +342,9 @@ namespace ttns
                         }
                         else
                         {
-                            if (linalg::real(m_S(i, i)) > 0)
+                            if (std::real(m_S(i, i)) > 0)
                             {
-                                sv = linalg::real(m_S(i, i)) * svd_scale * svd_scale;
+                                sv = std::real(m_S(i, i)) * svd_scale * svd_scale;
                             }
                             if (!std::isnan(sv))
                             {
@@ -520,7 +521,7 @@ namespace ttns
                     CALL_AND_HANDLE(twosite::construct_two_site_energy(m_coeffs, m_2s_1, m_2s_2, m_twosite_temp, m_twosite_energy), "Failed to construct two site energy object.");
                     CALL_AND_HANDLE(m_svd(m_twosite_energy, m_S, m_twosite_temp, m_V), "Failed to compute svd.");
                     m_U = linalg::trans(m_twosite_temp);
-
+                    m_S.from_host();
                     for (size_type i = 0; i < m_S.size(); ++i)
                     {
                         real_type sv = 0;
@@ -528,9 +529,9 @@ namespace ttns
 
                         if (m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
                         {
-                            if (linalg::real(m_S(i, i)) > 0)
+                            if (std::real(m_S(i, i)) > 0)
                             {
-                                sv = std::sqrt(linalg::real(m_S(i, i))) * svd_scale;
+                                sv = std::sqrt(std::real(m_S(i, i))) * svd_scale;
                             }
                             if (!std::isnan(sv))
                             {
@@ -542,9 +543,9 @@ namespace ttns
                         }
                         else
                         {
-                            if (linalg::real(m_S(i, i)) > 0)
+                            if (std::real(m_S(i, i)) > 0)
                             {
-                                sv = linalg::real(m_S(i, i)) * svd_scale * svd_scale;
+                                sv = std::real(m_S(i, i)) * svd_scale * svd_scale;
                             }
                             if (!std::isnan(sv))
                             {
@@ -668,12 +669,13 @@ namespace ttns
 
         size_type get_nunoccupied(const dmat_type &pops, real_type &scale_factor)
         {
+            pops.from_host();
             scale_factor = 0.0;
             size_type nunocc = 0;
 
             for (size_type i = 0; i < pops.size(); ++i)
             {
-                scale_factor += pops(i, i) * pops(i, i);
+                scale_factor += pops.at(i) * pops.at(i);
             }
             scale_factor = std::sqrt(scale_factor);
 
@@ -681,14 +683,14 @@ namespace ttns
             {
                 if (m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
                 {
-                    if (pops(i, i) / scale_factor < m_unoccupied_threshold)
+                    if (pops.at(i) / scale_factor < m_unoccupied_threshold)
                     {
                         ++nunocc;
                     }
                 }
                 else
                 {
-                    if (pops(i, i) * pops(i, i) / scale_factor < m_unoccupied_threshold)
+                    if (pops.at(i) * pops.at(i) / scale_factor < m_unoccupied_threshold)
                     {
                         ++nunocc;
                     }

@@ -12,8 +12,8 @@
  * limitations under the License
  */
 
-#ifndef PYTTN_LINALG_TENSOR_SPARSE_DIAGONAL_MATRIX_HPP_
-#define PYTTN_LINALG_TENSOR_SPARSE_DIAGONAL_MATRIX_HPP_
+#ifndef PYTTN_LINALG_TENSOR_SPARSE_DIAGONAL_MATRIX_BASE_HPP_
+#define PYTTN_LINALG_TENSOR_SPARSE_DIAGONAL_MATRIX_BASE_HPP_
 
 #include "special_matrix_base.hpp"
 
@@ -66,138 +66,42 @@ namespace linalg
 
     }; // class diagonal_matrix_base
 
-    template <typename T>
-    class diagonal_matrix<T, blas_backend> : public diagonal_matrix_base<diagonal_matrix<T, blas_backend>>
+    
+    template <typename T, typename backend>
+    class diagonal_matrix : public diagonal_matrix_base<diagonal_matrix<T, backend>>
     {
     public:
-        using self_type = diagonal_matrix<T, blas_backend>;
-        using base_type = diagonal_matrix_base<self_type>;
-        using size_type = typename blas_backend::size_type;
+        using size_type = typename traits<backend>::size_type;
 
-        template <typename U>
-        friend std::ostream &operator<<(std::ostream &out, const diagonal_matrix<U, blas_backend> &mat);
-        template <typename U>
-        friend std::istream &operator>>(std::istream &out, diagonal_matrix<U, blas_backend> &mat);
-
-    public:
-        template <typename... Args>
-        diagonal_matrix(Args &&...args)
-        try : base_type(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct diagonal_matrix object.");
-        }
-        template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(base_type::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
-
-        T &operator[](size_type i) { return base_type::m_vals[i]; }
-        const T &operator[](size_type i) const { return base_type::m_vals[i]; }
-        T &at(size_type i)
-        {
-            ASSERT(internal::compare_bounds(i, base_type::m_nnz), "Failed to access element of diagonal matrix.  Index out of bounds.");
-            return base_type::m_vals[i];
-        }
-        const T &at(size_type i) const
-        {
-            ASSERT(internal::compare_bounds(i, base_type::m_nnz), "Failed to access element of diagonal matrix.  Index out of bounds.");
-            return base_type::m_vals[i];
-        }
-
-        T &operator()(size_type i, size_type /* j */) { return base_type::m_vals[i]; }
-        const T &operator()(size_type i, size_type /* j */) const { return base_type::m_vals[i]; }
-
-        T &at(size_type i, size_type j)
-        {
-            ASSERT(internal::compare_bounds(i, base_type::m_shape[0]) && internal::compare_bounds(j, base_type::m_shape[1]), "Failed to access element of diagonal matrix.  Index out of bounds.");
-            ASSERT(i == j, "Failed to access element of diagonal matrix.  Requested element is not on the diagonal.");
-            return base_type::m_vals[i];
-        }
-
-        const T &at(size_type i, size_type j) const
-        {
-            ASSERT(internal::compare_bounds(i, base_type::m_shape[0]) && internal::compare_bounds(j, base_type::m_shape[1]), "Failed to access element of diagonal matrix.  Index out of bounds.");
-            ASSERT(i == j, "Failed to access element of diagonal matrix.  Requested element is not on the diagonal.");
-            return base_type::m_vals[i];
-        }
-
-        matrix<T, blas_backend> todense() const
-        {
-            matrix<T, blas_backend> mat(base_type::m_shape[0], base_type::m_shape[1]);
-            for (size_t i = 0; i < base_type::m_nnz; ++i)
-            {
-                mat(i, i) = base_type::m_vals[i];
-            }
-            return mat;
-        }
-    }; // diagonal_matrix<T, blas_backend>
-
-#ifdef PYTTN_BUILD_CUDA
-    template <typename T>
-    class diagonal_matrix<T, cuda_backend> : public diagonal_matrix_base<diagonal_matrix<T, cuda_backend>>
-    {
-    public:
-        using self_type = diagonal_matrix<T, cuda_backend>;
+        using self_type = diagonal_matrix<T, backend>;
         using base_type = diagonal_matrix_base<self_type>;
         using pointer = typename base_type::pointer;
         using const_pointer = typename base_type::const_pointer;
-
+        using const_reference = const T&;
+        using reference = T&;
     public:
         template <typename... Args>
-        diagonal_matrix(Args &&...args)
-        try : base_type(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct diagonal_matrix object.");
-        }
+        diagonal_matrix(Args &&...args);
 
         template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(base_type::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
+        self_type &operator=(Args &&...args);
 
-        __host__ __device__ pointer buffer() { return base_type::m_vals; }
-        __host__ __device__ const_pointer buffer() const { return base_type::m_vals; }
-        __host__ __device__ pointer data() { return base_type::m_vals; }
-        __host__ __device__ const_pointer data() const { return base_type::m_vals; }
+        void from_host() const;
 
-        matrix<T> todense() const
-        {
-            diagonal_matrix<T> mat(*this);
-            return mat.todense();
-        }
-    }; // diagonal_matrix<T, cuda_backend>
-#endif
+        reference operator[](size_type i);
+        const_reference operator[](size_type i) const ;
+        reference at(size_type i);
+        const_reference at(size_type i) const;
+        reference operator()(size_type i, size_type /* j */) ;
+        const_reference operator()(size_type i, size_type /* j */) const;
+        reference at(size_type i, size_type j);
+        const_reference at(size_type i, size_type j) const;
+        inline tensor<T, 2, blas_backend> todense() const;
+    }; // diagonal_matrix
 
-    template <typename T>
-    std::ostream &operator<<(std::ostream &out, const diagonal_matrix<T, blas_backend> &mat)
-    {
-        using size_type = typename diagonal_matrix<T, blas_backend>::size_type;
-        out << "diagonal: " << mat.m_shape[0] << " " << mat.m_shape[1] << std::endl;
-        for (size_type i = 0; i < mat.nnz(); ++i)
-        {
-            out << i << " " << i << " " << mat.m_vals[i] << std::endl;
-        }
-        return out;
-    }
-
-#ifdef PYTTN_BUILD_CUDA
-    template <typename T>
-    std::ostream &operator<<(std::ostream &out, const diagonal_matrix<T, cuda_backend> &_mat)
-    {
-        diagonal_matrix<T, blas_backend> mat(_mat);
-        out << mat;
-        return out;
-    }
-#endif
+    template <typename T, typename backend>
+    std::ostream &operator<<(std::ostream &out, const diagonal_matrix<T, backend> &mat);
 
 } // namespace linalg
 
-#endif // PYTTN_LINALG_TENSOR_SPARSE_DIAGONAL_MATRIX_HPP_//
+#endif // PYTTN_LINALG_TENSOR_SPARSE_DIAGONAL_MATRIX_BASE_HPP_//

@@ -23,7 +23,6 @@
 #include <common/zip.hpp>
 #include "coeff_type.hpp"
 #include "system_information.hpp"
-#include "operator_dictionaries/default_operator_dictionaries.hpp"
 
 #ifdef CEREAL_LIBRARY_FOUND
 #include <cereal/types/vector.hpp>

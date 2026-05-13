@@ -17,13 +17,7 @@
 
 // include all the files required to implement the various expression template based operations supported by the code.
 #include "../linalg_forward_decl.hpp"
-#include "expressions/elemental/expression.hpp"
-#include "expressions/elemental/applicative/addition.hpp"
-#include "expressions/elemental/applicative/scalar_multiplication.hpp"
-#include "expressions/elemental/applicative/complex_conjugation.hpp"
-#include "expressions/elemental/applicative/exponential.hpp"
-#include "expressions/elemental/applicative/hadamard.hpp"
-#include "expressions/elemental/applicative/complex.hpp"
+#include "expressions/elemental/blas/expression.hpp"
 
 #include "expressions/permutations/transpose_expression.hpp"
 #include "expressions/permutations/tensor_transpose.hpp"

@@ -43,7 +43,7 @@ namespace ttns
     class sttn_node_data
     {
     public:
-        using real_type = typename tmp::get_real_type<T>::type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using elem_type = operator_contraction_info<T>;
 
         template <typename Y, typename V>
@@ -169,8 +169,8 @@ namespace ttns
     class sop_operator
     {
     public:
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
         using op_type = ops::primitive<T, backend>;
         using element_type = site_operator<T, backend>;
@@ -191,6 +191,7 @@ namespace ttns
         using const_reverse_iterator = typename container_type::const_reverse_iterator;
 
         using site_ops_type = typename autoSOP<T>::site_ops_type;
+        using hrank_info = std::map<std::pair<size_t, size_t>, size_t>;
 
     protected:
         tree_type m_contraction_info;
@@ -318,6 +319,17 @@ namespace ttns
             for (size_t term = 0; term < m_mode_operators[nu].size(); ++term)
             {
                 m_mode_operators[nu][term].update(t, dt);
+            }
+        }
+
+        void bond_dimensions(hrank_info &binfo) const
+        {
+            for (const auto &a : m_contraction_info)
+            {
+                if (!a.is_root())
+                {
+                    binfo[std::make_pair(a.id(), a.parent().id())] = a().nterms();
+                }
             }
         }
 

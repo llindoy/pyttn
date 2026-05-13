@@ -45,14 +45,14 @@ namespace linalg
     };
 
     template <>
-    class numpy_converter<complex<float>>
+    class numpy_converter<std::complex<float>>
     {
     public:
         using type = std::complex<float>;
     };
 
     template <>
-    class numpy_converter<complex<double>>
+    class numpy_converter<std::complex<double>>
     {
     public:
         using type = std::complex<double>;

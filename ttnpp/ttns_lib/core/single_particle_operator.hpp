@@ -51,7 +51,7 @@ namespace ttns
         using buffer_type = matrix_element_buffer<T, backend>;
         using cinftype = sttn_node_data<T>;
 
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
     public:
         template <typename spfnode, typename Atype>

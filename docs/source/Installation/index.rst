@@ -24,6 +24,18 @@ The cmake build system can make use of the
   
 located in directory ${pyTTN_ROOT_DIR}/external. If these libraries are not found in this location it will attempt to pull them from their respective Github repositories. For `BLAS <https://netlib.org/blas/>`__ and `Lapack <https://netlib.org/lapack/>`__ linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
 
+
+CUDA Backend Dependencies
+-------------------------
+When building the CUDA backend (see Compiling the CUDA backend) the core C++ library depends on the following components of the CUDA toolkit:
+- `cuBLAS <https://developer.nvidia.com/cublas>`__
+- `cuSOLVER <https://developer.nvidia.com/cusolver>`__
+- `cuRAND <https://docs.nvidia.com/cuda/curand/index.html>`__
+
+as well as
+- `cuTENSOR <https://developer.nvidia.com/cutensor>`__
+
+
 Python Dependencies Dependencies
 --------------------------------
 
@@ -65,18 +77,16 @@ By default, this will make use of a single threaded build for compiling the Pybi
 
 to allow for the use of 8 threads when compiling.
 
+Compiling the CUDA backend
+==========================
+
+pyTTN also supports GPU acceleration of all tensor operations for one-site algorithms (adaptive approachs are in progress). In order to enable compilation with cuda it is necessary to set the environment variable ``PYTTN_BUILD_CUDA``, e.g.
+.. code:: console
+
+   export PYTTN_BUILD_CUDA=True
 
 
-.. raw:: html
-
-   <!-- 
-    Selecting BLAS
-    ~~~~~~~~~~~~~~
-
-   ### Building with CUDA Support
-   [!Note]
-   Work in progress
-   -->
+Once compiled with CUDA ``ttn`` objects can then be constructed to work with the GPU backend by specifying ``backend="cuda"``. At present pyTTN has been tested using CUDA 12.6 and 12.9. The library depends on cuTENSOR in order to implement certain tensor contractions and reshapings. If cuTENSOR is installed in a non-standard location it is additionally necessary to set the ``CUTENSOR_ROOT_DIR`` environment variable before attempting to install with pip.
 
 The TTNPP Library
 =================

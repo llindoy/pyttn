@@ -77,7 +77,7 @@ public:
 protected:
   template <typename Hop> void build_system_op(Hop &H, real_type tol) {
     // add on the spin terms
-    if (linalg::abs(m_eps) > tol) {
+    if (std::abs(m_eps) > tol) {
       H += m_eps * sOP("sz", this->m_spin_index);
     }
     if (std::abs(m_delta) > tol) {

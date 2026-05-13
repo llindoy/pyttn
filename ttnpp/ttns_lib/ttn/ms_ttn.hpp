@@ -41,7 +41,7 @@ namespace ttns
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         using node_reference = typename base_type::node_reference;
         using const_node_reference = typename base_type::const_node_reference;
@@ -57,7 +57,7 @@ namespace ttns
 
         using slice_type = multiset_ttn_slice<T, backend, false>;
         using const_slice_type = multiset_ttn_slice<T, backend, true>;
-        static constexpr std::string_view class_info = "msttn:";
+        static constexpr std::string_view class_info{"msttn:"};
 
         template <typename U, typename be>
         friend class ttn;
@@ -472,7 +472,7 @@ namespace ttns
             size_t iskip = 0;
             for (size_t i = 0; i < buf.size(); ++i)
             {
-                backend::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
+                linalg::backend_algebra<backend>::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
                 iskip += buf[i].size();
             }
         }
@@ -489,7 +489,7 @@ namespace ttns
             size_t iskip = 0;
             for (size_t i = 0; i < buf.size(); ++i)
             {
-                backend::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
+                linalg::backend_algebra<backend>::copy(buf[i].buffer(), buf[i].size(), res.buffer() + iskip);
                 iskip += buf[i].size();
             }
         }
@@ -507,7 +507,7 @@ namespace ttns
             size_t iskip = 0;
             for (size_t i = 0; i < buf.size(); ++i)
             {
-                backend::copy(res.buffer() + iskip, buf[i].size(), buf[i].buffer());
+                linalg::backend_algebra<backend>::copy(res.buffer() + iskip, buf[i].size(), buf[i].buffer());
                 iskip += buf[i].size();
             }
         }

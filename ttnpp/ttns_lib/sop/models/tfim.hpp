@@ -79,7 +79,7 @@ namespace ttns
         template <typename Hop>
         void build_sop_repr(Hop &H, real_type tol)
         {
-            if (linalg::abs(m_t) > tol)
+            if (std::abs(m_t) > tol)
             {
                 // add on the onsite terms
                 for (size_t i = 0; i < m_N; ++i)
@@ -88,7 +88,7 @@ namespace ttns
                 }
             }
 
-            if (linalg::abs(m_J) > tol)
+            if (std::abs(m_J) > tol)
             {
                 // add on the onsite terms
                 for (size_t i = 1; i < m_N; ++i)

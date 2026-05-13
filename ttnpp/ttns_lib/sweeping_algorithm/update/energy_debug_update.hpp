@@ -27,8 +27,8 @@ namespace ttns
     class energy_debug_engine<T, backend, ttn, sop_environment>
     {
     public:
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using environment_type = sop_environment<T, backend, ttn>;
 
         using env_container_type = typename environment_type::container_type;
@@ -44,7 +44,7 @@ namespace ttns
         using buffer_type = typename environment_type::buffer_type;
 
         using parameter_list = simple_update_parameter_list;
-        static constexpr std::string_view class_info = "energy debug:";
+        static constexpr std::string_view class_info{"energy debug:"};
 
     protected:
         linalg::matrix<T, backend> m_res;
@@ -118,8 +118,8 @@ public:
     class energy_debug_engine<T, backend, ms_ttn, sop_environment>
     {
     public:
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using environment_type = sop_environment<T, backend, ms_ttn>;
 
         using env_container_type = typename environment_type::container_type;
@@ -135,7 +135,7 @@ public:
         using buffer_type = typename environment_type::buffer_type;
 
         using parameter_list = simple_update_parameter_list;
-        static constexpr std::string_view class_info = "energy debug:";
+        static constexpr std::string_view class_info{"energy debug:"};
 
     public:
         multiset_update_buffer<T, backend> mbuf;

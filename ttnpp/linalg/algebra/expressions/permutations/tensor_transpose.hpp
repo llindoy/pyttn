@@ -36,7 +36,7 @@ namespace linalg
             using tensor_type = _tensor_type;
             using value_type = typename std::remove_cv<typename traits<tensor_type>::value_type>::type;
             using backend_type = typename traits<tensor_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using shape_type = std::array<size_type, traits<tensor_type>::rank>;
 
         protected:
@@ -70,7 +70,7 @@ namespace linalg
             typename std::enable_if<is_dense<array_type>::value, void>::type applicative(array_type &res) const
             {
                 ASSERT(res.buffer() != m_arr.buffer(), "Inplace generic tensor reordering is not supported.");
-                CALL_AND_HANDLE(backend_type::tensor_transpose(m_arr.buffer(), m_arr.shape(), m_arr.stride(), res.buffer(), res.shape(), res.stride(), m_order), "Failed to compute tensor transpose.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::tensor_transpose(m_arr.buffer(), m_arr.shape(), m_arr.stride(), res.buffer(), res.shape(), res.stride(), m_order), "Failed to compute tensor transpose.");
             }
         };
 
@@ -80,8 +80,10 @@ namespace linalg
     {
         using value_type = typename traits<tensor_type>::value_type;
         using backend_type = typename traits<tensor_type>::backend_type;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
         static constexpr size_t rank = traits<tensor_type>::rank;
-        using shape_type = std::array<typename backend_type::size_type, rank>;
+        using shape_type = std::array<typename traits<backend_type>::size_type, rank>;
         using const_shape_reference = const shape_type &;
     };
 

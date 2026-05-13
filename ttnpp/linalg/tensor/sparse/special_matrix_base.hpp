@@ -16,8 +16,8 @@
 #define PYTTN_LINALG_TENSOR_SPARSE_SPECIAL_MATRIX_BASE_HPP_
 
 #include <vector>
-#include "../../linalg_forward_decl.hpp"
 #include "../../utils/serialisation.hpp"
+#include "../../linalg_forward_decl.hpp"
 
 namespace linalg
 {
@@ -45,7 +45,7 @@ namespace linalg
         using traits_type = traits<impl>;
         using backend_type = typename traits_type::backend_type;
         using value_type = typename traits_type::value_type;
-        using size_type = typename backend_type::size_type;
+        using size_type = typename traits<backend_type>::size_type;
 
         static constexpr size_type rank = traits_type::rank;
 
@@ -57,14 +57,17 @@ namespace linalg
         using shape_type = std::array<size_type, rank>;
         using self_type = special_matrix_base<impl>;
 
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+        using device_pointer = typename std::add_pointer<device_value_type>::type;
+        using const_device_pointer = typename std::add_pointer<typename std::add_const<device_value_type>::type>::type;
         // the classes used for memory allocation and transfer
-        using allocator = memory::allocator<value_type, backend_type>;
-        using memfill = memory::filler<value_type, backend_type>;
+        using allocator = memory::allocator<device_value_type, backend_type>;
+        using memfill = memory::filler<device_value_type, backend_type>;
         template <typename srcbck>
         using memtransfer = memory::transfer<srcbck, backend_type>;
 
     protected:
-        pointer m_vals;       ///< The 1-dimensional array used to store the values present in the matrix
+        device_pointer m_vals;       ///< The 1-dimensional array used to store the values present in the matrix
         size_type m_nnz;      ///< The total number of non-zero elements in the special matrix
         size_type m_capacity; ///< The maximum number of elements that can be in the special matrix
         shape_type m_shape;   ///< A static array of size 2 that stores the shape of the special_matrix
@@ -296,8 +299,8 @@ namespace linalg
         inline bool same_shape(const shape_type &_shape) const { return _shape == m_shape; }
 #ifdef CEREAL_LIBRARY_FOUND
     public:
-        using buffer_reader_type = internal::buffer_reader_wrapper<value_type, backend_type>;
-        using buffer_writer_type = internal::buffer_writer_wrapper<value_type, backend_type>;
+        using buffer_reader_type = internal::buffer_reader_wrapper<device_value_type, backend_type>;
+        using buffer_writer_type = internal::buffer_writer_wrapper<device_value_type, backend_type>;
 
         template <typename archive>
         void save(archive &ar) const
@@ -324,26 +327,26 @@ namespace linalg
         template <typename Vt>
         inline value_update_type<Vt, impl> operator*=(const Vt &v)
         {
-            CALL_AND_HANDLE(backend_type::scal(m_nnz, value_type(v), m_vals, 1), "Failed to perform operator*= on csr matrix object.  scal call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::scal(m_nnz, value_type(v), m_vals, 1), "Failed to perform operator*= on csr matrix object.  scal call failed.");
             return *this;
         }
         template <typename Vt>
         inline value_update_type<Vt, impl> operator/=(const Vt &v)
         {
-            CALL_AND_HANDLE(backend_type::scal(m_nnz, value_type(1.0 / v), m_vals, 1), "Failed to perform operator/= on csr matrix object.  scal call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::scal(m_nnz, value_type(1.0 / v), m_vals, 1), "Failed to perform operator/= on csr matrix object.  scal call failed.");
             return *this;
         }
 
     public:
-        inline pointer buffer() { return m_vals; }
-        inline const_pointer buffer() const { return m_vals; }
-        inline pointer data() { return m_vals; }
-        inline const_pointer data() const { return m_vals; }
+        inline device_pointer buffer() { return m_vals; }
+        inline const_device_pointer buffer() const { return m_vals; }
+        inline device_pointer data() { return m_vals; }
+        inline const_device_pointer data() const { return m_vals; }
 
         void set_buffer(const value_type *vals, size_type size)
         {
             ASSERT(size == m_nnz, "Failed to set special matrix vals from vector.  The two buffers are not the same size.");
-            CALL_AND_HANDLE(memtransfer<blas_backend>::copy(vals, m_nnz, m_vals), "Failed to set special matrix vals from vector.  Failed when copying the current vals buffer into the new vals buffer.");
+            CALL_AND_HANDLE(memtransfer<blas_backend>::copy(reinterpret_cast<const device_value_type*>(vals), m_nnz, m_vals), "Failed to set special matrix vals from vector.  Failed when copying the current vals buffer into the new vals buffer.");
         }
 
     public:
@@ -355,7 +358,7 @@ namespace linalg
             ASSERT(vals.size() == _size, "Failed to initialise the special matrix object.  The input value array is not compatible with the input number of rows or columns (its size must be equal to the smaller of the two).");
 
             CALL_AND_HANDLE(resize(_nrows, _ncols), "Failed to initialise the special matrix object.  Error when resizing.");
-            CALL_AND_HANDLE(memtransfer<blas_backend>::copy(&vals[0], vals.size(), m_vals), "Failed to initialise the special matrix object.  Failed when copying the input vals buffer into the new vals buffer.");
+            CALL_AND_HANDLE(memtransfer<blas_backend>::copy(reinterpret_cast<const device_value_type*>(&vals[0]), vals.size(), m_vals), "Failed to initialise the special matrix object.  Failed when copying the input vals buffer into the new vals buffer.");
         }
 
         template <typename srcbck>
@@ -367,7 +370,7 @@ namespace linalg
             ASSERT(vals.size() == _size, "Failed to initialise the special matrix object.  The input value array is not compatible with the input number of rows or columns (its size must be equal to the smaller of the two).");
 
             CALL_AND_HANDLE(resize(_nrows, _ncols), "Failed to initialise the special matrix object.  Error when resizing.");
-            CALL_AND_HANDLE(memtransfer<srcbck>::copy(vals.buffer(), vals.size(), m_vals), "Failed to initialise the special matrix object.  Failed when copying the input vals buffer into the new vals buffer.");
+            CALL_AND_HANDLE(memtransfer<srcbck>::copy(reinterpret_cast<const device_value_type*>(vals.buffer()), vals.size(), m_vals), "Failed to initialise the special matrix object.  Failed when copying the input vals buffer into the new vals buffer.");
         }
 
     private:
@@ -378,7 +381,7 @@ namespace linalg
             CALL_AND_HANDLE(resize(src.shape()), "Failed to copy assign special_matrix_base object.  Failed to resize buffers so that they could fit the src matrix.");
             static_assert(traits<impl>::is_mutable, "Failed to initialise copy assignment operator for special matrix object.  The specified special matrix is not mutable.");
             using srcbck = typename traits<Container>::backend_type;
-            CALL_AND_HANDLE(memtransfer<srcbck>::copy(src.buffer(), src.nnz(), m_vals), "Failed to shrink the special_matrix object.  Failed when copying the src value buffer into m_vals.");
+            CALL_AND_HANDLE(memtransfer<srcbck>::copy(reinterpret_cast<const device_value_type*>(src.buffer()), src.nnz(), m_vals), "Failed to shrink the special_matrix object.  Failed when copying the src value buffer into m_vals.");
             return *this;
         }
         template <typename Container>
@@ -388,7 +391,7 @@ namespace linalg
             static_assert(traits<impl>::is_mutable, "Failed to initialise copy assignment operator for special matrix object.  The specified special matrix is not mutable.");
             // first resize this buffer so that it can store the results of src
             CALL_AND_HANDLE(resize(src.shape()), "Failed to copy assign special_matrix_base object.  Failed to resize buffers so that they could fit the src matrix.");
-            CALL_AND_HANDLE(backend_type::copy_real_to_complex(src.buffer(), src.nnz(), m_vals), "Failed to shrink the special_matrix object.  Failed when copying the src value buffer into m_vals.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::copy_real_to_complex(src.buffer(), src.nnz(), m_vals), "Failed to shrink the special_matrix object.  Failed when copying the src value buffer into m_vals.");
             return *this;
         }
 

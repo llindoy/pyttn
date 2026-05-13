@@ -18,6 +18,7 @@
 #include <linalg/linalg.hpp>
 #include "primitive_operator.hpp"
 #include "../kron.hpp"
+#include "../../sop/operator_dictionaries/operator_dictionary.hpp"
 
 namespace ttns
 {

@@ -35,10 +35,11 @@ namespace ttns
         using env_node_type = typename env_container_type::node_type;
         using env_type = typename environment_type::environment_type;
 
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
         using dmat_type = linalg::diagonal_matrix<real_type, backend>;
+        using host_dmat_type = linalg::diagonal_matrix<real_type, linalg::blas_backend>;
 
         using hnode = ttn_node<T, backend>;
         using hdata = ttn_node_data<T, backend>;
@@ -71,7 +72,8 @@ namespace ttns
         orthogonality::truncation_mode m_trunc_mode = orthogonality::truncation_mode::singular_values_truncation;
 
         mat_type m_U;
-        linalg::diagonal_matrix<T, backend> m_S;
+        linalg::diagonal_matrix<T, linalg::blas_backend> m_S;
+
         mat_type m_V;
         bool m_only_apply_when_no_unoccupied = false;
         bool m_eval_but_dont_apply = false;
@@ -233,7 +235,9 @@ namespace ttns
                 }
 
                 real_type scale_factor = 1.0;
-                size_type n_unocc = get_nunoccupied(pops, scale_factor);
+                size_type n_unocc;
+                CALL_AND_HANDLE(n_unocc = get_nunoccupied(pops, scale_factor), "Failed determine the number of unoccupied vectors");
+
                 svd_scale /= scale_factor;
                 if (m_only_apply_when_no_unoccupied && n_unocc >= m_minimum_unoccupied)
                 {
@@ -302,19 +306,23 @@ namespace ttns
 
                         size_type neigs_evaluated = 0;
                         // computes the complex conjugate of the right singular vectors
-                        CALL_AND_HANDLE(neigs_evaluated = eigensolver(m_V, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
-
+                        CALL_AND_HANDLE(neigs_evaluated = eigensolver(m_V, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], buf.temp2[0], mconjm), "Failed to compute sparse svd.");
+                        if(neigs_evaluated > m_S.shape(0)){neigs_evaluated = m_S.shape(0);}
                         CALL_AND_HANDLE(m_V = linalg::conj(m_V), "Failed to conjugate the right singular vectors.");
 
                         for (size_type i = 0; i < neigs_evaluated; ++i)
                         {
+                            //std::cerr << m_S.shape(0) << " " << m_S.shape(1) << " " << i << std::endl;
+
                             real_type sv = 0;
+                            CALL_AND_HANDLE(sv = std::real(m_S.at(i)), "Failed to access two site energy variance eigenvalues.");
                             // check if any of the dominant svds of the Hamiltonian acting on the twosite coefficient tensor are occupied through the half step
                             if (m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
                             {
-                                if (linalg::real(m_S(i, i)) > 0)
+                                
+                                if (sv > 0)
                                 {
-                                    sv = std::sqrt(linalg::real(m_S(i, i))) * svd_scale;
+                                    sv = std::sqrt(sv) * svd_scale;
                                 }
                                 if (!std::isnan(sv))
                                 {
@@ -326,9 +334,9 @@ namespace ttns
                             }
                             else
                             {
-                                if (linalg::real(m_S(i, i)) > 0)
+                                if (sv > 0)
                                 {
-                                    sv = linalg::real(m_S(i, i)) * svd_scale * svd_scale;
+                                    sv = std::real(sv) * svd_scale * svd_scale;
                                 }
                                 if (!std::isnan(sv))
                                 {
@@ -448,7 +456,8 @@ namespace ttns
                 }
 
                 real_type scale_factor = 1.0;
-                size_type n_unocc = get_nunoccupied(pops, scale_factor);
+                size_type n_unocc;
+                CALL_AND_HANDLE(n_unocc = get_nunoccupied(pops, scale_factor), "Failed determine the number of unoccupied vectors");
                 if (m_only_apply_when_no_unoccupied && n_unocc >= m_minimum_unoccupied)
                 {
                     return false;
@@ -516,18 +525,19 @@ namespace ttns
 
                         // computes U but stored with its columns as rows - e.g. this is U^T.  E.g. the singular vectors are currently the rows of m_U
                         size_type neigs_evaluated = 0;
-                        CALL_AND_HANDLE(neigs_evaluated = eigensolver(m_U, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], mconjm), "Failed to compute sparse svd.");
-
+                        CALL_AND_HANDLE(neigs_evaluated = eigensolver(m_U, m_S, m_twosite, m_coeffs, m_2s_1, m_2s_2, nterms, m_trvec, m_trvec2, buf.temp[0], buf.temp2[0], mconjm), "Failed to compute sparse svd.");
+                        if(neigs_evaluated > m_S.shape(0)){neigs_evaluated = m_S.shape(0);}
                         for (size_type i = 0; i < neigs_evaluated; ++i)
                         {
                             real_type sv = 0;
-                            // check if any of the dominant svds of the Hamiltonian acting on the twosite coefficient tensor are occupied through the half step
+                            CALL_AND_HANDLE(sv = std::real(m_S.at(i)), "Failed to access two site energy variance eigenvalues.");
 
+                            // check if any of the dominant svds of the Hamiltonian acting on the twosite coefficient tensor are occupied through the half step
                             if (m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
                             {
-                                if (linalg::real(m_S(i, i)) > 0)
+                                if (sv > 0)
                                 {
-                                    sv = std::sqrt(linalg::real(m_S(i, i))) * svd_scale;
+                                    sv = std::sqrt(sv) * svd_scale;
                                 }
                                 if (!std::isnan(sv))
                                 {
@@ -539,9 +549,9 @@ namespace ttns
                             }
                             else
                             {
-                                if (linalg::real(m_S(i, i)) > 0)
+                                if (sv > 0)
                                 {
-                                    sv = linalg::real(m_S(i, i)) * svd_scale * svd_scale;
+                                    sv = sv * svd_scale * svd_scale;
                                 }
                                 if (!std::isnan(sv))
                                 {
@@ -660,12 +670,13 @@ namespace ttns
 
         size_type get_nunoccupied(const dmat_type &pops, real_type &scale_factor)
         {
+            pops.from_host();
             scale_factor = 0.0;
             size_type nunocc = 0;
 
             for (size_type i = 0; i < pops.size(); ++i)
             {
-                scale_factor += pops(i, i) * pops(i, i);
+                scale_factor += pops.at(i) * pops.at(i);
             }
             scale_factor = std::sqrt(scale_factor);
 
@@ -673,14 +684,14 @@ namespace ttns
             {
                 if (m_trunc_mode == orthogonality::truncation_mode::singular_values_truncation)
                 {
-                    if (pops(i, i) / scale_factor < m_unoccupied_threshold)
+                    if ( pops.at(i) / scale_factor < m_unoccupied_threshold)
                     {
                         ++nunocc;
                     }
                 }
                 else
                 {
-                    if (pops(i, i) * pops(i, i) / scale_factor < m_unoccupied_threshold)
+                    if ( pops.at(i) * pops.at(i)/ scale_factor < m_unoccupied_threshold)
                     {
                         ++nunocc;
                     }

@@ -34,8 +34,8 @@ namespace ttns
     {
     public:
         using matrix_type = linalg::matrix<T, backend>;
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
     protected:
         std::vector<size_type> m_mode_dims;
@@ -593,7 +593,7 @@ namespace ttns
                     this->resize(this->hrank(), dims);
                 }
                 this->as_matrix().fill_zeros();
-                backend::rank_3_strided_copy(temp.buffer(), _shape[0], _shape[1], _shape[2], this->as_matrix().buffer(), _shape[1] + iadd);
+                linalg::backend_algebra<backend>::rank_3_strided_copy(temp.buffer(), _shape[0], _shape[1], _shape[2], this->as_matrix().buffer(), _shape[1] + iadd);
                 return _shape;
             }
             catch (const std::exception &ex)
@@ -652,7 +652,7 @@ namespace ttns
             {
                 std::array<size_t, 3> _shape;
                 CALL_AND_RETHROW(_shape = this->expand_bond(mode, iadd, temp));
-                backend::rank_3_strided_append(pad.buffer(), _shape[0], _shape[1], _shape[2], iadd, this->as_matrix().buffer(), _shape[1] + iadd);
+                linalg::backend_algebra<backend>::rank_3_strided_append(pad.buffer(), _shape[0], _shape[1], _shape[2], iadd, this->as_matrix().buffer(), _shape[1] + iadd);
             }
             catch (const std::exception &ex)
             {
@@ -700,7 +700,7 @@ namespace ttns
         void set_random(linalg::random_engine<backend> &rng)
         {
             auto &mat = this->as_matrix();
-            rng.fill_normal(mat);
+            CALL_AND_HANDLE(rng.fill_normal(mat), "Failed to fill node with random normal values.");
         }
 
         void set_node_state(size_type i, linalg::random_engine<backend> &rng, bool random_unoccupied_initialisation = false)
@@ -976,7 +976,7 @@ namespace ttns
     operator<<(std::ostream &os, const ttn_node_data<T, backend> &t)
     {
         ttn_node_data<T, linalg::blas_backend> odata(t);
-        os << t;
+        os << odata;
         return os;
     }
 #endif
@@ -1000,8 +1000,8 @@ namespace ttns
         using value_type = node_data_type<T, backend>;
         using tree_type = tree_base<value_type>;
         using base_type = tree_node_base<tree_type>;
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using node_type = typename tree_type::node_type;
         using orthogonality_type = typename node_type::orthogonality_type;
 
@@ -1176,8 +1176,8 @@ namespace ttns
         using value_type = ttn_node_data<T, backend>;
         using tree_type = tree_base<value_type>;
         using base_type = tree_node_base<tree_type>;
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using node_type = typename tree_type::node_type;
         using self_type = node_type;
         using node_helper = ttn_node_helper<ttn_node_data, T, backend>;
@@ -1446,7 +1446,7 @@ namespace ttns
         real_type norm() const
         {
             auto vec = m_data.as_rank_1();
-            return std::sqrt(linalg::real(linalg::dot_product(linalg::conj(vec), vec)));
+            return std::sqrt(std::real(linalg::dot_product(linalg::conj(vec), vec)));
         }
 
         template <typename U>

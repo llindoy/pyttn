@@ -31,12 +31,14 @@ namespace linalg
         public:
             using value_type = typename std::remove_cv<typename traits<T1>::value_type>::type;
             using backend_type = typename traits<T1>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using device_value_type = typename device_type<value_type, backend_type>::type;
+
+            using size_type = typename traits<backend_type>::size_type;
             using self_type = matrix_matrix_product<T1, T2>;
             using base_type = matrix_matrix_product_base<self_type>;
             using left_type = T1;
             using right_type = T2;
-            using value_ptr = typename std::add_pointer<typename std::add_const<value_type>::type>::type;
+            using value_ptr = typename std::add_pointer<typename std::add_const<device_value_type>::type>::type;
             static constexpr size_t rank = 2;
 
             using ttype = typename base_type::ttype;
@@ -113,29 +115,35 @@ namespace linalg
             // performs the dense matrix matrix product.  This uses gemm which expect column major order matrices and so has been written to take that into account.  Rather than performing the operation
             // C = op(A) op(B) we perform C^T = op(B^T) op(A^T)
             template <typename T3>
-            void applicative_impl(T3 &res, value_type beta = value_type(0.0), value_type coeff_scale = value_type(1.0))
+            void applicative_impl(T3 &res, value_type _beta = value_type(0.0), value_type coeff_scale = value_type(1.0))
             {
                 try
                 {
+
                     ASSERT(res.buffer() != m_Abuffer && res.buffer() != m_Bbuffer, "The matrix matrix product does not support inplace products.");
 
-                    value_type coeff = m_coeff * coeff_scale;
+                    value_type _coeff(m_coeff * coeff_scale);
                     if (m_opA == backend_type::op_c && m_opB == backend_type::op_c)
                     {
                         if (is_complex<value_type>::value)
                         {
-                            coeff = conj(coeff);
-                            if (beta != value_type(0.0))
+                            _coeff = conj(_coeff);
+                            if (_beta != value_type(0.0))
                             {
-                                beta = conj(beta);
-                                CALL_AND_HANDLE(backend_type::complex_conjugate(res.size(), res.buffer(), res.buffer()), "Failed to compute complex conjugate of result");
+                                _beta = conj(_beta);
+                                CALL_AND_HANDLE(backend_algebra<backend_type>::complex_conjugate(res.size(), res.buffer(), res.buffer()), "Failed to compute complex conjugate of result");
                             }
-                            CALL_AND_HANDLE(backend_type::gemm(backend_type::op_n, backend_type::op_n, m_m, m_n, m_k, coeff, m_Bbuffer, m_ldB, m_Abuffer, m_ldA, beta, res.buffer(), res.shape(1)), "Failed to compute matrix product.  Error when calling gemm.");
-                            CALL_AND_HANDLE(backend_type::complex_conjugate(res.size(), res.buffer(), res.buffer()), "Failed to compute complex conjugate of result");
+                            device_value_type beta(_beta);
+                            device_value_type coeff(_coeff);
+
+                            CALL_AND_HANDLE(backend_algebra<backend_type>::gemm(backend_type::op_n, backend_type::op_n, m_m, m_n, m_k, coeff, m_Bbuffer, m_ldB, m_Abuffer, m_ldA, beta, res.buffer(), res.shape(1)), "Failed to compute matrix product.  Error when calling gemm.");
+                            CALL_AND_HANDLE(backend_algebra<backend_type>::complex_conjugate(res.size(), res.buffer(), res.buffer()), "Failed to compute complex conjugate of result");
                         }
                         else
                         {
-                            CALL_AND_HANDLE(backend_type::gemm(backend_type::op_n, backend_type::op_n, m_m, m_n, m_k, coeff, m_Bbuffer, m_ldB, m_Abuffer, m_ldA, beta, res.buffer(), res.shape(1)), "Failed to compute matrix product.  Error when calling gemm.");
+                            device_value_type beta(_beta);
+                            device_value_type coeff(_coeff);
+                            CALL_AND_HANDLE(backend_algebra<backend_type>::gemm(backend_type::op_n, backend_type::op_n, m_m, m_n, m_k, coeff, m_Bbuffer, m_ldB, m_Abuffer, m_ldA, beta, res.buffer(), res.shape(1)), "Failed to compute matrix product.  Error when calling gemm.");
                         }
                     }
                     else
@@ -144,6 +152,7 @@ namespace linalg
                         ttype opB = m_opB;
                         value_ptr Abuffer = m_Abuffer;
                         value_ptr Bbuffer = m_Bbuffer;
+                        device_value_type coeff(_coeff);
 
                         if (m_opA == backend_type::op_c && m_opB != backend_type::op_c)
                         {
@@ -152,7 +161,7 @@ namespace linalg
                             {
                                 ASSERT(m_working != nullptr, "The workspace array has not been bound.");
                                 ASSERT(m_working_size >= m_Asize, "The workspace array is not large enough to store temporary objects.");
-                                CALL_AND_HANDLE(backend_type::complex_conjugate(m_Asize, m_Abuffer, m_working), "Failed to compute complex conjugate array value.");
+                                CALL_AND_HANDLE(backend_algebra<backend_type>::complex_conjugate(m_Asize, m_Abuffer, m_working), "Failed to compute complex conjugate array value.");
                                 Abuffer = static_cast<value_ptr>(m_working);
                             }
                         }
@@ -163,13 +172,14 @@ namespace linalg
                             {
                                 ASSERT(m_working != nullptr, "The workspace array has not been bound.");
                                 ASSERT(m_working_size >= m_Bsize, "The workspace array is not large enough to store temporary objects.");
-                                CALL_AND_HANDLE(backend_type::complex_conjugate(m_Bsize, m_Bbuffer, m_working), "Failed to compute complex conjugate array value.");
+                                CALL_AND_HANDLE(backend_algebra<backend_type>::complex_conjugate(m_Bsize, m_Bbuffer, m_working), "Failed to compute complex conjugate array value.");
                                 Bbuffer = static_cast<value_ptr>(m_working);
                             }
                         }
+                        device_value_type beta(_beta);
 
                         CALL_AND_HANDLE(
-                            backend_type::gemm(opB, opA, m_m, m_n, m_k, coeff, Bbuffer, m_ldB, Abuffer, m_ldA, beta, res.buffer(), res.shape(1)),
+                            backend_algebra<backend_type>::gemm(opB, opA, m_m, m_n, m_k, coeff, Bbuffer, m_ldB, Abuffer, m_ldA, beta, res.buffer(), res.shape(1)),
                             "Error when calling gemm.");
                     }
                 }
@@ -190,7 +200,9 @@ namespace linalg
         using rvalue_type = typename traits<T2>::value_type;
         using value_type = decltype(lvalue_type() * rvalue_type());
         using backend_type = typename traits<T1>::backend_type;
-        using shape_type = std::array<typename backend_type::size_type, 2>;
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+
+        using shape_type = std::array<typename traits<backend_type>::size_type, 2>;
         using const_shape_reference = const shape_type &;
         static constexpr size_t rank = 2;
     };

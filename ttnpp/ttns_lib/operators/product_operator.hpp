@@ -44,8 +44,8 @@ namespace ttns
     class product_operator
     {
     public:
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
         using op_type = ops::primitive<T, backend>;
         using element_type = site_operator<T, backend>;

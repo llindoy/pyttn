@@ -29,7 +29,7 @@ namespace linalg
     template <typename T1, typename T2>
     scalconj_return_type<T1, T2> conj(const scal_type<T1, T2> &a)
     {
-        using std::conj;
+        using linalg::conj;
         using lit_type = expression_templates::literal_type<T1, typename traits<T2>::backend_type>;
         return scalconj_type<T1, T2>(scalconj_binary_type<T1, T2>(lit_type(conj(static_cast<T1>(a.left()))), conj_type<T2>(conj_unary_type<T2>(a.right()), a.shape())), a.shape());
     }
@@ -38,7 +38,7 @@ namespace linalg
     template <typename T1, typename T2>
     scal_type<T1, T2> conj(const scalconj_type<T1, T2> &a)
     {
-        using std::conj;
+        using linalg::conj;
         using lit_type = expression_templates::literal_type<T1, typename traits<T2>::backend_type>;
         return scal_type<T1, T2>(scal_binary_type<T1, T2>(lit_type(conj(static_cast<T1>(a.left()))), a.right().obj()), a.shape());
     }
@@ -54,7 +54,7 @@ namespace linalg
     template <typename array_type, bool conjugate>
     trans_type<array_type, !conjugate> conj(const trans_type<array_type, conjugate> &a)
     {
-        using std::conj;
+        using linalg::conj;
         return trans_type<array_type, !conjugate>(a.matrix(), conj(a.coeff()));
     }
 
@@ -62,7 +62,7 @@ namespace linalg
     template <typename array_type, bool conjugate>
     perm3_type<array_type, !conjugate> conj(const perm3_type<array_type, conjugate> &a)
     {
-        using std::conj;
+        using linalg::conj;
         return perm3_type<array_type, !conjugate>(a.tensor(), a.permutation_index(), conj(a.coeff()));
     }
 

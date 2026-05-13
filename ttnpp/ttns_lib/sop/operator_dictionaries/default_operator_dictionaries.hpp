@@ -78,7 +78,6 @@ namespace ttns
                 // bind the vacancy operators
                 {std::string("v"), std::make_shared<vacancy<T>>()},
                 {std::string("jw"), std::make_shared<jordan_wigner<T>>()}};
-
     } // namespace fermion
 
     namespace boson

@@ -44,9 +44,9 @@ namespace utils
     public:
         using value_type = T;
         using real_type = typename linalg::get_real_type<T>::type;
-        using complex_type = linalg::complex<real_type>;
+        using complex_type = std::complex<real_type>;
         using backend_type = backend;
-        using size_type = typename backend_type::size_type;
+        using size_type = typename linalg::traits<backend_type>::size_type;
 
     protected:
         linalg::arnoldi_iteration<value_type, backend> m_arnoldi;
@@ -242,12 +242,12 @@ namespace utils
                                 size_type n = get_eig_index();
                                 eigenvalue_index = n;
 
-                                m_residues(0, iter) = m_arnoldi.hk1k() * linalg::abs(m_rvecs(m_vals.size() - 1, n));
+                                m_residues(0, iter) = m_arnoldi.hk1k() * std::abs(m_rvecs(m_vals.size() - 1, n));
                                 if (m_verbose)
                                 {
-                                    std::cerr << 0 << " " << iter << " " << iend << " " << m_residues(0, iter) << " " << (m_invert_mode ? 1.0 / m_vals(n, n) : m_vals(n, n)) << std::endl;
+                                    std::cerr << 0 << " " << iter << " " << iend << " " << m_residues(0, iter) << " " << (m_invert_mode ? real_type(1.0) / m_vals(n, n) : m_vals(n, n)) << std::endl;
                                 }
-                                if (m_residues(0, iter) < m_eps || m_residues(0, iter) < m_rel_eps * linalg::abs((m_invert_mode ? 1.0 / m_vals(n, n) : m_vals(n, n))))
+                                if (m_residues(0, iter) < m_eps || m_residues(0, iter) < m_rel_eps * std::abs((m_invert_mode ? real_type(1.0) / m_vals(n, n) : m_vals(n, n))))
                                 {
                                     do_restart = false;
                                     keep_running = false;
@@ -295,7 +295,7 @@ namespace utils
         }
 
         template <typename vals_type, typename vecs_type, typename... Args>
-        typename std::enable_if<linalg::is_same_backend<vals_type, linalg::vector<value_type, backend_type>>::value && linalg::is_same_backend<vecs_type, linalg::vector<value_type, backend_type>>::value, size_t>::type
+        typename std::enable_if<linalg::is_same_backend<vals_type, linalg::vector<value_type, linalg::blas_backend>>::value && linalg::is_same_backend<vecs_type, linalg::vector<value_type, backend_type>>::value, size_t>::type
         operator()(vecs_type &x, vals_type &E, Args &&...args)
         {
             try
@@ -379,9 +379,9 @@ namespace utils
                                 size_type eigindex = eigorder[eigenvalues_evaluated - 1];
 
                                 // and compute the associated residue
-                                m_residues(iter) = m_arnoldi.hk1k() * linalg::abs(m_rvecs(m_vals.size() - 1, eigindex));
+                                m_residues(iter) = m_arnoldi.hk1k() * std::abs(m_rvecs(m_vals.size() - 1, eigindex));
 
-                                if (m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps * linalg::abs((m_invert_mode ? 1.0 / m_vals(eigindex, eigindex) : m_vals(eigindex, eigindex))))
+                                if (m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps * std::abs((m_invert_mode ? real_type(1.0) / m_vals(eigindex, eigindex) : m_vals(eigindex, eigindex))))
                                 {
                                     do_restart = false;
                                     keep_running = false;
@@ -495,12 +495,12 @@ namespace utils
         //                            size_type n = get_eig_index();
         //                            eigenvalue_index = n;
 
-        //                            m_residues(eigindex, iter) = m_arnoldi.hk1k()*linalg::abs(m_rvecs(m_vals.size()-1, n));
+        //                            m_residues(eigindex, iter) = m_arnoldi.hk1k()*std::abs(m_rvecs(m_vals.size()-1, n));
         //                            if(m_verbose)
         //                            {
         //                                std::cerr << eigindex << " " << iter << " " << iend << " " << m_residues(eigindex, iter) << " " << (m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n)) << std::endl;
         //                            }
-        //                            if(m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps*linalg::abs((m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n))))
+        //                            if(m_residues(eigindex, iter) < m_eps || m_residues(eigindex, iter) < m_rel_eps*std::abs((m_invert_mode ? 1.0/m_vals(n, n) : m_vals(n, n))))
         //                            {
         //                                do_restart = false;
         //                                keep_running=false;
@@ -550,9 +550,9 @@ namespace utils
             {
                 for (size_type i = 0; i < m_vals.size(0); ++i)
                 {
-                    if (linalg::abs(m_vals(i, i)) > m_val)
+                    if (std::abs(m_vals(i, i)) > m_val)
                     {
-                        m_val = linalg::abs(m_vals(i, i));
+                        m_val = std::abs(m_vals(i, i));
                         index = i;
                     }
                 }
@@ -561,9 +561,9 @@ namespace utils
             {
                 for (size_type i = 0; i < m_vals.size(0); ++i)
                 {
-                    if (linalg::real(m_vals(i, i)) < m_val || i == 0)
+                    if (std::real(m_vals(i, i)) < m_val || i == 0)
                     {
-                        m_val = linalg::real(m_vals(i, i));
+                        m_val = std::real(m_vals(i, i));
                         index = i;
                     }
                 }
@@ -572,9 +572,9 @@ namespace utils
             {
                 for (size_type i = 0; i < m_vals.size(0); ++i)
                 {
-                    if (linalg::real(m_vals(i, i)) > m_val || i == 0)
+                    if (std::real(m_vals(i, i)) > m_val || i == 0)
                     {
-                        m_val = linalg::real(m_vals(i, i));
+                        m_val = std::real(m_vals(i, i));
                         index = i;
                     }
                 }
@@ -592,17 +592,17 @@ namespace utils
             if (m_mode == eigenvalue_target::largest_magnitude)
             {
                 std::sort(eigs.begin(), eigs.end(), [](const std::pair<T, size_type> &a, const std::pair<T, size_type> &b)
-                          { return linalg::abs(a.first) > linalg::abs(b.first); });
+                          { return std::abs(a.first) > std::abs(b.first); });
             }
             else if (m_mode == eigenvalue_target::smallest_real)
             {
                 std::sort(eigs.begin(), eigs.end(), [](const std::pair<T, size_type> &a, const std::pair<T, size_type> &b)
-                          { return linalg::real(a.first) < linalg::real(b.first); });
+                          { return std::real(a.first) < std::real(b.first); });
             }
             else if (m_mode == eigenvalue_target::largest_real)
             {
                 std::sort(eigs.begin(), eigs.end(), [](const std::pair<T, size_type> &a, const std::pair<T, size_type> &b)
-                          { return linalg::real(a.first) > linalg::real(b.first); });
+                          { return std::real(a.first) > std::real(b.first); });
             }
 
             for (size_type i = 0; i < m_vals.size(0); ++i)
@@ -618,7 +618,7 @@ namespace utils
             try
             {
                 // sort and scale eigenvalues
-                E = m_invert_mode ? 1.0 / m_vals(n, n) : m_vals(n, n);
+                E = m_invert_mode ? real_type(1.0) / m_vals(n, n) : m_vals(n, n);
 
                 // sort eigenvectors in krylov subspace
                 CALL_AND_HANDLE(m_rvecsd.resize(1, m_lvecs.size(0)), "Failed to resize rvecs array.");
@@ -629,7 +629,7 @@ namespace utils
                 auto xm = x.reinterpret_shape(1, x.size());
                 auto xv = x.reinterpret_shape(x.size());
                 CALL_AND_HANDLE(xm = m_rvecsd * m_arnoldi.Q(), "Failed to compute eigenvectors.");
-                real_type norm = std::sqrt(linalg::real(linalg::dot_product(linalg::conj(xv), xv)));
+                real_type norm = std::sqrt(std::real(linalg::dot_product(linalg::conj(xv), xv)));
                 x /= norm;
             }
             catch (const std::exception &ex)

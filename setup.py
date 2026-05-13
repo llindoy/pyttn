@@ -31,7 +31,7 @@ class CMakeExtension(Extension):
         self.rebuild = rebuild
 
         parallel_build=os.environ.get('PYTTN_PARALLELISE_COMPILATION')
-        parallel=8
+        parallel=4
         if parallel_build is not None:
             if parallel_build.isdecimal():
                 parallel = int(parallel_build)
@@ -50,7 +50,12 @@ class CMakeExtension(Extension):
         if use_openmp is not None:
             if use_openmp.lower() in ('true', '1', 't'):
                 self.openmp = False
-        
+
+        self.cuda = False
+        use_cuda=os.environ.get('PYTTN_BUILD_CUDA')
+        if use_cuda is not None:
+            if use_cuda.lower() in ('true', '1', 't'):
+                self.cuda = True
 
 class CMakeBuild(build_ext):
     def build_extension(self, ext: CMakeExtension) -> None:
@@ -84,6 +89,14 @@ class CMakeBuild(build_ext):
         if ext.openmp:
             cmake_args.append("-DUSE_OPENMP=ON")
             print("building with OpenMP")
+        else:
+            cmake_args.append("-DUSE_OPENMP=OFF")
+
+        if ext.cuda:
+            cmake_args.append("-DUSE_CUDA=ON")
+            print("building with OpenMP")
+        else:
+            cmake_args.append("-DUSE_CUDA=OFF")
 
         if ext.cxx_compiler_path is not None:
             cmake_args.append(f"-DCMAKE_CXX_COMPILER={ext.cxx_compiler_path}")
