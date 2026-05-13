@@ -48,13 +48,15 @@ test = [
     "pytest-xdist",
 ]
 docs = [     
-    "jupyter-sphinx >= 0.5.3",
+
+    "sphinx < 9.2",        
+    "docutils < 0.22",
     "nbsphinx >= 0.9.3",
+    "nbsphinx_link >= 1.2",
+    "jupyter-sphinx >= 0.5.3",
     "reno >= 4.0.0",
     "sphinx-autodoc-typehints >= 2.0.0",
-    "nbsphinx_link >= 1.2",
-    "pydata-sphinx-theme", 
-    "sphinx-autodoc-typehints"
+    "pydata-sphinx-theme"
 ]
 notebook = [
     "notebook >= 7.1.0",
