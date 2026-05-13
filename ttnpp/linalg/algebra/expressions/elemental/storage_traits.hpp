@@ -16,6 +16,7 @@
 #define PYTTN_LINALG_ALGEBRA_EXPRESSIONS_ELEMENTAL_STORAGE_TRAITS_HPP_
 
 #include "../../../linalg_forward_decl.hpp"
+#include "../../../linalg_type_traits.hpp"
 
 namespace linalg
 {
@@ -31,7 +32,7 @@ namespace linalg
         {
             static_assert(is_number<T>::value, "Failed to initialise storage_traits object.  The literal expects a number type as an input template parameter.");
             using type = literal_type<T, backend>;
-            using eval_type = T;
+            using eval_type = typename device_type<T, backend>::type;
 
             static inline eval_type data(type a) { return a; }
         };
@@ -42,7 +43,7 @@ namespace linalg
         {
             static_assert(is_number<T>::value, "Failed to initialise storage_traits object.  The tensor object expects a number type as an input template parameter.");
             using type = const tensor<T, D, backend> &;
-            using eval_type = const T *;
+            using eval_type = const typename device_type<T, backend>::type *;
 
             static inline eval_type data(type a) { return static_cast<eval_type>(a.buffer()); }
         };
@@ -52,7 +53,7 @@ namespace linalg
         {
             static_assert(is_number<T>::value, "Failed to initialise storage_traits object.  The reinterpreted tensor object expects a number type as an input template parameter.");
             using type = const reinterpreted_tensor<T, D, backend> &;
-            using eval_type = const T *;
+            using eval_type = const typename device_type<T, backend>::type *;
 
             static inline eval_type data(type a) { return static_cast<eval_type>(a.buffer()); }
         };
@@ -62,7 +63,7 @@ namespace linalg
         {
             static_assert(is_number<T>::value && (std::is_same<T1, T>::value || std::is_same<typename std::add_const<T1>::type, T>::value), "Failed to initialise storage_traits object.  The reinterpreted tensor object expects a number type as an input template parameter.");
             using type = const tensor_slice<arrtype<T1, D1, backend>, T, D> &;
-            using eval_type = const T *;
+            using eval_type = const typename device_type<T, backend>::type *;
 
             static inline eval_type data(type a) { return static_cast<eval_type>(a.buffer()); }
         };
@@ -72,7 +73,7 @@ namespace linalg
         {
             static_assert(is_number<T>::value, "Failed to initialise storage_traits object.  The reinterpreted tensor object expects a number type as an input template parameter.");
             using type = const hermitian_matrix<T, backend> &;
-            using eval_type = const T *;
+            using eval_type = const typename device_type<T, backend>::type *;
 
             static inline eval_type data(type a) { return static_cast<eval_type>(a.buffer()); }
         };
@@ -82,7 +83,7 @@ namespace linalg
         {
             static_assert(is_number<T>::value, "Failed to initialise storage_traits object.  The reinterpreted tensor object expects a number type as an input template parameter.");
             using type = const upper_hessenberg_matrix<T, backend> &;
-            using eval_type = const T *;
+            using eval_type = const typename device_type<T, backend>::type *;
 
             static inline eval_type data(type a) { return static_cast<eval_type>(a.buffer()); }
         };
@@ -102,35 +103,20 @@ namespace linalg
         struct storage_traits<csr_matrix<T, backend>>
         {
             using type = const csr_matrix<T, backend> &;
-            using eval_type = const T *;
+            using eval_type = const typename device_type<T, backend>::type *;
             static inline eval_type data(type a) { return static_cast<eval_type>(a.buffer()); }
         };
 
         namespace internal
         {
             template <typename T, typename backend>
-            struct diagonal_matrix_view_storage_type;
-
-            template <typename T>
-            struct diagonal_matrix_view_storage_type<T, blas_backend>
+            struct diagonal_matrix_view_storage_type
             {
-                using size_type = typename blas_backend::size_type;
+                using size_type = typename traits<backend>::size_type;
                 T *buffer;
                 size_type incx;
-                T operator[](size_type i) const { return buffer[i * incx]; }
+                T operator[](size_type i) const;
             };
-
-#ifdef PYTTN_BUILD_CUDA
-            template <typename T>
-            struct diagonal_matrix_view_storage_type<T, cuda_backend>
-            {
-                using size_type = typename cuda_backend::size_type;
-                T *buffer;
-                size_type incx;
-                __host__ __device__ T operator[](size_type i) const { return buffer[i * incx]; }
-            };
-
-#endif
         } // namespace intenral
 
         // traits for the tensor objects
@@ -138,7 +124,7 @@ namespace linalg
         struct storage_traits<diagonal_matrix<T, backend>>
         {
             using type = const diagonal_matrix<T, backend> &;
-            using eval_type = const T *;
+            using eval_type = const typename device_type<T, backend>::type *;
             static inline eval_type data(type a) { return static_cast<eval_type>(a.buffer()); }
         };
 
@@ -147,7 +133,7 @@ namespace linalg
         struct storage_traits<symmetric_tridiagonal_matrix<T, backend>>
         {
             using type = const symmetric_tridiagonal_matrix<T, backend> &;
-            using eval_type = const T *;
+            using eval_type = const typename device_type<T, backend>::type *;
             static inline eval_type data(type a) { return static_cast<eval_type>(a.buffer()); }
         };
 

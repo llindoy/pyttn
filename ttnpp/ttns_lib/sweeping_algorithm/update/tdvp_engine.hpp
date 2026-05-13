@@ -29,8 +29,8 @@ namespace ttns
     class tdvp_engine<T, backend, ttn, sop_environment>
     {
     public:
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using environment_type = sop_environment<T, backend, ttn>;
 
         using env_container_type = typename environment_type::container_type;
@@ -48,7 +48,7 @@ namespace ttns
 
         using parameter_list = simple_update_parameter_list;
 
-        static constexpr std::string_view class_info = "tdvp:";
+        static constexpr std::string_view class_info{"tdvp:"};
     protected:
         // the krylov subspace engine
         expmv_type m_expmv;
@@ -253,8 +253,8 @@ namespace ttns
     class tdvp_engine<T, backend, ms_ttn, sop_environment>
     {
     public:
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using environment_type = sop_environment<T, backend, ms_ttn>;
 
         using env_container_type = typename environment_type::container_type;
@@ -271,7 +271,7 @@ namespace ttns
         using expmv_type = utils::expmv<T, backend, false>;
 
         using parameter_list = simple_update_parameter_list;
-        static constexpr std::string_view class_info = "tdvp:";
+        static constexpr std::string_view class_info{"tdvp:"};
 
     protected:
         // the krylov subspace engine

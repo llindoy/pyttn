@@ -23,12 +23,6 @@
 
 #include <linalg/linalg.hpp>
 
-namespace common
-{
-    template <typename T>
-    using complex = linalg::complex<T>;
-}
-
 namespace tmp
 {
 
@@ -49,32 +43,6 @@ namespace tmp
     struct _all<std::true_type, types...> : public _all<types...>
     {
     };
-
-    template <typename T>
-    struct get_real_type
-    {
-        using type = T;
-    };
-
-    template <typename T>
-    struct get_real_type<common::complex<T>>
-    {
-        using type = T;
-    };
-
-    template <typename T>
-    struct is_complex : std::false_type
-    {
-    };
-
-    template <typename T>
-    struct is_complex<common::complex<T>>
-        : std::integral_constant<bool, std::is_arithmetic<T>::value>
-    {
-    };
-
-    template <typename T>
-    using is_number = linalg::is_number<T>;
 
     // Some tmp functions
     template <bool flag, class IsTrue, class IsFalse>

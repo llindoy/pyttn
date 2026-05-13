@@ -1,0 +1,287 @@
+/**
+ * This files is part of the pyTTN package.
+ * (C) Copyright 2025 NPL Management Limited
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
+ */
+
+#ifndef PYTHON_BINDING_TDVP_TPP
+#define PYTHON_BINDING_TDVP_TPP
+
+#include "tdvp.hpp"
+
+namespace py = pybind11;
+
+template <typename T, template <typename, typename> class ttn_class, typename backend>
+void init_tdvp_onesite(py::module &m, const std::string &label)
+{
+    using namespace ttns;
+
+    using _T = typename linalg::numpy_converter<T>::type;
+
+    using tdvp = _one_site_tdvp<T, backend, ttn_class>;
+    using _ttn = ttn_class<T, backend>;
+    using _sop = typename tdvp::env_type;
+
+    using size_type = typename tdvp::size_type;
+    using real_type = typename linalg::get_real_type<T>::type;
+    // wrapper for the sPOP type
+    py::class_<tdvp>(m, label.c_str())
+        .def(py::init<>())
+        .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type, size_type>(),
+             py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1, R"mydelim(
+            Construct a new one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.
+
+            :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            :type krylov_dim: int, optional
+            :param num_threads: The number of openmp threads to be used for parallelising over the Hamiltonian sum in the solver. (Default: 1)
+            :type num_threads: int, optional
+            :param set_var_num_threads: The number of openmp threads to be used for parallelising over the set by the solver. (Default: 1)
+            :type set_var_num_threads: int, optional
+          )mydelim")
+        .def("assign", [](tdvp &self, const tdvp &o)
+             { self = o; })
+        .def("__copy__", [](const tdvp &o)
+             { return tdvp(o); })
+        .def("__deepcopy__", [](const tdvp &o, py::dict)
+             { return tdvp(o); }, py::arg("memo"))
+        .def("initialise", &tdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1, R"mydelim(
+            Initialise one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.
+
+            :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+            :type krylov_dim: int, optional
+            :param num_threads: The number of openmp threads to be used for parallelising over the Hamiltonian sum in the solver. (Default: 1)
+            :type num_threads: int, optional
+            :param set_var_num_threads: The number of openmp threads to be used for parallelising over the set by the solver. (Default: 1)
+            :type set_var_num_threads: int, optional
+          )mydelim")
+        .def_property("coefficient", [](const tdvp &o)
+                      { return _T(o.coefficient()); }, [](tdvp &o, const _T &i)
+                      { o.coefficient() = i; }, "A coefficient used to scale the timestep.")
+        .def_property("t", static_cast<const real_type &(tdvp::*)() const>(&tdvp::t), [](tdvp &o, const real_type &i)
+                      { o.t() = i; }, "The current time point reached by the integrator.")
+        .def_property("dt", static_cast<const real_type &(tdvp::*)() const>(&tdvp::dt), [](tdvp &o, const real_type &i)
+                      { o.dt() = i; }, "The timestep used for integration of the dynamics.")
+        .def_property("expmv_tol", static_cast<const real_type &(tdvp::*)() const>(&tdvp::expmv_tol), [](tdvp &o, const real_type &i)
+                      { o.expmv_tol() = i; }, "The tolerance used for the krylov subspace matrix exponential")
+        .def_property("krylov_steps", static_cast<const size_type &(tdvp::*)() const>(&tdvp::krylov_steps), [](tdvp &o, const size_type &i)
+                      { o.krylov_steps() = i; }, "The number of internal substeps used by the krylov subspace integrator for each real step.")
+        .def_property("use_time_dependent_hamiltonian", static_cast<const bool &(tdvp::*)() const>(&tdvp::use_time_dependent_hamiltonian), [](tdvp &o, const bool &i)
+                      { o.use_time_dependent_hamiltonian() = i; }, "Whether or not to update the time variable of the Hamiltonian object throughout integration.")
+        .def("clear", &tdvp::clear, "Clear all internal buffers of the TDVP object.")
+        .def("step", &tdvp::operator(), py::arg(), py::arg(), py::arg("update_env") = false, R"mydelim(
+            Performs a single step of the single site TDVP algorithm
+
+            :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+            :type update_env: bool, optional
+          )mydelim")
+        .def("__call__", &tdvp::operator(), py::arg(), py::arg(), py::arg("update_env") = false, R"mydelim(
+            Performs a single step of the single site TDVP algorithm
+
+            :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+            :type update_env: bool, optional
+          )mydelim")
+        .def("prepare_environment", &tdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion") = false, R"mydelim(
+            Update all Single Particle Function environment tensors to prepare the system for performing a TDVP sweep. 
+
+            :param A: The Tree Tensor Network Object that will be optimised using the TDVP algorithm
+            :type A: ttn_complex
+            :param H: The Hamiltonian sop operator object
+            :type H: sop_operator_complex
+            :param attempt_expansion: Whether or not to attempt subspace expansion throughout the update scheme.  (Default: False)
+            :type attempt_expansion: bool, optional
+          )mydelim")
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const tdvp & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](tdvp & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const tdvp& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<tdvp>(t);}
+         ))  
+#endif  
+        .def("backend", [](const tdvp &)
+             { return linalg::traits<backend>::label(); });
+}
+
+template <typename T, template <typename, typename> class ttn_class, typename backend>
+void init_tdvp_adaptive(py::module &m, const std::string &label)
+{
+    using namespace ttns;
+
+    using _T = typename linalg::numpy_converter<T>::type;
+
+    using atdvp = _adaptive_one_site_tdvp<T, backend, ttn_class>;
+    using _ttn = ttn_class<T, backend>;
+    using _sop = typename atdvp::env_type;
+
+    using size_type = typename atdvp::size_type;
+    using real_type = typename linalg::get_real_type<T>::type;
+
+    py::class_<atdvp>(m, label.c_str())
+        .def(py::init<>())
+        .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type, size_type, size_type, size_type>(),
+             py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("subspace_krylov_dim") = 4, py::arg("subspace_neigs") = 2, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
+        .def("assign", [](atdvp &self, const atdvp &o)
+             { self = o; })
+        .def("__copy__", [](const atdvp &o)
+             { return atdvp(o); })
+        .def("__deepcopy__", [](const atdvp &o, py::dict)
+             { return atdvp(o); }, py::arg("memo"))
+        .def("initialise", &atdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("subspace_krylov_dim") = 4, py::arg("subspace_neigs") = 2, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
+        .def_property("coefficient", [](const atdvp &o)
+                      { return _T(o.coefficient()); }, [](atdvp &o, const _T &i)
+                      { o.coefficient() = i; })
+        .def_property("t", static_cast<const real_type &(atdvp::*)() const>(&atdvp::t), [](atdvp &o, const real_type &i)
+                      { o.t() = i; })
+        .def_property("dt", static_cast<const real_type &(atdvp::*)() const>(&atdvp::dt), [](atdvp &o, const real_type &i)
+                      { o.dt() = i; })
+        .def_property("expmv_tol", static_cast<const real_type &(atdvp::*)() const>(&atdvp::expmv_tol), [](atdvp &o, const real_type &i)
+                      { o.expmv_tol() = i; })
+        .def_property("krylov_steps", static_cast<const size_type &(atdvp::*)() const>(&atdvp::krylov_steps), [](atdvp &o, const size_type &i)
+                      { o.krylov_steps() = i; })
+        .def_property("use_time_dependent_hamiltonian", static_cast<const bool &(atdvp::*)() const>(&atdvp::use_time_dependent_hamiltonian), [](atdvp &o, const bool &i)
+                      { o.use_time_dependent_hamiltonian() = i; })
+        .def_property("subspace_eigensolver_tol", static_cast<const real_type &(atdvp::*)() const>(&atdvp::subspace_eigensolver_tol), [](atdvp &o, const real_type &i)
+                      { o.subspace_eigensolver_tol() = i; })
+        .def_property("subspace_eigensolver_reltol", static_cast<const real_type &(atdvp::*)() const>(&atdvp::subspace_eigensolver_reltol), [](atdvp &o, const real_type &i)
+                      { o.subspace_eigensolver_reltol() = i; })
+        .def_property("spawning_threshold", static_cast<const real_type &(atdvp::*)() const>(&atdvp::spawning_threshold), [](atdvp &o, const real_type &i)
+                      { o.spawning_threshold() = i; })
+        .def_property("unoccupied_threshold", static_cast<const real_type &(atdvp::*)() const>(&atdvp::unoccupied_threshold), [](atdvp &o, const real_type &i)
+                      { o.unoccupied_threshold() = i; })
+        .def_property("subspace_weighting_factor", static_cast<const real_type &(atdvp::*)() const>(&atdvp::subspace_weighting_factor), [](atdvp &o, const real_type &i)
+                      { o.subspace_weighting_factor() = i; })
+        .def_property("only_apply_when_no_unoccupied", static_cast<const bool &(atdvp::*)() const>(&atdvp::only_apply_when_no_unoccupied), [](atdvp &o, bool i)
+                      { o.only_apply_when_no_unoccupied() = i; })
+        .def_property("eval_but_dont_apply", static_cast<const bool &(atdvp::*)() const>(&atdvp::eval_but_dont_apply), [](atdvp &o, bool i)
+                      { o.eval_but_dont_apply() = i; })
+        .def_property("minimum_unoccupied", static_cast<const size_type &(atdvp::*)() const>(&atdvp::minimum_unoccupied), [](atdvp &o, const size_type &i)
+                      { o.minimum_unoccupied() = i; })
+        .def_property("maximum_bond_dimension", static_cast<const size_type &(atdvp::*)() const>(&atdvp::maximum_bond_dimension), [](atdvp &o, const size_type &i)
+                      { o.maximum_bond_dimension() = i; })
+        .def("clear", &atdvp::clear)
+        .def("step", [](atdvp &o, _ttn &A, _sop &sop, bool update_environment = false)
+             { return o(A, sop, update_environment); }, py::arg(), py::arg(), py::arg("update_env") = false)
+        .def("__call__", [](atdvp &o, _ttn &A, _sop &sop, bool update_environment = false)
+             { return o(A, sop, update_environment); }, py::arg(), py::arg(), py::arg("update_env") = false)
+        .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion") = false)
+        .def("backend", [](const atdvp &)
+             { return linalg::traits<backend>::label(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const atdvp & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](atdvp & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const atdvp& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<atdvp>(t);}
+         ))  
+#endif  
+             ;
+}
+
+template <typename T, template <typename, typename> class ttn_class, typename backend>
+void init_tdvp_adaptive_ts_cost(py::module &m, const std::string &label)
+{
+    using namespace ttns;
+
+    using _T = typename linalg::numpy_converter<T>::type;
+
+    using atdvp = _subspace_two_site_cost_tdvp<T, backend, ttn_class>;
+    using _ttn = ttn_class<T, backend>;
+    using _sop = typename atdvp::env_type;
+
+    using size_type = typename atdvp::size_type;
+    using real_type = typename linalg::get_real_type<T>::type;
+
+    py::class_<atdvp>(m, label.c_str())
+        .def(py::init<>())
+        .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type, size_type>(),
+             py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
+        .def("assign", [](atdvp &self, const atdvp &o)
+             { self = o; })
+        .def("__copy__", [](const atdvp &o)
+             { return atdvp(o); })
+        .def("__deepcopy__", [](const atdvp &o, py::dict)
+             { return atdvp(o); }, py::arg("memo"))
+        .def("initialise", &atdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
+        .def_property("coefficient", [](const atdvp &o)
+                      { return _T(o.coefficient()); }, [](atdvp &o, const _T &i)
+                      { o.coefficient() = i; })
+        .def_property("t", static_cast<const real_type &(atdvp::*)() const>(&atdvp::t), [](atdvp &o, const real_type &i)
+                      { o.t() = i; })
+        .def_property("dt", static_cast<const real_type &(atdvp::*)() const>(&atdvp::dt), [](atdvp &o, const real_type &i)
+                      { o.dt() = i; })
+        .def_property("expmv_tol", static_cast<const real_type &(atdvp::*)() const>(&atdvp::expmv_tol), [](atdvp &o, const real_type &i)
+                      { o.expmv_tol() = i; })
+        .def_property("krylov_steps", static_cast<const size_type &(atdvp::*)() const>(&atdvp::krylov_steps), [](atdvp &o, const size_type &i)
+                      { o.krylov_steps() = i; })
+        .def_property("use_time_dependent_hamiltonian", static_cast<const bool &(atdvp::*)() const>(&atdvp::use_time_dependent_hamiltonian), [](atdvp &o, const bool &i)
+                      { o.use_time_dependent_hamiltonian() = i; })
+        .def_property("spawning_threshold", static_cast<const real_type &(atdvp::*)() const>(&atdvp::spawning_threshold), [](atdvp &o, const real_type &i)
+                      { o.spawning_threshold() = i; })
+        .def_property("unoccupied_threshold", static_cast<const real_type &(atdvp::*)() const>(&atdvp::unoccupied_threshold), [](atdvp &o, const real_type &i)
+                      { o.unoccupied_threshold() = i; })
+        .def_property("subspace_weighting_factor", static_cast<const real_type &(atdvp::*)() const>(&atdvp::subspace_weighting_factor), [](atdvp &o, const real_type &i)
+                      { o.subspace_weighting_factor() = i; })
+        .def_property("only_apply_when_no_unoccupied", static_cast<const bool &(atdvp::*)() const>(&atdvp::only_apply_when_no_unoccupied), [](atdvp &o, bool i)
+                      { o.only_apply_when_no_unoccupied() = i; })
+        .def_property("eval_but_dont_apply", static_cast<const bool &(atdvp::*)() const>(&atdvp::eval_but_dont_apply), [](atdvp &o, bool i)
+                      { o.eval_but_dont_apply() = i; })
+        .def_property("minimum_unoccupied", static_cast<const size_type &(atdvp::*)() const>(&atdvp::minimum_unoccupied), [](atdvp &o, const size_type &i)
+                      { o.minimum_unoccupied() = i; })
+        .def_property("maximum_bond_dimension", static_cast<const size_type &(atdvp::*)() const>(&atdvp::maximum_bond_dimension), [](atdvp &o, const size_type &i)
+                      { o.maximum_bond_dimension() = i; })
+        .def("clear", &atdvp::clear)
+        .def("step", [](atdvp &o, _ttn &A, _sop &sop, bool update_environment = false)
+             { return o(A, sop, update_environment); }, py::arg(), py::arg(), py::arg("update_env") = false)
+        .def("__call__", [](atdvp &o, _ttn &A, _sop &sop, bool update_environment = false)
+             { return o(A, sop, update_environment); }, py::arg(), py::arg(), py::arg("update_env") = false)
+        .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion") = false)
+        .def("backend", [](const atdvp &)
+             { return linalg::traits<backend>::label(); })
+#ifdef CEREAL_LIBRARY_FOUND
+         .def("save", 
+            [](const atdvp & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+        .def("load", 
+            [](atdvp & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
+            py::arg(), py::arg("as_binary")=true)
+         .def(py::pickle(
+            [](const atdvp& a){return serialisation_utilities::__getstate__(a);},
+            [](py::tuple t){return serialisation_utilities::__setstate__<atdvp>(t);}
+         ))  
+#endif  
+             ;
+}
+
+#endif

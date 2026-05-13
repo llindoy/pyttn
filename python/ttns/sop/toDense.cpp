@@ -12,14 +12,13 @@
  * limitations under the License
  */
 
-#include "toDense.hpp"
+#include "toDense.tpp"
 #include "../../pyttn_typedef.hpp"
 
-template <>
-void initialise_convert_to_dense<pyttn_real_type>(py::module &m)
+void initialise_convert_to_dense(py::module &m)
 {
     using real_type = pyttn_real_type;
-    using complex_type = linalg::complex<real_type>;
+    using complex_type = std::complex<real_type>;
     init_convert_to_dense<real_type, complex_type>(m);
     init_convert_to_dense<complex_type, complex_type>(m);
 }

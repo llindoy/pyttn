@@ -44,7 +44,7 @@ template <typename T>
 class complex_from_string
 {
 public:
-    using complex_type = linalg::complex<T>;
+    using complex_type = std::complex<T>;
     static bool is_valid(const std::string& str)
     {
         std::regex x_regex("^(-)?([0-9]+([.][0-9]*)?|[.][0-9]+)$");   //for matching a purely real number
@@ -141,7 +141,7 @@ class parse_complex
 public:
     static_assert(std::is_floating_point<T>::value, "Require a floating point real type when parsing complex numbers.");
     using real_type = T;
-    using complex_type = linalg::complex<T>;
+    using complex_type = std::complex<T>;
 public:
     static bool is_complex(const rapidjson::Value& val)
     {
@@ -206,10 +206,10 @@ public:
 
 
 template <typename T>
-class loader<linalg::complex<T>, typename std::enable_if<std::is_floating_point<T>::value, void>::type >
+class loader<std::complex<T>, typename std::enable_if<std::is_floating_point<T>::value, void>::type >
 {
 public:
-    using complex_type = linalg::complex<T>;
+    using complex_type = std::complex<T>;
 public:
     template <typename obj>
     static bool is_type(const obj& val){return parse_complex<T>::is_complex(val);}

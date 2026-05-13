@@ -15,23 +15,23 @@
 #ifndef PYTTN_LINALG_LINALG_FORWARD_DECL_HPP_
 #define PYTTN_LINALG_LINALG_FORWARD_DECL_HPP_
 
-namespace linalg
-{
-    class backend_base
-    {
-    };
-} // namespace linalg
-
 #include <common/exception_handling.hpp>
 
-#include "utils/linalg_utils.hpp"
-#include "backends/blas_backend.hpp"
-#include "backends/cuda_backend.hpp"
-#include "utils/memory_helper.hpp"
-#include "utils/serialisation.hpp"
-
 namespace linalg
 {
+    namespace memory
+    {
+        template <typename T, typename backend>
+        class allocator;
+        template <typename src_bck, typename dest_bck>
+        class transfer;
+        template <typename T, typename backend>
+        class filler;
+    }
+    class blas_backend;
+#ifdef PYTTN_BUILD_CUDA
+    class cuda_backend;
+#endif
 
     // forward declaration of the traits types.  All linalg types have a traits object that provides additional information about the type
     template <typename Container, typename enabled = void>
@@ -138,11 +138,7 @@ namespace linalg
     template <typename Arr, typename data_type>
     class diagonal_matrix_view;
 
-    // additional details for dense tensor objects providing additional functionality
-    template <class ArrRef, size_t D = traits<ArrRef>::rank, bool is_mutable = traits<ArrRef>::is_mutable, typename backend_type = typename traits<ArrRef>::backend_type>
-    class tensor_details
-    {
-    };
+
 
     template <typename... Args>
     struct is_copy_assignable;
@@ -182,12 +178,29 @@ namespace linalg
     template <typename T, typename backend = blas_backend>
     class triangular_matrix;
 
+    namespace internal
+    {
+        template <typename T, typename backend>
+        struct buffer_reader_wrapper;
+        template <typename T, typename backend>
+        struct buffer_writer_wrapper;
+    }   //namespace internal
+
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //                         forward declaration of expression types                             //
     /////////////////////////////////////////////////////////////////////////////////////////////////
     namespace expression_templates
     {
+        namespace internal
+        {
+            template <typename type, typename expr, typename backend>
+            struct expression_applicative;
+            template <typename T, typename backend>
+            struct diagonal_matrix_view_storage_type;
+        }   //namespace internal
 
+        template <typename backend>
+        class random_engine;
         template <typename T>
         struct storage_traits;
         template <typename T, typename backend>
@@ -201,23 +214,16 @@ namespace linalg
         template <typename... Args>
         struct result_type;
 
-        template <typename derived, bool has_buffers = true>
-        class expression_base;
         template <typename expr, size_t rank, typename backend>
         class expression_tree;
-
-        // declaration of tensor index permutation expression objects
-        template <typename arrtype, bool conjugate, typename enabler = void>
-        class transpose_expression;
+        
         template <typename arrtype, typename enabler = void>
         class tensor_transpose_expression;
         template <typename arrtype, bool conjugate>
         class tensor_permutation_3_expression;
 
         /// declaration of tensor contraction expression objects
-        class tensor_contraction_expression
-        {
-        };
+        class tensor_contraction_expression{};
         template <typename impl>
         class matrix_vector_product_base;
         template <typename T1, typename T2, class enabled = void>
@@ -288,7 +294,5 @@ namespace linalg
     class arnoldi_iteration;
 
 } // namespace linalg
-
-#include "linalg_type_traits.hpp"
 
 #endif // PYTTN_LINALG_LINALG_FORWARD_DECL_HPP_

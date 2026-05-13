@@ -39,7 +39,7 @@ from .sSOPExt import (
     sPOP,
     sSOP,
 )
-from .stateExt import isKet, isSepState, ket, sepState, stateStr
+#from .stateExt import isKet, isSepState, ket, sepState, stateStr
 
 __all__: list[str] = [
     "SOP",
@@ -50,11 +50,11 @@ __all__: list[str] = [
     "sSOP",
     "sSOP",
     "OPBase",
-    "stateStr",
-    "sepState",
-    "ket",
-    "isSepState",
-    "isKet",
+    #"stateStr",
+    #"sepState",
+    #"ket",
+    #"isSepState",
+    #"isKet",
     "OperatorDictionary",
     "operator_dictionary",
     "liouville_space_superoperator",

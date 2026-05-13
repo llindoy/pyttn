@@ -29,8 +29,8 @@ namespace ttns
     {
     public:
         using backend_type = B;
-        using size_type = typename backend_type::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend_type>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
         ms_sop_env_node_data() {}
         ms_sop_env_node_data(const ms_sop_env_node_data &o) = default;

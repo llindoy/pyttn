@@ -42,9 +42,9 @@ namespace linalg
             using value_type =
                 typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
-            using int_type = typename backend_type::int_type;
+            using int_type = typename traits<backend_type>::int_type;
 
         protected:
             tensor<value_type, 1, backend_type> m_work;
@@ -161,7 +161,7 @@ namespace linalg
                                     "Failed to copy the matrix into working space.");
                     CALL_AND_RETHROW(compute(m_A, m_B, alpha, beta));
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigenvalues.");
@@ -199,7 +199,7 @@ namespace linalg
                         CALL_AND_RETHROW(compute(A, B, alpha, beta));
                     }
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigendecomposition.");
@@ -234,7 +234,7 @@ namespace linalg
                         "transpose the matrix so that it is in column major form.");
                     CALL_AND_RETHROW(compute(m_A, m_B, alpha, beta, vecs));
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigendecomposition.");
@@ -283,7 +283,7 @@ namespace linalg
                         CALL_AND_RETHROW(compute(A, B, alpha, vecs));
                     }
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigendecomposition.");
@@ -319,7 +319,7 @@ namespace linalg
                         "transpose the matrix so that it is in column major form.");
                     CALL_AND_RETHROW(compute(m_A, m_B, alpha, beta, vecs_r, vecs_l));
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigendecomposition.");
@@ -368,7 +368,7 @@ namespace linalg
                         CALL_AND_RETHROW(compute(A, B, alpha, beta, vecs_r, vecs_l));
                     }
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigendecomposition.");
@@ -399,7 +399,7 @@ namespace linalg
                     value_type worksize;
                     int_type LWORK = -1;
                     int_type LDB = B.shape(1);
-                    CALL_AND_HANDLE(backend_type::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
                                                        B.buffer(), LDB, m_alpha_r.buffer(),
                                                        m_alpha_i.buffer(), beta.buffer(), &VL,
                                                        LDVL, &VR, LDVR, &worksize, LWORK),
@@ -435,7 +435,7 @@ namespace linalg
                     value_type worksize;
                     int_type LWORK = -1;
                     int_type LDB = B.shape(1);
-                    CALL_AND_HANDLE(backend_type::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
                                                        B.buffer(), LDB, m_alpha_r.buffer(),
                                                        m_alpha_i.buffer(), beta.buffer(), &VL,
                                                        LDVL, rvecs, LDVR, &worksize, LWORK),
@@ -471,7 +471,7 @@ namespace linalg
                     value_type worksize;
                     int_type LWORK = -1;
                     int_type LDB = B.shape(1);
-                    CALL_AND_HANDLE(backend_type::ggev(
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::ggev(
                                         JOBVL, JOBVR, N, A.buffer(), LDA, B.buffer(), LDB,
                                         m_alpha_r.buffer(), m_alpha_i.buffer(), beta.buffer(),
                                         rvecsl, LDVL, rvecsr, LDVR, &worksize, LWORK),
@@ -515,7 +515,7 @@ namespace linalg
                 int_type LDVR = 1;
                 int_type LWORK = m_work.size();
                 int_type LDB = B.shape(1);
-                CALL_AND_HANDLE(backend_type::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
+                CALL_AND_HANDLE(backend_algebra<backend_type>::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
                                                    B.buffer(), LDB, m_alpha_r.buffer(),
                                                    m_alpha_i.buffer(), beta.buffer(), &VL,
                                                    LDVL, &VR, LDVR, m_work.buffer(), LWORK),
@@ -552,7 +552,7 @@ namespace linalg
                 int_type LDVR = vecs.shape(1);
                 int_type LWORK = m_work.size();
                 int_type LDB = B.shape(1);
-                CALL_AND_HANDLE(backend_type::ggev(
+                CALL_AND_HANDLE(backend_algebra<backend_type>::ggev(
                                     JOBVL, JOBVR, N, A.buffer(), LDA, B.buffer(), LDB,
                                     m_alpha_r.buffer(), m_alpha_i.buffer(), beta.buffer(),
                                     &VL, LDVL, rvecs, LDVR, m_work.buffer(), LWORK),
@@ -601,7 +601,7 @@ namespace linalg
                 int_type LDVR = vecs_r.shape(1);
                 int_type LWORK = m_work.size();
                 int_type LDB = B.shape(1);
-                CALL_AND_HANDLE(backend_type::ggev(
+                CALL_AND_HANDLE(backend_algebra<backend_type>::ggev(
                                     JOBVL, JOBVR, N, A.buffer(), LDA, B.buffer(), LDB,
                                     m_alpha_r.buffer(), m_alpha_i.buffer(), beta.buffer(),
                                     rvecsl, LDVL, rvecsr, LDVR, m_work.buffer(), LWORK),
@@ -631,7 +631,7 @@ namespace linalg
                 // sensible normalisation
                 CALL_AND_HANDLE(
                     for (size_type i = 0; i < vecs_r.shape(0); ++i) {
-                        complex<value_type> scaling = static_cast<value_type>(1.0) /
+                        std::complex<value_type> scaling = static_cast<value_type>(1.0) /
                                                       dot_product(conj(vecs_l[i]), vecs_r[i]);
                         vecs_r[i] *= scaling;
                     },
@@ -752,9 +752,9 @@ namespace linalg
         public:
             using value_type = typename traits<matrix_type>::value_type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
-            using int_type = typename backend_type::int_type;
+            using int_type = typename traits<backend_type>::int_type;
 
         protected:
             tensor<typename get_real_type<value_type>::type, 1, backend_type> m_rwork;
@@ -1085,7 +1085,7 @@ namespace linalg
                     value_type worksize;
                     int_type LWORK = -1;
                     int_type LDB = B.shape(1);
-                    CALL_AND_HANDLE(backend_type::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
                                                        B.buffer(), LDB, alpha.buffer(),
                                                        beta.buffer(), &VL, LDVL, &VR, LDVR,
                                                        &worksize, LWORK, m_rwork.buffer()),
@@ -1120,7 +1120,7 @@ namespace linalg
                     value_type worksize;
                     int_type LWORK = -1;
                     int_type LDB = B.shape(1);
-                    CALL_AND_HANDLE(backend_type::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
                                                        B.buffer(), LDB, alpha.buffer(),
                                                        beta.buffer(), &VL, LDVL,
                                                        vecs.buffer(), LDVR, &worksize, LWORK,
@@ -1156,7 +1156,7 @@ namespace linalg
                     value_type worksize;
                     int_type LWORK = -1;
                     int_type LDB = B.shape(1);
-                    CALL_AND_HANDLE(backend_type::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
                                                        B.buffer(), LDB, alpha.buffer(),
                                                        beta.buffer(), vecs_l.buffer(), LDVL,
                                                        vecs_r.buffer(), LDVR, &worksize,
@@ -1204,7 +1204,7 @@ namespace linalg
                 int_type LWORK = m_work.size();
                 int_type LDB = B.shape(1);
                 CALL_AND_HANDLE(
-                    backend_type::ggev(JOBVL, JOBVR, N, A.buffer(), LDA, B.buffer(), LDB,
+                    backend_algebra<backend_type>::ggev(JOBVL, JOBVR, N, A.buffer(), LDA, B.buffer(), LDB,
                                        alpha.buffer(), beta.buffer(), &VL, LDVL, &VR, LDVR,
                                        m_work.buffer(), LWORK, m_rwork.buffer()),
                     "Failed to compute eigenvalues of general matrix.  Failed when calling "
@@ -1236,7 +1236,7 @@ namespace linalg
                 int_type LDVR = vecs.shape(1);
                 int_type LWORK = m_work.size();
                 int_type LDB = B.shape(1);
-                CALL_AND_HANDLE(backend_type::ggev(
+                CALL_AND_HANDLE(backend_algebra<backend_type>::ggev(
                                     JOBVL, JOBVR, N, A.buffer(), LDA, B.buffer(), LDB,
                                     alpha.buffer(), beta.buffer(), &VL, LDVL, vecs.buffer(),
                                     LDVR, m_work.buffer(), LWORK, m_rwork.buffer()),
@@ -1274,7 +1274,7 @@ namespace linalg
                 int_type LDVR = vecs_r.shape(1);
                 int_type LWORK = m_work.size();
                 int_type LDB = B.shape(1);
-                CALL_AND_HANDLE(backend_type::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
+                CALL_AND_HANDLE(backend_algebra<backend_type>::ggev(JOBVL, JOBVR, N, A.buffer(), LDA,
                                                    B.buffer(), LDB, alpha.buffer(),
                                                    beta.buffer(), vecs_l.buffer(), LDVL,
                                                    vecs_r.buffer(), LDVR, m_work.buffer(),

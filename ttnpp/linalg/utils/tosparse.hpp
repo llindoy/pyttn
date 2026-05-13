@@ -17,7 +17,6 @@
 
 
 #include "../linalg_forward_decl.hpp"
-#include "../linalg_traits.hpp"
 
 namespace linalg
 {
@@ -26,10 +25,10 @@ template <typename T>
 class tosparse
 {
 protected:
-    using real_type = typename linalg::get_real_type<T>::type;
+    using real_type = typename get_real_type<T>::type;
 
 public:
-    static inline void convert(const linalg::matrix<T>& in, linalg::csr_matrix<T>& out, real_type tol=1e-14)
+    static inline void convert(const matrix<T, blas_backend>& in, csr_matrix<T, blas_backend>& out, real_type tol=1e-14)
     {
         //determine the number of non-zero elements in the dense matrix
         size_t nnz = 0;
@@ -37,7 +36,7 @@ public:
         {
             for(size_t j = 0; j < in.size(1); ++j)
             {
-                if(linalg::abs(in(i, j)) >= tol)
+                if(std::abs(in(i, j)) >= tol)
                 {
                     ++nnz;
                 }
@@ -55,7 +54,7 @@ public:
         {
             for(size_t j = 0; j < in.size(1); ++j)
             {
-                if(linalg::abs(in(i, j)) >= tol)
+                if(std::abs(in(i, j)) >= tol)
                 {
                     buffer[nnz] = in(i, j);
                     colind[nnz] = j;
@@ -67,6 +66,6 @@ public:
     }
 };
 
-}
+}   //namespace linalg
 
 #endif //PYTTN_LINALG_UTILS_TOSPARSE_HPP_

@@ -29,7 +29,7 @@ namespace ttns
     struct multiset_slice_node_storage_type<T, backend, true>
     {
     public:
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
         using node_type = typename ms_ttn<T, backend>::node_type;
         using type = const node_type &;
 
@@ -53,7 +53,7 @@ namespace ttns
     struct multiset_slice_node_storage_type<T, backend, false>
     {
     public:
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
         using node_type = typename ms_ttn<T, backend>::node_type;
         using type = node_type &;
         multiset_slice_node_storage_type(type obj) : m_obj(obj) {}
@@ -76,7 +76,7 @@ namespace ttns
     class multiset_ttn_node_slice : multiset_slice_node_storage_type<T, backend, CONST>
     {
     public:
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
         using base_type = multiset_slice_node_storage_type<T, backend, CONST>;
         using obj_type = typename base_type::type;
 
@@ -141,7 +141,7 @@ namespace ttns
     struct multiset_slice_storage_type<T, backend, true>
     {
     public:
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
         using type = const ms_ttn<T, backend> &;
         multiset_slice_storage_type(type obj) : m_obj(obj) {}
 
@@ -174,7 +174,7 @@ namespace ttns
     struct multiset_slice_storage_type<T, backend, false>
     {
     public:
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
         using type = ms_ttn<T, backend> &;
 
         using slice_ref = multiset_ttn_node_slice<T, backend, false>;
@@ -208,7 +208,7 @@ namespace ttns
     class multiset_ttn_slice : multiset_slice_storage_type<T, backend, CONST>
     {
     public:
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
         using base_type = multiset_slice_storage_type<T, backend, CONST>;
         using obj_type = typename base_type::type;
 

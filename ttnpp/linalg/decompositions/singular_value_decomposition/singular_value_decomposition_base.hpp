@@ -182,8 +182,59 @@ namespace linalg
 
         template <typename T, typename backend, bool use_divide_and_conquer = true>
         struct singular_value_decomposition_helper;
+        
         template <typename matrix_type, bool use_divide_and_conquer = true, typename enabler = void>
-        class dense_matrix_singular_value_decomposition;
+        class dense_matrix_singular_value_decomposition
+        {
+            using value_type = typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
+            using backend_type = typename traits<matrix_type>::backend_type;
+            using int_type = typename traits<backend_type>::int_type;
+
+            using size_type = typename traits<backend_type>::size_type;
+            using mem_trans = memory::transfer<backend_type, backend_type>;
+        public:
+            dense_matrix_singular_value_decomposition();
+            dense_matrix_singular_value_decomposition(size_type m, size_type n, bool requires_matrix = true) ;
+            template <typename mat_type, typename = typename std::enable_if<is_tensor<mat_type>::value, void>::type, typename = valid_decomp_matrix_type<matrix_type, mat_type, void>>
+            dense_matrix_singular_value_decomposition(const mat_type &mat, bool requires_matrix = true);
+
+            /////////////////////////////////////////////////////////////////////////////////////////
+            // Functions for resizing the internal buffers required for computing a singular values//
+            // decomposition                                                                       //
+            /////////////////////////////////////////////////////////////////////////////////////////
+            void resize(size_type m, size_type n, bool /*requires_matrix*/ = true); 
+            
+            template <typename mat_type>
+            valid_decomp_matrix_type<matrix_type, mat_type, void> resize(const mat_type &mat, bool requires_matrix = true);
+            void resize_work_space(size_type worksize);
+
+            /////////////////////////////////////////////////////////////////////////////////////////
+            // Functions for clearing the single value decomposition engine
+            /////////////////////////////////////////////////////////////////////////////////////////
+            void clear();
+
+            /////////////////////////////////////////////////////////////////////////////////////////
+            // Functions for computing the singular values decomposition of a general dense matrix //
+            /////////////////////////////////////////////////////////////////////////////////////////
+
+            // Functions for just computing the singular values
+            template <typename mat_type, typename vals_type>
+            valid_decomp_func<matrix_type, mat_type, void, validate_real_vals_type, vals_type> operator()(const mat_type &mat, vals_type &S);
+
+            // Functions for computing the singular values and left and right singular vectors
+            template <typename mat_type, typename vals_type, typename uvecs_type, typename vvecs_type>
+            valid_decomp_func<matrix_type, mat_type, void, validate_real_vals_vecs_rl_type, vals_type, uvecs_type, vvecs_type> operator()(const mat_type &mat, vals_type &S, uvecs_type &U, vvecs_type &Vh, bool compute_full = true);
+
+            //////////////////////////////////////////////////////////////////////////////////////////
+            //  Functions for determining the optimal workspace for singular valuesdecomposition    //
+            //////////////////////////////////////////////////////////////////////////////////////////
+            template <typename mat_type, typename vals_type>
+            valid_decomp_func<matrix_type, mat_type, size_type, validate_vals_type, vals_type> query_work_space(const mat_type &mat, vals_type &S);
+
+            template <typename mat_type, typename vals_type, typename uvecs_type, typename vvecs_type>
+            valid_decomp_func<matrix_type, mat_type, size_type, validate_real_vals_vecs_rl_type, vals_type, uvecs_type, vvecs_type> query_work_space(const mat_type &mat, vals_type &S, uvecs_type &U, vvecs_type &Vh, bool compute_full = true);
+        };
+
     } // namespace internal
 } // namespace linalg
 

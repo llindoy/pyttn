@@ -16,6 +16,9 @@
 #define PYTTN_LINALG_DECOMPOSITIONS_SINGULAR_VALUE_DECOMPOSITION_BLAS_HPP_
 
 #include "singular_value_decomposition_base.hpp"
+#include "../../backends/blas/blas_algebra.hpp"
+#include "../../backends/blas/blas_backend.hpp"
+
 
 namespace linalg
 {
@@ -26,10 +29,12 @@ namespace linalg
         template <typename T>
         struct singular_value_decomposition_helper<T, blas_backend, false>
         {
-            using int_type = blas_backend::int_type;
+            using backend_type = blas_backend;
+
+            using int_type = typename traits<backend_type>::int_type;
             static_assert(is_number<T>::value && !is_complex<T>::value, "Failed to initialise singular value decomposition working space object.");
-            using size_type = blas_backend::size_type;
-            using memfill = memory::filler<T, blas_backend>;
+            using size_type = typename traits<backend_type>::size_type;
+            using memfill = memory::filler<T, backend_type>;
 
             struct additional_working
             {
@@ -40,7 +45,7 @@ namespace linalg
             static inline void call(bool compute_vectors, const int_type M, const int_type N, T *A, const int_type LDA, T *S, T *U, const int_type LDU, T *VT, const int_type LDVT, T *WORK, const int_type LWORK, additional_working & /* working */)
             {
                 char JOBZ = (compute_vectors ? 'A' : 'N');
-                CALL_AND_RETHROW(blas_backend::gesvd(JOBZ, JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, WORK, LWORK));
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd(JOBZ, JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, WORK, LWORK));
             }
 
             static inline int_type query_worksize(bool compute_vectors, const int_type M, const int_type N, T *A, const int_type LDA, T *S, T *U, const int_type LDU, T *VT, const int_type LDVT, additional_working & /* working */)
@@ -48,7 +53,7 @@ namespace linalg
                 T worksize;
                 int_type lwork = -1;
                 char JOBZ = (compute_vectors ? 'A' : 'N');
-                CALL_AND_RETHROW(blas_backend::gesvd(JOBZ, JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, &worksize, lwork));
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd(JOBZ, JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, &worksize, lwork));
                 CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
             }
 
@@ -60,12 +65,12 @@ namespace linalg
                 // if MM < NN then the second possible result argument (U^T) is not referenced so R must store (VT^T) and A will store U^T on exit
                 if (MM < NN)
                 {
-                    CALL_AND_RETHROW(blas_backend::gesvd('A', 'O', MM, NN, A, LDA, S, R, LDR, &nref, 1, WORK, LWORK));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('A', 'O', MM, NN, A, LDA, S, R, LDR, &nref, 1, WORK, LWORK));
                 }
                 // otherwise the first result argument (VT^T) is not referenced
                 else
                 {
-                    CALL_AND_RETHROW(blas_backend::gesvd('O', 'A', MM, NN, A, LDA, S, &nref, 1, R, LDR, WORK, LWORK));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('O', 'A', MM, NN, A, LDA, S, &nref, 1, R, LDR, WORK, LWORK));
                 }
             }
 
@@ -78,12 +83,12 @@ namespace linalg
                 // if MM < NN then the second possible result argument (U^T) is not referenced so R must store (VT^T) and A will store U^T on exit
                 if (MM < NN)
                 {
-                    CALL_AND_RETHROW(blas_backend::gesvd('A', 'O', MM, NN, A, LDA, S, R, LDR, &nref, 1, &worksize, lwork));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('A', 'O', MM, NN, A, LDA, S, R, LDR, &nref, 1, &worksize, lwork));
                 }
                 // otherwise the first result argument (VT^T) is not referenced
                 else
                 {
-                    CALL_AND_RETHROW(blas_backend::gesvd('O', 'A', MM, NN, A, LDA, S, &nref, 1, R, LDR, &worksize, lwork));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('O', 'A', MM, NN, A, LDA, S, &nref, 1, R, LDR, &worksize, lwork));
                 }
 
                 CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
@@ -91,16 +96,18 @@ namespace linalg
         };
 
         template <typename T>
-        struct singular_value_decomposition_helper<complex<T>, blas_backend, false>
+        struct singular_value_decomposition_helper<std::complex<T>, blas_backend, false>
         {
-            using int_type = blas_backend::int_type;
+            using backend_type = blas_backend;
+
+            using int_type = typename traits<backend_type>::int_type;
             static_assert(is_number<T>::value && !is_complex<T>::value, "Failed to initialise singular value decomposition working space object.");
-            using size_type = blas_backend::size_type;
-            using memfill = memory::filler<complex<T>, blas_backend>;
+            using size_type = typename traits<backend_type>::size_type;
+            using memfill = memory::filler<std::complex<T>, backend_type>;
 
             struct additional_working
             {
-                tensor<T, 1> m_rwork;
+                tensor<T, 1, blas_backend> m_rwork;
                 void resize(size_type m, size_type n)
                 {
                     size_type mn = m < n ? m : n;
@@ -108,53 +115,53 @@ namespace linalg
                 }
                 void clear() { CALL_AND_RETHROW(m_rwork.clear()); }
             };
-            static inline void call(bool compute_vectors, const int_type M, const int_type N, complex<T> *A, const int_type LDA, T *S, complex<T> *U, const int_type LDU, complex<T> *VT, const int_type LDVT, complex<T> *WORK, const int_type LWORK, additional_working &working)
+            static inline void call(bool compute_vectors, const int_type M, const int_type N, std::complex<T> *A, const int_type LDA, T *S, std::complex<T> *U, const int_type LDU, std::complex<T> *VT, const int_type LDVT, std::complex<T> *WORK, const int_type LWORK, additional_working &working)
             {
                 char JOBZ = (compute_vectors ? 'A' : 'N');
-                CALL_AND_RETHROW(blas_backend::gesvd(JOBZ, JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, WORK, LWORK, working.m_rwork.buffer()));
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd(JOBZ, JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, WORK, LWORK, working.m_rwork.buffer()));
             }
 
-            static inline int_type query_worksize(bool compute_vectors, const int_type M, const int_type N, complex<T> *A, const int_type LDA, T *S, complex<T> *U, const int_type LDU, complex<T> *VT, const int_type LDVT, additional_working &working)
+            static inline int_type query_worksize(bool compute_vectors, const int_type M, const int_type N, std::complex<T> *A, const int_type LDA, T *S, std::complex<T> *U, const int_type LDU, std::complex<T> *VT, const int_type LDVT, additional_working &working)
             {
-                complex<T> worksize;
+                std::complex<T> worksize;
                 int_type lwork = -1;
                 char JOBZ = (compute_vectors ? 'A' : 'N');
-                CALL_AND_RETHROW(blas_backend::gesvd(JOBZ, JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, &worksize, lwork, working.m_rwork.buffer()));
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd(JOBZ, JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, &worksize, lwork, working.m_rwork.buffer()));
                 CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
             }
 
-            static inline void call_inplace(const int_type M, const int_type N, complex<T> *A, const int_type LDA, T *S, complex<T> *R, const int_type LDR, complex<T> *WORK, const int_type LWORK, additional_working &working)
+            static inline void call_inplace(const int_type M, const int_type N, std::complex<T> *A, const int_type LDA, T *S, std::complex<T> *R, const int_type LDR, std::complex<T> *WORK, const int_type LWORK, additional_working &working)
             {
                 int_type MM = N;
                 int_type NN = M;
-                complex<T> nref;
+                std::complex<T> nref;
                 // if MM < NN then the second possible result argument (U^T) is not referenced so R must store (VT^T) and A will store U^T on exit
                 if (MM < NN)
                 {
-                    CALL_AND_RETHROW(blas_backend::gesvd('A', 'O', MM, NN, A, LDA, S, R, LDR, &nref, 1, WORK, LWORK, working.m_rwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('A', 'O', MM, NN, A, LDA, S, R, LDR, &nref, 1, WORK, LWORK, working.m_rwork.buffer()));
                 }
                 // otherwise the first result argument (VT^T) is not referenced
                 else
                 {
-                    CALL_AND_RETHROW(blas_backend::gesvd('O', 'A', MM, NN, A, LDA, S, &nref, 1, R, LDR, WORK, LWORK, working.m_rwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('O', 'A', MM, NN, A, LDA, S, &nref, 1, R, LDR, WORK, LWORK, working.m_rwork.buffer()));
                 }
             }
 
-            static inline int_type query_worksize_inplace(const int_type M, const int_type N, complex<T> *A, const int_type LDA, T *S, complex<T> *R, const int_type LDR, additional_working &working)
+            static inline int_type query_worksize_inplace(const int_type M, const int_type N, std::complex<T> *A, const int_type LDA, T *S, std::complex<T> *R, const int_type LDR, additional_working &working)
             {
-                complex<T> worksize, nref;
+                std::complex<T> worksize, nref;
                 int_type lwork = -1;
                 int_type MM = N;
                 int_type NN = M;
                 // if MM < NN then the second possible result argument (U^T) is not referenced so R must store (VT^T) and A will store U^T on exit
                 if (MM < NN)
                 {
-                    CALL_AND_RETHROW(blas_backend::gesvd('A', 'O', MM, NN, A, LDA, S, R, LDR, &nref, 1, &worksize, lwork, working.m_rwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('A', 'O', MM, NN, A, LDA, S, R, LDR, &nref, 1, &worksize, lwork, working.m_rwork.buffer()));
                 }
                 // otherwise the first result argument (VT^T) is not referenced
                 else
                 {
-                    CALL_AND_RETHROW(blas_backend::gesvd('O', 'A', MM, NN, A, LDA, S, &nref, 1, R, LDR, &worksize, lwork, working.m_rwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesvd('O', 'A', MM, NN, A, LDA, S, &nref, 1, R, LDR, &worksize, lwork, working.m_rwork.buffer()));
                 }
                 CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
             }
@@ -163,14 +170,16 @@ namespace linalg
         template <typename T>
         struct singular_value_decomposition_helper<T, blas_backend, true>
         {
-            using int_type = blas_backend::int_type;
+            using backend_type = blas_backend;
+
+            using int_type = typename traits<backend_type>::int_type;
             static_assert(is_number<T>::value && !is_complex<T>::value, "Failed to initialise singular value decomposition working space object.");
-            using size_type = blas_backend::size_type;
-            using memfill = memory::filler<T, blas_backend>;
+            using size_type = typename traits<backend_type>::size_type;
+            using memfill = memory::filler<T, backend_type>;
 
             struct additional_working
             {
-                linalg::tensor<int, 1, blas_backend> m_iwork;
+                linalg::tensor<int, 1, backend_type> m_iwork;
                 void resize(size_type m, size_type n)
                 {
                     size_type mn = m < n ? m : n;
@@ -183,7 +192,7 @@ namespace linalg
             {
                 // we need to compute A^T = VT^T S U^T as lapack expects a column major matrix but we are passing in a row major matrix.
                 char JOBZ = (compute_vectors ? 'A' : 'N');
-                CALL_AND_RETHROW(blas_backend::gesdd(JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, WORK, LWORK, working.m_iwork.buffer()));
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd(JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, WORK, LWORK, working.m_iwork.buffer()));
             }
 
             static inline int_type query_worksize(bool compute_vectors, const int_type M, const int_type N, T *A, const int_type LDA, T *S, T *U, const int_type LDU, T *VT, const int_type LDVT, additional_working &working)
@@ -191,7 +200,7 @@ namespace linalg
                 T worksize;
                 int_type lwork = -1;
                 char JOBZ = (compute_vectors ? 'A' : 'N');
-                CALL_AND_RETHROW(blas_backend::gesdd(JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, &worksize, lwork, working.m_iwork.buffer()));
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd(JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, &worksize, lwork, working.m_iwork.buffer()));
                 CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
             }
 
@@ -203,12 +212,12 @@ namespace linalg
                 // if MM < NN then the second possible result argument (U^T) is not referenced so R must store (VT^T) and A will store U^T on exit
                 if (MM < NN)
                 {
-                    CALL_AND_RETHROW(blas_backend::gesdd('O', MM, NN, A, LDA, S, R, LDR, &nref, 1, WORK, LWORK, working.m_iwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd('O', MM, NN, A, LDA, S, R, LDR, &nref, 1, WORK, LWORK, working.m_iwork.buffer()));
                 }
                 // otherwise the first result argument (VT^T) is not referenced
                 else
                 {
-                    CALL_AND_RETHROW(blas_backend::gesdd('O', MM, NN, A, LDA, S, &nref, 1, R, LDR, WORK, LWORK, working.m_iwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd('O', MM, NN, A, LDA, S, &nref, 1, R, LDR, WORK, LWORK, working.m_iwork.buffer()));
                 }
             }
 
@@ -221,12 +230,12 @@ namespace linalg
                 // if MM < NN then the second possible result argument (U^T) is not referenced so R must store (VT^T) and A will store U^T on exit
                 if (MM < NN)
                 {
-                    CALL_AND_RETHROW(blas_backend::gesdd('O', MM, NN, A, LDA, S, R, LDR, &nref, 1, &worksize, lwork, working.m_iwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd('O', MM, NN, A, LDA, S, R, LDR, &nref, 1, &worksize, lwork, working.m_iwork.buffer()));
                 }
                 // otherwise the first result argument (VT^T) is not referenced
                 else
                 {
-                    CALL_AND_RETHROW(blas_backend::gesdd('O', MM, NN, A, LDA, S, &nref, 1, R, LDR, &worksize, lwork, working.m_iwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd('O', MM, NN, A, LDA, S, &nref, 1, R, LDR, &worksize, lwork, working.m_iwork.buffer()));
                 }
 
                 CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
@@ -234,16 +243,18 @@ namespace linalg
         };
 
         template <typename T>
-        struct singular_value_decomposition_helper<complex<T>, blas_backend, true>
+        struct singular_value_decomposition_helper<std::complex<T>, blas_backend, true>
         {
-            using int_type = blas_backend::int_type;
+            using backend_type = blas_backend;
+
+            using int_type = typename traits<backend_type>::int_type;
             static_assert(is_number<T>::value && !is_complex<T>::value, "Failed to initialise singular value decomposition working space object.");
-            using size_type = blas_backend::size_type;
-            using memfill = memory::filler<complex<T>, blas_backend>;
+            using size_type = typename traits<backend_type>::size_type;
+            using memfill = memory::filler<std::complex<T>, backend_type>;
 
             struct additional_working
             {
-                tensor<T, 1> m_rwork;
+                tensor<T, 1, blas_backend> m_rwork;
                 tensor<int, 1> m_iwork;
                 void resize(size_type m, size_type n)
                 {
@@ -266,54 +277,54 @@ namespace linalg
                     CALL_AND_RETHROW(m_iwork.clear());
                 }
             };
-            static inline void call(bool compute_vectors, const int_type M, const int_type N, complex<T> *A, const int_type LDA, T *S, complex<T> *U, const int_type LDU, complex<T> *VT, const int_type LDVT, complex<T> *WORK, const int_type LWORK, additional_working &working)
+            static inline void call(bool compute_vectors, const int_type M, const int_type N, std::complex<T> *A, const int_type LDA, T *S, std::complex<T> *U, const int_type LDU, std::complex<T> *VT, const int_type LDVT, std::complex<T> *WORK, const int_type LWORK, additional_working &working)
             {
                 // we need to compute A^T = VT^T S U^T as lapack expects a column major matrix but we are passing in a row major matrix.
                 char JOBZ = (compute_vectors ? 'A' : 'N');
-                CALL_AND_RETHROW(blas_backend::gesdd(JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, WORK, LWORK, working.m_rwork.buffer(), working.m_iwork.buffer()));
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd(JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, WORK, LWORK, working.m_rwork.buffer(), working.m_iwork.buffer()));
             }
 
-            static inline int_type query_worksize(bool compute_vectors, const int_type M, const int_type N, complex<T> *A, const int_type LDA, T *S, complex<T> *U, const int_type LDU, complex<T> *VT, const int_type LDVT, additional_working &working)
+            static inline int_type query_worksize(bool compute_vectors, const int_type M, const int_type N, std::complex<T> *A, const int_type LDA, T *S, std::complex<T> *U, const int_type LDU, std::complex<T> *VT, const int_type LDVT, additional_working &working)
             {
-                complex<T> worksize;
+                std::complex<T> worksize;
                 int_type lwork = -1;
                 char JOBZ = (compute_vectors ? 'A' : 'N');
-                CALL_AND_RETHROW(blas_backend::gesdd(JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, &worksize, lwork, working.m_rwork.buffer(), working.m_iwork.buffer()));
+                CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd(JOBZ, N, M, A, LDA, S, VT, LDVT, U, LDU, &worksize, lwork, working.m_rwork.buffer(), working.m_iwork.buffer()));
                 CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
             }
 
-            static inline void call_inplace(const int_type M, const int_type N, complex<T> *A, const int_type LDA, T *S, complex<T> *R, const int_type LDR, complex<T> *WORK, const int_type LWORK, additional_working &working)
+            static inline void call_inplace(const int_type M, const int_type N, std::complex<T> *A, const int_type LDA, T *S, std::complex<T> *R, const int_type LDR, std::complex<T> *WORK, const int_type LWORK, additional_working &working)
             {
                 int_type MM = N;
                 int_type NN = M;
-                complex<T> nref;
+                std::complex<T> nref;
                 // if MM < NN then the second possible result argument (U^T) is not referenced so R must store (VT^T) and A will store U^T on exit
                 if (MM < NN)
                 {
-                    CALL_AND_RETHROW(blas_backend::gesdd('O', MM, NN, A, LDA, S, R, LDR, &nref, 1, WORK, LWORK, working.m_rwork.buffer(), working.m_iwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd('O', MM, NN, A, LDA, S, R, LDR, &nref, 1, WORK, LWORK, working.m_rwork.buffer(), working.m_iwork.buffer()));
                 }
                 // otherwise the first result argument (VT^T) is not referenced
                 else
                 {
-                    CALL_AND_RETHROW(blas_backend::gesdd('O', MM, NN, A, LDA, S, &nref, 1, R, LDR, WORK, LWORK, working.m_rwork.buffer(), working.m_iwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd('O', MM, NN, A, LDA, S, &nref, 1, R, LDR, WORK, LWORK, working.m_rwork.buffer(), working.m_iwork.buffer()));
                 }
             }
 
-            static inline int_type query_worksize_inplace(const int_type M, const int_type N, complex<T> *A, const int_type LDA, T *S, complex<T> *R, const int_type LDR, additional_working &working)
+            static inline int_type query_worksize_inplace(const int_type M, const int_type N, std::complex<T> *A, const int_type LDA, T *S, std::complex<T> *R, const int_type LDR, additional_working &working)
             {
-                complex<T> worksize, nref;
+                std::complex<T> worksize, nref;
                 int_type lwork = -1;
                 int_type MM = N;
                 int_type NN = M;
                 // if MM < NN then the second possible result argument (U^T) is not referenced so R must store (VT^T) and A will store U^T on exit
                 if (MM < NN)
                 {
-                    CALL_AND_RETHROW(blas_backend::gesdd('O', MM, NN, A, LDA, S, R, LDR, &nref, 1, &worksize, lwork, working.m_rwork.buffer(), working.m_iwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd('O', MM, NN, A, LDA, S, R, LDR, &nref, 1, &worksize, lwork, working.m_rwork.buffer(), working.m_iwork.buffer()));
                 }
                 // otherwise the first result argument (VT^T) is not referenced
                 else
                 {
-                    CALL_AND_RETHROW(blas_backend::gesdd('O', MM, NN, A, LDA, S, &nref, 1, R, LDR, &worksize, lwork, working.m_rwork.buffer(), working.m_iwork.buffer()));
+                    CALL_AND_RETHROW(backend_algebra<backend_type>::gesdd('O', MM, NN, A, LDA, S, &nref, 1, R, LDR, &worksize, lwork, working.m_rwork.buffer(), working.m_iwork.buffer()));
                 }
                 CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
             }
@@ -323,10 +334,10 @@ namespace linalg
         class dense_matrix_singular_value_decomposition<matrix_type, use_divide_and_conquer, typename std::enable_if<is_dense_matrix<matrix_type>::value && std::is_same<typename traits<matrix_type>::backend_type, blas_backend>::value, void>::type>
         {
         public:
-            using int_type = blas_backend::int_type;
+            using int_type = typename traits<blas_backend>::int_type;
             using value_type = typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
             using helper = singular_value_decomposition_helper<value_type, backend_type, use_divide_and_conquer>;
 

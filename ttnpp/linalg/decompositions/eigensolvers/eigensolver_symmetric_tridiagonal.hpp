@@ -16,6 +16,8 @@
 #define PYTTN_LINALG_DECOMPOSITIONS_EIGENSOLVERS_EIGENSOLVER_SYMMETRIC_TRIDIAGONAL_HPP_
 
 #include "eigensolver_base.hpp"
+#include "../../backends/blas/blas_algebra.hpp"
+#include "../../backends/blas/blas_backend.hpp"
 
 namespace linalg
 {
@@ -27,8 +29,8 @@ namespace linalg
             static_assert(is_symtridiag_matrix_type<matrix_type>::value && std::is_same<typename traits<matrix_type>::backend_type, blas_backend>::value && !is_complex<typename traits<matrix_type>::value_type>::value, "Invalid template parameter for symmetric_tridiagonal_eigensolver");
 
         public:
-            using int_type = blas_backend::blas_int_type;
-            using size_type = blas_backend::size_type;
+            using int_type = blas_backend::int_type;
+            using size_type = typename traits<blas_backend>::size_type;
             using mem_trans = memory::transfer<blas_backend, blas_backend>;
             using value_type = typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
 
@@ -103,7 +105,7 @@ namespace linalg
                     value_type Z;
                     int_type ldz = 1;
                     value_type work;
-                    CALL_AND_HANDLE(blas_backend::stev(JOBZ, n, mat.D(), mat.E(), &Z, ldz, &work), "Failed when making lapack call.");
+                    CALL_AND_HANDLE(backend_algebra<blas_backend>::stev(JOBZ, n, mat.D(), mat.E(), &Z, ldz, &work), "Failed when making lapack call.");
                 }
                 catch (const common::invalid_value &ex)
                 {
@@ -126,7 +128,7 @@ namespace linalg
                     value_type Z;
                     int_type ldz = 1;
                     value_type work;
-                    CALL_AND_HANDLE(blas_backend::stev(JOBZ, n, mat.D(), mat.E(), &Z, ldz, &work), "Failed when making lapack call.");
+                    CALL_AND_HANDLE(backend_algebra<blas_backend>::stev(JOBZ, n, mat.D(), mat.E(), &Z, ldz, &work), "Failed when making lapack call.");
                 }
                 catch (const common::invalid_value &ex)
                 {
@@ -155,7 +157,7 @@ namespace linalg
 
                     CALL_AND_HANDLE(mem_trans::copy(mat.D(), mat.shape(0), eigs.buffer()), "Failed to copy the diagonal component to a temporary buffer.");
                     CALL_AND_HANDLE(mem_trans::copy(mat.E(), mat.shape(0) - 1, m_E.buffer()), "Failed to copy the off-diagonal component to a temporary buffer.");
-                    CALL_AND_HANDLE(blas_backend::stev(JOBZ, n, eigs.buffer(), m_E.buffer(), &Z, ldz, &work), "Failed when making lapack call.");
+                    CALL_AND_HANDLE(backend_algebra<blas_backend>::stev(JOBZ, n, eigs.buffer(), m_E.buffer(), &Z, ldz, &work), "Failed when making lapack call.");
                 }
                 catch (const common::invalid_value &ex)
                 {
@@ -184,11 +186,11 @@ namespace linalg
                     if (keep_inputs)
                     {
                         CALL_AND_HANDLE(mem_trans::copy(mat.E(), mat.shape(0) - 1, m_E.buffer()), "Failed to copy the off-diagonal component to a temporary buffer.");
-                        CALL_AND_HANDLE(blas_backend::stev(JOBZ, n, eigs.buffer(), m_E.buffer(), &Z, ldz, &work), "Failed when making lapack call.");
+                        CALL_AND_HANDLE(backend_algebra<blas_backend>::stev(JOBZ, n, eigs.buffer(), m_E.buffer(), &Z, ldz, &work), "Failed when making lapack call.");
                     }
                     else
                     {
-                        CALL_AND_HANDLE(blas_backend::stev(JOBZ, n, eigs.buffer(), mat.E(), &Z, ldz, &work), "Failed when making lapack call.");
+                        CALL_AND_HANDLE(backend_algebra<blas_backend>::stev(JOBZ, n, eigs.buffer(), mat.E(), &Z, ldz, &work), "Failed when making lapack call.");
                     }
                 }
                 catch (const common::invalid_value &ex)
@@ -215,7 +217,7 @@ namespace linalg
 
                     CALL_AND_HANDLE(mem_trans::copy(mat.D(), mat.shape(0), eigs.buffer()), "Failed to copy the diagonal component to a temporary buffer.");
                     CALL_AND_HANDLE(mem_trans::copy(mat.E(), mat.shape(0) - 1, m_E.buffer()), "Failed to copy the off-diagonal component to a temporary buffer.");
-                    CALL_AND_HANDLE(blas_backend::stev(JOBZ, n, eigs.buffer(), m_E.buffer(), vecs.buffer(), ldz, m_work.buffer()), "Failed when making lapack call.");
+                    CALL_AND_HANDLE(backend_algebra<blas_backend>::stev(JOBZ, n, eigs.buffer(), m_E.buffer(), vecs.buffer(), ldz, m_work.buffer()), "Failed when making lapack call.");
                     CALL_AND_HANDLE(vecs = trans(vecs), "Failed when transposing the resulting vecs array to get the correct eigenvectors.");
                 }
                 catch (const common::invalid_value &ex)
@@ -243,12 +245,12 @@ namespace linalg
                     if (keep_inputs)
                     {
                         CALL_AND_HANDLE(mem_trans::copy(mat.E(), mat.shape(0) - 1, m_E.buffer()), "FFailed to copy the off-diagonal component to a temporary buffer.");
-                        CALL_AND_HANDLE(blas_backend::stev(JOBZ, n, eigs.buffer(), m_E.buffer(), vecs.buffer(), ldz, m_work.buffer()), "Failed when making lapack call.");
+                        CALL_AND_HANDLE(backend_algebra<blas_backend>::stev(JOBZ, n, eigs.buffer(), m_E.buffer(), vecs.buffer(), ldz, m_work.buffer()), "Failed when making lapack call.");
                         CALL_AND_HANDLE(vecs = trans(vecs), "Failed when transposing the resulting vecs array to get the correct eigenvectors.");
                     }
                     else
                     {
-                        CALL_AND_HANDLE(blas_backend::stev(JOBZ, n, eigs.buffer(), mat.E(), vecs.buffer(), ldz, m_work.buffer()), "Failed when making lapack call.");
+                        CALL_AND_HANDLE(backend_algebra<blas_backend>::stev(JOBZ, n, eigs.buffer(), mat.E(), vecs.buffer(), ldz, m_work.buffer()), "Failed when making lapack call.");
                         CALL_AND_HANDLE(vecs = trans(vecs), "Failed when transposing the resulting vecs array to get the correct eigenvectors.");
                     }
                 }

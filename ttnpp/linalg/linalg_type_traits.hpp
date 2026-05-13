@@ -19,6 +19,7 @@
 #include <array>
 
 #include "utils/linalg_utils.hpp"
+#include "backends/backend.hpp"
 
 namespace linalg
 {

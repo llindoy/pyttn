@@ -1,9 +1,8 @@
+
 image: python:3.13
 
 stages:
   - build
-  - lint
-  - test
   - pages
 
 before_script:
@@ -18,7 +17,7 @@ cache:
   key: pip-global-cache
   paths:
     - $CI_PROJECT_DIR/.cache/pip
-    
+
 build:
   stage: build
   rules:
@@ -27,43 +26,17 @@ build:
   - when: always
 
   script:
-    - export CMAKE_BUILD_PARALLEL_LEVEL=4
-    - export PARALLEL_BUILD_TTNPP=8
-    - python -m pip -v install .
+    - export CMAKE_BUILD_PARALLEL_LEVEL=2
+    - export PARALLEL_BUILD_TTNPP=2
+    - python -m pip -v install .[lint,test]
 
-  artifacts:
-    paths:
-        - /builds/quantum-software/pyttn/pyttn/
-        - /builds/qsm/pyttn/pyttn/
-
-lint:
-  stage: lint
-  rules:
-  - if: '$CI_COMMIT_BRANCH == "docs"'
-    when: never
-  - when: always
-
-  script:
-    - export SKIP_BUILD_TTNPP_LIBRARY=True
-    - python -m pip -v install .[lint]
-    - ruff check
-
-test:
-  stage: test
-  rules:
-  - if: '$CI_COMMIT_BRANCH == "docs"'
-    when: never
-  - when: always
-
-  script:
-    - export SKIP_BUILD_TTNPP_LIBRARY=True
-    - python -m pip -v install .[test]
-    - python -m pytest -n 2
+    - ruff check .
+    - python -m pytest -n 2 tests
 
 pages:
   stage: pages
   rules:
-  - if: '$CI_COMMIT_BRANCH == "docs"'
+  - if: '$CI_COMMIT_BRANCH == "docs" || $CI_COMMIT_BRANCH == "main"'
     when: always
   - when: never
 
@@ -81,4 +54,3 @@ pages:
   artifacts:
     paths:
       - public
-

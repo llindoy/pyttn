@@ -16,6 +16,8 @@
  #define PYTTN_LINALG_DECOMPOSITIONS_QR_BLAS_HPP_
 
 #include "qr_base.hpp"
+#include "../../backends/blas/blas_algebra.hpp"
+#include "../../backends/blas/blas_backend.hpp"
 
 namespace linalg
 {
@@ -25,12 +27,13 @@ namespace linalg
         template <typename T>
         struct qr_helper<T, blas_backend>
         {
-            using int_type = blas_backend::int_type;
+            using int_type = typename traits<blas_backend>::int_type;
             static_assert(is_number<T>::value && !is_complex<T>::value,
                           "Failed to initialise singular value decomposition working "
                           "space object.");
-            using size_type = blas_backend::size_type;
+            using size_type = typename traits<blas_backend>::size_type;
             using memfill = memory::filler<T, blas_backend>;
+            using backend_type = blas_backend;
 
             struct additional_working
             {
@@ -42,7 +45,7 @@ namespace linalg
                                        const int_type lda, T *tau, T *work,
                                        const int_type lwork)
             {
-                CALL_AND_HANDLE(blas_backend::gelqf(m, n, a, lda, tau, work, lwork),
+                CALL_AND_HANDLE(backend_algebra<backend_type>::gelqf(m, n, a, lda, tau, work, lwork),
                                 "Failed to perform lq call.");
             }
 
@@ -50,7 +53,7 @@ namespace linalg
                                        const int_type lda, T *tau, T *work,
                                        const int_type lwork)
             {
-                CALL_AND_HANDLE(blas_backend::geqrf(m, n, a, lda, tau, work, lwork),
+                CALL_AND_HANDLE(backend_algebra<backend_type>::geqrf(m, n, a, lda, tau, work, lwork),
                                 "Failed to perform qr call.");
             }
 
@@ -59,24 +62,25 @@ namespace linalg
                                        T *work, const int_type lwork,
                                        additional_working & /* working */)
             {
-                CALL_AND_HANDLE(blas_backend::geqp3(m, n, a, lda, jpvt, tau, work, lwork),
+                CALL_AND_HANDLE(backend_algebra<backend_type>::geqp3(m, n, a, lda, jpvt, tau, work, lwork),
                                 "Failed to perform qr call.");
             }
         };
 
         template <typename T>
-        struct qr_helper<complex<T>, blas_backend>
+        struct qr_helper<std::complex<T>, blas_backend>
         {
-            using int_type = blas_backend::int_type;
+            using int_type = typename traits<blas_backend>::int_type;
             static_assert(is_number<T>::value && !is_complex<T>::value,
                           "Failed to initialise singular value decomposition working "
                           "space object.");
-            using size_type = blas_backend::size_type;
+            using size_type = typename traits<blas_backend>::size_type;
             using memfill = memory::filler<T, blas_backend>;
+            using backend_type = blas_backend;
 
             struct additional_working
             {
-                tensor<T, 1> m_rwork;
+                tensor<T, 1, blas_backend> m_rwork;
                 void resize(size_type m, size_type n)
                 {
                     CALL_AND_RETHROW(m_rwork.resize(2 * std::max(m, n)));
@@ -84,29 +88,29 @@ namespace linalg
                 void clear() { CALL_AND_RETHROW(m_rwork.clear()); }
             };
 
-            static inline void call_lq(const int_type m, const int_type n, complex<T> *a,
-                                       const int_type lda, complex<T> *tau,
-                                       complex<T> *work, const int_type lwork)
+            static inline void call_lq(const int_type m, const int_type n, std::complex<T> *a,
+                                       const int_type lda, std::complex<T> *tau,
+                                       std::complex<T> *work, const int_type lwork)
             {
-                CALL_AND_HANDLE(blas_backend::gelqf(m, n, a, lda, tau, work, lwork),
+                CALL_AND_HANDLE(backend_algebra<backend_type>::gelqf(m, n, a, lda, tau, work, lwork),
                                 "Failed to perform lq call.");
             }
 
-            static inline void call_qr(const int_type m, const int_type n, complex<T> *a,
-                                       const int_type lda, complex<T> *tau,
-                                       complex<T> *work, const int_type lwork)
+            static inline void call_qr(const int_type m, const int_type n, std::complex<T> *a,
+                                       const int_type lda, std::complex<T> *tau,
+                                       std::complex<T> *work, const int_type lwork)
             {
-                CALL_AND_HANDLE(blas_backend::geqrf(m, n, a, lda, tau, work, lwork),
+                CALL_AND_HANDLE(backend_algebra<backend_type>::geqrf(m, n, a, lda, tau, work, lwork),
                                 "Failed to perform qr call.");
             }
 
-            static inline void call_qr(const int_type m, const int_type n, complex<T> *a,
+            static inline void call_qr(const int_type m, const int_type n, std::complex<T> *a,
                                        const int_type lda, int_type *jpvt,
-                                       complex<T> *tau, complex<T> *work,
+                                       std::complex<T> *tau, std::complex<T> *work,
                                        const int_type lwork,
                                        additional_working &working)
             {
-                CALL_AND_HANDLE(blas_backend::geqp3(m, n, a, lda, jpvt, tau, work, lwork,
+                CALL_AND_HANDLE(backend_algebra<backend_type>::geqp3(m, n, a, lda, jpvt, tau, work, lwork,
                                                     working.m_rwork.buffer()),
                                 "Failed to perform qr call.");
             }
@@ -127,11 +131,11 @@ namespace linalg
                 void>::type>
         {
         public:
-            using int_type = blas_backend::int_type;
+            using int_type = typename traits<blas_backend>::int_type;
             using value_type =
                 typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
 
             using helper = qr_helper<value_type, backend_type>;
@@ -307,7 +311,7 @@ namespace linalg
                     }
 
                     // now resize the workbuffer for constructing the unitary
-                    CALL_AND_HANDLE(blas_backend::unglq(rank, mat.shape(0), rank,
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::unglq(rank, mat.shape(0), rank,
                                                         mat.buffer(), mat.shape(1),
                                                         m_tau.buffer(), &worksize, lwork),
                                     "Failed to query worksize for constructing unitary from "
@@ -316,7 +320,7 @@ namespace linalg
                     CALL_AND_HANDLE(resize_work_space(iworksize),
                                     "Failed to compute singular value decomposition of "
                                     "matrix. Failed to resize the optimal workspace array.");
-                    CALL_AND_HANDLE(blas_backend::unglq(
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::unglq(
                                         rank, mat.shape(0), rank, mat.buffer(), mat.shape(1),
                                         m_tau.buffer(), m_work.buffer(), m_work.size()),
                                     "Failed to compute unitary from elementary reflectors.");
@@ -336,7 +340,7 @@ namespace linalg
                         }
                     }
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating qr.");
@@ -364,11 +368,11 @@ namespace linalg
                 void>::type>
         {
         public:
-            using int_type = blas_backend::int_type;
+            using int_type = typename traits<blas_backend>::int_type;
             using value_type =
                 typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
 
             using helper = qr_helper<value_type, backend_type>;
@@ -639,7 +643,7 @@ namespace linalg
 
                     // now resize the workbuffer for constructing the unitary
                     //std::cerr << mat.shape(1) << " " << rank << " " << rank << std::endl;
-                    CALL_AND_HANDLE(blas_backend::ungqr(mat.shape(1), rank, rank,
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::ungqr(mat.shape(1), rank, rank,
                                                         mat.buffer(), mat.shape(1),
                                                         m_tau.buffer(), &worksize, lwork),
                                     "Failed to query worksize for constructing unitary from "
@@ -648,14 +652,14 @@ namespace linalg
                     CALL_AND_HANDLE(resize_work_space(iworksize),
                                     "Failed to compute singular value decomposition of "
                                     "matrix. Failed to resize the optimal workspace array.");
-                    CALL_AND_HANDLE(blas_backend::ungqr(
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::ungqr(
                                         mat.shape(1), rank, rank, mat.buffer(), mat.shape(1),
                                         m_tau.buffer(), m_work.buffer(), m_work.size()),
                                     "Failed to compute unitary from elementary reflectors.");
 
                     CALL_AND_RETHROW(set_Q(mat, Q));
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating lq.");
@@ -703,7 +707,7 @@ namespace linalg
 
                     // now resize the workbuffer for constructing the unitary
                     //std::cerr << mat.shape(1) << " " << rank << " " << rank << std::endl;
-                    CALL_AND_HANDLE(blas_backend::ungqr(mat.shape(1), rank, rank,
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::ungqr(mat.shape(1), rank, rank,
                                                         mat.buffer(), mat.shape(1),
                                                         m_tau.buffer(), &worksize, lwork),
                                     "Failed to query worksize for constructing unitary from "
@@ -712,14 +716,14 @@ namespace linalg
                     CALL_AND_HANDLE(resize_work_space(iworksize),
                                     "Failed to compute singular value decomposition of "
                                     "matrix. Failed to resize the optimal workspace array.");
-                    CALL_AND_HANDLE(blas_backend::ungqr(
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::ungqr(
                                         mat.shape(1), rank, rank, mat.buffer(), mat.shape(1),
                                         m_tau.buffer(), m_work.buffer(), m_work.size()),
                                     "Failed to compute unitary from elementary reflectors.");
 
                     CALL_AND_RETHROW(set_Q(mat, Q));
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating lq.");

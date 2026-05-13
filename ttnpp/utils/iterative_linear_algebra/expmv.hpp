@@ -32,13 +32,13 @@ namespace utils
     class expmv_base;
 
     template <typename T, typename backend>
-    class expmv_base<linalg::complex<T>, backend>
+    class expmv_base<std::complex<T>, backend>
     {
     public:
-        using value_type = linalg::complex<T>;
+        using value_type = std::complex<T>;
         using real_type = T;
         using backend_type = backend;
-        using size_type = typename backend_type::size_type;
+        using size_type = typename linalg::traits<backend_type>::size_type;
 
     protected:
         linalg::arnoldi_iteration<value_type, backend> m_arnoldi;
@@ -173,7 +173,7 @@ namespace utils
                 CALL_AND_HANDLE(vecs = m_rvecsd * m_arnoldi.Q(), "Failed to compute eigenvectors.");
                 for (size_type i = 0; i < vecs.size(0); ++i)
                 {
-                    real_type norm = std::sqrt(linalg::real(linalg::dot_product(linalg::conj(vecs[i]), vecs[i])));
+                    real_type norm = std::sqrt(std::real(linalg::dot_product(linalg::conj(vecs[i]), vecs[i])));
                     vecs[i] /= norm;
                 }
             }
@@ -223,13 +223,13 @@ namespace utils
                         }
                         auto H = m_arnoldi.H();
                         m_eigensolver(H, m_vals, m_rvecs, m_lvecs, true);
-                        err_res = local_error_estimate(linalg::abs(dt), coeff / scale_factor);
+                        err_res = local_error_estimate(std::abs(dt), coeff / scale_factor);
                         if (ended_early)
                         {
                             m_cur_order = m_arnoldi.current_krylov_dim();
                             return;
                         }
-                        mdtres[counter] = std::make_pair(linalg::abs(std::pow(m_eps / (err_res / linalg::abs(dt)), real_type(1.0 / m_arnoldi.current_krylov_dim())) * (linalg::abs(dt))), m_arnoldi.current_krylov_dim());
+                        mdtres[counter] = std::make_pair(std::abs(std::pow(m_eps / (err_res / std::abs(dt)), real_type(1.0 / m_arnoldi.current_krylov_dim())) * (std::abs(dt))), m_arnoldi.current_krylov_dim());
                         ++counter;
                     }
                     catch (const std::exception &ex)
@@ -241,7 +241,7 @@ namespace utils
 
                     if (!nan_encountered)
                     {
-                        if (err_res / linalg::abs(dt) < m_delta * m_eps || keep_running == false)
+                        if (err_res / std::abs(dt) < m_delta * m_eps || keep_running == false)
                         {
                             m_cur_order = iend;
                             return;
@@ -260,7 +260,7 @@ namespace utils
                             m_arnoldi.finalise_krylov_rep(m_cur_order);
                             auto H2 = m_arnoldi.H();
                             CALL_AND_HANDLE(m_eigensolver(H2, m_vals, m_rvecs, m_lvecs, true), "Failed to diagonalise upper hessenberg matrix.");
-                            CALL_AND_HANDLE(err_res = local_error_estimate(linalg::abs(dt), coeff / scale_factor), "Failed to compute local error estimate.");
+                            CALL_AND_HANDLE(err_res = local_error_estimate(std::abs(dt), coeff / scale_factor), "Failed to compute local error estimate.");
                             return;
                         }
                         istart = iend + 1;
@@ -275,9 +275,9 @@ namespace utils
                 size_type order = 0;
                 for (size_type i = 0; i < counter; ++i)
                 {
-                    if (linalg::abs(std::get<0>(mdtres[i])) > maxdt)
+                    if (std::abs(std::get<0>(mdtres[i])) > maxdt)
                     {
-                        maxdt = linalg::abs(std::get<0>(mdtres[i]));
+                        maxdt = std::abs(std::get<0>(mdtres[i]));
                         order = std::get<1>(mdtres[i]);
                     }
                 }
@@ -288,7 +288,7 @@ namespace utils
                     m_arnoldi.finalise_krylov_rep(m_cur_order);
                     auto H2 = m_arnoldi.H();
                     CALL_AND_HANDLE(m_eigensolver(H2, m_vals, m_rvecs, m_lvecs, true), "Failed to diagonalise upper hessenberg matrix.");
-                    CALL_AND_HANDLE(err_res = local_error_estimate(linalg::abs(dt), coeff / scale_factor), "Failed to compute local error estimate.");
+                    CALL_AND_HANDLE(err_res = local_error_estimate(std::abs(dt), coeff / scale_factor), "Failed to compute local error estimate.");
                 }
             }
             catch (const std::exception &ex)
@@ -451,14 +451,14 @@ namespace utils
     class expmv;
 
     template <typename T, typename backend>
-    class expmv<linalg::complex<T>, backend, true> : public expmv_base<linalg::complex<T>, backend>
+    class expmv<std::complex<T>, backend, true> : public expmv_base<std::complex<T>, backend>
     {
     public:
-        using value_type = linalg::complex<T>;
+        using value_type = std::complex<T>;
         using real_type = T;
         using backend_type = backend;
-        using size_type = typename backend_type::size_type;
-        using base_type = expmv_base<linalg::complex<T>, backend>;
+        using size_type = typename linalg::traits<backend_type>::size_type;
+        using base_type = expmv_base<std::complex<T>, backend>;
 
     public:
         expmv() : base_type() {}
@@ -504,7 +504,7 @@ namespace utils
 
                     if (!nan_encountered)
                     {
-                        err = err_res; /// linalg::abs(dt_trial);
+                        err = err_res; /// std::abs(dt_trial);
 
                         ASSERT(base_type::m_cur_order >= 1, "The iend value obtained is not allowed.");
 
@@ -512,18 +512,18 @@ namespace utils
                         while (!error_tol_satisfied)
                         {
                             dt_trial_next = base_type::m_gamma * std::pow(base_type::m_eps / err, real_type(1.0 / base_type::m_cur_order)) * (dt_trial);
-                            if (linalg::abs(dt_trial_next) < 0.1 * linalg::abs(dt_trial))
+                            if (std::abs(dt_trial_next) < 0.1 * std::abs(dt_trial))
                             {
                                 dt_trial_next = 0.1 * dt_trial;
                             }
-                            if (linalg::abs(dt_trial_next) > 10 * linalg::abs(dt_trial))
+                            if (std::abs(dt_trial_next) > 10 * std::abs(dt_trial))
                             {
                                 dt_trial_next = 10 * dt_trial;
                             }
                             dt_trial = dt_trial_next;
 
-                            CALL_AND_HANDLE(err_res = base_type::local_error_estimate(linalg::abs(dt_trial), coeff / scale_factor), "Failed to compute local error estimate.");
-                            err = err_res / linalg::abs(dt_trial);
+                            CALL_AND_HANDLE(err_res = base_type::local_error_estimate(std::abs(dt_trial), coeff / scale_factor), "Failed to compute local error estimate.");
+                            err = err_res / std::abs(dt_trial);
                             error_tol_satisfied = err < base_type::m_delta * base_type::m_eps;
                         }
 
@@ -531,17 +531,17 @@ namespace utils
                         dt_completed += dt_trial;
 
                         dt_trial_next = base_type::m_gamma * std::pow(base_type::m_eps / err_res, real_type(1.0 / base_type::m_cur_order)) * (dt_trial);
-                        if (linalg::abs(dt_trial_next) < 0.1 * linalg::abs(dt_trial))
+                        if (std::abs(dt_trial_next) < 0.1 * std::abs(dt_trial))
                         {
                             dt_trial_next = 0.1 * dt_trial;
                         }
-                        if (linalg::abs(dt_trial_next) > 10 * linalg::abs(dt_trial))
+                        if (std::abs(dt_trial_next) > 10 * std::abs(dt_trial))
                         {
                             dt_trial_next = 10 * dt_trial;
                         }
                         dt_trial = dt_trial_next;
 
-                        if (linalg::abs(dt_trial + dt_completed) > linalg::abs(dt))
+                        if (std::abs(dt_trial + dt_completed) > std::abs(dt))
                         {
                             dt_trial = dt - dt_completed;
                         }
@@ -587,15 +587,15 @@ namespace utils
     };
 
     template <typename T, typename backend>
-    class expmv<linalg::complex<T>, backend, false> : public expmv_base<linalg::complex<T>, backend>
+    class expmv<std::complex<T>, backend, false> : public expmv_base<std::complex<T>, backend>
     {
     public:
-        using value_type = linalg::complex<T>;
+        using value_type = std::complex<T>;
         using real_type = T;
         using backend_type = backend;
-        using size_type = typename backend_type::size_type;
+        using size_type = typename linalg::traits<backend_type>::size_type;
 
-        using base_type = expmv_base<linalg::complex<T>, backend>;
+        using base_type = expmv_base<std::complex<T>, backend>;
 
         size_type m_ndt;
 
@@ -624,7 +624,7 @@ namespace utils
                 CALL_AND_HANDLE(base_type::m_tempr.resize(x.size()), "Failed to resize the working buffer.");
                 CALL_AND_HANDLE(base_type::m_arnoldi.resize(krylov_dim, size), "Failed to resize krylov subspace.");
 
-                if (linalg::abs(dt * coeff) == real_type(0.0))
+                if (std::abs(dt * coeff) == real_type(0.0))
                 {
                     return 0;
                 }

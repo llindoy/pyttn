@@ -33,14 +33,19 @@ namespace linalg
         public:
             static_assert(dense_type::rank == 2, "Failed to construct matrix_matrix_product object.  The two input tensor must both be rank 2.");
             using backend_type = typename traits<dense_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using left_type = sparse_type;
             using right_type = dense_type;
             using lvalue_type = typename traits<left_type>::value_type;
             using rvalue_type = typename traits<right_type>::value_type;
-            using lvalue_ptr = typename std::add_pointer<typename std::add_const<lvalue_type>::type>::type;
-            using rvalue_ptr = typename std::add_pointer<typename std::add_const<rvalue_type>::type>::type;
-            using value_type = decltype(lvalue_type() * rvalue_type());
+            using ldevice_value_type = typename device_type<lvalue_type, backend_type>::type;
+            using rdevice_value_type = typename device_type<rvalue_type, backend_type>::type;
+
+            using lvalue_ptr = typename std::add_pointer<typename std::add_const<ldevice_value_type>::type>::type;
+            using rvalue_ptr = typename std::add_pointer<typename std::add_const<rdevice_value_type>::type>::type;
+
+            using value_type = decltype(rvalue_type() * lvalue_type());
+            using device_value_type = typename device_type<value_type, backend_type>::type;
             using self_type = matrix_matrix_product<left_type, right_type>;
             using base_type = matrix_matrix_product_base<self_type>;
 
@@ -126,14 +131,15 @@ namespace linalg
 
             // This routine expects dense matrices in row major order.  And as such there is no need to perform the reordering of operations required for the dense dense matrix products.
             template <typename T3>
-            void applicative_impl(T3 &res, value_type beta = 0.0, value_type coeff_scale = 1.0)
+            void applicative_impl(T3 &res, value_type _beta = 0.0, value_type coeff_scale = 1.0)
             {
                 try
                 {
+                    device_value_type beta(_beta);
                     ASSERT(res.buffer() != m_Bbuffer, "The matrix matrix product does not support inplace products.");
-                    value_type coeff = m_coeff * coeff_scale;
+                    device_value_type coeff(m_coeff * coeff_scale);
                     size_type ldc = res.size(1);
-                    CALL_AND_HANDLE(backend_type::dgmm(m_sparse_left, m_opA, m_opB, m_n, m_m, m_k, coeff, m_Abuffer, m_incA, m_Bbuffer, m_ldB, beta, res.buffer(), ldc), "dgmm call failed.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::dgmm(m_sparse_left, m_opA, m_opB, m_n, m_m, m_k, coeff, m_Abuffer, m_incA, m_Bbuffer, m_ldB, beta, res.buffer(), ldc), "dgmm call failed.");
                 }
                 catch (const std::exception &ex)
                 {

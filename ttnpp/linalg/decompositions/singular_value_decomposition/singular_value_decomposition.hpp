@@ -17,7 +17,6 @@
 
 #include <common/exception_handling.hpp>
 #include "singular_value_decomposition_blas.hpp"
-#include "singular_value_decomposition_cuda.hpp"
 
 namespace linalg
 {

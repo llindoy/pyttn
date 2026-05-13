@@ -79,7 +79,7 @@ namespace ttns
     class multiset_sop_operator
     {
     public:
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         using op_type = ops::primitive<T, backend>;
         using element_type = site_operator<T, backend>;
@@ -88,7 +88,7 @@ namespace ttns
         using node_type = typename tree_type::node_type;
 
         using mode_terms_type = std::vector<element_type>;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
         using ttn_type = ms_ttn<T, backend>;
 

@@ -17,5 +17,152 @@
 
 namespace py = pybind11;
 
-template <>
-void initialise_liouville_space<pyttn_real_type>(py::module &m);
+void initialise_liouville_space(py::module &m)
+{
+  using namespace ttns;
+  using real_type = pyttn_real_type;
+  using complex_type = std::complex<real_type>;
+  using _T = typename linalg::numpy_converter<complex_type>::type;
+
+#ifdef BUILD_REAL_TTN
+  using opdictr = operator_dictionary<real_type, linalg::blas_backend>;
+#endif
+  using opdictc = operator_dictionary<complex_type, linalg::blas_backend>;
+
+
+  py::class_<liouville_space>(m, "liouville_space")
+      .def_static(
+          "left_superoperator",
+          static_cast<void (*)(const SOP<complex_type> &, const system_modes &, SOP<complex_type> &, _T)>(&liouville_space::left_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "right_superoperator",
+          static_cast<void (*)(const SOP<complex_type> &, const system_modes &, SOP<complex_type> &, _T)>(&liouville_space::right_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "commutator_superoperator",
+          static_cast<void (*)(const SOP<complex_type> &, const system_modes &, SOP<complex_type> &, _T)>(&liouville_space::commutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "anticommutator_superoperator",
+          static_cast<void (*)(const SOP<complex_type> &, const system_modes &, SOP<complex_type> &, _T)>(&liouville_space::anticommutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "left_superoperator",
+          static_cast<void (*)(const SOP<complex_type> &, const system_modes &, const opdictc &, SOP<complex_type> &, opdictc &, _T)>(&liouville_space::left_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "right_superoperator",
+          static_cast<void (*)(const SOP<complex_type> &, const system_modes &, const opdictc &, SOP<complex_type> &, opdictc &, _T)>(&liouville_space::right_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "commutator_superoperator",
+          static_cast<void (*)(const SOP<complex_type> &, const system_modes &, const opdictc &, SOP<complex_type> &, opdictc &, _T)>(&liouville_space::commutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "anticommutator_superoperator",
+          static_cast<void (*)(const SOP<complex_type> &, const system_modes &, const opdictc &, SOP<complex_type> &, opdictc &, _T)>(&liouville_space::anticommutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "left_superoperator",
+          static_cast<void (*)(const sSOP<complex_type> &, const system_modes &, sSOP<complex_type> &, _T)>(&liouville_space::left_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "right_superoperator",
+          static_cast<void (*)(const sSOP<complex_type> &, const system_modes &, sSOP<complex_type> &, _T)>(&liouville_space::right_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "commutator_superoperator",
+          static_cast<void (*)(const sSOP<complex_type> &, const system_modes &, sSOP<complex_type> &, _T)>(&liouville_space::commutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "anticommutator_superoperator",
+          static_cast<void (*)(const sSOP<complex_type> &, const system_modes &, sSOP<complex_type> &, _T)>(&liouville_space::anticommutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "left_superoperator",
+          static_cast<void (*)(const sSOP<complex_type> &, const system_modes &, const opdictc &, sSOP<complex_type> &, opdictc &, _T)>(&liouville_space::left_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "right_superoperator",
+          static_cast<void (*)(const sSOP<complex_type> &, const system_modes &, const opdictc &, sSOP<complex_type> &, opdictc &, _T)>(&liouville_space::right_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "commutator_superoperator",
+          static_cast<void (*)(const sSOP<complex_type> &, const system_modes &, const opdictc &, sSOP<complex_type> &, opdictc &, _T)>(&liouville_space::commutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "anticommutator_superoperator",
+          static_cast<void (*)(const sSOP<complex_type> &, const system_modes &, const opdictc &, sSOP<complex_type> &, opdictc &, _T)>(&liouville_space::anticommutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = _T(1))
+      .def_static(
+          "left_superoperator",
+          static_cast<void (*)(const sSOP<real_type> &, const system_modes &, sSOP<real_type> &, real_type)>(&liouville_space::left_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "right_superoperator",
+          static_cast<void (*)(const sSOP<real_type> &, const system_modes &, sSOP<real_type> &, real_type)>(&liouville_space::right_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "commutator_superoperator",
+          static_cast<void (*)(const sSOP<real_type> &, const system_modes &, sSOP<real_type> &, real_type)>(&liouville_space::commutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "anticommutator_superoperator",
+          static_cast<void (*)(const sSOP<real_type> &, const system_modes &, sSOP<real_type> &, real_type)>(&liouville_space::anticommutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+
+// Functions for handling real valued SOPs.  These should only be allowed if the user has compiled with the option BUILD_REAL_TTN
+#ifdef BUILD_REAL_TTN
+      .def_static(
+          "left_superoperator",
+          static_cast<void (*)(const SOP<real_type> &, const system_modes &, SOP<real_type> &, real_type)>(&liouville_space::left_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "right_superoperator",
+          static_cast<void (*)(const SOP<real_type> &, const system_modes &, SOP<real_type> &, real_type)>(&liouville_space::right_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "commutator_superoperator",
+          static_cast<void (*)(const SOP<real_type> &, const system_modes &, SOP<real_type> &, real_type)>(&liouville_space::commutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "anticommutator_superoperator",
+          static_cast<void (*)(const SOP<real_type> &, const system_modes &, SOP<real_type> &, real_type)>(&liouville_space::anticommutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "left_superoperator",
+          static_cast<void (*)(const SOP<real_type> &, const system_modes &, const opdictr &, SOP<real_type> &, opdictr &, real_type)>(&liouville_space::left_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "right_superoperator",
+          static_cast<void (*)(const SOP<real_type> &, const system_modes &, const opdictr &, SOP<real_type> &, opdictr &, real_type)>(&liouville_space::right_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "commutator_superoperator",
+          static_cast<void (*)(const SOP<real_type> &, const system_modes &, const opdictr &, SOP<real_type> &, opdictr &, real_type)>(&liouville_space::commutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "anticommutator_superoperator",
+          static_cast<void (*)(const SOP<real_type> &, const system_modes &, const opdictr &, SOP<real_type> &, opdictr &, real_type)>(&liouville_space::anticommutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "left_superoperator",
+          static_cast<void (*)(const sSOP<real_type> &, const system_modes &, const opdictr &, sSOP<real_type> &, opdictr &, real_type)>(&liouville_space::left_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "right_superoperator",
+          static_cast<void (*)(const sSOP<real_type> &, const system_modes &, const opdictr &, sSOP<real_type> &, opdictr &, real_type)>(&liouville_space::right_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "commutator_superoperator",
+          static_cast<void (*)(const sSOP<real_type> &, const system_modes &, const opdictr &, sSOP<real_type> &, opdictr &, real_type)>(&liouville_space::commutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+      .def_static(
+          "anticommutator_superoperator",
+          static_cast<void (*)(const sSOP<real_type> &, const system_modes &, const opdictr &, sSOP<real_type> &, opdictr &, real_type)>(&liouville_space::anticommutator_superoperator),
+          py::arg(), py::arg(), py::arg(), py::arg(), py::arg(), py::arg("coeff") = real_type(1))
+#endif
+      ;
+}
+

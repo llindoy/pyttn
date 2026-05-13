@@ -326,10 +326,10 @@ namespace ttns
         };
 
         template <typename RT>
-        class sigma_y<linalg::complex<RT>, true> : public single_site_operator<linalg::complex<RT>>
+        class sigma_y<std::complex<RT>, true> : public single_site_operator<std::complex<RT>>
         {
         public:
-            using T = linalg::complex<RT>;
+            using T = std::complex<RT>;
 
         public:
             sigma_y() {}

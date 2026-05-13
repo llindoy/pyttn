@@ -71,6 +71,15 @@ External Libraries:
 
 The cmake build system can make use of the [Pybind11](https://github.com/pybind/pybind11) and [Catch2](https://github.com/catchorg/Catch2) external libraries located in directory ${pyTTN_ROOT_DIR}/external.  If these libraries are not found in this location it will attempt to pull them from their respective Github repositories.  For [BLAS](https://netlib.org/blas/) and [Lapack](https://netlib.org/lapack/) linear algebra, the cmake build script uses the standard find_lapack and find_blas calls to locate the libraries. When compiling with Clang or AppleClang this method searches for LLVM using the FindLLVM.cmake module that is included within CMake.
 
+#### CUDA Backend Dependencies
+When building the CUDA backend (see [Compiling the CUDA backend](#compiling-the-cuda-backend)) the core C++ library depends on the following components of the CUDA toolkit:
+- [cuBLAS](https://developer.nvidia.com/cublas)
+- [cuSOLVER](https://developer.nvidia.com/cusolver)
+- [cuRAND](https://docs.nvidia.com/cuda/curand/index.html)
+
+as well as
+- [cuTENSOR](https://developer.nvidia.com/cutensor)
+
 #### Python Dependencies Dependencies
 The core python wrapper version supports Python versions >=3.9.
 
@@ -87,7 +96,6 @@ Full tree visualisation functionality provided by the `visualise_tree` function 
  - [matplotlib](https://matplotlib.org/)
  - [pydot](https://github.com/pydot/pydot)
  - [graphviz](https://graphviz.org/)
-
 
 With the final two dependencies only required for use of improved tree plotting functionality, e.g. when using `prog = "dot"`.  In order to use this improved tree plotting functionality it is necessary to install the system graphviz in addition to the graphviz python package.
 
@@ -117,6 +125,15 @@ export PYTTN_PARALLELISE_COMPILATION=8
 ```
 to allow for the use of 8 threads when compiling.
 
+### Compiling the CUDA backend
+
+pyTTN also supports GPU acceleration of all tensor operations for one-site algorithms (adaptive approachs are in progress). In order to enable compilation with cuda it is necessary to set the environment variable `PYTTN_BUILD_CUDA`, e.g.
+```
+export PYTTN_BUILD_CUDA=True
+```
+
+Once compiled with CUDA `ttn` objects can then be constructed to work with the GPU backend by specifying `backend="cuda"`. At present pyTTN has been tested using CUDA 12.6 and 12.9. The library depends on cuTENSOR in order to implement certain tensor contractions and reshapings. If cuTENSOR is installed in a non-standard location it is additionally necessary to set the `CUTENSOR_ROOT_DIR` environment variable before attempting to install with pip.
+
 ### Other Build Options
 
 Several other environment variables exist for altering the compilation of pyTTN.  These are:
@@ -124,13 +141,6 @@ Several other environment variables exist for altering the compilation of pyTTN.
  - `PYTTN_CXX_COMPILER`: Allowing for the user to specialise an alternative C++ compiler compared to the default selected by CMake.
  - `PYTTN_BUILD_SERIAL`: A boolean flag as to whether to build a serial or parallel version of pyTTN.  Setting this variable to `true` will disable OpenMP parallelisation.
 
-### Selecting BLAS 
-
-<!-- 
-### Building with CUDA Support
-[!Note]
-Work in progress
--->
 
 ## Using the Software
 Example python scripts showing the use of pyTTN for a range of application are provided in the ${pyTTN_ROOT_DIR}/examples. pyTTN implements a range of numerically exact methods (methods that are systematically convergable to the exact results) for the dynamics of quantum system and provides several example applications to

@@ -67,7 +67,7 @@ namespace ttns
 
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         using node_reference = typename base_type::node_reference;
         using const_node_reference = typename base_type::const_node_reference;
@@ -344,7 +344,6 @@ namespace ttns
                 for (auto &n : reverse(m_nodes))
                 {
                     n.set_node_random(m_rengine);
-
                     if (!n.is_root())
                     {
                         CALL_AND_HANDLE(n.decompose_up(m_orthog), "Failed to shift orthogonality up.");

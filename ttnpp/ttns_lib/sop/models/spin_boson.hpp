@@ -85,11 +85,11 @@ namespace ttns
         void build_system_op(Hop &H, real_type tol)
         {
             // add on the spin terms
-            if (linalg::abs(m_eps) > tol)
+            if (std::abs(m_eps) > tol)
             {
                 H += m_eps * sOP("sz", this->m_spin_index);
             }
-            if (linalg::abs(m_delta) > tol)
+            if (std::abs(m_delta) > tol)
             {
                 H += m_delta * sOP("sx", m_spin_index);
             }
@@ -181,7 +181,7 @@ namespace ttns
 
                     if (!(i == this->m_spin_index && j == this->m_spin_index))
                     {
-                        if (linalg::abs(m_T(i, j)) > tol)
+                        if (std::abs(m_T(i, j)) > tol)
                         {
                             H += m_T(i, j) * sOP(li, i) * sOP(lj, j);
                         }

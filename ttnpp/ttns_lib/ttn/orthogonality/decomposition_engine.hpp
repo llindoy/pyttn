@@ -37,8 +37,8 @@ namespace ttns
         class decomposition_engine
         {
         public:
-            using real_type = typename tmp::get_real_type<T>::type;
-            using size_type = typename backend::size_type;
+            using real_type = typename linalg::get_real_type<T>::type;
+            using size_type = typename linalg::traits<backend>::size_type;
             using matrix_type = linalg::matrix<T, backend>;
             using dmat_type = linalg::diagonal_matrix<real_type, backend>;
             using dmat_host_type = linalg::diagonal_matrix<real_type>;
@@ -106,7 +106,7 @@ namespace ttns
                     for (auto &a : A)
                     {
                         size_type ws;
-                        CALL_AND_HANDLE(ws = decomp_type::maximum_work_size_node(*this, a(), U, r, use_capacity), "Failed to when attempting to query maximum work size for node.");
+                        CALL_AND_HANDLE(ws = decomp_type::maximum_work_size_node(*this, a(), U, r, a.is_root(), use_capacity), "Failed to when attempting to query maximum work size for node.");
                         if (ws > max_ws)
                         {
                             max_ws = ws;
@@ -147,6 +147,7 @@ namespace ttns
                 {
                     CALL_AND_HANDLE(m_s.resize(A.shape()), "Failed to resize m_s matrix.");
                     size_type ws;
+
                     CALL_AND_HANDLE(ws = m_svd.query_work_space(A, m_s, U, V, false), "Failed when making query work space call for the underlying svd object.");
                     return ws;
                 }
@@ -226,7 +227,7 @@ namespace ttns
             void resizeU(Utype &U, size_t m, size_t n)
             {
                 ASSERT(U.shape(0) == m, "Something went horribly wrong if U.shape(0) != m");
-                // if U.shape(1) == n then U is the correct size and we can simply return
+                // if U.shape(1) == n then U is the linalg::backend_algebra<backend>:: size and we can simply return
                 if (n == U.shape(1))
                 {
                     return;
@@ -237,12 +238,12 @@ namespace ttns
                 if (n > U.shape(1))
                 {
                     m_temp2.fill_zeros();
-                    backend::copy_matrix_subblock(U.shape(0), U.shape(1), U.buffer(), U.shape(1), m_temp2.buffer(), n);
+                    linalg::backend_algebra<backend>::copy_matrix_subblock(U.shape(0), U.shape(1), U.buffer(), U.shape(1), m_temp2.buffer(), n);
                 }
                 else
                 {
-                    // now copy the correct subblock of U into temp2
-                    backend::copy_matrix_subblock(U.shape(0), n, U.buffer(), U.shape(1), m_temp2.buffer(), n);
+                    // now copy the linalg::backend_algebra<backend>:: subblock of U into temp2
+                    linalg::backend_algebra<backend>::copy_matrix_subblock(U.shape(0), n, U.buffer(), U.shape(1), m_temp2.buffer(), n);
                 }
 
                 // and overwrite U with m_temp2
@@ -262,11 +263,11 @@ namespace ttns
                 {
                     using memfill = linalg::memory::filler<real_type, backend>;
                     memfill::fill(m_s.buffer(), n, real_type(0.0));
-                    backend::copy(S.buffer(), si, m_s.buffer());
+                    linalg::backend_algebra<backend>::copy(S.buffer(), si, m_s.buffer());
                 }
                 else
                 {
-                    backend::copy(S.buffer(), n, m_s.buffer());
+                    linalg::backend_algebra<backend>::copy(S.buffer(), n, m_s.buffer());
                 }
                 S = m_s;
             }
@@ -281,11 +282,11 @@ namespace ttns
                 if (m > V.shape(0))
                 {
                     m_temp2.fill_zeros();
-                    backend::copy(V.buffer(), V.shape(0) * V.shape(1), m_temp2.buffer());
+                    linalg::backend_algebra<backend>::copy(V.buffer(), V.shape(0) * V.shape(1), m_temp2.buffer());
                 }
                 else
                 {
-                    backend::copy(V.buffer(), m * V.shape(1), m_temp2.buffer());
+                    linalg::backend_algebra<backend>::copy(V.buffer(), m * V.shape(1), m_temp2.buffer());
                 }
 
                 // and overwrite U with m_temp2
@@ -301,9 +302,9 @@ namespace ttns
 #endif
                 try
                 {
-                    // check that the temporary arrays have the correct capacity
+                    // check that the temporary arrays have the linalg::backend_algebra<backend>:: capacity
                     CALL_AND_HANDLE(S.resize(A.shape(1), A.shape(1)), "Failed to resize S matrix.");
-                    CALL_AND_HANDLE(m_temp.resize(V.shape()), "Failed to resize temporary V matrix to ensure it has the correct shape.");
+                    CALL_AND_HANDLE(m_temp.resize(V.shape()), "Failed to resize temporary V matrix to ensure it has the linalg::backend_algebra<backend>:: shape.");
                     CALL_AND_HANDLE(m_svd(A, S, U, m_temp, A.shape(0) < A.shape(1)), "Failed when evaluating the decomposition.")
 
                     size_type bond_dimension = get_truncated_bond_dimension(S, A.shape(1), tol, nchi, rel_truncate, trunc_mode);
@@ -315,7 +316,7 @@ namespace ttns
                         }
                     }
 
-                    // now we need to ensure that the U matrix and R = S*V matrix are all the correct sizes.
+                    // now we need to ensure that the U matrix and R = S*V matrix are all the linalg::backend_algebra<backend>:: sizes.
                     CALL_AND_HANDLE(resizeU(U, A.shape(0), bond_dimension), "Failed to resize U matrix to make it compatible with expected bond dimension.");
                     CALL_AND_HANDLE(resizeS(S, bond_dimension), "Failed to resize S matrix to make it compatible with expected bond dimension.");
                     CALL_AND_HANDLE(resizeV(m_temp, bond_dimension, A.shape(1)), "Failed to resize V matrix to make it compatible with expected bond dimension.");
@@ -346,18 +347,18 @@ namespace ttns
             void pad_buffer(const Atype &A, Utype &U, Stype &S, size_type bond_dimension)
             {
 #ifdef TRACE_LOG
-                logging::trace("padding tensor buffers to correct bond dimension.");
+                logging::trace("padding tensor buffers to linalg::backend_algebra<backend>:: bond dimension.");
 #endif
-                CALL_AND_HANDLE(m_temp2.resize(A.shape(0), bond_dimension), "Failed to resize the second temporary matrix so that it has the correct shape.");
+                CALL_AND_HANDLE(m_temp2.resize(A.shape(0), bond_dimension), "Failed to resize the second temporary matrix so that it has the linalg::backend_algebra<backend>:: shape.");
 
                 using memfill = linalg::memory::filler<real_type, backend>;
                 try
                 {
-                    backend::fill_matrix_block(U.buffer(), U.shape(0), bond_dimension, m_temp2.buffer(), m_temp2.shape(0), bond_dimension);
+                    linalg::backend_algebra<backend>::fill_matrix_block(U.buffer(), U.shape(0), bond_dimension, m_temp2.buffer(), m_temp2.shape(0), bond_dimension);
                 }
                 catch (const std::exception &ex)
                 {
-                    RAISE_EXCEPTION("Failed to zero pad the U matrix so that it has the correct shape.");
+                    RAISE_EXCEPTION("Failed to zero pad the U matrix so that it has the linalg::backend_algebra<backend>:: shape.");
                 }
 
                 CALL_AND_HANDLE(U.resize(U.shape(0), bond_dimension), "Failed to resize the U matrix.");
@@ -373,7 +374,7 @@ namespace ttns
                 }
                 catch (const std::exception &ex)
                 {
-                    RAISE_EXCEPTION("Failed to zero pad the S matrix so that it has the correct shape.");
+                    RAISE_EXCEPTION("Failed to zero pad the S matrix so that it has the linalg::backend_algebra<backend>:: shape.");
                 }
             }
 
@@ -381,17 +382,17 @@ namespace ttns
             void truncateU(Utype &U, size_type bond_dimension)
             {
 #ifdef TRACE_LOG
-                logging::trace("truncating U tensor to correct bond dimension.");
+                logging::trace("truncating U tensor to linalg::backend_algebra<backend>:: bond dimension.");
 #endif
                 CALL_AND_HANDLE(m_temp2.resize(U.shape(0), bond_dimension), "Failed to resize temp buffer");
                 try
                 {
-                    backend::copy_matrix_subblock(U.shape(0), bond_dimension, U.buffer(), U.shape(1), m_temp2.buffer(), bond_dimension);
+                    linalg::backend_algebra<backend>::copy_matrix_subblock(U.shape(0), bond_dimension, U.buffer(), U.shape(1), m_temp2.buffer(), bond_dimension);
                 }
                 catch (const std::exception &ex)
                 {
                     logging::critical(ex.what());
-                    RAISE_EXCEPTION("Failed to zero pad the U matrix so that it has the correct shape.");
+                    RAISE_EXCEPTION("Failed to zero pad the U matrix so that it has the linalg::backend_algebra<backend>:: shape.");
                 }
                 CALL_AND_HANDLE(U.resize(U.shape(0), bond_dimension), "Failed to resize the U matrix.");
                 CALL_AND_HANDLE(U = m_temp2, "Failed to assign the U matrix.");
@@ -401,17 +402,17 @@ namespace ttns
             void truncateV(Utype &V, size_type bond_dimension)
             {
 #ifdef TRACE_LOG
-                logging::trace("truncating V tensor to correct bond dimension.");
+                logging::trace("truncating V tensor to linalg::backend_algebra<backend>:: bond dimension.");
 #endif
                 CALL_AND_HANDLE(m_temp2.resize(bond_dimension, V.shape(1)), "Failed to resize temp buffer");
                 try
                 {
-                    backend::copy_matrix_subblock(bond_dimension, V.shape(1), V.buffer(), V.shape(0), m_temp2.buffer(), V.shape(1));
+                    linalg::backend_algebra<backend>::copy_matrix_subblock(bond_dimension, V.shape(1), V.buffer(), V.shape(0), m_temp2.buffer(), V.shape(1));
                 }
                 catch (const std::exception &ex)
                 {
                     logging::critical(ex.what());
-                    RAISE_EXCEPTION("Failed to zero pad the U matrix so that it has the correct shape.");
+                    RAISE_EXCEPTION("Failed to zero pad the U matrix so that it has the linalg::backend_algebra<backend>:: shape.");
                 }
                 CALL_AND_HANDLE(V.resize(bond_dimension, V.shape(1)), "Failed to resize the U matrix.");
                 CALL_AND_HANDLE(V = m_temp2, "Failed to assign the U matrix.");

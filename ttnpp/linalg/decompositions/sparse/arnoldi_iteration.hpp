@@ -30,7 +30,7 @@ namespace linalg
         using value_type = T;
         using real_type = typename get_real_type<T>::type;
         using backend_type = backend;
-        using size_type = typename backend_type::size_type;
+        using size_type = typename traits<backend_type>::size_type;
 
     protected:
         size_type m_max_krylov_dim;
@@ -334,7 +334,7 @@ namespace linalg
         }
 
         const real_type &beta() const { return m_beta; }
-        real_type hk1k() const { return linalg::real(m_Hv(m_cur_krylov_dim - 1, m_cur_krylov_dim)); }
+        real_type hk1k() const { return std::real(m_Hv(m_cur_krylov_dim - 1, m_cur_krylov_dim)); }
         real_type &threshold() { return m_threshold; }
         const real_type &threshold() const { return m_threshold; }
         const size_type &current_krylov_dim() const { return m_cur_krylov_dim; }
@@ -358,7 +358,7 @@ namespace linalg
     public:
         void finalise_krylov_rep(size_type cur_krylov_dim)
         {
-            using linalg::real;
+            using std::real;
             // now we resize the upper hessenberg matrix and the arnoldi vectors to be the actual size used
             CALL_AND_HANDLE(m_Q.resize(cur_krylov_dim, m_Q.shape(1)), "Failed to compute the krylov subspace representation of mat acting on vec.  Failed to resize the arnoldi vectors matrix so that it is the correct shape.");
             CALL_AND_HANDLE(m_H.resize(cur_krylov_dim, cur_krylov_dim), "Failed to compute the krylov subspace representation of mat acting on vec.  Failed to resize the result matrix so that it is the correct shape.");
