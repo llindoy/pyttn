@@ -128,7 +128,7 @@ void test_3( std::string label)
 int main(int argc, char* argv[])
 {
     using real_type = double;
-    using complex_type = linalg::complex<double>;
+    using complex_type = std::complex<double>;
     using backend_type = linalg::blas_backend;
     using namespace utils;
     backend_type::initialise();

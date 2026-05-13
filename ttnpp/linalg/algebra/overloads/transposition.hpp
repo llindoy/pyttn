@@ -72,7 +72,7 @@ namespace linalg
     scal_trans_return_type<T, array_type, true>
     adjoint(const scal_type<T, array_type> &a)
     {
-        using std::conj;
+        using linalg::conj;
         using rettype = trans_type<array_type, true>;
         CALL_AND_RETHROW(return rettype(a.right(), conj(static_cast<typename array_type::value_type>(a.left()))));
     }
@@ -104,7 +104,7 @@ namespace linalg
     template <typename T1, typename T2>
     trans_return_type<T2, false> adjoint(const scalconj_type<T1, T2> &a)
     {
-        using std::conj;
+        using linalg::conj;
         using rettype = trans_type<T2, false>;
         CALL_AND_RETHROW(return rettype(a.right().obj(), conj(static_cast<typename T2::value_type>(a.left()))));
     }

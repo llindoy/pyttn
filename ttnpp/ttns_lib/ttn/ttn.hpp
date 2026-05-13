@@ -46,7 +46,7 @@ namespace ttns
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         using node_reference = typename base_type::node_reference;
         using const_node_reference = typename base_type::const_node_reference;
@@ -61,7 +61,7 @@ namespace ttns
 
         template <typename U, typename be>
         friend class ttn;
-        static constexpr std::string_view class_info = "ttn:";
+        static constexpr std::string_view class_info{"ttn:"};
 
     private:
         // provide access to base class operators
@@ -625,7 +625,7 @@ namespace ttns
                     {                 
                         skip[1] = d2[1]*ind;
                         skip[3] = d2[3]*ind;
-                        backend::set_tensor_block(m_nodes[curr]().buffer(), d2, active_tensor.buffer(), dest_dims, skip);
+                        linalg::backend_algebra<backend>::set_tensor_block(m_nodes[curr]().buffer(), d2, active_tensor.buffer(), dest_dims, skip);
                     }
 
                     //now we resize the current node object so that it can fit the active tensor and copy the results
@@ -770,7 +770,7 @@ namespace ttns
             logging::debug("applying a one body operators to ttn."); 
 
             ASSERT(index < this->nmodes(), "Failed to apply one body operator to ttn. Index out of bounds.");
-            ASSERT(op.size() == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
+            ASSERT(op->size() == m_dim_sizes[index], "Failed to apply one body operator to ttn. Incompatible dimensions.");
 
             CALL_AND_RETHROW(_apply_one_body_operator(op, m_leaf_indices[index], shift_orthogonality));
             return *this;
@@ -898,7 +898,7 @@ namespace ttns
                 real_type pisum = 0.0;
                 for (size_t j = 0; j < m_dim_sizes[i]; ++j)
                 {
-                    pi[j] = linalg::real(linalg::dot_product(linalg::conj(b[j]), b[j]));
+                    pi[j] = std::real(linalg::dot_product(linalg::conj(b[j]), b[j]));
                     pisum += pi[j];
                 }
 
@@ -951,7 +951,7 @@ namespace ttns
             const auto &a = A().as_matrix();
             for (size_t j = 0; j < m_dim_sizes[i]; ++j)
             {
-                res[j] = linalg::real(linalg::dot_product(linalg::conj(a[j]), a[j]));
+                res[j] = std::real(linalg::dot_product(linalg::conj(a[j]), a[j]));
             }
         }
 
@@ -967,7 +967,7 @@ namespace ttns
     };
 
     template <typename T, typename backend, typename real_type = typename linalg::get_real_type<T>::type>
-    real_type collapse_wavefunction(const ttn<T, backend> &o, ttn<T, backend> &res, std::vector<size_t> &state, bool truncate = false, real_type tol = real_type(0), typename backend::size_type nchi = 0)
+    real_type collapse_wavefunction(const ttn<T, backend> &o, ttn<T, backend> &res, std::vector<size_t> &state, bool truncate = false, real_type tol = real_type(0), typename linalg::traits<backend>::size_type nchi = 0)
     {
         // first we copy the res array into o
         res = o;

@@ -24,6 +24,32 @@
 !patches
 !patches/*
 
+!build_artifacts/
+!build_artifacts/pyttn
+!build_artifacts/pyttn/*
+
+#add cuda source files and example build
+!cuda
+!cuda/*
+!cuda/linalg
+!cuda/linalg/*
+
+!cuda/ttns/
+!cuda/ttns/algorithms
+!cuda/ttns/algorithms/*
+!cuda/ttns/observables
+!cuda/ttns/observables/*
+!cuda/ttns/operators
+!cuda/ttns/operators/*
+!cuda/ttns/sop
+!cuda/ttns/sop/*
+!cuda/ttns/ttn
+!cuda/ttns/ttn/*
+
+!cuda_test
+!cuda_test/*
+
+
 #now we add the docs folder and its required folders
 !docs
 !docs/make.bat

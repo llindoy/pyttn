@@ -12,13 +12,15 @@
  * limitations under the License
  */
 
-#ifndef PYTTN_LINALG_TENSOR_SPARSE_CSR_MATRIX_HPP_
-#define PYTTN_LINALG_TENSOR_SPARSE_CSR_MATRIX_HPP_
+#ifndef PYTTN_LINALG_TENSOR_SPARSE_CSR_MATRIX_BASE_HPP_
+#define PYTTN_LINALG_TENSOR_SPARSE_CSR_MATRIX_BASE_HPP_
 
 #include <vector>
 #include <tuple>
 #include <algorithm>
+
 #include "../../linalg_forward_decl.hpp"
+#include "../../linalg_type_traits.hpp"
 
 #ifdef CEREAL_LIBRARY_FOUND
 #include <cereal/types/array.hpp>
@@ -327,12 +329,12 @@ namespace linalg
                 return false;
             }
             bool is_equal;
-            CALL_AND_HANDLE(is_equal = backend_type::is_equal(m_colind, other.m_colind, m_nnz), "Failed to compare two csr topology objects.  Failed to determine if the column indices arrays are equal.");
+            CALL_AND_HANDLE(is_equal = backend_algebra<backend_type>::is_equal(m_colind, other.m_colind, m_nnz), "Failed to compare two csr topology objects.  Failed to determine if the column indices arrays are equal.");
             if (!is_equal)
             {
                 return false;
             }
-            CALL_AND_HANDLE(is_equal = backend_type::is_equal(m_rowptr, other.m_rowptr, m_shape[0] + 1), "Failed to compare two csr topology objects.  Failed to determine if the column indices arrays are equal.");
+            CALL_AND_HANDLE(is_equal = backend_algebra<backend_type>::is_equal(m_rowptr, other.m_rowptr, m_shape[0] + 1), "Failed to compare two csr topology objects.  Failed to determine if the column indices arrays are equal.");
             if (!is_equal)
             {
                 return false;
@@ -363,13 +365,18 @@ namespace linalg
         using topology_type = csr_topology_type<backend_type>;
 
         using value_type = typename traits<csr_impl>::value_type;
-        using real_type = typename linalg::get_real_type<value_type>::type;
+        using real_type = typename get_real_type<value_type>::type;
         using size_type = typename topology_type::size_type;
         using index_type = typename topology_type::index_type;
         using self_type = csr_matrix_base<csr_impl>;
 
         using pointer = typename std::add_pointer<value_type>::type;
         using const_pointer = typename std::add_pointer<typename std::add_const<value_type>::type>::type;
+
+        using device_value_type = typename device_type<value_type, backend_type>::type;
+        using device_pointer = typename std::add_pointer<device_value_type>::type;
+        using const_device_pointer = typename std::add_pointer<typename std::add_const<device_value_type>::type>::type;
+
         using index_pointer = typename topology_type::index_pointer;
         using const_index_pointer = typename topology_type::const_index_pointer;
 
@@ -377,8 +384,8 @@ namespace linalg
         using shape_type = std::array<size_type, rank>;
 
         // the classes used for memory allocation and transfer
-        using allocator = memory::allocator<value_type, backend_type>;
-        using memfill = memory::filler<value_type, backend_type>;
+        using allocator = memory::allocator<device_value_type, backend_type>;
+        using memfill = memory::filler<device_value_type, backend_type>;
         template <typename srcbck>
         using memtransfer = memory::transfer<srcbck, backend_type>;
 
@@ -387,7 +394,7 @@ namespace linalg
         friend class csr_matrix_base;
 
     protected:
-        pointer m_vals; ///< The 1-dimensional array used to store the values present in the matrix
+        device_pointer m_vals; ///< The 1-dimensional array used to store the values present in the matrix
         topology_type m_topo;
 
     public:
@@ -477,7 +484,7 @@ namespace linalg
         {
             if (this != &src)
             {
-                pointer temp = src.m_vals;
+                device_pointer temp = src.m_vals;
                 src.m_vals = m_vals;
                 m_vals = temp;
                 m_topo.swap(src.m_topo);
@@ -547,7 +554,7 @@ namespace linalg
         {
             if (m_topo.m_nnz < m_topo.m_max_nnz)
             {
-                value_type *temp2;
+                device_value_type *temp2;
                 CALL_AND_HANDLE(temp2 = allocator::allocate(m_topo.m_nnz), "Failed to resize the csr matrix object.  Failed to allocate the new valus buffer when an increase in size is required.");
                 CALL_AND_HANDLE(memtransfer<backend_type>::copy(m_vals, m_topo.m_nnz, temp2), "Failed to shrink the csr matrix object.  Failed when copying the current vals buffer into the new vals buffer.");
                 CALL_AND_HANDLE(allocator::deallocate(m_vals), "Failed to shrink the csr matrix object.  Failed to deallocate the previous vals buffer object.");
@@ -563,7 +570,7 @@ namespace linalg
         void set_vals(const std::vector<value_type> &_vals)
         {
             ASSERT(_vals.size() == m_topo.m_nnz, "Failed to set csr matrix vals from vector.  The two buffers are not the same size.");
-            CALL_AND_HANDLE(memtransfer<blas_backend>::copy(&_vals[0], m_topo.m_nnz, m_vals), "Failed to set csr matrix vals from vector.  Failed when copying the current vals buffer into the new vals buffer.");
+            CALL_AND_HANDLE(memtransfer<blas_backend>::copy(reinterpret_cast<const device_value_type*>(&_vals[0]), m_topo.m_nnz, m_vals), "Failed to set csr matrix vals from vector.  Failed when copying the current vals buffer into the new vals buffer.");
         }
         void set_colind(const std::vector<index_type> &_colind) { CALL_AND_HANDLE(m_topo.set_colind(_colind), "Failed to set csr matrix colind from buffer.  The two buffers are not the same size."); }
         void set_rowptr(const std::vector<index_type> &_rowptr) { CALL_AND_HANDLE(m_topo.set_rowptr(_rowptr), "Failed to set csr matrix rowptr from buffer.  The two buffers are not the same size."); }
@@ -608,8 +615,8 @@ namespace linalg
         ///////////////////////////////////////////////////////////////////////////////////////////
         //          functions for serialising and deserialising the csr matrix object.           //
         ///////////////////////////////////////////////////////////////////////////////////////////
-        using buffer_reader_type = internal::buffer_reader_wrapper<value_type, backend_type>;
-        using buffer_writer_type = internal::buffer_writer_wrapper<value_type, backend_type>;
+        using buffer_reader_type = internal::buffer_reader_wrapper<device_value_type, backend_type>;
+        using buffer_writer_type = internal::buffer_writer_wrapper<device_value_type, backend_type>;
 
         template <typename archive>
         void save(archive &ar) const
@@ -637,23 +644,23 @@ namespace linalg
         template <typename Vt>
         inline value_update_type<Vt, self_type> operator*=(const Vt &v)
         {
-            CALL_AND_HANDLE(backend_type::scal(m_topo.m_nnz, value_type(v), m_vals, 1), "Failed to perform operator*= on csr matrix object.  scal call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::scal(m_topo.m_nnz, value_type(v), m_vals, 1), "Failed to perform operator*= on csr matrix object.  scal call failed.");
             return *this;
         }
         template <typename Vt>
         inline value_update_type<Vt, self_type> operator/=(const Vt &v)
         {
-            CALL_AND_HANDLE(backend_type::scal(m_topo.m_nnz, value_type(1.0 / v), m_vals, 1), "Failed to perform operator/= on csr matrix object.  scal call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::scal(m_topo.m_nnz, value_type(1.0 / v), m_vals, 1), "Failed to perform operator/= on csr matrix object.  scal call failed.");
             return *this;
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         //     functions providing access to the raw buffers storing the csr matrix object.      //
         ///////////////////////////////////////////////////////////////////////////////////////////
-        inline pointer buffer() { return m_vals; }
-        inline const_pointer buffer() const { return m_vals; }
-        inline pointer data() { return m_vals; }
-        inline const_pointer data() const { return m_vals; }
+        inline device_pointer buffer() { return m_vals; }
+        inline const_device_pointer buffer() const { return m_vals; }
+        inline device_pointer data() { return m_vals; }
+        inline const_device_pointer data() const { return m_vals; }
 
         inline index_pointer rowptr() { return m_topo.m_rowptr; }
         inline const_index_pointer rowptr() const { return m_topo.m_rowptr; }
@@ -831,7 +838,7 @@ namespace linalg
             }
 
             CALL_AND_HANDLE(memtransfer<blas_backend>::copy(&_rowptr[0], _rowptr.size(), m_topo.m_rowptr), "Failed to initialise csr_matrix_base object.  Failed when copying the current rowptr buffer into the new rowptr buffer.");
-            CALL_AND_HANDLE(backend_type::transfer_coo_tuple_to_csr(coo, m_vals, m_topo.m_colind), "Failed to initialise csr_matrix_base object.  Failed when copying the vals and colinds from the coo tuple array.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::transfer_coo_tuple_to_csr(coo, m_vals, m_topo.m_colind), "Failed to initialise csr_matrix_base object.  Failed when copying the vals and colinds from the coo tuple array.");
         }
 
     private:
@@ -846,7 +853,7 @@ namespace linalg
                 CALL_AND_HANDLE(resize_buffer(src.nnz()), "Failed to copy assign csr_matrix_base object.  Failed to resize buffers so that they could fit the src matrix.");
             }
             using srcbck = typename traits<Container>::backend_type;
-            CALL_AND_HANDLE(memtransfer<srcbck>::copy(src.buffer(), m_topo.m_nnz, m_vals), "Failed to shrink the csr matrix object.  Failed when copying the src value buffer into m_vals.");
+            CALL_AND_HANDLE(memtransfer<srcbck>::copy(reinterpret_cast<const device_value_type*>(src.buffer()), m_topo.m_nnz, m_vals), "Failed to shrink the csr matrix object.  Failed when copying the src value buffer into m_vals.");
             return *this;
         }
 
@@ -861,7 +868,7 @@ namespace linalg
             {
                 CALL_AND_HANDLE(resize_buffer(src.nnz()), "Failed to copy assign csr_matrix_base object.  Failed to resize buffers so that they could fit the src matrix.");
             }
-            CALL_AND_HANDLE(backend_type::copy_real_to_complex(src.buffer(), m_topo.m_nnz, m_vals), "Failed to shrink the csr matrix object.  Failed when copying the src value buffer into m_vals.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::copy_real_to_complex(src.buffer(), m_topo.m_nnz, m_vals), "Failed to shrink the csr matrix object.  Failed when copying the src value buffer into m_vals.");
             return *this;
         }
 
@@ -903,8 +910,8 @@ namespace linalg
         }
     }; // class csr_matrix_base
 
-    template <typename T>
-    class csr_matrix<T, blas_backend> : public csr_matrix_base<csr_matrix<T, blas_backend>>
+    template <typename T, typename backend>
+    class csr_matrix : public csr_matrix_base<csr_matrix<T, backend>>
     {
     public:
         using self_type = csr_matrix<T, blas_backend>;
@@ -914,231 +921,19 @@ namespace linalg
         using real_type = typename base_type::real_type;
         using index_type = typename base_type::index_type;
 
-        template <typename U>
-        friend std::ostream &operator<<(std::ostream &out, const csr_matrix<U, blas_backend> &mat);
-
-    public:
         template <typename... Args>
-        csr_matrix(Args &&...args)
-        try : base_type(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct csr matrix object.");
-        }
+        csr_matrix(Args &&...args);
         template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(base_type::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
+        self_type &operator=(Args &&...args);
+        inline size_type nnz_in_row(size_type i) const;
+        inline void transpose(csr_matrix<T, blas_backend> &o, T alpha = T(1)) const;
+        static inline void transpose(const csr_matrix<T, backend> &imat, csr_matrix<T, backend> &o, T alpha = T(1));
+        inline tensor<T, 2, blas_backend> todense() const;
+    };
 
-        inline size_type nnz_in_row(size_type i) const
-        {
-            ASSERT(i < this->nrows(), "Unable to get number of terms in row.  Index out of bounds.");
-            auto rowptr = this->rowptr();
-            return (rowptr[i + 1] - rowptr[i]);
-        }
-
-        inline bool contains_diagonal(size_type i) const
-        {
-            ASSERT(i < this->nrows(), "Unable to get number of terms in row.  Index out of bounds.");
-            auto rowptr = this->rowptr();
-            auto colind = this->colind();
-            for (size_type j = static_cast<size_type>(rowptr[i]); j < static_cast<size_type>(rowptr[i + 1]); ++j)
-            {
-                if (static_cast<size_t>(colind[j]) == i)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        // a function for pruning zeros from the csr matrix.  This iterates over the tree and if a value has magnitude less than the tolerance we remove it.
-        // This doesn't change the size of any buffers at all
-        inline void prune(real_type tol = 1e-12)
-        {
-            if (tol > 0)
-            {
-                size_type counter = 0;
-                size_t rpi = 0;
-
-                auto buffer = this->buffer();
-                auto rowptr = this->rowptr();
-                auto colind = this->colind();
-                for (size_type i = 0; i < this->nrows(); ++i)
-                {
-                    size_t rpi1 = static_cast<size_type>(rowptr[i + 1]);
-                    for (size_type j = rpi; j < rpi1; ++j)
-                    {
-                        // if the absolute value of the current value type is greater than the pruning tolerance we are going to reinsert it
-                        // at position counter and incement counter. If a term isn't greater than the pruning tolerance then we are not incrementing
-                        // counter and so at a later stage it will be overwritten.
-                        if (tol <= linalg::abs(buffer[j]))
-                        {
-                            buffer[counter] = buffer[j];
-                            colind[counter] = colind[j];
-                            ++counter;
-                        }
-                    }
-                    rowptr[i + 1] = counter;
-                    rpi = rpi1;
-                }
-                this->resize(counter);
-            }
-        }
-
-        inline void transpose(csr_matrix<T, blas_backend> &o, T alpha = T(1)) const
-        {
-            transpose(*this, o, alpha);
-        }
-
-        static inline void transpose(const csr_matrix<T, blas_backend> &imat, csr_matrix<T, blas_backend> &o, T alpha = T(1))
-        {
-            CALL_AND_HANDLE(o.resize(imat.nnz(), imat.ncols(), imat.nrows()), "Failed to allocate storage for new array.");
-            auto ibuffer = imat.buffer();
-            auto irowptr = imat.rowptr();
-            auto icolind = imat.colind();
-
-            auto obuffer = o.buffer();
-            auto orowptr = o.rowptr();
-            auto ocolind = o.colind();
-
-            // pad the rowptr array with zeros
-            std::fill(orowptr, orowptr + (imat.ncols() + 1), index_type(0));
-            // iterate over each term in the buffer and use its column index to set the rowptr of the output result
-            for (size_type i = 0; i < imat.nnz(); ++i)
-            {
-                // get the column index in the original array and increment the rowptr object of the transposed array corresponding to this index
-                ++orowptr[icolind[i] + 1];
-            }
-            // now increment the rowptr objects so that it is the cumulative sum rather than number of elements in row.
-            // Following this step the output rowptr is completed, but we will be editing it in the next step
-            for (size_type i = 0; i < imat.ncols(); ++i)
-            {
-                orowptr[i + 1] += orowptr[i];
-            }
-
-            size_type rpi = 0;
-            // now set up the output data and column indices.  We do this by iterating over each row of the original array.
-            for (size_type i = 0; i < imat.nrows(); ++i)
-            {
-                size_type rpi1 = static_cast<size_type>(irowptr[i + 1]);
-                for (size_type j = rpi; j < rpi1; ++j)
-                {
-                    // for this column index.  Get the current output rowptr value.  Incrementing the results after
-                    // we have extracted the value.  Now set the output value and column index
-                    index_type index = orowptr[icolind[j]]++;
-                    obuffer[index] = alpha * ibuffer[j];
-                    ocolind[index] = i;
-                }
-                rpi = rpi1;
-            }
-
-            // now each output rowptr has been incremented by the number of elements in the row so we need to shift everything
-            // along to get the correct structure
-            for (size_t i = 0; i < imat.ncols(); ++i)
-            {
-                size_t j = imat.ncols() - i;
-                orowptr[j] = orowptr[j - 1];
-            }
-            orowptr[0] = 0;
-        }
-
-        inline matrix<T, blas_backend> todense() const
-        {
-            matrix<T> ret(this->shape(0), this->shape(1), T(0));
-            auto buffer = this->buffer();
-            auto rowptr = this->rowptr();
-            auto colind = this->colind();
-
-            size_type rpi = 0;
-            for (size_t i = 0; i < this->nrows(); ++i)
-            {
-                size_type rpi1 = static_cast<size_type>(rowptr[i + 1]);
-                for (size_type j = rpi; j < rpi1; ++j)
-                {
-                    index_type index = colind[j];
-                    ret(i, index) = buffer[j];
-                }
-                rpi = rpi1;
-            }
-            return ret;
-        }
-    }; // csr_matrix<T, blas_backend>
-
-#ifdef PYTTN_BUILD_CUDA
-    template <typename T>
-    class csr_matrix<T, cuda_backend> : public csr_matrix_base<csr_matrix<T, cuda_backend>>
-    {
-    public:
-        using self_type = csr_matrix<T, cuda_backend>;
-        using base_type = csr_matrix_base<self_type>;
-        using real_type = typename base_type::real_type;
-
-        using pointer = typename base_type::pointer;
-        using const_pointer = typename base_type::const_pointer;
-        using index_pointer = typename base_type::index_pointer;
-        using const_index_pointer = typename base_type::const_index_pointer;
-        using coo_type = typename base_type::coo_type;
-
-    public:
-        template <typename... Args>
-        csr_matrix(Args &&...args)
-        try : base_type(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct csr matrix object.");
-        }
-        template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(base_type::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
-
-        inline void transpose(csr_matrix<T, cuda_backend> &o, T alpha = T(1)) const
-        {
-            RAISE_EXCEPTION("CUDA CSR MATRIX TRANSPOSE NOT IMPLEMENTED.");
-        }
-
-        inline matrix<T, blas_backend> todense() const
-        {
-            csr_matrix<T, blas_backend> ret(*this);
-            return ret.todense();
-        }
-    }; // csr_matrix<T, blas_backend>
-#endif
-
-    template <typename T>
-    std::ostream &operator<<(std::ostream &out, const csr_matrix<T, blas_backend> &mat)
-    {
-        using size_type = typename csr_matrix<T, blas_backend>::size_type;
-        using const_index_pointer = typename csr_matrix<T, blas_backend>::const_index_pointer;
-        const_index_pointer rowptr = mat.rowptr();
-        const_index_pointer colind = mat.colind();
-        for (size_type i = 0; i < mat.nrows(); ++i)
-        {
-            for (size_type j = static_cast<size_type>(rowptr[i]); j < static_cast<size_type>(rowptr[i + 1]); ++j)
-            {
-                out << i << " " << colind[j] << " " << mat.m_vals[j] << std::endl;
-            }
-        }
-        return out;
-    }
-
-#ifdef PYTTN_BUILD_CUDA
-    template <typename T>
-    std::ostream &operator<<(std::ostream &out, const csr_matrix<T, cuda_backend> &_mat)
-    {
-        csr_matrix<T, blas_backend> mat(_mat);
-        out << mat;
-        return out;
-    }
-#endif
+    template <typename T, typename backend>
+    std::ostream &operator<<(std::ostream &out, const csr_matrix<T, backend> &mat);
 
 } // namespace linalg
 
-#endif // PYTTN_LINALG_TENSOR_SPARSE_CSR_MATRIX_HPP_//
+#endif // PYTTN_LINALG_TENSOR_SPARSE_CSR_MATRIX_BASEHPP_//

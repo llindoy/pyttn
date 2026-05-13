@@ -31,7 +31,7 @@ namespace ttns
     class sop_term
     {
     public:
-        using real_type = typename tmp::get_real_type<T>::type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
         using tree_type = tree<sop_node_data<T>>;
         using node_type = typename tree_type::node_type;
@@ -111,7 +111,7 @@ namespace ttns
     class sop_node_data
     {
     public:
-        using real_type = typename tmp::get_real_type<T>::type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
         template <typename Y, typename V>
         friend class operator_container;

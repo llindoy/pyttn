@@ -25,7 +25,7 @@ namespace ttns
     {
     public:
         using real_type = typename linalg::get_real_type<T>::type;
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         Op() {}
         Op(const Op &o) : m_op(o.m_op), m_indices(o.m_indices), m_dims(o.m_dims) {}
@@ -51,7 +51,7 @@ namespace ttns
             size_type prod = 1;
             for (size_type i = 0; i < dims.size(); ++i)
             {
-                ASSERT(dims[i] > 0 && indices[i] >= 0, "Failed to construct object indicees or dims invalid.");
+                ASSERT(dims[i] > 0, "Failed to construct object indicees or dims invalid.");
                 prod *= dims[i];
             }
             ASSERT(prod == m.shape(0) && prod == m.shape(1), "Dimensions array is not compatible with specified matrix.");
@@ -180,7 +180,7 @@ namespace ttns
 
                 linalg::tensor<T, 5, backend> Umt(dims1, m_dims[0], m_dims[0], strides[0], strides[0]);
 
-                linalg::singular_value_decomposition<linalg::matrix<T, backend>, true> m_svd;
+                linalg::singular_value_decomposition<linalg::matrix<T, backend>, false> m_svd;
 
                 linalg::matrix<T, backend> _U, _Vh;
                 linalg::diagonal_matrix<real_type, backend> S;

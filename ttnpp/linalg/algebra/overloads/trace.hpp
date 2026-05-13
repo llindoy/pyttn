@@ -44,7 +44,7 @@ namespace linalg
 
         ASSERT(a.shape(0) == a.shape(1), "Failed to evaluate trace of matrix.  The matrix is not a square matrix.");
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::trace(a.shape(1), a.buffer(), a.diagonal_stride()), "Failed to evaluate trace of matrix.  Failed to call the backend::trace routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::trace(a.shape(1), a.buffer(), a.diagonal_stride()), "Failed to evaluate trace of matrix.  Failed to call the backend::trace routine.");
         return val;
     }
 
@@ -57,7 +57,7 @@ namespace linalg
 
         ASSERT(a.shape(0) == a.shape(1), "Failed to evaluate trace of matrix.  The matrix is not a square matrix.");
         value_type val;
-        CALL_AND_HANDLE(val = backend_type::trace(a.shape(1), a.buffer(), a.diagonal_stride()), "Failed to evaluate trace of matrix.  Failed to call the backend::trace routine.");
+        CALL_AND_HANDLE(val = backend_algebra<backend_type>::trace(a.shape(1), a.buffer(), a.diagonal_stride()), "Failed to evaluate trace of matrix.  Failed to call the backend::trace routine.");
         return conj(val);
     }
 } // namespace linalg

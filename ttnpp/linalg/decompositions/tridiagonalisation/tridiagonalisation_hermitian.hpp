@@ -16,6 +16,8 @@
 #define PYTTN_LINALG_DECOMPOSITIONS_TRIDIAGONALISATION_TRIDIAGONALISATION_HERMITIAN_HPP_
 
 #include "tridiagonalisation_base.hpp"
+#include "../../backends/blas/blas_algebra.hpp"
+#include "../../backends/blas/blas_backend.hpp"
 
 namespace linalg
 {
@@ -32,9 +34,9 @@ namespace linalg
             using value_type = typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using real_type = typename get_real_type<value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
-            using int_type = typename backend_type::int_type;
+            using int_type = typename traits<backend_type>::int_type;
 
         protected:
             tensor<value_type, 1, backend_type> m_work;
@@ -105,7 +107,7 @@ namespace linalg
                     CALL_AND_HANDLE(m_mat = mat, "Failed to compute eigenvalues of general matrix.  Failed to copy the matrix into working space.");
                     CALL_AND_RETHROW(compute(m_mat, tri));
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating tridiagonalisation.");
@@ -133,7 +135,7 @@ namespace linalg
                         CALL_AND_RETHROW(compute(mat, tri));
                     }
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigendecomposition.");
@@ -155,7 +157,7 @@ namespace linalg
                     CALL_AND_HANDLE(m_mat = mat, "Failed to compute eigendecomposition of general matrix.  Failed to transpose the matrix so that it is in column major form.");
                     CALL_AND_RETHROW(compute(m_mat, tri, Q));
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigendecomposition.");
@@ -183,7 +185,7 @@ namespace linalg
                         CALL_AND_RETHROW(compute(mat, tri, Q));
                     }
                 }
-                catch (const invalid_value &ex)
+                catch (const common::invalid_value &ex)
                 {
                     logging::error(ex.what());
                     RAISE_NUMERIC("evaluating eigendecomposition.");
@@ -208,7 +210,7 @@ namespace linalg
                     int_type LDA = mat.shape(1);
                     value_type worksize;
                     int_type lwork = -1;
-                    CALL_AND_HANDLE(blas_backend::sytrd(UPLO, N, mat.buffer(), LDA, tri.D(), tri.E(), m_tau.buffer(), &worksize, lwork), "Failed to query the optimal workspace for the eigensolver.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::sytrd(UPLO, N, mat.buffer(), LDA, tri.D(), tri.E(), m_tau.buffer(), &worksize, lwork), "Failed to query the optimal workspace for the eigensolver.");
                     CALL_AND_RETHROW(return internal::worksize_as_integer(worksize));
                 }
                 catch (const std::exception &ex)
@@ -228,13 +230,13 @@ namespace linalg
                     int_type LDA = mat.shape(1);
                     value_type worksize;
                     int_type lwork = -1;
-                    CALL_AND_HANDLE(blas_backend::sytrd(UPLO, N, mat.buffer(), LDA, tri.D(), tri.E(), m_tau.buffer(), &worksize, lwork), "Failed to query the optimal workspace.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::sytrd(UPLO, N, mat.buffer(), LDA, tri.D(), tri.E(), m_tau.buffer(), &worksize, lwork), "Failed to query the optimal workspace.");
 
                     char SIDE = 'L';
                     char TRANS = 'T';
                     value_type worksize2;
                     lwork = -1;
-                    CALL_AND_HANDLE(blas_backend::ormtr(SIDE, UPLO, TRANS, N, N, mat.buffer(), LDA, m_tau.buffer(), Q.buffer(), N, &worksize2, lwork), "Failed to query the optimal workspac.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::ormtr(SIDE, UPLO, TRANS, N, N, mat.buffer(), LDA, m_tau.buffer(), Q.buffer(), N, &worksize2, lwork), "Failed to query the optimal workspac.");
 
                     if (worksize2 > worksize)
                     {
@@ -266,7 +268,7 @@ namespace linalg
                 int_type N = mat.shape(0);
                 int_type LDA = mat.shape(1);
                 int_type lwork = m_work.size();
-                CALL_AND_HANDLE(blas_backend::sytrd(UPLO, N, mat.buffer(), LDA, tri.D(), tri.E(), m_tau.buffer(), m_work.buffer(), lwork), "Failed to query the optimal workspace for the eigensolver.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::sytrd(UPLO, N, mat.buffer(), LDA, tri.D(), tri.E(), m_tau.buffer(), m_work.buffer(), lwork), "Failed to query the optimal workspace for the eigensolver.");
             }
 
             template <typename mat_type, typename Qtype>
@@ -280,7 +282,7 @@ namespace linalg
                 int_type N = mat.shape(0);
                 int_type LDA = mat.shape(1);
                 int_type lwork = m_work.size();
-                CALL_AND_HANDLE(blas_backend::sytrd(UPLO, N, mat.buffer(), LDA, tri.D(), tri.E(), m_tau.buffer(), m_work.buffer(), lwork), "Failed to query the optimal workspace for the eigensolver.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::sytrd(UPLO, N, mat.buffer(), LDA, tri.D(), tri.E(), m_tau.buffer(), m_work.buffer(), lwork), "Failed to query the optimal workspace for the eigensolver.");
 
                 Q.fill_zeros();
                 for (size_t i = 0; i < N; ++i)
@@ -290,7 +292,7 @@ namespace linalg
 
                 char SIDE = 'L';
                 char TRANS = 'T';
-                CALL_AND_HANDLE(blas_backend::ormtr(SIDE, UPLO, TRANS, N, N, mat.buffer(), LDA, m_tau.buffer(), Q.buffer(), N, m_work.buffer(), lwork), "Failed to query the optimal workspac.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::ormtr(SIDE, UPLO, TRANS, N, N, mat.buffer(), LDA, m_tau.buffer(), Q.buffer(), N, m_work.buffer(), lwork), "Failed to query the optimal workspac.");
             }
 
             /////////////////////////////////////////////////////////////////////////////////////////

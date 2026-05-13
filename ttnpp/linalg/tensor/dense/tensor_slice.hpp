@@ -12,10 +12,12 @@
  * limitations under the License
  */
 
-#ifndef PYTTN_LINALG_TENSOR_DENSE_TENSOR_SLICE_HPP_
-#define PYTTN_LINALG_TENSOR_DENSE_TENSOR_SLICE_HPP_
+#ifndef PYTTN_LINALG_TENSOR_DENSE_TENSOR_SLICE_BASE_HPP_
+#define PYTTN_LINALG_TENSOR_DENSE_TENSOR_SLICE_BASE_HPP_
 
 #include "../../linalg_forward_decl.hpp"
+#include "tensor_slice_traits.hpp"
+#include "tensor_details.hpp"
 
 /**
  * @cond INTERNAL
@@ -23,7 +25,6 @@
 
 namespace linalg
 {
-
     //////////////////////////////////////////////////////////////////////////////////////////
     // CRTP base class for the arbitrary rank, reduced dimensional slice of a tensor.  This  //
     // provide the majority of the functionality required for the implementations.           //
@@ -33,10 +34,13 @@ namespace linalg
     {
     public:
         using value_type = typename traits<tensor_slice_impl>::value_type;
+        using device_value_type = typename traits<tensor_slice_impl>::device_value_type;
         using backend_type = typename traits<tensor_slice_impl>::backend_type;
-        using size_type = typename backend_type::size_type;
+        using size_type = typename traits<backend_type>::size_type;
         using pointer = typename std::add_pointer<value_type>::type;
-        using const_pointer = typename std::add_pointer<typename std::add_const<value_type>::type>::type;
+        using const_pointer = typename std::add_pointer<typename std::add_const<device_value_type>::type>::type;
+        using device_pointer = typename std::add_pointer<device_value_type>::type;
+        using const_device_pointer = typename std::add_pointer<typename std::add_const<device_value_type>::type>::type;
 
         using container_type = typename traits<tensor_slice_impl>::container_type;
         static constexpr size_type rank = traits<tensor_slice_impl>::rank;
@@ -51,17 +55,17 @@ namespace linalg
         using detail_type = tensor_details<tensor_slice_impl>;
 
     public:
-        using memfill = memory::filler<value_type, backend_type>;
+        using memfill = memory::filler<device_value_type, backend_type>;
         template <typename srcbck>
         using memtransfer = memory::transfer<srcbck, backend_type>;
 
     protected:
         container_pointer m_tensor;
-        pointer m_buffer;
+        device_pointer m_buffer;
         size_type m_i; // parameters for indexing the
 
     public:
-        tensor_slice_base(container_pointer tensor, pointer _buffer, size_type i) : m_tensor(tensor), m_buffer(_buffer + i * tensor->stride(first_index - 1)), m_i(i) {}
+        tensor_slice_base(container_pointer tensor, device_pointer _buffer, size_type i) : m_tensor(tensor), m_buffer(_buffer + i * tensor->stride(first_index - 1)), m_i(i) {}
         tensor_slice_base(tensor_slice_impl &&impl) : m_tensor(std::move(impl.m_tensor)), m_buffer(std::move(impl.m_buffer)), m_i(std::move(impl.m_i)) {}
 
         tensor_slice_base(const tensor_slice_base &o) = default;
@@ -97,7 +101,7 @@ namespace linalg
         {
             ASSERT(size() == src.size(), "Failed to copy buffer from input container.  The two objects do not have the same size.");
             using srcbck = typename Container::backend_type;
-            CALL_AND_HANDLE(memtransfer<srcbck>::copy(src.buffer(), src.size(), m_buffer), "Copy assignment operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(memtransfer<srcbck>::copy(reinterpret_cast<const_device_pointer>(src.buffer()), src.size(), m_buffer), "Copy assignment operator failed.  Error when copying the buffer.");
             return *this;
         }
 
@@ -144,7 +148,7 @@ namespace linalg
             {
                 ASSERT(shape(i) == src.shape(i), "Failed to copy assign tensor_slice object.  The two slice object do not have the same shape.");
             }
-            CALL_AND_HANDLE(memtransfer<srcbck>::copy(src.buffer(), size(), m_buffer), "Failed to copy assign tensor_slice_base object.  Error when copying the buffer.");
+            CALL_AND_HANDLE(memtransfer<srcbck>::copy(reinterpret_cast<const_device_pointer>(src.buffer()), size(), m_buffer), "Failed to copy assign tensor_slice_base object.  Error when copying the buffer.");
             return *this;
         }
 
@@ -157,7 +161,7 @@ namespace linalg
             {
                 ASSERT(shape(i) == src.shape(i), "Failed to copy assign tensor_slice object.  The two slice object do not have the same shape.");
             }
-            CALL_AND_HANDLE(backend_type::copy_real_to_complex(src.buffer(), size(), m_buffer), "Copy operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::copy_real_to_complex(src.buffer(), size(), m_buffer), "Copy operator failed.  Error when copying the buffer.");
             return *this;
         }
 
@@ -200,7 +204,7 @@ namespace linalg
             {
                 ASSERT(shape(i) == src.shape(i), "Failed to addition assign tensor_slice object.  The two slice object do not have the same shape.");
             }
-            CALL_AND_HANDLE(backend_type::addition_assign(src.buffer(), src.size(), m_buffer), "Addition assignment operator failed.  Error when additioning the buffer.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::addition_assign(reinterpret_cast<const_device_pointer>(src.buffer()), src.size(), m_buffer), "Addition assignment operator failed.  Error when additioning the buffer.");
             return *this;
         }
 
@@ -214,7 +218,7 @@ namespace linalg
             {
                 ASSERT(shape(i) == src.shape(i), "Failed to addition assign tensor_slice object.  The two slice object do not have the same shape.");
             }
-            CALL_AND_HANDLE(backend_type::addition_assign_real_to_complex(src.buffer(), src.size(), m_buffer), "Addition assignment operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::addition_assign_real_to_complex(src.buffer(), src.size(), m_buffer), "Addition assignment operator failed.  Error when copying the buffer.");
             return *this;
         }
 
@@ -258,7 +262,7 @@ namespace linalg
             {
                 ASSERT(shape(i) == src.shape(i), "Failed to subtraction assign tensor_slice object.  The two slice object do not have the same shape.");
             }
-            CALL_AND_HANDLE(backend_type::subtraction_assign(src.buffer(), src.size(), m_buffer), "Subtraction assignment operator failed.  Error when subtractioning the buffer.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::subtraction_assign(reinterpret_cast<const_device_pointer>(src.buffer()), src.size(), m_buffer), "Subtraction assignment operator failed.  Error when subtractioning the buffer.");
             return *this;
         }
 
@@ -272,7 +276,7 @@ namespace linalg
             {
                 ASSERT(shape(i) == src.shape(i), "Failed to subtraction assign tensor_slice object.  The two slice object do not have the same shape.");
             }
-            CALL_AND_HANDLE(backend_type::subtraction_assign_real_to_complex(src.buffer(), src.size(), m_buffer), "Subtraction assignment operator failed.  Error when subtractioning the buffer.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::subtraction_assign_real_to_complex(src.buffer(), src.size(), m_buffer), "Subtraction assignment operator failed.  Error when subtractioning the buffer.");
             return *this;
         }
 
@@ -311,7 +315,7 @@ namespace linalg
         {
             ASSERT(size() == src.size(), "Failed to copy buffer from input container.  The two objects do not have the same size.");
             using srcbck = typename Container::backend_type;
-            CALL_AND_HANDLE(memtransfer<srcbck>::copy(src.buffer(), src.size(), m_buffer), "Copy assignment operator failed.  Error when copying the buffer.");
+            CALL_AND_HANDLE(memtransfer<srcbck>::copy(reinterpret_cast<const_device_pointer>(src.buffer()), src.size(), m_buffer), "Copy assignment operator failed.  Error when copying the buffer.");
             return *this;
         }
 
@@ -328,6 +332,16 @@ namespace linalg
             }
             return _shape;
         }
+        inline const shape_type stride() const
+        {
+            shape_type _shape;
+            for (size_type i = first_index; i < container_rank; ++i)
+            {
+                _shape[i - first_index] = m_tensor->stride(i);
+            }
+            return _shape;
+        }
+
 
         inline const size_type &size(size_type i) const { CALL_AND_HANDLE(return m_tensor->shape(i + first_index), "Failed to return size of tensor slice object. Failed when accessing underlying tensor objects sizes."); }
         inline const size_type &dims(size_type i) const { CALL_AND_HANDLE(return m_tensor->shape(i + first_index), "Failed to return size of tensor slice object. Failed when accessing underlying tensor objects sizes."); }
@@ -338,10 +352,10 @@ namespace linalg
 
         inline bool same_shape(const shape_type &_shape) const { return _shape == shape(); }
 
-        inline pointer buffer() { return m_buffer; }
-        inline const_pointer buffer() const { return m_buffer; }
-        inline pointer data() { return m_buffer; }
-        inline const_pointer data() const { return m_buffer; }
+        inline device_pointer buffer() { return m_buffer; }
+        inline const_device_pointer buffer() const { return m_buffer; }
+        inline device_pointer data() { return m_buffer; }
+        inline const_device_pointer data() const { return m_buffer; }
 
     public:
         template <typename... Args>
@@ -381,236 +395,41 @@ namespace linalg
         }
         inline self_type &fill_zeros()
         {
-            CALL_AND_HANDLE(fill_impl(value_type(0.0)), "Failed to fill buffer to zero.");
+            CALL_AND_HANDLE(fill_impl(device_value_type(0.0)), "Failed to fill buffer to zero.");
             return *this;
         }
         inline self_type &fill_ones()
         {
-            CALL_AND_HANDLE(fill_impl(value_type(1.0)), "Failed to fill buffer to one.");
+            CALL_AND_HANDLE(fill_impl(device_value_type(1.0)), "Failed to fill buffer to one.");
             return *this;
         }
 
     private:
         template <bool _mutable = traits<self_type>::is_mutable, typename U = value_type>
         typename std::enable_if<_mutable && std::is_convertible<U, value_type>::value, void>::type
-        fill_impl(const U &v) { CALL_AND_HANDLE(memfill::fill(m_buffer, size(), value_type(v)), "Failed to set buffer to value.  Error when calling the memfill object fill function."); }
+        fill_impl(const U &v) { CALL_AND_HANDLE(memfill::fill(m_buffer, size(), device_value_type(v)), "Failed to set buffer to value.  Error when calling the memfill object fill function."); }
 
     public:
         // Inplace scalar multiplication/division functions
         template <typename Vt>
         inline value_update_type<Vt, self_type> operator*=(const Vt &v)
         {
-            CALL_AND_HANDLE(backend_type::scal(size(), value_type(v), m_buffer, 1), "Failed to perform operator*= on tensor slice object.  scal call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::scal(size(), device_value_type(v), m_buffer, 1), "Failed to perform operator*= on tensor slice object.  scal call failed.");
             return *this;
         }
         template <typename Vt>
         inline value_update_type<Vt, self_type> operator/=(const Vt &v)
         {
-            CALL_AND_HANDLE(backend_type::scal(size(), value_type(1.0 / v), m_buffer, 1), "Failed to perform operator/= on tensor slice object.  scal call failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::scal(size(), device_value_type(1.0 / v), m_buffer, 1), "Failed to perform operator/= on tensor slice object.  scal call failed.");
             return *this;
         }
     }; // class tensor_slice_base
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // D dimensional implementation of the reduced dimensional tensor slice object for   //
-    //                              use with the blas backend                            //
-    ///////////////////////////////////////////////////////////////////////////////////////
-    template <template <typename, size_t, typename> class ArrType, typename T, size_t D1, size_t D2, typename pref>
-    class tensor_slice<ArrType<T, D1, blas_backend>, pref, D2> : public tensor_slice_base<tensor_slice<ArrType<T, D1, blas_backend>, pref, D2>>
+    template <template <typename, size_t, typename> class ArrType, typename T, size_t D1, typename backend, size_t D2, typename pref>
+    class tensor_slice<ArrType<T, D1, backend>, pref, D2> : public tensor_slice_base<tensor_slice<ArrType<T, D1, backend>, pref, D2>>
     {
     public:
-        using array_type = ArrType<T, D1, blas_backend>;
-        static_assert(is_dense_tensor<array_type>::value, "Failed to instantiate tensor_slice object.  The input array type is not a valid dense tensor type.");
-        using self_type = tensor_slice<array_type, pref, D2>;
-        using slice_base = tensor_slice_base<self_type>;
-        using slice_traits = tensor_slice_traits<array_type, pref, D2>;
-        using const_slice_traits = tensor_slice_traits<array_type, typename std::add_const<pref>::type, D2>;
-        using size_type = typename slice_base::size_type;
-
-        using value_type = pref;
-        using reference = typename std::add_lvalue_reference<pref>::type;
-        using const_reference = typename std::add_lvalue_reference<typename std::add_const<pref>::type>::type;
-
-    protected:
-        using slice_base::m_buffer;
-        using slice_base::m_tensor;
-
-    public:
-        template <typename... Args>
-        tensor_slice(Args &&...args)
-        try : slice_base(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct tensor slice object.");
-        }
-        template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(slice_base::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
-
-        // accessor operator[] for returning slices
-        inline typename slice_traits::slice_type operator[](size_type i) { return slice_traits::make(m_tensor, m_buffer, i); }
-        inline typename const_slice_traits::slice_type operator[](size_type i) const { return const_slice_traits::make(m_tensor, m_buffer, i); }
-        inline typename slice_traits::slice_type slice(size_type i)
-        {
-            ASSERT(internal::compare_bounds(i, m_buffer, slice_base::shape(0)), "Unable to return slice of array.  Slice index out of bounds.");
-            return slice_traits::make(m_tensor, i);
-        }
-        inline typename const_slice_traits::slice_type slice(size_type i) const
-        {
-            ASSERT(internal::compare_bounds(i, m_buffer, slice_base::shape(0)), "Unable to return slice of array.  Slice index out of bounds.");
-            return const_slice_traits::make(m_tensor, i);
-        }
-
-        // accessor which accesses the tensor as a 1d array
-        inline reference operator()(size_type index) { return m_buffer[index]; }
-        inline const_reference operator()(size_type index) const { return m_buffer[index]; }
-        inline reference at(size_type i)
-        {
-            ASSERT(internal::compare_bounds(i, slice_base::size()), "Unable to access tensor element using at.  Index out of bounds.");
-            return m_buffer[i];
-        }
-        inline const_reference at(size_type i) const
-        {
-            ASSERT(internal::compare_bounds(i, slice_base::size()), "Unable to access tensor element using at.  Index out of bounds.");
-            return m_buffer[i];
-        }
-
-        // general accessor functions
-        template <typename... Inds>
-        inline reference operator()(Inds... indices)
-        {
-            static_assert(sizeof...(Inds) == D2, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
-            return m_buffer[get_index<pack_type>(indices...)];
-        }
-
-        template <typename... Inds>
-        inline const_reference operator()(Inds... indices) const
-        {
-            static_assert(sizeof...(Inds) == D2, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
-            return m_buffer[get_index<pack_type>(indices...)];
-        }
-
-        template <typename... Inds>
-        inline reference at(Inds... indices)
-        {
-            static_assert(sizeof...(Inds) == D2, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
-            size_type index;
-            CALL_AND_HANDLE(index = get_index_bounds_check<pack_type>(indices...), "Unable to access tensor element.  Failed to determine flattened index.");
-            return m_buffer[index];
-        }
-
-        template <typename... Inds>
-        inline const_reference at(Inds... indices) const
-        {
-            static_assert(sizeof...(Inds) == D2, "Failed to access element of tensor object.  The input index list does not have the correct size.");
-            using pack_type = typename internal::check_integral<Inds...>::pack_type;
-            size_type index;
-            CALL_AND_HANDLE(index = get_index_bounds_check<pack_type>(indices...), "Unable to access tensor element.  Failed to determine flattened index.");
-            return m_buffer[index];
-        }
-
-    private:
-        ///@cond INTERNAL
-        // get the index in the array corresponding to the parameter pack.
-        template <typename IntegerType, typename... Args>
-        inline size_type get_index_bounds_check(IntegerType i, Args... args) const
-        {
-            ASSERT(internal::compare_bounds(i, slice_base::shape(D2 - sizeof...(args) - 1)), "Unable to get flattened index.  One of the unflattened indices was out of bounds.");
-            CALL_AND_HANDLE(return i * slice_base::stride(D2 - sizeof...(args) - 1) + get_index(args...), "Unable to get flattened index.  Error on iterated get_index call.");
-        }
-        template <typename IntegerType>
-        inline size_type get_index_bounds_check(IntegerType i) const
-        {
-            ASSERT(internal::compare_bounds(i, slice_base::shape(D2 - 1)), "Unable to get flattened index.  Final unflattened index was out of bounds.");
-            return i;
-        }
-
-        template <typename IntegerType, typename... Args>
-        inline size_type get_index(IntegerType i, Args... args) const { return i * slice_base::stride(D2 - sizeof...(args) - 1) + get_index(args...); }
-        template <typename IntegerType>
-        inline size_type get_index(IntegerType i) const { return i; }
-
-        ///@endcond
-    };
-
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // 1 dimensional implementation of the reduced dimensional tensor slice object for   //
-    //                              use with the blas backend                            //
-    ///////////////////////////////////////////////////////////////////////////////////////
-    template <template <typename, size_t, typename> class ArrType, typename T, size_t D1, typename pref>
-    class tensor_slice<ArrType<T, D1, blas_backend>, pref, 1> : public tensor_slice_base<tensor_slice<ArrType<T, D1, blas_backend>, pref, 1>>
-    {
-    public:
-        using array_type = ArrType<T, D1, blas_backend>;
-        static_assert(is_dense_tensor<array_type>::value, "Failed to instantiate tensor_slice object.  The input array type is not a valid dense tensor type.");
-        using self_type = tensor_slice<array_type, pref, 1>;
-        using slice_base = tensor_slice_base<self_type>;
-        using size_type = typename slice_base::size_type;
-
-        using value_type = pref;
-        using reference = typename std::add_lvalue_reference<pref>::type;
-        using const_reference = typename std::add_lvalue_reference<typename std::add_const<pref>::type>::type;
-
-    protected:
-        using slice_base::m_buffer;
-        using slice_base::m_tensor;
-
-    public:
-        template <typename... Args>
-        tensor_slice(Args &&...args)
-        try : slice_base(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct tensor slice object.");
-        }
-        template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(slice_base::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
-
-        inline reference operator[](size_type i) { return m_buffer[i]; }
-        inline reference operator()(size_type i) { return m_buffer[i]; }
-        inline const_reference operator[](size_type i) const { return m_buffer[i]; }
-        inline const_reference operator()(size_type i) const { return m_buffer[i]; }
-
-        inline reference slice(size_type i)
-        {
-            ASSERT(internal::compare_bounds(i, slice_base::size()), "Failed to access element. Index out of bounds.");
-            return m_buffer[i];
-        }
-        inline reference at(size_type i)
-        {
-            ASSERT(internal::compare_bounds(i, slice_base::size()), "Failed to access element. Index out of bounds.");
-            return m_buffer[i];
-        }
-        inline const_reference slice(size_type i) const
-        {
-            ASSERT(internal::compare_bounds(i, slice_base::size()), "Failed to access element. Index out of bounds.");
-            return m_buffer[i];
-        }
-        inline const_reference at(size_type i) const
-        {
-            ASSERT(internal::compare_bounds(i, slice_base::size()), "Failed to access element. Index out of bounds.");
-            return m_buffer[i];
-        }
-    };
-
-#ifdef PYTTN_BUILD_CUDA
-    template <template <typename, size_t, typename> class ArrType, typename T, size_t D1, size_t D2, typename pref>
-    class tensor_slice<ArrType<T, D1, cuda_backend>, pref, D2> : public tensor_slice_base<tensor_slice<ArrType<T, D1, cuda_backend>, pref, D2>>
-    {
-    public:
-        using array_type = ArrType<T, D1, cuda_backend>;
+        using array_type = ArrType<T, D1, backend>;
         static_assert(is_dense_tensor<array_type>::value, "Failed to instantiate tensor_slice object.  The input array type is not a valid dense tensor type.");
         using self_type = tensor_slice<array_type, pref, D2>;
         using slice_base = tensor_slice_base<self_type>;
@@ -620,52 +439,39 @@ namespace linalg
         using const_pointer = typename slice_base::const_pointer;
         using const_slice_traits = tensor_slice_traits<array_type, typename std::add_const<pref>::type, D2>;
         using size_type = typename slice_base::size_type;
+        using const_reference = const T&;
+        using reference = T&;
 
-    protected:
-        using slice_base::m_buffer;
-        using slice_base::m_tensor;
 
     public:
         template <typename... Args>
-        tensor_slice(Args &&...args)
-        try : slice_base(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct tensor slice object.");
-        }
+        tensor_slice(Args &&...args);
         template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(slice_base::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
-
+        self_type &operator=(Args &&...args);
         // accessor operator[] for returning slices
-        inline typename slice_traits::slice_type operator[](size_type i) { return slice_traits::make(m_tensor, i); }
-        inline typename const_slice_traits::slice_type operator[](size_type i) const { return const_slice_traits::make(m_tensor, i); }
-        inline typename slice_traits::slice_type slice(size_type i)
-        {
-            ASSERT(internal::compare_bounds(i, slice_base::shape(0)), "Unable to return slice of array.  Slice index out of bounds.");
-            return slice_traits::make(m_tensor, i);
-        }
-        inline typename const_slice_traits::slice_type slice(size_type i) const
-        {
-            ASSERT(internal::compare_bounds(i, slice_base::shape(0)), "Unable to return slice of array.  Slice index out of bounds.");
-            return const_slice_traits::make(m_tensor, i);
-        }
+        inline typename slice_traits::slice_type operator[](size_type i);
+        inline typename const_slice_traits::slice_type operator[](size_type i) const;
+        inline typename slice_traits::slice_type slice(size_type i);
+        inline typename const_slice_traits::slice_type slice(size_type i) const;
 
-        __host__ __device__ pointer buffer() { return slice_base::m_buffer; }
-        __host__ __device__ const_pointer buffer() const { return slice_base::m_buffer; }
-        __host__ __device__ pointer data() { return slice_base::m_buffer; }
-        __host__ __device__ const_pointer data() const { return slice_base::m_buffer; }
+        // accessor which accesses the tensor as a 1d array
+        inline reference operator()(size_type index);
+        inline const_reference operator()(size_type index) const;
+        inline reference at(size_type i);
+        inline const_reference at(size_type i) const;
+
+        // general accessor functions
+        template <typename... Inds> inline reference operator()(Inds... indices);
+        template <typename... Inds> inline const_reference operator()(Inds... indices) const;
+        template <typename... Inds> inline reference at(Inds... indices);
+        template <typename... Inds> inline const_reference at(Inds... indices) const;
     };
 
-    template <template <typename, size_t, typename> class ArrType, typename T, size_t D1, typename pref>
-    class tensor_slice<ArrType<T, D1, cuda_backend>, pref, 1> : public tensor_slice_base<tensor_slice<ArrType<T, D1, cuda_backend>, pref, 1>>
+    template <template <typename, size_t, typename> class ArrType, typename T, size_t D1, typename backend, typename pref>
+    class tensor_slice<ArrType<T, D1, backend>, pref, 1> : public tensor_slice_base<tensor_slice<ArrType<T, D1, backend>, pref, 1>>
     {
     public:
-        using array_type = ArrType<T, D1, cuda_backend>;
+        using array_type = ArrType<T, D1, backend>;
         static_assert(is_dense_tensor<array_type>::value, "Failed to instantiate tensor_slice object.  The input array type is not a valid dense tensor type.");
         using self_type = tensor_slice<array_type, pref, 1>;
         using slice_base = tensor_slice_base<self_type>;
@@ -674,33 +480,28 @@ namespace linalg
 
         using pointer = typename slice_base::pointer;
         using const_pointer = typename slice_base::const_pointer;
+        using const_reference = const T&;
+        using reference = T&;
 
     public:
         template <typename... Args>
-        tensor_slice(Args &&...args)
-        try : slice_base(std::forward<Args>(args)...) {}
-        catch (const std::exception &ex)
-        {
-            logging::error(ex.what());
-            RAISE_EXCEPTION("Failed to construct tensor slice object.");
-        }
+        tensor_slice(Args &&...args);
         template <typename... Args>
-        self_type &operator=(Args &&...args)
-        {
-            CALL_AND_RETHROW(slice_base::operator=(std::forward<Args>(args)...));
-            return *this;
-        }
+        self_type &operator=(Args &&...args);
 
-        __host__ __device__ pointer buffer() { return slice_base::m_buffer; }
-        __host__ __device__ const_pointer buffer() const { return slice_base::m_buffer; }
-        __host__ __device__ pointer data() { return slice_base::m_buffer; }
-        __host__ __device__ const_pointer data() const { return slice_base::m_buffer; }
+        inline reference operator[](size_type i);
+        inline reference operator()(size_type i);
+        inline const_reference operator[](size_type i) const;
+        inline const_reference operator()(size_type i) const;
+
+        inline reference slice(size_type i);
+        inline reference at(size_type i);
+        inline const_reference slice(size_type i) const;
+        inline const_reference at(size_type i) const; 
     };
-
-#endif // PYTTN_BUILD_CUDA
 
 } // namespace linalg
 
 ///@endcond
 
-#endif // PYTTN_LINALG_TENSOR_DENSE_TENSOR_SLICE_HPP_//
+#endif // PYTTN_LINALG_TENSOR_DENSE_TENSOR_SLICE_BASE_HPP_//

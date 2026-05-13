@@ -12,14 +12,22 @@
  * limitations under the License
  */
 
-#include "tensor.hpp"
+#include "tensor.tpp"
 #include <linalg/linalg.hpp>
 #include "../pyttn_typedef.hpp"
 
-template <>
-void initialise_tensors<pyttn_real_type>(py::module &m);
+void initialise_tensors(py::module &m)
+{
+    using complex_type = std::complex<pyttn_real_type>;
+    init_tensor_cpu<pyttn_real_type, 1>(m, "vector_real");
+    init_matrix_cpu<pyttn_real_type>(m, "matrix_real");
+    init_tensor_cpu<pyttn_real_type, 3>(m, "tensor_3_real");
+    init_tensor_cpu<pyttn_real_type, 4>(m, "tensor_4_real");
 
-#ifdef PYTTN_BUILD_CUDA
-template <>
-void initialise_tensors_cuda<pyttn_real_type>(py::module &m);
-#endif
+    init_tensor_cpu<complex_type, 1>(m, "vector_complex");
+    init_matrix_cpu<complex_type>(m, "matrix_complex");
+    init_tensor_cpu<complex_type, 3>(m, "tensor_3_complex");
+    init_tensor_cpu<complex_type, 4>(m, "tensor_4_complex");
+}
+
+

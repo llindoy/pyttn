@@ -22,17 +22,12 @@ namespace ttns
 {
 
     template <typename T, typename backend = linalg::blas_backend>
-    class two_site_variations;
-
-    template <typename U>
-    class two_site_variations<linalg::complex<U>, linalg::blas_backend>
+    class two_site_variations
     {
     public:
-        using value_type = linalg::complex<U>;
-        using real_type = U;
-        using T = linalg::complex<U>;
-        using backend = linalg::blas_backend;
-        using size_type = typename backend::size_type;
+        using value_type = T;
+        using real_type = typename linalg::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
 
         using environment_type = sop_environment<T, backend>;
         using spo_core = typename environment_type::spo_core;
@@ -100,9 +95,7 @@ namespace ttns
                 const auto &a = A().as_matrix();
                 // compute the action of the Hamiltonian on the lower of the two nodes and store the result in res
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_HAMILTONIAN_SUM
-#pragma omp parallel for default(shared) schedule(dynamic, 1) num_threads(HA.size())
-#endif
+#pragma omp parallel for default(shared) schedule(static) num_threads(HA.size())
 #endif
                 for (size_type r = 0; r < hinds.size(); ++r)
                 {
@@ -165,9 +158,7 @@ namespace ttns
                 const auto &hinf_p = hinf.parent();
                 // compute the action of the Hamiltonian on the upper of the two nodes and store the result in res
 #ifdef USE_OPENMP
-#ifdef PARALLELISE_HAMILTONIAN_SUM
-#pragma omp parallel for default(shared) schedule(dynamic, 1) num_threads(HA.size())
-#endif
+#pragma omp parallel for default(shared) schedule(static) num_threads(HA.size())
 #endif
                 for (size_type r = 0; r < hinds.size(); ++r)
                 {
@@ -262,7 +253,7 @@ namespace ttns
         // function for evaluating the two matrices required to evaluate the singular vectors (either left or right) of the projected two site Hamiltonian onto
         // TODO: set up openmp parallelisation of this function call.
         template <typename vtype, typename rtype>
-        inline void operator()(const vtype &v, const linalg::vector<T> &hcoeff, triad &op1, rank_4 &op2, size_type nterms, mat &t1, mat &t2, mat &temp2, bool MconjM, rtype &res) const
+        inline void operator()(const vtype &v, const linalg::vector<T> &hcoeff, triad &op1, rank_4 &op2, size_type nterms, mat &t1, mat &t2, mat &temp2, mat& temp3, bool MconjM, rtype &res) const
         {
 #ifdef TRACE_LOG
             logging::trace("evaluating the action of the projected two site hamiltonian on a vector.");
@@ -290,8 +281,14 @@ namespace ttns
 
                         for (size_type r = 0; r < nterms; ++r)
                         {
+                            auto contract_val = contract(op2[r], 0, 2, vtens, 0, 2);
+                            if(contract_val.requires_workspace())
+                            {
+                                CALL_AND_HANDLE(temp3.resize(1, contract_val.working_size()), "Failed to resize working buffer.");
+                            }
+
                             // first apply op2 to the v matrix
-                            CALL_AND_HANDLE(t2 = contract(op2[r], 0, 2, vtens, 0, 2), "Failed to contract op2 with the tensor representation of the input array.");
+                            CALL_AND_HANDLE(t2 = contract_val.bind_workspace(temp3), "Failed to contract op2 with the tensor representation of the input array.");
 
                             // now apply op1 to the t2 vector. This is simply a matrix vector product and we add the result to t1
                             CALL_AND_HANDLE(t1vec += hcoeff[r] * op1[r] * t2vec, "Failed to compute the t1 vector.");
@@ -325,8 +322,13 @@ namespace ttns
                         // r = t1 Mconj
                         for (size_type r = 0; r < nterms; ++r)
                         {
+                            auto contract_val =  contract(linalg::conj(op2[r]), 0, 2, t1tens, 0, 2, temp2);
+                            if(contract_val.requires_workspace())
+                            {
+                                CALL_AND_HANDLE(temp3.resize(1, contract_val.working_size()), "Failed to resize working buffer.");
+                            }
                             // first apply op2 to the v matrix
-                            CALL_AND_HANDLE(t2 = contract(linalg::conj(op2[r]), 0, 2, t1tens, 0, 2, temp2), "Failed to contract op2 with the tensor representation of the input array.");
+                            CALL_AND_HANDLE(t2 = contract_val.bind_workspace(temp3), "Failed to contract op2 with the tensor representation of the input array.");
 
                             // now apply op1 to the t2 vector. This is simply a matrix vector product and we add the result to t1
                             CALL_AND_HANDLE(res += linalg::conj(hcoeff[r]) * (linalg::conj(op1[r]) * t2vec), "Failed to contract op1 with temporary array.");

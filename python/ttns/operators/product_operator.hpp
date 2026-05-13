@@ -28,90 +28,10 @@
 
 namespace py = pybind11;
 
-template <typename T, typename backend>
-void init_product_operator(py::module &m, const std::string &label)
-{
-    using namespace ttns;
+void initialise_product_operator(py::module &m);
 
-    using opdict = operator_dictionary<T, backend>;
-    using pop = product_operator<T, backend>;
-    using real_type = typename linalg::get_real_type<T>::type;
-
-    // the base primitive operator type
-    py::class_<pop>(m, (std::string("product_operator_") + label).c_str())
-        .def(py::init())
-        .def(py::init<const pop &>())
-        .def(py::init<sNBO<real_type> &, const system_modes &, bool>(),
-             py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def(py::init<sNBO<real_type> &, const system_modes &, const opdict &, bool>(),
-             py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def(py::init<sNBO<T> &, const system_modes &, bool>(),
-             py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def(py::init<sNBO<T> &, const system_modes &, const opdict &, bool>(),
-             py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def(py::init<sPOP &, const system_modes &, bool>(),
-             py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def(py::init<sPOP &, const system_modes &, const opdict &, bool>(),
-             py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def(py::init<sOP &, const system_modes &, bool>(),
-             py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def(py::init<sOP &, const system_modes &, const opdict &, bool>(),
-             py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def("assign", [](pop &self, const pop &o)
-             { self = o; })
-        .def("__copy__", [](const pop &o)
-             { return pop(o); })
-        .def("__deepcopy__", [](const pop &o, py::dict)
-             { return pop(o); }, py::arg("memo"))
-        .def("initialise", [](pop &o, sNBO<T> &sop, const system_modes &sys, bool use_sparse)
-             { o.initialise(sop, sys, use_sparse); }, py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def("initialise", [](pop &o, sNBO<T> &sop, const system_modes &sys, const opdict &opd, bool use_sparse)
-             { o.initialise(sop, sys, opd, use_sparse); }, py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def("initialise", [](pop &o, sNBO<real_type> &sop, const system_modes &sys, bool use_sparse)
-             { o.initialise(sop, sys, use_sparse); }, py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def("initialise", [](pop &o, sNBO<real_type> &sop, const system_modes &sys, const opdict &opd, bool use_sparse)
-             { o.initialise(sop, sys, opd, use_sparse); }, py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def("initialise", [](pop &o, sPOP &sop, const system_modes &sys, bool use_sparse)
-             { o.initialise(sop, sys, use_sparse); }, py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def("initialise", [](pop &o, sPOP &sop, const system_modes &sys, const opdict &opd, bool use_sparse)
-             { o.initialise(sop, sys, opd, use_sparse); }, py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def("initialise", [](pop &o, sOP &sop, const system_modes &sys, bool use_sparse)
-             { o.initialise(sop, sys, use_sparse); }, py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def("initialise", [](pop &o, sOP &sop, const system_modes &sys, const opdict &opd, bool use_sparse)
-             { o.initialise(sop, sys, opd, use_sparse); }, py::arg(), py::arg(), py::arg(), py::arg("use_sparse") = true)
-        .def("clear", &pop::clear)
-        .def("nmodes", &pop::nmodes)
-        .def("complex_dtype", [](const pop &)
-             { return !std::is_same<T, real_type>::value; })
-        .def("__str__", [](const pop &o)
-             {std::ostringstream oss; oss << o; return oss.str(); })
-
-#ifdef CEREAL_LIBRARY_FOUND
-         .def("save", 
-            [](const pop & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-        .def("load", 
-            [](pop & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-         .def(py::pickle(
-            [](const pop& a){return serialisation_utilities::__getstate__(a);},
-            [](py::tuple t){return serialisation_utilities::__setstate__<pop>(t);}
-         ))  
-#endif  
-
-        .def("backend", [](const pop &)
-             { return backend::label(); });
-}
-
-template <typename real_type, typename backend>
-void initialise_product_operator(py::module &m)
-{
-    using complex_type = linalg::complex<real_type>;
-
-#ifdef BUILD_REAL_TTN
-    init_product_operator<real_type, backend>(m, "real");
+#ifdef PYTTN_BUILD_CUDA
+void initialise_product_operator_cuda(py::module &m);
 #endif
-    init_product_operator<complex_type, backend>(m, "complex");
-}
 
 #endif

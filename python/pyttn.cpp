@@ -89,7 +89,7 @@ using overload_cast_ = pybind11::detail::overload_cast_impl<Args...>;
 PYBIND11_MODULE(ttnpp, m)
 {
     m.doc() = R"mydelimiter(
-      Python wrapping of the TTNS_LIB library for performing calculations on tree tensor network states
+        TTN++ Python bindings   
       )mydelimiter";
     auto m_linalg = m.def_submodule("linalg", R"mydelimiter(
         Linear algebra submodule for TTNS library."
@@ -156,24 +156,25 @@ PYBIND11_MODULE(ttnpp, m)
     // Wrap the required linear algebra types to enable python based instantiation
     // of operators.
     //
-    // The CPU implementations
-    initialise_tensors<pyttn_real_type>(m_linalg);
-    initialise_sparse_matrices<pyttn_real_type>(m_linalg);
-    initialise_orthogonal_vector<pyttn_real_type, linalg::blas_backend>(m_linalg);
-
     // initialise the blas backend objects
     initialise_blas_backend(m_linalg);
 
-#ifdef PYTTN_BUILD_CUDA
-    // the GPU implementations
-    initialise_tensors_cuda<pyttn_real_type>(m_linalg_gpu);
-    initialise_sparse_matrices_cuda<pyttn_real_type>(m_linalg_gpu);
-    initialise_orthogonal_vector<pyttn_real_type, linalg::cuda_backend>(m_linalg_gpu);
+    // The CPU implementations
+    initialise_tensors(m_linalg);
+    initialise_sparse_matrices(m_linalg);
+    initialise_orthogonal_vector(m_linalg);
 
+#ifdef PYTTN_BUILD_CUDA
     // initialise the cuda environment objects
     initialise_cuda_backend(m_linalg_gpu);
-#endif
 
+    // the GPU implementations
+    initialise_tensors_cuda(m_linalg_gpu);
+    initialise_sparse_matrices_cuda(m_linalg_gpu);
+    initialise_orthogonal_vector_cuda(m_linalg_gpu);
+
+#endif
+    
     //
     // Wrap the required utils functions
     //
@@ -183,69 +184,79 @@ PYBIND11_MODULE(ttnpp, m)
     //
     // Wrap the sOP functionality
     //
-    initialise_sSOP<pyttn_real_type>(m);
+    initialise_sSOP(m);
     initialise_system_info(m);
-    initialise_state<pyttn_real_type>(m);
-    initialise_SOP<pyttn_real_type>(m);
-    initialise_operator_dictionary<pyttn_real_type, linalg::blas_backend>(m);
-    initialise_liouville_space<pyttn_real_type>(m);
-    initialise_convert_to_dense<pyttn_real_type>(m);
-    initialise_Op<pyttn_real_type, linalg::blas_backend>(m);
+    //initialise_state(m);
+    initialise_SOP(m);
+
+    initialise_operator_dictionary(m);
+    initialise_liouville_space(m);
+    initialise_convert_to_dense(m);
 
     //
     // Wrap the models functionality included in SOP
     //
-    initialise_models<pyttn_real_type>(m_models);
+    initialise_models(m_models);
 
 #ifdef PYTTN_BUILD_CUDA
     // the GPU implementations
-    initialise_operator_dictionary<pyttn_real_type, linalg::cuda_backend>(m_cuda);
-    initialise_Op<pyttn_real_type, linalg::cuda_backend>(m_cuda);
-
+    initialise_operator_dictionary_cuda(m_cuda);
 #endif
 
     //
     // Wrap core ttns functionality
     //
     initialise_ntree(m);
-    initialise_ttn<pyttn_real_type, linalg::blas_backend>(m);
-    initialise_msttn<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_ttn(m);
+    initialise_msttn(m);
 
 #ifdef PYTTN_BUILD_CUDA
-    initialise_ttn<pyttn_real_type, linalg::cuda_backend>(m_cuda);
-    initialise_msttn<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    initialise_ttn_cuda(m_cuda);
+    initialise_msttn_cuda(m_cuda);
 #endif
 
-    initialise_matrix_element<pyttn_real_type, linalg::blas_backend>(m);
-    initialise_rdm<pyttn_real_type, linalg::blas_backend>(m);
-
-    initialise_site_operators<pyttn_real_type, linalg::blas_backend>(m_ops);
-    initialise_product_operator<pyttn_real_type, linalg::blas_backend>(m);
-    initialise_sop_operator<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_matrix_element(m);
+    initialise_rdm(m);
 
 #ifdef PYTTN_BUILD_CUDA
-    initialise_matrix_element<pyttn_real_type, linalg::cuda_backend>(m_cuda);
-    initialise_rdm<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    initialise_matrix_element_cuda(m_cuda);
+    initialise_rdm_cuda(m_cuda);
+#endif
 
-    initialise_site_operators<pyttn_real_type, linalg::cuda_backend>(m_ops_gpu);
-    initialise_product_operator<pyttn_real_type, linalg::cuda_backend>(m_cuda);
-    initialise_sop_operator<pyttn_real_type, linalg::cuda_backend>(m_cuda);
+    initialise_site_operators(m_ops);
+    initialise_product_operator(m);
+    initialise_sop_operator(m);
+    initialise_Op(m);
+
+#ifdef PYTTN_BUILD_CUDA
+
+    initialise_site_operators_cuda(m_ops_gpu);
+    initialise_product_operator_cuda(m_cuda);
+    initialise_sop_operator_cuda(m_cuda);
+    initialise_Op_cuda(m_cuda);
+
 #endif
 
     //
     // Wrap the core algorithms for operating on ttns
     //
-    initialise_dmrg<pyttn_real_type, linalg::blas_backend>(m);
-    initialise_dmrg_adaptive<pyttn_real_type, linalg::blas_backend>(m);
+    initialise_dmrg_onesite_ttn(m);
+    initialise_dmrg_adaptive_ttn(m);
+    initialise_dmrg_onesite_msttn(m);
 
-    initialise_tdvp<pyttn_real_type, linalg::blas_backend>(m);
-    initialise_tdvp_adaptive<pyttn_real_type, linalg::blas_backend>(m);
-
+    initialise_tdvp_onesite_ttn(m);
+    initialise_tdvp_adaptive_ttn(m);
+    initialise_tdvp_onesite_msttn(m);
 #ifdef PYTTN_BUILD_CUDA
-    initialise_dmrg<pyttn_real_type, linalg::cuda_backend>(m);
-    // initialise_dmrg_adaptive<pyttn_real_type, linalg::cuda_backend>(m);
 
-    initialise_tdvp<pyttn_real_type, linalg::cuda_backend>(m);
-    // initialise_tdvp_adaptive<pyttn_real_type, linalg::cuda_backend>(m);
+    initialise_dmrg_onesite_ttn_cuda(m_cuda);
+    //initialise_dmrg_adaptive_ttn_cuda(m_cuda);
+    initialise_dmrg_onesite_msttn_cuda(m_cuda);
+
+    initialise_tdvp_onesite_ttn_cuda(m_cuda);
+    //initialise_tdvp_adaptive_ttn_cuda(m_cuda);
+    initialise_tdvp_onesite_msttn_cuda(m_cuda);
+
 #endif
+
 }

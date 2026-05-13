@@ -274,7 +274,6 @@ void init_models(py::module &m, const std::string &label)
             });
 }
 
-template <typename real_type>
 void initialise_models(py::module &m);
 
 #endif // PYTHON_BINDING_SOP_MODELS_HPP

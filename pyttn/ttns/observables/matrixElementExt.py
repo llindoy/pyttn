@@ -24,7 +24,22 @@ try:
 
 except ImportError:
     _use_real_matel = False
+    
+try:
+    from pyttn.ttnpp.cuda import matrix_element_complex as matrix_element_complex_cuda
+    from pyttn.ttnpp.cuda import ttn_complex as ttn_complex_cuda
+    from pyttn.ttnpp.cuda import ms_ttn_complex as ms_ttn_complex_cuda
 
+    _cuda_import = True
+
+    # and if we have imported real ttns we import the cuda versions
+    if _use_real_matel:
+        from pyttn.ttnpp.cuda import matrix_element_real as matrix_element_real_cuda
+        from pyttn.ttnpp.cuda import ttn_real as ttn_real_cuda
+        from pyttn.ttnpp.cuda import ms_ttn_real as ms_ttn_real_cuda
+
+except ImportError:
+    _cuda_import = False
 
 class MatrixElement(metaclass=ABCMeta):
     """A class defining the general interface for the pybind11 wrappers generated for the MatrixElement object.  These wrapper classes are
@@ -35,6 +50,7 @@ class MatrixElement(metaclass=ABCMeta):
         cls,
         *args,
         dtype: Optional[Union[float, complex, np.float64, np.complex128]] = np.complex128,
+        backend: str = 'blas',
         **kwargs,
     ) -> "MatrixElement":
         """A factory method for constructing an object used for evaluating matrix elements from a TTN. If this function is passed a TTN object it uses
@@ -48,8 +64,10 @@ class MatrixElement(metaclass=ABCMeta):
             - **A** (:class:`ttn` or :class:`ms_ttn`), **B** (:class:`ttn` or :class:`ms_ttn`) - Two TTNs with the same topology defining the size of the bra and ket respectively.
             - **A** (:class:`ttn` or :class:`ms_ttn`), **B** (:class:`ttn` or :class:`ms_ttn`), **H** (:class:`sop_operator` or :class:`ms_sop_operator`)- Two TTNs and a Hamiltonian operator with the same topology defining the size of the bra, ket and operator respectively
         
-        :param dtype: The type to be stored in the matrix element object.  This is ignored if the a TTN object is passed in the first argument.
+        :param dtype: The type to be stored in the matrix element object.  This is ignored if a TTN object is passed in the first argument.
         :type dtype: {np.float64, np.complex128}, optional
+        :param backend: The backend to be used by the matrix element object.  This is ignored if a TTN object is passed in the first argument
+        :type backend: str 
         :param `**kwargs`: A dictionary containing optional input arguments.
 
             - **nbuffers** (int, optional) - The number of buffers to allocate.
@@ -62,29 +80,52 @@ class MatrixElement(metaclass=ABCMeta):
             if args:
                 if isinstance(args[0], ttn_complex) or isinstance(args[0], ms_ttn_complex):
                     return matrix_element_complex(*args, **kwargs)
+                elif _cuda_import and (isinstance(args[0], ttn_complex_cuda) or isinstance(args[0], ms_ttn_complex_cuda)):
+                    return matrix_element_complex_cuda(*args, **kwargs)
                 elif isinstance(args[0], ttn_real) or isinstance(args[0], ms_ttn_real):
                     return matrix_element_real(*args, **kwargs)
+                elif _cuda_import and (isinstance(args[0], ttn_real_cuda) or isinstance(args[0], ms_ttn_real_cuda)):
+                    return matrix_element_real_cuda(*args, **kwargs)
                 else:
                     raise RuntimeError("Invalid dtype for MatrixElement")
             else:
-                if dtype == np.complex128 or dtype is complex:
-                    return matrix_element_complex(**kwargs)
-                elif dtype == np.float64 or dtype is float:
-                    return matrix_element_real(**kwargs)
+                if backend == 'blas':
+                    if dtype == np.complex128 or dtype is complex:
+                        return matrix_element_complex(**kwargs)
+                    elif dtype == np.float64 or dtype is float:
+                        return matrix_element_real(**kwargs)
+                    else:
+                        raise RuntimeError("Invalid dtype for MatrixElement")
+                elif _cuda_import and backend == 'cuda':
+                    if dtype == np.complex128 or dtype is complex:
+                        return matrix_element_complex_cuda(**kwargs)
+                    elif dtype == np.float64 or dtype is float:
+                        return matrix_element_real_cuda(**kwargs)
+                    else:
+                        raise RuntimeError("Invalid dtype for MatrixElement")    
                 else:
-                    raise RuntimeError("Invalid dtype for MatrixElement")
-
+                    raise RuntimeError("Invalid backend for MatrixElement")
         else:
             if args:
                 if isinstance(args[0], ttn_complex) or isinstance(args[0], ms_ttn_complex):
                     return matrix_element_complex(*args, **kwargs)
+                elif _cuda_import and (isinstance(args[0], ttn_complex_cuda) or isinstance(args[0], ms_ttn_complex_cuda)):
+                    return matrix_element_complex_cuda(*args, **kwargs)
                 else:
                     raise RuntimeError("Invalid dtype for MatrixElement")
             else:
-                if dtype == np.complex128 or dtype is complex:
-                    return matrix_element_complex(**kwargs)
+                if backend == 'blas':
+                    if dtype == np.complex128 or dtype is complex:
+                        return matrix_element_complex(**kwargs)
+                    else:
+                        raise RuntimeError("Invalid dtype for MatrixElement")
+                elif _cuda_import and backend == 'cuda':
+                    if dtype == np.complex128 or dtype is complex:
+                        return matrix_element_complex_cuda(**kwargs)
+                    else:
+                        raise RuntimeError("Invalid dtype for MatrixElement")
                 else:
-                    raise RuntimeError("Invalid dtype for MatrixElement")
+                    raise RuntimeError("Invalid backend for MatrixElement")
                 
     @abstractmethod
     def assign(self, o):
@@ -158,5 +199,10 @@ class MatrixElement(metaclass=ABCMeta):
 MatrixElement.register(matrix_element_complex)
 if _use_real_matel:
     MatrixElement.register(matrix_element_real)
+
+if _cuda_import:
+    MatrixElement.register(matrix_element_complex_cuda)
+    if _use_real_matel:
+        MatrixElement.register(matrix_element_real_cuda)
 
 matrix_element = MatrixElement

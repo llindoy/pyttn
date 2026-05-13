@@ -33,13 +33,13 @@ namespace utils
     class explicitly_restarted_arnoldi;
 
     template <typename T, typename backend>
-    class explicitly_restarted_arnoldi<complex<T>, backend>
+    class explicitly_restarted_arnoldi<std::complex<T>, backend>
     {
     public:
-        using value_type = complex<T>;
+        using value_type = std::complex<T>;
         using real_type = T;
         using backend_type = backend;
-        using size_type = typename backend_type::size_type;
+        using size_type = typename linalg::traits<backend_type>::size_type;
 
     protected:
         linalg::arnoldi_iteration<value_type, backend> m_arnoldi;
@@ -217,9 +217,9 @@ namespace utils
 
                         mx -= E * x;
                         m_residues[iter - 1] = std::sqrt(
-                            linalg::real(linalg::dot_product(linalg::conj(m_x), m_x)));
+                            std::real(linalg::dot_product(linalg::conj(m_x), m_x)));
                         // std::cerr << E << " " << m_residues[iter-1] << std::endl;
-                        if (m_residues[iter - 1] / linalg::abs(E) < m_eps)
+                        if (m_residues[iter - 1] / std::abs(E) < m_eps)
                         {
                             m_residues.resize(iter);
                             return true;
@@ -314,7 +314,7 @@ namespace utils
                 CALL_AND_HANDLE(xm = m_rvecsd * m_arnoldi.Q(),
                                 "Failed to compute eigenvectors.");
                 real_type norm =
-                    std::sqrt(linalg::real(linalg::dot_product(linalg::conj(x), x)));
+                    std::sqrt(std::real(linalg::dot_product(linalg::conj(x), x)));
                 x /= norm;
             }
             catch (const std::exception &ex)

@@ -32,8 +32,8 @@ namespace ttns
     {
     protected:
         using matrix_type = linalg::matrix<T, backend>;
-        using real_type = typename tmp::get_real_type<T>::type;
-        using size_type = typename backend::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
         using ancestor_index = typename ttn<T, backend>::ancestor_index;
 
     protected:

@@ -15,8 +15,6 @@
 #ifndef PYTTN_TTNS_LIB_SOP_STATE_HPP_
 #define PYTTN_TTNS_LIB_SOP_STATE_HPP_
 
-#include <linalg/linalg.hpp>
-
 #include <iostream>
 #include <list>
 #include <vector>
@@ -191,8 +189,6 @@ namespace ttns
     template <typename T>
     class sepState
     {
-        using real_type = typename linalg::get_real_type<T>::type;
-
     public:
         sepState() : m_coeff(T(0.0)) {}
         sepState(const std::vector<size_t> &N) : m_coeff(T(1.0)), m_state(N) {}
@@ -277,7 +273,7 @@ std::ostream &operator<<(std::ostream &os, const ttns::sepState<T> &op)
     return os;
 }
 
-template <typename T, typename U, typename = typename std::enable_if<linalg::is_number<T>::value and linalg::is_number<U>::value, void>::type>
+template <typename T, typename U>
 ttns::sepState<decltype(T() * U())> operator*(const T &b, const ttns::sepState<U> &o)
 {
     ttns::sepState<decltype(T() * U())> ret;
@@ -287,7 +283,7 @@ ttns::sepState<decltype(T() * U())> operator*(const T &b, const ttns::sepState<U
     return ret;
 }
 
-template <typename T, typename U, typename = typename std::enable_if<linalg::is_number<T>::value and linalg::is_number<U>::value, void>::type>
+template <typename T, typename U>
 ttns::sepState<decltype(T() * U())> operator*(const ttns::sepState<T> &o, const U &b)
 {
     ttns::sepState<decltype(T() * U())> ret;
@@ -296,7 +292,7 @@ ttns::sepState<decltype(T() * U())> operator*(const ttns::sepState<T> &o, const 
     return ret;
 }
 
-template <typename T, typename U, typename = typename std::enable_if<linalg::is_number<T>::value and linalg::is_number<U>::value, void>::type>
+template <typename T, typename U>
 ttns::sepState<decltype(T() * U())> operator/(const ttns::sepState<T> &o, const U &b)
 {
     ttns::sepState<decltype(T() * U())> ret;
@@ -306,21 +302,21 @@ ttns::sepState<decltype(T() * U())> operator/(const ttns::sepState<T> &o, const 
     return ret;
 }
 
-template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
+template <typename T>
 ttns::sepState<T> operator*(const T &b, const ttns::stateStr &o)
 {
     ttns::sepState<T> ret(b, o.state());
     return ret;
 }
 
-template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
+template <typename T>
 ttns::sepState<T> operator*(const ttns::stateStr &o, const T &b)
 {
     ttns::sepState<T> ret(b, o.state());
     return ret;
 }
 
-template <typename T, typename = typename std::enable_if<linalg::is_number<T>::value, void>::type>
+template <typename T>
 ttns::sepState<T> operator/(const ttns::stateStr &o, const T &b)
 {
     ttns::sepState<T> ret(T(1.0) / b, o.state());
@@ -474,7 +470,7 @@ namespace ttns
         {
             for (auto it = m_terms.begin(); it != m_terms.end();)
             {
-                if (linalg::abs(std::get<1>(*it))< tol)
+                if (std::abs(std::get<1>(*it))< tol)
                 {
                     it = m_terms.erase(it);
                 }
@@ -496,7 +492,7 @@ namespace ttns
         const auto plus = "+";
         for (const auto &t : op)
         {
-            sep = linalg::real(std::get<1>(t))>0 ? plus : separator;
+            sep = std::real(std::get<1>(t))>0 ? plus : separator;
             os << sep << std::get<1>(t) << " " << std::get<0>(t) << std::endl;
         }
         return os;

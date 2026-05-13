@@ -33,13 +33,13 @@ namespace utils
     class krylov_integrator;
 
     template <typename T, typename backend>
-    class krylov_integrator<complex<T>, backend>
+    class krylov_integrator<std::complex<T>, backend>
     {
     public:
-        using value_type = complex<T>;
+        using value_type = std::complex<T>;
         using real_type = T;
         using backend_type = backend;
-        using size_type = typename backend_type::size_type;
+        using size_type = typename linalg::traits<backend_type>::size_type;
 
     protected:
         linalg::arnoldi_iteration<value_type, backend> m_arnoldi;
@@ -463,7 +463,7 @@ namespace utils
                 for (size_type i = 0; i < vecs.size(0); ++i)
                 {
                     real_type norm = std::sqrt(
-                        linalg::real(linalg::dot_product(linalg::conj(vecs[i]), vecs[i])));
+                        std::real(linalg::dot_product(linalg::conj(vecs[i]), vecs[i])));
                     vecs[i] /= norm;
                 }
             }

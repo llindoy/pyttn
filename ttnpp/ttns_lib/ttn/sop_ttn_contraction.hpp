@@ -67,7 +67,7 @@ namespace ttns
                 B.copy_mode_structure(A);
             }
 
-            bool include_constant_contribution = (linalg::abs(Op.Eshift()) > cutoff);
+            bool include_constant_contribution = (std::abs(Op.Eshift()) > cutoff);
 
             // now we iterate over every node in the tensor networks and we use the sizes of op and A to determine the sizes of B.
             for (size_type i = 0; i < A.size(); ++i)
@@ -173,7 +173,7 @@ namespace ttns
             // For all interior nodes.  This just corresponds to a kronecker product.
             // For all exterior nodes.  We actually need to perform the required contractions.
 #ifdef USE_OPENMP
-#pragma omp parallel for default(shared)
+#pragma omp parallel for default(shared) schedule(static)
 #endif
             for (size_type i = 0; i < A.size(); ++i)
             {

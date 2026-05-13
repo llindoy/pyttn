@@ -32,8 +32,8 @@ namespace ttns
     {
     public:
         using backend_type = B;
-        using size_type = typename backend_type::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend_type>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using triad = std::vector<linalg::matrix<T, B>>;
 
         using tree_type = tree<operator_node_data<T, B>>;
@@ -220,8 +220,8 @@ namespace ttns
     {
     public:
         using backend_type = B;
-        using size_type = typename backend_type::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend_type>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
 
         template <typename Y, typename V>
         friend class operator_container;

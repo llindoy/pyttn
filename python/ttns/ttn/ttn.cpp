@@ -12,13 +12,11 @@
  * limitations under the License
  */
 
-#include "ttn.hpp"
+
+#include "ttn.tpp"
 #include "../../pyttn_typedef.hpp"
 
-template <>
-void initialise_ttn<pyttn_real_type, linalg::blas_backend>(py::module &m);
-
-#ifdef PYTTN_BUILD_CUDA
-template <>
-void initialise_ttn<pyttn_real_type, linalg::cuda_backend>(py::module &m);
-#endif
+void initialise_ttn(py::module &m)
+{
+    initialise_ttn_types<pyttn_real_type, linalg::blas_backend>(m);
+}

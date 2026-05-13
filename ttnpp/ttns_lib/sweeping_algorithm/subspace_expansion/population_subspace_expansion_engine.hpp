@@ -32,8 +32,8 @@ namespace ttns
     class population_subspace_expansion<T, backend, ttn_class, sop_environment>
     {
     public:
-        using size_type = typename backend::size_type;
-        using real_type = typename tmp::get_real_type<T>::type;
+        using size_type = typename linalg::traits<backend>::size_type;
+        using real_type = typename linalg::get_real_type<T>::type;
         using environment_type = sop_environment<T, backend, ttn_class>;
 
         using env_container_type = typename environment_type::container_type;
@@ -55,7 +55,7 @@ namespace ttns
         using twosite = two_site_variations<T, backend>;
         using eigensolver_type = utils::arnoldi<T, backend>;
         
-        static constexpr std::string_view class_info = "population:";
+        static constexpr std::string_view class_info{"population:"};
 
         struct parameter_list
         {

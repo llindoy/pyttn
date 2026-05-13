@@ -29,9 +29,9 @@ namespace ttns
         {
             using hdata = ttn_node_data<T, backend>;
             using mat = linalg::matrix<T, backend>;
-            using real_type = typename tmp::get_real_type<T>::type;
+            using real_type = typename linalg::get_real_type<T>::type;
             using dmat = linalg::diagonal_matrix<real_type, backend>;
-            using size_type = typename backend::size_type;
+            using size_type = typename linalg::traits<backend>::size_type;
 
         public:
             // the base functions for acting on the underlying hdata objects
@@ -42,7 +42,7 @@ namespace ttns
             }
 
             template <typename engine>
-            static inline size_type maximum_work_size_node(engine &eng, const hdata &A, mat U, mat &R, bool use_capacity = false)
+            static inline size_type maximum_work_size_node(engine &eng, const hdata &A, mat U, mat &R, bool /*is_root*/, bool use_capacity = false)
             {
                 try
                 {

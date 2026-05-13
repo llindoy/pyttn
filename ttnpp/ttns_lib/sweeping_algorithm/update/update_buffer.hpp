@@ -27,7 +27,7 @@ namespace ttns
   template <typename T, typename backend>
   class multiset_update_buffer
   {
-    using size_type = typename backend::size_type;
+    using size_type = typename linalg::traits<backend>::size_type;
     using ttn_type = ms_ttn<T, backend>;
 
 protected:

@@ -16,6 +16,7 @@
 #define PYTTN_LINALG_DECOMPOSITIONS_EIGENSOLVERS_EIGENSOLVER_GENERAL_HPP_
 
 #include "eigensolver_base.hpp"
+#include "../../backends/blas/blas_backend.hpp"
 
 namespace linalg
 {
@@ -34,9 +35,9 @@ namespace linalg
         public:
             using value_type = typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
-            using int_type = typename backend_type::int_type;
+            using int_type = typename traits<backend_type>::int_type;
 
         protected:
             tensor<value_type, 1, backend_type> m_work;
@@ -269,7 +270,7 @@ namespace linalg
                     int_type LDVR = 1;
                     value_type worksize;
                     int_type LWORK = -1;
-                    CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), &VL, LDVL, &VR, LDVR, &worksize, LWORK), "Failed to query the optimal worksize for geev call.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), &VL, LDVL, &VR, LDVR, &worksize, LWORK), "Failed to query the optimal worksize for geev call.");
                     size_type iworksize;
                     CALL_AND_RETHROW(iworksize = internal::worksize_as_integer(worksize));
                     return iworksize;
@@ -297,7 +298,7 @@ namespace linalg
                     int_type LDVR = vecs.shape(1);
                     value_type worksize;
                     int_type LWORK = -1;
-                    CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), &VL, LDVL, rvecs, LDVR, &worksize, LWORK), "Failed to query the optimal worksize for geev call.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), &VL, LDVL, rvecs, LDVR, &worksize, LWORK), "Failed to query the optimal worksize for geev call.");
                     size_type iworksize;
                     CALL_AND_RETHROW(iworksize = internal::worksize_as_integer(worksize));
                     return iworksize;
@@ -324,7 +325,7 @@ namespace linalg
                     int_type LDVR = vecs_r.shape(1);
                     value_type worksize;
                     int_type LWORK = -1;
-                    CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), rvecsl, LDVL, rvecsr, LDVR, &worksize, LWORK), "Failed to query the optimal worksize for geev call.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), rvecsl, LDVL, rvecsr, LDVR, &worksize, LWORK), "Failed to query the optimal worksize for geev call.");
                     size_type iworksize;
                     CALL_AND_RETHROW(iworksize = internal::worksize_as_integer(worksize));
                     return iworksize;
@@ -357,7 +358,7 @@ namespace linalg
                 int_type LDVL = 1;
                 int_type LDVR = 1;
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), &VL, LDVL, &VR, LDVR, m_work.buffer(), LWORK), "Failed to compute eigenvalues of general matrix.  Failed when calling geev.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), &VL, LDVL, &VR, LDVR, m_work.buffer(), LWORK), "Failed to compute eigenvalues of general matrix.  Failed when calling geev.");
                 CALL_AND_HANDLE(internal::interleave_eigenvalues(N, m_eigs_r.buffer(), 1, m_eigs_i.buffer(), 1, eigs.buffer(), eigs.incx()), "Failed to compute eigenvalues of general matrix.  Failed to interleave real and imaginary part arrays to form complex array.");
             }
 
@@ -377,7 +378,7 @@ namespace linalg
                 int_type LDVL = 1;
                 int_type LDVR = vecs.shape(1);
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), &VL, LDVL, rvecs, LDVR, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of general matrix.  Failed when calling geev.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), &VL, LDVL, rvecs, LDVR, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of general matrix.  Failed when calling geev.");
                 CALL_AND_HANDLE(internal::interleave_eigenvalues(N, m_eigs_r.buffer(), 1, m_eigs_i.buffer(), 1, eigs.buffer(), eigs.incx()), "Failed to compute eigendecomposition of general matrix.  Failed to interleave real and imaginary part arrays to form complex array.");
 
                 CALL_AND_HANDLE(mem_trans::copy(rvecs, N * N, mat.buffer()), "Failed to copy the packed eigenvector buffer to the mat buffer.");
@@ -402,7 +403,7 @@ namespace linalg
                 int_type LDVL = vecs_l.shape(1);
                 int_type LDVR = vecs_r.shape(1);
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), rvecsl, LDVL, rvecsr, LDVR, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of general matrix.  Failed when calling geev.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, m_eigs_r.buffer(), m_eigs_i.buffer(), rvecsl, LDVL, rvecsr, LDVR, m_work.buffer(), LWORK), "Failed to compute eigendecomposition of general matrix.  Failed when calling geev.");
                 CALL_AND_HANDLE(internal::interleave_eigenvalues(N, m_eigs_r.buffer(), 1, m_eigs_i.buffer(), 1, eigs.buffer(), eigs.incx()), "Failed to compute eigendecomposition of general matrix.  Failed to interleave real and imaginary part arrays to form complex array.");
 
                 CALL_AND_HANDLE(mem_trans::copy(rvecsr, N * N, mat.buffer()), "Failed to copy the packed eigenvector buffer to the mat buffer.");
@@ -411,7 +412,7 @@ namespace linalg
                 CALL_AND_HANDLE(mem_trans::copy(rvecsl, N * N, mat.buffer()), "Failed to copy the packed eigenvector buffer to the mat buffer.");
                 CALL_AND_HANDLE(internal::unpack_eigenvectors(N, m_eigs_i.buffer(), mat.buffer(), vecs_l.buffer()), "Failed to unpack eigenvectors buffer to complex format.");
                 // take the inner product of the left and right eigenvectors to allow for a sensible normalisation
-                CALL_AND_HANDLE(for (size_type i = 0; i < vecs_r.shape(0); ++i) {complex<value_type> scaling = static_cast<value_type>(1.0)/dot_product(conj(vecs_l[i]), vecs_r[i]); vecs_r[i] *= scaling; }, "Failed to compute eigendecomposition of general matrix.  Failed to rescale the right eigenvectors.");
+                CALL_AND_HANDLE(for (size_type i = 0; i < vecs_r.shape(0); ++i) {std::complex<value_type> scaling = static_cast<value_type>(1.0)/dot_product(conj(vecs_l[i]), vecs_r[i]); vecs_r[i] *= scaling; }, "Failed to compute eigendecomposition of general matrix.  Failed to rescale the right eigenvectors.");
                 CALL_AND_HANDLE(vecs_r = trans(vecs_r), "Failed to compute eigendecomposition of general matrix.  Failed to construct right eigenvectors in row major order.");
                 CALL_AND_HANDLE(vecs_l = trans(vecs_l), "Failed to compute eigendecomposition of general matrix.  Failed to construct left eigenvectors in row major order.");
             }
@@ -454,9 +455,9 @@ namespace linalg
         public:
             using value_type = typename traits<matrix_type>::value_type;
             using backend_type = typename traits<matrix_type>::backend_type;
-            using size_type = typename backend_type::size_type;
+            using size_type = typename traits<backend_type>::size_type;
             using mem_trans = memory::transfer<backend_type, backend_type>;
-            using int_type = typename backend_type::int_type;
+            using int_type = typename traits<backend_type>::int_type;
 
         protected:
             tensor<typename get_real_type<value_type>::type, 1, backend_type> m_rwork;
@@ -661,7 +662,7 @@ namespace linalg
                     int_type LDVR = 1;
                     value_type worksize;
                     int_type LWORK = -1;
-                    CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), &VL, LDVL, &VR, LDVR, &worksize, LWORK, m_rwork.buffer()), "Failed to query the optimal worksize for geev call.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), &VL, LDVL, &VR, LDVR, &worksize, LWORK, m_rwork.buffer()), "Failed to query the optimal worksize for geev call.");
                     size_type iworksize;
                     CALL_AND_RETHROW(iworksize = internal::worksize_as_integer(worksize));
                     return iworksize;
@@ -687,7 +688,7 @@ namespace linalg
                     int_type LDVR = vecs.shape(1);
                     value_type worksize;
                     int_type LWORK = -1;
-                    CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), &VL, LDVL, vecs.buffer(), LDVR, &worksize, LWORK, m_rwork.buffer()), "Failed to query the optimal worksize for geev call.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), &VL, LDVL, vecs.buffer(), LDVR, &worksize, LWORK, m_rwork.buffer()), "Failed to query the optimal worksize for geev call.");
                     size_type iworksize;
                     CALL_AND_RETHROW(iworksize = internal::worksize_as_integer(worksize));
                     return iworksize;
@@ -712,7 +713,7 @@ namespace linalg
                     int_type LDVR = vecs_r.shape(1);
                     value_type worksize;
                     int_type LWORK = -1;
-                    CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), vecs_l.buffer(), LDVL, vecs_r.buffer(), LDVR, &worksize, LWORK, m_rwork.buffer()), "Failed to query the optimal worksize for geev call.");
+                    CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), vecs_l.buffer(), LDVL, vecs_r.buffer(), LDVR, &worksize, LWORK, m_rwork.buffer()), "Failed to query the optimal worksize for geev call.");
                     size_type iworksize;
                     CALL_AND_RETHROW(iworksize = internal::worksize_as_integer(worksize));
                     return iworksize;
@@ -747,7 +748,7 @@ namespace linalg
                 int_type LDVL = 1;
                 int_type LDVR = 1;
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), &VL, LDVL, &VR, LDVR, m_work.buffer(), LWORK, m_rwork.buffer()), "Failed to compute eigenvalues of general matrix.  Failed when calling geev.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), &VL, LDVL, &VR, LDVR, m_work.buffer(), LWORK, m_rwork.buffer()), "Failed to compute eigenvalues of general matrix.  Failed when calling geev.");
             }
 
             template <typename mat_type, typename vals_type, typename vecs_type>
@@ -768,7 +769,7 @@ namespace linalg
                 int_type LDVL = 1;
                 int_type LDVR = vecs.shape(1);
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), &VL, LDVL, vecs.buffer(), LDVR, m_work.buffer(), LWORK, m_rwork.buffer()), "Failed to compute eigenvalues of general matrix.  Failed when calling geev.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), &VL, LDVL, vecs.buffer(), LDVR, m_work.buffer(), LWORK, m_rwork.buffer()), "Failed to compute eigenvalues of general matrix.  Failed when calling geev.");
 
                 // now vecs is in column major order so we convert it to row major order
                 CALL_AND_HANDLE(vecs = trans(vecs), "Failed to compute eigendecomposition of general matrix.  Failed to construct eigenvectors in row major order.");
@@ -791,7 +792,7 @@ namespace linalg
                 int_type LDVL = vecs_l.shape(1);
                 int_type LDVR = vecs_r.shape(1);
                 int_type LWORK = m_work.size();
-                CALL_AND_HANDLE(backend_type::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), vecs_l.buffer(), LDVL, vecs_r.buffer(), LDVR, m_work.buffer(), LWORK, m_rwork.buffer()), "Failed to compute eigenvalues of general matrix.  Failed when calling geev.");
+                CALL_AND_HANDLE(backend_algebra<backend_type>::geev(JOBVL, JOBVR, N, mat.buffer(), LDA, eigs.buffer(), vecs_l.buffer(), LDVL, vecs_r.buffer(), LDVR, m_work.buffer(), LWORK, m_rwork.buffer()), "Failed to compute eigenvalues of general matrix.  Failed when calling geev.");
 
                 // take the inner product of the left and right eigenvectors to allow for a sensible normalisation
                 using std::sqrt;

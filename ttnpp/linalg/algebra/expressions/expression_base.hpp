@@ -16,11 +16,15 @@
 #define PYTTN_LINALG_ALGEBRA_EXPRESSIONS_EXPRESSION_BASE_HPP_
 
 #include "../../linalg_forward_decl.hpp"
+#include "../../linalg_traits.hpp"
+#include "../../backends/backend.hpp"
 
 namespace linalg
 {
     namespace expression_templates
     {
+        template <typename derived, bool has_buffers = true>
+        class expression_base;
 
         // crtp base class for arbitrary expressions.  This allows for much cleaner implementation of the assignments of expressions to tensors
         template <typename derived>
@@ -29,6 +33,8 @@ namespace linalg
         public:
             using backend_type = typename traits<derived>::backend_type;
             using value_type = typename traits<derived>::value_type;
+            using device_value_type = typename device_type<value_type, backend_type>::type;
+
             using shape_type = typename traits<derived>::shape_type;
             using const_shape_reference = typename traits<derived>::const_shape_reference;
 
@@ -56,6 +62,8 @@ namespace linalg
         public:
             using backend_type = typename traits<derived>::backend_type;
             using value_type = typename traits<derived>::value_type;
+            using device_value_type = typename device_type<value_type, backend_type>::type;
+
             using shape_type = typename traits<derived>::shape_type;
             using const_shape_reference = typename traits<derived>::const_shape_reference;
 

@@ -1,0 +1,189 @@
+/**
+ * This files is part of the pyTTN package.
+ * (C) Copyright 2025 NPL Management Limited
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License
+ */
+
+#ifndef PYTTN_LINALG_SPECIAL_FUNCTIONS_LINEAR_SOLVE_CUH_
+#define PYTTN_LINALG_SPECIAL_FUNCTIONS_LINEAR_SOLVE_CUH_
+
+#include "../decompositions/lu_decomposition/lu_decomposition.hpp"
+
+namespace linalg
+{
+    template <typename matrix_type>
+    class linear_solver<matrix_type, true, typename std::enable_if<is_dense_matrix<matrix_type>::value && std::is_same<typename traits<matrix_type>::backend_type, cuda_backend>::value, void>::type>
+    {
+    public:
+        using value_type = typename std::remove_cv<typename traits<matrix_type>::value_type>::type;
+        using backend_type = typename traits<matrix_type>::backend_type;
+        using size_type = typename traits<backend_type>::size_type;
+        using mem_trans = memory::transfer<backend_type, backend_type>;
+
+    protected:
+        matrix_type m_temp;
+        vector<value_type, backend_type> m_tred;
+        vector<int, backend_type> m_ipiv;
+        lu_decomposition<matrix_type> m_lu;
+
+        tensor<int, 1, cuda_backend> m_gpu_info;
+        tensor<int, 1> m_cpu_info;
+
+    public:
+        linear_solver() {}
+        linear_solver(size_type n, bool use_temporary = true) { CALL_AND_HANDLE(resize(n, use_temporary), "Failed to construct linear_solver engine.  Failed to resize temporary array."); }
+        template <typename mat_type, typename = typename std::enable_if<is_tensor<mat_type>::value, void>::type,
+                  typename = typename std::enable_if<internal::valid_decomposition_matrix<matrix_type, value_type, backend_type>::value, void>::type>
+        linear_solver(const mat_type &m, bool use_temporary = true)
+        {
+            ASSERT(m.size(0) == m.size(1), "Failed to construct linear_solver engine.  The input matrix is not square.");
+            CALL_AND_HANDLE(resize(m.size(0), use_temporary), "Failed to construct linear_solver engine.  Failed to resize temporary array.");
+        }
+
+        void resize(size_t n, bool use_temporary = true)
+        {
+            if (use_temporary)
+            {
+                CALL_AND_HANDLE(m_temp.resize(n, n), "Failed to resize linear_solver engine object.  Failed when resizing internal matrix.");
+            }
+            CALL_AND_HANDLE(m_ipiv.resize(n), "Failed to resize linear_solver engine object.  Failed when resizing ipiv array.");
+            CALL_AND_HANDLE(m_tred.resize(n), "Failed to resize linear_solver engine object.  Failed when resizing temporary reduction array.");
+            m_gpu_info.resize(1);
+            m_cpu_info.resize(1);
+        }
+
+        template <typename mat_type, typename vec_type>
+        typename std::enable_if<internal::valid_decomposition_matrix<mat_type, value_type, backend_type>::value, void>::type apply_lu(mat_type &m, vec_type &B)
+        {
+            ASSERT(m.shape(0) == m.shape(1), "Failed to compute linear_solver.  The input matrix is not square.");
+            ASSERT(B.shape(0) == m.shape(0), "Failed to compute linear_solver.  The input vector is not compatible with the input matrix.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(backend_type::op_t, m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+            m_cpu_info = m_gpu_info;
+            ASSERT(m_cpu_info[0] == 0, "Invalid return code from getrs.");
+        }
+
+        template <typename mat_type, typename vec_type>
+        typename std::enable_if<internal::valid_decomposition_matrix<mat_type, value_type, backend_type>::value, void>::type operator()(const mat_type &m, vec_type &B)
+        {
+            ASSERT(m.shape(0) == m.shape(1), "Failed to compute linear_solver.  The input matrix is not square.");
+            ASSERT(B.shape(0) == m.shape(0), "Failed to compute linear_solver.  The input vector is not compatible with the input matrix.");
+            CALL_AND_HANDLE(resize(m.shape(0), true), "Failed to compute linear_solver.  Failed to resize the temporary buffers.");
+            CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
+            CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
+            CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(backend_type::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+        }
+
+        template <typename mat_type, typename vec_type>
+        typename std::enable_if<internal::valid_decomposition_matrix<mat_type, value_type, backend_type>::value, void>::type operator()(mat_type &m, vec_type &B, bool keep_input = true)
+        {
+            ASSERT(m.shape(0) == m.shape(1), "Failed to compute linear_solver.  The input matrix is not square.");
+            ASSERT(B.shape(0) == m.shape(0), "Failed to compute linear_solver.  The input vector is not compatible with the input matrix.");
+            CALL_AND_HANDLE(resize(m.shape(0), keep_input), "Failed to compute linear_solver.  Failed to resize the temporary buffers.");
+            if (keep_input)
+            {
+                CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
+                CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
+
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(backend_type::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+            }
+            else
+            {
+                CALL_AND_HANDLE(m_lu(m, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
+                // now we compute the linear_solver from the LU decomposition
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(backend_type::op_t, m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), B.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+            }
+        }
+
+        template <typename mat_type, typename vec_type, typename x_type>
+        typename std::enable_if<internal::valid_decomposition_matrix<mat_type, value_type, backend_type>::value, void>::type operator()(const mat_type &m, x_type &X, const vec_type &B)
+        {
+            ASSERT(m.shape(0) == m.shape(1), "Failed to compute linear_solver.  The input matrix is not square.");
+            ASSERT(B.shape(0) == m.shape(0), "Failed to compute linear_solver.  The input vector is not compatible with the input matrix.");
+            ASSERT(X.shape(0) == m.shape(0), "Failed to compute linear_solver.  The input vector is not compatible with the input matrix.");
+            CALL_AND_HANDLE(resize(m.shape(0), true), "Failed to compute linear_solver.  Failed to resize the temporary buffers.");
+            CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
+            CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
+            X = B;
+            CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(backend_type::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), X.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+        }
+
+        template <typename mat_type, typename vec_type, typename x_type>
+        typename std::enable_if<internal::valid_decomposition_matrix<mat_type, value_type, backend_type>::value, void>::type operator()(mat_type &m, x_type &X, const vec_type &B, bool keep_input = true)
+        {
+            ASSERT(m.shape(0) == m.shape(1), "Failed to compute linear_solver.  The input matrix is not square.");
+            ASSERT(B.shape(0) == m.shape(0), "Failed to compute linear_solver.  The input vector is not compatible with the input matrix.");
+            ASSERT(X.shape(0) == m.shape(0), "Failed to compute linear_solver.  The input vector is not compatible with the input matrix.");
+            CALL_AND_HANDLE(resize(m.shape(0), keep_input), "Failed to compute linear_solver.  Failed to resize the temporary buffers.");
+            if (keep_input)
+            {
+                CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
+                CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
+                X = B;
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(backend_type::op_t, m_temp.size(1), 1, m_temp.buffer(), m_temp.size(1), m_ipiv.buffer(), X.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+            }
+            else
+            {
+                CALL_AND_HANDLE(m_lu(m, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
+                // now we compute the linear_solver from the LU decomposition
+                X = B;
+                CALL_AND_HANDLE(backend_algebra<backend_type>::getrf(backend_type::op_t, m.size(1), 1, m.buffer(), m.size(1), m_ipiv.buffer(), X.buffer(), B.size(), m_gpu_info.buffer()), "Failed to solve linear system.  Lapack call failed.");
+            }
+        }
+
+        template <typename mat_type>
+        typename std::enable_if<internal::valid_decomposition_matrix<mat_type, value_type, backend_type>::value, value_type>::type determinant(const mat_type &m)
+        {
+            ASSERT(m.shape(0) == m.shape(1), "Failed to compute linear_solver.  The input matrix is not square.");
+            CALL_AND_HANDLE(resize(m.shape(0), true), "Failed to compute linear_solver.  Failed to resize the temporary buffers.");
+            CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
+            CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
+            return compute_determinant(m_temp);
+        }
+
+        template <typename mat_type>
+        typename std::enable_if<internal::valid_decomposition_matrix<mat_type, value_type, backend_type>::value, value_type>::type determinant(mat_type &m, bool keep_input = true)
+        {
+            ASSERT(m.shape(0) == m.shape(1), "Failed to compute linear_solver.  The input matrix is not square.");
+            CALL_AND_HANDLE(resize(m.shape(0), keep_input), "Failed to compute linear_solver.  Failed to resize the temporary buffers.");
+            if (keep_input)
+            {
+                CALL_AND_HANDLE(m_temp = m, "Failed to compute linear_solver.  Failed to copy array into temporary array.");
+                CALL_AND_HANDLE(m_lu(m, m_temp, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
+
+                return compute_determinant(m_temp);
+            }
+            else
+            {
+                CALL_AND_HANDLE(m_lu(m, m_ipiv), "Failed to compute linear_solver.  LU decomposition failed.");
+                // now we compute the linear_solver from the LU decomposition
+                return compute_determinant(m);
+            }
+        }
+
+        template <typename mat_type>
+        value_type compute_determinant(mat_type &m)
+        {
+            size_type N = m.size(1);
+            m_tred.fill(
+                [] __host__ __device__(size_type i, value_type * mbuf, int *ipiv, size_type n)
+                {
+                    return mbuf[i * (n + 1)] * ((ipiv[i] != i + 1) ? -1.0 : 1.0);
+                },
+                m.buffer(), m_ipiv.buffer(), N);
+            return backend_algebra<backend_type>::determinant_reduction(m_tred.buffer(), N);
+        }
+
+    }; // class linear_solver
+
+} // namespace linalg
+#
+
+#endif // PYTTN_LINALG_SPECIAL_FUNCTIONS_LINEAR_SOLVE_CUH_//

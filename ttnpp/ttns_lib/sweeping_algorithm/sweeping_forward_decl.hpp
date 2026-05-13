@@ -27,9 +27,9 @@ namespace ttns
     class empty_environment
     {
     public:
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
         using ttn_type = ttn_class<T, backend>;
-        static constexpr std::string_view class_info = "noenv:";
+        static constexpr std::string_view class_info{"noenv:"};
 
         struct environment_type
         {
@@ -44,7 +44,7 @@ namespace ttns
 
         struct buffer_type
         {
-            using size_type = typename backend::size_type;
+            using size_type = typename linalg::traits<backend>::size_type;
             void reallocate(size_t, size_t) {}
             void resize(size_type, size_type) {}
             void clear() {}
@@ -108,7 +108,7 @@ namespace ttns
     class single_site
     {
     public:
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
         using environment_type = Environment<T, backend, ttn_class>;
         using ttn_type = ttn_class<T, backend>;
 
@@ -122,7 +122,7 @@ namespace ttns
         using population_matrix_type = typename ttn_type::population_matrix_type;
 
         using buffer_type = typename environment_type::buffer_type;
-        static constexpr std::string_view class_info = "onesite:";
+        static constexpr std::string_view class_info{"onesite:"};
 
         struct parameter_list
         {
@@ -181,7 +181,7 @@ namespace ttns
     class trivial_update
     {
     public:
-        using size_type = typename backend::size_type;
+        using size_type = typename linalg::traits<backend>::size_type;
         using environment_type = Environment<T, backend, ttn_class>;
         using env_container_type = typename environment_type::container_type;
         using env_node_type = typename env_container_type::node_type;
@@ -192,7 +192,7 @@ namespace ttns
 
         using hnode = typename ttn_type::node_type;
         using mat_type = linalg::matrix<T, backend>;
-        static constexpr std::string_view class_info = "trivial:";
+        static constexpr std::string_view class_info{"trivial:"};
 
         using buffer_type = typename environment_type::buffer_type;
         struct parameter_list
