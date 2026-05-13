@@ -31,6 +31,7 @@ build:
     - python -m pip -v install .[lint,test]
 
     - ruff check .
+    - export OMP_NUM_THREADS=1
     - python -m pytest -n 2 tests
 
 pages:
