@@ -1489,7 +1489,7 @@ namespace ttns
 
             virtual std::pair<T, std::string> transpose() const
             {
-                using RT = typename linalg::get_real_type<T>::type;
+                //using RT = typename linalg::get_real_type<T>::type;
 
                 std::pair<T, std::string> opt = m_op->transpose();
                 std::pair<T, std::string> ret = std::make_pair(static_cast<T>(std::pow(std::get<0>(opt), m_n)), std::get<1>(opt)+std::string("^")+std::to_string(m_n));

@@ -74,10 +74,10 @@ else()
     endif()
 endif()
 message(STATUS ${CMAKE_CXX_FLAGS})
-add_executable(operator_test.x operator_test.cpp)
+add_executable(operator_test.x operator_test_ms.cpp)
 
-
-target_include_directories(operator_test.x PUBLIC ${TTNS_INCLUDE_DIRECTORIES})
+target_include_directories(operator_test.x PUBLIC ${CMAKE_SOURCE_DIR}/ttnpp   ${CEREAL_INCLUDE_DIRS}  $<$<BOOL:${USE_SPDLOG}>:${SPDLOG_INCLUDE_DIRS}>)
+target_include_directories(operator_test.x SYSTEM PUBLIC ${TTNS_INCLUDE_DIRECTORIES} ${cereal_INCLUDE_DIR} ${spdlog_INCLUDE_DIR})
 target_link_libraries(operator_test.x PRIVATE ${LINALG_LIBS} ${LIBS} ${OpenMP_LIBS}) 
 
 check_ipo_supported(RESULT ipo)

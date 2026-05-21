@@ -12,6 +12,8 @@ from pyttn import (
     ntreeBuilder,
     product_operator,
     site_operator,
+    multiset_SOP,
+    operator_dictionary,
     sOP,
     sop_operator,
     system_modes,
@@ -36,6 +38,94 @@ def tfim_hamiltonian():
         H += -1.0 * J * sOP("sz", i) * sOP("sz", i + 1)
 
     return H
+
+
+def tfim_hamiltonian_ms():
+    J = 1.0
+    h = 1.0
+    N = 16
+
+    H = multiset_SOP(2, N - 1)
+
+    # add on the Hamiltonian terms including the first two sites
+    H[0, 1] += -1.0 * h
+    H[1, 0] += -1.0 * h
+
+    H[0, 0] += -1.0 * J * sOP("sz", 0)
+    H[1, 1] += 1.0 * J * sOP("sz", 0)
+
+    # add on the Hamiltonian terms acting on the remainder of the chain
+    # add on the onsite transversal fields
+    for i in range(N - 1):
+        H[0, 0] += -1.0 * h * sOP("sx", i)
+        H[1, 1] += -1.0 * h * sOP("sx", i)
+
+    # now add on the zz interactions
+    for i in range(N - 2):
+        H[0, 0] += -1.0 * J * sOP("sz", i) * sOP("sz", i + 1)
+        H[1, 1] += -1.0 * J * sOP("sz", i) * sOP("sz", i + 1)
+
+    return H
+
+def tfim_hamiltonian_opdict():
+    J = 1.0
+    h = 1.0
+    N = 16
+
+    H = SOP(N)
+
+    # add on the onsite transversal fields
+    for i in range(N):
+        H += -1.0 * h * sOP("SpinX", i)
+
+    # now add on the zz interactions
+    for i in range(N - 1):
+        H += -1.0 * J * sOP("SpinZ", i) * sOP("SpinZ", i + 1)
+
+    ops = operator_dictionary(N)
+    sz = np.array([[1, 0], [0, -1]], dtype=np.complex128)
+    sx = np.array([[0, 1], [1, 0]], dtype=np.complex128)
+
+    for i in range(N):
+        ops.insert(i, "SpinZ", site_operator(sz, optype="matrix", mode=i))
+        ops.insert(i, "SpinX", site_operator(sx, optype="matrix", mode=i))
+    return H, ops
+
+
+def tfim_hamiltonian_ms_opdict():
+    J = 1.0
+    h = 1.0
+    N = 16
+
+    H = multiset_SOP(2, N - 1)
+
+    # add on the Hamiltonian terms including the first two sites
+    H[0, 1] += -1.0 * h
+    H[1, 0] += -1.0 * h
+
+    H[0, 0] += -1.0 * J * sOP("SpinZ", 0)
+    H[1, 1] += 1.0 * J * sOP("SpinZ", 0)
+
+    # add on the Hamiltonian terms acting on the remainder of the chain
+    # add on the onsite transversal fields
+    for i in range(N - 1):
+        H[0, 0] += -1.0 * h * sOP("SpinX", i)
+        H[1, 1] += -1.0 * h * sOP("SpinX", i)
+
+    # now add on the zz interactions
+    for i in range(N - 2):
+        H[0, 0] += -1.0 * J * sOP("SpinZ", i) * sOP("SpinZ", i + 1)
+        H[1, 1] += -1.0 * J * sOP("SpinZ", i) * sOP("SpinZ", i + 1)
+
+    ops = operator_dictionary(N-1)
+    sz = np.array([[1, 0], [0, -1]], dtype=np.complex128)
+    sx = np.array([[0, 1], [1, 0]], dtype=np.complex128)
+
+    for i in range(N-1):
+        ops.insert(i, "SpinZ", site_operator(sz, optype="matrix", mode=i))
+        ops.insert(i, "SpinX", site_operator(sx, optype="matrix", mode=i))
+
+    return H, ops
 
 
 def tfim_dmrg(A):
@@ -72,6 +162,18 @@ def tfim_dmrg(A):
 
     return A
 
+
+@pytest.fixture
+def ttn_rand():
+    """Prepares a vacuum state MPS with fixed bond dimension 6 that is also the same as its capacity"""
+    N = 16
+    chi = 6
+
+    dims = [2 for i in range(N)]
+    topo = ntreeBuilder.mlmctdh_tree(dims, 2, chi)
+    A = ttn(topo, dtype=np.complex128)
+    A.random()
+    return A
 
 
 @pytest.fixture

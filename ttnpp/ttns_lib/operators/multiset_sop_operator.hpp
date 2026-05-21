@@ -216,6 +216,7 @@ namespace ttns
             m_mode_operators.resize(m_nset);
             _m_Eshift.resize(m_nset);
             m_Eshift.resize(m_nset);
+            m_indices.resize(m_nset);
             m_time_dependent_coefficients_set.resize(m_nset);
             m_time_dependent_operators_set.resize(m_nset);
 
@@ -227,6 +228,8 @@ namespace ttns
                 // set up the operator indexing tree and bind it in the correct location
                 size_t i = std::get<0>(data.first);
                 size_t j = std::get<1>(data.first);
+                m_indices[i].push_back(j);
+
                 auto &_sop = data.second;
 
                 setup_indexing_tree(_sop, i, j, A, sys, compress, exploit_identity, site_ops);
