@@ -29,14 +29,14 @@ except ImportError:
 
 # and attempt to import the cuda backend
 try:
-    from pyttn.ttnpp.cuda import ttn_complex as ms_ttn_complex_cuda
-    from pyttn.ttnpp.cuda import ttn_node_complex as ms_ttn_node_complex_cuda
+    from pyttn.ttnpp.cuda import ms_ttn_complex as ms_ttn_complex_cuda
+    from pyttn.ttnpp.cuda import ms_ttn_node_complex as ms_ttn_node_complex_cuda
 
     _cuda_import = True
     # and if we have imported real ttns we import the cuda versions
     if _real_ttn_import:
-        from pyttn.ttnpp.cuda import ttn_real as ms_ttn_real_cuda
-        from pyttn.ttnpp.cuda import ttn_node_real as ms_ttn_node_real_cuda
+        from pyttn.ttnpp.cuda import ms_ttn_real as ms_ttn_real_cuda
+        from pyttn.ttnpp.cuda import ms_ttn_node_real as ms_ttn_node_real_cuda
 
 except ImportError:
     _cuda_import = False

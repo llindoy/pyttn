@@ -74,45 +74,78 @@ def chunks(nodes: list[int], n: int) -> Generator[Any, Any, None]:
         yield nodes[i : i + N]
 
 
-def __split_node_mps(T, node, children, nindex, handle_leaves=False):
-    curr_node = node
-    if handle_leaves:
-        if len(children) == 1:
-            T.add_edge(curr_node, children[0])
-        elif len(children) == 2:
-            T.add_edge(curr_node, nindex)
-            T.add_edge(nindex, children[0])
-            T.add_edge(nindex, children[1])
-            nindex += 1
-        elif len(children) > 2:
-            T.add_edge(curr_node, nindex)
-            curr_node = nindex
-            nindex += 1
-            for cind in range(len(children) - 2):
-                T.add_edge(curr_node, children[cind])
-                T.add_edge(curr_node, nindex)
-                curr_node = nindex
+
+def __split_node_mps(T, node, leaf_children, internal_children, nindex):
+    if len(leaf_children) == 0 and len(internal_children) == 0:
+        return T, nindex
+
+    curr = node
+
+    # process all children except last
+    if len(leaf_children) == 0:
+        print("running A")
+        for i in range(len(internal_children)):
+            child = internal_children[i]
+
+            if i == 0:
+                # attach first child directly
+                T.add_edge(curr, child)
+            else:
+                # create auxiliary node
+                aux = nindex
                 nindex += 1
-            T.add_edge(curr_node, children[-2])
-            T.add_edge(curr_node, children[-1])
+
+                T.add_edge(curr, aux)
+                curr = aux
+
+                T.add_edge(curr, child)
+    elif len(internal_children) == 0:
+        print("running B")
+        for i in range(len(leaf_children) - 1):
+            child = leaf_children[i]
+
+            if i == 0:
+                # attach first child directly
+                T.add_edge(curr, child)
+            else:
+                # create auxiliary node
+                aux = nindex
+                nindex += 1
+
+                T.add_edge(curr, aux)
+                curr = aux
+
+                T.add_edge(curr, child)
+        # handle last child
+        last_child = leaf_children[-1]
+        T.add_edge(curr, last_child)
     else:
-        if len(children) > 0:
-            for cind in range(len(children) - 1):
-                T.add_edge(curr_node, children[cind])
-                T.add_edge(curr_node, nindex)
-                curr_node = nindex
+        print("running C")
+        children = leaf_children + internal_children
+        for i in range(len(children)):
+            child = children[i]
+
+            if i == 0:
+                # attach first child directly
+                T.add_edge(curr, child)
+            else:
+                # create auxiliary node
+                aux = nindex
                 nindex += 1
-            T.add_edge(curr_node, children[-1])
+
+                T.add_edge(curr, aux)
+                curr = aux
+
+                T.add_edge(curr, child)
+
+
+
     return T, nindex
 
 
-def __split_node_branching(T, node, children, max_nchild, nindex, handle_leaves=False):
+def __split_node_branching(T, node, children, max_nchild, nindex):
     curr_node = node
     if len(children) > max_nchild:
-        if handle_leaves:
-            T.add_edge(curr_node, nindex)
-            curr_node = nindex
-            nindex += 1
         # if the children list is longer than the maximum degree, iterate over creating up to max degree chunks
         for chunk in chunks(children, max_nchild):
             if len(chunk) == 1:
@@ -124,35 +157,22 @@ def __split_node_branching(T, node, children, max_nchild, nindex, handle_leaves=
                 nindex += 1
                 T, nindex = __split_node_branching(T, nlabel, chunk, max_nchild, nindex)
     else:
-        if len(children) > 1 and handle_leaves:
-            T.add_edge(curr_node, nindex)
-            curr_node = nindex
-            nindex += 1
-            for child in children:
-                T.add_edge(curr_node, child)
-        else:
-            for child in children:
-                T.add_edge(curr_node, child)
+        for child in children:
+            T.add_edge(curr_node, child)
     return T, nindex
 
+def __split_node(T, node, leaf_children, internal_children, max_nchild, nindex):
 
-def __split_node(T, node, children, max_nchild, nindex, handle_leaves=False):
     if max_nchild is None:
-        for i in range(len(children)):
-            T.add_edge(node, children[i])
-    elif max_nchild > 1:
-        T, nindex = __split_node_branching(
-            T, node, children, max_nchild, nindex, handle_leaves=handle_leaves
-        )
-    elif max_nchild == 1:
-        T, nindex = __split_node_mps(
-            T, node, children, nindex, handle_leaves=handle_leaves
-        )
-    else:
-        for i in range(len(children)):
-            T.add_edge(node, children[i])
+        children = leaf_children + internal_children
+        for c in children:
+            T.add_edge(node, c)
+        return T, nindex
 
-    return T, nindex
+    if max_nchild == 1:
+        return __split_node_mps(T, node, leaf_children, internal_children, nindex)
+
+    return __split_node_branching(T, node, leaf_children + internal_children, max_nchild, nindex)
 
 
 def __split_high_degree_nodes(
@@ -172,6 +192,7 @@ def __split_high_degree_nodes(
         )
 
         nchildren = {}
+        children = {}
         nodes_to_split = {}
 
         curr_node = None
@@ -191,7 +212,12 @@ def __split_high_degree_nodes(
             else:
                 nchildren[curr_node] += 1
 
-            if nchildren[curr_node] > max_nchild:
+            if curr_node not in children.keys():
+                children[curr_node] = [e[1]]
+            else:
+                children[curr_node].append(e[1])
+
+            if len(children[curr_node]) > max_nchild:
                 if curr_node not in nodes_to_split.keys():
                     nodes_to_split[curr_node] = sind
 
@@ -199,8 +225,8 @@ def __split_high_degree_nodes(
             if curr_node != e[1]:
                 curr_node = e[1]
 
-            if curr_node not in nchildren.keys():
-                nchildren[curr_node] = 0
+            if curr_node not in children.keys():
+                children[curr_node] = []
 
         # if none of the nodes are high degree we don't need to do anything
         if len(nodes_to_split) == 0:
@@ -212,43 +238,25 @@ def __split_high_degree_nodes(
             counter = N
             T = nx.Graph()
             # if we are at a node we need to split
-            for node, ind in nodes_to_split.items():
-                nchild = nchildren[node]
+            for node, _ in nodes_to_split.items():
+                ch = children[node]
 
                 # get a list containing all of its children
-                leaf_children = [
-                    edges[ind + i][1]
-                    for i in range(nchild)
-                    if nchildren[edges[ind + i][1]] == 0
-                ]
+                leaf_children = [c for c in ch if len(children[c]) == 0]
+                internal_children = [c for c in ch if len(children[c]) > 0]
 
-                internal_children = [
-                    edges[ind + i][1]
-                    for i in range(nchild)
-                    if nchildren[edges[ind + i][1]] > 0
-                ]
-
-                if max_nleaves is None:
-                    T, counter = __split_node(
-                        T, node, leaf_children + internal_children, max_nchild, counter
-                    )
-                else:
-                    T, counter = __split_node(
-                        T, node, internal_children, max_nchild, counter
-                    )
-                    T, counter = __split_node(
-                        T, node, leaf_children, max_nleaves, counter, handle_leaves=True
-                    )
-
-            for e in edges:
-                if e[0] not in nodes_to_split.keys():
-                    T.add_edge(e[0], e[1])
+                T, counter = __split_node(T, node, leaf_children, internal_children, max_nchild, counter)
+  
+            for node in children:
+                if node not in nodes_to_split:
+                    for child in children[node]:
+                        T.add_edge(node, child)
             return T
 
 
 def generate_spanning_tree(
     M: np.ndarray,
-    max_internal_children: Optional[int] = None,
+    max_children: Optional[int] = None,
     max_leaf_children: Optional[int] = None,
     root_index: int = 0,
 ) -> tuple[nx.Graph, int]:
@@ -258,8 +266,8 @@ def generate_spanning_tree(
 
     :param M: The "distance" matrix used to define a weighted graph of the nodes to be represented as a tree
     :type M: np.ndarray
-    :param max_internal_children: The maximum allowed number of internal node children.  If this is none, the number of internal node children will be set to the value of max_leaf_children, defaults to None
-    :type max_internal_children: int, None, optional
+    :param max_children: The maximum allowed number of children for any node.  If this is none, the number of children will not be limited, defaults to None
+    :type max_children: int, None, optional
     :param max_leaf_children: The maximum allowed number of leaf node children.  If this is none, then we don't treat leaf and internal node children separately, defaults to None
     :type max_leaf_children: int, None, optional
     :param root_index: The index of the nodes that will be set as the root of this tree, defaults to 0
@@ -278,7 +286,7 @@ def generate_spanning_tree(
         spanning_tree,
         M.shape[0],
         root_index,
-        max_nchild=max_internal_children,
+        max_nchild=max_children,
         max_nleaves=max_leaf_children,
     )
 

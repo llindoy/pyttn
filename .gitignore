@@ -154,6 +154,7 @@
 #now we include the tutorials
 !tutorials
 !tutorials/*.ipynb
+!tutorials/pyrazine_parameters.py
 !tutorials/DMRG/
 !tutorials/DMRG/*.ipynb
 !tutorials/TDVP/

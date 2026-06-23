@@ -52,10 +52,10 @@ void initialise_cuda_backend(py::module &m)
             :returns: The number of cuda devices available on the system
             :rtype: int
         )mydelim")
-        .def("list_devices", [](const cuda_environment &o)
+        .def("list_devices", []()
              {
                 std::ostringstream oss;
-                o.list_devices(oss);
+                cuda_environment::list_devices(oss);
                 return oss.str(); }, R"mydelim(
             :returns: A string of the cuda_environmen properties
             :rtype: str
