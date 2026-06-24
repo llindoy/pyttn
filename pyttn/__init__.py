@@ -12,6 +12,9 @@
 
 from .ttns import (  # noqa: I001
     SOP,
+    OperatorBuilder,
+    SystemInfo,
+    TopoTree,
     NodeIncrementSetter,
     NodeSumSetter,
     OPBase,
@@ -197,4 +200,7 @@ __all__: list[str] = [
     "is_ttn",
     "is_ms_ttn",
     "available_backends",
+    "OperatorBuilder",
+    "SystemInfo",
+    "TopoTree",
 ]

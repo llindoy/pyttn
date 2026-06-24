@@ -122,6 +122,14 @@ class sOP(OPBase):
         pass
 
     @property
+    def fermionic(self) -> bool:
+        """Returns whether or not this represents a fermionic operator
+
+        :return: Whether or not this representas a fermionic operator
+        :rtype: bool
+        """
+
+    @property
     def mode(self) -> int:
         """Returns the mode the sOP object acts on
 

@@ -39,6 +39,9 @@ from .sSOPExt import (
     sPOP,
     sSOP,
 )
+
+from .operator_builder import OperatorBuilder
+from .system_information import SystemInfo
 #from .stateExt import isKet, isSepState, ket, sepState, stateStr
 
 __all__: list[str] = [
@@ -50,6 +53,8 @@ __all__: list[str] = [
     "sSOP",
     "sSOP",
     "OPBase",
+    "OperatorBuilder",
+    "SystemInfo",
     #"stateStr",
     #"sepState",
     #"ket",

@@ -69,6 +69,8 @@ from .sop import (
     #stateStr,
     system_modes,
     tls_mode,
+    OperatorBuilder,
+    SystemInfo,
 )
 from .topology import (
     NodeIncrementSetter,
@@ -97,6 +99,7 @@ from .ttns import (
     ntree,
     ntreeBuilder,
     ntreeNode,
+    TopoTree,
     ttn,
     ttnNode,
     ttnNodeData,
@@ -143,6 +146,8 @@ __all__: list[str] = [
     #"isSepState",
     #"isKet",
     "operator_dictionary",
+    "OperatorBuilder",
+    "SystemInfo",
     "OperatorDictionary",
     "liouville_space_superoperator",
     "sOP",
@@ -188,6 +193,7 @@ __all__: list[str] = [
     "ntree",
     "ntreeBuilder",
     "ntreeNode",
+    "TopoTree",
     "is_ttn",
     "is_ms_ttn",
     "available_backends",

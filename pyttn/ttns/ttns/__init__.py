@@ -12,6 +12,7 @@
 
 
 from .ntreeExt import ntree, ntreeNode, ntreeBuilder
+from .topology_tree import TopoTree
 from .msttnExt import is_ms_ttn, msttn, ms_ttn, multiset_ttn, msttnNode, ms_ttn_node, multiset_ttn_node
 from .ttnExt import available_backends, is_ttn, ttn, ttnNode, ttnNodeData, ttn_node_data, ttn_node
 from .msttnSliceExt import is_ms_ttn_slice, ms_ttn_slice, multiset_ttn_slice, msttnSlice
@@ -32,6 +33,7 @@ __all__: list[str] = [
         "ms_ttn_node",
         "multiset_ttn_node",
         "ntree",
+        "TopoTree",
         "ntreeBuilder",
         "ntreeNode",
         "is_ttn",

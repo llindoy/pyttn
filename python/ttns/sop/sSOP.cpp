@@ -39,7 +39,8 @@ void init_sSOP(py::module &m)
                       { o.op() = i; }, "The label of the operator")
         .def_property("mode", static_cast<const size_t &(sOP::*)() const>(&sOP::mode), [](sOP &o, const size_t &i)
                       { o.mode() = i; }, "The mode the operator acts on")
-
+        .def_property("fermionic", static_cast<const bool &(sOP::*)() const>(&sOP::fermionic), [](sOP &o, const bool &i)
+                      { o.fermionic() = i; }, "The mode the operator acts on")
         .def("__str__", [](const sOP &o)
              { return static_cast<std::string>(o); })
 #ifdef CEREAL_LIBRARY_FOUND

@@ -176,13 +176,38 @@ namespace ttns
         sPOP as_prod_op(const std::vector<std::vector<std::string>> &opdict) const
         {
             sPOP ret;
-            for (const auto &t : m_ops)
+
+            // index for iterating through stored operators
+            size_t opind = 0;
+
+            // loop over all modes in order
+            for (size_t mode = 0; mode < opdict.size(); ++mode)
             {
-                if (opdict[std::get<1>(t)][std::get<0>(t)] != std::string("id"))
+                // Insert operators acting on this mode
+                while (opind < m_ops.size() && std::get<1>(m_ops[opind]) == mode)
                 {
-                    ret *= sOP(opdict[std::get<1>(t)][std::get<0>(t)], std::get<1>(t));
+                    const auto &t = m_ops[opind];
+
+                    const std::string &label = opdict[std::get<1>(t)][std::get<0>(t)];
+
+                    if (label != std::string("id"))
+                    {
+                        ret *= sOP(label, std::get<1>(t));
+                    }
+
+                    ++opind;
+                }
+
+                // Insert Jordan–Wigner string if required
+                if (m_mapped &&
+                    mode < m_prepend_jw.size() &&
+                    m_prepend_jw[mode])
+                {
+                    ret *= sOP("jw", mode);
                 }
             }
+
+
             return ret;
         }
 
