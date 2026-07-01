@@ -11,14 +11,14 @@
 # limitations under the License
 
 from abc import ABCMeta, abstractmethod
-from typing import Union
+from typing import Union, Optional
 
 import numpy as np
 
 from pyttn.ttnpp import SOP_complex, multiset_SOP_complex, system_modes
 
 from .opdictExt import operator_dictionary
-from .sSOPExt import OPBase, sSOP
+from .sSOPExt import OPBase, sSOP, _todense_impl, _attach_todense
 
 try:
     from pyttn.ttnpp import SOP_real, multiset_SOP_real
@@ -29,25 +29,31 @@ except ImportError:
 
 
 class SOP(metaclass=ABCMeta):
-    """A class for storing a compact sum-of-product operators object.  This class is less flexible than the SOP object but provides considerably higher performance."""
+    """Compact representation of a sum-of-product (SOP) operator.
+
+    This representation is more efficient than the symbolic `sSOP` form but
+    provides reduced flexibility.
+    """
 
     def __new__(
         cls,
         *args,
         dtype: Union[float, complex, np.float64, np.complex128] = np.complex128,
     ) -> "SOP":
-        """Factory function for constructing a sum-of-product compact string operator.
+        """Factory function for constructing a compact SOP operator.
 
-        :param `*args`: Variable length list of arguments. This function can handle two possible lists of arguments
+        :param *args: Initialisation arguments. Valid options are:
 
-            - N (int) - The number of modes of the SOP
-            - N (int), label (str) - The number of modes of the SOP and a label for the SOP
-        :param dtype: The dtype to use for the site operator.  (Default: np.complex128)
+            - N (int): number of modes
+            - N (int), label (str): number of modes and an optional label
+
+        :param dtype: Data type used for internal storage (default: np.complex128)
         :type dtype: {np.float64, np.complex128}, optional
 
-        :returns: The SOP object
+        :returns: SOP instance
         :rtype: SOP
         """
+
         if _support_real_SOP:
             if dtype == np.complex128 or dtype is complex:
                 return SOP_complex(*args)
@@ -63,11 +69,12 @@ class SOP(metaclass=ABCMeta):
 
     @abstractmethod
     def assign(self, o: "SOP"):
-        """Assign the value of the SOP from another
+        """Copy the contents of another SOP into this object.
 
-        :param o: The SOP to copy into this one
+        :param o: Source SOP
         :type o: SOP
         """
+
         pass
 
     @abstractmethod
@@ -90,34 +97,36 @@ class SOP(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def resize(self, n: int):
-        """Resizes the SOP object so that it can act on n modes
+    def resize(self, n: int):    
+        """Resize the operator to act on a given number of modes.
 
-        :param n: The number of modes
+        :param n: Number of modes
         :type n: int
         """
 
+
     @abstractmethod
     def reserve(self, n: int):
-        """Allocate the internal buffer for the SOP object so that it is capable of storing n terms
+        """reallocate storage for a given number of terms
 
-        :param n: The number of elements that should be reserved.
+        :param n: Number of terms to reserve
         :type n: int
         """
 
     @abstractmethod
     def nmodes(self) -> int:
-        """Returns the number of modes that the SOP acts on
+        """Return the number of modes.
 
-        :return: The number of modes that the SOP acts on
+        :return: Number of modes
         :rtype: int
         """
 
+
     @abstractmethod
     def nterms(self) -> int:
-        """Returns the number of terms in the SOP
+        """Return the number of terms.
 
-        :return: The number of terms in the SOP
+        :return: Number of terms
         :rtype: int
         """
         pass
@@ -125,7 +134,11 @@ class SOP(metaclass=ABCMeta):
     @property
     @abstractmethod
     def operator_dictionary(self) -> operator_dictionary:
-        """The operator dictionary object used by the SOP object"""
+        """Operator dictionary used to interpret site operators.
+
+        :return: Operator dictionary
+        :rtype: operator_dictionary
+        """
         pass
 
     @abstractmethod
@@ -148,53 +161,54 @@ class SOP(metaclass=ABCMeta):
 
     @abstractmethod
     def insert(self, *args):
-        """Insert a new n-body operator into the sum-of-product representation
+        """Insert a new term into the SOP.
 
-        :param `*args`: An input defining the n-boddy operator. Valid  options are:
+        :param *args: Term specification. Valid options are:
 
-            - coeff (Union[float, complex, np.float64, np.complex128]), pop (sPOP): Add a new sNBO defined by coeff*pop
-            - term (sNBO): Add the specified n-body operator
+            - coeff (float or complex), pop (sPOP): insert coeff × pop
+            - term (sNBO): insert an existing n-body operator
         """
+
         pass
 
     @abstractmethod
     def set_is_fermion_mode(self, is_fermion_mode: list[bool]) -> bool:
-        """Set whether or not the modes in the SOP object are fermionic
+        """Specify which modes are fermionic.
 
-        :param is_fermion_mode: A list specifying whether each mode is fermionic
+        :param is_fermion_mode: Boolean list indicating fermionic modes
         :type is_fermion_mode: list[bool]
-        :return: Whether or not this set operation was successful
+        :return: True if successful
         :rtype: bool
         """
         pass
 
     @abstractmethod
     def prune_zeros(self, tol: float = 1e-15):
-        """Remove any terms in the Hamiltonian definition that are zero within the user specified tolerance
+        """Remove terms with coefficients below a tolerance.
 
-        :param tol: A pruning tolerance for removing zero terms, defaults to 1e-15
+        :param tol: Threshold for removing terms (default: 1e-15)
         :type tol: float, optional
         """
         pass
 
     @abstractmethod
     def jordan_wigner(self, sysinf: system_modes, tol: float = 1e-15) -> "SOP":
-        """Perform an inplace Jordan-Wigner mapping of the SOP object
+        """Apply the Jordan–Wigner transformation.
 
-        :param sysinf: Definition of the modes forming the system
+        :param sysinf: System mode definition
         :type sysinf: system_modes
-        :param tol: A pruning tolerance for removing zero terms, defaults to 1e-15
+        :param tol: Tolerance for pruning small terms (default: 1e-15)
         :type tol: float, optional
-        :return: The jordan-wigner mapped SOP object
+        :return: Transformed SOP (also modifies this object)
         :rtype: SOP
         """
         pass
 
     @abstractmethod
     def expand(self) -> sSOP:
-        """Expand the SOP object to form an sSOP object
+        """Expand the compact SOP into a symbolic sSOP.
 
-        :return: The sSOP representation of this SOP
+        :return: Equivalent sSOP representation
         :rtype: sSOP
         """
 
@@ -315,12 +329,38 @@ class SOP(metaclass=ABCMeta):
         :rtype: SOP
         """
         pass
+    
+    @property
+    @abstractmethod
+    def dtype(self) -> np.dtype:
+        """
+        Returns the NumPy dtype of the underlying operator representation.
+
+        This corresponds to the scalar type used internally, e.g.
+        ``np.float64`` or ``np.complex128``.
+
+        :return: The dtype of the operator
+        :rtype: numpy.dtype
+        """
+        pass
+
+    @abstractmethod
+    def complex_dtype(self) -> bool:
+        """
+        Returns whether or not the operator stores complex-valued data.
+
+        :return: True if complex dtype, False otherwise
+        :rtype: bool
+        """
+        pass
 
 
 SOP.register(SOP_complex)
+_attach_todense(SOP_complex)
+
 if _support_real_SOP:
     SOP.register(SOP_real)
-
+    _attach_todense(SOP_real)
 class multiset_SOP(metaclass=ABCMeta):
     """A class for storing a compact multiset sum-of-product operator object."""
 
@@ -459,6 +499,32 @@ class multiset_SOP(metaclass=ABCMeta):
         """
         pass
 
+
+    @property
+    @abstractmethod
+    def dtype(self) -> np.dtype:
+        """
+        Returns the NumPy dtype of the underlying operator representation.
+
+        This corresponds to the scalar type used internally, e.g.
+        ``np.float64`` or ``np.complex128``.
+
+        :return: The dtype of the operator
+        :rtype: numpy.dtype
+        """
+        pass
+
+    @abstractmethod
+    def complex_dtype(self) -> bool:
+        """
+        Returns whether or not the operator stores complex-valued data.
+
+        :return: True if complex dtype, False otherwise
+        :rtype: bool
+        """
+        pass
+
+
     @abstractmethod
     def __str__(self) -> str:
         """Return the string representation of the SOP object
@@ -503,3 +569,5 @@ if _support_real_SOP:
 
 ms_SOP = multiset_SOP
 ms_SOPBase = multiset_SOP
+
+

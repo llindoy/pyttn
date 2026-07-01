@@ -10,6 +10,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+import numpy as np 
+
 from abc import ABCMeta, abstractmethod
 from typing import Union
 
@@ -223,6 +225,20 @@ class SOPOperator(metaclass=ABCMeta):
 
         :return: whether or not the SOPOperator is storing a complex valued dtype
         :rtype: bool
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def dtype(self) -> np.dtype:
+        """
+        Returns the NumPy dtype of the underlying operator representation.
+
+        This corresponds to the scalar type used internally, e.g.
+        ``np.float64`` or ``np.complex128``.
+
+        :return: The dtype of the operator
+        :rtype: numpy.dtype
         """
         pass
 

@@ -25,6 +25,7 @@ void init_SOP(py::module &m, const std::string &label)
     using _T = typename linalg::numpy_converter<T>::type;
 
     using real_type = typename linalg::get_real_type<T>::type;
+    using complex_type = std::complex<real_type>;
     using _SOP = SOP<T>;
     using _msSOP = multiset_SOP<T>;
     // wrapper for the sPOP type
@@ -56,9 +57,30 @@ void init_SOP(py::module &m, const std::string &label)
         .def("set_is_fermion_mode", &_SOP::set_is_fermionic_mode)
         .def("prune_zeros", &_SOP::prune_zeros, py::arg("tol") = 1e-15)
         .def("jordan_wigner", static_cast<_SOP &(_SOP::*)(const system_modes &, double)>(&_SOP::jordan_wigner), py::arg(), py::arg("tol") = 1e-15)
-
+         .def_property_readonly("dtype", [](const _SOP &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
+         .def("complex_dtype", [](const _SOP &)
+              { return !std::is_same<T, real_type>::value; })
         .def("expand", &_SOP::expand)
-
+        .def("_todense", [](const _SOP& op, const system_modes& sys)
+                    {
+                         linalg::matrix<T> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, mat), "Failed to convert SOP to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const _SOP& op, const system_modes& sys, const operator_dictionary<complex_type, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sSOP to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const _SOP& op, const system_modes& sys, const operator_dictionary<T, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<T> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert SOP to dense matrix.");
+                         return mat;
+                    })
         .def_property("label", static_cast<const std::string &(_SOP::*)() const>(&_SOP::label), [](_SOP &o, const std::string &i)
                       { o.label() = i; })
         .def("__str__", [](const _SOP &o)
@@ -231,7 +253,11 @@ void init_SOP(py::module &m, const std::string &label)
         .def("prune_zeros", &_msSOP::prune_zeros, py::arg("tol") = 1e-15)
 
         .def("jordan_wigner", static_cast<_msSOP &(_msSOP::*)(const system_modes &, double)>(&_msSOP::jordan_wigner), py::arg(), py::arg("tol") = 1e-15)
-
+         .def_property_readonly("dtype", [](const _msSOP &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
+         .def("complex_dtype", [](const _msSOP &)
+              { return !std::is_same<T, real_type>::value; })
         .def("__getitem__", [](_msSOP &i, std::pair<size_t, size_t> ind) -> _SOP &
              { return i(std::get<0>(ind), std::get<1>(ind)); }, py::return_value_policy::reference)
         .def("__setitem__", [](_msSOP &i, std::pair<size_t, size_t> ind, const _SOP &o)
@@ -259,12 +285,66 @@ void init_SOP(py::module &m, const std::string &label)
 }
 
 
+template <typename T>
+void init_prodOP(py::module &m, const std::string &label)
+{
+    using namespace ttns;
+
+    using prod_type = prodOP;
+    using elem_type = typename prod_type::elem_type;
+
+    py::class_<prod_type>(m, label.c_str())
+        .def("__len__", &prod_type::size)
+        .def("size", &prod_type::size)
+        .def("nmodes", &prod_type::nmodes)
+
+        .def(
+            "__iter__",
+            [](const prod_type &p)
+            {
+                return py::make_iterator(p.begin(), p.end());
+            },
+            py::keep_alive<0, 1>())
+
+        .def("__getitem__", [](const prod_type &p, size_t i)
+             {
+                 if (i >= p.size())
+                     throw py::index_error("prodOP index out of range");
+                 const auto &e = p[i];
+                 return py::make_tuple(
+                     std::get<0>(e),  // operator index
+                     std::get<1>(e),  // mode
+                     std::get<2>(e)   // fermionic flag
+                 );
+             })
+
+        .def(
+            "as_sPOP",
+            [](const prod_type &p,
+               const std::vector<std::vector<std::string>> &opdict)
+            {
+                return p.as_prod_op(opdict);
+            },
+            py::arg("operator_dictionary"))
+
+        .def("__repr__", [](const prod_type &p)
+             { return std::string(p); })
+
+
+        .def("contains_jw", &prod_type::contains_jordan_wigner_string)
+        .def("prepend_jw", &prod_type::prepend_jordan_wigner_string);
+};
+
 void initialise_SOP(py::module &m)
 {
     using real_type = pyttn_real_type;
     using complex_type = std::complex<real_type>;
 #ifdef BUILD_REAL_TTN
     init_SOP<real_type>(m, "SOP_real");
+    init_prodOP<real_type>(m, "prodOP_real");
+
 #endif
     init_SOP<complex_type>(m, "SOP_complex");
+    init_prodOP<complex_type>(m, "prodOP_complex");
+
 }

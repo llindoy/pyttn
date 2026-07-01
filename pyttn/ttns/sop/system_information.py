@@ -100,6 +100,7 @@ class SystemInfo:
     def items(self):
         """Return composite to primitive mappings."""
         return self._data.items()
+    
 
     def clear(self) -> None:
         """Remove all composite modes."""
@@ -139,6 +140,27 @@ class SystemInfo:
     def __repr__(self) -> str:
         return f"labelled_system({self._data})"
 
+    def build_flattened_modes(self, primitive_ordering : List[str]) -> system_modes:
+        """Construct a system_modes object from a given primitive ordering.
+
+        :param primitive_ordering: Ordered list of primitive labels
+        :type primitive_ordering: list[str]
+
+        :return: system_modes object
+        :rtype: system_modes
+        """
+        modes = []
+        for prim_label in primitive_ordering:
+            found = False
+            for comp_dict in self._data.values():
+                if prim_label in comp_dict:
+                    modes.append(mode_data(comp_dict[prim_label]))
+                    found = True
+                    break
+            if not found:
+                raise ValueError(f"Primitive label '{prim_label}' not found in any composite mode")
+        
+        return system_modes(modes)
 
     def build_system_modes(self, ordering):
         """Construct a system_modes object from a given composite ordering.

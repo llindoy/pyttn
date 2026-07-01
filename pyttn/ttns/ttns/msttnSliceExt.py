@@ -11,7 +11,7 @@
 # limitations under the License
 
 from abc import ABCMeta, abstractmethod
-
+import numpy as np
 
 from pyttn.ttnpp import ms_ttn_slice_complex
 
@@ -155,6 +155,20 @@ class msttnSlice(metaclass=ABCMeta):
 
         :returns: dtype
         :rtype: {np.complex128 or np.float64}
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def dtype(self) -> np.dtype:
+        """
+        Returns the NumPy dtype of the underlying ttn representation.
+
+        This corresponds to the scalar type used internally, e.g.
+        ``np.float64`` or ``np.complex128``.
+
+        :return: The dtype of the operator
+        :rtype: numpy.dtype
         """
         pass
 

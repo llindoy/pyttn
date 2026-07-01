@@ -36,6 +36,11 @@ namespace ttns
      * A class for handling individual site operators. Here we use type erasure to construct a type that is easier to work with for the
      * python side of the code.
      * */
+
+    template <typename T, typename backend>
+    class operator_dictionary;
+    template <typename T, typename backend>
+    class operator_from_default_dictionaries;
     template <typename T, typename backend>
     class site_operator
     {

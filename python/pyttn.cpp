@@ -52,6 +52,8 @@
 #include "ttns/sop/state.hpp"
 #include "ttns/sop/SOP.hpp"
 #include "ttns/sop/liouville_space.hpp"
+#include "ttns/sop/symbolic_transpose.hpp"
+
 #include "ttns/sop/operator_dictionary.hpp"
 #include "ttns/sop/sSOP.hpp"
 #include "ttns/sop/system_information.hpp"
@@ -191,6 +193,8 @@ PYBIND11_MODULE(ttnpp, m)
 
     initialise_operator_dictionary(m);
     initialise_liouville_space(m);
+    initialise_symbolic_transpose(m);
+
     initialise_convert_to_dense(m);
 
     //

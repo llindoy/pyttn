@@ -60,6 +60,10 @@ void init_Op(py::module &m, const std::string &label)
         .def("clear", &Optype::clear)
         .def("complex_dtype", [](const Optype &)
              { return !std::is_same<T, real_type>::value; })
+        .def_property_readonly("dtype", [](const Optype &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
+
         .def("__str__", [](const Optype &o)
              {std::ostringstream oss; oss << o; return oss.str(); })
         .def("backend", [](const Optype &)

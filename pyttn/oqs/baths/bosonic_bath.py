@@ -127,8 +127,6 @@ class BosonicBath(Bath):
 
     :param Jw: The bath spectral function defining the non-interacting correlation function
     :type Jw: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]]
-    :param S: The system operator
-    :type S: OPBase, optional
     :param beta: The inverse temperature of the bath, defaults to None
     :type beta: float, optional
     :param wmax: the maximum frequency bound, defaults to np.inf
@@ -140,13 +138,11 @@ class BosonicBath(Bath):
     def __init__(
         self,
         Jw: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]],
-        S: Optional[OPBase] = None,
         beta: Optional[float] = None,
         wmax: float = np.inf,
         wmin: Optional[float] = None,
     ):
         self.Jw = Jw
-        self.S = S
         self.beta = beta
         if wmin is None:
             wmin = self.find_wmin(wmax)

@@ -54,6 +54,8 @@ from .spectral_density import (
     SumSpectralDensity,
 )
 
+from .model import OQSModel
+
 __all__: list[str] = [
     "OrthopolDiscretisation",
     "DensityDiscretisation",
@@ -92,4 +94,5 @@ __all__: list[str] = [
     "SumSpectralDensity",
     "DebyeSpectralDensity",
     "BrownianOscillatorSpectralDensity",
+    "OQSModel",
 ]

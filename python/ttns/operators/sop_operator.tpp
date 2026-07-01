@@ -67,6 +67,9 @@ void init_sop_operator(py::module &m, const std::string &label)
              {;  o.bond_dimensions(res); }, "For details see :meth:`pyttn.ttn_dtype.bond_dimensions`")
         .def("complex_dtype", [](const _sop &)
              { return !std::is_same<T, real_type>::value; })
+         .def_property_readonly("dtype", [](const _sop &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
         .def("backend", [](const _sop &)
              { return linalg::traits<backend>::label(); })
 #ifdef CEREAL_LIBRARY_FOUND
@@ -108,6 +111,9 @@ void init_sop_operator(py::module &m, const std::string &label)
         .def("nset", &_mssop::nset)
         .def("complex_dtype", [](const _mssop &)
              { return !std::is_same<T, real_type>::value; })
+         .def_property_readonly("dtype", [](const _mssop &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
         .def("nmodes", &_mssop::nmodes)
         .def("backend", [](const _mssop &)
              { return linalg::traits<backend>::label(); })

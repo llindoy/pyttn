@@ -150,6 +150,20 @@ class msttnNode(metaclass=ABCMeta):
         """
         pass
 
+    @property
+    @abstractmethod
+    def dtype(self) -> np.dtype:
+        """
+        Returns the NumPy dtype of the underlying ttn representation.
+
+        This corresponds to the scalar type used internally, e.g.
+        ``np.float64`` or ``np.complex128``.
+
+        :return: The dtype of the operator
+        :rtype: numpy.dtype
+        """
+        pass
+
     @abstractmethod
     def conj(self) -> None:
         "Take the complex conjugate of the msttnNode.  Here this is evaluated lazily"
@@ -348,6 +362,20 @@ class msttn(metaclass=ABCMeta):
 
         :return: Whether or not the object has a complex dtype
         :rtype: bool
+        """
+        pass
+    
+    @property
+    @abstractmethod
+    def dtype(self) -> np.dtype:
+        """
+        Returns the NumPy dtype of the underlying ttn representation.
+
+        This corresponds to the scalar type used internally, e.g.
+        ``np.float64`` or ``np.complex128``.
+
+        :return: The dtype of the operator
+        :rtype: numpy.dtype
         """
         pass
 

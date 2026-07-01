@@ -13,6 +13,11 @@
 from .ttns import (  # noqa: I001
     SOP,
     OperatorBuilder,
+    operator_context, 
+    wrap, 
+    op, 
+    fop, 
+    operator,
     SystemInfo,
     TopoTree,
     NodeIncrementSetter,
@@ -31,6 +36,7 @@ from .ttns import (  # noqa: I001
     fermion_mode,
     fermion_operator,
     fOP,
+    symbolic_transpose,
     generate_hierarchical_clustering_tree,
     generate_spanning_tree,
     generic_mode,
@@ -201,6 +207,12 @@ __all__: list[str] = [
     "is_ms_ttn",
     "available_backends",
     "OperatorBuilder",
+    "operator_context", 
+    "wrap", 
+    "op", 
+    "fop", 
+    "operator",
     "SystemInfo",
     "TopoTree",
+    "symbolic_transpose"
 ]

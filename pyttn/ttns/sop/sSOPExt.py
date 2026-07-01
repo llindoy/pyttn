@@ -11,7 +11,7 @@
 # limitations under the License
 
 from abc import ABCMeta, abstractmethod
-from typing import Union
+from typing import Union, Optional
 
 import numpy as np
 
@@ -25,6 +25,8 @@ from pyttn.ttnpp import (
 )
 from pyttn.ttnpp import sOP as _sOP
 from pyttn.ttnpp import sPOP as _sPOP
+
+from pyttn.ttnpp import system_modes
 
 
 class OPBase(metaclass=ABCMeta):
@@ -241,7 +243,7 @@ class sPOP(OPBase):
             -  Default construct the sPOP
             - op (:class:`sOP`) - Construct sPOP from single site operator
             - ops (list[:class:`sOP`]) - Construct sPOP from a list of single site operators
-            - pop (:class:`sPOP`) - Construct sPPO from product operator
+            - pop (:class:`sPOP`) - Construct sPOP from product operator
         :return: The sPOP object
         :rtype: sPOP
         """
@@ -1082,6 +1084,44 @@ class sSOP(OPBase):
         :rtype: sSOP
         """
         pass
+
+
+def _todense_impl(self, sys, opdict=None):
+    if opdict is None:
+        return self._todense(sys)
+    else:
+        return self._todense(sys, opdict)
+
+def todense(
+        self,
+        sys: system_modes,
+        opdict: Optional["OperatorDictionary"] = None,
+    ):
+        """
+        Convert the operator to a dense matrix representation.
+        If an operator dictionary is provided, it is used to resolve
+        the site operators when constructing the dense matrix. Otherwise,
+        the default operator definitions associated with the system modes
+        are used.
+        :param sys: System mode information describing the Hilbert space
+        :type sys: system_modes
+        :param opdict: Operator dictionary defining site operators, defaults to None
+        :type opdict: Optional[OperatorDictionary], optional
+        :return: Dense matrix representation of the operator
+        :rtype: Matrix
+        """
+        if opdict is None:
+            return self._todense(sys)
+        else:
+            return self._todense(sys, opdict)
+
+def _attach_todense(cls):
+    cls.todense = _todense_impl
+    cls.todense.__name__ = "todense"
+    cls.todense.__qualname__ = f"{cls.__name__}.todense"
+
+for cls in (_sOP, _sPOP, sNBO_complex, sNBO_real, sSOP_complex, sSOP_real):
+    _attach_todense(cls)
 
 
 sSOP.register(sSOP_complex)

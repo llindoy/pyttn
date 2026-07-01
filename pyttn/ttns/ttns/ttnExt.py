@@ -188,6 +188,20 @@ class ttnNodeData(metaclass=ABCMeta):
         """
         pass
 
+    @property
+    @abstractmethod
+    def dtype(self) -> np.dtype:
+        """
+        Returns the NumPy dtype of the underlying ttn representation.
+
+        This corresponds to the scalar type used internally, e.g.
+        ``np.float64`` or ``np.complex128``.
+
+        :return: The dtype of the operator
+        :rtype: numpy.dtype
+        """
+        pass
+
     @abstractmethod
     def conj(self) -> None:
         "Take the complex conjugate of the ttnNodeData.  Here this is evaluated lazily"
@@ -474,6 +488,20 @@ class ttnNode(metaclass=ABCMeta):
         """
         pass
 
+    @property
+    @abstractmethod
+    def dtype(self) -> np.dtype:
+        """
+        Returns the NumPy dtype of the underlying ttn representation.
+
+        This corresponds to the scalar type used internally, e.g.
+        ``np.float64`` or ``np.complex128``.
+
+        :return: The dtype of the operator
+        :rtype: numpy.dtype
+        """
+        pass
+
     @abstractmethod
     def conj(self) -> None:
         "Take the complex conjugate of the ttnNode.  Here this is evaluated lazily"
@@ -664,6 +692,20 @@ class ttn(metaclass=ABCMeta):
 
         :return: dtype
         :rtype: bool
+        """
+        pass
+    
+    @property
+    @abstractmethod
+    def dtype(self) -> np.dtype:
+        """
+        Returns the NumPy dtype of the underlying ttn representation.
+
+        This corresponds to the scalar type used internally, e.g.
+        ``np.float64`` or ``np.complex128``.
+
+        :return: The dtype of the operator
+        :rtype: numpy.dtype
         """
         pass
 

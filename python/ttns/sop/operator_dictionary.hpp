@@ -18,6 +18,7 @@
 #include "../../utils.hpp"
 #include <ttns_lib/operators/sop_operator.hpp>
 #include <sstream>
+#include <pybind11/numpy.h>
 
 namespace py = pybind11;
 

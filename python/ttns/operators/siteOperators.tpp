@@ -65,6 +65,9 @@ void init_site_operators(py::module &m, const std::string &label)
 
         .def("complex_dtype", [](const siteop &)
              { return !std::is_same<T, real_type>::value; })
+         .def_property_readonly("dtype", [](const siteop &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
 
         .def("transpose", &siteop::transpose)
         .def("todense", [](const siteop& op){return op.todense();})
@@ -137,6 +140,9 @@ void init_site_operators(py::module &m, const std::string &label)
         .def("transpose", &prim::transpose)
         .def("complex_dtype", [](const prim &)
              { return !std::is_same<T, real_type>::value; })
+         .def_property_readonly("dtype", [](const prim &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
         .def("__str__", &prim::to_string)
         .def("backend", [](const prim &)
              { return linalg::traits<backend>::label(); });
@@ -147,6 +153,9 @@ void init_site_operators(py::module &m, const std::string &label)
         .def(py::init<size_type>())
         .def("complex_dtype", [](const ident &)
              { return !std::is_same<T, real_type>::value; })
+         .def_property_readonly("dtype", [](const ident &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const ident & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -173,6 +182,9 @@ void init_site_operators(py::module &m, const std::string &label)
                     return dmat(mat); }))
         .def("complex_dtype", [](const dmat &)
              { return !std::is_same<T, real_type>::value; })
+         .def_property_readonly("dtype", [](const dmat &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
         .def("matrix", &dmat::mat)
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
@@ -198,6 +210,9 @@ void init_site_operators(py::module &m, const std::string &label)
         .def(py::init<const csr_type &>())
         .def("complex_dtype", [](const spmat &)
              { return !std::is_same<T, real_type>::value; })
+         .def_property_readonly("dtype", [](const spmat &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
         .def("matrix", &spmat::mat)
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
@@ -232,6 +247,9 @@ void init_site_operators(py::module &m, const std::string &label)
         .def(py::init<const linalg::tensor<T, 1> &, size_t, size_t>())
         .def("complex_dtype", [](const diagmat &)
              { return !std::is_same<T, real_type>::value; })
+         .def_property_readonly("dtype", [](const diagmat &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
         .def("matrix", &diagmat::mat)
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 

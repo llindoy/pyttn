@@ -48,6 +48,10 @@ void init_msttn(py::module &m, const std::string &label)
         .def("is_leaf", &_msttn_node::is_leaf)
         .def("complex_dtype", [](const _msttn_node &)
              { return !std::is_same<T, real_type>::value; })
+        .def_property_readonly("dtype", [](const  _msttn_node &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
+
         .def("conj", &_msttn_node::conj)
         .def("nmodes", &_msttn_node::size)
 
@@ -78,6 +82,9 @@ void init_msttn(py::module &m, const std::string &label)
         //.def("assign", static_cast<_msttn_slice& (_msttn_slice::*)(const _msttn_slice&)>(&_msttn_slice::template operator=<T, backend>))
         .def("complex_dtype", [](const _msttn_slice &)
              { return !std::is_same<T, real_type>::value; })
+         .def_property_readonly("dtype", [](const  _msttn_slice &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
         .def("nset", &_msttn_slice::nset)
         .def("backend", [](const _msttn_slice &)
              { return linalg::traits<backend>::label(); });
@@ -102,6 +109,9 @@ void init_msttn(py::module &m, const std::string &label)
 
         .def("complex_dtype", [](const _msttn &)
              { return !std::is_same<T, real_type>::value; })
+         .def_property_readonly("dtype", [](const  _msttn &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
         .def("assign", [](_msttn &o, const _msttn &i)
              { o = i; })
         //.def("assign", &_msttn::template operator=<real_type, backend> )

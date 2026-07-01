@@ -26,6 +26,7 @@
 #include <pybind11/pytypes.h>
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
+#include <pybind11/numpy.h>
 
 namespace py = pybind11;
 

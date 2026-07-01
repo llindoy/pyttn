@@ -38,8 +38,6 @@ class CorrelatedBosonicBath(Bath):
 
     :param Jw: The matrix valued bath spectral function defining the non-interacting correlation function
     :type Jw: CorrelatedSpectralDensity,
-    :param S: The system operator
-    :type S: list[OPBase], optional
     :param beta: The inverse temperature of the bath, defaults to None
     :type beta: float, optional
     :param wmax: the maximum frequency bound, defaults to np.inf
@@ -53,7 +51,6 @@ class CorrelatedBosonicBath(Bath):
     def __init__(
         self,
         Jw: CorrelatedSpectralDensity,
-        S: Optional[list[OPBase]] = None,
         beta: Optional[float] = None,
         wmax: float = np.inf,
         wmin: Optional[float] = None,
@@ -62,7 +59,6 @@ class CorrelatedBosonicBath(Bath):
         ] = "trace",
     ):
         self.Jw = Jw
-        self.S = S
         self.beta = beta
         if wmin is None:
             wmin = self.find_wmin(wmax)

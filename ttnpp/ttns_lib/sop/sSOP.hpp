@@ -1354,4 +1354,5 @@ ttns::sSOP<decltype(T() * U())> operator*(const ttns::sSOP<T> &a, const ttns::sS
     return ret;
 }
 
+
 #endif // PYTTN_TTNS_LIB_SOP_SSOP_HPP_

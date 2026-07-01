@@ -14,7 +14,7 @@ if(NOT USE_CUDA)
         linalg/tensor.cpp linalg/backend.cpp linalg/sparseMatrix.cpp linalg/orthogonal_vector_gen.cpp
         utils/orthopol.cpp utils/discretisation.cpp
         ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/models/models.cpp
-        ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp 
+        ttns/sop/operator_dictionary.cpp ttns/sop/liouville_space.cpp ttns/sop/symbolic_transpose.cpp
         #ttns/sop/state.cpp 
         ttns/sop/toDense.cpp
         ttns/ttn/ntree.cpp ttns/ttn/ttn.cpp ttns/ttn/ms_ttn.cpp
@@ -40,7 +40,7 @@ else()
         utils/orthopol.cpp utils/discretisation.cpp
         ttns/sop/sSOP.cpp ttns/sop/SOP.cpp ttns/sop/system_information.cpp ttns/sop/models/models.cpp
         ttns/sop/operator_dictionary.cpp cuda/ttns/sop/operator_dictionary.cu
-        cuda/ttns/sop/liouville_space.cu
+        cuda/ttns/sop/liouville_space.cu ttns/sop/symbolic_transpose.cu
         #ttns/sop/state.cpp 
         ttns/sop/toDense.cpp
         ttns/ttn/ntree.cpp cuda/ttns/ttn/ttn.cu cuda/ttns/ttn/ms_ttn.cu

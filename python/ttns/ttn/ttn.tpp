@@ -52,7 +52,9 @@ void init_ttn(py::module &m, const std::string &label)
          .def("is_orthogonalised", &_ttn_node_data::reallocate)
          .def("complex_dtype", [](const _ttn_node_data &)
               { return !std::is_same<T, real_type>::value; })
-
+         .def_property_readonly("dtype", [](const  _ttn_node_data &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
          .def("conj", &_ttn_node_data::conj)
          .def("nmodes", &_ttn_node_data::nmodes)
          .def("__len__", &_ttn_node_data::nmodes)
@@ -107,6 +109,9 @@ void init_ttn(py::module &m, const std::string &label)
          .def("is_leaf", &_ttn_node::is_leaf)
          .def("complex_dtype", [](const _ttn_node &)
               { return !std::is_same<T, real_type>::value; })
+         .def_property_readonly("dtype", [](const  _ttn_node &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
          .def("conj", &_ttn_node::conj)
          .def("nmodes", &_ttn_node::size)
          .def("__len__", &_ttn_node::size)
@@ -151,7 +156,9 @@ void init_ttn(py::module &m, const std::string &label)
 
          .def("complex_dtype", [](const _ttn &)
               { return !std::is_same<T, real_type>::value; }, "For details see :class:`pyttn.ttn_dtype`")
-
+         .def_property_readonly("dtype", [](const  _ttn &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
          .def("assign", &_ttn::template operator= <T, backend, true>)
          .def("assign", &_ttn::template operator= <T, backend, false>)
 

@@ -34,10 +34,6 @@ class FermionicBath(Bath):
 
     :param Jw: The bath spectral function defining the non-interacting correlation function
     :type Jw: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]] 
-    :param Sp: The system raising operators
-    :type Sp: Optional[OPBase]
-    :param Sm: The system raising operators
-    :type Sm: Optional[OPBase]    
     :param beta: The inverse temperature of the bath, defaults to None
     :type beta: float, optional
     :param wmax: the maximum frequency bound, default to np.inf
@@ -51,16 +47,12 @@ class FermionicBath(Bath):
     def __init__(
         self,
         Jw: Callable[[Union[np.ndarray, float]], Union[np.ndarray, float]],
-        Sp: Optional[OPBase] = None,
-        Sm: Optional[OPBase] = None,
         beta: Optional[float] = None,
         wmax: float = np.inf,
         wmin: Optional[float] = None,
         wtol: Optional[float] = None,
     ):
         self.Jw = Jw
-        self.Sp = Sp
-        self.Sm = Sm
         self.beta = beta
         self.wmin = wmin
         self.wmax = wmax

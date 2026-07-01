@@ -120,6 +120,20 @@ class ProductOperator(metaclass=ABCMeta):
         """
         pass
 
+    @property
+    @abstractmethod
+    def dtype(self) -> np.dtype:
+        """
+        Returns the NumPy dtype of the underlying operator representation.
+
+        This corresponds to the scalar type used internally, e.g.
+        ``np.float64`` or ``np.complex128``.
+
+        :return: The dtype of the operator
+        :rtype: numpy.dtype
+        """
+        pass
+
     @abstractmethod
     def __copy__(self):
         """Function implementing shallow copy of the ProductOperator object"""

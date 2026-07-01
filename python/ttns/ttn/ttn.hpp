@@ -29,6 +29,7 @@
 #include <pybind11/pytypes.h>
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
+#include <pybind11/numpy.h>
 
 void initialise_ttn(py::module &m);
 

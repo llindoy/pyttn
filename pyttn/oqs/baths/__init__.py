@@ -11,7 +11,7 @@
 # limitations under the License
 
 
-from .bath import Bath
+from .bath import Bath, BathSpec
 from .bath_factory import (
     bosonic_bath,
     discrete_bath,
@@ -50,6 +50,7 @@ __all__ = [
     "discrete_bosonic_bath",
     "discrete_fermionic_bath",
     "Bath",
+    "BathSpec",
     "BosonicBath",
     "CorrelatedBosonicBath",
     "DiscreteBath",

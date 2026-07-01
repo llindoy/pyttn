@@ -34,12 +34,17 @@ class OperatorDictionary(metaclass=ABCMeta):
     ) -> "OperatorDictionary":
         """Factory function for constructing a user defined operator dictionary.
 
-        :param `*args`: Variable length list of arguments.
+        :param *args: Arguments specifying how the dictionary is initialised. Valid options are:
+    
+            - No arguments: construct an empty dictionary
+            - n_modes (int): construct a dictionary with space for `n_modes` system modes
+            - dict (dict_type): initialise from an existing dictionary mapping labels to operators
+            - opdict (OperatorDictionary): construct as a copy of another operator dictionary
         :param dtype: The dtype to use for the site operator.  (Default: np.complex128)
         :type dtype: {np.float64, np.complex128}, optional
 
         :returns: The operator dictionary object
-        :rtype: operator_dictionary_real or operator_dictionary_complex
+        :rtype: OperatorDictionary
         """
 
         if _real_opdict:
@@ -58,7 +63,7 @@ class OperatorDictionary(metaclass=ABCMeta):
 
     @abstractmethod
     def assign(self, o: "OperatorDictionary"):
-        """Assign the value of the operator dictionary from another
+        """Assign the value from another operator dictionary.
 
         :param o: The operator dictionary to copy into this one
         :type o: OperatorDictionary
@@ -82,7 +87,7 @@ class OperatorDictionary(metaclass=ABCMeta):
 
     @abstractmethod
     def resize(self, size: int):
-        """Resize the operator dictionary object so that it can describe a system with size modes
+        """Resize the dictionary to support a given number of modes.
 
         :param size: The number of modes
         :type size: int
@@ -90,77 +95,81 @@ class OperatorDictionary(metaclass=ABCMeta):
 
     @abstractmethod
     def __setitem__(self, mode: int, el: dict[str, 'site_operator']):
-        """Set the operator dictionary for mode mode
+        """Set the operator dictionary for a given mode.
 
-        :param mode: The mode to be set
+        :param mode: Mode index
         :type mode: int
-        :param el: A dictionary of strings and site_operator objects containing the operators that act on this mode
+        :param el: Mapping from string labels to site_operator objects
         :type el: dict[str, site_operator]
         """
         pass
 
     @abstractmethod
     def __getitem__(self, mode: int) -> dict[str, 'site_operator']:
-        """Get the operator dictionary for mode mode
+        """Return the operator dictionary for a given mode.
 
-        :param mode: The mode to be set
+        :param mode: Mode index
         :type mode: int
-        :returns: A dictionary of strings and site_operator objects containing the operators that act on this mode
+        :returns: Mapping from string labels to site_operator objects
         :rtype: dict[str, site_operator]
         """
+
         pass
 
     @abstractmethod
     def site_dictionary(self, mode: int) -> dict[str, 'site_operator']:
-        """Get the operator dictionary for mode mode
+        """Return the operator dictionary for a given mode.
 
-        :param mode: The mode to be set
+        :param mode: Mode index
         :type mode: int
-        :returns: A dictionary of strings and site_operator objects containing the operators that act on this mode
+        :returns: Mapping from string labels to site_operator objects
         :rtype: dict[str, site_operator]
         """
         pass
 
     @abstractmethod
     def insert(self, mode: int, label: str, op: 'site_operator'):
-        """Insert the operator op with label label into the site operator dictionary associated with mode mode
+        """Insert an operator into the dictionary for a given mode.
 
-        :param mode: The mode to consider
+        :param mode: Mode index
         :type mode: int
-        :param label: The label used to represent the operator
+        :param label: Label identifying the operator
         :type label: str
         :param op: The site_operator object
         :type op: site_operator
         """
+
         pass
 
     @abstractmethod
     def __call__(self, mode: int, label: str) -> 'site_operator':
-        """Return the operator with label label in the dictionary of mode mode
+        """Return the operator associated with a label for a given mode.
 
-        :param mode: The mode to consider
+        :param mode: Mode index
         :type mode: int
-        :param label: The label used to represent the operator
+        :param label: Operator label
         :type label: str
-        :returns: The site_operator object
+        :returns: The corresponding site_operator
         :rtype: site_operator
         """
+
         pass
 
     @abstractmethod
     def __len__(self) -> int:
-        """Returns the number of modes in the operator dictionary
+        """Return the number of modes in the dictionary.
 
-        :return: The number of modes in the dictionary
+        :return: Number of modes
         :rtype: int
         """
+
         pass
 
     @abstractmethod
     def nmodes(self) -> int:
-        """Returns the number of modes in the operator dictionary
+        """Return the number of modes in the dictionary.
 
-        :return: The number of modes in the dictionary
+        :return: Number of modes
         :rtype: int
         """
         pass

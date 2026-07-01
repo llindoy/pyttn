@@ -40,8 +40,9 @@ from .sSOPExt import (
     sSOP,
 )
 
-from .operator_builder import OperatorBuilder
+from .operator_builder import OperatorBuilder, operator_context, wrap, op, fop, operator, lSOP, lCSOP
 from .system_information import SystemInfo
+from .symbolicTransposeExt import symbolic_transpose
 #from .stateExt import isKet, isSepState, ket, sepState, stateStr
 
 __all__: list[str] = [
@@ -54,6 +55,13 @@ __all__: list[str] = [
     "sSOP",
     "OPBase",
     "OperatorBuilder",
+    "lSOP",
+    "lCSOP",
+    "operator_context", 
+    "wrap", 
+    "op", 
+    "fop", 
+    "operator",
     "SystemInfo",
     #"stateStr",
     #"sepState",
@@ -79,5 +87,6 @@ __all__: list[str] = [
     "generic_mode",
     "system_modes",
     "combine_systems",
-    "convert_to_dense"
+    "convert_to_dense",
+    "symbolic_transpose"
 ]

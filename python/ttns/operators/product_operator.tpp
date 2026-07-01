@@ -74,6 +74,9 @@ void init_product_operator(py::module &m, const std::string &label)
         .def("nmodes", &pop::nmodes)
         .def("complex_dtype", [](const pop &)
              { return !std::is_same<T, real_type>::value; })
+        .def_property_readonly("dtype", [](const pop &){
+               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
+               else{return py::dtype::of<T>();} })
         .def("__str__", [](const pop &o)
              {std::ostringstream oss; oss << o; return oss.str(); })
 

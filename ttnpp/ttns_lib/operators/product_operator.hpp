@@ -421,31 +421,23 @@ namespace ttns
         {
             std::vector<linalg::matrix<T>> mats(mode_dims.size());
 
-            size_t counter = 0;
-            for(size_type i=0; i<mode_dims.size(); ++i)
-            {
-                if(counter > m_mode_operators.size())
-                {
-                    mats[i] = linalg::matrix<T>(mode_dims[i], mode_dims[i], [](size_t x, size_t y){return x==y ? T(1.0) : T(0.0);});
-                }
-                else
-                {
-                    if (i == m_mode_operators[counter].mode())
-                    {
-                        ASSERT(mode_dims[i] == m_mode_operators[counter].mode_dimension(), "Cannot convert site operator to dense matrix.  The specified mode dims are not compatible with the current size.");
-                        CALL_AND_HANDLE(m_mode_operators[counter].todense(mats[i]), "Failed to construct dense matrix from product operator.  Failed to convert a site operator.");
-                        ++counter;
-                    }
-                    else
-                    {
-                        mats[i] = linalg::matrix<T>(mode_dims[i], mode_dims[i], [](size_t x, size_t y){return x==y ? T(1.0) : T(0.0);});
-                    }
-                }
-            }
-            ASSERT(counter == m_mode_operators.size(), "Invalid conversion of mode operator to dense matrix.  Likely insufficient mode dimensions passed to function.");
+            // Build lookup map
+            std::map<size_t, const element_type*> op_map;
+            for (const auto& op : m_mode_operators){op_map[op.mode()] = &op;}
 
-            //now construct the dense matrix from these operators
-            CALL_AND_HANDLE(kron::eval(m_coeff, mats, ret), "Failed to evaluate kron prod");
+            for(size_type i = 0; i < mode_dims.size(); ++i)
+            {
+                auto it = op_map.find(i);
+
+                if (it != op_map.end())
+                {
+                    const auto& op = *it->second;
+                    ASSERT(mode_dims[i] == op.mode_dimension(), "Mode dimension mismatch");
+                    CALL_AND_HANDLE(op.todense(mats[i]),"Failed to construct dense matrix");
+                }
+                else{mats[i] = linalg::matrix<T>(mode_dims[i],mode_dims[i],[](size_t x, size_t y){return x == y ? T(1.0) : T(0.0);});}
+            }
+            CALL_AND_HANDLE(kron::eval(m_coeff, mats, ret),"Failed to evaluate kron prod");
         }
 
 #ifdef CEREAL_LIBRARY_FOUND

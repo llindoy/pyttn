@@ -41,6 +41,25 @@ void init_sSOP(py::module &m)
                       { o.mode() = i; }, "The mode the operator acts on")
         .def_property("fermionic", static_cast<const bool &(sOP::*)() const>(&sOP::fermionic), [](sOP &o, const bool &i)
                       { o.fermionic() = i; }, "The mode the operator acts on")
+        .def("_todense", [](const sOP& op, const system_modes& sys)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, mat), "Failed to convert sOP to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const sOP& op, const system_modes& sys, const operator_dictionary<real_type, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<real_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sSOP to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const sOP& op, const system_modes& sys, const operator_dictionary<complex_type, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sOP to dense matrix.");
+                         return mat;
+                    })
+                    
         .def("__str__", [](const sOP &o)
              { return static_cast<std::string>(o); })
 #ifdef CEREAL_LIBRARY_FOUND
@@ -285,6 +304,25 @@ void init_sSOP(py::module &m)
 
         .def("__iter__", [](sPOP &s)
              { return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
+
+        .def("_todense", [](const sPOP& op, const system_modes& sys)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, mat), "Failed to convert sPOP to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const sPOP& op, const system_modes& sys, const operator_dictionary<real_type, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<real_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sSOP to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const sPOP& op, const system_modes& sys, const operator_dictionary<complex_type, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sPOP to dense matrix.");
+                         return mat;
+                    })
         .def("__str__", [](const sPOP &o)
              { return static_cast<std::string>(o); })
 #ifdef CEREAL_LIBRARY_FOUND
@@ -691,8 +729,8 @@ void init_sSOP(py::module &m)
             .def("__deepcopy__", [](const NBO &o, py::dict)
                  { return NBO(o); }, py::arg("memo"))
             .def("clear", &NBO::clear)
-            .def("insert_front", &NBO::append)
-            .def("insert_back", &NBO::prepend)
+            .def("insert_front", &NBO::prepend)
+            .def("insert_back", &NBO::append)
             .def("nmodes", &NBO::nmodes)
             .def("__iter__", [](NBO &s)
                  { return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
@@ -702,10 +740,28 @@ void init_sSOP(py::module &m)
                           { o.ops() = i; })
             .def_property("pop", static_cast<const sPOP &(NBO::*)() const>(&NBO::pop), [](NBO &o, const sPOP &i)
                           { o.pop() = i; })
-
+         .def_property_readonly("dtype", [](const NBO &){return py::dtype::of<real_type>();})
+         .def("complex_dtype", [](const NBO &){ return false; })
             .def("__str__", [](const NBO &o)
                  { return static_cast<std::string>(o); })
-
+        .def("_todense", [](const NBO& op, const system_modes& sys)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, mat), "Failed to convert sNBO to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const NBO& op, const system_modes& sys, const operator_dictionary<real_type, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<real_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sSOP to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const NBO& op, const system_modes& sys, const operator_dictionary<complex_type, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sNBO to dense matrix.");
+                         return mat;
+                    })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const NBO & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -813,9 +869,12 @@ void init_sSOP(py::module &m)
             .def("__deepcopy__", [](const NBO &o, py::dict)
                  { return NBO(o); }, py::arg("memo"))
             .def("clear", &NBO::clear)
-            .def("insert_front", &NBO::append)
-            .def("insert_back", &NBO::prepend)
+            .def("insert_front", &NBO::prepend)
+            .def("insert_back", &NBO::append)
             .def("nmodes", &NBO::nmodes)
+
+         .def_property_readonly("dtype", [](const NBO &){return py::dtype::of<complex_type>();})
+         .def("complex_dtype", [](const NBO &){ return true; })
             .def_property("coeff", static_cast<const coeff<complex_type> &(NBO::*)() const>(&NBO::coeff), [](NBO &o, const coeff<complex_type> &i)
                           { o.coeff() = i; })
             .def_property("ops", static_cast<const std::list<sOP> &(NBO::*)() const>(&NBO::ops), [](NBO &o, const std::list<sOP> &i)
@@ -827,7 +886,18 @@ void init_sSOP(py::module &m)
                  { return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
             .def("__str__", [](const NBO &o)
                  { return static_cast<std::string>(o); })
-
+        .def("_todense", [](const NBO& op, const system_modes& sys)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, mat), "Failed to convert sNBO to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const NBO& op, const system_modes& sys, const operator_dictionary<complex_type, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sNBO to dense matrix.");
+                         return mat;
+                    })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const NBO & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -940,12 +1010,31 @@ void init_sSOP(py::module &m)
                           { o.label() = i; })
             .def_property("terms", static_cast<const container_type &(_SOP::*)() const>(&_SOP::terms), [](_SOP &o, const container_type &i)
                           { o.terms() = i; })
+         .def_property_readonly("dtype", [](const _SOP &){return py::dtype::of<real_type>();})
+         .def("complex_dtype", [](const _SOP &){ return false; })
             .def("__setitem__", [](_SOP &self, size_t i, const sNBO<real_type> &v)
                  { self[i] = v; })
             .def("__getitem__", static_cast<sNBO<real_type> &(_SOP::*)(size_t)>(&_SOP::operator[]), py::return_value_policy::reference)
             .def("__str__", [](const _SOP &o)
                  {std::ostringstream oss; oss << o; return oss.str(); })
-
+        .def("_todense", [](const _SOP& op, const system_modes& sys)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, mat), "Failed to convert sSOP to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const _SOP& op, const system_modes& sys, const operator_dictionary<real_type, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<real_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sSOP to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const _SOP& op, const system_modes& sys, const operator_dictionary<complex_type, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sSOP to dense matrix.");
+                         return mat;
+                    })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const _SOP & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
@@ -1085,12 +1174,25 @@ void init_sSOP(py::module &m)
                           { o.label() = i; })
             .def_property("terms", static_cast<const container_type &(_SOP::*)() const>(&_SOP::terms), [](_SOP &o, const container_type &i)
                           { o.terms() = i; })
+         .def_property_readonly("dtype", [](const _SOP &){return py::dtype::of<complex_type>();})
+         .def("complex_dtype", [](const _SOP &){ return true; })
             .def("__setitem__", [](_SOP &self, size_t i, const sNBO<complex_type> &v)
                  { self[i] = v; })
             .def("__getitem__", static_cast<sNBO<complex_type> &(_SOP::*)(size_t)>(&_SOP::operator[]), py::return_value_policy::reference)
             .def("__str__", [](const _SOP &o)
                  {std::ostringstream oss; oss << o; return oss.str(); })
-
+        .def("_todense", [](const _SOP& op, const system_modes& sys)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, mat), "Failed to convert sSOP to dense matrix.");
+                         return mat;
+                    })
+        .def("_todense", [](const _SOP& op, const system_modes& sys, const operator_dictionary<complex_type, linalg::blas_backend>& dict)
+                    {
+                         linalg::matrix<complex_type> mat;
+                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sSOP to dense matrix.");
+                         return mat;
+                    })
 #ifdef CEREAL_LIBRARY_FOUND
          .def("save", 
             [](const _SOP & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},

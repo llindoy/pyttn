@@ -18,6 +18,8 @@
 #include <ttns_lib/sop/sSOP.hpp>
 #include <ttns_lib/sop/SOP.hpp>
 #include <ttns_lib/sop/multiset_SOP.hpp>
+#include <ttns_lib/sop/operator_dictionaries/operator_dictionary.hpp>
+#include <ttns_lib/sop/toDense.hpp>
 
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
@@ -26,6 +28,7 @@
 #include <pybind11/pytypes.h>
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
+#include <pybind11/numpy.h>
 #include "../../utils.hpp"
 
 namespace py = pybind11;

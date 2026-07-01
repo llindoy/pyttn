@@ -1,6 +1,6 @@
 /**
  * This files is part of the pyTTN package.
- * (C) Copyright 2025 NPL Management Limited
+ * (C) Copyright 2026 NPL Management Limited
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,13 +12,15 @@
  * limitations under the License
  */
 
-#ifndef PYTHON_BINDING_MS_TTN_HPP
-#define PYTHON_BINDING_MS_TTN_HPP
+#ifndef PYTHON_BINDING_SYMBOLIC_TRANSPOSE_HPP
+#define PYTHON_BINDING_SYMBOLIC_TRANSPOSE_HPP
 
-#include <ttns_lib/ttn/ms_ttn.hpp>
-#include <ttns_lib/ttn/multiset_ttn_slice.hpp>
-#include <ttns_lib/operators/site_operators/site_operator.hpp>
 #include "../../utils.hpp"
+
+#include <ttns_lib/sop/sSOP.hpp>
+#include <ttns_lib/sop/SOP.hpp>
+#include <ttns_lib/sop/transpose.hpp>
+#include <ttns_lib/sop/operator_dictionaries/default_operator_dictionaries.hpp>
 
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
@@ -27,20 +29,9 @@
 #include <pybind11/pytypes.h>
 #include <pybind11/complex.h>
 #include <pybind11/functional.h>
-#include <pybind11/numpy.h>
-
-#ifdef CEREAL_LIBRARY_FOUND
-#include <cereal/archives/binary.hpp>
-#include <cereal/archives/json.hpp>
-#include <fstream>
-#endif
 
 namespace py = pybind11;
 
-void initialise_msttn(py::module &m);
+void initialise_symbolic_transpose(py::module &m);
 
-#ifdef PYTTN_BUILD_CUDA
-void initialise_msttn_cuda(py::module &m);
 #endif
-
-#endif // PYTHON_BINDING_TTN_HPP

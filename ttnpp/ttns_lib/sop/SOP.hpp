@@ -192,7 +192,15 @@ namespace ttns
 
                     if (label != std::string("id"))
                     {
-                        ret *= sOP(label, std::get<1>(t));
+                        //multiply by the new operator only add in information about the mode being fermionic if we have not performed a Jordan Wigner mapping.
+                        if(!m_mapped)
+                        {
+                            ret *= sOP(label, std::get<1>(t), std::get<2>(t));
+                        }
+                        else
+                        {
+                            ret *= sOP(label, std::get<1>(t));
+                        }
                     }
 
                     ++opind;
