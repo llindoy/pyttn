@@ -106,6 +106,7 @@ def convert_nx_to_tree(tree: nx.Graph, root_ind: int = 0) -> tuple[ntree, list[i
         node_dict[edge[1]] = node_dict[edge[0]] + [edge_counter[edge[0]]]
         res().at(node_dict[edge[0]]).insert(edge[1])
 
+
     # construct an array where each element corresponds to a leaf of the tree and
     # stores the physical mode it corresponds to.
     leaf_labels = [leaf.value for leaf in res.leaves()]

@@ -10,18 +10,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from math import ceil
-from typing import Any, Generator, Optional
+from typing import Optional
 
 import networkx as nx
 import numpy as np
 
+from .spectral_tree import __spectral_split_indices
 
 def distance_matrix_to_graph(M: np.ndarray) -> nx.Graph:
     return nx.from_numpy_array(np.abs(M - np.diag(np.diag(M))))
 
 
-def __insert_physical_nodes(spanning_tree, N, root_ind):
+def __insert_physical_nodes(spanning_tree, N, root_ind, max_children):
     # a function for taking a networkx tree generated from a max weight spanning tree of a graph
     # and inserts children nodes below each of the leaf nodes representing the physical tree nodes
     # additionally this shifts all indices stored in the tree so that they each have a unique label
@@ -65,194 +65,112 @@ def __insert_physical_nodes(spanning_tree, N, root_ind):
     for i in range(N):
         if nchildren[i] > 0:
             spanning_tree.add_edge(mapping[i], i)
+
     return spanning_tree, mapping[root_ind]
 
 
-def chunks(nodes: list[int], n: int) -> Generator[Any, Any, None]:
-    N = ceil(len(nodes) / n)
-    for i in range(0, len(nodes), N):
-        yield nodes[i : i + N]
+def __build_local_spectral_ttn(nodes, W, T, next_index, max_children):
+    """
+    Build a spectral TTN over nodes with strict degree constraint.
+    Returns (root, next_index).
+    """
+    if max_children == 1:
+        # order nodes using spectral ordering 
+        if len(nodes) <= 1:
+            return nodes[0], next_index
+
+        # simple fallback: keep order (or sort)
+        ordered = list(nodes)
+
+        root = ordered[0]
+        current = root
+
+        for n in ordered[1:]:
+            aux = next_index
+            next_index += 1
+
+            T.add_edge(current, aux)
+            T.add_edge(aux, n)
+
+            current = aux
+        return root, next_index
+
+    # leaf
+    if len(nodes) == 1:
+        return nodes[0], next_index
+
+    # already small enough so make star
+    if len(nodes) <= max_children:
+        root = next_index
+        next_index += 1
+        for n in nodes:
+            T.add_edge(root, n)
+        return root, next_index
+
+    groups = [nodes]
+
+    while any(len(g) > 1 for g in groups) and len(groups) < max_children:
+        # split the largest group
+        largest = max(groups, key=len)
+        groups.remove(largest)
+
+        A, B = __spectral_split_indices(largest, W)
+        groups.append(A)
+        groups.append(B)
+
+    def merge_groups(groups):
+        # merge two smallest groups
+        groups = sorted(groups, key=len)
+        merged = groups[0] + groups[1]
+        return groups[2:] + [merged]
+
+    while len(groups) > max_children:
+        groups = merge_groups(groups)
+
+    root = next_index
+    next_index += 1
+
+    children_roots = []
+
+    for g in groups:
+        child, next_index = __build_local_spectral_ttn(g, W, T, next_index, max_children)
+        children_roots.append(child)
+
+    for child in children_roots:
+        T.add_edge(root, child)
+
+    assert len(children_roots) <= max_children, (f"max_children violated at node {root}: {len(children_roots)}")
+
+    return root, next_index
 
 
-
-def __split_node_mps(T, node, leaf_children, internal_children, nindex):
-    if len(leaf_children) == 0 and len(internal_children) == 0:
-        return T, nindex
-
-    curr = node
-
-    # process all children except last
-    if len(leaf_children) == 0:
-        print("running A")
-        for i in range(len(internal_children)):
-            child = internal_children[i]
-
-            if i == 0:
-                # attach first child directly
-                T.add_edge(curr, child)
-            else:
-                # create auxiliary node
-                aux = nindex
-                nindex += 1
-
-                T.add_edge(curr, aux)
-                curr = aux
-
-                T.add_edge(curr, child)
-    elif len(internal_children) == 0:
-        print("running B")
-        for i in range(len(leaf_children) - 1):
-            child = leaf_children[i]
-
-            if i == 0:
-                # attach first child directly
-                T.add_edge(curr, child)
-            else:
-                # create auxiliary node
-                aux = nindex
-                nindex += 1
-
-                T.add_edge(curr, aux)
-                curr = aux
-
-                T.add_edge(curr, child)
-        # handle last child
-        last_child = leaf_children[-1]
-        T.add_edge(curr, last_child)
-    else:
-        print("running C")
-        children = leaf_children + internal_children
-        for i in range(len(children)):
-            child = children[i]
-
-            if i == 0:
-                # attach first child directly
-                T.add_edge(curr, child)
-            else:
-                # create auxiliary node
-                aux = nindex
-                nindex += 1
-
-                T.add_edge(curr, aux)
-                curr = aux
-
-                T.add_edge(curr, child)
-
-
-
-    return T, nindex
-
-
-def __split_node_branching(T, node, children, max_nchild, nindex):
-    curr_node = node
-    if len(children) > max_nchild:
-        # if the children list is longer than the maximum degree, iterate over creating up to max degree chunks
-        for chunk in chunks(children, max_nchild):
-            if len(chunk) == 1:
-                T.add_edge(curr_node, chunk[0])
-            else:
-                # for each chunk
-                nlabel = nindex
-                T.add_edge(curr_node, nlabel)
-                nindex += 1
-                T, nindex = __split_node_branching(T, nlabel, chunk, max_nchild, nindex)
-    else:
-        for child in children:
-            T.add_edge(curr_node, child)
-    return T, nindex
-
-def __split_node(T, node, leaf_children, internal_children, max_nchild, nindex):
-
-    if max_nchild is None:
-        children = leaf_children + internal_children
-        for c in children:
-            T.add_edge(node, c)
-        return T, nindex
-
-    if max_nchild == 1:
-        return __split_node_mps(T, node, leaf_children, internal_children, nindex)
-
-    return __split_node_branching(T, node, leaf_children + internal_children, max_nchild, nindex)
-
-
-def __split_high_degree_nodes(
-    spanning_tree, N, root_index, max_nchild=None, max_nleaves=None
-):
-    if max_nchild is None and max_nleaves is None:
-        # if max degree has not been specified we just return the current tree
+def __restructure_hybrid(spanning_tree: nx.Graph,W: np.ndarray,root_index: int,max_children: Optional[int]) -> nx.Graph:
+    if max_children is None:
         return spanning_tree
-    else:
-        # in this case iterate through the tree determine if any nodes are too large and if they are we partition
-        # the node into sets of the correct size.  To do this we get a DFS edges list and if there are any instances
-        # of nodes with more than max_nchild children we insert sufficiently many logical nodes so that we have the
-        # correct degree of connectivity
-        edges = sorted(
-            nx.dfs_edges(spanning_tree, source=root_index),
-            key=lambda x: np.abs(x[0] - root_index),
-        )
 
-        nchildren = {}
-        children = {}
-        nodes_to_split = {}
+    T_new = nx.Graph()
+    next_index = max(spanning_tree.nodes) + 1
 
-        curr_node = None
-        sind = 0
-        if max_nchild is None:
-            max_nchild = max_nleaves
+    T_dir = nx.bfs_tree(spanning_tree, root_index)
 
-        # iterate over the edges getting the number of children associated with each node and the location of the
-        # first edge associated with a nodes children in the list
-        for i, e in enumerate(edges):
-            if curr_node != e[0]:
-                curr_node = e[0]
-                sind = i
+    # build child mapping
+    children_map = {n: [] for n in T_dir.nodes}
+    for u, v in T_dir.edges:
+        children_map[u].append(v)
 
-            if curr_node not in nchildren.keys():
-                nchildren[curr_node] = 1
-            else:
-                nchildren[curr_node] += 1
+    for node in T_dir.nodes:
+        children = children_map[node]
 
-            if curr_node not in children.keys():
-                children[curr_node] = [e[1]]
-            else:
-                children[curr_node].append(e[1])
+        if len(children) < max_children:
+            for c in children:
+                T_new.add_edge(node, c)
+            continue
 
-            if len(children[curr_node]) > max_nchild:
-                if curr_node not in nodes_to_split.keys():
-                    nodes_to_split[curr_node] = sind
+        subtree_root, next_index = __build_local_spectral_ttn(children, W, T_new, next_index, max_children,)
 
-        for _, e in enumerate(edges):
-            if curr_node != e[1]:
-                curr_node = e[1]
+        T_new.add_edge(node, subtree_root)
 
-            if curr_node not in children.keys():
-                children[curr_node] = []
-
-        # if none of the nodes are high degree we don't need to do anything
-        if len(nodes_to_split) == 0:
-            return spanning_tree
-
-        # otherwise we iterate through the tree and split high degree nodes off
-        else:
-            # now we split any nodes that need to be split
-            counter = N
-            T = nx.Graph()
-            # if we are at a node we need to split
-            for node, _ in nodes_to_split.items():
-                ch = children[node]
-
-                # get a list containing all of its children
-                leaf_children = [c for c in ch if len(children[c]) == 0]
-                internal_children = [c for c in ch if len(children[c]) > 0]
-
-                T, counter = __split_node(T, node, leaf_children, internal_children, max_nchild, counter)
-  
-            for node in children:
-                if node not in nodes_to_split:
-                    for child in children[node]:
-                        T.add_edge(node, child)
-            return T
-
+    return T_new
 
 def generate_spanning_tree(
     M: np.ndarray,
@@ -282,12 +200,14 @@ def generate_spanning_tree(
     G = distance_matrix_to_graph(M)
 
     spanning_tree = nx.maximum_spanning_tree(G)
-    spanning_tree = __split_high_degree_nodes(
+
+    spanning_tree = __restructure_hybrid(
         spanning_tree,
-        M.shape[0],
+        M,
         root_index,
-        max_nchild=max_children,
-        max_nleaves=max_leaf_children,
+        max_children,
     )
 
-    return __insert_physical_nodes(spanning_tree, M.shape[0], root_index)
+
+
+    return __insert_physical_nodes(spanning_tree, M.shape[0], root_index, max_children)

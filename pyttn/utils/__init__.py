@@ -29,6 +29,7 @@ from .load_from_quantics import QuanticsInputs
 from .mode_combination import ModeCombination
 from .truncate import DepthTruncation, EnergyTruncation, TruncationBase
 from .visualise_tree import visualise_tree
+from .visualise_graphs import visualise_interaction_graph, visualise_interaction_hypergraph
 
 __all__ = [
     "orthopol",
@@ -48,5 +49,7 @@ __all__ = [
     "EnergyTruncation",
     "ModeCombination",
     "visualise_tree",
+    "visualise_interaction_graph",
+    "visualise_interaction_hypergraph",
     "QuanticsInputs",
 ]

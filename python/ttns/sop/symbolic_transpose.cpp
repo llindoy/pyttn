@@ -14,95 +14,52 @@
 
 #include "symbolic_transpose.hpp"
 #include "../../pyttn_typedef.hpp"
+#include "../../common_bindings.hpp"
 
 namespace py = pybind11;
 
+
+template <typename In> struct symbolic_transpose_output{using type = In;};
+template <> struct symbolic_transpose_output<ttns::sOP>{using type = ttns::sNBO<std::complex<pyttn_real_type>>;};
+template <> struct symbolic_transpose_output<ttns::sPOP>{using type = ttns::sNBO<std::complex<pyttn_real_type>>;};
+template <typename In, typename value_type> struct symbolic_transpose_dict_output;
+template <template <typename > class Op, typename v1, typename v2> struct symbolic_transpose_dict_output<Op<v1>, v2>{using type = Op<decltype(v1()*v2())>;};
+template <typename value_type> struct symbolic_transpose_dict_output<ttns::sOP, value_type>{using type = ttns::sNBO<value_type>;};
+template <typename value_type> struct symbolic_transpose_dict_output<ttns::sPOP, value_type>{using type = ttns::sNBO<value_type>;};
+
+template <typename In>
+struct bind_symbolic_transpose
+{
+    static inline void apply (py::class_<ttns::symbolic_transpose>& cls, const char * = nullptr)
+    {
+        using Out = typename symbolic_transpose_output<In>::type;
+        cls.def_static("apply", [](const In& in, const ttns::system_modes& sys){Out out; ttns::symbolic_transpose::apply(in, sys, out); return out;} );
+    }
+};
+template <typename T, typename In>
+struct bind_symbolic_transpose_dict
+{
+    static inline void apply(py::class_<ttns::symbolic_transpose>& cls, const char * = nullptr)
+    {
+        using namespace ttns;
+        using opdict = operator_dictionary<T, linalg::blas_backend>;
+        using Out = typename symbolic_transpose_dict_output<In, T>::type;
+
+        cls.def_static("apply", [](const In& in, const opdict& dictin, const ttns::system_modes& sys, opdict& dictout){Out out; ttns::symbolic_transpose::apply(in, dictin, sys, out, dictout); return out;} );
+    }
+};
+
+
 void initialise_symbolic_transpose(py::module &m)
 {
-  using namespace ttns;
-  using real_type = pyttn_real_type;
-  using complex_type = std::complex<real_type>;
+    using namespace ttns;
+    using real_type = pyttn_real_type;
+    using complex_type = std::complex<real_type>;
 
-  using opdictr = operator_dictionary<real_type, linalg::blas_backend>;
-  using opdictc = operator_dictionary<complex_type, linalg::blas_backend>;
-
-  py::class_<symbolic_transpose>(m, "symbolic_transpose")
-      .def_static(
-          "apply",
-          static_cast<void (*)(const sOP &, const system_modes &, sNBO<complex_type> &)>(&symbolic_transpose::apply)
-        )
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sPOP &, const system_modes &, sNBO<complex_type> &)>(&symbolic_transpose::apply)
-        )
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sNBO<complex_type> &, const system_modes &, sNBO<complex_type> &)>(&symbolic_transpose::apply)
-        )    
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sSOP<complex_type> &, const system_modes &, sSOP<complex_type> &)>(&symbolic_transpose::apply)
-        )    
-
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sNBO<real_type> &, const system_modes &, sNBO<real_type> &)>(&symbolic_transpose::apply)
-        )    
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sSOP<real_type> &, const system_modes &, sSOP<real_type> &)>(&symbolic_transpose::apply)
-        )    
-      .def_static(
-          "apply",
-          static_cast<void (*)(const sOP &, const opdictc&, const system_modes &, sNBO<complex_type> &, opdictc&)>(&symbolic_transpose::apply)
-        )
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sOP &, const opdictr&, const system_modes &, sNBO<real_type> &, opdictr&)>(&symbolic_transpose::apply)
-        )
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sPOP &, const opdictc&, const system_modes &, sNBO<complex_type> &, opdictc&)>(&symbolic_transpose::apply)
-        )
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sPOP &, const opdictr&, const system_modes &, sNBO<real_type> &, opdictr&)>(&symbolic_transpose::apply)
-        )
-
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sNBO<complex_type> &, const opdictc&, const system_modes &, sNBO<complex_type> &, opdictc&)>(&symbolic_transpose::apply)
-        )    
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sNBO<complex_type> &, const opdictr&, const system_modes &, sNBO<complex_type> &, opdictr&)>(&symbolic_transpose::apply)
-        )    
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sNBO<real_type> &, const opdictr&, const system_modes &, sNBO<real_type> &, opdictr&)>(&symbolic_transpose::apply)
-        )    
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sNBO<real_type> &, const opdictc&, const system_modes &, sNBO<complex_type> &, opdictc&)>(&symbolic_transpose::apply)
-        )    
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sSOP<complex_type> &, const opdictc&, const system_modes &, sSOP<complex_type> &, opdictc&)>(&symbolic_transpose::apply)
-        )    
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sSOP<complex_type> &, const opdictr&, const system_modes &, sSOP<complex_type> &, opdictr&)>(&symbolic_transpose::apply)
-        )    
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sSOP<real_type> &, const opdictr&, const system_modes &, sSOP<real_type> &, opdictr&)>(&symbolic_transpose::apply)
-        ) 
-        .def_static(
-          "apply",
-          static_cast<void (*)(const sSOP<real_type> &, const opdictc&, const system_modes &, sSOP<complex_type> &, opdictc&)>(&symbolic_transpose::apply)
-        ) 
-        ;
+    using opdictr = operator_dictionary<real_type, linalg::blas_backend>;
+    using opdictc = operator_dictionary<complex_type, linalg::blas_backend>;
+    auto cls = py::class_<symbolic_transpose>(m, "symbolic_transpose");
+    python_bindings::bind_all<bind_symbolic_transpose, symbolic_transpose, sOP, sPOP, sNBO<complex_type>, sSOP<complex_type>, sNBO<real_type>, sSOP<real_type>>(cls);
+    python_bindings::bind_all<bind_symbolic_transpose_dict, symbolic_transpose, real_type, sOP, sPOP, sNBO<complex_type>, sSOP<complex_type>, sNBO<real_type>, sSOP<real_type>>(cls);
+    python_bindings::bind_all<bind_symbolic_transpose_dict, symbolic_transpose, complex_type, sOP, sPOP, sNBO<complex_type>, sSOP<complex_type>, sNBO<real_type>, sSOP<real_type>>(cls);
 }
-
-
-

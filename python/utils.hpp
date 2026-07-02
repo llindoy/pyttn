@@ -17,6 +17,8 @@
 
 #include <linalg/linalg.hpp>
 
+#include <pybind11/pybind11.h>
+
 #include <pybind11/operators.h>
 #include <pybind11/stl.h>
 #include <pybind11/cast.h>
@@ -57,6 +59,43 @@ namespace linalg
     public:
         using type = std::complex<double>;
     };
+
+    template <typename real_type, typename complex_type>
+    inline complex_type extract_scalar(py::object obj)
+    {
+        using numpy_complex_type = typename linalg::numpy_converter<complex_type>::type;
+
+        // unwrap numpy scalar
+        if (py::hasattr(obj, "item"))
+        {
+            obj = obj.attr("item")();
+        }
+
+        try
+        {
+            return complex_type(obj.cast<numpy_complex_type>());
+        }
+        catch (const py::cast_error &)
+        {
+        }
+
+        try
+        {
+            return complex_type(obj.cast<real_type>());
+        }
+        catch (const py::cast_error &)
+        {
+        }
+
+        throw std::runtime_error("Unsupported scalar type in multiplication.");
+    }
+
+    template <typename real_type>
+    inline real_type extract_real_scalar(py::object obj)
+    {
+        if (py::hasattr(obj, "item")){obj = obj.attr("item")();}
+        return obj.cast<real_type>();
+    }
 
     template <typename T>
     void pybuffer_to_vector(const py::buffer &b, std::vector<T> &res)
@@ -253,7 +292,7 @@ namespace serialisation_utilities
     }
 
     template <typename obj>
-    static inline py::tuple __getstate__(obj& a)
+    static inline py::tuple __getstate__(obj &a)
     {
         std::ostringstream oss;
         {

@@ -12,10 +12,11 @@
  * limitations under the License
  */
 
-#ifndef PYTHON_BINDING_DMRG_TPP
-#define PYTHON_BINDING_DMRG_TPP
+#ifndef PYTHON_BINDING_DMRGTPP
+#define PYTHON_BINDING_DMRGTPP
 
 #include "dmrg.hpp"
+#include "../../common_bindings.hpp"
 
 namespace py = pybind11;
 
@@ -24,8 +25,6 @@ void init_dmrg_onesite(py::module &m, const std::string &label)
 {
     using namespace ttns;
 
-    using _T = typename linalg::numpy_converter<T>::type;
-
     using dmrg = _one_site_dmrg<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
     using _sop = typename dmrg::env_type;
@@ -33,8 +32,8 @@ void init_dmrg_onesite(py::module &m, const std::string &label)
     using size_type = typename dmrg::size_type;
     using real_type = typename linalg::get_real_type<T>::type;
     // wrapper for the sPOP type
-    py::class_<dmrg>(m, label.c_str())
-        .def(py::init<>())
+    auto cls = py::class_<dmrg>(m, label.c_str());
+    cls.def(py::init<>())
         .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type>(),
              py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1, R"mydelim(
             Construct a new one-site DMRG object initialising all buffers needed to perform DMRG on a Tree Tensor Network A, with Hamiltonian H.
@@ -50,14 +49,6 @@ void init_dmrg_onesite(py::module &m, const std::string &label)
             :param set_var_num_threads: The number of openmp threads to be used for parallelising over the set by the solver. (Default: 1)
             :type set_var_num_threads: int, optional
           )mydelim")
-        .def("assign", [](dmrg &self, const dmrg &o)
-             { self = o; }, R"mydelim(
-            Assign the DMRG object from another DMRG object
-          )mydelim")
-        .def("__copy__", [](const dmrg &o)
-             { return dmrg(o); })
-        .def("__deepcopy__", [](const dmrg &o, py::dict)
-             { return dmrg(o); }, py::arg("memo"))
         .def("initialise", &dmrg::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1, R"mydelim(
             Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Network A, with Hamiltonian H.
 
@@ -73,7 +64,7 @@ void init_dmrg_onesite(py::module &m, const std::string &label)
             :type set_var_num_threads: int, optional
           )mydelim")
         .def("E", [](const dmrg &o)
-             { return _T(o.E()); }, "Returns the current energy computed through the last DMRG sweep.")
+             { return T(o.E()); }, "Returns the current energy computed through the last DMRG sweep.")
         .def_property("restarts", static_cast<const size_type &(dmrg::*)() const>(&dmrg::restarts), [](dmrg &o, const size_type &i)
                       { o.restarts() = i; }, "The number of restarts to use in the krylov subspace eigensolver.")
         .def_property("eigensolver_tol", static_cast<const real_type &(dmrg::*)() const>(&dmrg::eigensolver_tol), [](dmrg &o, const real_type &i)
@@ -104,23 +95,15 @@ void init_dmrg_onesite(py::module &m, const std::string &label)
           )mydelim")
         .def("backend", [](const dmrg &)
              { return linalg::traits<backend>::label(); })
-#ifdef CEREAL_LIBRARY_FOUND
-         .def("save", 
-            [](const dmrg & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-        .def("load", 
-            [](dmrg & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-         .def(py::pickle(
-            [](const dmrg& a){return serialisation_utilities::__getstate__(a);},
-            [](py::tuple t){return serialisation_utilities::__setstate__<dmrg>(t);}
-         ))  
-#endif  
 
 
         .doc() = R"mydelim(
             A class implementing the one site DMRG algorithm on trees.
           )mydelim";
+    using namespace python_bindings;
+    bind_dtype<T>(cls);
+    bind_copyable(cls);
+    bind_pickleable(cls);
     // utils::eigenvalue_target& mode(){return m_eigensolver.mode();}
     // const utils::eigenvalue_target& mode() const{return m_eigensolver.mode();}
 }
@@ -130,8 +113,6 @@ void init_dmrg_adaptive(py::module &m, const std::string &label)
 {
     using namespace ttns;
 
-    using _T = typename linalg::numpy_converter<T>::type;
-
     using admrg = _adaptive_one_site_dmrg<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
     using _sop = typename admrg::env_type;
@@ -140,8 +121,8 @@ void init_dmrg_adaptive(py::module &m, const std::string &label)
     using real_type = typename linalg::get_real_type<T>::type;
 
     // wrapper for the sPOP type
-    py::class_<admrg>(m, label.c_str())
-        .def(py::init<>(), R"mydelim(
+    auto cls = py::class_<admrg>(m, label.c_str());
+    cls.def(py::init<>(), R"mydelim(
             Default construct for adaptive one-site dmrg object.
             )mydelim")
         .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type, size_type, size_type>(),
@@ -163,12 +144,6 @@ void init_dmrg_adaptive(py::module &m, const std::string &label)
             :param set_var_num_threads: The number of openmp threads to be used for parallelising over the set by the solver. (Default: 1)
             :type set_var_num_threads: int, optional
             )mydelim")
-        .def("assign", [](admrg &self, const admrg &o)
-             { self = o; })
-        .def("__copy__", [](const admrg &o)
-             { return admrg(o); })
-        .def("__deepcopy__", [](const admrg &o, py::dict)
-             { return admrg(o); }, py::arg("memo"))
         .def("initialise", &admrg::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("subspace_krylov_dim") = 4, py::arg("subspace_neigs") = 2, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1, R"mydelim(
             Initialise the internal buffers of the DMRG object needed to perform DMRG on a Tree Tensor Network A, with Hamiltonian H.
 
@@ -188,7 +163,7 @@ void init_dmrg_adaptive(py::module &m, const std::string &label)
             :type set_var_num_threads: int, optional
             )mydelim")
         .def("E", [](const admrg &o)
-             { return _T(o.E()); }, "Returns the current energy computed through the last DMRG sweep.")
+             { return T(o.E()); }, "Returns the current energy computed through the last DMRG sweep.")
         .def_property("restarts", static_cast<const size_type &(admrg::*)() const>(&admrg::restarts), [](admrg &o, const size_type &i)
                       { o.restarts() = i; }, "The number of restarts to use in the krylov subspace eigensolver.")
         .def_property("eigensolver_tol", static_cast<const real_type &(admrg::*)() const>(&admrg::eigensolver_tol), [](admrg &o, const real_type &i)
@@ -249,23 +224,13 @@ void init_dmrg_adaptive(py::module &m, const std::string &label)
           )mydelim")
         .def("backend", [](const admrg &)
              { return linalg::traits<backend>::label(); })
-#ifdef CEREAL_LIBRARY_FOUND
-         .def("save", 
-            [](const admrg & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-        .def("load", 
-            [](admrg & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-         .def(py::pickle(
-            [](const admrg& a){return serialisation_utilities::__getstate__(a);},
-            [](py::tuple t){return serialisation_utilities::__setstate__<admrg>(t);}
-         ))  
-#endif  
-
         .doc() = R"mydelim(
               A class implementing the adaptive one site DMRG algorithm on trees.
             )mydelim";
-
+    using namespace python_bindings;
+    bind_dtype<T>(cls);
+    bind_copyable(cls);
+    bind_pickleable(cls);
     // orthogonality::truncation_mode& truncation_mode() {return m_ss_expand.truncation_mode();}
     // const orthogonality::truncation_mode& truncation_mode() const {return m_ss_expand.truncation_mode();}
 }

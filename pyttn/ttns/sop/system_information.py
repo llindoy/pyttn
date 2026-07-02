@@ -221,3 +221,88 @@ class SystemInfo:
             "primitive_label_to_index": primitive_label_to_index,
             "labels_to_prim_indices": label_to_prim_indices
         }
+    
+    def group_modes(self, groups: Dict[str, List[str]]) -> "SystemInfo":
+        """
+        Construct a new SystemInfo by regrouping primitive modes.
+
+        :param groups: Mapping from new composite labels to lists of primitive labels
+        :type groups: dict[str, list[str]]
+
+        :return: New SystemInfo with regrouped composite modes
+        :rtype: SystemInfo
+        """
+
+        primitive_lookup: Dict[str, primitive_mode_data] = {}
+
+        for comp_dict in self._data.values():
+            for p_label, p_mode in comp_dict.items():
+                if p_label in primitive_lookup:
+                    raise ValueError(f"Duplicate primitive label '{p_label}' detected")
+                primitive_lookup[p_label] = p_mode
+
+        all_primitives = set(primitive_lookup.keys())
+
+        used = set()
+
+        for comp_label, prims in groups.items():
+            if not isinstance(prims, list):
+                raise ValueError(f"Grouping for '{comp_label}' must be a list")
+
+            for p in prims:
+                if p not in primitive_lookup:
+                    raise ValueError(f"Unknown primitive '{p}' in group '{comp_label}'")
+
+                if p in used:
+                    raise ValueError(f"Primitive '{p}' appears in multiple groups")
+
+                used.add(p)
+
+        unused = all_primitives - used
+        new_sys = SystemInfo()
+
+        # Add grouped composites
+        for comp_label, prims in groups.items():
+            new_sys[comp_label] = {
+                p: primitive_lookup[p]
+                for p in prims
+            }
+
+        # Add ungrouped primitives as their own composites
+        for p in unused:
+            new_sys[p] = primitive_lookup[p]
+
+        return new_sys
+
+
+def primitive_label(i : int, N : int, prefix="p") -> str:
+    """
+    Generate a zero-padded primitive label for index i in a system of size N.
+
+    Example:
+        i=3, N=10 → "p3"
+        i=3, N=100 → "p03"
+    """
+    width = len(str(N - 1))
+    return f"{prefix}{i:0{width}d}"
+
+def primitive_labels(N: int, prefix="p") -> list[str]:
+    """
+    Generate zero-padded primitive labels.
+
+    Example:
+        N=4 → ["p0","p1","p2","p3"]
+        N=12 → ["p00","p01",...,"p11"]
+    """
+    width = len(str(N - 1))
+    return [f"{prefix}{i:0{width}d}" for i in range(N)]
+
+
+def group_consecutive_labels(labels: list[str], K: int, prefix="G"):
+    """
+    Group labels into consecutive chunks of size K.
+    """
+    groups = {}
+    for idx, i in enumerate(range(0, len(labels), K)):
+        groups[f"{prefix}{idx}"] = labels[i:i+K]
+    return groups

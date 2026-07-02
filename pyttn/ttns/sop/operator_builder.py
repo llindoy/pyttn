@@ -325,6 +325,30 @@ class lSOP:
 
         return lSOP(new_expr, index_to_label)
 
+
+    def to_lCSOP(self, ordering: list[str]) -> "lCSOP":
+        """
+        Convert this symbolic labelled SOP (lSOP) into a compact labelled SOP (lCSOP)
+        using a specified ordering of labels.
+
+        :param ordering: Ordered list of site labels
+        :type ordering: list[str]
+
+        :return: Compiled labelled compact SOP
+        :rtype: lCSOP
+        """
+
+        missing = self.sites() - set(ordering)
+        if missing:
+            raise ValueError(f"Missing labels in ordering: {missing}")
+
+        site_map = {label: i for i, label in enumerate(ordering)}
+        nmodes = len(ordering)
+        sop = self.to_SOP(site_map, nmodes)
+
+        index_to_label = {i: label for label, i in site_map.items()}
+        return lCSOP(sop, index_to_label)
+
 class lCSOP:
     """
     Container for compiled labelled SOP operators.

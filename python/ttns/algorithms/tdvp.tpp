@@ -12,10 +12,11 @@
  * limitations under the License
  */
 
-#ifndef PYTHON_BINDING_TDVP_TPP
-#define PYTHON_BINDING_TDVP_TPP
+#ifndef PYTHON_BINDINGTDVPTPP
+#define PYTHON_BINDINGTDVPTPP
 
 #include "tdvp.hpp"
+#include "../../common_bindings.hpp"
 
 namespace py = pybind11;
 
@@ -24,8 +25,6 @@ void init_tdvp_onesite(py::module &m, const std::string &label)
 {
     using namespace ttns;
 
-    using _T = typename linalg::numpy_converter<T>::type;
-
     using tdvp = _one_site_tdvp<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
     using _sop = typename tdvp::env_type;
@@ -33,8 +32,8 @@ void init_tdvp_onesite(py::module &m, const std::string &label)
     using size_type = typename tdvp::size_type;
     using real_type = typename linalg::get_real_type<T>::type;
     // wrapper for the sPOP type
-    py::class_<tdvp>(m, label.c_str())
-        .def(py::init<>())
+    auto cls = py::class_<tdvp>(m, label.c_str());
+    cls.def(py::init<>())
         .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type, size_type>(),
              py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1, R"mydelim(
             Construct a new one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.
@@ -50,12 +49,6 @@ void init_tdvp_onesite(py::module &m, const std::string &label)
             :param set_var_num_threads: The number of openmp threads to be used for parallelising over the set by the solver. (Default: 1)
             :type set_var_num_threads: int, optional
           )mydelim")
-        .def("assign", [](tdvp &self, const tdvp &o)
-             { self = o; })
-        .def("__copy__", [](const tdvp &o)
-             { return tdvp(o); })
-        .def("__deepcopy__", [](const tdvp &o, py::dict)
-             { return tdvp(o); }, py::arg("memo"))
         .def("initialise", &tdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1, R"mydelim(
             Initialise one-site DMRG object initialising all buffers needed to perform TDVP on a Tree Tensor Network A, with Hamiltonian H.
 
@@ -71,7 +64,7 @@ void init_tdvp_onesite(py::module &m, const std::string &label)
             :type set_var_num_threads: int, optional
           )mydelim")
         .def_property("coefficient", [](const tdvp &o)
-                      { return _T(o.coefficient()); }, [](tdvp &o, const _T &i)
+                      { return T(o.coefficient()); }, [](tdvp &o, const T &i)
                       { o.coefficient() = i; }, "A coefficient used to scale the timestep.")
         .def_property("t", static_cast<const real_type &(tdvp::*)() const>(&tdvp::t), [](tdvp &o, const real_type &i)
                       { o.t() = i; }, "The current time point reached by the integrator.")
@@ -114,28 +107,19 @@ void init_tdvp_onesite(py::module &m, const std::string &label)
             :param attempt_expansion: Whether or not to attempt subspace expansion throughout the update scheme.  (Default: False)
             :type attempt_expansion: bool, optional
           )mydelim")
-#ifdef CEREAL_LIBRARY_FOUND
-         .def("save", 
-            [](const tdvp & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-        .def("load", 
-            [](tdvp & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-         .def(py::pickle(
-            [](const tdvp& a){return serialisation_utilities::__getstate__(a);},
-            [](py::tuple t){return serialisation_utilities::__setstate__<tdvp>(t);}
-         ))  
-#endif  
+
         .def("backend", [](const tdvp &)
              { return linalg::traits<backend>::label(); });
+    using namespace python_bindings;
+    bind_dtype<T>(cls);
+    bind_copyable(cls);
+    bind_pickleable(cls);
 }
 
 template <typename T, template <typename, typename> class ttn_class, typename backend>
 void init_tdvp_adaptive(py::module &m, const std::string &label)
 {
     using namespace ttns;
-
-    using _T = typename linalg::numpy_converter<T>::type;
 
     using atdvp = _adaptive_one_site_tdvp<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -144,19 +128,13 @@ void init_tdvp_adaptive(py::module &m, const std::string &label)
     using size_type = typename atdvp::size_type;
     using real_type = typename linalg::get_real_type<T>::type;
 
-    py::class_<atdvp>(m, label.c_str())
-        .def(py::init<>())
+    auto cls = py::class_<atdvp>(m, label.c_str());
+    cls.def(py::init<>())
         .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type, size_type, size_type, size_type>(),
              py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("subspace_krylov_dim") = 4, py::arg("subspace_neigs") = 2, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
-        .def("assign", [](atdvp &self, const atdvp &o)
-             { self = o; })
-        .def("__copy__", [](const atdvp &o)
-             { return atdvp(o); })
-        .def("__deepcopy__", [](const atdvp &o, py::dict)
-             { return atdvp(o); }, py::arg("memo"))
         .def("initialise", &atdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("subspace_krylov_dim") = 4, py::arg("subspace_neigs") = 2, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
         .def_property("coefficient", [](const atdvp &o)
-                      { return _T(o.coefficient()); }, [](atdvp &o, const _T &i)
+                      { return T(o.coefficient()); }, [](atdvp &o, const T &i)
                       { o.coefficient() = i; })
         .def_property("t", static_cast<const real_type &(atdvp::*)() const>(&atdvp::t), [](atdvp &o, const real_type &i)
                       { o.t() = i; })
@@ -193,20 +171,11 @@ void init_tdvp_adaptive(py::module &m, const std::string &label)
              { return o(A, sop, update_environment); }, py::arg(), py::arg(), py::arg("update_env") = false)
         .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion") = false)
         .def("backend", [](const atdvp &)
-             { return linalg::traits<backend>::label(); })
-#ifdef CEREAL_LIBRARY_FOUND
-         .def("save", 
-            [](const atdvp & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-        .def("load", 
-            [](atdvp & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-         .def(py::pickle(
-            [](const atdvp& a){return serialisation_utilities::__getstate__(a);},
-            [](py::tuple t){return serialisation_utilities::__setstate__<atdvp>(t);}
-         ))  
-#endif  
-             ;
+             { return linalg::traits<backend>::label(); })             ;
+    using namespace python_bindings;
+    bind_dtype<T>(cls);
+    bind_copyable(cls);
+    bind_pickleable(cls);
 }
 
 template <typename T, template <typename, typename> class ttn_class, typename backend>
@@ -214,7 +183,6 @@ void init_tdvp_adaptive_ts_cost(py::module &m, const std::string &label)
 {
     using namespace ttns;
 
-    using _T = typename linalg::numpy_converter<T>::type;
 
     using atdvp = _subspace_two_site_cost_tdvp<T, backend, ttn_class>;
     using _ttn = ttn_class<T, backend>;
@@ -223,19 +191,13 @@ void init_tdvp_adaptive_ts_cost(py::module &m, const std::string &label)
     using size_type = typename atdvp::size_type;
     using real_type = typename linalg::get_real_type<T>::type;
 
-    py::class_<atdvp>(m, label.c_str())
-        .def(py::init<>())
+    auto cls = py::class_<atdvp>(m, label.c_str());
+    cls.def(py::init<>())
         .def(py::init<const _ttn &, const _sop &, size_type, size_type, size_type, size_type>(),
              py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
-        .def("assign", [](atdvp &self, const atdvp &o)
-             { self = o; })
-        .def("__copy__", [](const atdvp &o)
-             { return atdvp(o); })
-        .def("__deepcopy__", [](const atdvp &o, py::dict)
-             { return atdvp(o); }, py::arg("memo"))
         .def("initialise", &atdvp::initialise, py::arg(), py::arg(), py::arg("krylov_dim") = 16, py::arg("nstep") = 1, py::arg("num_threads") = 1, py::arg("set_var_num_threads") = 1)
         .def_property("coefficient", [](const atdvp &o)
-                      { return _T(o.coefficient()); }, [](atdvp &o, const _T &i)
+                      { return T(o.coefficient()); }, [](atdvp &o, const T &i)
                       { o.coefficient() = i; })
         .def_property("t", static_cast<const real_type &(atdvp::*)() const>(&atdvp::t), [](atdvp &o, const real_type &i)
                       { o.t() = i; })
@@ -268,20 +230,11 @@ void init_tdvp_adaptive_ts_cost(py::module &m, const std::string &label)
              { return o(A, sop, update_environment); }, py::arg(), py::arg(), py::arg("update_env") = false)
         .def("prepare_environment", &atdvp::prepare_environment, py::arg(), py::arg(), py::arg("attempt_expansion") = false)
         .def("backend", [](const atdvp &)
-             { return linalg::traits<backend>::label(); })
-#ifdef CEREAL_LIBRARY_FOUND
-         .def("save", 
-            [](const atdvp & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-        .def("load", 
-            [](atdvp & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-         .def(py::pickle(
-            [](const atdvp& a){return serialisation_utilities::__getstate__(a);},
-            [](py::tuple t){return serialisation_utilities::__setstate__<atdvp>(t);}
-         ))  
-#endif  
-             ;
+             { return linalg::traits<backend>::label(); });
+    using namespace python_bindings;
+    bind_dtype<T>(cls);
+    bind_copyable(cls);
+    bind_pickleable(cls);
 }
 
 #endif

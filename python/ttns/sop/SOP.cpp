@@ -14,7 +14,7 @@
 
 #include "SOP.hpp"
 #include "../../pyttn_typedef.hpp"
-
+#include "common_bindings.hpp"
 
 
 template <typename T>
@@ -22,263 +22,104 @@ void init_SOP(py::module &m, const std::string &label)
 {
     using namespace ttns;
 
-    using _T = typename linalg::numpy_converter<T>::type;
 
     using real_type = typename linalg::get_real_type<T>::type;
     using complex_type = std::complex<real_type>;
     using _SOP = SOP<T>;
     using _msSOP = multiset_SOP<T>;
-    // wrapper for the sPOP type
-    py::class_<_SOP>(m, label.c_str())
-        .def(py::init<size_t>())
-        .def(py::init<size_t, const std::string &>())
-        .def(py::init<const _SOP &>())
-        .def("assign", [](_SOP &self, const _SOP &o)
-             { self = o; })
-        .def("__copy__", [](const _SOP &o)
-             { return _SOP(o); })
-        .def("__deepcopy__", [](const _SOP &o, py::dict)
-             { return _SOP(o); }, py::arg("memo"))
+    {
+        // wrapper for the SOP type
+        auto cls = py::class_<_SOP>(m, label.c_str());
+        cls.def(py::init<size_t>())
+            .def(py::init<size_t, const std::string &>())
+            .def(py::init<const _SOP &>())
+            .def("__iter__", [](_SOP &s){ return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
+            .def("clear", &_SOP::clear)
+            .def("resize", &_SOP::resize)
+            .def("reserve", &_SOP::reserve)
+            .def("nmodes", &_SOP::nmodes)
+            .def("nterms", &_SOP::nterms)
+            .def_property("operator_dictionary", &_SOP::operator_dictionary, &_SOP::set_operator_dictionary)
+            .def("set_operator_dictionary", &_SOP::set_operator_dictionary)
+            .def("get_operator_dictionary", &_SOP::operator_dictionary)
+            .def("insert", static_cast<void (_SOP::*)(const T &, const sPOP &)>(&_SOP::insert))
+            .def("insert", static_cast<void (_SOP::*)(const sNBO<T> &)>(&_SOP::insert))
+            .def("set_is_fermion_mode", &_SOP::set_is_fermionic_mode)
+            .def("prune_zeros", &_SOP::prune_zeros, py::arg("tol") = 1e-15)
+            .def("jordan_wigner", static_cast<_SOP &(_SOP::*)(const system_modes &, double)>(&_SOP::jordan_wigner), py::arg(), py::arg("tol") = 1e-15)
+            .def("expand", &_SOP::expand)
+            .def_property("label", static_cast<const std::string &(_SOP::*)() const>(&_SOP::label), [](_SOP &o, const std::string &i){ o.label() = i; })
+            .def("__str__", [](const _SOP &o){std::ostringstream oss; oss << o; return oss.str(); })
+            .doc() = R"mydelim(
+                A class for storing a compact representation of a sum-of-product string operators.  This class requires
+                knowledge of the total number of degrees of freedom.
 
-        .def("__iter__", [](_SOP &s)
-             { return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
-        .def("clear", &_SOP::clear)
-        .def("resize", &_SOP::resize)
-        .def("reserve", &_SOP::reserve)
-        .def("nmodes", &_SOP::nmodes)
-        .def("nterms", &_SOP::nterms)
-        .def_property("operator_dictionary", &_SOP::operator_dictionary, &_SOP::set_operator_dictionary)
-        .def("set_operator_dictionary", &_SOP::set_operator_dictionary)
-        .def("get_operator_dictionary", &_SOP::operator_dictionary)
+                Construct arguments
 
-        .def("insert", static_cast<void (_SOP::*)(const T &, const sPOP &)>(&_SOP::insert))
-        .def("insert", static_cast<void (_SOP::*)(const sNBO<T> &)>(&_SOP::insert))
+                :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
+                :type A: ttn_complex
+                :param H: The Hamiltonian sop operator object
+                :type H: sop_operator_complex
+                :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
+                :type krylov_dim: int, optional
+                :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
+                :type numthreads: int, optional
 
-        .def("set_is_fermion_mode", &_SOP::set_is_fermionic_mode)
-        .def("prune_zeros", &_SOP::prune_zeros, py::arg("tol") = 1e-15)
-        .def("jordan_wigner", static_cast<_SOP &(_SOP::*)(const system_modes &, double)>(&_SOP::jordan_wigner), py::arg(), py::arg("tol") = 1e-15)
-         .def_property_readonly("dtype", [](const _SOP &){
-               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
-               else{return py::dtype::of<T>();} })
-         .def("complex_dtype", [](const _SOP &)
-              { return !std::is_same<T, real_type>::value; })
-        .def("expand", &_SOP::expand)
-        .def("_todense", [](const _SOP& op, const system_modes& sys)
-                    {
-                         linalg::matrix<T> mat;
-                         CALL_AND_HANDLE(convert_to_dense(op, sys, mat), "Failed to convert SOP to dense matrix.");
-                         return mat;
-                    })
-        .def("_todense", [](const _SOP& op, const system_modes& sys, const operator_dictionary<complex_type, linalg::blas_backend>& dict)
-                    {
-                         linalg::matrix<complex_type> mat;
-                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert sSOP to dense matrix.");
-                         return mat;
-                    })
-        .def("_todense", [](const _SOP& op, const system_modes& sys, const operator_dictionary<T, linalg::blas_backend>& dict)
-                    {
-                         linalg::matrix<T> mat;
-                         CALL_AND_HANDLE(convert_to_dense(op, sys, dict, mat), "Failed to convert SOP to dense matrix.");
-                         return mat;
-                    })
-        .def_property("label", static_cast<const std::string &(_SOP::*)() const>(&_SOP::label), [](_SOP &o, const std::string &i)
-                      { o.label() = i; })
-        .def("__str__", [](const _SOP &o)
-             {std::ostringstream oss; oss << o; return oss.str(); })
+                Callable arguments
 
-#ifdef CEREAL_LIBRARY_FOUND
-        .def("save", [](const _SOP &a, const std::string &ofname, bool as_binary)
-             { serialisation_utilities::save_obj(a, ofname, as_binary); }, py::arg(), py::arg("as_binary") = true)
-        .def("load", [](_SOP &a, const std::string &ifname, bool as_binary)
-             { serialisation_utilities::load_obj(a, ifname, as_binary); }, py::arg(), py::arg("as_binary") = true)
-        .def(py::pickle([](const _SOP &a){ return serialisation_utilities::__getstate__(a); }, 
-                        [](py::tuple t){ return serialisation_utilities::__setstate__<_SOP>(t); }))
-#endif
+                :param A: Tree Tensor Network that the DMRG algorithm will act on
+                :type A: ttn_complex
+                :param h: The Hamiltonian sop operator object
+                :type h: sop_operator_complex
+                :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
+                :type update_env: bool, optional
+            )mydelim";
 
-        .def("__imul__", [](_SOP &a, const real_type &b)
-             { return a *= b; })
-        .def("__imul__", [](_SOP &a, const _T &b)
-             { return a *= T(b); })
-        .def("__idiv__", [](_SOP &a, const real_type &b)
-             { return a /= b; })
-        .def("__idiv__", [](_SOP &a, const _T &b)
-             { return a /= T(b); })
+        using namespace python_bindings;
+        bind_all<bind_imul, _SOP, real_type, T>(cls);
+        bind_all<bind_idiv, _SOP, real_type, T>(cls);
+        bind_all<bind_iadd, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
+        bind_all<bind_isub, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
+        bind_all<bind_add, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
+        bind_all<bind_radd, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
+        bind_all<bind_sub, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
+        bind_all<bind_rsub, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
+        bind_todense<T>(cls);
+        bind_dtype<T>(cls);
+        bind_utils(cls);
+        bind_copyable(cls);
+        bind_pickleable(cls);
+    }
+            
+    {
+        // wrapper for the msSOP type
+        auto cls = py::class_<_msSOP>(m, (std::string("multiset_") + label).c_str());
+        cls.def(py::init())
+            .def(py::init<size_t, size_t>())
+            .def(py::init<size_t, size_t, const std::string &>())
+            .def(py::init<const _msSOP &>())
+            .def("clear", &_msSOP::clear)
+            .def("resize", &_msSOP::resize)
+            .def("nmodes", &_msSOP::nmodes)
+            .def("nset", &_msSOP::nset)
+            .def("nterms", &_msSOP::nterms)
 
-        .def("__iadd__", [](_SOP &a, const real_type &b)
-             { return a += b; })
-        .def("__iadd__", [](_SOP &a, const _T &b)
-             { return a += T(b); })
-        .def("__iadd__", [](_SOP &a, const sOP &b)
-             { return a += b; })
-        .def("__iadd__", [](_SOP &a, const sPOP &b)
-             { return a += b; })
-        .def("__iadd__", [](_SOP &a, const sNBO<real_type> &b)
-             { return a += b; })
-        .def("__iadd__", [](_SOP &a, const sNBO<T> &b)
-             { return a += b; })
-        .def("__iadd__", [](_SOP &a, const sSOP<real_type> &b)
-             { return a += b; })
-        .def("__iadd__", [](_SOP &a, const sSOP<T> &b)
-             { return a += b; })
+            .def("set", static_cast<void (_msSOP::*)(size_t, size_t, const SOP<T> &)>(&_msSOP::set))
+            .def("set_is_fermion_mode", &_msSOP::set_is_fermionic_mode)
+            .def("prune_zeros", &_msSOP::prune_zeros, py::arg("tol") = 1e-15)
+            .def("jordan_wigner", static_cast<_msSOP &(_msSOP::*)(const system_modes &, double)>(&_msSOP::jordan_wigner), py::arg(), py::arg("tol") = 1e-15)
 
-        .def("__isub__", [](_SOP &a, const real_type &b)
-             { return a -= b; })
-        .def("__isub__", [](_SOP &a, const _T &b)
-             { return a -= T(b); })
-        .def("__isub__", [](_SOP &a, const sOP &b)
-             { return a -= b; })
-        .def("__isub__", [](_SOP &a, const sPOP &b)
-             { return a -= b; })
-        .def("__isub__", [](_SOP &a, const sNBO<real_type> &b)
-             { return a -= b; })
-        .def("__isub__", [](_SOP &a, const sNBO<T> &b)
-             { return a -= b; })
-        .def("__isub__", [](_SOP &a, const sSOP<real_type> &b)
-             { return a -= b; })
-        .def("__isub__", [](_SOP &a, const sSOP<T> &b)
-             { return a -= b; })
-
-        .def("__add__", [](_SOP &a, const _T &b)
-             { return a + T(b); })
-        .def("__add__", [](_SOP &a, const real_type &b)
-             { return a + b; })
-        .def("__add__", [](_SOP &a, const sOP &b)
-             { return a + b; })
-        .def("__add__", [](_SOP &a, const sPOP &b)
-             { return a + b; })
-        .def("__add__", [](_SOP &a, const sNBO<real_type> &b)
-             { return a + b; })
-        .def("__add__", [](_SOP &a, const sNBO<T> &b)
-             { return a + b; })
-        .def("__add__", [](_SOP &a, const sSOP<real_type> &b)
-             { return a + b; })
-        .def("__add__", [](_SOP &a, const sSOP<T> &b)
-             { return a + b; })
-
-        .def("__radd__", [](_SOP &b, const _T &a)
-             { return T(a) + b; })
-        .def("__radd__", [](_SOP &b, const real_type &a)
-             { return a + b; })
-        .def("__radd__", [](_SOP &b, const sOP &a)
-             { return a + b; })
-        .def("__radd__", [](_SOP &b, const sPOP &a)
-             { return a + b; })
-        .def("__radd__", [](_SOP &b, const sNBO<real_type> &a)
-             { return a + b; })
-        .def("__radd__", [](_SOP &b, const sNBO<T> &a)
-             { return a + b; })
-        .def("__radd__", [](_SOP &b, const sSOP<real_type> &a)
-             { return a + b; })
-        .def("__radd__", [](_SOP &b, const sSOP<T> &a)
-             { return a + b; })
-
-        .def("__sub__", [](_SOP &a, const _T &b)
-             { return a - T(b); })
-        .def("__sub__", [](_SOP &a, const real_type &b)
-             { return a - b; })
-        .def("__sub__", [](_SOP &a, const sOP &b)
-             { return a - b; })
-        .def("__sub__", [](_SOP &a, const sPOP &b)
-             { return a - b; })
-        .def("__sub__", [](_SOP &a, const sNBO<real_type> &b)
-             { return a - b; })
-        .def("__sub__", [](_SOP &a, const sNBO<T> &b)
-             { return a - b; })
-        .def("__sub__", [](_SOP &a, const sSOP<real_type> &b)
-             { return a - b; })
-        .def("__sub__", [](_SOP &a, const sSOP<T> &b)
-             { return a - b; })
-        .def("__rsub__", [](_SOP &b, const _T &a)
-             { return T(a) - b; })
-        .def("__rsub__", [](_SOP &b, const real_type &a)
-             { return a - b; })
-        .def("__rsub__", [](_SOP &b, const sOP &a)
-             { return a - b; })
-        .def("__rsub__", [](_SOP &b, const sPOP &a)
-             { return a - b; })
-        .def("__rsub__", [](_SOP &b, const sNBO<real_type> &a)
-             { return a - b; })
-        .def("__rsub__", [](_SOP &b, const sNBO<T> &a)
-             { return a - b; })
-        .def("__rsub__", [](_SOP &b, const sSOP<real_type> &a)
-             { return a - b; })
-        .def("__rsub__", [](_SOP &b, const sSOP<T> &a)
-             { return a - b; })
-        .doc() = R"mydelim(
-            A class for storing a compact representation of a sum-of-product string operators.  This class requires
-            knowledge of the total number of degrees of freedom.
-
-            Construct arguments
-
-            :param A: The Tree Tensor Network Object that will be optimised using the DMRG algorithm
-            :type A: ttn_complex
-            :param H: The Hamiltonian sop operator object
-            :type H: sop_operator_complex
-            :param krylov_dim: The krylov subspace dimension used for the eigensolver steps. (Default: 16)
-            :type krylov_dim: int, optional
-            :param numthreads: The number of openmp threads to be used by the solver. (Default: 1)
-            :type numthreads: int, optional
-
-            Callable arguments
-
-            :param A: Tree Tensor Network that the DMRG algorithm will act on
-            :type A: ttn_complex
-            :param h: The Hamiltonian sop operator object
-            :type h: sop_operator_complex
-            :param update_env: Whether or not to force an update of all environment tensor at the start of the update scheme.  (Default: False)
-            :type update_env: bool, optional
-          )mydelim";
-
-    // wrapper for the sPOP type
-    py::class_<_msSOP>(m, (std::string("multiset_") + label).c_str())
-        .def(py::init())
-        .def(py::init<size_t, size_t>())
-        .def(py::init<size_t, size_t, const std::string &>())
-        .def(py::init<const _msSOP &>())
-        .def("assign", [](_msSOP &self, const _msSOP &o)
-             { self = o; })
-        .def("__copy__", [](const _msSOP &o)
-             { return _msSOP(o); })
-        .def("__deepcopy__", [](const _msSOP &o, py::dict)
-             { return _msSOP(o); }, py::arg("memo"))
-        .def("clear", &_msSOP::clear)
-        .def("resize", &_msSOP::resize)
-        .def("nmodes", &_msSOP::nmodes)
-        .def("nset", &_msSOP::nset)
-        .def("nterms", &_msSOP::nterms)
-
-        .def("set", static_cast<void (_msSOP::*)(size_t, size_t, const SOP<T> &)>(&_msSOP::set))
-
-        .def("set_is_fermion_mode", &_msSOP::set_is_fermionic_mode)
-        .def("prune_zeros", &_msSOP::prune_zeros, py::arg("tol") = 1e-15)
-
-        .def("jordan_wigner", static_cast<_msSOP &(_msSOP::*)(const system_modes &, double)>(&_msSOP::jordan_wigner), py::arg(), py::arg("tol") = 1e-15)
-         .def_property_readonly("dtype", [](const _msSOP &){
-               if constexpr (std::is_same<T, real_type>::value){return py::dtype::of<real_type>();}
-               else{return py::dtype::of<T>();} })
-         .def("complex_dtype", [](const _msSOP &)
-              { return !std::is_same<T, real_type>::value; })
-        .def("__getitem__", [](_msSOP &i, std::pair<size_t, size_t> ind) -> _SOP &
-             { return i(std::get<0>(ind), std::get<1>(ind)); }, py::return_value_policy::reference)
-        .def("__setitem__", [](_msSOP &i, std::pair<size_t, size_t> ind, const _SOP &o)
-             { i(std::get<0>(ind), std::get<1>(ind)) = o; })
-        .def_property("label", static_cast<const std::string &(_msSOP::*)() const>(&_msSOP::label), [](_msSOP &o, const std::string &i)
-                      { o.label() = i; })
-        .def("__str__", [](const _msSOP &o)
-             {std::ostringstream oss; oss << o; return oss.str(); })
-#ifdef CEREAL_LIBRARY_FOUND
-        .def("save",
-           [](const _msSOP & a, const std::string& ofname, bool as_binary){serialisation_utilities::save_obj(a, ofname, as_binary);},
-           py::arg(), py::arg("as_binary")=true)
-        .def("load",
-            [](_msSOP & a, const std::string& ifname, bool as_binary){serialisation_utilities::load_obj(a, ifname, as_binary);},
-            py::arg(), py::arg("as_binary")=true)
-        .def(py::pickle(
-            [](const _msSOP& a){return serialisation_utilities::__getstate__(a);},
-            [](py::tuple t){return serialisation_utilities::__setstate__<_msSOP>(t);}
-        ))
-#endif
-        ;
+            .def("__getitem__", [](_msSOP &i, std::pair<size_t, size_t> ind) -> _SOP & { return i(std::get<0>(ind), std::get<1>(ind)); }, py::return_value_policy::reference)
+            .def("__setitem__", [](_msSOP &i, std::pair<size_t, size_t> ind, const _SOP &o){ i(std::get<0>(ind), std::get<1>(ind)) = o; })
+            .def_property("label", static_cast<const std::string &(_msSOP::*)() const>(&_msSOP::label), [](_msSOP &o, const std::string &i){ o.label() = i; })
+            .def("__str__", [](const _msSOP &o){std::ostringstream oss; oss << o; return oss.str(); });
+            
+        using namespace python_bindings;
+        bind_dtype<T>(cls);
+        bind_utils(cls);
+        bind_copyable(cls);
+        bind_pickleable(cls);
+    }
 
     // SOP<T>& operator()(size_t i, size_t j)
     // const SOP<T>& operator()(size_t i, size_t j) const
