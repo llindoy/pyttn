@@ -28,8 +28,7 @@ from pyttn.ttnpp import (
     tls_mode,
 )
 
-from .interaction_hypergraph import InteractionHypergraph, build_interaction_hypergraph
-from .interaction_graph import InteractionGraph, build_interaction_graph, hypergraph_to_graph
+
 from .liouvilleSpaceExt import liouville_space_superoperator
 from .opdictExt import OperatorDictionary, operator_dictionary
 from .SOPExt import SOP, ms_SOP, multiset_SOP
@@ -91,12 +90,8 @@ __all__: list[str] = [
     "combine_systems",
     "convert_to_dense",
     "symbolic_transpose",
-    "InteractionGraph",
-    "build_interaction_graph",
     "primitive_label",
     "primitive_labels",
     "group_consecutive_labels",
-    "InteractionHypergraph",
-    "build_interaction_hypergraph",
-    "hypergraph_to_graph",
+
 ]

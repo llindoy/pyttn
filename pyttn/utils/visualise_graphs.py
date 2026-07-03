@@ -39,7 +39,16 @@ def visualise_interaction_graph(
 
     # edge widths proportional to weight
     weights = [d["weight"] for _, _, d in G_nx.edges(data=True)]
-    widths = [edge_width_scale * w for w in weights]
+
+    if weights:
+        max_weight = max(weights)
+
+        min_width = 0.15
+        max_width = edge_width_scale
+
+        widths = [min_width + (max_width - min_width)*(w/max_weight) for w in weights]
+    else:
+        widths = []
 
     nx.draw(
         G_nx,

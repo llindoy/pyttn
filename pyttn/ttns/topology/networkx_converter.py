@@ -61,9 +61,8 @@ def convert_nx_to_subtree(
 
     subtree_root = root.at([root_skip])
 
-    leaf_labels = [
-        subtree_root.at(leaf_inds).value for leaf_inds in subtree_root.leaf_indices()
-    ]
+    leaf_labels = [subtree_root.at(leaf_inds).value for leaf_inds in subtree_root.leaf_indices()
+                   ]
     leaf_indices = [0 for _ in leaf_labels]
     for i in range(len(leaf_labels)):
         leaf_indices[leaf_labels[i]] = i

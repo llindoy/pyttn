@@ -99,7 +99,8 @@ def mutual_information_tree(_A, _h, sweep, nstep, dt, nstrides=50):
 
     spanning_tree, spanning_root_ind = generate_hierarchical_clustering_tree(corr_mat)
     tree, leaf_ordering = convert_nx_to_tree(spanning_tree, root_ind=spanning_root_ind)
-    ntreeBuilder.sanitise(tree)
+    ntreeBuilder.insert_basis_nodes(tree)
+    ntreeBuilder.collapse_bond_matrices(tree)
 
     return corr_mat, tree, leaf_ordering
 

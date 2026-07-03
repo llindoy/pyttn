@@ -11,10 +11,8 @@
 # limitations under the License
 
 from typing import Callable, Optional, Union
-
 import numpy as np
-
-from pyttn.ttnpp import ntree, ntreeNode
+from pyttn.ttnpp import ntree, ntreeNode, ntreeBuilder
 
 from .bond_setter import BondDimensionSetter
 
@@ -233,3 +231,59 @@ def set_topology_properties(
             __update_interior_nodes(root(), chi, node_list)
         elif isinstance(root, ntreeNode):
             __update_interior_nodes(root, chi, node_list)
+
+
+def build_bond_dimension_trees(tree: ntree, local_dims: list[int], bond_dims: dict) -> tuple[ntree, ntree]:
+    """
+    Construct minimum- and maximum-bond-dimension trees.
+
+    The supplied topology tree is copied twice. Local basis
+    transformation nodes are inserted automatically using
+    ntreeBuilder.insert_basis_nodes. Interior nodes are then
+    assigned the proposed minimum and maximum bond dimensions.
+
+    :param tree: Input topology tree
+    :type tree: ntree
+    :param local_dims: Local Hilbert space dimensions indexed by physical-mode label
+    :type local_dims: list[int]
+    :param bond_dims: Output from propose_bond_dimensions
+    :type bond_dims: dict
+
+    :returns: (minimum_tree, maximum_tree)
+    :rtype: tuple[ntree, ntree]
+    """
+
+    tree_min = ntree(tree)
+    tree_max = ntree(tree)
+
+    ntreeBuilder.insert_basis_nodes(tree_min)
+    ntreeBuilder.insert_basis_nodes(tree_max)
+
+    def populate(node_min, node_max):
+        # Physical modes - set to local hilbert space dimension
+        if node_min.is_leaf():
+            phys_ind = node_min.value
+            node_min.value = local_dims[phys_ind]
+            node_max.value = local_dims[phys_ind]
+
+        # Root - is trivial
+        elif node_min.is_root():
+            node_min.value = 1
+            node_max.value = 1
+
+        # Internal node - set to bond dimension guessed before
+        else:
+            key = tuple(node_min.index())
+
+            if key not in bond_dims:
+                raise ValueError(f"No bond dimension information for node {key}")
+
+            node_min.value = bond_dims[key]["min_chi"]
+            node_max.value = bond_dims[key]["max_chi"]
+
+        for i in range(node_min.size()):
+            populate(node_min.at(i), node_max.at(i))
+
+    populate(tree_min(), tree_max())
+
+    return tree_min, tree_max

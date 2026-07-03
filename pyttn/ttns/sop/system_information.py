@@ -137,6 +137,60 @@ class SystemInfo:
         """Return total number of primitive modes."""
         return sum(len(v) for v in self._data.values())
     
+
+    def lhd(self, composite: str) -> int:
+        """
+        Return the local Hilbert space dimension of a composite mode.
+
+        :param composite: Composite mode label
+        :type composite: str
+
+        :returns: Local Hilbert space dimension
+        :rtype: int
+        """
+        if composite not in self._data:
+            raise ValueError(f"Unknown composite mode '{composite}'")
+        d = 1
+        for prim in self._data[composite].values():
+            d *= prim.lhd
+
+        return d
+    
+    def local_dims(self, labels: list[str]) -> list[int]:
+        """
+        Return a list of the local Hilbert space dimension of each composite mode in the order specified in labels
+
+        :param labels: Composite mode labels
+        :type labels: list[str]
+
+        :returns: Local Hilbert space dimensions
+        :rtype: list[int]
+        """
+
+        system_labels = set(self._data.keys())
+        requested_labels = set(labels)
+
+        missing = system_labels - requested_labels
+        if missing:
+            raise ValueError(f"Missing composite labels: {sorted(missing)}")
+
+        extra = requested_labels - system_labels
+        if extra:
+            raise ValueError(f"Unknown composite labels: {sorted(extra)}")
+
+        if len(labels) != len(system_labels):
+            raise ValueError("Labels must contain each composite mode exactly once.")
+
+        dims = []
+        for label in labels:
+            d = 1
+            for prim in self._data[label].values():
+                d *= prim.lhd
+            dims.append(d)
+
+        return dims
+
+
     def __repr__(self) -> str:
         return f"labelled_system({self._data})"
 
@@ -215,12 +269,7 @@ class SystemInfo:
 
         sys = system_modes(modes)
             
-        return {
-            "system_modes": sys,
-            "primitive_labels": primitive_labels,
-            "primitive_label_to_index": primitive_label_to_index,
-            "labels_to_prim_indices": label_to_prim_indices
-        }
+        return { "system_modes": sys, "primitive_labels": primitive_labels, "primitive_label_to_index": primitive_label_to_index, "labels_to_prim_indices": label_to_prim_indices}
     
     def group_modes(self, groups: Dict[str, List[str]]) -> "SystemInfo":
         """
@@ -280,8 +329,8 @@ def primitive_label(i : int, N : int, prefix="p") -> str:
     Generate a zero-padded primitive label for index i in a system of size N.
 
     Example:
-        i=3, N=10 → "p3"
-        i=3, N=100 → "p03"
+        i=3, N=10 : "p3"
+        i=3, N=100 : "p03"
     """
     width = len(str(N - 1))
     return f"{prefix}{i:0{width}d}"
@@ -291,8 +340,8 @@ def primitive_labels(N: int, prefix="p") -> list[str]:
     Generate zero-padded primitive labels.
 
     Example:
-        N=4 → ["p0","p1","p2","p3"]
-        N=12 → ["p00","p01",...,"p11"]
+        N=4 : ["p0","p1","p2","p3"]
+        N=12 : ["p00","p01",...,"p11"]
     """
     width = len(str(N - 1))
     return [f"{prefix}{i:0{width}d}" for i in range(N)]

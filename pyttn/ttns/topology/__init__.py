@@ -11,12 +11,15 @@
 # limitations under the License
 
 from .bond_setter import NodeSumSetter, NodeIncrementSetter
-from .topology_properties import set_topology_properties, set_bond_dimensions, set_dims
+from .topology_properties import set_topology_properties, set_bond_dimensions, set_dims, build_bond_dimension_trees
 from .spanning_tree import generate_spanning_tree
 from .hierarchical_clustering import generate_hierarchical_clustering_tree
 from .spectral_tree import generate_spectral_tree
 from .networkx_converter import convert_nx_to_subtree, convert_nx_to_tree
-
+from .interaction_hypergraph import InteractionHypergraph, build_interaction_hypergraph
+from .interaction_graph import InteractionGraph, build_interaction_graph, hypergraph_to_graph
+from .cluster_modes import cluster_modes_graph
+from .tree_cut_metrics import compute_tree_cut_metrics, propose_bond_dimensions
 __all__ = [
     "NodeSumSetter",
     "NodeIncrementSetter",
@@ -27,5 +30,14 @@ __all__ = [
     "generate_hierarchical_clustering_tree",
     "generate_spectral_tree",
     "convert_nx_to_subtree",
-    "convert_nx_to_tree"
+    "convert_nx_to_tree",
+    "InteractionGraph",
+    "build_interaction_graph",
+    "InteractionHypergraph",
+    "build_interaction_hypergraph",
+    "hypergraph_to_graph",
+    "cluster_modes_graph",
+    "compute_tree_cut_metrics",
+    "propose_bond_dimensions",
+    "build_bond_dimension_trees",
 ]

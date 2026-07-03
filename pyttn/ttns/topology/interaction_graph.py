@@ -13,11 +13,11 @@
 
 import numpy as np
 
-from pyttn.ttns.sop.interaction_hypergraph import build_interaction_hypergraph
+from .interaction_terms import interaction_terms
 from itertools import combinations
 
-from .system_information import SystemInfo
-from .operator_builder import lCSOP
+from ..sop.system_information import SystemInfo
+from ..sop.operator_builder import lCSOP
 
 class InteractionGraph:
     """A simple undirected graph structure for representing interactions between composite modes."""
@@ -106,16 +106,13 @@ def hypergraph_to_graph(H, scaling: str = "uniform", store_term_data: bool = Fal
 
     :param H: The interaction hypergraph
     :type H: InteractionHypergraph
-    :param scaling: The scaling scheme used to distribute hyperedge weights
-        among pairwise edges ("uniform", "linear", or "none")
+    :param scaling: The scaling scheme used to distribute hyperedge weights among pairwise edges ("uniform", "linear", or "none")
     :type scaling: str
-    :param store_term_data: Whether to propagate contributing term data
-        to nodes and edges
+    :param store_term_data: Whether to propagate contributing term data to nodes and edges
     :type store_term_data: bool
     :returns: The constructed interaction graph
     :rtype: InteractionGraph
     """
-
 
     G = InteractionGraph()
 
@@ -133,9 +130,7 @@ def hypergraph_to_graph(H, scaling: str = "uniform", store_term_data: bool = Fal
 
         w = data["weight"]
 
-        # --------------------------------------------------
         # scaling choice
-        # --------------------------------------------------
         if scaling == "uniform":
             factor = w / (k * (k - 1) / 2)
 
@@ -148,9 +143,7 @@ def hypergraph_to_graph(H, scaling: str = "uniform", store_term_data: bool = Fal
         else:
             raise ValueError(f"Unknown scaling: {scaling}")
 
-        # --------------------------------------------------
         # distribute to pairwise edges
-        # --------------------------------------------------
         for u, v in combinations(nodes, 2):
             edge_key = G.add_edge(u, v)
             G.edges[edge_key]["weight"] += factor
@@ -176,21 +169,36 @@ def build_interaction_graph(op: lCSOP, sysinfo : SystemInfo, store_term_data : b
     :type sysinfo: SystemInfo
     :param store_term_data: Whether to store contributing term data in edges and nodes
     :type store_term_data: bool
-    :param scaling: The scaling scheme used to distribute hyperedge weights
-        among pairwise edges ("uniform", "linear", or "none")
+    :param scaling: The scaling scheme used to distribute hyperedge weights among pairwise edges ("uniform", "linear", or "none")
     :type scaling: str
     :returns: The constructed interaction graph 
     :rtype: InteractionGraph
     """
 
-    H = build_interaction_hypergraph(
-        op,
-        sysinfo,
-        store_term_data=store_term_data
-    )
+    G = InteractionGraph()
 
-    return hypergraph_to_graph(
-        H,
-        scaling=scaling,
-        store_term_data=store_term_data
-    )
+    for comps, w, coeff, term in interaction_terms(op, sysinfo):
+        for c in comps:
+            G.add_node(c)
+            if store_term_data:
+                G.nodes[c]["terms"].append(coeff * term)
+        k = len(comps)
+        if k < 2:
+            continue
+        if scaling == "uniform":
+            factor = w / (k * (k - 1) / 2)
+        elif scaling == "linear":
+            factor = w / (k - 1)
+        elif scaling == "none":
+            factor = w
+        else:
+            raise ValueError(f"Unknown scaling: {scaling}")
+
+        for u, v in combinations(comps, 2):
+            edge_key = G.add_edge(u, v)
+            G.edges[edge_key]["weight"] += factor
+            if store_term_data:
+                G.edges[edge_key]["terms"].append(coeff * term)
+
+    return G
+

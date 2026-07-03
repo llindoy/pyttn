@@ -289,6 +289,25 @@ namespace python_bindings
         cls.def("complex_dtype", [](const CLS &){ return !std::is_same<T, real_type>::value; });
     } 
 
+    template<typename T, typename CLS, typename Getter, typename Setter>
+    void bind_rw_property(py::class_<CLS>& cls, const char* name, Getter get, Setter set, const char* doc = nullptr)
+    {
+        if(doc){cls.def_property(name, static_cast<const T&(CLS::*)() const>(get), [set](CLS& o, const T& i){(o.*set)() = i;}, doc);}
+        else{cls.def_property(name, static_cast<const T&(CLS::*)() const>(get),[set](CLS& o, const T& i){(o.*set)() = i;});}
+    }
 }
+
+
+#define RW_PROP(CLASS, TYPE, MEMBER) \
+    static_cast<const TYPE&(CLASS::*)() const>(&CLASS::MEMBER), \
+    static_cast<TYPE&(CLASS::*)()>(&CLASS::MEMBER)
+
+#define BIND_RW_PROPERTY(cls, CLS, TYPE, MEMBER, DOC)          \
+    python_bindings::bind_rw_property<TYPE>(                   \
+        cls,                                                   \
+        #MEMBER,                                               \
+        static_cast<const TYPE&(CLS::*)() const>(&CLS::MEMBER),\
+        static_cast<TYPE&(CLS::*)()>(&CLS::MEMBER),            \
+        DOC)
 
 #endif // PYTHON_BINDING_HELPERS_HPP_

@@ -36,16 +36,13 @@ namespace python_bindings
             .def("insert_front", &NBO::prepend)
             .def("insert_back", &NBO::append)
             .def("nmodes", &NBO::nmodes)
-            .def("__iter__", [](NBO &s)
-                 { return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
-            .def_property("coeff", static_cast<const coeff<T> &(NBO::*)() const>(&NBO::coeff), [](NBO &o, const coeff<T> &i)
-                          { o.coeff() = i; })
-            .def_property("ops", static_cast<const std::list<sOP> &(NBO::*)() const>(&NBO::ops), [](NBO &o, const std::list<sOP> &i)
-                          { o.ops() = i; })
-            .def_property("pop", static_cast<const sPOP &(NBO::*)() const>(&NBO::pop), [](NBO &o, const sPOP &i)
-                          { o.pop() = i; })
-            .def("__str__", [](const NBO &o)
-                 { return static_cast<std::string>(o); });
+            .def("__iter__", [](NBO &s){ return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
+            .def("__str__", [](const NBO &o){ return static_cast<std::string>(o); });
+
+        BIND_RW_PROPERTY(cls, NBO, coeff<T>, coeff, nullptr);
+        BIND_RW_PROPERTY(cls, NBO, std::list<sOP>, ops, nullptr);
+        BIND_RW_PROPERTY(cls, NBO, sPOP, pop, nullptr);
+
         bind_all<bind_imul, NBO, sOP, sPOP, NBO, real_type>(cls);
         bind_add_sub_sop<real_type>(cls);
         bind_mul_div_sop<real_type>(cls);
@@ -70,10 +67,8 @@ namespace python_bindings
             .def(py::init<const real_type &>())
             .def(py::init<const func_type &>())
             .def(py::init<const coef &>())
-            .def("assign", [](coef &self, const real_type &o)
-                 { self = o; })
-            .def("assign", [](coef &self, const func_type &o)
-                 { self = o; })
+            .def("assign", [](coef &self, const real_type &o){ self = o; })
+            .def("assign", [](coef &self, const func_type &o){ self = o; })
             .def("clear", &coef::clear)
             .def("is_zero", &coef::is_zero, py::arg("tol") = real_type(1e-14))
             .def("is_positive", &coef::is_positive)
@@ -120,18 +115,14 @@ namespace python_bindings
             .def("nmodes", &_SOP::nmodes)
             .def("nterms", &_SOP::nterms)
             .def("__len__", &_SOP::nterms)
-            .def("__iter__", [](_SOP &s)
-                 { return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
-            .def_property("label", static_cast<const std::string &(_SOP::*)() const>(&_SOP::label), [](_SOP &o, const std::string &i)
-                          { o.label() = i; })
-            .def_property("terms", static_cast<const container_type &(_SOP::*)() const>(&_SOP::terms), [](_SOP &o, const container_type &i)
-                          { o.terms() = i; })
-            .def("__setitem__", [](_SOP &self, size_t i, const sNBO<T> &v)
-                 { self[i] = v; })
+            .def("__iter__", [](_SOP &s){ return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
+            .def("__setitem__", [](_SOP &self, size_t i, const sNBO<T> &v){ self[i] = v; })
             .def("__getitem__", static_cast<sNBO<T> &(_SOP::*)(size_t)>(&_SOP::operator[]), py::return_value_policy::reference)
-            .def("__str__", [](const _SOP &o)
-                 {std::ostringstream oss; oss << o; return oss.str(); });
+            .def("__str__", [](const _SOP &o){std::ostringstream oss; oss << o; return oss.str(); });
                 
+        BIND_RW_PROPERTY(cls, _SOP, std::string, label, nullptr);
+        BIND_RW_PROPERTY(cls, _SOP, container_type, terms, nullptr);
+
         bind_all<bind_iadd, _SOP, sOP, sPOP, sNBO<T>, _SOP>(cls);
         bind_all<bind_isub, _SOP, sOP, sPOP, sNBO<T>, _SOP>(cls);
         bind_all<bind_imul, _SOP, real_type, sOP, sPOP, sNBO<T>, _SOP>(cls);
@@ -160,15 +151,11 @@ void init_sSOP(py::module &m)
             .def(py::init<const std::string &, size_t, bool>())
             .def(py::init<const sOP &>())
             .def("clear", &sOP::clear, "Clear the sOPs mode and label information.")
-            .def_property("op", static_cast<const std::string &(sOP::*)() const>(&sOP::op), [](sOP &o, const std::string &i)
-                          { o.op() = i; }, "The label of the operator")
-            .def_property("mode", static_cast<const size_t &(sOP::*)() const>(&sOP::mode), [](sOP &o, const size_t &i)
-                          { o.mode() = i; }, "The mode the operator acts on")
-            .def_property("fermionic", static_cast<const bool &(sOP::*)() const>(&sOP::fermionic), [](sOP &o, const bool &i)
-                          { o.fermionic() = i; }, "The mode the operator acts on")
+            .def("__str__", [](const sOP &o){ return static_cast<std::string>(o); });
 
-            .def("__str__", [](const sOP &o)
-                 { return static_cast<std::string>(o); });
+        BIND_RW_PROPERTY(cls, sOP, std::string, op, nullptr);
+        BIND_RW_PROPERTY(cls, sOP, size_t, mode, nullptr);
+        BIND_RW_PROPERTY(cls, sOP, bool, fermionic, nullptr);
 
         python_bindings::bind_add_sub_sop<real_type>(cls);
         python_bindings::bind_mul_div_sop<real_type>(cls);
@@ -277,14 +264,15 @@ void init_sSOP(py::module &m)
                     :returns: The number of modes that this sPOP acts on
                     :rtype: int
                )mydelim")
-            .def_property("ops", static_cast<const std::list<sOP> &(sPOP::*)() const>(&sPOP::ops), [](sPOP &o, const std::list<sOP> &i){ o.ops() = i; }, "A list of the individual sOP objects forming the sPOP.")
             .def("__iter__", [](sPOP &s){ return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
             .def("__str__", [](const sPOP &o){ return static_cast<std::string>(o); });;
+
+        BIND_RW_PROPERTY(cls, sPOP, std::list<sOP>, ops, "A list of the individual sOP objects forming the sPOP.");
+
 
         python_bindings::bind_add_sub_sop<real_type>(cls);
         python_bindings::bind_mul_div_sop<real_type>(cls);
         python_bindings::bind_all<python_bindings::bind_imul, sPOP, sOP, sPOP>(cls);
-
         python_bindings::bind_todense<real_type>(cls);
         python_bindings::bind_utils(cls);
         python_bindings::bind_copyable(cls);
@@ -364,7 +352,6 @@ void init_sSOP(py::module &m)
         python_bindings::bind_all<python_bindings::bind_isub, _SOP, sNBO<real_type>, sSOP<real_type>>(cls);
         python_bindings::bind_idiv<complex_type>::apply(cls);
         python_bindings::bind_all<python_bindings::bind_imul, _SOP, complex_type, sNBO<real_type>, sSOP<real_type>>(cls);
-
         python_bindings::bind_todense<complex_type>(cls);
     }
 }
