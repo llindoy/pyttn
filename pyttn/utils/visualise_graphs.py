@@ -1,6 +1,3 @@
-import networkx as nx
-import matplotlib.pyplot as plt
-import xgi
 
 def visualise_interaction_graph(
     graph,
@@ -23,73 +20,72 @@ def visualise_interaction_graph(
     :param edge_width_scale: Scaling factor for edge thickness
     :type edge_width_scale: float
     """
+    try:
+        import networkx as nx
 
-    G_nx = nx.Graph()
+        G_nx = nx.Graph()
 
-    # add nodes
-    for node in graph.nodes:
-        G_nx.add_node(node)
+        # add nodes
+        for node in graph.nodes:
+            G_nx.add_node(node)
 
-    # add edges with weights
-    for (u, v), data in graph.edges.items():
-        u_, v_ = [u, v]
-        G_nx.add_edge(u_, v_, weight=data["weight"])
+        # add edges with weights
+        for (u, v), data in graph.edges.items():
+            u_, v_ = [u, v]
+            G_nx.add_edge(u_, v_, weight=data["weight"])
 
-    pos = nx.spring_layout(G_nx)
+        pos = nx.spring_layout(G_nx)
 
-    # edge widths proportional to weight
-    weights = [d["weight"] for _, _, d in G_nx.edges(data=True)]
+        # edge widths proportional to weight
+        weights = [d["weight"] for _, _, d in G_nx.edges(data=True)]
 
-    if weights:
-        max_weight = max(weights)
+        if weights:
+            max_weight = max(weights)
 
-        min_width = 0.15
-        max_width = edge_width_scale
+            min_width = 0.15
+            max_width = edge_width_scale
 
-        widths = [min_width + (max_width - min_width)*(w/max_weight) for w in weights]
-    else:
-        widths = []
+            widths = [min_width + (max_width - min_width)*(w/max_weight) for w in weights]
+        else:
+            widths = []
 
-    nx.draw(
-        G_nx,
-        pos,
-        with_labels=with_labels,
-        node_size=node_size,
-        width=widths,
-        font_size=font_size,
-    )
+        nx.draw(
+            G_nx,
+            pos,
+            with_labels=with_labels,
+            node_size=node_size,
+            width=widths,
+            font_size=font_size,
+        )
 
-    plt.title("Interaction Graph")
-
+    except Exception:
+        raise RuntimeError("Failed to visualise interaction graph.") from None
 
 def visualise_interaction_hypergraph(
     hypergraph,
-    with_labels: bool = True,
-    node_size: int = 300,
 ):
     """
     Visualise an InteractionHypergraph using XGI.
 
     :param hypergraph: The interaction hypergraph
     :type hypergraph: InteractionHypergraph
-    :param with_labels: Whether to draw node labels
-    :type with_labels: bool
-    :param node_size: Size of nodes in the plot
-    :type node_size: int
     """
+    try:
+        import xgi
 
-    H_xgi = xgi.Hypergraph()
+        H_xgi = xgi.Hypergraph()
 
-    # add nodes
-    for node in hypergraph.nodes:
-        H_xgi.add_node(node)
-        print(node)
+        # add nodes
+        for node in hypergraph.nodes:
+            H_xgi.add_node(node)
+            print(node)
 
-    # add hyperedges
-    H_xgi.add_edges_from([list(nodes) for nodes in hypergraph.hyperedges.items()])
-    print([list(nodes) for nodes in hypergraph.hyperedges.items()])
+        # add hyperedges
+        H_xgi.add_edges_from([list(nodes) for nodes in hypergraph.hyperedges.items()])
+        print([list(nodes) for nodes in hypergraph.hyperedges.items()])
 
-    pos = xgi.barycenter_spring_layout(H_xgi, seed=1)
-    xgi.draw(H_xgi, pos, hull=True, edge_lw=2, edge_ec='k')
+        pos = xgi.barycenter_spring_layout(H_xgi, seed=1)
+        xgi.draw(H_xgi, pos, hull=True, edge_lw=2, edge_ec='k')
 
-    plt.title("Interaction Hypergraph")
+    except Exception:
+        raise RuntimeError("Failed to visualise interaction hypergraph.") from None

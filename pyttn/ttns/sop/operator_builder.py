@@ -118,6 +118,11 @@ class OperatorBuilder:
                 sop += expr
                 return lCSOP(sop, dict(self.index_to_label))
 
+def _merge_labels(a, b):
+    labels = a.sites() | b.sites()
+    site_map = { label: i for i, label in enumerate(sorted(labels)) }
+    idx_to_label = { i: label for label, i in site_map.items() }
+    return site_map, idx_to_label
 
 class lSOP:
     """A container for symbolic operator expressions with label metadata.
@@ -349,6 +354,144 @@ class lSOP:
         index_to_label = {i: label for label, i in site_map.items()}
         return lCSOP(sop, index_to_label)
 
+
+
+    def __add__(self, other : Union["lSOP", "lCSOP"]) -> "lSOP":
+        """
+        Add two labelled operator expressions.
+
+        The site-label mappings of both operators are merged and the underlying symbolic expressions are combined.
+
+        If ``other`` is an ``lCSOP`` object, it is first expanded into its symbolic representation.
+
+        :param other: Operator to add
+        :type other: lSOP or lCSOP
+        :return: Sum of the two labelled operators
+        :rtype: lSOP
+        """
+
+        if isinstance(other, lCSOP):
+            other = other.expand()
+
+        if not isinstance(other, lSOP):
+            return NotImplemented
+
+        site_map, idx_to_label = _merge_labels(self, other)
+
+        expr = self.to_sSOP(site_map)
+        expr += other.to_sSOP(site_map)
+
+        return lSOP(expr, idx_to_label)
+
+    def __iadd__(self, other : Union["lSOP", "lCSOP"]) -> "lSOP":
+        """
+        Add another labelled operator in-place.
+
+        :param other: Operator to add
+        :type other: lSOP or lCSOP
+        :return: Updated operator
+        :rtype: lSOP
+        """
+        tmp = self + other
+        self.expr = tmp.expr
+        self.index_to_label = tmp.index_to_label
+        return self
+
+    def __sub__(self, other : Union["lSOP", "lCSOP"]) -> "lSOP":
+        """
+        Subtract another labelled operator.
+
+        :param other: Operator to subtract
+        :type other: lSOP or lCSOP
+        :return: Difference of the two operators
+        :rtype: lSOP
+        """
+        return self + (-other)
+
+    def __isub__(self, other : Union["lSOP", "lCSOP"]) -> "lSOP":
+        """
+        Subtract another labelled operator in-place.
+
+        :param other: Operator to add
+        :type other: lSOP or lCSOP
+        :return: Updated operator
+        :rtype: lSOP
+        """
+        return self.__iadd__(-other)
+    
+    def __neg__(self) -> "lSOP":
+        """
+        Return the additive inverse of the operator.
+
+        :return: Negated operator
+        :rtype: lSOP
+        """
+        return self * (-1)
+    
+    def __mul__(self, other : Union["lSOP", "lCSOP"]) -> "lSOP":
+        """
+        Multiply the operator by a scalar.
+
+        :param other: Scalar multiplier
+        :type other: int, float, complex, or numpy scalar
+        :return: Scaled operator
+        :rtype: lSOP
+        """
+        if np.isscalar(other):
+            sop = copy.deepcopy(self.expr)
+            sop *= other
+            return lSOP(sop,self.index_to_label.copy())
+        
+        return NotImplemented
+    
+    def __rmul__(self, other : Union["lSOP", "lCSOP"]) -> "lSOP":
+        """
+        Multiply the operator by a scalar from the left
+
+        :param other: Scalar multiplier
+        :type other: int, float, complex, or numpy scalar
+        :return: Scaled operator
+        :rtype: lSOP
+        """
+        return self * other
+
+    def __truediv__(self, other : Union["lSOP", "lCSOP"]) -> "lSOP":
+        """
+        Divide the operator by a scalar
+        :param other: Scalar multiplier
+        :type other: int, float, complex, or numpy scalar
+        :return: Scaled operator
+        :rtype: lSOP
+        """
+        if not np.isscalar(other):
+            return NotImplemented
+        return self * (1.0 / other)
+
+    def __matmul__(self, other : "lSOP") -> "lSOP":
+        """
+        Form the operator product of two labelled operators.
+        The site-label mappings of both operators are merged
+
+        :param other: Operator to multiply with
+        :type other: lSOP
+        :return: Operator product
+        :rtype: lSOP
+        """
+        if not isinstance(other, lSOP):
+            return NotImplemented
+        
+
+        if self.index_to_label == other.index_to_label:
+            return lSOP(self.expr * other.expr, self.index_to_label.copy())
+
+        site_map, idx_to_label = _merge_labels(self, other)
+        expr_a = self.to_sSOP(site_map)
+        expr_b = other.to_sSOP(site_map)
+
+        expr = expr_a * expr_b
+
+        return lSOP(expr, idx_to_label)
+
 class lCSOP:
     """
     Container for compiled labelled SOP operators.
@@ -367,7 +510,7 @@ class lCSOP:
         :param index_to_label: Mapping from mode indices to labels
         :type index_to_label: dict[int, str]
         """
-        self.sop = sop
+        self.expr = sop
         self.index_to_label = index_to_label
 
     def sites(self) -> Set[str]:
@@ -386,7 +529,7 @@ class lCSOP:
         :return: Number of modes
         :rtype: int
         """
-        return self.sop.nmodes()
+        return self.expr.nmodes()
 
     def nterms(self) -> int:
         """
@@ -395,25 +538,25 @@ class lCSOP:
         :return: Number of terms
         :rtype: int
         """
-        return self.sop.nterms()
+        return self.expr.nterms()
 
     @property
     def dtype(self) -> np.dtype:
-        return self.sop.dtype
+        return self.expr.dtype
 
     def complex_dtype(self) -> bool:
-        return self.sop.complex_dtype()
+        return self.expr.complex_dtype()
 
     def backend(self) -> str:
-        return self.sop.backend()
+        return self.expr.backend()
 
 
     @property
     def operator_dictionary(self):
-        return self.sop.get_operator_dictionary()
+        return self.expr.get_operator_dictionary()
 
     def set_operator_dictionary(self, opdict):
-        self.sop.set_operator_dictionary(opdict)
+        self.expr.set_operator_dictionary(opdict)
 
  
     def jordan_wigner(self, ordering: list[str], sysinfo: SystemInfo, tol: float = 1e-15) -> "lCSOP":
@@ -456,7 +599,7 @@ class lCSOP:
         :param tol: tolerance
         :type tol: float
         """
-        self.sop.prune_zeros(tol)
+        self.expr.prune_zeros(tol)
 
     def expand(self) -> "lSOP":
         """
@@ -465,8 +608,7 @@ class lCSOP:
         :return: labelled symbolic operator
         :rtype: lSOP
         """
-
-        ssop = self.sop.expand()
+        ssop = self.expr.expand()
         return lSOP(ssop, self.index_to_label.copy())
 
 
@@ -475,9 +617,9 @@ class lCSOP:
             nmodes = len(site_map)
         new_sop = SOP(nmodes)
 
-        opdict = self.sop.get_operator_dictionary()
+        opdict = self.expr.get_operator_dictionary()
         print(opdict, nmodes)
-        for term, coeff in self.sop:
+        for term, coeff in self.expr:
             # convert prodOP to sPOP (C++)
 
             pop = term.as_sPOP(opdict)
@@ -533,14 +675,155 @@ class lCSOP:
         :return: SOP object
         :rtype: SOP
         """
-        return self.sop
+        return self.expr
 
     def __repr__(self):
         return f"LabelledCSOP(nmodes={self.nmodes()}, nterms={self.nterms()}, sites={self.sites()})"
 
     def __str__(self):
-        return str(self.sop)
+        return str(self.expr)
 
+    def __add__(self, other : "lCSOP") -> "lCSOP":
+        """
+        Add two labelled operator expressions.
+        The site-label mappings of both operators are merged and the underlying symbolic expressions are combined.
+
+        :param other: Operator to add
+        :type other:  lCSOP
+        :return: Sum of the two labelled operators
+        :rtype: lCSOP
+        """
+        if not isinstance(other, lCSOP):
+            return NotImplemented
+
+        site_map, idx_to_label = _merge_labels(self, other)
+
+        nmodes = len(site_map)
+
+        expr = self.to_SOP(site_map, nmodes=nmodes)
+        expr += other.to_SOP(site_map, nmodes=nmodes)
+
+        return lCSOP(expr, idx_to_label)
+
+    def __iadd__(self, other : "lCSOP") -> "lCSOP":
+        """
+        Add another labelled operator in-place.
+
+        :param other: Operator to add
+        :type other: lCSOP
+        :return: Updated operator
+        :rtype: lCSOP
+        """
+        tmp = self + other
+        self.expr = tmp.expr
+        self.index_to_label = tmp.index_to_label
+        return self
+
+    def __sub__(self, other : "lCSOP") -> "lCSOP":
+        """
+        Subtract another labelled operator.
+
+        :param other: Operator to subtract
+        :type other: lCSOP
+        :return: Difference of the two operators
+        :rtype: lCSOP
+        """
+        return self + (-other)
+
+    def __isub__(self, other : "lCSOP") -> "lCSOP":
+        """
+        Subtract another labelled operator in-place.
+
+        :param other: Operator to add
+        :type other: lCSOP
+        :return: Updated operator
+        :rtype: lCSOP
+        """
+        return self.__iadd__(-other)
+    
+    def __neg__(self) -> "lCSOP":
+        """
+        Return the additive inverse of the operator.
+
+        :return: Negated operator
+        :rtype: lCSOP
+        """
+        return self * (-1)
+    
+    def __mul__(self, other : "lCSOP") -> "lCSOP":
+        """
+        Multiply the operator by a scalar.
+
+        :param other: Scalar multiplier
+        :type other: int, float, complex, or numpy scalar
+        :return: Scaled operator
+        :rtype: lCSOP
+        """
+        if np.isscalar(other):
+            sop = copy.deepcopy(self.expr)
+            sop *= other
+            return lCSOP(sop,self.index_to_label.copy())
+        
+        return NotImplemented
+    
+    def __rmul__(self, other : "lCSOP") -> "lCSOP":
+        """
+        Multiply the operator by a scalar from the left
+
+        :param other: Scalar multiplier
+        :type other: int, float, complex, or numpy scalar
+        :return: Scaled operator
+        :rtype: lSOP
+        """
+        return self * other
+
+    def __truediv__(self, other : "lCSOP") -> "lCSOP":
+        """
+        Divide the operator by a scalar
+        :param other: Scalar multiplier
+        :type other: int, float, complex, or numpy scalar
+        :return: Scaled operator
+        :rtype: lSOP
+        """
+        if not np.isscalar(other):
+            return NotImplemented
+        return self * (1.0 / other)
+    
+
+    def __matmul__(self, other : Union["lSOP", "lCSOP"]) -> "lCSOP":
+        """
+        Form the operator product of two labelled operators.
+        The site-label mappings of both operators are merged
+
+        :param other: Operator to multiply with
+        :type other: lSOP or lCSOP
+        :return: Operator product
+        :rtype: lCSOP
+        """
+
+        if not isinstance(other, (lSOP, lCSOP)):
+            return NotImplemented
+
+        result = self.expand() @ (other.expand() if isinstance(other, lCSOP) else other)
+        ordering = [result.index_to_label[i] for i in range(len(result.index_to_label))]
+        return result.to_lCSOP(ordering)
+
+    def __rmatmul__(self, other : "lSOP") -> "lCSOP":
+        """
+        Left multiply lCSOP by lSOP
+
+        :param other: Operator to multiply with
+        :type other: lSOP
+        :return: Operator product
+        :rtype: lCSOP
+        """
+
+        if not isinstance(other, lSOP):
+            return NotImplemented
+
+        result = other @ self.expand()
+        ordering = [result.index_to_label[i] for i in range(len(result.index_to_label))]
+        return result.to_lCSOP(ordering)
 
 # Global builder context
 _current_builder: Optional[OperatorBuilder] = None

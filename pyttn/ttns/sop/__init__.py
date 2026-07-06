@@ -42,7 +42,7 @@ from .sSOPExt import (
 )
 
 from .operator_builder import OperatorBuilder, operator_context, wrap, op, fop, operator, lSOP, lCSOP
-from .system_information import SystemInfo, primitive_label, primitive_labels, group_consecutive_labels
+from .system_information import SystemInfo, site_label, site_labels, group_consecutive_labels
 from .symbolicTransposeExt import symbolic_transpose
 #from .stateExt import isKet, isSepState, ket, sepState, stateStr
 
@@ -90,8 +90,8 @@ __all__: list[str] = [
     "combine_systems",
     "convert_to_dense",
     "symbolic_transpose",
-    "primitive_label",
-    "primitive_labels",
+    "site_label",
+    "site_labels",
     "group_consecutive_labels",
 
 ]

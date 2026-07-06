@@ -11,7 +11,7 @@
 # limitations under the License
 
 from typing import Optional, Union, List
-from pyttn.ttns.sop import SystemInfo, lSOP
+from pyttn.ttns.sop import SystemInfo, lCSOP
 from .baths.bath import Bath, BathSpec
 
 from itertools import combinations
@@ -33,7 +33,7 @@ class OQSModel:
 
     def __init__(self, *,
                  system_info : Optional[SystemInfo] = None, 
-                 system_hamiltonian : Optional[lSOP] = None,
+                 system_hamiltonian : Optional[lCSOP] = None,
                  baths: Optional[list[BathSpec]] = None): 
         """Initialise an open quantum system model.
 
@@ -82,7 +82,7 @@ class OQSModel:
 
         self._system_info = value
 
-    def set_system_hamiltonian(self, H : lSOP) -> "OQSModel":
+    def set_system_hamiltonian(self, H : lCSOP) -> "OQSModel":
         """Set the system Hamiltonian.
 
         :param H: Labelled operator acting on system degrees of freedom
@@ -95,7 +95,7 @@ class OQSModel:
         return self
 
     @property
-    def system_hamiltonian(self) -> lSOP:
+    def system_hamiltonian(self) -> lCSOP:
         """Return the system Hamiltonian.
 
         :return: Labelled operator describing the system Hamiltonian
@@ -105,7 +105,7 @@ class OQSModel:
         return self._system_hamiltonian
 
     @system_hamiltonian.setter
-    def system_hamiltonian(self, H : lSOP):
+    def system_hamiltonian(self, H : lCSOP):
         """Set the system Hamiltonian.
 
         :param H: Labelled operator acting on system degrees of freedom
@@ -114,14 +114,7 @@ class OQSModel:
 
         self._system_hamiltonian = H
 
-    
-    def add_bath(
-        self,
-        bath: Bath,
-        coupling_ops: Union[lSOP, list[lSOP]],
-        params: Optional[dict] = None,
-        tag: Optional[str] = None,
-    ) -> "OQSModel":
+    def add_bath(self, bath: Bath, coupling_ops: Union[lCSOP, list[lCSOP]], params: Optional[dict] = None, tag: Optional[str] = None,) -> "OQSModel":
         """Add a bath coupled to the system.
 
         This function associates a bath object (describing the environment)
@@ -165,105 +158,3 @@ class OQSModel:
         :rtype: list[BathSpec]
         """
         return self._baths
-
-    def build_coupling_graph(self, t : float = 0.0):
-        """Construct a weighted coupling graph for the system-bath model.
-
-        The graph includes:
-
-        - System–system couplings from the Hamiltonian
-        - System–bath couplings from bath specifications
-
-        System–system edges are weighted by operator coefficients.
-        System–bath edges are weighted by the product of operator coefficients
-        and bath reorganisation energy.
-
-        Hyperedges are reduced to pairwise weighted edges.
-
-        :param t: The time point at which to evaluate the values of coefficients (default t=0.0)
-        :type t: float, option        
-        :return: (connectivity matrix, index map)
-        :rtype: tuple[np.ndarray, dict[int, tuple[str, Any]]]
-        """
-
-        if self._system_hamiltonian is None:
-            raise ValueError("System Hamiltonian must be defined")
-
-        # Collect system sites
-        system_sites = sorted(self._system_hamiltonian.sites())
-
-        # Assign indices
-        index_map = {}
-        idx = 0
-
-        site_to_idx = {}
-
-        for s in system_sites:
-            site_to_idx[s] = idx
-            index_map[idx] = ("system", s)
-            idx += 1
-
-        bath_indices = []
-
-        for bi, spec in enumerate(self._baths):
-            bath_idx = idx
-            bath_indices.append(bath_idx)
-
-            tag = spec.tag if spec.tag is not None else bi
-            index_map[bath_idx] = ("bath", tag)
-
-            idx += 1
-
-        N = idx
-        C = np.zeros((N, N), dtype=float)
-
-        # System–system connectivity
-        for term in self._system_hamiltonian.expr:
-            coeff = abs(term.coeff(t))
-
-            # extract unique sites in term
-            sites = {
-                self._system_hamiltonian.index_to_label[op.mode]
-                for op in term.ops
-            }
-
-            # pairwise edges
-            for s1, s2 in combinations(sites, 2):
-                i = site_to_idx[s1]
-                j = site_to_idx[s2]
-
-                C[i, j] += coeff**2
-                C[j, i] += coeff**2
-
-        # System–bath connectivity
-        # 
-        for bi, spec in enumerate(self._baths):
-            bath_idx = bath_indices[bi]
-
-            # --- reorganisation energy (fallback safe) ---
-            bath = spec.bath
-            if hasattr(bath, "reorganisation_energy"):
-                lam = bath.reorganisation_energy()
-            else:
-                lam = 1.0
-
-            # --- loop over coupling operators ---
-            for cop in spec.coupling_ops:
-
-                for term in cop.expr:
-                    coeff = abs(term.coeff(t))
-
-                    sites = {
-                        cop.index_to_label[op.mode]
-                        for op in term.ops
-                    }
-
-                    for s in sites:
-                        i = site_to_idx[s]
-
-                        weight = coeff**2 * lam
-
-                        C[i, bath_idx] += weight
-                        C[bath_idx, i] += weight
-
-        return C, index_map

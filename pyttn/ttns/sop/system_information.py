@@ -155,7 +155,24 @@ class SystemInfo:
             d *= prim.lhd
 
         return d
-    
+
+    def local_dim(self, label : str) -> int:
+        """
+        Return a  the local Hilbert space dimension of a composite mode
+
+        :param label: Composite mode label
+        :type label:str
+
+        :returns: Local Hilbert space dimension
+        :rtype: int
+        """
+
+        d = 1
+        for prim in self._data[label].values():
+            d *= prim.lhd
+
+        return d
+
     def local_dims(self, labels: list[str]) -> list[int]:
         """
         Return a list of the local Hilbert space dimension of each composite mode in the order specified in labels
@@ -324,7 +341,7 @@ class SystemInfo:
         return new_sys
 
 
-def primitive_label(i : int, N : int, prefix="p") -> str:
+def site_label(i : int, N : int, prefix="p") -> str:
     """
     Generate a zero-padded primitive label for index i in a system of size N.
 
@@ -335,7 +352,7 @@ def primitive_label(i : int, N : int, prefix="p") -> str:
     width = len(str(N - 1))
     return f"{prefix}{i:0{width}d}"
 
-def primitive_labels(N: int, prefix="p") -> list[str]:
+def site_labels(N: int, prefix="p") -> list[str]:
     """
     Generate zero-padded primitive labels.
 

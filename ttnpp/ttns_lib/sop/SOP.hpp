@@ -537,6 +537,21 @@ namespace ttns
             return *this;
         }
 
+        template<typename U>
+        SOP<T>& operator+=(const SOP<U>& a)
+        {
+            ASSERT( this->nmodes() == a.nmodes(), "Cannot add SOP objects with different numbers of modes.");
+            this->Eshift() += a.Eshift();
+
+            for(const auto& t : a)
+            {
+                auto nbo = std::get<1>(t) * std::get<0>(t).as_prod_op(a.operator_dictionary());
+                insert(nbo.coeff(), nbo.pop());            
+            }
+            return *this;
+        }
+
+
         template <typename U>
         SOP<T> &operator-=(const sSOP<U> &a)
         {
@@ -577,6 +592,21 @@ namespace ttns
             this->Eshift() -= a;
             return *this;
         }
+
+        template<typename U>
+        SOP<T>& operator-=(const SOP<U>& a)
+        {
+            ASSERT( this->nmodes() == a.nmodes(), "Cannot add SOP objects with different numbers of modes.");
+            this->Eshift() -= a.Eshift();
+
+            for(const auto& t : a)
+            {
+                auto nbo = std::get<1>(t) * std::get<0>(t).as_prod_op(a.operator_dictionary());
+                insert(-1.0*nbo.coeff(), nbo.pop());            
+            }
+            return *this;
+        }
+
 
         void set_operator_dictionary(const SOP &o)
         {
@@ -839,15 +869,6 @@ namespace ttns
 
 }
 
-/*
-template <typename T>
-ttns::SOP<T> operator+(const ttns::SOP<T>& a, const ttns::SOP<T>& b)
-{
-    ttns::SOP<T> ret(a);
-    for(auto& t : b){ret.insert(t.second, t.first);}
-    return  ret;
-}*/
-
 template <typename T, typename U>
 typename std::enable_if<linalg::is_number<T>::value, ttns::SOP<decltype(T() * U())>>::type operator+(const T &a, const ttns::SOP<U> &b)
 {
@@ -934,17 +955,16 @@ ttns::SOP<T> operator+(const ttns::SOP<T> &b, const ttns::sOP &a)
     return ret;
 }
 
-/*
-template <typename T>
-ttns::SOP<T> operator-(const ttns::SOP<T>& a, const ttns::SOP<T>& b)
+template<typename T, typename U>
+ttns::SOP<decltype(T()*U())> operator+(const ttns::SOP<T>& a, const ttns::SOP<U>& b)
 {
-    ttns::SOP<T> ret(a);
-    for(auto& t : b)
-    {
-        ret.insert(-t.second, t.first);
-    }
+    ttns::SOP<decltype(T()*U())> ret(a.nmodes());
+    ret += a;
+    ret += b;
     return ret;
-}*/
+}
+
+
 
 template <typename T, typename U>
 typename std::enable_if<linalg::is_number<T>::value, ttns::SOP<decltype(T() * U())>>::type operator-(const T &a, const ttns::SOP<U> &b)
@@ -1030,6 +1050,18 @@ ttns::SOP<T> operator-(const ttns::SOP<T> &b, const ttns::sOP &a)
 {
     ttns::SOP<T> ret(b);
     ret.insert(-1.0, {a});
+    return ret;
+}
+
+template<typename T, typename U>
+ttns::SOP<decltype(T()*U())> operator-(const ttns::SOP<T>& a, const ttns::SOP<U>& b)
+{
+    ASSERT(a.nmodes() == b.nmodes(), "Cannot add SOP objects with different numbers of modes.");
+    using value_type = decltype(T()*U());
+
+    ttns::SOP<decltype(T()*U())> ret(a.nmodes());
+    ret += a;
+    ret -= b;
     return ret;
 }
 

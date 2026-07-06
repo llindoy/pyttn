@@ -37,6 +37,7 @@ visualisation = [
     "pydot", 
     "graphviz",
     "matplotlib",
+    "xgi",
 ]
 dev = [
     "tox >= 4.12.1"

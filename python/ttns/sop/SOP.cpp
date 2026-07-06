@@ -78,12 +78,12 @@ void init_SOP(py::module &m, const std::string &label)
         using namespace python_bindings;
         bind_all<bind_imul, _SOP, real_type, T>(cls);
         bind_all<bind_idiv, _SOP, real_type, T>(cls);
-        bind_all<bind_iadd, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
-        bind_all<bind_isub, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
-        bind_all<bind_add, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
-        bind_all<bind_radd, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
-        bind_all<bind_sub, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
-        bind_all<bind_rsub, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>>(cls);
+        bind_all<bind_iadd, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>, SOP<real_type>, _SOP>(cls);
+        bind_all<bind_isub, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>, SOP<real_type>, _SOP>(cls);
+        bind_all<bind_add, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>, SOP<real_type>, _SOP>(cls);
+        bind_all<bind_radd, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>, SOP<real_type>, _SOP>(cls);
+        bind_all<bind_sub, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>, SOP<real_type>, _SOP>(cls);
+        bind_all<bind_rsub, _SOP, real_type, T, sOP, sPOP, sNBO<real_type>, sNBO<T>, sSOP<real_type>, sSOP<T>, SOP<real_type>, _SOP>(cls);
         bind_todense<T>(cls);
         bind_dtype<T>(cls);
         bind_utils(cls);
