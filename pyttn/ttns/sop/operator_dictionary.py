@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from opdictExt import OperatorDictionary
+from .opdictExt import OperatorDictionary
 from ..operators.siteOperatorsExt import site_operator
 
 class LabelledOperatorDictionary:

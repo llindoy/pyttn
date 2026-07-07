@@ -41,9 +41,10 @@ from .sSOPExt import (
     sSOP,
 )
 
-from .operator_builder import OperatorBuilder, operator_context, wrap, op, fop, operator, lSOP, lCSOP
+from .operator_builder import OperatorBuilder, operator_context, wrap, op, fop, operator, lSOP, lCSOP, sum, prod
 from .system_information import SystemInfo, site_label, site_labels, group_consecutive_labels
 from .symbolicTransposeExt import symbolic_transpose
+from .super_operator import SuperOp
 #from .stateExt import isKet, isSepState, ket, sepState, stateStr
 
 __all__: list[str] = [
@@ -93,5 +94,8 @@ __all__: list[str] = [
     "site_label",
     "site_labels",
     "group_consecutive_labels",
+    "sum",
+    "prod",
+    "SuperOp",
 
 ]

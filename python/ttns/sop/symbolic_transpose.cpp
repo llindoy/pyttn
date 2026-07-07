@@ -45,7 +45,8 @@ struct bind_symbolic_transpose_dict
         using opdict = operator_dictionary<T, linalg::blas_backend>;
         using Out = typename symbolic_transpose_dict_output<In, T>::type;
 
-        cls.def_static("apply", [](const In& in, const opdict& dictin, const ttns::system_modes& sys, opdict& dictout){Out out; ttns::symbolic_transpose::apply(in, dictin, sys, out, dictout); return out;} );
+        cls.def_static("apply", [](const In& in, const opdict& dictin, const ttns::system_modes& sys, opdict& dictout, const std::string& suffix){Out out; ttns::symbolic_transpose::apply(in, dictin, sys, out, dictout, suffix); return out;}, 
+                                py::arg(), py::arg(), py::arg(), py::arg(), py::arg("suffix") = std::string("~"));
     }
 };
 
@@ -59,7 +60,7 @@ void initialise_symbolic_transpose(py::module &m)
     using opdictr = operator_dictionary<real_type, linalg::blas_backend>;
     using opdictc = operator_dictionary<complex_type, linalg::blas_backend>;
     auto cls = py::class_<symbolic_transpose>(m, "symbolic_transpose");
-    python_bindings::bind_all<bind_symbolic_transpose, symbolic_transpose, sOP, sPOP, sNBO<complex_type>, sSOP<complex_type>, sNBO<real_type>, sSOP<real_type>>(cls);
-    python_bindings::bind_all<bind_symbolic_transpose_dict, symbolic_transpose, real_type, sOP, sPOP, sNBO<complex_type>, sSOP<complex_type>, sNBO<real_type>, sSOP<real_type>>(cls);
-    python_bindings::bind_all<bind_symbolic_transpose_dict, symbolic_transpose, complex_type, sOP, sPOP, sNBO<complex_type>, sSOP<complex_type>, sNBO<real_type>, sSOP<real_type>>(cls);
+    python_bindings::bind_all<bind_symbolic_transpose, symbolic_transpose, sOP, sPOP, sNBO<complex_type>, sSOP<complex_type>, SOP<complex_type>, sNBO<real_type>, sSOP<real_type>, SOP<real_type>>(cls);
+    python_bindings::bind_all<bind_symbolic_transpose_dict, symbolic_transpose, real_type, sOP, sPOP, sNBO<complex_type>, sSOP<complex_type>, SOP<complex_type>, sNBO<real_type>, sSOP<real_type>, SOP<real_type>>(cls);
+    python_bindings::bind_all<bind_symbolic_transpose_dict, symbolic_transpose, complex_type, sOP, sPOP, sNBO<complex_type>, sSOP<complex_type>, SOP<complex_type>, sNBO<real_type>, sSOP<real_type>, SOP<real_type>>(cls);
 }

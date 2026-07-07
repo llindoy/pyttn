@@ -340,6 +340,45 @@ class SystemInfo:
 
         return new_sys
 
+    def liouville_space(self, grouping : str = "paired", suffix : str = "~") -> "SystemInfo":
+        """
+        Construct the Liouville-space doubled system.
+
+        Each primitive mode ``p`` is duplicated to create a corresponding tilde mode ``p{tilde_suffix}``.
+
+        Supported grouping schemes are:
+
+        - ``"none"``: physical and tilde modes are separate composites
+        - ``"paired"``: physical and tilde modes are grouped together
+
+        :param grouping: Liouville-space grouping scheme
+        :type grouping: str
+        :param tilde_suffix: Suffix appended to tilde-mode labels
+        :type tilde_suffix: str
+        :returns: Liouville-space SystemInfo
+        :rtype: SystemInfo
+        """
+        new_sys = SystemInfo()
+        if grouping == "paired":
+            for comp_label, prim_dict in self._data.items():
+                new_comp = {}
+                # physical primitives first
+                for p_label, p_mode in prim_dict.items():
+                    new_comp[p_label] = p_mode
+                # tilde primitives second
+                for p_label, p_mode in prim_dict.items():
+                    new_comp[f"{p_label}{suffix}"] = p_mode
+                new_sys[comp_label] = new_comp
+            return new_sys
+        elif grouping == "none":
+            for comp_label, prim_dict in self._data.items():
+                # original composite
+                new_sys[comp_label] = dict(prim_dict)
+                # tilde composite
+                new_sys[f"{comp_label}{suffix}"] = {f"{p_label}{suffix}": p_mode for p_label, p_mode in prim_dict.items()}
+            return new_sys
+        raise ValueError( f"Unknown grouping '{grouping}'. " "Supported values are 'paired' and 'none'.")
+
 
 def site_label(i : int, N : int, prefix="p") -> str:
     """

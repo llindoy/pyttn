@@ -20,7 +20,7 @@ from .opdictExt import OperatorDictionary
 from .sSOPExt import OPBase
 
 def symbolic_transpose(
-    Op : OPBase, sys : system_modes, opdict: Optional[OperatorDictionary]=None, Lopdict: Optional[OperatorDictionary]=None
+    Op : OPBase, sys : system_modes, opdict: Optional[OperatorDictionary]=None, Lopdict: Optional[OperatorDictionary]=None, suffix : str = "~",
 ) -> OPBase:
     """
     Apply a symbolic transpose to an operator.
@@ -30,7 +30,7 @@ def symbolic_transpose(
     the transpose is applied term-wise, including any required phase
     factors.
 
-    :param Op: Input operator (sOP, sPOP, sNBO, or sSOP)
+    :param Op: Input operator (sOP, sPOP, sNBO, sSOP, or SOP)
     :type Op: OPBase
     :param sys: System mode information describing the Hilbert space
     :type sys: system_modes
@@ -38,6 +38,8 @@ def symbolic_transpose(
     :type opdict: Optional[OperatorDictionary], optional
     :param Lopdict: Operator dictionary for output operators, defaults to None
     :type Lopdict: Optional[OperatorDictionary], optional
+    :param suffix: A string to append to non-trivial transpose operators default to ~
+    :type suffix: str
     :return: Transposed operator of the same type as the input
     :rtype: tuple[OPBase, OperatorDictionary]
     """
@@ -45,7 +47,7 @@ def symbolic_transpose(
     if isinstance(opdict, OperatorDictionary):
         if not isinstance(Lopdict, OperatorDictionary):
             Lopdict = type(opdict)(opdict.nmodes())
-        res = _symbolic_transpose_backend.apply(Op, opdict, sys, Lopdict)
+        res = _symbolic_transpose_backend.apply(Op, opdict, sys, Lopdict, suffix)
 
     else:
         res = _symbolic_transpose_backend.apply(Op, sys)

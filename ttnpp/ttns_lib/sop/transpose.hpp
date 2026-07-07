@@ -12,8 +12,8 @@
  * limitations under the License
  */
 
-#ifndef PYTTN_TTNS_LIB_SOP_LIOUVILLE_SPACE_HPP_
-#define PYTTN_TTNS_LIB_SOP_LIOUVILLE_SPACE_HPP_
+#ifndef PYTTN_TTNS_LIB_SOP_SYMBOLIC_TRANSPOSE_HPP_
+#define PYTTN_TTNS_LIB_SOP_SYMBOLIC_TRANSPOSE_HPP_
 
 #include <linalg/linalg.hpp>
 
@@ -103,9 +103,40 @@ namespace ttns
             }
         }
 
+        template <typename T>
+        static inline void apply(const SOP<T>& op, const system_modes &sysinf, SOP<T> &res)
+        {
+            ASSERT(sysinf.nprimitive_modes() >= op.nmodes(), "Failed to construct left superoperator input operator and system information are incompatible.");
+            // iterater over each term in the operator
+            res.resize(op.nmodes());
+            res.Eshift() = op.Eshift();
+            // iterater over each term in the operator
+            for (const auto &t : op)
+            {
+                // extracting its coefficient
+                ttns::literal::coeff<T> coeff = std::get<1>(t);
+
+                // and a product operator representation of it
+                sPOP term = std::get<0>(t).as_prod_op(op.operator_dictionary());
+                sPOP lt;
+
+                // now iterate over each term in the product
+                for (const auto &site_op : term)
+                {
+                    // now for each term we get the transpose operator.  This requires a query of the default operator dictionary associated
+                    // with the system mode std::pair<T, std::string>
+                    auto opinfo = query_default_operator_dictionary<T>(sysinf.primitive_mode(site_op.mode()).type(), site_op.op());
+                    auto tinfo = opinfo->transpose();
+                    coeff *= std::get<0>(tinfo);
+                    lt *= sOP(std::get<1>(tinfo), site_op.mode(), site_op.fermionic());
+                }
+                res.insert(coeff, lt);
+            }
+        }
+
  public:
         template <typename T, typename U, typename backend = linalg::blas_backend>
-        static inline void apply(const sOP& site_op, const operator_dictionary<T, backend> &opdict, const system_modes &sysinf, sNBO<U> &res, operator_dictionary<T, backend> &opdictf)
+        static inline void apply(const sOP& site_op, const operator_dictionary<T, backend> &opdict, const system_modes &sysinf, sNBO<U> &res, operator_dictionary<T, backend> &opdictf, const std::string& suffix = std::string("~"))
         {
             ASSERT(site_op.mode() < sysinf.nmodes(), "Failed to transpose operator.  Operator index out of bounds.");
             using op_type = ops::primitive<T, backend>;
@@ -114,7 +145,7 @@ namespace ttns
             // if the operator is in the user defined dictionary
             if (_op != nullptr)
             {
-                std::string label = site_op.op() + std::string("_tilde");
+                std::string label = site_op.op() +  suffix;
                 opdictf.insert(site_op.mode(), label, site_operator<T, backend>(_op->transpose(), site_op.mode()));
                 res = sOP(label, site_op.mode() , site_op.fermionic());
             }
@@ -129,7 +160,7 @@ namespace ttns
         }
 
         template <typename T, typename U, typename backend = linalg::blas_backend>
-        static inline void apply(const sPOP& op, const operator_dictionary<T, backend> &opdict, const system_modes &sysinf, sNBO<U> &res, operator_dictionary<T, backend> &opdictf)
+        static inline void apply(const sPOP& op, const operator_dictionary<T, backend> &opdict, const system_modes &sysinf, sNBO<U> &res, operator_dictionary<T, backend> &opdictf, const std::string& suffix = std::string("~"))
         {
             using op_type = ops::primitive<T, backend>;
 
@@ -145,7 +176,7 @@ namespace ttns
                 // if the operator is in the user defined dictionary
                 if (_op != nullptr)
                 {
-                    std::string label = site_op.op() + std::string("_tilde");
+                    std::string label = site_op.op() + suffix;
                     opdictf.insert(site_op.mode(), label, site_operator<T, backend>(_op->transpose(), site_op.mode()));
                     lt *= sOP(label, site_op.mode() , site_op.fermionic());
                 }
@@ -163,7 +194,7 @@ namespace ttns
         }
 
         template <typename T, typename U, typename V, typename backend = linalg::blas_backend>
-        static inline void apply(const sNBO<T>& op, const operator_dictionary<U, backend> &opdict, const system_modes &sysinf, sNBO<V> &res, operator_dictionary<U, backend> &opdictf)
+        static inline void apply(const sNBO<T>& op, const operator_dictionary<U, backend> &opdict, const system_modes &sysinf, sNBO<V> &res, operator_dictionary<U, backend> &opdictf, const std::string& suffix = std::string("~"))
         {
             using op_type = ops::primitive<U, backend>;
 
@@ -181,7 +212,7 @@ namespace ttns
                 // if the operator is in the user defined dictionary
                 if (_op != nullptr)
                 {
-                    std::string label = site_op.op() + std::string("_tilde");
+                    std::string label = site_op.op() + suffix;
                     opdictf.insert(site_op.mode(), label, site_operator<U, backend>(_op->transpose(), site_op.mode()));
                     lt *= sOP(label, site_op.mode() , site_op.fermionic());
                 }
@@ -199,7 +230,7 @@ namespace ttns
         }
 
         template <typename T, typename U, typename V,  typename backend = linalg::blas_backend>
-        static inline void apply(const sSOP<T>& op, const operator_dictionary<U, backend> &opdict, const system_modes &sysinf, sSOP<V> &res, operator_dictionary<U, backend> &opdictf)
+        static inline void apply(const sSOP<T>& op, const operator_dictionary<U, backend> &opdict, const system_modes &sysinf, sSOP<V> &res, operator_dictionary<U, backend> &opdictf, const std::string& suffix = std::string("~"))
         {
             ASSERT(sysinf.nprimitive_modes() >= op.nmodes(), "Failed to construct left superoperator input operator and system information are incompatible.");
             ASSERT(op.nmodes() <= opdict.nmodes(), "Failed to construct left_superoperator the operator dictionary and operator are not compatible.");
@@ -225,7 +256,7 @@ namespace ttns
                     // if the operator is in the user defined dictionary
                     if (_op != nullptr)
                     {
-                        std::string label = site_op.op() + std::string("_tilde");
+                        std::string label = site_op.op() + suffix;
                         opdictf.insert(site_op.mode(), label, site_operator<U, backend>(_op->transpose(), site_op.mode()));
                         lt *= sOP(label, site_op.mode() , site_op.fermionic());
                     }
@@ -242,7 +273,52 @@ namespace ttns
                 res += coeff * lt;
             }
         }
+
+        template <typename T, typename U, typename V,  typename backend = linalg::blas_backend>
+        static inline void apply(const SOP<T>& op, const operator_dictionary<U, backend> &opdict, const system_modes &sysinf, SOP<V> &res, operator_dictionary<U, backend> &opdictf, const std::string& suffix = std::string("~"))
+        {
+            ASSERT(sysinf.nprimitive_modes() >= op.nmodes(), "Failed to construct left superoperator input operator and system information are incompatible.");
+            ASSERT(op.nmodes() <= opdict.nmodes(), "Failed to construct left_superoperator the operator dictionary and operator are not compatible.");
+
+            using op_type = ops::primitive<U, backend>;
+            res.resize(op.nmodes());
+            res.Eshift() = op.Eshift();
+            // iterater over each term in the operator
+            for (const auto &t : op)
+            {
+                // extracting its coefficient
+                ttns::literal::coeff<V> coeff = std::get<1>(t);
+
+                // and a product operator representation of it
+                sPOP term = std::get<0>(t).as_prod_op(op.operator_dictionary());
+                sPOP lt;
+                // now iterate over each term in the product
+                for (const auto &site_op : term)
+                {
+                    // first try to query the operator from the opdict
+                    std::shared_ptr<op_type> _op = opdict.query(site_op.mode(), site_op.op());
+
+                    // if the operator is in the user defined dictionary
+                    if (_op != nullptr)
+                    {
+                        std::string label = site_op.op() + suffix;
+                        opdictf.insert(site_op.mode(), label, site_operator<U, backend>(_op->transpose(), site_op.mode()));
+                        lt *= sOP(label, site_op.mode() , site_op.fermionic());
+                    }
+                    else
+                    {
+                        // now for each term we get the transpose operator.  This requires a query of the default operator dictionary associated
+                        // with the system mode std::pair<T, std::string>
+                        auto opinfo = query_default_operator_dictionary<U>(sysinf.primitive_mode(site_op.mode()).type(), site_op.op());
+                        auto tinfo = opinfo->transpose();
+                        coeff *= std::get<0>(tinfo);
+                        lt *= sOP(std::get<1>(tinfo), site_op.mode() , site_op.fermionic());
+                    }
+                }
+                res.insert(coeff, lt);
+            }
+        }
     };
 }
 
-#endif // PYTTN_TTNS_LIB_SOP_LIOUVILLE_SPACE_HPP_
+#endif // PYTTN_TTNS_LIB_SOP_SYMBOLIC_TRANSPOSE_HPP_

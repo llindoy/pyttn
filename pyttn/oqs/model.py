@@ -11,7 +11,8 @@
 # limitations under the License
 
 from typing import Optional, Union, List
-from pyttn.ttns.sop import SystemInfo, lCSOP
+from pyttn.ttns.sop import SystemInfo, lSOP, lCSOP
+from pyttn.ttns.topology import InteractionGraph
 from .baths.bath import Bath, BathSpec
 
 from itertools import combinations
@@ -33,7 +34,7 @@ class OQSModel:
 
     def __init__(self, *,
                  system_info : Optional[SystemInfo] = None, 
-                 system_hamiltonian : Optional[lCSOP] = None,
+                 system_hamiltonian : Optional[Union[lSOP, lCSOP]] = None,
                  baths: Optional[list[BathSpec]] = None): 
         """Initialise an open quantum system model.
 
@@ -47,7 +48,11 @@ class OQSModel:
 
         """
         self._system_info = system_info
-        self._system_hamiltonian = system_hamiltonian
+        if isinstance(system_hamiltonian, lCSOP):
+            self._system_hamiltonian = system_hamiltonian
+        else:
+            self._system_hamiltonian = system_hamiltonian.to_lCSOP()
+
         self._baths = list(baths) if baths is not None else []
 
     def set_system_info(self, sysinf : SystemInfo) -> "OQSModel":
@@ -82,16 +87,19 @@ class OQSModel:
 
         self._system_info = value
 
-    def set_system_hamiltonian(self, H : lCSOP) -> "OQSModel":
+    def set_system_hamiltonian(self, H : Union[lSOP, lCSOP]) -> "OQSModel":
         """Set the system Hamiltonian.
 
         :param H: Labelled operator acting on system degrees of freedom
-        :type H: lSOP
+        :type H: Union[lSOP, lCSOP]
         :return: The updated model instance
         :rtype: OQSModel
         """
 
-        self._system_hamiltonian = H
+        if isinstance(H, lCSOP):
+            self._system_hamiltonian = H
+        else:
+            self._system_hamiltonian = H.to_lCSOP()        
         return self
 
     @property
@@ -99,20 +107,22 @@ class OQSModel:
         """Return the system Hamiltonian.
 
         :return: Labelled operator describing the system Hamiltonian
-        :rtype: lSOP
+        :rtype: lCSOP
         """
 
         return self._system_hamiltonian
 
     @system_hamiltonian.setter
-    def system_hamiltonian(self, H : lCSOP):
+    def system_hamiltonian(self, H : Union[lSOP, lCSOP]):
         """Set the system Hamiltonian.
 
         :param H: Labelled operator acting on system degrees of freedom
-        :type H: lSOP
+        :type H: Union[lSOP, lCSOP]
         """
-
-        self._system_hamiltonian = H
+        if isinstance(H, lCSOP):
+            self._system_hamiltonian = H
+        else:
+            self._system_hamiltonian = H.to_lCSOP()
 
     def add_bath(self, bath: Bath, coupling_ops: Union[lCSOP, list[lCSOP]], params: Optional[dict] = None, tag: Optional[str] = None,) -> "OQSModel":
         """Add a bath coupled to the system.
@@ -158,3 +168,6 @@ class OQSModel:
         :rtype: list[BathSpec]
         """
         return self._baths
+    
+
+#ef build_model_graph(model : OQSModel) -> InteractionGraph:
