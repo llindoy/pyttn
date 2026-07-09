@@ -179,9 +179,83 @@ class SuperOp:
         return rop, Lopdict
     
     @staticmethod
-    def commutator(op : lCSOP, hsys : SystemInfo, lsys : SystemInfo, opdict: Optional[LabelledOperatorDictionary] = None, suffix : str = "~") -> tuple[lCSOP, Optional[LabelledOperatorDictionary]]:
-        pass
+    def _merge_opdicts(left: LabelledOperatorDictionary,right: LabelledOperatorDictionary) -> LabelledOperatorDictionary:
+        nmodes = max(left.nmodes(),right.nmodes())
+
+        raw = OperatorDictionary(nmodes,dtype=left.dtype)
+
+        merged = LabelledOperatorDictionary(raw)
+
+        for mode in range(left.nmodes()):
+            for label, op in left.site_dictionary(mode).items():
+                merged.insert(mode, label, op)
+
+        for mode in range(right.nmodes()):
+            for label, op in right.site_dictionary(mode).items():
+                merged.insert(mode, label, op)
+
+        return merged
 
     @staticmethod
+    def commutator(op : lCSOP, hsys : SystemInfo, lsys : SystemInfo, opdict: Optional[LabelledOperatorDictionary] = None, suffix : str = "~") -> tuple[lCSOP, Optional[LabelledOperatorDictionary]]:
+        """
+        Construct the commutator superoperator. This embeds an operator into the Liouville space defined by ``lsys`` and represents the action
+
+            O_C = O ⊗ I - I ⊗ Oᵀ
+
+        where ``O`` acts on the physical Hilbert-space modes and the identity acts on the remaining Liouville-space degrees of freedom.  
+        If an operator dictionary is supplied, a corresponding Liouville-space operator dictionary is constructed containingoperators acting on all modes appearing in ``lsys``.
+
+        :param op: Operator acting on the Hilbert space
+        :type op: lCSOP
+        :param hsys: Hilbert-space system definition
+        :type hsys: SystemInfo
+        :param lsys: Liouville-space system definition
+        :type lsys: SystemInfo
+        :param opdict: Optional labelled operator dictionary
+        :type opdict: Optional[LabelledOperatorDictionary]
+        :param suffix: Tilde suffix used in the Liouville-space system
+        :type suffix: str
+        :returns: Commutator superoperator and corresponding Liouville-space operator dictionary
+        :rtype: tuple[lCSOP, Optional[LabelledOperatorDictionary]]
+        """
+
+        OL, Lopdict = SuperOp.left(op, hsys, lsys, opdict, suffix)
+        OR, Ropdict = SuperOp.right(op, hsys, lsys, opdict, suffix)
+
+        if opdict is None:
+            return OL-OR, None
+        else:
+            return OL-OR, SuperOp._merge_opdicts(Lopdict, Ropdict)
+        
+    @staticmethod
     def anticommutator(op : lCSOP, hsys : SystemInfo, lsys : SystemInfo, opdict: Optional[LabelledOperatorDictionary] = None, suffix : str = "~") -> tuple[lCSOP, Optional[LabelledOperatorDictionary]]:
-        pass
+        """
+        Construct the anticommutator superoperator. This embeds an operator into the Liouville space defined by ``lsys`` and represents the action
+
+            O_C = O ⊗ I + I ⊗ Oᵀ
+
+        where ``O`` acts on the physical Hilbert-space modes and the identity acts on the remaining Liouville-space degrees of freedom.  
+        If an operator dictionary is supplied, a corresponding Liouville-space operator dictionary is constructed containingoperators acting on all modes appearing in ``lsys``.
+
+        :param op: Operator acting on the Hilbert space
+        :type op: lCSOP
+        :param hsys: Hilbert-space system definition
+        :type hsys: SystemInfo
+        :param lsys: Liouville-space system definition
+        :type lsys: SystemInfo
+        :param opdict: Optional labelled operator dictionary
+        :type opdict: Optional[LabelledOperatorDictionary]
+        :param suffix: Tilde suffix used in the Liouville-space system
+        :type suffix: str
+        :returns: Anticommutator superoperator and corresponding Liouville-space operator dictionary
+        :rtype: tuple[lCSOP, Optional[LabelledOperatorDictionary]]
+        """
+
+        OL, Lopdict = SuperOp.left(op, hsys, lsys, opdict, suffix)
+        OR, Ropdict = SuperOp.right(op, hsys, lsys, opdict, suffix)
+
+        if opdict is None:
+            return OL+OR, None
+        else:
+            return OL+OR, SuperOp._merge_opdicts(Lopdict, Ropdict)

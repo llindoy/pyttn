@@ -31,6 +31,7 @@ from pyttn.ttnpp import (
 
 from .liouvilleSpaceExt import liouville_space_superoperator
 from .opdictExt import OperatorDictionary, operator_dictionary
+from .operator_dictionary import LabelledOperatorDictionary
 from .SOPExt import SOP, ms_SOP, multiset_SOP
 from .sSOPExt import (
     OPBase,
@@ -97,5 +98,6 @@ __all__: list[str] = [
     "sum",
     "prod",
     "SuperOp",
+    "LabelledOperatorDictionary",
 
 ]

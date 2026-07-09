@@ -17,7 +17,7 @@ from .ntreeExt import ntree
 class TopoTree: 
     """A lightweight wrapper around an ntree object that associates leaf nodes with composite site labels.
 
-    This class provides a mapping between the leaves of a tree tensor network topology
+    This class provides a mapping between the leaves of a wtree tensor network topology
     and user-defined site labels. The ordering of the labels determines the ordering
     of modes when constructing system_modes and relabelling operator objects.
     """
