@@ -14,7 +14,6 @@ import numpy as np
 import networkx as nx
 from typing import Optional
 from .spectral_tree import __spectral_split_indices
-from .spanning_tree import distance_matrix_to_graph, __insert_physical_nodes
 
 def __build_local_spectral_ttn(nodes, W, T, next_index, max_children):
     """

@@ -426,3 +426,121 @@ class DiscreteFermionicBath(DiscreteOQSBath):
             H, Sp, self._gk, self._wk, Sm=Sm, binds=binds, geom=geom, bskip=bskip
         )
         return H
+
+
+class SplitDiscreteFermionicBath:
+    """A fermionic bath split into two independently discretised channels - occupied
+    ("filled") and unoccupied ("empty") orbitals, typically produced via
+    ``FermionicBath.discretise(decomposition, Ef=..., sigma="+")`` and
+    ``sigma="-"`` respectively - attached to the tree as a single unit under one
+    attachment node.
+
+    The two channels can be laid out in the tree in one of two ways:
+
+    - ``attachment="branch"`` (the physically-motivated default, matching a
+      hand-built occupied/empty tree): two independent subtrees are inserted as
+      children of the attachment node, one per channel.
+    - ``attachment="merge"``: both channels' modes are combined into a single
+      subtree, in an order controlled by ``ordering``.
+
+    :param gf: Coupling coefficients for the filled (occupied) channel
+    :type gf: np.ndarray
+    :param wf: Frequencies for the filled (occupied) channel
+    :type wf: np.ndarray
+    :param ge: Coupling coefficients for the empty (unoccupied) channel
+    :type ge: np.ndarray
+    :param we: Frequencies for the empty (unoccupied) channel
+    :type we: np.ndarray
+    :param attachment: How to attach the two channels to the tree. (Default "branch")
+    :type attachment: {"branch", "merge"}, optional
+    :param ordering: Only used when ``attachment="merge"``: ``"filled_first"``
+        concatenates all filled modes then all empty modes; ``"interleaved"``
+        alternates between them; or an explicit list of ``("filled"|"empty", local
+        index)`` tuples (each filled/empty index appearing exactly once) for a fully
+        user-specified order. (Default "filled_first")
+    :type ordering: {"filled_first", "interleaved"} or list[tuple[str, int]], optional
+    """
+
+    def __init__(self, gf: np.ndarray, wf: np.ndarray, ge: np.ndarray, we: np.ndarray, attachment: str = "branch", ordering: Union[str, list] = "filled_first"):
+        if attachment not in ("branch", "merge"):
+            raise ValueError(f"Unknown attachment '{attachment}'; expected 'branch' or 'merge'.")
+        self._filled = DiscreteFermionicBath(gf, wf)
+        self._empty = DiscreteFermionicBath(ge, we)
+        self._attachment = attachment
+        self._ordering = ordering
+        self._leaf_source: Optional[list] = None
+
+    def is_fermionic(self) -> bool:
+        """Returns True: a split bath is always fermionic."""
+        return True
+
+    def truncate_modes(self, truncation: Optional[TruncationBase] = None):
+        """Apply the same truncation rule to both channels.
+
+        :param truncation: The truncation rule, forwarded to both channels' own
+            ``truncate_modes``. (Default DepthTruncation(2), per channel)
+        :type truncation: TruncationBase, optional
+        """
+        self._filled.truncate_modes(truncation)
+        self._empty.truncate_modes(truncation)
+
+    def system_information(self, mode_comb=None, force_evaluate=False):
+        """Force both channels to evaluate their own internal system_modes objects; see :meth:`DiscreteFermionicBath.system_information`."""
+        self._filled.system_information(mode_comb=mode_comb, force_evaluate=force_evaluate)
+        self._empty.system_information(mode_comb=mode_comb, force_evaluate=force_evaluate)
+
+    def _resolve_merge_order(self) -> list:
+        nf, ne = len(self._filled.primitive_mode_dims), len(self._empty.primitive_mode_dims)
+        full = [("filled", i) for i in range(nf)] + [("empty", i) for i in range(ne)]
+        if self._ordering == "filled_first":
+            return full
+        if self._ordering == "interleaved":
+            order = []
+            for i in range(max(nf, ne)):
+                if i < nf:
+                    order.append(("filled", i))
+                if i < ne:
+                    order.append(("empty", i))
+            return order
+        if isinstance(self._ordering, list):
+            if sorted(self._ordering) != sorted(full):
+                raise ValueError(f"Custom ordering must contain each of {full} exactly once.")
+            return list(self._ordering)
+        raise ValueError(f"Unknown ordering '{self._ordering}'; expected 'filled_first', 'interleaved', or an explicit list of ('filled'|'empty', index) tuples.")
+
+    def add_bath_tree(self, node: ntreeNode, degree: int, chi, lhd=None) -> list:
+        """Attach both channels under ``node``, per ``attachment``/``ordering``; see the class docstring. Return value mirrors :meth:`DiscreteBath.add_bath_tree` but is not used by callers (they re-derive leaf information from ``node`` itself, exactly as for a plain single-channel bath)."""
+        if self._attachment == "branch":
+            # each call appends its own subtree as a new child of node - DFS leaf
+            # order therefore visits every filled leaf before any empty leaf.
+            self._filled.add_bath_tree(node, degree, chi, lhd)
+            self._empty.add_bath_tree(node, degree, chi, lhd)
+            self._leaf_source = [("filled", i) for i in range(len(self._filled.primitive_mode_dims))] + [("empty", i) for i in range(len(self._empty.primitive_mode_dims))]
+        else:
+            order = self._resolve_merge_order()
+            g = np.array([self._filled.gk[i] if ch == "filled" else self._empty.gk[i] for ch, i in order])
+            w = np.array([self._filled.wk[i] if ch == "filled" else self._empty.wk[i] for ch, i in order])
+            self._merged = DiscreteFermionicBath(g, w)
+            self._merged.system_information()
+            self._merged.add_bath_tree(node, degree, chi, lhd)
+            self._leaf_source = order
+        return []
+
+    @property
+    def primitive_mode_dims(self):
+        """The local Hilbert space dimension of each mode, in the same order the leaves ended up in the tree built by :meth:`add_bath_tree` (which must be called first)."""
+        if self._leaf_source is None:
+            raise RuntimeError("add_bath_tree must be called before primitive_mode_dims is available.")
+        return [self._filled.primitive_mode_dims[i] if ch == "filled" else self._empty.primitive_mode_dims[i] for ch, i in self._leaf_source]
+
+    def add_system_bath_hamiltonian(self, H, Sp, Sm, geom="star", binds=None, bskip=1):
+        """Add both channels' system-bath coupling Hamiltonians to ``H``, splitting ``binds`` between channels according to the tree layout chosen by :meth:`add_bath_tree` (which must be called first). See :meth:`DiscreteFermionicBath.add_system_bath_hamiltonian` for parameter meanings - identical here, just applied once per channel."""
+        if self._leaf_source is None:
+            raise RuntimeError("add_bath_tree must be called before add_system_bath_hamiltonian.")
+        if binds is None:
+            binds = list(range(bskip, bskip + len(self._leaf_source)))
+        binds_filled = [b for b, (ch, _) in zip(binds, self._leaf_source) if ch == "filled"]
+        binds_empty = [b for b, (ch, _) in zip(binds, self._leaf_source) if ch == "empty"]
+        H = self._filled.add_system_bath_hamiltonian(H, Sp, Sm, geom=geom, binds=binds_filled)
+        H = self._empty.add_system_bath_hamiltonian(H, Sp, Sm, geom=geom, binds=binds_empty)
+        return H

@@ -54,7 +54,16 @@ from .spectral_density import (
     SumSpectralDensity,
 )
 
-from .model import OQSModel
+from .model import OQSModel, Representation
+from .method_builder import BuildResult, Method, MethodBuilder
+from .topology import (
+    attach_bath_placeholders,
+    build_joint_interaction_graph,
+    default_bath_weight,
+    propose_joint_topology,
+    propose_system_topology,
+    propose_topology,
+)
 
 __all__: list[str] = [
     "OrthopolDiscretisation",
@@ -95,4 +104,14 @@ __all__: list[str] = [
     "DebyeSpectralDensity",
     "BrownianOscillatorSpectralDensity",
     "OQSModel",
+    "Representation",
+    "MethodBuilder",
+    "Method",
+    "BuildResult",
+    "propose_system_topology",
+    "attach_bath_placeholders",
+    "propose_topology",
+    "propose_joint_topology",
+    "build_joint_interaction_graph",
+    "default_bath_weight",
 ]

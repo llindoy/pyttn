@@ -13,7 +13,7 @@
 # limitations under the License
 
 from ..sop.system_information import SystemInfo
-from ..sop.operator_builder import lCSOP
+from ..sop.labelled_SOP import lCSOP
 
 def interaction_terms(op: lCSOP,sysinfo: SystemInfo):
     prim_to_comp = {}
@@ -22,9 +22,9 @@ def interaction_terms(op: lCSOP,sysinfo: SystemInfo):
         for prim_label in prims:
             prim_to_comp[prim_label] = comp_label
 
-    opdict = op.sop.get_operator_dictionary()
+    opdict = op.expr.get_operator_dictionary()
 
-    for term, coeff in op.sop:
+    for term, coeff in op.expr:
 
         pop = term.as_sPOP(opdict)
 

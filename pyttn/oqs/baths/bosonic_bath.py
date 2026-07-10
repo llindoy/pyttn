@@ -15,7 +15,6 @@ from typing import Callable, Optional, Union
 import numpy as np
 import scipy as sp
 
-from pyttn.ttns import OPBase
 
 from ..bath_fitting import (
     BathDiscretisation,
@@ -284,6 +283,31 @@ class BosonicBath(Bath):
         :rtype: Union[np.ndarray, float]
         """
         return evaluate_bosonic_spectral_function(self.Jw, w, beta=self.beta)
+
+    def reorganisation_energy(self, wmin: Optional[float] = None, wmax: Optional[float] = None, **kwargs) -> float:
+        """Return the bath reorganisation energy.  Evaluates
+
+        .. math::
+            \\lambda = \\frac{1}{\\pi}\\int_{0}^{\\infty} \\frac{J(\\omega)}{\\omega} \\mathrm{d}\\omega
+
+        over the positive-frequency branch of the spectral density. If the spectral density provides a ``Lambda`` attribute, that value is returned directly.
+
+        :param wmin: lower integration bound, defaults to ``max(self.wmin, 0)``
+        :type wmin: float, optional
+        :param wmax: upper integration bound, defaults to ``self.wmax``
+        :type wmax: float, optional
+        :param `**kwargs`: Additional keyword arguments forwarded to ``scipy.integrate.quad``
+        :return: The bath reorganisation energy
+        :rtype: float
+        """
+        if hasattr(self.Jw, "Lambda"):
+            return float(self.Jw.Lambda)
+
+        lo = wmin if wmin is not None else max(self.wmin, 0.0)
+        hi = wmax if wmax is not None else self.wmax
+
+        result = sp.integrate.quad(lambda w: self.Jw(w) / w, lo, hi, **kwargs)[0]
+        return result / np.pi
 
     def discretise(
         self, discretisation_engine: BathDiscretisation, **kwargs

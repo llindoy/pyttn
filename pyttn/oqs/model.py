@@ -43,17 +43,9 @@ class OQSModel:
         :type baths: list[BathSpec], optional
         :param representation: Whether or not this is storing a Hilbert or Liouville space representation of the generator
         :type representation: Representation
-
-        Notes
-        -----                    
-        If the toplogy object has been specified it must specify the full tree connectivity for the system degrees of freedom.
-        Optionally it can also include specification of where in the tree bath degrees of freedom are too be attached.  
-        When including bath connectivity it is necessary to include additional leaf nodes in the tree structure that have the
-        same label as the tag used when defining the BathSpec representation of the Bath in order to ensure that Baths can be 
-        appropriately identified.
         """
         self._system_info = system_info
-        if isinstance(system_generator, lCSOP):
+        if system_generator is None or isinstance(system_generator, lCSOP):
             self._system_generator = system_generator
         else:
             self._system_generator = system_generator.to_lCSOP()
@@ -166,8 +158,7 @@ class OQSModel:
         return self._representation is Representation.LIOUVILLE
 
     def validate(self):
-        """
-        Validate the consistency of the OQS model
+        """Validate the consistency of the OQS model
 
         :raises ValueError: If any inconsistency is detected.
         """
@@ -177,7 +168,9 @@ class OQSModel:
         
         if self._system_generator is None:
             raise ValueError("No system Generator has been defined")
-        system_labels = set(self._system_info.primitive_labels())
+        system_labels = set()
+        for comp in self._system_info.composite_labels():
+            system_labels.update(self._system_info.primitive_labels(comp))
         hsites = self._system_generator.sites()
         invalid = hsites - system_labels
 
@@ -200,12 +193,7 @@ class OQSModel:
 
 
     def add_bath(self, bath: Bath, coupling_ops: Union[lCSOP, list[lCSOP]], tag : str, params: Optional[dict] = None) -> "OQSModel":
-        """Add a bath coupled to the system.
-
-        This function associates a bath object (describing the environment)
-        with one or more system operators defining how the system couples to it.
-
-        Supports both:
+        """Add a bath coupled to the system. Supports both:
 
         - Single-channel baths (one coupling operator)
         - Multi-channel correlated baths (list of coupling operators)

@@ -19,7 +19,14 @@ from .networkx_converter import convert_nx_to_subtree, convert_nx_to_tree
 from .interaction_hypergraph import InteractionHypergraph, build_interaction_hypergraph
 from .interaction_graph import InteractionGraph, build_interaction_graph, hypergraph_to_graph
 from .cluster_modes import cluster_modes_graph
-from .tree_cut_metrics import compute_tree_cut_metrics, propose_bond_dimensions
+from .tree_cut_metrics import compute_tree_cut_metrics, propose_bond_dimensions, bond_dimension_inputs
+from .topology_proposal import (
+    connected_components,
+    bridge_disconnected_components,
+    build_topology_tree,
+    join_disconnected_components,
+    propose_topology_from_graph,
+)
 __all__ = [
     "NodeSumSetter",
     "NodeIncrementSetter",
@@ -40,4 +47,10 @@ __all__ = [
     "compute_tree_cut_metrics",
     "propose_bond_dimensions",
     "build_bond_dimension_trees",
+    "bond_dimension_inputs",
+    "connected_components",
+    "bridge_disconnected_components",
+    "build_topology_tree",
+    "join_disconnected_components",
+    "propose_topology_from_graph",
 ]

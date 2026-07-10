@@ -12,7 +12,7 @@
 # limitations under the License
 
 from ..sop.system_information import SystemInfo
-from ..sop.operator_builder import lCSOP
+from ..sop.labelled_SOP import lCSOP
 from .interaction_terms import interaction_terms
 
 class InteractionHypergraph:

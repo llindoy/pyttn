@@ -13,8 +13,8 @@
 
 from .opdictExt import OperatorDictionary
 from .symbolicTransposeExt import symbolic_transpose
-from .operator_dictionary import LabelledOperatorDictionary
-from .operator_builder import lCSOP
+from .labelled_operator_dictionary import LabelledOperatorDictionary
+from .labelled_SOP import lCSOP
 from .system_information import SystemInfo
 
 from typing import Optional

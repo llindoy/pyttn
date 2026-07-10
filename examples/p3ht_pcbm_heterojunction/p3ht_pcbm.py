@@ -187,8 +187,7 @@ def p3ht_pcbm_single_set(topo, capacity, mode_dims, tmax=200, dt=0.25, adaptive=
                          ofname="p3ht_pcbm.h5", output_skip=1):
     from p3ht_pcbm_hamiltonian import hamiltonian
 
-    """Function for performing the dynamics of the single set p3ht_pcbm model
-    """
+    """Function for performing the dynamics of the single set p3ht_pcbm model"""
     nsteps = int(tmax / (dt)) + 1
     Nmodes = len(mode_dims)
 
@@ -278,13 +277,10 @@ def p3ht_pcbm_single_set(topo, capacity, mode_dims, tmax=200, dt=0.25, adaptive=
     output_results(ofname, timepoints, res, maxchi, (t2 - t1))
 
 
-def p3ht_pcbm_multiset(
-    topo, mode_dims, tmax=200, dt=0.25, ofname="p3ht_pcbm.h5", output_skip=1
-):
+def p3ht_pcbm_multiset(topo, mode_dims, tmax=200, dt=0.25, ofname="p3ht_pcbm.h5", output_skip=1):
 
 
-    """Function for performing the dynamics of the multiset p3ht_pcbm model
-    """
+    """Function for performing the dynamics of the multiset p3ht_pcbm model"""
     nsteps = int(tmax / (dt)) + 1
     Nmodes = len(mode_dims)
 

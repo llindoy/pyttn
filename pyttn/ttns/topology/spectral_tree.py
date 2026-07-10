@@ -10,8 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-from math import ceil
-from typing import Any, Generator, Optional
+from typing import Optional
 
 import networkx as nx
 import numpy as np

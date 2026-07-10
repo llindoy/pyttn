@@ -31,7 +31,7 @@ from pyttn.ttnpp import (
 
 from .liouvilleSpaceExt import liouville_space_superoperator
 from .opdictExt import OperatorDictionary, operator_dictionary
-from .operator_dictionary import LabelledOperatorDictionary
+from .labelled_operator_dictionary import LabelledOperatorDictionary
 from .SOPExt import SOP, ms_SOP, multiset_SOP
 from .sSOPExt import (
     OPBase,
@@ -42,7 +42,9 @@ from .sSOPExt import (
     sSOP,
 )
 
-from .operator_builder import OperatorBuilder, operator_context, wrap, op, fop, operator, lSOP, lCSOP, sum, prod
+from .operator_builder import OperatorBuilder, operator_context, wrap, op, fop, operator, sum, prod
+from .labelled_sSOP import lSOP
+from .labelled_SOP import lCSOP
 from .system_information import SystemInfo, site_label, site_labels, group_consecutive_labels
 from .symbolicTransposeExt import symbolic_transpose
 from .super_operator import SuperOp

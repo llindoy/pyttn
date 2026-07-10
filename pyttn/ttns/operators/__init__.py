@@ -19,11 +19,10 @@ from .mssopOperatorExt import (
 from .productOperatorExt import ProductOperator, product_operator
 from .siteOperatorsExt import SiteOperator, site_operator
 from .sopOperatorExt import SOPOperator, sop_operator
-from .opExt import op, Op
+from .opExt import Op
 
 __all__: list[str] = [
     "Op",
-    "op",
     "ops",
     "SiteOperator",
     "site_operator",

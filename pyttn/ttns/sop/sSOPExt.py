@@ -11,7 +11,10 @@
 # limitations under the License
 
 from abc import ABCMeta, abstractmethod
-from typing import Union, Optional
+from typing import Union, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .opdictExt import OperatorDictionary
 
 import numpy as np
 

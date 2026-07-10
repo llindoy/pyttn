@@ -65,6 +65,15 @@ class TopoTree:
         """
         return {label: i for i, label in enumerate(self.leaf_labels)}
 
+    def leaf_paths(self) -> Dict[str, List[int]]:
+        """Construct a mapping from site labels to their node path in the tree.
+
+        :return: A mapping from site labels to the list of child indices leading
+            from the root to that leaf
+        :rtype: dict[str, list[int]]
+        """
+        return dict(zip(self.leaf_labels, self.tree.leaf_indices()))
+
     def insert_subtree(self, 
                        node_path : List[int], 
                        subtree : Optional[ntree] = None, 
@@ -110,7 +119,9 @@ class TopoTree:
         #get the node we are attaching the subtree to
         node = None
         try:
-            node = self.tree.at(node_path)
+            # ntree.at([]) cannot reach the root when the root has no children yet
+            # (e.g. a single-composite system tree); access it directly instead.
+            node = self.tree.root() if len(node_path) == 0 else self.tree.at(node_path)
         except Exception:
             raise RuntimeError(f"Failed to insert subtree.  Node path {node_path} is not valid for tree {self.tree}.") from None
 

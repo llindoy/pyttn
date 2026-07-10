@@ -85,6 +85,32 @@
 !examples/scaling/spin_boson_model/
 !examples/scaling/spin_boson_model/*.py
 
+#now we include the labelled interface examples folder
+!examples/labelled_interface/
+!examples/labelled_interface/*.py
+!examples/labelled_interface/anderson_impurity_model/
+!examples/labelled_interface/anderson_impurity_model/*.py
+!examples/labelled_interface/vibronic/
+!examples/labelled_interface/vibronic/*.py
+!examples/labelled_interface/vibronic/*.pkl
+!examples/labelled_interface/spin_models/
+!examples/labelled_interface/spin_models/dissipative_xy/
+!examples/labelled_interface/spin_models/dissipative_xy/cayley_tree/
+!examples/labelled_interface/spin_models/dissipative_xy/cayley_tree/*.py
+!examples/labelled_interface/spin_models/dissipative_xy/chain/
+!examples/labelled_interface/spin_models/dissipative_xy/chain/*.py
+!examples/labelled_interface/pyrazine/
+!examples/labelled_interface/pyrazine/*.py
+!examples/labelled_interface/oqs/
+!examples/labelled_interface/oqs/spin_boson/
+!examples/labelled_interface/oqs/spin_boson/*.py
+!examples/labelled_interface/oqs/spin_boson/METTS/
+!examples/labelled_interface/oqs/spin_boson/METTS/*.py
+!examples/labelled_interface/scaling/
+!examples/labelled_interface/scaling/*.py
+!examples/labelled_interface/scaling/spin_boson_model/
+!examples/labelled_interface/scaling/spin_boson_model/*.py
+
 #now we include the actual library include files
 !ttnpp
 !ttnpp/*
@@ -125,6 +151,9 @@
 !pyttn/utils
 !pyttn/utils/*.py
 
+!pyttn/simulation
+!pyttn/simulation/*.py
+
 #now we include the c++ src files
 !src
 !src/*.cpp
@@ -137,14 +166,16 @@
 !tests/CMakeLists.txt
 !tests/linalg/CMakeLists.txt
 !tests/pyttn/*/
-!tests/pyttn/linalg/*.py
 !tests/pyttn/algorithms/*.py
+!tests/pyttn/linalg/*.py
 !tests/pyttn/observables/*.py
 !tests/pyttn/operators/*.py
-!tests/pyttn/state/*.py
-!tests/pyttn/linalg/*.py
 !tests/pyttn/oqs/*.py
+!tests/pyttn/state/*.py
+!tests/pyttn/sop/*.py
+!tests/pyttn/linalg/*.py
 !tests/pyttn/topology/*.py
+!tests/pyttn/simulation/*.py
 !tests/ttns/*
 !tests/ttns/**
 !tests/utils/*

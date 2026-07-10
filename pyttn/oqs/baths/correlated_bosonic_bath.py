@@ -14,7 +14,6 @@ from typing import Callable, Optional, Union
 
 import numpy as np
 
-from pyttn.ttns import OPBase
 
 from ..bath_fitting import (
     BathDiscretisation,

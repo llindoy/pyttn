@@ -96,9 +96,6 @@ def sbm_dynamics(Nb,alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep=1
     :type nhilbmax: int, optional
     """
     
-    """
-    Set up the system information
-    """
     # setup the function for evaluating the exponential cutoff spectral density
     @jit(nopython=True)
     def J(w):
@@ -129,9 +126,6 @@ def sbm_dynamics(Nb,alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep=1
     sysinf[0] = pyttn.tls_mode()
     sysinf = pyttn.combine_systems(sysinf, bsys)
 
-    """
-    Set up the Hamiltonian for the discretised model
-    """
     # set up the total Hamiltonian
     H = pyttn.SOP(sysinf.nprimitive_modes())
 
@@ -141,10 +135,8 @@ def sbm_dynamics(Nb,alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep=1
     # add the system bath Hamiltonian terms to the Hamiltonian
     H = discbath.add_system_bath_hamiltonian(H, pyttn.sOP("sz", 0), geom=geom)
 
-    """
-    Set up the TTN structures and initial state of the wavefunction. 
-    Here we make use of the discrete bath add_bath_tree function to add each of the trees
-    """
+    #Set up the TTN structures and initial state of the wavefunction. 
+    #Here we make use of the discrete bath add_bath_tree function to add each of the trees
     # construct the topology and capacity trees used for constructing
     chi0 = chi
     if adaptive:
@@ -160,18 +152,14 @@ def sbm_dynamics(Nb,alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep=1
     A = pyttn.ttn(topo, capacity, dtype=np.complex128)
     A.set_state([0 for i in range(sysinf.nmodes())])
 
-    """
-    Set up the operator objects representing the Hamiltonian and observables of interest
-    """
+    #Set up the operator objects representing the Hamiltonian and observables of interest
     # set up the Hamiltonian as a sop object
     h = pyttn.sop_operator(H, A, sysinf)
 
     # set up the observable to measure
     op = pyttn.site_operator(pyttn.sOP("sz", 0), sysinf)
 
-    """
-    Set up objects used for computing matrix elements and performing the time evolution
-    """
+    #Set up objects used for computing matrix elements and performing the time evolution
     # construct objects need for evaluating observables
     mel = pyttn.matrix_element(A)
 
@@ -188,9 +176,7 @@ def sbm_dynamics(Nb,alpha, wc, s, eps, delta, chi, nbose, dt, beta=None, nstep=1
     sweep.dt = dt
     sweep.coefficient = -1.0j
 
-    """
-    Perform the time evolution and measure the required observables dumping to a hdf5 file.
-    """
+    #Perform the time evolution and measure the required observables dumping to a hdf5 file.
     # run dynamics and measure properties storing them in a file
     t=(np.arange(nstep + 1) * dt)
     Sz = np.zeros(nstep + 1)

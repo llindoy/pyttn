@@ -15,7 +15,6 @@ from .ttns import (  # noqa: I001
     OperatorBuilder,
     operator_context, 
     wrap, 
-    op, 
     fop, 
     operator,
     SystemInfo,

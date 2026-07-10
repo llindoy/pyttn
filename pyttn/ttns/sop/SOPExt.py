@@ -11,14 +11,14 @@
 # limitations under the License
 
 from abc import ABCMeta, abstractmethod
-from typing import Union, Optional
+from typing import Union
 
 import numpy as np
 
 from pyttn.ttnpp import SOP_complex, multiset_SOP_complex, system_modes
 
 from .opdictExt import operator_dictionary
-from .sSOPExt import OPBase, sSOP, _todense_impl, _attach_todense
+from .sSOPExt import OPBase, sSOP, _attach_todense
 
 try:
     from pyttn.ttnpp import SOP_real, multiset_SOP_real

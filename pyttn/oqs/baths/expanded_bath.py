@@ -11,20 +11,10 @@
 # limitations under the License
 
 from typing import Callable, Optional, Union
-import numpy as np
 import abc
 
-from pyttn.utils.truncate import DepthTruncation, TruncationBase
-from pyttn.utils.mode_combination import ModeCombination
 from pyttn import (
-    system_modes,
-    boson_mode,
-    fermion_mode,
-    ntreeBuilder,
     ntreeNode,
-    OPBase,
-    sSOP,
-    SOP,
 )
 
 class ExpandedBath(metaclass=abc.ABCMeta):
